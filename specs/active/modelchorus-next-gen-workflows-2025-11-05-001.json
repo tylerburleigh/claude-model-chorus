@@ -1,7 +1,7 @@
 {
   "spec_id": "modelchorus-next-gen-workflows-2025-11-05-001",
   "generated": "2025-11-05T12:00:00Z",
-  "last_updated": "2025-11-05T18:45:03.142892Z",
+  "last_updated": "2025-11-05T18:47:49.765735Z",
   "metadata": {
     "title": "ModelChorus Next-Generation Workflows",
     "description": "Extend ModelChorus with conversation infrastructure, CHAT workflow for peer consultation, and THINKDEEP workflow for deep reasoning. Strategic implementation based on multi-model consensus (Claude, Gemini, Codex).",
@@ -16,7 +16,7 @@
       "history": []
     },
     "activated_date": "2025-11-05T17:44:07.657627Z",
-    "progress_percentage": 15,
+    "progress_percentage": 17,
     "current_phase": "phase-1"
   },
   "hierarchy": {
@@ -33,7 +33,7 @@
         "phase-5"
       ],
       "total_tasks": 88,
-      "completed_tasks": 14,
+      "completed_tasks": 15,
       "metadata": {
         "objectives": [
           "Establish conversation infrastructure as foundation for all workflows",
@@ -54,7 +54,7 @@
         "phase-1-verify"
       ],
       "total_tasks": 25,
-      "completed_tasks": 14,
+      "completed_tasks": 15,
       "metadata": {
         "purpose": "Build foundational conversation threading, state management, and context preservation",
         "risk_level": "medium",
@@ -88,7 +88,7 @@
         "task-1-10"
       ],
       "total_tasks": 21,
-      "completed_tasks": 14,
+      "completed_tasks": 15,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -470,7 +470,7 @@
     "task-1-5": {
       "type": "task",
       "title": "src/modelchorus/core/base_workflow.py",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-1-files",
       "children": [
         "task-1-5-1",
@@ -484,7 +484,7 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/modelchorus/core/base_workflow.py",
         "task_category": "refactoring",
@@ -495,7 +495,7 @@
     "task-1-5-1": {
       "type": "subtask",
       "title": "Add conversation_memory parameter to BaseWorkflow",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-1-5",
       "children": [],
       "dependencies": {
@@ -504,9 +504,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "implementation_details": "Optional ConversationMemory injection"
+        "implementation_details": "Optional ConversationMemory injection",
+        "started_at": "2025-11-05T18:46:23.532552Z",
+        "completed_at": "2025-11-05T18:47:49.749184Z",
+        "needs_journaling": false,
+        "actual_hours": 0.024,
+        "journaled_at": "2025-11-05T18:47:49.761444Z"
       }
     },
     "task-1-5-2": {
@@ -2920,6 +2925,15 @@
       "content": "Successfully implemented comprehensive unit tests for StateManager class in tests/test_state.py. Created 31 tests covering all major functionality:\n\n- In-Memory Operations: 7 tests for set/get/update/delete/list operations\n- Thread-Safety: 3 tests verifying concurrent access and state isolation\n- Serialization: 6 tests for JSON serialization/deserialization and export/import\n- File Persistence: 6 tests for automatic file saving, disk loading, and sync operations\n- Edge Cases: 6 tests for error handling and edge cases\n- Integration Tests: 3 additional test classes for export/import roundtrip and process restart recovery\n\nAll 31 tests pass successfully with 86% code coverage for state.py module (166 statements, 23 missed lines are mostly error handling branches). Full test suite (76 tests total) passes with no regressions. Tests follow existing patterns from test_integration.py and use proper pytest fixtures for file operations.",
       "metadata": {},
       "task_id": "task-1-10-1"
+    },
+    {
+      "timestamp": "2025-11-05T18:47:49.761430Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add conversation_memory parameter to BaseWorkflow",
+      "author": "claude-code",
+      "content": "Successfully added optional conversation_memory parameter to BaseWorkflow class. Changes made:\n\n1. Added import: from .conversation import ConversationMemory\n2. Added parameter to __init__: conversation_memory: Optional[ConversationMemory] = None\n3. Stored as instance attribute: self.conversation_memory = conversation_memory  \n4. Updated docstrings to document the new parameter in both class-level and __init__ docstrings\n\nThe implementation is backward compatible - all 76 existing tests pass without modification. The parameter is properly typed using Optional[ConversationMemory] with a default value of None, allowing workflows to opt-in to conversation support when needed. Verified via inspect that the parameter signature and type hints are correct.",
+      "metadata": {},
+      "task_id": "task-1-5-1"
     }
   ]
 }

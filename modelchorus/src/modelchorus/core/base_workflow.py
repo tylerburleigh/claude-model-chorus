@@ -10,6 +10,8 @@ from typing import Any, Dict, List, Optional
 from dataclasses import dataclass, field
 from datetime import datetime
 
+from .conversation import ConversationMemory
+
 
 @dataclass
 class WorkflowStep:
@@ -55,9 +57,16 @@ class BaseWorkflow(ABC):
         name: Human-readable name of the workflow
         description: Brief description of what this workflow does
         config: Configuration dictionary for the workflow
+        conversation_memory: Optional ConversationMemory instance for multi-turn conversations
     """
 
-    def __init__(self, name: str, description: str, config: Optional[Dict[str, Any]] = None):
+    def __init__(
+        self,
+        name: str,
+        description: str,
+        config: Optional[Dict[str, Any]] = None,
+        conversation_memory: Optional[ConversationMemory] = None
+    ):
         """
         Initialize the base workflow.
 
@@ -65,10 +74,12 @@ class BaseWorkflow(ABC):
             name: Human-readable workflow name
             description: Brief description of the workflow
             config: Optional configuration dictionary
+            conversation_memory: Optional ConversationMemory for multi-turn conversations
         """
         self.name = name
         self.description = description
         self.config = config or {}
+        self.conversation_memory = conversation_memory
         self._result: Optional[WorkflowResult] = None
 
     @abstractmethod

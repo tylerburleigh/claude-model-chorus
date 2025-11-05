@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T18:38:27.602524Z",
+    "generated_at": "2025-11-05T18:45:21.443629Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 31,
-    "total_lines": 5670,
-    "total_classes": 37,
+    "total_files": 32,
+    "total_lines": 6352,
+    "total_classes": 40,
     "total_functions": 12,
     "avg_complexity": 2.75,
     "max_complexity": 16,
@@ -20,9 +20,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 31,
-        "lines": 5670,
-        "classes": 37,
+        "files": 32,
+        "lines": 6352,
+        "classes": 40,
         "functions": 12,
         "avg_complexity": 2.75
       }
@@ -648,6 +648,32 @@
       "lines": 187
     },
     {
+      "name": "test_state",
+      "file": "tests/test_state.py",
+      "language": "python",
+      "docstring": "Unit tests for state persistence layer.\n\nTests verify StateManager functionality including:\n- In-memory state storage and retrieval\n- Thread-safe concurrent operations\n- JSON serialization and deserialization\n- File-based persistence (when enabled)\n- Error handling and edge cases",
+      "classes": [
+        "TestStateManager",
+        "TestStateManagerExportImportRoundtrip",
+        "TestStateManagerFileRecovery"
+      ],
+      "functions": [],
+      "imports": [
+        "json",
+        "pytest",
+        "threading",
+        "time",
+        "pathlib.Path",
+        "datetime.datetime",
+        "datetime.timezone",
+        "modelchorus.core.state.StateManager",
+        "modelchorus.core.state.get_default_state_manager",
+        "modelchorus.core.models.ConversationState"
+      ],
+      "exports": [],
+      "lines": 682
+    },
+    {
       "name": "__init__",
       "file": "__init__.py",
       "language": "python",
@@ -1113,10 +1139,298 @@
           "context": [
             "get_default_state_manager"
           ]
+        },
+        {
+          "instantiator": "test_set_and_get_state",
+          "file": "tests/test_state.py",
+          "line": 32,
+          "context": [
+            "TestStateManager",
+            "test_set_and_get_state"
+          ]
+        },
+        {
+          "instantiator": "test_get_state_object_with_metadata",
+          "file": "tests/test_state.py",
+          "line": 50,
+          "context": [
+            "TestStateManager",
+            "test_get_state_object_with_metadata"
+          ]
+        },
+        {
+          "instantiator": "test_update_state_existing",
+          "file": "tests/test_state.py",
+          "line": 66,
+          "context": [
+            "TestStateManager",
+            "test_update_state_existing"
+          ]
+        },
+        {
+          "instantiator": "test_update_state_nonexistent",
+          "file": "tests/test_state.py",
+          "line": 91,
+          "context": [
+            "TestStateManager",
+            "test_update_state_nonexistent"
+          ]
+        },
+        {
+          "instantiator": "test_delete_state",
+          "file": "tests/test_state.py",
+          "line": 104,
+          "context": [
+            "TestStateManager",
+            "test_delete_state"
+          ]
+        },
+        {
+          "instantiator": "test_list_workflows",
+          "file": "tests/test_state.py",
+          "line": 120,
+          "context": [
+            "TestStateManager",
+            "test_list_workflows"
+          ]
+        },
+        {
+          "instantiator": "test_clear_all",
+          "file": "tests/test_state.py",
+          "line": 138,
+          "context": [
+            "TestStateManager",
+            "test_clear_all"
+          ]
+        },
+        {
+          "instantiator": "test_concurrent_set_state",
+          "file": "tests/test_state.py",
+          "line": 159,
+          "context": [
+            "TestStateManager",
+            "test_concurrent_set_state"
+          ]
+        },
+        {
+          "instantiator": "test_concurrent_read_write",
+          "file": "tests/test_state.py",
+          "line": 191,
+          "context": [
+            "TestStateManager",
+            "test_concurrent_read_write"
+          ]
+        },
+        {
+          "instantiator": "test_state_isolation",
+          "file": "tests/test_state.py",
+          "line": 240,
+          "context": [
+            "TestStateManager",
+            "test_state_isolation"
+          ]
+        },
+        {
+          "instantiator": "test_serialize_state",
+          "file": "tests/test_state.py",
+          "line": 265,
+          "context": [
+            "TestStateManager",
+            "test_serialize_state"
+          ]
+        },
+        {
+          "instantiator": "test_deserialize_state",
+          "file": "tests/test_state.py",
+          "line": 287,
+          "context": [
+            "TestStateManager",
+            "test_deserialize_state"
+          ]
+        },
+        {
+          "instantiator": "test_roundtrip_serialization",
+          "file": "tests/test_state.py",
+          "line": 308,
+          "context": [
+            "TestStateManager",
+            "test_roundtrip_serialization"
+          ]
+        },
+        {
+          "instantiator": "test_export_state",
+          "file": "tests/test_state.py",
+          "line": 334,
+          "context": [
+            "TestStateManager",
+            "test_export_state"
+          ]
+        },
+        {
+          "instantiator": "test_import_state",
+          "file": "tests/test_state.py",
+          "line": 353,
+          "context": [
+            "TestStateManager",
+            "test_import_state"
+          ]
+        },
+        {
+          "instantiator": "test_deserialize_invalid_json",
+          "file": "tests/test_state.py",
+          "line": 380,
+          "context": [
+            "TestStateManager",
+            "test_deserialize_invalid_json"
+          ]
+        },
+        {
+          "instantiator": "test_file_persistence_on_set",
+          "file": "tests/test_state.py",
+          "line": 394,
+          "context": [
+            "TestStateManager",
+            "test_file_persistence_on_set"
+          ]
+        },
+        {
+          "instantiator": "test_load_from_disk",
+          "file": "tests/test_state.py",
+          "line": 426,
+          "context": [
+            "TestStateManager",
+            "test_load_from_disk"
+          ]
+        },
+        {
+          "instantiator": "test_load_all_from_disk",
+          "file": "tests/test_state.py",
+          "line": 455,
+          "context": [
+            "TestStateManager",
+            "test_load_all_from_disk"
+          ]
+        },
+        {
+          "instantiator": "test_sync_to_disk",
+          "file": "tests/test_state.py",
+          "line": 470,
+          "context": [
+            "TestStateManager",
+            "test_sync_to_disk"
+          ]
+        },
+        {
+          "instantiator": "test_delete_removes_file",
+          "file": "tests/test_state.py",
+          "line": 492,
+          "context": [
+            "TestStateManager",
+            "test_delete_removes_file"
+          ]
+        },
+        {
+          "instantiator": "test_persistence_disabled_no_files",
+          "file": "tests/test_state.py",
+          "line": 508,
+          "context": [
+            "TestStateManager",
+            "test_persistence_disabled_no_files"
+          ]
+        },
+        {
+          "instantiator": "test_get_nonexistent_workflow",
+          "file": "tests/test_state.py",
+          "line": 526,
+          "context": [
+            "TestStateManager",
+            "test_get_nonexistent_workflow"
+          ]
+        },
+        {
+          "instantiator": "test_delete_nonexistent_workflow",
+          "file": "tests/test_state.py",
+          "line": 533,
+          "context": [
+            "TestStateManager",
+            "test_delete_nonexistent_workflow"
+          ]
+        },
+        {
+          "instantiator": "test_serialize_nonexistent",
+          "file": "tests/test_state.py",
+          "line": 540,
+          "context": [
+            "TestStateManager",
+            "test_serialize_nonexistent"
+          ]
+        },
+        {
+          "instantiator": "test_import_malformed_json",
+          "file": "tests/test_state.py",
+          "line": 547,
+          "context": [
+            "TestStateManager",
+            "test_import_malformed_json"
+          ]
+        },
+        {
+          "instantiator": "test_state_timestamps_update",
+          "file": "tests/test_state.py",
+          "line": 557,
+          "context": [
+            "TestStateManager",
+            "test_state_timestamps_update"
+          ]
+        },
+        {
+          "instantiator": "test_schema_version_preservation",
+          "file": "tests/test_state.py",
+          "line": 579,
+          "context": [
+            "TestStateManager",
+            "test_schema_version_preservation"
+          ]
+        },
+        {
+          "instantiator": "test_export_import_roundtrip",
+          "file": "tests/test_state.py",
+          "line": 615,
+          "context": [
+            "TestStateManagerExportImportRoundtrip",
+            "test_export_import_roundtrip"
+          ]
+        },
+        {
+          "instantiator": "test_export_import_roundtrip",
+          "file": "tests/test_state.py",
+          "line": 633,
+          "context": [
+            "TestStateManagerExportImportRoundtrip",
+            "test_export_import_roundtrip"
+          ]
+        },
+        {
+          "instantiator": "test_process_restart_recovery",
+          "file": "tests/test_state.py",
+          "line": 655,
+          "context": [
+            "TestStateManagerFileRecovery",
+            "test_process_restart_recovery"
+          ]
+        },
+        {
+          "instantiator": "test_process_restart_recovery",
+          "file": "tests/test_state.py",
+          "line": 665,
+          "context": [
+            "TestStateManagerFileRecovery",
+            "test_process_restart_recovery"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 1
+      "instantiation_count": 33
     },
     {
       "name": "ModelCapability",
@@ -2501,6 +2815,82 @@
       "imported_by": []
     },
     {
+      "name": "TestStateManager",
+      "file": "tests/test_state.py",
+      "line": 23,
+      "language": "python",
+      "docstring": "Test suite for StateManager class.",
+      "bases": [],
+      "methods": [
+        "test_set_and_get_state",
+        "test_get_state_object_with_metadata",
+        "test_update_state_existing",
+        "test_update_state_nonexistent",
+        "test_delete_state",
+        "test_list_workflows",
+        "test_clear_all",
+        "test_concurrent_set_state",
+        "test_concurrent_read_write",
+        "test_state_isolation",
+        "test_serialize_state",
+        "test_deserialize_state",
+        "test_roundtrip_serialization",
+        "test_export_state",
+        "test_import_state",
+        "test_deserialize_invalid_json",
+        "test_file_persistence_on_set",
+        "test_load_from_disk",
+        "test_load_all_from_disk",
+        "test_sync_to_disk",
+        "test_delete_removes_file",
+        "test_persistence_disabled_no_files",
+        "test_get_nonexistent_workflow",
+        "test_delete_nonexistent_workflow",
+        "test_serialize_nonexistent",
+        "test_import_malformed_json",
+        "test_state_timestamps_update",
+        "test_schema_version_preservation",
+        "test_get_default_state_manager"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestStateManagerExportImportRoundtrip",
+      "file": "tests/test_state.py",
+      "line": 609,
+      "language": "python",
+      "docstring": "Test complete export/import workflow.",
+      "bases": [],
+      "methods": [
+        "test_export_import_roundtrip"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestStateManagerFileRecovery",
+      "file": "tests/test_state.py",
+      "line": 647,
+      "language": "python",
+      "docstring": "Test state recovery after simulated process restart.",
+      "bases": [],
+      "methods": [
+        "test_process_restart_recovery"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
       "name": "TestCLIProvidersImplementInterface",
       "file": "test_cli_interface.py",
       "line": 27,
@@ -3641,8 +4031,22 @@
       "is_async": false,
       "is_exported": false,
       "is_public": true,
-      "callers": [],
-      "calls": []
+      "callers": [
+        {
+          "name": "test_get_default_state_manager",
+          "file": "tests/test_state.py",
+          "line": 596,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_get_default_state_manager",
+          "file": "tests/test_state.py",
+          "line": 597,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [],
+      "call_count": 2
     },
     {
       "name": "mock_claude_response",
@@ -3980,6 +4384,18 @@
       "modelchorus.providers.base_provider.GenerationRequest",
       "modelchorus.providers.claude_provider.ClaudeProvider",
       "modelchorus.providers.codex_provider.CodexProvider"
+    ],
+    "tests/test_state.py": [
+      "json",
+      "pytest",
+      "threading",
+      "time",
+      "pathlib.Path",
+      "datetime.datetime",
+      "datetime.timezone",
+      "modelchorus.core.state.StateManager",
+      "modelchorus.core.state.get_default_state_manager",
+      "modelchorus.core.models.ConversationState"
     ],
     "test_cli_interface.py": [
       "sys",

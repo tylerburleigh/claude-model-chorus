@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 13:38:27
+**Generated:** 2025-11-05 13:45:21
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 31
-- **Total Lines:** 5670
-- **Total Classes:** 37
+- **Total Files:** 32
+- **Total Lines:** 6352
+- **Total Classes:** 40
 - **Total Functions:** 12
 - **Avg Complexity:** 2.75
 - **Max Complexity:** 16
@@ -785,6 +785,73 @@ Attributes:
 
 ---
 
+### `TestStateManager`
+
+**Language:** python
+**Defined in:** `tests/test_state.py:23`
+
+**Description:**
+> Test suite for StateManager class.
+
+**Methods:**
+- `test_set_and_get_state()`
+- `test_get_state_object_with_metadata()`
+- `test_update_state_existing()`
+- `test_update_state_nonexistent()`
+- `test_delete_state()`
+- `test_list_workflows()`
+- `test_clear_all()`
+- `test_concurrent_set_state()`
+- `test_concurrent_read_write()`
+- `test_state_isolation()`
+- `test_serialize_state()`
+- `test_deserialize_state()`
+- `test_roundtrip_serialization()`
+- `test_export_state()`
+- `test_import_state()`
+- `test_deserialize_invalid_json()`
+- `test_file_persistence_on_set()`
+- `test_load_from_disk()`
+- `test_load_all_from_disk()`
+- `test_sync_to_disk()`
+- `test_delete_removes_file()`
+- `test_persistence_disabled_no_files()`
+- `test_get_nonexistent_workflow()`
+- `test_delete_nonexistent_workflow()`
+- `test_serialize_nonexistent()`
+- `test_import_malformed_json()`
+- `test_state_timestamps_update()`
+- `test_schema_version_preservation()`
+- `test_get_default_state_manager()`
+
+---
+
+### `TestStateManagerExportImportRoundtrip`
+
+**Language:** python
+**Defined in:** `tests/test_state.py:609`
+
+**Description:**
+> Test complete export/import workflow.
+
+**Methods:**
+- `test_export_import_roundtrip()`
+
+---
+
+### `TestStateManagerFileRecovery`
+
+**Language:** python
+**Defined in:** `tests/test_state.py:647`
+
+**Description:**
+> Test state recovery after simulated process restart.
+
+**Methods:**
+- `test_process_restart_recovery()`
+
+---
+
 ### `WorkflowRegistry`
 
 **Language:** python
@@ -1390,3 +1457,16 @@ Example:
 - `pytest`
 - `unittest.mock.AsyncMock`
 - `unittest.mock.patch`
+
+### `tests/test_state.py`
+
+- `datetime.datetime`
+- `datetime.timezone`
+- `json`
+- `modelchorus.core.models.ConversationState`
+- `modelchorus.core.state.StateManager`
+- `modelchorus.core.state.get_default_state_manager`
+- `pathlib.Path`
+- `pytest`
+- `threading`
+- `time`
