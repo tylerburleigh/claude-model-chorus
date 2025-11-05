@@ -2,18 +2,18 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T21:17:27.823289Z",
+    "generated_at": "2025-11-05T21:22:03.364264Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 34,
-    "total_lines": 7320,
+    "total_files": 35,
+    "total_lines": 7536,
     "total_classes": 42,
-    "total_functions": 13,
-    "avg_complexity": 4.0,
+    "total_functions": 18,
+    "avg_complexity": 3.67,
     "max_complexity": 19,
     "high_complexity_functions": [
       "chat (19)",
@@ -21,11 +21,11 @@
     ],
     "by_language": {
       "python": {
-        "files": 34,
-        "lines": 7320,
+        "files": 35,
+        "lines": 7536,
         "classes": 42,
-        "functions": 13,
-        "avg_complexity": 4.0
+        "functions": 18,
+        "avg_complexity": 3.67
       }
     }
   },
@@ -50,6 +50,29 @@
       ],
       "exports": [],
       "lines": 105
+    },
+    {
+      "name": "chat_example",
+      "file": "examples/chat_example.py",
+      "language": "python",
+      "docstring": "Multi-turn conversation example using ChatWorkflow.\n\nThis example demonstrates how to:\n1. Create a new conversation\n2. Continue an existing conversation\n3. Include file context in conversations\n4. Track conversation history",
+      "classes": [],
+      "functions": [
+        "basic_chat_example",
+        "multi_turn_conversation_example",
+        "chat_with_file_context_example",
+        "conversation_tracking_example",
+        "main"
+      ],
+      "imports": [
+        "asyncio",
+        "pathlib.Path",
+        "modelchorus.providers.ClaudeProvider",
+        "modelchorus.workflows.ChatWorkflow",
+        "modelchorus.core.conversation.ConversationMemory"
+      ],
+      "exports": [],
+      "lines": 216
     },
     {
       "name": "provider_integration",
@@ -948,6 +971,38 @@
       "is_public": true,
       "instantiated_by": [
         {
+          "instantiator": "basic_chat_example",
+          "file": "examples/chat_example.py",
+          "line": 27,
+          "context": [
+            "basic_chat_example"
+          ]
+        },
+        {
+          "instantiator": "multi_turn_conversation_example",
+          "file": "examples/chat_example.py",
+          "line": 56,
+          "context": [
+            "multi_turn_conversation_example"
+          ]
+        },
+        {
+          "instantiator": "chat_with_file_context_example",
+          "file": "examples/chat_example.py",
+          "line": 127,
+          "context": [
+            "chat_with_file_context_example"
+          ]
+        },
+        {
+          "instantiator": "conversation_tracking_example",
+          "file": "examples/chat_example.py",
+          "line": 160,
+          "context": [
+            "conversation_tracking_example"
+          ]
+        },
+        {
           "instantiator": "chat",
           "file": "src/modelchorus/cli/main.py",
           "line": 131,
@@ -1074,7 +1129,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 14
+      "instantiation_count": 18
     },
     {
       "name": "WorkflowRequest",
@@ -2193,6 +2248,38 @@
       "is_public": true,
       "instantiated_by": [
         {
+          "instantiator": "basic_chat_example",
+          "file": "examples/chat_example.py",
+          "line": 26,
+          "context": [
+            "basic_chat_example"
+          ]
+        },
+        {
+          "instantiator": "multi_turn_conversation_example",
+          "file": "examples/chat_example.py",
+          "line": 55,
+          "context": [
+            "multi_turn_conversation_example"
+          ]
+        },
+        {
+          "instantiator": "chat_with_file_context_example",
+          "file": "examples/chat_example.py",
+          "line": 126,
+          "context": [
+            "chat_with_file_context_example"
+          ]
+        },
+        {
+          "instantiator": "conversation_tracking_example",
+          "file": "examples/chat_example.py",
+          "line": 159,
+          "context": [
+            "conversation_tracking_example"
+          ]
+        },
+        {
           "instantiator": "list_providers",
           "file": "src/modelchorus/cli/main.py",
           "line": 420,
@@ -2373,7 +2460,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 20
+      "instantiation_count": 24
     },
     {
       "name": "CLIProvider",
@@ -2713,6 +2800,38 @@
       "is_public": true,
       "instantiated_by": [
         {
+          "instantiator": "basic_chat_example",
+          "file": "examples/chat_example.py",
+          "line": 30,
+          "context": [
+            "basic_chat_example"
+          ]
+        },
+        {
+          "instantiator": "multi_turn_conversation_example",
+          "file": "examples/chat_example.py",
+          "line": 59,
+          "context": [
+            "multi_turn_conversation_example"
+          ]
+        },
+        {
+          "instantiator": "chat_with_file_context_example",
+          "file": "examples/chat_example.py",
+          "line": 130,
+          "context": [
+            "chat_with_file_context_example"
+          ]
+        },
+        {
+          "instantiator": "conversation_tracking_example",
+          "file": "examples/chat_example.py",
+          "line": 163,
+          "context": [
+            "conversation_tracking_example"
+          ]
+        },
+        {
           "instantiator": "chat",
           "file": "src/modelchorus/cli/main.py",
           "line": 134,
@@ -2722,7 +2841,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 1
+      "instantiation_count": 5
     },
     {
       "name": "ConsensusStrategy",
@@ -3219,6 +3338,12 @@
         },
         {
           "name": "<module>",
+          "file": "examples/chat_example.py",
+          "line": 216,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
           "file": "examples/provider_integration.py",
           "line": 157,
           "call_type": "function_call"
@@ -3358,7 +3483,504 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 3
+      "call_count": 4
+    },
+    {
+      "name": "basic_chat_example",
+      "file": "examples/chat_example.py",
+      "line": 19,
+      "language": "python",
+      "docstring": "Basic chat conversation without continuation.",
+      "parameters": [],
+      "return_type": null,
+      "complexity": 2,
+      "decorators": [],
+      "is_async": true,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "main",
+          "file": "examples/chat_example.py",
+          "line": 199,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 21,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 22,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 23,
+          "call_type": "function_call"
+        },
+        {
+          "name": "run",
+          "file": "unknown",
+          "line": 36,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 42,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 43,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 45,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "multi_turn_conversation_example",
+      "file": "examples/chat_example.py",
+      "line": 48,
+      "language": "python",
+      "docstring": "Multi-turn conversation with continuation.",
+      "parameters": [],
+      "return_type": null,
+      "complexity": 4,
+      "decorators": [],
+      "is_async": true,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "main",
+          "file": "examples/chat_example.py",
+          "line": 202,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 50,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 51,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 52,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 65,
+          "call_type": "function_call"
+        },
+        {
+          "name": "run",
+          "file": "unknown",
+          "line": 66,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 72,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 76,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 77,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 80,
+          "call_type": "function_call"
+        },
+        {
+          "name": "run",
+          "file": "unknown",
+          "line": 81,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 88,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 89,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 90,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 93,
+          "call_type": "function_call"
+        },
+        {
+          "name": "run",
+          "file": "unknown",
+          "line": 94,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 101,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 102,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 103,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "chat_with_file_context_example",
+      "file": "examples/chat_example.py",
+      "line": 106,
+      "language": "python",
+      "docstring": "Chat with file context included.",
+      "parameters": [],
+      "return_type": null,
+      "complexity": 2,
+      "decorators": [],
+      "is_async": true,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "main",
+          "file": "examples/chat_example.py",
+          "line": 205,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 108,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 109,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 110,
+          "call_type": "function_call"
+        },
+        {
+          "name": "write_text",
+          "file": "unknown",
+          "line": 114,
+          "call_type": "method_call"
+        },
+        {
+          "name": "run",
+          "file": "unknown",
+          "line": 136,
+          "call_type": "method_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 138,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 143,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 144,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 146,
+          "call_type": "function_call"
+        },
+        {
+          "name": "unlink",
+          "file": "unknown",
+          "line": 149,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "conversation_tracking_example",
+      "file": "examples/chat_example.py",
+      "line": 152,
+      "language": "python",
+      "docstring": "Demonstrate conversation history tracking.",
+      "parameters": [],
+      "return_type": null,
+      "complexity": 5,
+      "decorators": [],
+      "is_async": true,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "main",
+          "file": "examples/chat_example.py",
+          "line": 208,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 154,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 155,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 156,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 169,
+          "call_type": "function_call"
+        },
+        {
+          "name": "run",
+          "file": "unknown",
+          "line": 170,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 175,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get_thread",
+          "file": "unknown",
+          "line": 181,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 183,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 184,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 185,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 185,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 186,
+          "call_type": "function_call"
+        },
+        {
+          "name": "enumerate",
+          "file": "unknown",
+          "line": 189,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 190,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 191,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 193,
+          "call_type": "function_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 193,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "main",
+      "file": "examples/chat_example.py",
+      "line": 196,
+      "language": "python",
+      "docstring": "Run all examples.",
+      "parameters": [],
+      "return_type": null,
+      "complexity": 1,
+      "decorators": [],
+      "is_async": true,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "<module>",
+          "file": "examples/basic_workflow.py",
+          "line": 105,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "examples/chat_example.py",
+          "line": 216,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "examples/provider_integration.py",
+          "line": 157,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "src/modelchorus/cli/main.py",
+          "line": 461,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "basic_chat_example",
+          "file": "unknown",
+          "line": 199,
+          "call_type": "function_call"
+        },
+        {
+          "name": "multi_turn_conversation_example",
+          "file": "unknown",
+          "line": 202,
+          "call_type": "function_call"
+        },
+        {
+          "name": "chat_with_file_context_example",
+          "file": "unknown",
+          "line": 205,
+          "call_type": "function_call"
+        },
+        {
+          "name": "conversation_tracking_example",
+          "file": "unknown",
+          "line": 208,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 210,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 211,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 212,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 4
     },
     {
       "name": "main",
@@ -3378,6 +4000,12 @@
           "name": "<module>",
           "file": "examples/basic_workflow.py",
           "line": 105,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "examples/chat_example.py",
+          "line": 216,
           "call_type": "function_call"
         },
         {
@@ -3593,7 +4221,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 3
+      "call_count": 4
     },
     {
       "name": "get_provider_by_name",
@@ -4674,6 +5302,12 @@
         },
         {
           "name": "<module>",
+          "file": "examples/chat_example.py",
+          "line": 216,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
           "file": "examples/provider_integration.py",
           "line": 157,
           "call_type": "function_call"
@@ -4693,7 +5327,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 3
+      "call_count": 4
     },
     {
       "name": "get_default_state_manager",
@@ -4805,6 +5439,13 @@
       "modelchorus.core.WorkflowResult",
       "modelchorus.core.WorkflowRegistry",
       "modelchorus.core.WorkflowRequest"
+    ],
+    "examples/chat_example.py": [
+      "asyncio",
+      "pathlib.Path",
+      "modelchorus.providers.ClaudeProvider",
+      "modelchorus.workflows.ChatWorkflow",
+      "modelchorus.core.conversation.ConversationMemory"
     ],
     "examples/provider_integration.py": [
       "asyncio",

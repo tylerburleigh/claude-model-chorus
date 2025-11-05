@@ -151,8 +151,17 @@ class ChatWorkflow(BaseWorkflow):
             f"files: {len(files) if files else 0}"
         )
 
-        # Generate thread ID if not provided
-        thread_id = continuation_id or str(uuid.uuid4())
+        # Generate or use thread ID
+        if continuation_id:
+            thread_id = continuation_id
+        else:
+            # Create new thread if conversation memory available
+            if self.conversation_memory:
+                thread_id = self.conversation_memory.create_thread(
+                    workflow_name=self.name
+                )
+            else:
+                thread_id = str(uuid.uuid4())
 
         # Initialize result
         result = WorkflowResult(success=False)
@@ -286,8 +295,14 @@ class ChatWorkflow(BaseWorkflow):
                 if msg.files:
                     context_parts.append(f"  [Referenced files: {', '.join(msg.files)}]\n")
 
-        # Add current user prompt
-        context_parts.append(f"\nUSER: {prompt}")
+            # Add current user prompt with USER: prefix when there's history
+            context_parts.append(f"\nUSER: {prompt}")
+        else:
+            # No history - just add prompt (with file context if any)
+            if context_parts:
+                context_parts.append(f"\n{prompt}")
+            else:
+                return prompt
 
         full_prompt = "\n".join(context_parts)
 

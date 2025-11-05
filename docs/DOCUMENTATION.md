@@ -1,17 +1,17 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 16:17:27
+**Generated:** 2025-11-05 16:22:03
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 34
-- **Total Lines:** 7320
+- **Total Files:** 35
+- **Total Lines:** 7536
 - **Total Classes:** 42
-- **Total Functions:** 13
-- **Avg Complexity:** 4.0
+- **Total Functions:** 18
+- **Avg Complexity:** 3.67
 - **Max Complexity:** 19
 - **High Complexity Functions:**
   - chat (19)
@@ -1080,6 +1080,17 @@ Attributes:
 
 ## ⚡ Functions
 
+### `async basic_chat_example() -> None`
+
+**Language:** python
+**Defined in:** `examples/chat_example.py:19`
+**Complexity:** 2
+
+**Description:**
+> Basic chat conversation without continuation.
+
+---
+
 ### `chat(prompt, provider, continuation_id, files, system, temperature, max_tokens, output, verbose) -> None`
 
 **Language:** python
@@ -1114,6 +1125,17 @@ Example:
 
 ---
 
+### `async chat_with_file_context_example() -> None`
+
+**Language:** python
+**Defined in:** `examples/chat_example.py:106`
+**Complexity:** 2
+
+**Description:**
+> Chat with file context included.
+
+---
+
 ### `consensus(prompt, providers, strategy, system, temperature, max_tokens, timeout, output, verbose) -> None`
 
 **Language:** python
@@ -1138,6 +1160,17 @@ Example:
 - `timeout`: float
 - `output`: Optional[Path]
 - `verbose`: bool
+
+---
+
+### `async conversation_tracking_example() -> None`
+
+**Language:** python
+**Defined in:** `examples/chat_example.py:152`
+**Complexity:** 5
+
+**Description:**
+> Demonstrate conversation history tracking.
 
 ---
 
@@ -1195,6 +1228,17 @@ Example:
 
 **Description:**
 > Main entry point for the example.
+
+---
+
+### `async main() -> None`
+
+**Language:** python
+**Defined in:** `examples/chat_example.py:196`
+**Complexity:** 1
+
+**Description:**
+> Run all examples.
 
 ---
 
@@ -1259,6 +1303,17 @@ Example:
 
 ---
 
+### `async multi_turn_conversation_example() -> None`
+
+**Language:** python
+**Defined in:** `examples/chat_example.py:48`
+**Complexity:** 4
+
+**Description:**
+> Multi-turn conversation with continuation.
+
+---
+
 ### `sample_generation_request() -> None`
 
 **Language:** python
@@ -1295,6 +1350,14 @@ Example:
 - `modelchorus.core.WorkflowRegistry`
 - `modelchorus.core.WorkflowRequest`
 - `modelchorus.core.WorkflowResult`
+
+### `examples/chat_example.py`
+
+- `asyncio`
+- `modelchorus.core.conversation.ConversationMemory`
+- `modelchorus.providers.ClaudeProvider`
+- `modelchorus.workflows.ChatWorkflow`
+- `pathlib.Path`
 
 ### `examples/provider_integration.py`
 
