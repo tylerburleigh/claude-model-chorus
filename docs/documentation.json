@@ -1,0 +1,3653 @@
+{
+  "metadata": {
+    "project_name": "claude-model-chorus",
+    "version": "1.0.0",
+    "generated_at": "2025-11-05T16:32:23.906695Z",
+    "languages": [
+      "python"
+    ],
+    "schema_version": "2.0"
+  },
+  "statistics": {
+    "total_files": 28,
+    "total_lines": 4048,
+    "total_classes": 31,
+    "total_functions": 11,
+    "avg_complexity": 2.82,
+    "max_complexity": 16,
+    "high_complexity_functions": [
+      "consensus (16)"
+    ],
+    "by_language": {
+      "python": {
+        "files": 28,
+        "lines": 4048,
+        "classes": 31,
+        "functions": 11,
+        "avg_complexity": 2.82
+      }
+    }
+  },
+  "modules": [
+    {
+      "name": "basic_workflow",
+      "file": "modelchorus/examples/basic_workflow.py",
+      "language": "python",
+      "docstring": "Basic workflow example for ModelChorus.\n\nThis example demonstrates how to create and execute a simple workflow\nusing the ModelChorus framework.",
+      "classes": [
+        "ExampleWorkflow"
+      ],
+      "functions": [
+        "main"
+      ],
+      "imports": [
+        "asyncio",
+        "modelchorus.core.BaseWorkflow",
+        "modelchorus.core.WorkflowResult",
+        "modelchorus.core.WorkflowRegistry",
+        "modelchorus.core.WorkflowRequest"
+      ],
+      "exports": [],
+      "lines": 105
+    },
+    {
+      "name": "provider_integration",
+      "file": "modelchorus/examples/provider_integration.py",
+      "language": "python",
+      "docstring": "Provider integration example for ModelChorus.\n\nThis example demonstrates how to integrate and use different AI providers\nwith ModelChorus.",
+      "classes": [
+        "ExampleProvider"
+      ],
+      "functions": [
+        "main"
+      ],
+      "imports": [
+        "asyncio",
+        "modelchorus.providers.ModelProvider",
+        "modelchorus.providers.ModelConfig",
+        "modelchorus.providers.ModelCapability",
+        "modelchorus.providers.GenerationRequest",
+        "modelchorus.providers.GenerationResponse"
+      ],
+      "exports": [],
+      "lines": 157
+    },
+    {
+      "name": "__init__",
+      "file": "modelchorus/src/modelchorus/__init__.py",
+      "language": "python",
+      "docstring": "ModelChorus - Standalone Multi-Model Workflow Package\n\nA flexible orchestration engine for multi-model AI workflows including\nthinking, debugging, consensus building, code review, and more.",
+      "classes": [],
+      "functions": [],
+      "imports": [],
+      "exports": [],
+      "lines": 12
+    },
+    {
+      "name": "__init__",
+      "file": "modelchorus/src/modelchorus/cli/__init__.py",
+      "language": "python",
+      "docstring": "Command-line interface for ModelChorus.\n\nThis module provides CLI commands for running workflows and\nmanaging ModelChorus operations.",
+      "classes": [],
+      "functions": [],
+      "imports": [
+        "main.app",
+        "main.main"
+      ],
+      "exports": [],
+      "lines": 10
+    },
+    {
+      "name": "main",
+      "file": "modelchorus/src/modelchorus/cli/main.py",
+      "language": "python",
+      "docstring": "CLI interface for ModelChorus.\n\nTyper-based command-line application for running multi-model workflows.",
+      "classes": [],
+      "functions": [
+        "get_provider_by_name",
+        "consensus",
+        "list_providers",
+        "version",
+        "main"
+      ],
+      "imports": [
+        "asyncio",
+        "json",
+        "sys",
+        "pathlib.Path",
+        "typing.List",
+        "typing.Optional",
+        "typer",
+        "rich.console.Console",
+        "rich.table.Table",
+        "rich.print",
+        "providers.ClaudeProvider",
+        "providers.CodexProvider",
+        "providers.GeminiProvider",
+        "providers.CursorAgentProvider",
+        "providers.GenerationRequest",
+        "workflows.ConsensusWorkflow",
+        "workflows.ConsensusStrategy"
+      ],
+      "exports": [],
+      "lines": 283
+    },
+    {
+      "name": "__init__",
+      "file": "modelchorus/src/modelchorus/core/__init__.py",
+      "language": "python",
+      "docstring": "Core orchestration logic for ModelChorus workflows.\n\nThis module contains the main workflow engine and model orchestration\ncomponents that power multi-model AI workflows.",
+      "classes": [],
+      "functions": [],
+      "imports": [
+        "base_workflow.BaseWorkflow",
+        "base_workflow.WorkflowResult",
+        "base_workflow.WorkflowStep",
+        "registry.WorkflowRegistry",
+        "models.WorkflowRequest",
+        "models.WorkflowResponse",
+        "models.ModelSelection",
+        "models.WorkflowStep",
+        "models.ModelResponse",
+        "models.ConsensusConfig"
+      ],
+      "exports": [],
+      "lines": 30
+    },
+    {
+      "name": "base_workflow",
+      "file": "modelchorus/src/modelchorus/core/base_workflow.py",
+      "language": "python",
+      "docstring": "Base workflow abstract class for ModelChorus.\n\nThis module defines the abstract base class that all workflow implementations\nmust inherit from, providing a consistent interface for multi-model orchestration.",
+      "classes": [
+        "WorkflowStep",
+        "WorkflowResult",
+        "BaseWorkflow"
+      ],
+      "functions": [],
+      "imports": [
+        "abc.ABC",
+        "abc.abstractmethod",
+        "typing.Any",
+        "typing.Dict",
+        "typing.List",
+        "typing.Optional",
+        "dataclasses.dataclass",
+        "dataclasses.field",
+        "datetime.datetime"
+      ],
+      "exports": [],
+      "lines": 142
+    },
+    {
+      "name": "models",
+      "file": "modelchorus/src/modelchorus/core/models.py",
+      "language": "python",
+      "docstring": "Pydantic models for ModelChorus workflow requests and responses.\n\nThis module defines the data models used for workflow communication,\nproviding validation and serialization for workflow inputs and outputs.",
+      "classes": [
+        "WorkflowRequest",
+        "WorkflowResponse",
+        "ModelSelection",
+        "WorkflowStep",
+        "ModelResponse",
+        "ConsensusConfig"
+      ],
+      "functions": [],
+      "imports": [
+        "typing.Any",
+        "typing.Dict",
+        "typing.List",
+        "typing.Optional",
+        "pydantic.BaseModel",
+        "pydantic.Field",
+        "pydantic.ConfigDict"
+      ],
+      "exports": [],
+      "lines": 367
+    },
+    {
+      "name": "registry",
+      "file": "modelchorus/src/modelchorus/core/registry.py",
+      "language": "python",
+      "docstring": "Workflow registry for ModelChorus plugin system.\n\nThis module provides a registry for dynamically registering and loading\nworkflow implementations, enabling a flexible plugin architecture.",
+      "classes": [
+        "WorkflowRegistry"
+      ],
+      "functions": [],
+      "imports": [
+        "typing.Dict",
+        "typing.Type",
+        "typing.Optional",
+        "typing.Callable",
+        "inspect",
+        "base_workflow.BaseWorkflow"
+      ],
+      "exports": [],
+      "lines": 220
+    },
+    {
+      "name": "__init__",
+      "file": "modelchorus/src/modelchorus/providers/__init__.py",
+      "language": "python",
+      "docstring": "Provider integrations for ModelChorus.\n\nThis module contains abstractions and implementations for different\nAI model providers via CLI tools.",
+      "classes": [],
+      "functions": [],
+      "imports": [
+        "base_provider.ModelProvider",
+        "base_provider.ModelConfig",
+        "base_provider.ModelCapability",
+        "base_provider.GenerationRequest",
+        "base_provider.GenerationResponse",
+        "cli_provider.CLIProvider",
+        "claude_provider.ClaudeProvider",
+        "codex_provider.CodexProvider",
+        "gemini_provider.GeminiProvider",
+        "cursor_agent_provider.CursorAgentProvider"
+      ],
+      "exports": [],
+      "lines": 32
+    },
+    {
+      "name": "base_provider",
+      "file": "modelchorus/src/modelchorus/providers/base_provider.py",
+      "language": "python",
+      "docstring": "Base provider abstract class for ModelChorus.\n\nThis module defines the abstract base class that all model provider implementations\nmust inherit from, providing a consistent interface for different AI providers\n(Anthropic, OpenAI, Google, etc.).",
+      "classes": [
+        "ModelCapability",
+        "ModelConfig",
+        "GenerationRequest",
+        "GenerationResponse",
+        "ModelProvider"
+      ],
+      "functions": [],
+      "imports": [
+        "abc.ABC",
+        "abc.abstractmethod",
+        "typing.Any",
+        "typing.Dict",
+        "typing.List",
+        "typing.Optional",
+        "dataclasses.dataclass",
+        "dataclasses.field",
+        "enum.Enum"
+      ],
+      "exports": [],
+      "lines": 174
+    },
+    {
+      "name": "claude_provider",
+      "file": "modelchorus/src/modelchorus/providers/claude_provider.py",
+      "language": "python",
+      "docstring": "Claude CLI provider for ModelChorus.\n\nThis module provides integration with Anthropic's Claude models via the `claude` CLI tool.",
+      "classes": [
+        "ClaudeProvider"
+      ],
+      "functions": [],
+      "imports": [
+        "json",
+        "logging",
+        "typing.Any",
+        "typing.Dict",
+        "typing.List",
+        "typing.Optional",
+        "cli_provider.CLIProvider",
+        "base_provider.GenerationRequest",
+        "base_provider.GenerationResponse",
+        "base_provider.ModelConfig",
+        "base_provider.ModelCapability"
+      ],
+      "exports": [],
+      "lines": 246
+    },
+    {
+      "name": "cli_provider",
+      "file": "modelchorus/src/modelchorus/providers/cli_provider.py",
+      "language": "python",
+      "docstring": "CLI-based provider for ModelChorus.\n\nThis module provides the base class for providers that interact with AI models\nvia command-line interface tools (e.g., claude CLI, gemini CLI, codex CLI).",
+      "classes": [
+        "CLIProvider"
+      ],
+      "functions": [],
+      "imports": [
+        "asyncio",
+        "json",
+        "logging",
+        "abc.abstractmethod",
+        "typing.Any",
+        "typing.Dict",
+        "typing.List",
+        "typing.Optional",
+        "base_provider.ModelProvider",
+        "base_provider.GenerationRequest",
+        "base_provider.GenerationResponse"
+      ],
+      "exports": [],
+      "lines": 228
+    },
+    {
+      "name": "codex_provider",
+      "file": "modelchorus/src/modelchorus/providers/codex_provider.py",
+      "language": "python",
+      "docstring": "Codex CLI provider for ModelChorus.\n\nThis module provides integration with OpenAI's Codex models via the `codex` CLI tool.",
+      "classes": [
+        "CodexProvider"
+      ],
+      "functions": [],
+      "imports": [
+        "json",
+        "logging",
+        "typing.Any",
+        "typing.Dict",
+        "typing.List",
+        "typing.Optional",
+        "cli_provider.CLIProvider",
+        "base_provider.GenerationRequest",
+        "base_provider.GenerationResponse",
+        "base_provider.ModelConfig",
+        "base_provider.ModelCapability"
+      ],
+      "exports": [],
+      "lines": 250
+    },
+    {
+      "name": "cursor_agent_provider",
+      "file": "modelchorus/src/modelchorus/providers/cursor_agent_provider.py",
+      "language": "python",
+      "docstring": "Cursor Agent CLI provider for ModelChorus.\n\nThis module provides integration with Cursor's AI agent via the `cursor-agent` CLI tool.",
+      "classes": [
+        "CursorAgentProvider"
+      ],
+      "functions": [],
+      "imports": [
+        "json",
+        "logging",
+        "typing.Any",
+        "typing.Dict",
+        "typing.List",
+        "typing.Optional",
+        "cli_provider.CLIProvider",
+        "base_provider.GenerationRequest",
+        "base_provider.GenerationResponse",
+        "base_provider.ModelConfig",
+        "base_provider.ModelCapability"
+      ],
+      "exports": [],
+      "lines": 240
+    },
+    {
+      "name": "gemini_provider",
+      "file": "modelchorus/src/modelchorus/providers/gemini_provider.py",
+      "language": "python",
+      "docstring": "Gemini CLI provider for ModelChorus.\n\nThis module provides integration with Google's Gemini models via the `gemini` CLI tool.",
+      "classes": [
+        "GeminiProvider"
+      ],
+      "functions": [],
+      "imports": [
+        "json",
+        "logging",
+        "typing.Any",
+        "typing.Dict",
+        "typing.List",
+        "typing.Optional",
+        "cli_provider.CLIProvider",
+        "base_provider.GenerationRequest",
+        "base_provider.GenerationResponse",
+        "base_provider.ModelConfig",
+        "base_provider.ModelCapability"
+      ],
+      "exports": [],
+      "lines": 247
+    },
+    {
+      "name": "__init__",
+      "file": "modelchorus/src/modelchorus/utils/__init__.py",
+      "language": "python",
+      "docstring": "Utility functions and helpers for ModelChorus.\n\nThis module contains shared utilities, helpers, and common functions\nused across the ModelChorus package.",
+      "classes": [],
+      "functions": [],
+      "imports": [],
+      "exports": [],
+      "lines": 8
+    },
+    {
+      "name": "__init__",
+      "file": "modelchorus/src/modelchorus/workflows/__init__.py",
+      "language": "python",
+      "docstring": "Workflow implementations for ModelChorus.\n\nThis module contains specific workflow types such as thinkdeep, debug,\nconsensus, codereview, precommit, and planner.",
+      "classes": [],
+      "functions": [],
+      "imports": [
+        "consensus.ConsensusWorkflow",
+        "consensus.ConsensusStrategy",
+        "consensus.ConsensusResult",
+        "consensus.ProviderConfig"
+      ],
+      "exports": [],
+      "lines": 20
+    },
+    {
+      "name": "consensus",
+      "file": "modelchorus/src/modelchorus/workflows/consensus.py",
+      "language": "python",
+      "docstring": "Consensus workflow for multi-model coordination.\n\nThis module implements the ConsensusWorkflow which enables querying multiple\nAI models simultaneously and synthesizing their responses for improved accuracy\nand reliability.",
+      "classes": [
+        "ConsensusStrategy",
+        "ProviderConfig",
+        "ConsensusResult",
+        "ConsensusWorkflow"
+      ],
+      "functions": [],
+      "imports": [
+        "asyncio",
+        "logging",
+        "typing.List",
+        "typing.Dict",
+        "typing.Any",
+        "typing.Optional",
+        "dataclasses.dataclass",
+        "dataclasses.field",
+        "enum.Enum",
+        "providers.ModelProvider",
+        "providers.GenerationRequest",
+        "providers.GenerationResponse"
+      ],
+      "exports": [],
+      "lines": 352
+    },
+    {
+      "name": "__init__",
+      "file": "modelchorus/tests/__init__.py",
+      "language": "python",
+      "docstring": "Tests for ModelChorus CLI-based multi-model workflow package.\n\nThis test suite covers:\n- CLI providers (ClaudeProvider, CodexProvider)\n- Consensus workflow\n- Integration tests",
+      "classes": [],
+      "functions": [],
+      "imports": [],
+      "exports": [],
+      "lines": 8
+    },
+    {
+      "name": "conftest",
+      "file": "modelchorus/tests/conftest.py",
+      "language": "python",
+      "docstring": "Pytest configuration and fixtures for ModelChorus tests.",
+      "classes": [],
+      "functions": [
+        "mock_claude_response",
+        "mock_codex_response",
+        "mock_subprocess_run",
+        "sample_generation_request"
+      ],
+      "imports": [
+        "pytest",
+        "unittest.mock.AsyncMock",
+        "unittest.mock.MagicMock"
+      ],
+      "exports": [],
+      "lines": 65
+    },
+    {
+      "name": "test_claude_provider",
+      "file": "modelchorus/tests/test_claude_provider.py",
+      "language": "python",
+      "docstring": "Tests for ClaudeProvider CLI integration.",
+      "classes": [
+        "TestClaudeProvider"
+      ],
+      "functions": [],
+      "imports": [
+        "json",
+        "pytest",
+        "unittest.mock.AsyncMock",
+        "unittest.mock.patch",
+        "modelchorus.providers.claude_provider.ClaudeProvider",
+        "modelchorus.providers.base_provider.GenerationRequest"
+      ],
+      "exports": [],
+      "lines": 166
+    },
+    {
+      "name": "test_codex_provider",
+      "file": "modelchorus/tests/test_codex_provider.py",
+      "language": "python",
+      "docstring": "Tests for CodexProvider CLI integration.",
+      "classes": [
+        "TestCodexProvider"
+      ],
+      "functions": [],
+      "imports": [
+        "json",
+        "pytest",
+        "unittest.mock.AsyncMock",
+        "unittest.mock.patch",
+        "modelchorus.providers.codex_provider.CodexProvider",
+        "modelchorus.providers.base_provider.GenerationRequest"
+      ],
+      "exports": [],
+      "lines": 180
+    },
+    {
+      "name": "test_consensus_workflow",
+      "file": "modelchorus/tests/test_consensus_workflow.py",
+      "language": "python",
+      "docstring": "Tests for Consensus workflow.",
+      "classes": [
+        "TestConsensusWorkflow"
+      ],
+      "functions": [],
+      "imports": [
+        "pytest",
+        "unittest.mock.AsyncMock",
+        "modelchorus.workflows.consensus.ConsensusWorkflow",
+        "modelchorus.workflows.consensus.ConsensusStrategy",
+        "modelchorus.providers.base_provider.GenerationResponse",
+        "modelchorus.providers.base_provider.GenerationRequest"
+      ],
+      "exports": [],
+      "lines": 142
+    },
+    {
+      "name": "test_integration",
+      "file": "modelchorus/tests/test_integration.py",
+      "language": "python",
+      "docstring": "Integration tests for ModelChorus.\n\nThese tests verify that components work together correctly.\nNote: These tests use mocks to avoid calling actual CLI tools.",
+      "classes": [
+        "TestIntegration"
+      ],
+      "functions": [],
+      "imports": [
+        "pytest",
+        "unittest.mock.patch",
+        "unittest.mock.AsyncMock",
+        "modelchorus.workflows.consensus.ConsensusWorkflow",
+        "modelchorus.workflows.consensus.ConsensusStrategy",
+        "modelchorus.providers.base_provider.GenerationResponse",
+        "modelchorus.providers.base_provider.GenerationRequest",
+        "modelchorus.providers.claude_provider.ClaudeProvider",
+        "modelchorus.providers.codex_provider.CodexProvider"
+      ],
+      "exports": [],
+      "lines": 187
+    },
+    {
+      "name": "__init__",
+      "file": "tests/__init__.py",
+      "language": "python",
+      "docstring": "Tests for ModelChorus package.",
+      "classes": [],
+      "functions": [],
+      "imports": [],
+      "exports": [],
+      "lines": 1
+    },
+    {
+      "name": "__init__",
+      "file": "tests/test_providers/__init__.py",
+      "language": "python",
+      "docstring": "Tests for provider implementations.",
+      "classes": [],
+      "functions": [],
+      "imports": [],
+      "exports": [],
+      "lines": 1
+    },
+    {
+      "name": "test_cli_interface",
+      "file": "tests/test_providers/test_cli_interface.py",
+      "language": "python",
+      "docstring": "Test CLI providers implement the ModelProvider interface correctly.\n\nThis test suite verifies that all CLI-based providers (CLIProvider, ClaudeProvider,\nCodexProvider, GeminiProvider, CursorAgentProvider) properly implement the\nModelProvider abstract interface.",
+      "classes": [
+        "TestCLIProvidersImplementInterface"
+      ],
+      "functions": [],
+      "imports": [
+        "sys",
+        "pathlib.Path",
+        "pytest",
+        "modelchorus.providers.ModelProvider",
+        "modelchorus.providers.CLIProvider",
+        "modelchorus.providers.ClaudeProvider",
+        "modelchorus.providers.CodexProvider",
+        "modelchorus.providers.GeminiProvider",
+        "modelchorus.providers.CursorAgentProvider",
+        "modelchorus.providers.GenerationRequest"
+      ],
+      "exports": [],
+      "lines": 175
+    }
+  ],
+  "classes": [
+    {
+      "name": "ExampleWorkflow",
+      "file": "modelchorus/examples/basic_workflow.py",
+      "line": 14,
+      "language": "python",
+      "docstring": "Example workflow that demonstrates basic workflow structure.\n\nThis is a placeholder implementation showing the minimal structure\nneeded to create a working workflow.",
+      "bases": [
+        "BaseWorkflow"
+      ],
+      "methods": [
+        "run"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "ExampleProvider",
+      "file": "modelchorus/examples/provider_integration.py",
+      "line": 18,
+      "language": "python",
+      "docstring": "Example provider implementation.\n\nThis is a placeholder showing how to implement a custom provider\nfor ModelChorus. In a real implementation, this would integrate\nwith an actual AI provider's API.",
+      "bases": [
+        "ModelProvider"
+      ],
+      "methods": [
+        "__init__",
+        "generate",
+        "supports_vision"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "main",
+          "file": "modelchorus/examples/provider_integration.py",
+          "line": 108,
+          "context": [
+            "main"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 1
+    },
+    {
+      "name": "WorkflowStep",
+      "file": "modelchorus/src/modelchorus/core/base_workflow.py",
+      "line": 15,
+      "language": "python",
+      "docstring": "Represents a single step in a workflow execution.",
+      "bases": [],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "add_step",
+          "file": "modelchorus/src/modelchorus/core/base_workflow.py",
+          "line": 38,
+          "context": [
+            "WorkflowResult",
+            "add_step"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 1
+    },
+    {
+      "name": "WorkflowResult",
+      "file": "modelchorus/src/modelchorus/core/base_workflow.py",
+      "line": 26,
+      "language": "python",
+      "docstring": "Result of a workflow execution.",
+      "bases": [],
+      "methods": [
+        "add_step"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "run",
+          "file": "modelchorus/examples/basic_workflow.py",
+          "line": 34,
+          "context": [
+            "ExampleWorkflow",
+            "run"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 1
+    },
+    {
+      "name": "BaseWorkflow",
+      "file": "modelchorus/src/modelchorus/core/base_workflow.py",
+      "line": 47,
+      "language": "python",
+      "docstring": "Abstract base class for all ModelChorus workflows.\n\nAll workflow implementations (thinkdeep, debug, consensus, etc.) must inherit\nfrom this class and implement the run() method.\n\nAttributes:\n    name: Human-readable name of the workflow\n    description: Brief description of what this workflow does\n    config: Configuration dictionary for the workflow",
+      "bases": [
+        "ABC"
+      ],
+      "methods": [
+        "__init__",
+        "run",
+        "synthesize",
+        "get_result",
+        "validate_config",
+        "__repr__"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "WorkflowRequest",
+      "file": "modelchorus/src/modelchorus/core/models.py",
+      "line": 12,
+      "language": "python",
+      "docstring": "Request model for workflow execution.\n\nEncapsulates all the information needed to execute a workflow,\nincluding the prompt, model specifications, and configuration.\n\nAttributes:\n    prompt: The main input prompt/task for the workflow\n    models: List of model identifiers to use (e.g., [\"gpt-4\", \"claude-3\"])\n    config: Optional workflow-specific configuration dictionary\n    system_prompt: Optional system prompt for model context\n    temperature: Optional temperature setting (0.0-1.0)\n    max_tokens: Optional maximum tokens for generation\n    images: Optional list of image paths or URLs for vision-capable models\n    metadata: Additional metadata for the workflow execution",
+      "bases": [
+        "BaseModel"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "main",
+          "file": "modelchorus/examples/basic_workflow.py",
+          "line": 60,
+          "context": [
+            "main"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 1
+    },
+    {
+      "name": "WorkflowResponse",
+      "file": "modelchorus/src/modelchorus/core/models.py",
+      "line": 86,
+      "language": "python",
+      "docstring": "Response model for workflow execution.\n\nContains the results of a workflow execution along with metadata\nabout the execution process.\n\nAttributes:\n    result: The main result/output from the workflow\n    success: Whether the workflow executed successfully\n    workflow_name: Name of the workflow that was executed\n    steps: Number of steps executed in the workflow\n    models_used: List of models that were used\n    error: Error message if the workflow failed\n    metadata: Additional metadata about the execution",
+      "bases": [
+        "BaseModel"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "ModelSelection",
+      "file": "modelchorus/src/modelchorus/core/models.py",
+      "line": 153,
+      "language": "python",
+      "docstring": "Model for specifying model selection criteria.\n\nUsed to configure which models should be used for specific\nworkflow steps or roles.\n\nAttributes:\n    model_id: The model identifier (e.g., \"gpt-4\", \"claude-3-opus\")\n    role: Optional role for this model (e.g., \"analyzer\", \"synthesizer\")\n    config: Optional model-specific configuration",
+      "bases": [
+        "BaseModel"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "WorkflowStep",
+      "file": "modelchorus/src/modelchorus/core/models.py",
+      "line": 193,
+      "language": "python",
+      "docstring": "Model for a single workflow execution step.\n\nRepresents one step in a multi-step workflow, capturing what\nwas done, which model was used, and the results.\n\nAttributes:\n    step_number: Sequential step number (1-indexed)\n    description: Human-readable description of this step\n    model: Model that executed this step\n    prompt: The prompt used for this step\n    response: The response from this step\n    metadata: Additional step metadata",
+      "bases": [
+        "BaseModel"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "add_step",
+          "file": "modelchorus/src/modelchorus/core/base_workflow.py",
+          "line": 38,
+          "context": [
+            "WorkflowResult",
+            "add_step"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 1
+    },
+    {
+      "name": "ModelResponse",
+      "file": "modelchorus/src/modelchorus/core/models.py",
+      "line": 255,
+      "language": "python",
+      "docstring": "Model for a response from a single model.\n\nRepresents the output from querying a specific model, used in\nmulti-model workflows to track individual model contributions.\n\nAttributes:\n    model: Identifier of the model that generated this response\n    content: The response content/text\n    role: Optional role this model played (e.g., \"for\", \"against\", \"neutral\")\n    metadata: Additional response metadata (tokens, latency, etc.)",
+      "bases": [
+        "BaseModel"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "ConsensusConfig",
+      "file": "modelchorus/src/modelchorus/core/models.py",
+      "line": 303,
+      "language": "python",
+      "docstring": "Configuration for consensus-building workflows.\n\nSpecifies how multiple models should be consulted and how their\nresponses should be synthesized into a consensus.\n\nAttributes:\n    mode: Consensus mode (\"debate\", \"vote\", \"synthesis\")\n    stances: Optional list of stances to assign to models (e.g., [\"for\", \"against\", \"neutral\"])\n    temperature: Temperature for model responses\n    min_agreement: Minimum agreement threshold (0.0-1.0) for consensus\n    synthesis_model: Optional model to use for final synthesis\n    max_rounds: Maximum number of consensus rounds",
+      "bases": [
+        "BaseModel"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "WorkflowRegistry",
+      "file": "modelchorus/src/modelchorus/core/registry.py",
+      "line": 13,
+      "language": "python",
+      "docstring": "Registry for workflow implementations.\n\nProvides a plugin system for registering and retrieving workflow classes\ndynamically. Workflows can be registered using the @register decorator or\nprogrammatically via register_workflow().\n\nExample:\n    ```python\n    @WorkflowRegistry.register(\"thinkdeep\")\n    class ThinkDeepWorkflow(BaseWorkflow):\n        async def run(self, prompt: str, **kwargs):\n            # Implementation\n            pass\n\n    # Later, retrieve the workflow\n    workflow_class = WorkflowRegistry.get(\"thinkdeep\")\n    workflow = workflow_class(\"My Workflow\", \"Description\")\n    ```",
+      "bases": [],
+      "methods": [
+        "register",
+        "register_workflow",
+        "get",
+        "list_workflows",
+        "is_registered",
+        "unregister",
+        "clear"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "ModelCapability",
+      "file": "modelchorus/src/modelchorus/providers/base_provider.py",
+      "line": 15,
+      "language": "python",
+      "docstring": "Enumeration of model capabilities.",
+      "bases": [
+        "Enum"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "ModelConfig",
+      "file": "modelchorus/src/modelchorus/providers/base_provider.py",
+      "line": 26,
+      "language": "python",
+      "docstring": "Configuration for a model.",
+      "bases": [],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "__init__",
+          "file": "modelchorus/examples/provider_integration.py",
+          "line": 36,
+          "context": [
+            "ExampleProvider",
+            "__init__"
+          ]
+        },
+        {
+          "instantiator": "__init__",
+          "file": "modelchorus/examples/provider_integration.py",
+          "line": 45,
+          "context": [
+            "ExampleProvider",
+            "__init__"
+          ]
+        },
+        {
+          "instantiator": "_initialize_models",
+          "file": "modelchorus/src/modelchorus/providers/claude_provider.py",
+          "line": 82,
+          "context": [
+            "ClaudeProvider",
+            "_initialize_models"
+          ]
+        },
+        {
+          "instantiator": "_initialize_models",
+          "file": "modelchorus/src/modelchorus/providers/claude_provider.py",
+          "line": 93,
+          "context": [
+            "ClaudeProvider",
+            "_initialize_models"
+          ]
+        },
+        {
+          "instantiator": "_initialize_models",
+          "file": "modelchorus/src/modelchorus/providers/claude_provider.py",
+          "line": 104,
+          "context": [
+            "ClaudeProvider",
+            "_initialize_models"
+          ]
+        },
+        {
+          "instantiator": "_initialize_models",
+          "file": "modelchorus/src/modelchorus/providers/codex_provider.py",
+          "line": 82,
+          "context": [
+            "CodexProvider",
+            "_initialize_models"
+          ]
+        },
+        {
+          "instantiator": "_initialize_models",
+          "file": "modelchorus/src/modelchorus/providers/codex_provider.py",
+          "line": 92,
+          "context": [
+            "CodexProvider",
+            "_initialize_models"
+          ]
+        },
+        {
+          "instantiator": "_initialize_models",
+          "file": "modelchorus/src/modelchorus/providers/codex_provider.py",
+          "line": 102,
+          "context": [
+            "CodexProvider",
+            "_initialize_models"
+          ]
+        },
+        {
+          "instantiator": "_initialize_models",
+          "file": "modelchorus/src/modelchorus/providers/cursor_agent_provider.py",
+          "line": 84,
+          "context": [
+            "CursorAgentProvider",
+            "_initialize_models"
+          ]
+        },
+        {
+          "instantiator": "_initialize_models",
+          "file": "modelchorus/src/modelchorus/providers/cursor_agent_provider.py",
+          "line": 93,
+          "context": [
+            "CursorAgentProvider",
+            "_initialize_models"
+          ]
+        },
+        {
+          "instantiator": "_initialize_models",
+          "file": "modelchorus/src/modelchorus/providers/cursor_agent_provider.py",
+          "line": 102,
+          "context": [
+            "CursorAgentProvider",
+            "_initialize_models"
+          ]
+        },
+        {
+          "instantiator": "_initialize_models",
+          "file": "modelchorus/src/modelchorus/providers/gemini_provider.py",
+          "line": 83,
+          "context": [
+            "GeminiProvider",
+            "_initialize_models"
+          ]
+        },
+        {
+          "instantiator": "_initialize_models",
+          "file": "modelchorus/src/modelchorus/providers/gemini_provider.py",
+          "line": 94,
+          "context": [
+            "GeminiProvider",
+            "_initialize_models"
+          ]
+        },
+        {
+          "instantiator": "_initialize_models",
+          "file": "modelchorus/src/modelchorus/providers/gemini_provider.py",
+          "line": 104,
+          "context": [
+            "GeminiProvider",
+            "_initialize_models"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 14
+    },
+    {
+      "name": "GenerationRequest",
+      "file": "modelchorus/src/modelchorus/providers/base_provider.py",
+      "line": 37,
+      "language": "python",
+      "docstring": "Request for text generation.",
+      "bases": [],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "main",
+          "file": "modelchorus/examples/provider_integration.py",
+          "line": 127,
+          "context": [
+            "main"
+          ]
+        },
+        {
+          "instantiator": "consensus",
+          "file": "modelchorus/src/modelchorus/cli/main.py",
+          "line": 145,
+          "context": [
+            "consensus"
+          ]
+        },
+        {
+          "instantiator": "sample_generation_request",
+          "file": "modelchorus/tests/conftest.py",
+          "line": 59,
+          "context": [
+            "sample_generation_request"
+          ]
+        },
+        {
+          "instantiator": "test_build_command_with_model",
+          "file": "modelchorus/tests/test_claude_provider.py",
+          "line": 39,
+          "context": [
+            "TestClaudeProvider",
+            "test_build_command_with_model"
+          ]
+        },
+        {
+          "instantiator": "test_build_command_without_system_prompt",
+          "file": "modelchorus/tests/test_claude_provider.py",
+          "line": 51,
+          "context": [
+            "TestClaudeProvider",
+            "test_build_command_without_system_prompt"
+          ]
+        },
+        {
+          "instantiator": "test_generate_success",
+          "file": "modelchorus/tests/test_claude_provider.py",
+          "line": 104,
+          "context": [
+            "TestClaudeProvider",
+            "test_generate_success"
+          ]
+        },
+        {
+          "instantiator": "test_generate_with_retry",
+          "file": "modelchorus/tests/test_claude_provider.py",
+          "line": 122,
+          "context": [
+            "TestClaudeProvider",
+            "test_generate_with_retry"
+          ]
+        },
+        {
+          "instantiator": "test_generate_all_retries_fail",
+          "file": "modelchorus/tests/test_claude_provider.py",
+          "line": 141,
+          "context": [
+            "TestClaudeProvider",
+            "test_generate_all_retries_fail"
+          ]
+        },
+        {
+          "instantiator": "test_build_command_with_model",
+          "file": "modelchorus/tests/test_codex_provider.py",
+          "line": 37,
+          "context": [
+            "TestCodexProvider",
+            "test_build_command_with_model"
+          ]
+        },
+        {
+          "instantiator": "test_build_command_with_images",
+          "file": "modelchorus/tests/test_codex_provider.py",
+          "line": 49,
+          "context": [
+            "TestCodexProvider",
+            "test_build_command_with_images"
+          ]
+        },
+        {
+          "instantiator": "test_generate_success",
+          "file": "modelchorus/tests/test_codex_provider.py",
+          "line": 118,
+          "context": [
+            "TestCodexProvider",
+            "test_generate_success"
+          ]
+        },
+        {
+          "instantiator": "test_generate_with_retry",
+          "file": "modelchorus/tests/test_codex_provider.py",
+          "line": 136,
+          "context": [
+            "TestCodexProvider",
+            "test_generate_with_retry"
+          ]
+        },
+        {
+          "instantiator": "test_generate_all_retries_fail",
+          "file": "modelchorus/tests/test_codex_provider.py",
+          "line": 155,
+          "context": [
+            "TestCodexProvider",
+            "test_generate_all_retries_fail"
+          ]
+        },
+        {
+          "instantiator": "test_execute_all_responses_strategy",
+          "file": "modelchorus/tests/test_consensus_workflow.py",
+          "line": 65,
+          "context": [
+            "TestConsensusWorkflow",
+            "test_execute_all_responses_strategy"
+          ]
+        },
+        {
+          "instantiator": "test_execute_first_valid_strategy",
+          "file": "modelchorus/tests/test_consensus_workflow.py",
+          "line": 91,
+          "context": [
+            "TestConsensusWorkflow",
+            "test_execute_first_valid_strategy"
+          ]
+        },
+        {
+          "instantiator": "test_execute_with_parameters",
+          "file": "modelchorus/tests/test_consensus_workflow.py",
+          "line": 111,
+          "context": [
+            "TestConsensusWorkflow",
+            "test_execute_with_parameters"
+          ]
+        },
+        {
+          "instantiator": "test_execute_all_providers_fail",
+          "file": "modelchorus/tests/test_consensus_workflow.py",
+          "line": 137,
+          "context": [
+            "TestConsensusWorkflow",
+            "test_execute_all_providers_fail"
+          ]
+        },
+        {
+          "instantiator": "test_end_to_end_consensus",
+          "file": "modelchorus/tests/test_integration.py",
+          "line": 51,
+          "context": [
+            "TestIntegration",
+            "test_end_to_end_consensus"
+          ]
+        },
+        {
+          "instantiator": "test_provider_initialization_and_generation",
+          "file": "modelchorus/tests/test_integration.py",
+          "line": 76,
+          "context": [
+            "TestIntegration",
+            "test_provider_initialization_and_generation"
+          ]
+        },
+        {
+          "instantiator": "test_error_handling_across_workflow",
+          "file": "modelchorus/tests/test_integration.py",
+          "line": 95,
+          "context": [
+            "TestIntegration",
+            "test_error_handling_across_workflow"
+          ]
+        },
+        {
+          "instantiator": "test_multiple_strategy_comparison",
+          "file": "modelchorus/tests/test_integration.py",
+          "line": 130,
+          "context": [
+            "TestIntegration",
+            "test_multiple_strategy_comparison"
+          ]
+        },
+        {
+          "instantiator": "test_concurrent_provider_execution",
+          "file": "modelchorus/tests/test_integration.py",
+          "line": 179,
+          "context": [
+            "TestIntegration",
+            "test_concurrent_provider_execution"
+          ]
+        },
+        {
+          "instantiator": "test_build_command_returns_list",
+          "file": "tests/test_providers/test_cli_interface.py",
+          "line": 143,
+          "context": [
+            "TestCLIProvidersImplementInterface",
+            "test_build_command_returns_list"
+          ]
+        },
+        {
+          "instantiator": "test_build_command_includes_cli_command",
+          "file": "tests/test_providers/test_cli_interface.py",
+          "line": 159,
+          "context": [
+            "TestCLIProvidersImplementInterface",
+            "test_build_command_includes_cli_command"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 24
+    },
+    {
+      "name": "GenerationResponse",
+      "file": "modelchorus/src/modelchorus/providers/base_provider.py",
+      "line": 50,
+      "language": "python",
+      "docstring": "Response from text generation.",
+      "bases": [],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "generate",
+          "file": "modelchorus/examples/provider_integration.py",
+          "line": 81,
+          "context": [
+            "ExampleProvider",
+            "generate"
+          ]
+        },
+        {
+          "instantiator": "parse_response",
+          "file": "modelchorus/src/modelchorus/providers/claude_provider.py",
+          "line": 201,
+          "context": [
+            "ClaudeProvider",
+            "parse_response"
+          ]
+        },
+        {
+          "instantiator": "parse_response",
+          "file": "modelchorus/src/modelchorus/providers/codex_provider.py",
+          "line": 208,
+          "context": [
+            "CodexProvider",
+            "parse_response"
+          ]
+        },
+        {
+          "instantiator": "parse_response",
+          "file": "modelchorus/src/modelchorus/providers/cursor_agent_provider.py",
+          "line": 193,
+          "context": [
+            "CursorAgentProvider",
+            "parse_response"
+          ]
+        },
+        {
+          "instantiator": "parse_response",
+          "file": "modelchorus/src/modelchorus/providers/gemini_provider.py",
+          "line": 202,
+          "context": [
+            "GeminiProvider",
+            "parse_response"
+          ]
+        },
+        {
+          "instantiator": "test_execute_all_responses_strategy",
+          "file": "modelchorus/tests/test_consensus_workflow.py",
+          "line": 49,
+          "context": [
+            "TestConsensusWorkflow",
+            "test_execute_all_responses_strategy"
+          ]
+        },
+        {
+          "instantiator": "test_execute_all_responses_strategy",
+          "file": "modelchorus/tests/test_consensus_workflow.py",
+          "line": 57,
+          "context": [
+            "TestConsensusWorkflow",
+            "test_execute_all_responses_strategy"
+          ]
+        },
+        {
+          "instantiator": "test_execute_first_valid_strategy",
+          "file": "modelchorus/tests/test_consensus_workflow.py",
+          "line": 83,
+          "context": [
+            "TestConsensusWorkflow",
+            "test_execute_first_valid_strategy"
+          ]
+        },
+        {
+          "instantiator": "test_execute_with_parameters",
+          "file": "modelchorus/tests/test_consensus_workflow.py",
+          "line": 103,
+          "context": [
+            "TestConsensusWorkflow",
+            "test_execute_with_parameters"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 9
+    },
+    {
+      "name": "ModelProvider",
+      "file": "modelchorus/src/modelchorus/providers/base_provider.py",
+      "line": 60,
+      "language": "python",
+      "docstring": "Abstract base class for all model providers.\n\nAll provider implementations (Anthropic, OpenAI, Google, etc.) must inherit\nfrom this class and implement the required methods.\n\nAttributes:\n    provider_name: Name of the provider (e.g., \"anthropic\", \"openai\")\n    api_key: API key for authentication\n    config: Provider-specific configuration",
+      "bases": [
+        "ABC"
+      ],
+      "methods": [
+        "__init__",
+        "generate",
+        "supports_vision",
+        "get_available_models",
+        "supports_capability",
+        "validate_api_key",
+        "set_model_list",
+        "__repr__"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "ClaudeProvider",
+      "file": "modelchorus/src/modelchorus/providers/claude_provider.py",
+      "line": 22,
+      "language": "python",
+      "docstring": "Provider for Anthropic's Claude models via the `claude` CLI tool.\n\nThis provider wraps the `claude` command-line interface to enable\ntext generation with Claude models (Opus, Sonnet, Haiku).\n\nSupported features:\n- Text generation with customizable prompts\n- System prompts\n- Temperature and token control\n- Vision capabilities (model-dependent)\n- Thinking mode (extended reasoning)\n\nExample:\n    >>> provider = ClaudeProvider()\n    >>> request = GenerationRequest(\n    ...     prompt=\"Explain quantum computing\",\n    ...     temperature=0.7,\n    ...     max_tokens=1000\n    ... )\n    >>> response = await provider.generate(request)\n    >>> print(response.content)",
+      "bases": [
+        "CLIProvider"
+      ],
+      "methods": [
+        "__init__",
+        "_initialize_models",
+        "build_command",
+        "parse_response",
+        "supports_vision",
+        "supports_thinking"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "list_providers",
+          "file": "modelchorus/src/modelchorus/cli/main.py",
+          "line": 242,
+          "context": [
+            "list_providers"
+          ]
+        },
+        {
+          "instantiator": "test_initialization",
+          "file": "modelchorus/tests/test_claude_provider.py",
+          "line": 18,
+          "context": [
+            "TestClaudeProvider",
+            "test_initialization"
+          ]
+        },
+        {
+          "instantiator": "test_build_command_basic",
+          "file": "modelchorus/tests/test_claude_provider.py",
+          "line": 26,
+          "context": [
+            "TestClaudeProvider",
+            "test_build_command_basic"
+          ]
+        },
+        {
+          "instantiator": "test_build_command_with_model",
+          "file": "modelchorus/tests/test_claude_provider.py",
+          "line": 38,
+          "context": [
+            "TestClaudeProvider",
+            "test_build_command_with_model"
+          ]
+        },
+        {
+          "instantiator": "test_build_command_without_system_prompt",
+          "file": "modelchorus/tests/test_claude_provider.py",
+          "line": 50,
+          "context": [
+            "TestClaudeProvider",
+            "test_build_command_without_system_prompt"
+          ]
+        },
+        {
+          "instantiator": "test_parse_response_success",
+          "file": "modelchorus/tests/test_claude_provider.py",
+          "line": 61,
+          "context": [
+            "TestClaudeProvider",
+            "test_parse_response_success"
+          ]
+        },
+        {
+          "instantiator": "test_parse_response_failure",
+          "file": "modelchorus/tests/test_claude_provider.py",
+          "line": 77,
+          "context": [
+            "TestClaudeProvider",
+            "test_parse_response_failure"
+          ]
+        },
+        {
+          "instantiator": "test_parse_response_invalid_json",
+          "file": "modelchorus/tests/test_claude_provider.py",
+          "line": 90,
+          "context": [
+            "TestClaudeProvider",
+            "test_parse_response_invalid_json"
+          ]
+        },
+        {
+          "instantiator": "test_generate_success",
+          "file": "modelchorus/tests/test_claude_provider.py",
+          "line": 103,
+          "context": [
+            "TestClaudeProvider",
+            "test_generate_success"
+          ]
+        },
+        {
+          "instantiator": "test_generate_with_retry",
+          "file": "modelchorus/tests/test_claude_provider.py",
+          "line": 121,
+          "context": [
+            "TestClaudeProvider",
+            "test_generate_with_retry"
+          ]
+        },
+        {
+          "instantiator": "test_generate_all_retries_fail",
+          "file": "modelchorus/tests/test_claude_provider.py",
+          "line": 140,
+          "context": [
+            "TestClaudeProvider",
+            "test_generate_all_retries_fail"
+          ]
+        },
+        {
+          "instantiator": "test_supports_vision",
+          "file": "modelchorus/tests/test_claude_provider.py",
+          "line": 154,
+          "context": [
+            "TestClaudeProvider",
+            "test_supports_vision"
+          ]
+        },
+        {
+          "instantiator": "test_supports_thinking",
+          "file": "modelchorus/tests/test_claude_provider.py",
+          "line": 162,
+          "context": [
+            "TestClaudeProvider",
+            "test_supports_thinking"
+          ]
+        },
+        {
+          "instantiator": "test_end_to_end_consensus",
+          "file": "modelchorus/tests/test_integration.py",
+          "line": 24,
+          "context": [
+            "TestIntegration",
+            "test_end_to_end_consensus"
+          ]
+        },
+        {
+          "instantiator": "test_provider_initialization_and_generation",
+          "file": "modelchorus/tests/test_integration.py",
+          "line": 63,
+          "context": [
+            "TestIntegration",
+            "test_provider_initialization_and_generation"
+          ]
+        },
+        {
+          "instantiator": "test_error_handling_across_workflow",
+          "file": "modelchorus/tests/test_integration.py",
+          "line": 85,
+          "context": [
+            "TestIntegration",
+            "test_error_handling_across_workflow"
+          ]
+        },
+        {
+          "instantiator": "test_multiple_strategy_comparison",
+          "file": "modelchorus/tests/test_integration.py",
+          "line": 127,
+          "context": [
+            "TestIntegration",
+            "test_multiple_strategy_comparison"
+          ]
+        },
+        {
+          "instantiator": "test_multiple_strategy_comparison",
+          "file": "modelchorus/tests/test_integration.py",
+          "line": 136,
+          "context": [
+            "TestIntegration",
+            "test_multiple_strategy_comparison"
+          ]
+        },
+        {
+          "instantiator": "test_concurrent_provider_execution",
+          "file": "modelchorus/tests/test_integration.py",
+          "line": 150,
+          "context": [
+            "TestIntegration",
+            "test_concurrent_provider_execution"
+          ]
+        },
+        {
+          "instantiator": "providers",
+          "file": "tests/test_providers/test_cli_interface.py",
+          "line": 34,
+          "context": [
+            "TestCLIProvidersImplementInterface",
+            "providers"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 20
+    },
+    {
+      "name": "CLIProvider",
+      "file": "modelchorus/src/modelchorus/providers/cli_provider.py",
+      "line": 23,
+      "language": "python",
+      "docstring": "Base class for CLI-based model providers.\n\nThis class extends ModelProvider to handle interactions with AI models\nvia CLI tools, providing common functionality for:\n- Building CLI commands\n- Executing commands asynchronously via subprocess\n- Parsing CLI output\n- Error handling and retries\n\nSubclasses must implement:\n- build_command(): Construct the CLI command for a request\n- parse_response(): Parse CLI output into GenerationResponse\n\nAttributes:\n    cli_command: Base CLI command (e.g., \"claude\", \"gemini\")\n    timeout: Command timeout in seconds\n    retry_limit: Maximum number of retry attempts",
+      "bases": [
+        "ModelProvider"
+      ],
+      "methods": [
+        "__init__",
+        "build_command",
+        "parse_response",
+        "execute_command",
+        "generate",
+        "supports_vision",
+        "__repr__"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "CodexProvider",
+      "file": "modelchorus/src/modelchorus/providers/codex_provider.py",
+      "line": 22,
+      "language": "python",
+      "docstring": "Provider for OpenAI's Codex models via the `codex` CLI tool.\n\nThis provider wraps the `codex` command-line interface to enable\ncode generation and completion with Codex models (GPT-4, GPT-3.5, etc.).\n\nSupported features:\n- Text and code generation\n- System prompts\n- Temperature and token control\n- Function calling capabilities\n- Vision support (model-dependent)\n\nExample:\n    >>> provider = CodexProvider()\n    >>> request = GenerationRequest(\n    ...     prompt=\"Write a Python function to sort a list\",\n    ...     temperature=0.5,\n    ...     max_tokens=500\n    ... )\n    >>> response = await provider.generate(request)\n    >>> print(response.content)",
+      "bases": [
+        "CLIProvider"
+      ],
+      "methods": [
+        "__init__",
+        "_initialize_models",
+        "build_command",
+        "parse_response",
+        "supports_vision",
+        "supports_function_calling"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "list_providers",
+          "file": "modelchorus/src/modelchorus/cli/main.py",
+          "line": 243,
+          "context": [
+            "list_providers"
+          ]
+        },
+        {
+          "instantiator": "test_initialization",
+          "file": "modelchorus/tests/test_codex_provider.py",
+          "line": 18,
+          "context": [
+            "TestCodexProvider",
+            "test_initialization"
+          ]
+        },
+        {
+          "instantiator": "test_build_command_basic",
+          "file": "modelchorus/tests/test_codex_provider.py",
+          "line": 26,
+          "context": [
+            "TestCodexProvider",
+            "test_build_command_basic"
+          ]
+        },
+        {
+          "instantiator": "test_build_command_with_model",
+          "file": "modelchorus/tests/test_codex_provider.py",
+          "line": 36,
+          "context": [
+            "TestCodexProvider",
+            "test_build_command_with_model"
+          ]
+        },
+        {
+          "instantiator": "test_build_command_with_images",
+          "file": "modelchorus/tests/test_codex_provider.py",
+          "line": 48,
+          "context": [
+            "TestCodexProvider",
+            "test_build_command_with_images"
+          ]
+        },
+        {
+          "instantiator": "test_parse_response_success",
+          "file": "modelchorus/tests/test_codex_provider.py",
+          "line": 60,
+          "context": [
+            "TestCodexProvider",
+            "test_parse_response_success"
+          ]
+        },
+        {
+          "instantiator": "test_parse_response_failure",
+          "file": "modelchorus/tests/test_codex_provider.py",
+          "line": 77,
+          "context": [
+            "TestCodexProvider",
+            "test_parse_response_failure"
+          ]
+        },
+        {
+          "instantiator": "test_parse_response_invalid_jsonl",
+          "file": "modelchorus/tests/test_codex_provider.py",
+          "line": 90,
+          "context": [
+            "TestCodexProvider",
+            "test_parse_response_invalid_jsonl"
+          ]
+        },
+        {
+          "instantiator": "test_parse_response_missing_agent_message",
+          "file": "modelchorus/tests/test_codex_provider.py",
+          "line": 102,
+          "context": [
+            "TestCodexProvider",
+            "test_parse_response_missing_agent_message"
+          ]
+        },
+        {
+          "instantiator": "test_generate_success",
+          "file": "modelchorus/tests/test_codex_provider.py",
+          "line": 117,
+          "context": [
+            "TestCodexProvider",
+            "test_generate_success"
+          ]
+        },
+        {
+          "instantiator": "test_generate_with_retry",
+          "file": "modelchorus/tests/test_codex_provider.py",
+          "line": 135,
+          "context": [
+            "TestCodexProvider",
+            "test_generate_with_retry"
+          ]
+        },
+        {
+          "instantiator": "test_generate_all_retries_fail",
+          "file": "modelchorus/tests/test_codex_provider.py",
+          "line": 154,
+          "context": [
+            "TestCodexProvider",
+            "test_generate_all_retries_fail"
+          ]
+        },
+        {
+          "instantiator": "test_supports_vision",
+          "file": "modelchorus/tests/test_codex_provider.py",
+          "line": 168,
+          "context": [
+            "TestCodexProvider",
+            "test_supports_vision"
+          ]
+        },
+        {
+          "instantiator": "test_supports_function_calling",
+          "file": "modelchorus/tests/test_codex_provider.py",
+          "line": 176,
+          "context": [
+            "TestCodexProvider",
+            "test_supports_function_calling"
+          ]
+        },
+        {
+          "instantiator": "test_end_to_end_consensus",
+          "file": "modelchorus/tests/test_integration.py",
+          "line": 25,
+          "context": [
+            "TestIntegration",
+            "test_end_to_end_consensus"
+          ]
+        },
+        {
+          "instantiator": "test_multiple_strategy_comparison",
+          "file": "modelchorus/tests/test_integration.py",
+          "line": 128,
+          "context": [
+            "TestIntegration",
+            "test_multiple_strategy_comparison"
+          ]
+        },
+        {
+          "instantiator": "test_multiple_strategy_comparison",
+          "file": "modelchorus/tests/test_integration.py",
+          "line": 137,
+          "context": [
+            "TestIntegration",
+            "test_multiple_strategy_comparison"
+          ]
+        },
+        {
+          "instantiator": "test_concurrent_provider_execution",
+          "file": "modelchorus/tests/test_integration.py",
+          "line": 151,
+          "context": [
+            "TestIntegration",
+            "test_concurrent_provider_execution"
+          ]
+        },
+        {
+          "instantiator": "providers",
+          "file": "tests/test_providers/test_cli_interface.py",
+          "line": 35,
+          "context": [
+            "TestCLIProvidersImplementInterface",
+            "providers"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 19
+    },
+    {
+      "name": "CursorAgentProvider",
+      "file": "modelchorus/src/modelchorus/providers/cursor_agent_provider.py",
+      "line": 22,
+      "language": "python",
+      "docstring": "Provider for Cursor's AI agent via the `cursor-agent` CLI tool.\n\nThis provider wraps the `cursor-agent` command-line interface to enable\ncode-focused AI interactions with Cursor's agent models.\n\nSupported features:\n- Code generation and completion\n- Natural language to code conversion\n- Code explanation and documentation\n- System prompts for context\n- Temperature control\n- Working directory support for context-aware code generation\n\nExample:\n    >>> provider = CursorAgentProvider()\n    >>> request = GenerationRequest(\n    ...     prompt=\"Write a function to validate email addresses\",\n    ...     temperature=0.3,\n    ...     max_tokens=500,\n    ...     metadata={\"working_directory\": \"/path/to/project\"}\n    ... )\n    >>> response = await provider.generate(request)\n    >>> print(response.content)",
+      "bases": [
+        "CLIProvider"
+      ],
+      "methods": [
+        "__init__",
+        "_initialize_models",
+        "build_command",
+        "parse_response",
+        "supports_vision",
+        "supports_code_generation"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "list_providers",
+          "file": "modelchorus/src/modelchorus/cli/main.py",
+          "line": 245,
+          "context": [
+            "list_providers"
+          ]
+        },
+        {
+          "instantiator": "providers",
+          "file": "tests/test_providers/test_cli_interface.py",
+          "line": 37,
+          "context": [
+            "TestCLIProvidersImplementInterface",
+            "providers"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 2
+    },
+    {
+      "name": "GeminiProvider",
+      "file": "modelchorus/src/modelchorus/providers/gemini_provider.py",
+      "line": 22,
+      "language": "python",
+      "docstring": "Provider for Google's Gemini models via the `gemini` CLI tool.\n\nThis provider wraps the `gemini` command-line interface to enable\ntext generation with Gemini models (Pro, Flash, Ultra).\n\nSupported features:\n- Text generation with customizable prompts\n- System instructions\n- Temperature and token control\n- Vision capabilities (multimodal support)\n- Function calling\n- Thinking/reasoning mode\n\nExample:\n    >>> provider = GeminiProvider()\n    >>> request = GenerationRequest(\n    ...     prompt=\"Explain machine learning\",\n    ...     temperature=0.7,\n    ...     max_tokens=1000\n    ... )\n    >>> response = await provider.generate(request)\n    >>> print(response.content)",
+      "bases": [
+        "CLIProvider"
+      ],
+      "methods": [
+        "__init__",
+        "_initialize_models",
+        "build_command",
+        "parse_response",
+        "supports_vision",
+        "supports_thinking"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "list_providers",
+          "file": "modelchorus/src/modelchorus/cli/main.py",
+          "line": 244,
+          "context": [
+            "list_providers"
+          ]
+        },
+        {
+          "instantiator": "providers",
+          "file": "tests/test_providers/test_cli_interface.py",
+          "line": 36,
+          "context": [
+            "TestCLIProvidersImplementInterface",
+            "providers"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 2
+    },
+    {
+      "name": "ConsensusStrategy",
+      "file": "modelchorus/src/modelchorus/workflows/consensus.py",
+      "line": 24,
+      "language": "python",
+      "docstring": "Strategy for reaching consensus among multiple model responses.",
+      "bases": [
+        "Enum"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "ProviderConfig",
+      "file": "modelchorus/src/modelchorus/workflows/consensus.py",
+      "line": 35,
+      "language": "python",
+      "docstring": "Configuration for a provider in the consensus workflow.",
+      "bases": [],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "__init__",
+          "file": "modelchorus/src/modelchorus/workflows/consensus.py",
+          "line": 109,
+          "context": [
+            "ConsensusWorkflow",
+            "__init__"
+          ]
+        },
+        {
+          "instantiator": "add_provider",
+          "file": "modelchorus/src/modelchorus/workflows/consensus.py",
+          "line": 129,
+          "context": [
+            "ConsensusWorkflow",
+            "add_provider"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 2
+    },
+    {
+      "name": "ConsensusResult",
+      "file": "modelchorus/src/modelchorus/workflows/consensus.py",
+      "line": 45,
+      "language": "python",
+      "docstring": "Result from a consensus workflow execution.",
+      "bases": [],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "execute",
+          "file": "modelchorus/src/modelchorus/workflows/consensus.py",
+          "line": 234,
+          "context": [
+            "ConsensusWorkflow",
+            "execute"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 1
+    },
+    {
+      "name": "ConsensusWorkflow",
+      "file": "modelchorus/src/modelchorus/workflows/consensus.py",
+      "line": 56,
+      "language": "python",
+      "docstring": "Workflow for coordinating multiple AI models to reach consensus.\n\nThis workflow allows querying multiple models simultaneously and applying\nvarious strategies to synthesize or select from their responses.\n\nKey features:\n- Parallel execution across multiple providers\n- Configurable consensus strategies\n- Error handling and fallback mechanisms\n- Response weighting and prioritization\n- Timeout management per provider\n\nExample:\n    >>> from modelchorus.providers import ClaudeProvider, GeminiProvider\n    >>> from modelchorus.workflows import ConsensusWorkflow\n    >>>\n    >>> # Create providers\n    >>> claude = ClaudeProvider()\n    >>> gemini = GeminiProvider()\n    >>>\n    >>> # Create workflow with providers\n    >>> workflow = ConsensusWorkflow([claude, gemini])\n    >>>\n    >>> # Execute consensus query\n    >>> request = GenerationRequest(prompt=\"Explain quantum computing\")\n    >>> result = await workflow.execute(request)\n    >>>\n    >>> # Access consensus or individual responses\n    >>> print(result.consensus_response)\n    >>> for provider, response in result.provider_results.items():\n    ...     print(f\"{provider}: {response.content}\")",
+      "bases": [],
+      "methods": [
+        "__init__",
+        "add_provider",
+        "_execute_provider",
+        "execute",
+        "_apply_strategy",
+        "get_provider_count",
+        "get_providers",
+        "set_strategy",
+        "__repr__"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "consensus",
+          "file": "modelchorus/src/modelchorus/cli/main.py",
+          "line": 135,
+          "context": [
+            "consensus"
+          ]
+        },
+        {
+          "instantiator": "test_initialization",
+          "file": "modelchorus/tests/test_consensus_workflow.py",
+          "line": 20,
+          "context": [
+            "TestConsensusWorkflow",
+            "test_initialization"
+          ]
+        },
+        {
+          "instantiator": "test_initialization_multiple_providers",
+          "file": "modelchorus/tests/test_consensus_workflow.py",
+          "line": 32,
+          "context": [
+            "TestConsensusWorkflow",
+            "test_initialization_multiple_providers"
+          ]
+        },
+        {
+          "instantiator": "test_initialization_with_strategy",
+          "file": "modelchorus/tests/test_consensus_workflow.py",
+          "line": 40,
+          "context": [
+            "TestConsensusWorkflow",
+            "test_initialization_with_strategy"
+          ]
+        },
+        {
+          "instantiator": "test_execute_all_responses_strategy",
+          "file": "modelchorus/tests/test_consensus_workflow.py",
+          "line": 63,
+          "context": [
+            "TestConsensusWorkflow",
+            "test_execute_all_responses_strategy"
+          ]
+        },
+        {
+          "instantiator": "test_execute_first_valid_strategy",
+          "file": "modelchorus/tests/test_consensus_workflow.py",
+          "line": 89,
+          "context": [
+            "TestConsensusWorkflow",
+            "test_execute_first_valid_strategy"
+          ]
+        },
+        {
+          "instantiator": "test_execute_with_parameters",
+          "file": "modelchorus/tests/test_consensus_workflow.py",
+          "line": 109,
+          "context": [
+            "TestConsensusWorkflow",
+            "test_execute_with_parameters"
+          ]
+        },
+        {
+          "instantiator": "test_execute_all_providers_fail",
+          "file": "modelchorus/tests/test_consensus_workflow.py",
+          "line": 135,
+          "context": [
+            "TestConsensusWorkflow",
+            "test_execute_all_providers_fail"
+          ]
+        },
+        {
+          "instantiator": "test_end_to_end_consensus",
+          "file": "modelchorus/tests/test_integration.py",
+          "line": 27,
+          "context": [
+            "TestIntegration",
+            "test_end_to_end_consensus"
+          ]
+        },
+        {
+          "instantiator": "test_error_handling_across_workflow",
+          "file": "modelchorus/tests/test_integration.py",
+          "line": 86,
+          "context": [
+            "TestIntegration",
+            "test_error_handling_across_workflow"
+          ]
+        },
+        {
+          "instantiator": "test_multiple_strategy_comparison",
+          "file": "modelchorus/tests/test_integration.py",
+          "line": 129,
+          "context": [
+            "TestIntegration",
+            "test_multiple_strategy_comparison"
+          ]
+        },
+        {
+          "instantiator": "test_multiple_strategy_comparison",
+          "file": "modelchorus/tests/test_integration.py",
+          "line": 138,
+          "context": [
+            "TestIntegration",
+            "test_multiple_strategy_comparison"
+          ]
+        },
+        {
+          "instantiator": "test_concurrent_provider_execution",
+          "file": "modelchorus/tests/test_integration.py",
+          "line": 152,
+          "context": [
+            "TestIntegration",
+            "test_concurrent_provider_execution"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 13
+    },
+    {
+      "name": "TestClaudeProvider",
+      "file": "modelchorus/tests/test_claude_provider.py",
+      "line": 13,
+      "language": "python",
+      "docstring": "Test suite for ClaudeProvider.",
+      "bases": [],
+      "methods": [
+        "test_initialization",
+        "test_build_command_basic",
+        "test_build_command_with_model",
+        "test_build_command_without_system_prompt",
+        "test_parse_response_success",
+        "test_parse_response_failure",
+        "test_parse_response_invalid_json",
+        "test_generate_success",
+        "test_generate_with_retry",
+        "test_generate_all_retries_fail",
+        "test_supports_vision",
+        "test_supports_thinking"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestCodexProvider",
+      "file": "modelchorus/tests/test_codex_provider.py",
+      "line": 13,
+      "language": "python",
+      "docstring": "Test suite for CodexProvider.",
+      "bases": [],
+      "methods": [
+        "test_initialization",
+        "test_build_command_basic",
+        "test_build_command_with_model",
+        "test_build_command_with_images",
+        "test_parse_response_success",
+        "test_parse_response_failure",
+        "test_parse_response_invalid_jsonl",
+        "test_parse_response_missing_agent_message",
+        "test_generate_success",
+        "test_generate_with_retry",
+        "test_generate_all_retries_fail",
+        "test_supports_vision",
+        "test_supports_function_calling"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestConsensusWorkflow",
+      "file": "modelchorus/tests/test_consensus_workflow.py",
+      "line": 12,
+      "language": "python",
+      "docstring": "Test suite for ConsensusWorkflow.",
+      "bases": [],
+      "methods": [
+        "test_initialization",
+        "test_initialization_multiple_providers",
+        "test_initialization_with_strategy",
+        "test_execute_all_responses_strategy",
+        "test_execute_first_valid_strategy",
+        "test_execute_with_parameters",
+        "test_execute_all_providers_fail"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestIntegration",
+      "file": "modelchorus/tests/test_integration.py",
+      "line": 17,
+      "language": "python",
+      "docstring": "Integration test suite.",
+      "bases": [],
+      "methods": [
+        "test_end_to_end_consensus",
+        "test_provider_initialization_and_generation",
+        "test_error_handling_across_workflow",
+        "test_multiple_strategy_comparison",
+        "test_concurrent_provider_execution"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestCLIProvidersImplementInterface",
+      "file": "tests/test_providers/test_cli_interface.py",
+      "line": 27,
+      "language": "python",
+      "docstring": "Test that all CLI providers implement the ModelProvider interface.",
+      "bases": [],
+      "methods": [
+        "providers",
+        "test_all_providers_inherit_from_base",
+        "test_all_providers_inherit_from_cli_provider",
+        "test_all_providers_have_generate_method",
+        "test_all_providers_have_build_command_method",
+        "test_all_providers_have_parse_response_method",
+        "test_all_providers_have_supports_vision_method",
+        "test_all_providers_have_get_available_models_method",
+        "test_all_providers_return_models",
+        "test_all_providers_have_provider_name",
+        "test_all_providers_have_cli_command",
+        "test_build_command_returns_list",
+        "test_build_command_includes_cli_command",
+        "test_supports_vision_returns_bool"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    }
+  ],
+  "functions": [
+    {
+      "name": "main",
+      "file": "modelchorus/examples/basic_workflow.py",
+      "line": 56,
+      "language": "python",
+      "docstring": "Main entry point for the example.",
+      "parameters": [],
+      "return_type": null,
+      "complexity": 2,
+      "decorators": [],
+      "is_async": true,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "<module>",
+          "file": "modelchorus/examples/basic_workflow.py",
+          "line": 105,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "modelchorus/examples/provider_integration.py",
+          "line": 157,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "modelchorus/src/modelchorus/cli/main.py",
+          "line": 283,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 66,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 67,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 68,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 69,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 70,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 73,
+          "call_type": "method_call"
+        },
+        {
+          "name": "workflow_class",
+          "file": "unknown",
+          "line": 76,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 81,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 82,
+          "call_type": "function_call"
+        },
+        {
+          "name": "run",
+          "file": "unknown",
+          "line": 85,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 88,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 89,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 90,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 91,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 92,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 92,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 95,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 96,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 97,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 99,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 100,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 3
+    },
+    {
+      "name": "main",
+      "file": "modelchorus/examples/provider_integration.py",
+      "line": 101,
+      "language": "python",
+      "docstring": "Main entry point for the provider example.",
+      "parameters": [],
+      "return_type": null,
+      "complexity": 2,
+      "decorators": [],
+      "is_async": true,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "<module>",
+          "file": "modelchorus/examples/basic_workflow.py",
+          "line": 105,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "modelchorus/examples/provider_integration.py",
+          "line": 157,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "modelchorus/src/modelchorus/cli/main.py",
+          "line": 283,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 104,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 105,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 110,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 111,
+          "call_type": "function_call"
+        },
+        {
+          "name": "validate_api_key",
+          "file": "unknown",
+          "line": 111,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 114,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get_available_models",
+          "file": "unknown",
+          "line": 115,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 116,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 117,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 118,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 121,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 122,
+          "call_type": "function_call"
+        },
+        {
+          "name": "supports_vision",
+          "file": "unknown",
+          "line": 122,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 123,
+          "call_type": "function_call"
+        },
+        {
+          "name": "supports_vision",
+          "file": "unknown",
+          "line": 123,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 124,
+          "call_type": "function_call"
+        },
+        {
+          "name": "supports_capability",
+          "file": "unknown",
+          "line": 124,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 134,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 135,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 136,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 137,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 138,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 139,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 140,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 143,
+          "call_type": "function_call"
+        },
+        {
+          "name": "generate",
+          "file": "unknown",
+          "line": 144,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 146,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 147,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 148,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 149,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 150,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 151,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 152,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 3
+    },
+    {
+      "name": "get_provider_by_name",
+      "file": "modelchorus/src/modelchorus/cli/main.py",
+      "line": 35,
+      "language": "python",
+      "docstring": "Get provider instance by name.",
+      "parameters": [
+        {
+          "name": "name",
+          "type": "str",
+          "default": null
+        }
+      ],
+      "return_type": null,
+      "complexity": 2,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "consensus",
+          "file": "modelchorus/src/modelchorus/cli/main.py",
+          "line": 126,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 44,
+          "call_type": "method_call"
+        },
+        {
+          "name": "lower",
+          "file": "unknown",
+          "line": 44,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 46,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 47,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 47,
+          "call_type": "method_call"
+        },
+        {
+          "name": "keys",
+          "file": "unknown",
+          "line": 47,
+          "call_type": "method_call"
+        },
+        {
+          "name": "Exit",
+          "file": "unknown",
+          "line": 48,
+          "call_type": "method_call"
+        },
+        {
+          "name": "provider_class",
+          "file": "unknown",
+          "line": 50,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "consensus",
+      "file": "modelchorus/src/modelchorus/cli/main.py",
+      "line": 54,
+      "language": "python",
+      "docstring": "Run consensus workflow across multiple AI models.\n\nExample:\n    modelchorus consensus \"Explain quantum computing\" -p claude -p gemini -s synthesize",
+      "parameters": [
+        {
+          "name": "prompt",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "providers",
+          "type": "List[str]",
+          "default": null
+        },
+        {
+          "name": "strategy",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "system",
+          "type": "Optional[str]",
+          "default": null
+        },
+        {
+          "name": "temperature",
+          "type": "float",
+          "default": null
+        },
+        {
+          "name": "max_tokens",
+          "type": "Optional[int]",
+          "default": null
+        },
+        {
+          "name": "timeout",
+          "type": "float",
+          "default": null
+        },
+        {
+          "name": "output",
+          "type": "Optional[Path]",
+          "default": null
+        },
+        {
+          "name": "verbose",
+          "type": "bool",
+          "default": null
+        }
+      ],
+      "return_type": null,
+      "complexity": 16,
+      "decorators": [
+        "app.command()"
+      ],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "Argument",
+          "file": "unknown",
+          "line": 55,
+          "call_type": "method_call"
+        },
+        {
+          "name": "Option",
+          "file": "unknown",
+          "line": 56,
+          "call_type": "method_call"
+        },
+        {
+          "name": "Option",
+          "file": "unknown",
+          "line": 62,
+          "call_type": "method_call"
+        },
+        {
+          "name": "Option",
+          "file": "unknown",
+          "line": 68,
+          "call_type": "method_call"
+        },
+        {
+          "name": "Option",
+          "file": "unknown",
+          "line": 73,
+          "call_type": "method_call"
+        },
+        {
+          "name": "Option",
+          "file": "unknown",
+          "line": 79,
+          "call_type": "method_call"
+        },
+        {
+          "name": "Option",
+          "file": "unknown",
+          "line": 84,
+          "call_type": "method_call"
+        },
+        {
+          "name": "Option",
+          "file": "unknown",
+          "line": 89,
+          "call_type": "method_call"
+        },
+        {
+          "name": "Option",
+          "file": "unknown",
+          "line": 95,
+          "call_type": "method_call"
+        },
+        {
+          "name": "upper",
+          "file": "unknown",
+          "line": 111,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 113,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 114,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 115,
+          "call_type": "method_call"
+        },
+        {
+          "name": "lower",
+          "file": "unknown",
+          "line": 115,
+          "call_type": "method_call"
+        },
+        {
+          "name": "Exit",
+          "file": "unknown",
+          "line": 117,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 121,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 121,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get_provider_by_name",
+          "file": "unknown",
+          "line": 126,
+          "call_type": "function_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 127,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 129,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 131,
+          "call_type": "method_call"
+        },
+        {
+          "name": "Exit",
+          "file": "unknown",
+          "line": 132,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 142,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 153,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 154,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 154,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 155,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 155,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 156,
+          "call_type": "method_call"
+        },
+        {
+          "name": "run",
+          "file": "unknown",
+          "line": 159,
+          "call_type": "method_call"
+        },
+        {
+          "name": "execute",
+          "file": "unknown",
+          "line": 159,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 162,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_column",
+          "file": "unknown",
+          "line": 166,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_column",
+          "file": "unknown",
+          "line": 167,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_column",
+          "file": "unknown",
+          "line": 168,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_row",
+          "file": "unknown",
+          "line": 173,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 176,
+          "call_type": "function_call"
+        },
+        {
+          "name": "add_row",
+          "file": "unknown",
+          "line": 179,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 185,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 186,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 190,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 191,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 193,
+          "call_type": "method_call"
+        },
+        {
+          "name": "items",
+          "file": "unknown",
+          "line": 209,
+          "call_type": "method_call"
+        },
+        {
+          "name": "write_text",
+          "file": "unknown",
+          "line": 215,
+          "call_type": "method_call"
+        },
+        {
+          "name": "dumps",
+          "file": "unknown",
+          "line": 215,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 216,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 220,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 221,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 223,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 224,
+          "call_type": "method_call"
+        },
+        {
+          "name": "Exit",
+          "file": "unknown",
+          "line": 225,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 228,
+          "call_type": "method_call"
+        },
+        {
+          "name": "Exit",
+          "file": "unknown",
+          "line": 229,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 231,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 234,
+          "call_type": "method_call"
+        },
+        {
+          "name": "format_exc",
+          "file": "unknown",
+          "line": 234,
+          "call_type": "method_call"
+        },
+        {
+          "name": "Exit",
+          "file": "unknown",
+          "line": 235,
+          "call_type": "method_call"
+        },
+        {
+          "name": "command",
+          "file": "unknown",
+          "line": 53,
+          "call_type": "method_call"
+        }
+      ]
+    },
+    {
+      "name": "list_providers",
+      "file": "modelchorus/src/modelchorus/cli/main.py",
+      "line": 239,
+      "language": "python",
+      "docstring": "List all available providers and their models.",
+      "parameters": [],
+      "return_type": null,
+      "complexity": 3,
+      "decorators": [
+        "app.command()"
+      ],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 248,
+          "call_type": "method_call"
+        },
+        {
+          "name": "items",
+          "file": "unknown",
+          "line": 250,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 251,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 252,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 253,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get_available_models",
+          "file": "unknown",
+          "line": 255,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 256,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 256,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 260,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 260,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 262,
+          "call_type": "method_call"
+        },
+        {
+          "name": "command",
+          "file": "unknown",
+          "line": 238,
+          "call_type": "method_call"
+        }
+      ]
+    },
+    {
+      "name": "version",
+      "file": "modelchorus/src/modelchorus/cli/main.py",
+      "line": 266,
+      "language": "python",
+      "docstring": "Show version information.",
+      "parameters": [],
+      "return_type": null,
+      "complexity": 1,
+      "decorators": [
+        "app.command()"
+      ],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 268,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 269,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 270,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 271,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 272,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 273,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 274,
+          "call_type": "method_call"
+        },
+        {
+          "name": "command",
+          "file": "unknown",
+          "line": 265,
+          "call_type": "method_call"
+        }
+      ]
+    },
+    {
+      "name": "main",
+      "file": "modelchorus/src/modelchorus/cli/main.py",
+      "line": 277,
+      "language": "python",
+      "docstring": "Main entry point for CLI.",
+      "parameters": [],
+      "return_type": null,
+      "complexity": 1,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "<module>",
+          "file": "modelchorus/examples/basic_workflow.py",
+          "line": 105,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "modelchorus/examples/provider_integration.py",
+          "line": 157,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "modelchorus/src/modelchorus/cli/main.py",
+          "line": 283,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "app",
+          "file": "unknown",
+          "line": 279,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 3
+    },
+    {
+      "name": "mock_claude_response",
+      "file": "modelchorus/tests/conftest.py",
+      "line": 10,
+      "language": "python",
+      "docstring": "Mock response from Claude CLI --output-format json.",
+      "parameters": [],
+      "return_type": null,
+      "complexity": 1,
+      "decorators": [
+        "pytest.fixture"
+      ],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": []
+    },
+    {
+      "name": "mock_codex_response",
+      "file": "modelchorus/tests/conftest.py",
+      "line": 35,
+      "language": "python",
+      "docstring": "Mock JSONL response from Codex CLI --json.",
+      "parameters": [],
+      "return_type": null,
+      "complexity": 1,
+      "decorators": [
+        "pytest.fixture"
+      ],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": []
+    },
+    {
+      "name": "mock_subprocess_run",
+      "file": "modelchorus/tests/conftest.py",
+      "line": 45,
+      "language": "python",
+      "docstring": "Mock subprocess.run for CLI command execution.",
+      "parameters": [],
+      "return_type": null,
+      "complexity": 1,
+      "decorators": [
+        "pytest.fixture"
+      ],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": []
+    },
+    {
+      "name": "sample_generation_request",
+      "file": "modelchorus/tests/conftest.py",
+      "line": 55,
+      "language": "python",
+      "docstring": "Sample GenerationRequest for testing.",
+      "parameters": [],
+      "return_type": null,
+      "complexity": 1,
+      "decorators": [
+        "pytest.fixture"
+      ],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": []
+    }
+  ],
+  "dependencies": {
+    "modelchorus/examples/basic_workflow.py": [
+      "asyncio",
+      "modelchorus.core.BaseWorkflow",
+      "modelchorus.core.WorkflowResult",
+      "modelchorus.core.WorkflowRegistry",
+      "modelchorus.core.WorkflowRequest"
+    ],
+    "modelchorus/examples/provider_integration.py": [
+      "asyncio",
+      "modelchorus.providers.ModelProvider",
+      "modelchorus.providers.ModelConfig",
+      "modelchorus.providers.ModelCapability",
+      "modelchorus.providers.GenerationRequest",
+      "modelchorus.providers.GenerationResponse"
+    ],
+    "modelchorus/src/modelchorus/cli/__init__.py": [
+      "main.app",
+      "main.main"
+    ],
+    "modelchorus/src/modelchorus/cli/main.py": [
+      "asyncio",
+      "json",
+      "sys",
+      "pathlib.Path",
+      "typing.List",
+      "typing.Optional",
+      "typer",
+      "rich.console.Console",
+      "rich.table.Table",
+      "rich.print",
+      "providers.ClaudeProvider",
+      "providers.CodexProvider",
+      "providers.GeminiProvider",
+      "providers.CursorAgentProvider",
+      "providers.GenerationRequest",
+      "workflows.ConsensusWorkflow",
+      "workflows.ConsensusStrategy"
+    ],
+    "modelchorus/src/modelchorus/core/__init__.py": [
+      "base_workflow.BaseWorkflow",
+      "base_workflow.WorkflowResult",
+      "base_workflow.WorkflowStep",
+      "registry.WorkflowRegistry",
+      "models.WorkflowRequest",
+      "models.WorkflowResponse",
+      "models.ModelSelection",
+      "models.WorkflowStep",
+      "models.ModelResponse",
+      "models.ConsensusConfig"
+    ],
+    "modelchorus/src/modelchorus/core/base_workflow.py": [
+      "abc.ABC",
+      "abc.abstractmethod",
+      "typing.Any",
+      "typing.Dict",
+      "typing.List",
+      "typing.Optional",
+      "dataclasses.dataclass",
+      "dataclasses.field",
+      "datetime.datetime"
+    ],
+    "modelchorus/src/modelchorus/core/models.py": [
+      "typing.Any",
+      "typing.Dict",
+      "typing.List",
+      "typing.Optional",
+      "pydantic.BaseModel",
+      "pydantic.Field",
+      "pydantic.ConfigDict"
+    ],
+    "modelchorus/src/modelchorus/core/registry.py": [
+      "typing.Dict",
+      "typing.Type",
+      "typing.Optional",
+      "typing.Callable",
+      "inspect",
+      "base_workflow.BaseWorkflow"
+    ],
+    "modelchorus/src/modelchorus/providers/__init__.py": [
+      "base_provider.ModelProvider",
+      "base_provider.ModelConfig",
+      "base_provider.ModelCapability",
+      "base_provider.GenerationRequest",
+      "base_provider.GenerationResponse",
+      "cli_provider.CLIProvider",
+      "claude_provider.ClaudeProvider",
+      "codex_provider.CodexProvider",
+      "gemini_provider.GeminiProvider",
+      "cursor_agent_provider.CursorAgentProvider"
+    ],
+    "modelchorus/src/modelchorus/providers/base_provider.py": [
+      "abc.ABC",
+      "abc.abstractmethod",
+      "typing.Any",
+      "typing.Dict",
+      "typing.List",
+      "typing.Optional",
+      "dataclasses.dataclass",
+      "dataclasses.field",
+      "enum.Enum"
+    ],
+    "modelchorus/src/modelchorus/providers/claude_provider.py": [
+      "json",
+      "logging",
+      "typing.Any",
+      "typing.Dict",
+      "typing.List",
+      "typing.Optional",
+      "cli_provider.CLIProvider",
+      "base_provider.GenerationRequest",
+      "base_provider.GenerationResponse",
+      "base_provider.ModelConfig",
+      "base_provider.ModelCapability"
+    ],
+    "modelchorus/src/modelchorus/providers/cli_provider.py": [
+      "asyncio",
+      "json",
+      "logging",
+      "abc.abstractmethod",
+      "typing.Any",
+      "typing.Dict",
+      "typing.List",
+      "typing.Optional",
+      "base_provider.ModelProvider",
+      "base_provider.GenerationRequest",
+      "base_provider.GenerationResponse"
+    ],
+    "modelchorus/src/modelchorus/providers/codex_provider.py": [
+      "json",
+      "logging",
+      "typing.Any",
+      "typing.Dict",
+      "typing.List",
+      "typing.Optional",
+      "cli_provider.CLIProvider",
+      "base_provider.GenerationRequest",
+      "base_provider.GenerationResponse",
+      "base_provider.ModelConfig",
+      "base_provider.ModelCapability"
+    ],
+    "modelchorus/src/modelchorus/providers/cursor_agent_provider.py": [
+      "json",
+      "logging",
+      "typing.Any",
+      "typing.Dict",
+      "typing.List",
+      "typing.Optional",
+      "cli_provider.CLIProvider",
+      "base_provider.GenerationRequest",
+      "base_provider.GenerationResponse",
+      "base_provider.ModelConfig",
+      "base_provider.ModelCapability"
+    ],
+    "modelchorus/src/modelchorus/providers/gemini_provider.py": [
+      "json",
+      "logging",
+      "typing.Any",
+      "typing.Dict",
+      "typing.List",
+      "typing.Optional",
+      "cli_provider.CLIProvider",
+      "base_provider.GenerationRequest",
+      "base_provider.GenerationResponse",
+      "base_provider.ModelConfig",
+      "base_provider.ModelCapability"
+    ],
+    "modelchorus/src/modelchorus/workflows/__init__.py": [
+      "consensus.ConsensusWorkflow",
+      "consensus.ConsensusStrategy",
+      "consensus.ConsensusResult",
+      "consensus.ProviderConfig"
+    ],
+    "modelchorus/src/modelchorus/workflows/consensus.py": [
+      "asyncio",
+      "logging",
+      "typing.List",
+      "typing.Dict",
+      "typing.Any",
+      "typing.Optional",
+      "dataclasses.dataclass",
+      "dataclasses.field",
+      "enum.Enum",
+      "providers.ModelProvider",
+      "providers.GenerationRequest",
+      "providers.GenerationResponse"
+    ],
+    "modelchorus/tests/conftest.py": [
+      "pytest",
+      "unittest.mock.AsyncMock",
+      "unittest.mock.MagicMock"
+    ],
+    "modelchorus/tests/test_claude_provider.py": [
+      "json",
+      "pytest",
+      "unittest.mock.AsyncMock",
+      "unittest.mock.patch",
+      "modelchorus.providers.claude_provider.ClaudeProvider",
+      "modelchorus.providers.base_provider.GenerationRequest"
+    ],
+    "modelchorus/tests/test_codex_provider.py": [
+      "json",
+      "pytest",
+      "unittest.mock.AsyncMock",
+      "unittest.mock.patch",
+      "modelchorus.providers.codex_provider.CodexProvider",
+      "modelchorus.providers.base_provider.GenerationRequest"
+    ],
+    "modelchorus/tests/test_consensus_workflow.py": [
+      "pytest",
+      "unittest.mock.AsyncMock",
+      "modelchorus.workflows.consensus.ConsensusWorkflow",
+      "modelchorus.workflows.consensus.ConsensusStrategy",
+      "modelchorus.providers.base_provider.GenerationResponse",
+      "modelchorus.providers.base_provider.GenerationRequest"
+    ],
+    "modelchorus/tests/test_integration.py": [
+      "pytest",
+      "unittest.mock.patch",
+      "unittest.mock.AsyncMock",
+      "modelchorus.workflows.consensus.ConsensusWorkflow",
+      "modelchorus.workflows.consensus.ConsensusStrategy",
+      "modelchorus.providers.base_provider.GenerationResponse",
+      "modelchorus.providers.base_provider.GenerationRequest",
+      "modelchorus.providers.claude_provider.ClaudeProvider",
+      "modelchorus.providers.codex_provider.CodexProvider"
+    ],
+    "tests/test_providers/test_cli_interface.py": [
+      "sys",
+      "pathlib.Path",
+      "pytest",
+      "modelchorus.providers.ModelProvider",
+      "modelchorus.providers.CLIProvider",
+      "modelchorus.providers.ClaudeProvider",
+      "modelchorus.providers.CodexProvider",
+      "modelchorus.providers.GeminiProvider",
+      "modelchorus.providers.CursorAgentProvider",
+      "modelchorus.providers.GenerationRequest"
+    ]
+  }
+}

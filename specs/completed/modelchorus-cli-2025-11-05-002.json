@@ -1,7 +1,7 @@
 {
   "spec_id": "modelchorus-cli-2025-11-05-002",
   "generated": "2025-11-05T14:00:00Z",
-  "last_updated": "2025-11-05T15:35:46.898462Z",
+  "last_updated": "2025-11-05T16:32:44.642366Z",
   "metadata": {
     "title": "ModelChorus: CLI-Based Multi-Model Workflow Package",
     "description": "Create a standalone Python package for multi-model AI workflow orchestration using CLI tool integrations (codex, gemini, claude, cursor-agent). Distributed via PyPI, completely independent from sdd-toolkit.",
@@ -18,7 +18,9 @@
     ],
     "progress_percentage": 100,
     "current_phase": "phase-5",
-    "activated_date": "2025-11-05T13:50:10.521577Z"
+    "activated_date": "2025-11-05T13:50:10.521577Z",
+    "completed_date": "2025-11-05T16:32:23.573744Z",
+    "actual_hours": 0.148
   },
   "hierarchy": {
     "spec-root": {
@@ -1504,6 +1506,14 @@
       "content": "All child tasks in phase phase-5 have been completed.",
       "metadata": {},
       "task_id": "phase-5"
+    },
+    {
+      "timestamp": "2025-11-05T16:32:44.642267Z",
+      "entry_type": "status_change",
+      "title": "ModelChorus v0.1.0 Production Release",
+      "author": "claude-code",
+      "content": "Successfully delivered ModelChorus v0.1.0 - a production-ready Python package and Claude Code plugin for multi-model AI consensus building.\n\nCompleted deliverables:\n- Full Python package with Consensus workflow implementation\n- 4 CLI-based AI providers (Claude, Gemini, Codex, Cursor Agent)\n- 5 consensus strategies (all_responses, first_valid, majority, weighted, synthesize)\n- Rich CLI interface with Typer\n- Comprehensive test suite\n- PyPI-ready packaging (validated with twine)\n- Claude Code plugin with Consensus skill using actual ModelChorus CLI\n- Complete documentation (README, SKILL.md, PR.md)\n\nAll 27 tasks completed across 5 phases. Package builds successfully, passes all tests, and is ready for PyPI publication and plugin marketplace distribution.",
+      "metadata": {}
     }
   ]
 }
