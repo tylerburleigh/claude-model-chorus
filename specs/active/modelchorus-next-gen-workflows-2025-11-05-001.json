@@ -1,7 +1,7 @@
 {
   "spec_id": "modelchorus-next-gen-workflows-2025-11-05-001",
   "generated": "2025-11-05T12:00:00Z",
-  "last_updated": "2025-11-05T23:48:29.473365Z",
+  "last_updated": "2025-11-05T23:49:57.480206Z",
   "metadata": {
     "title": "ModelChorus Next-Generation Workflows",
     "description": "Extend ModelChorus with conversation infrastructure, CHAT workflow for peer consultation, and THINKDEEP workflow for deep reasoning. Strategic implementation based on multi-model consensus (Claude, Gemini, Codex).",
@@ -16,7 +16,7 @@
       "history": []
     },
     "activated_date": "2025-11-05T17:44:07.657627Z",
-    "progress_percentage": 60,
+    "progress_percentage": 61,
     "current_phase": "phase-3"
   },
   "hierarchy": {
@@ -33,7 +33,7 @@
         "phase-5"
       ],
       "total_tasks": 88,
-      "completed_tasks": 53,
+      "completed_tasks": 54,
       "metadata": {
         "objectives": [
           "Establish conversation infrastructure as foundation for all workflows",
@@ -1503,7 +1503,7 @@
         "depends": []
       },
       "total_tasks": 23,
-      "completed_tasks": 13,
+      "completed_tasks": 14,
       "metadata": {
         "purpose": "Implement multi-step investigation workflow with hypothesis tracking",
         "risk_level": "medium",
@@ -1526,7 +1526,7 @@
         "task-3-8"
       ],
       "total_tasks": 19,
-      "completed_tasks": 13,
+      "completed_tasks": 14,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1935,7 +1935,7 @@
     "task-3-5": {
       "type": "task",
       "title": "src/modelchorus/workflows/__init__.py",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-3-files",
       "children": [
         "task-3-5-1"
@@ -1948,7 +1948,7 @@
         ]
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/modelchorus/workflows/__init__.py",
         "task_category": "implementation",
@@ -1959,7 +1959,7 @@
     "task-3-5-1": {
       "type": "subtask",
       "title": "Add ThinkDeepWorkflow and models to exports",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-3-5",
       "children": [],
       "dependencies": {
@@ -1968,8 +1968,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
-      "metadata": {}
+      "completed_tasks": 1,
+      "metadata": {
+        "started_at": "2025-11-05T23:49:21.417255Z",
+        "completed_at": "2025-11-05T23:49:57.456194Z",
+        "needs_journaling": false,
+        "actual_hours": 0.01,
+        "journaled_at": "2025-11-05T23:49:57.471996Z"
+      }
     },
     "task-3-6": {
       "type": "task",
@@ -3496,6 +3502,15 @@
       "content": "The thinkdeep commands are already fully implemented and registered in the CLI. Verified:\n\n1. ThinkDeepWorkflow is imported from workflows package (line 25 of main.py)\n2. The 'thinkdeep' command is registered and functional (lines 416-660)\n3. The 'thinkdeep-status' command is registered and functional (lines 663-785)\n4. Both commands show up in CLI help output\n5. Both commands have full parameter support including:\n   - Primary provider selection\n   - Expert provider for validation\n   - Continuation support for multi-turn investigations\n   - File inclusion\n   - Temperature and token controls\n   - Verbose output options\n\nTested with 'python -m modelchorus.cli.main --help' and both commands are available and working correctly.",
       "metadata": {},
       "task_id": "task-3-4-1"
+    },
+    {
+      "timestamp": "2025-11-05T23:49:57.471976Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add ThinkDeepWorkflow and models to exports",
+      "author": "claude-code",
+      "content": "Successfully added ThinkDeep-related models to the workflows package exports. Changes made to src/modelchorus/workflows/__init__.py:\n\n1. Added imports for ThinkDeep models from core.models:\n   - ConfidenceLevel (enum for investigation confidence tracking)\n   - Hypothesis (model for hypothesis tracking)\n   - InvestigationStep (model for investigation step data)\n   - ThinkDeepState (model for investigation state persistence)\n\n2. Added all four models to __all__ export list\n\n3. Verified imports work correctly with test command\n4. Verified all models can be instantiated successfully\n5. Confirmed ConfidenceLevel enum has all 7 values (exploring, low, medium, high, very_high, almost_certain, certain)\n\nUsers can now import these models directly from modelchorus.workflows package for programmatic use of ThinkDeep workflow state management.",
+      "metadata": {},
+      "task_id": "task-3-5-1"
     }
   ]
 }

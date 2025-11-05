@@ -13,6 +13,12 @@ from .consensus import (
     ProviderConfig,
 )
 from .thinkdeep import ThinkDeepWorkflow
+from ..core.models import (
+    ConfidenceLevel,
+    Hypothesis,
+    InvestigationStep,
+    ThinkDeepState,
+)
 
 __all__ = [
     "ChatWorkflow",
@@ -21,4 +27,8 @@ __all__ = [
     "ConsensusResult",
     "ProviderConfig",
     "ThinkDeepWorkflow",
+    "ConfidenceLevel",
+    "Hypothesis",
+    "InvestigationStep",
+    "ThinkDeepState",
 ]
