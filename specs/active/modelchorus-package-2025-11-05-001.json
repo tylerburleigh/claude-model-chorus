@@ -1,0 +1,1461 @@
+{
+  "spec_id": "modelchorus-package-2025-11-05-001",
+  "generated": "2025-11-05T12:00:00Z",
+  "last_updated": "2025-11-05T12:14:52.837095Z",
+  "metadata": {
+    "title": "ModelChorus: Standalone Multi-Model Workflow Package",
+    "description": "Create a standalone Python package for multi-model AI workflow orchestration, starting with consensus workflow. Distributed via PyPI, completely independent from sdd-toolkit.",
+    "status": "active",
+    "complexity": "high",
+    "estimated_hours": 28,
+    "objectives": [
+      "Create standalone Python package structure with pyproject.toml",
+      "Implement core abstractions for workflows and model providers",
+      "Build consensus workflow with stance-based coordination",
+      "Provide CLI interface (modelchorus consensus ...)",
+      "Enable PyPI distribution for any Python developer",
+      "Zero dependencies on sdd-toolkit or Claude Code"
+    ],
+    "activated_date": "2025-11-05T12:12:14.325465Z",
+    "progress_percentage": 2,
+    "current_phase": "phase-1"
+  },
+  "hierarchy": {
+    "spec-root": {
+      "type": "spec",
+      "title": "ModelChorus: Standalone Multi-Model Workflow Package",
+      "status": "in_progress",
+      "parent": null,
+      "children": [
+        "phase-1",
+        "phase-2",
+        "phase-3",
+        "phase-4",
+        "phase-5"
+      ],
+      "total_tasks": 41,
+      "completed_tasks": 1,
+      "metadata": {}
+    },
+    "phase-1": {
+      "type": "phase",
+      "title": "Package Foundation & Core Abstractions",
+      "status": "in_progress",
+      "parent": "spec-root",
+      "children": [
+        "phase-1-files",
+        "phase-1-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-2",
+          "phase-3"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 12,
+      "completed_tasks": 1,
+      "metadata": {
+        "purpose": "Establish package structure, core base classes, and Pydantic models",
+        "risk_level": "low",
+        "estimated_hours": 5
+      }
+    },
+    "phase-1-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "in_progress",
+      "parent": "phase-1",
+      "children": [
+        "task-1-1",
+        "task-1-2",
+        "task-1-3",
+        "task-1-4",
+        "task-1-5"
+      ],
+      "total_tasks": 10,
+      "completed_tasks": 1,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-1-verify"
+        ]
+      }
+    },
+    "task-1-1": {
+      "type": "task",
+      "title": "Create package directory structure",
+      "status": "completed",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-1-1"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-1-2",
+          "task-1-3",
+          "task-1-4",
+          "task-1-5"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "description": "Create modelchorus/ directory structure with src/modelchorus/ Python package layout",
+        "file_path": "task-1-1.md"
+      }
+    },
+    "task-1-1-1": {
+      "type": "subtask",
+      "title": "Create directory structure and __init__.py files",
+      "status": "completed",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "changes": "Create: modelchorus/src/modelchorus/{__init__.py,core/,workflows/,providers/,cli/,utils/}",
+        "completed_at": "2025-11-05T12:14:52.821910Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-05T12:14:52.830689Z"
+      }
+    },
+    "task-1-2": {
+      "type": "task",
+      "title": "pyproject.toml",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-2-1",
+        "task-1-2-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/pyproject.toml",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "description": "Package configuration with dependencies and metadata"
+      }
+    },
+    "task-1-2-1": {
+      "type": "subtask",
+      "title": "Define project metadata and dependencies",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Add: name='modelchorus', dependencies: anthropic, openai, google-generativeai, pydantic, httpx, rich, typer"
+      }
+    },
+    "task-1-2-2": {
+      "type": "subtask",
+      "title": "Configure CLI entry point and optional dependencies",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Add: [project.scripts] modelchorus = 'modelchorus.cli:main', [project.optional-dependencies] dev"
+      }
+    },
+    "task-1-3": {
+      "type": "task",
+      "title": "src/modelchorus/core/base.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-3-1",
+        "task-1-3-2",
+        "task-1-3-3"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-1-4"
+        ],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/core/base.py",
+        "task_category": "implementation",
+        "estimated_hours": 1.5,
+        "description": "Base classes for workflows and providers"
+      }
+    },
+    "task-1-3-1": {
+      "type": "subtask",
+      "title": "Implement BaseWorkflow abstract class",
+      "status": "pending",
+      "parent": "task-1-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Define: BaseWorkflow with abstract run() method, synthesize() helper"
+      }
+    },
+    "task-1-3-2": {
+      "type": "subtask",
+      "title": "Implement ModelProvider abstract class",
+      "status": "pending",
+      "parent": "task-1-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Define: ModelProvider with abstract generate() method, supports_vision() check"
+      }
+    },
+    "task-1-3-3": {
+      "type": "subtask",
+      "title": "Implement WorkflowRegistry for plugin system",
+      "status": "pending",
+      "parent": "task-1-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Add: WorkflowRegistry.register() decorator, .get() method for dynamic workflow loading"
+      }
+    },
+    "task-1-4": {
+      "type": "task",
+      "title": "src/modelchorus/core/models.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-4-1",
+        "task-1-4-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1",
+          "task-1-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/core/models.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "description": "Pydantic models for requests and responses"
+      }
+    },
+    "task-1-4-1": {
+      "type": "subtask",
+      "title": "Define WorkflowRequest and WorkflowResponse models",
+      "status": "pending",
+      "parent": "task-1-4",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Create Pydantic models: WorkflowRequest(prompt, models, config), WorkflowResponse(result, metadata)"
+      }
+    },
+    "task-1-4-2": {
+      "type": "subtask",
+      "title": "Define ModelResponse and ConsensusConfig models",
+      "status": "pending",
+      "parent": "task-1-4",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Create: ModelResponse(model, content, metadata), ConsensusConfig(mode, stances, temperature)"
+      }
+    },
+    "task-1-5": {
+      "type": "task",
+      "title": "README.md",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-5-1",
+        "task-1-5-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/README.md",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "description": "Package README with overview and placeholder examples"
+      }
+    },
+    "task-1-5-1": {
+      "type": "subtask",
+      "title": "Write package overview and installation",
+      "status": "pending",
+      "parent": "task-1-5",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Add: Project description, pip install modelchorus, feature list"
+      }
+    },
+    "task-1-5-2": {
+      "type": "subtask",
+      "title": "Add quick start examples",
+      "status": "pending",
+      "parent": "task-1-5",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Add: Programmatic and CLI usage examples (placeholder for now)"
+      }
+    },
+    "phase-1-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "verify-1-1",
+        "verify-1-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-1-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-1-1": {
+      "type": "verify",
+      "title": "Package structure is correct",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "python -m modelchorus.core.base",
+        "expected": "Module imports successfully, base classes defined"
+      }
+    },
+    "verify-1-2": {
+      "type": "verify",
+      "title": "pyproject.toml is valid",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pip install -e modelchorus/",
+        "expected": "Package installs in editable mode without errors"
+      }
+    },
+    "phase-2": {
+      "type": "phase",
+      "title": "Model Provider Integrations",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-2-files",
+        "phase-2-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-3"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 8,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Implement provider adapters for Anthropic, OpenAI, and Google",
+        "risk_level": "medium",
+        "estimated_hours": 6
+      }
+    },
+    "phase-2-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "task-2-1",
+        "task-2-2",
+        "task-2-3"
+      ],
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-2-verify"
+        ]
+      }
+    },
+    "task-2-1": {
+      "type": "task",
+      "title": "src/modelchorus/providers/anthropic.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-1-1",
+        "task-2-1-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/providers/anthropic.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "description": "Anthropic API provider implementation"
+      }
+    },
+    "task-2-1-1": {
+      "type": "subtask",
+      "title": "Implement AnthropicProvider class",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Inherit ModelProvider, implement generate() using anthropic client"
+      }
+    },
+    "task-2-1-2": {
+      "type": "subtask",
+      "title": "Add error handling and retry logic",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Handle API errors, rate limits, timeouts with exponential backoff"
+      }
+    },
+    "task-2-2": {
+      "type": "task",
+      "title": "src/modelchorus/providers/openai.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-2-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/providers/openai.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "description": "OpenAI API provider implementation"
+      }
+    },
+    "task-2-2-1": {
+      "type": "subtask",
+      "title": "Implement OpenAIProvider with error handling",
+      "status": "pending",
+      "parent": "task-2-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Inherit ModelProvider, implement generate() using openai client, add retry logic"
+      }
+    },
+    "task-2-3": {
+      "type": "task",
+      "title": "src/modelchorus/providers/google.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-3-1",
+        "task-2-3-2",
+        "task-2-3-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/providers/google.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "description": "Google Gemini API provider implementation"
+      }
+    },
+    "task-2-3-1": {
+      "type": "subtask",
+      "title": "Implement GoogleProvider with generate()",
+      "status": "pending",
+      "parent": "task-2-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Inherit ModelProvider, implement generate() using google.generativeai"
+      }
+    },
+    "task-2-3-2": {
+      "type": "subtask",
+      "title": "Add safety settings configuration",
+      "status": "pending",
+      "parent": "task-2-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Configure Gemini safety settings for open-ended generation"
+      }
+    },
+    "task-2-3-3": {
+      "type": "subtask",
+      "title": "Add error handling for Gemini-specific errors",
+      "status": "pending",
+      "parent": "task-2-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Handle quota errors, content filtering, retry logic"
+      }
+    },
+    "phase-2-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "verify-2-1",
+        "verify-2-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-2-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-2-1": {
+      "type": "verify",
+      "title": "Providers implement ModelProvider interface",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "python -m pytest tests/test_providers/test_interface.py",
+        "expected": "All providers implement required methods"
+      }
+    },
+    "verify-2-2": {
+      "type": "verify",
+      "title": "Providers can generate responses",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Each provider successfully calls its API and returns response (requires API keys)",
+        "command": ""
+      }
+    },
+    "phase-3": {
+      "type": "phase",
+      "title": "Consensus Workflow Implementation",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-3-files",
+        "phase-3-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-4"
+        ],
+        "blocked_by": [
+          "phase-1",
+          "phase-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 10,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Implement consensus workflow with sequential execution and synthesis",
+        "risk_level": "medium",
+        "estimated_hours": 8
+      }
+    },
+    "phase-3-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "task-3-1",
+        "task-3-2",
+        "task-3-3",
+        "task-3-4"
+      ],
+      "total_tasks": 8,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-3-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-3-1": {
+      "type": "task",
+      "title": "src/modelchorus/workflows/consensus.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-1-1",
+        "task-3-1-2",
+        "task-3-1-3"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-3-2",
+          "task-3-3"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/workflows/consensus.py",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "description": "Consensus workflow class with sequential execution"
+      }
+    },
+    "task-3-1-1": {
+      "type": "subtask",
+      "title": "Implement ConsensusWorkflow class",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Inherit BaseWorkflow, implement run() with sequential model calls"
+      }
+    },
+    "task-3-1-2": {
+      "type": "subtask",
+      "title": "Add mode selection (natural vs stance)",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Support natural mode (unbiased) and stance mode (for/against/neutral)"
+      }
+    },
+    "task-3-1-3": {
+      "type": "subtask",
+      "title": "Implement response collection and state tracking",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Collect responses sequentially, track which models consulted"
+      }
+    },
+    "task-3-2": {
+      "type": "task",
+      "title": "src/modelchorus/workflows/prompts.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-2-1",
+        "task-3-2-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-3-1",
+          "task-3-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/workflows/prompts.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "description": "Prompt generation for natural and stance modes"
+      }
+    },
+    "task-3-2-1": {
+      "type": "subtask",
+      "title": "Implement natural mode prompt generation",
+      "status": "pending",
+      "parent": "task-3-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Generate unbiased analysis prompts for natural perspective"
+      }
+    },
+    "task-3-2-2": {
+      "type": "subtask",
+      "title": "Implement stance mode prompt generation with ethical guardrails",
+      "status": "pending",
+      "parent": "task-3-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Generate stance-specific prompts (for/against/neutral) with Zen MCP ethical guardrails"
+      }
+    },
+    "task-3-3": {
+      "type": "task",
+      "title": "src/modelchorus/core/synthesis.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-3-1",
+        "task-3-3-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-3-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/core/synthesis.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "description": "Response synthesis utilities"
+      }
+    },
+    "task-3-3-1": {
+      "type": "subtask",
+      "title": "Implement synthesize_responses() function",
+      "status": "pending",
+      "parent": "task-3-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Use one model (Gemini) to synthesize multiple responses into unified output"
+      }
+    },
+    "task-3-3-2": {
+      "type": "subtask",
+      "title": "Add consensus formatting and metadata extraction",
+      "status": "pending",
+      "parent": "task-3-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Format synthesis with agreements, disagreements, confidence level"
+      }
+    },
+    "task-3-4": {
+      "type": "task",
+      "title": "Research Zen MCP stance prompts",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-3-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "research",
+        "estimated_hours": 1,
+        "description": "Extract ethical guardrails and stance system prompts from Zen MCP consensus.py",
+        "file_path": "task-3-4.md"
+      }
+    },
+    "phase-3-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "verify-3-1",
+        "verify-3-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-3-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-3-1": {
+      "type": "verify",
+      "title": "Consensus workflow executes sequentially",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Run consensus with 2 models, verify sequential execution and response collection",
+        "command": ""
+      }
+    },
+    "verify-3-2": {
+      "type": "verify",
+      "title": "Synthesis produces coherent output",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Synthesis identifies agreements, disagreements, and provides unified recommendation",
+        "command": ""
+      }
+    },
+    "phase-4": {
+      "type": "phase",
+      "title": "CLI Interface",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-4-files",
+        "phase-4-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-5"
+        ],
+        "blocked_by": [
+          "phase-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Create standalone CLI with Typer and Rich formatting",
+        "risk_level": "low",
+        "estimated_hours": 4
+      }
+    },
+    "phase-4-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "task-4-1",
+        "task-4-2",
+        "task-4-3"
+      ],
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-4-verify"
+        ]
+      }
+    },
+    "task-4-1": {
+      "type": "task",
+      "title": "src/modelchorus/cli/main.py",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-1-1",
+        "task-4-1-2"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-4-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/cli/main.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "description": "Typer-based CLI application"
+      }
+    },
+    "task-4-1-1": {
+      "type": "subtask",
+      "title": "Implement main CLI app and consensus command",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Create Typer app, add 'consensus' command with prompt, models, mode options"
+      }
+    },
+    "task-4-1-2": {
+      "type": "subtask",
+      "title": "Add provider initialization from environment",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Initialize providers from ANTHROPIC_API_KEY, OPENAI_API_KEY, GOOGLE_API_KEY env vars"
+      }
+    },
+    "task-4-2": {
+      "type": "task",
+      "title": "src/modelchorus/cli/formatting.py",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-2-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-4-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/cli/formatting.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "description": "Rich formatting for CLI output"
+      }
+    },
+    "task-4-2-1": {
+      "type": "subtask",
+      "title": "Implement rich console output formatting",
+      "status": "pending",
+      "parent": "task-4-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Use Rich library for formatted output: panels, tables, progress indicators"
+      }
+    },
+    "task-4-3": {
+      "type": "task",
+      "title": "Update README with CLI examples",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-3-1",
+        "task-4-3-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/README.md",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "description": "Add complete usage examples"
+      }
+    },
+    "task-4-3-1": {
+      "type": "subtask",
+      "title": "Add CLI usage examples",
+      "status": "pending",
+      "parent": "task-4-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Document: modelchorus consensus command with options and examples"
+      }
+    },
+    "task-4-3-2": {
+      "type": "subtask",
+      "title": "Add programmatic API examples",
+      "status": "pending",
+      "parent": "task-4-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Document: Python API for using ConsensusWorkflow directly"
+      }
+    },
+    "phase-4-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "verify-4-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-4-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-4-1": {
+      "type": "verify",
+      "title": "CLI command works end-to-end",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "modelchorus consensus 'Test proposal' --models gpt-4 claude-3.5-sonnet",
+        "expected": "CLI runs consensus workflow and displays formatted output"
+      }
+    },
+    "phase-5": {
+      "type": "phase",
+      "title": "Testing, Documentation & Distribution",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-5-files",
+        "phase-5-verify"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Add tests, complete documentation, and prepare for PyPI",
+        "risk_level": "low",
+        "estimated_hours": 5
+      }
+    },
+    "phase-5-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "task-5-1",
+        "task-5-2",
+        "task-5-3"
+      ],
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-5-verify"
+        ]
+      }
+    },
+    "task-5-1": {
+      "type": "task",
+      "title": "tests/test_consensus.py",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/tests/test_consensus.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "description": "Unit tests for consensus workflow"
+      }
+    },
+    "task-5-2": {
+      "type": "task",
+      "title": "LICENSE",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/LICENSE",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "description": "Add MIT license file"
+      }
+    },
+    "task-5-3": {
+      "type": "task",
+      "title": ".github/workflows/ci.yml",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/.github/workflows/ci.yml",
+        "task_category": "implementation",
+        "estimated_hours": 1.5,
+        "description": "GitHub Actions CI for testing and PyPI publishing"
+      }
+    },
+    "phase-5-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "verify-5-1",
+        "verify-5-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-5-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-5-1": {
+      "type": "verify",
+      "title": "Tests pass",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest modelchorus/tests/",
+        "expected": "All unit tests pass"
+      }
+    },
+    "verify-5-2": {
+      "type": "verify",
+      "title": "Package builds successfully",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "python -m build modelchorus/",
+        "expected": "Wheel and sdist build without errors"
+      }
+    }
+  },
+  "journal": [
+    {
+      "timestamp": "2025-11-05T12:14:52.830651Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Create directory structure and __init__.py files",
+      "author": "claude-code",
+      "content": "Successfully created the foundational directory structure for the modelchorus package with all necessary __init__.py files. Created the following structure:\n\n- modelchorus/src/modelchorus/ (root package directory)\n- modelchorus/src/modelchorus/core/ (orchestration logic)\n- modelchorus/src/modelchorus/workflows/ (workflow implementations)\n- modelchorus/src/modelchorus/providers/ (provider integrations)\n- modelchorus/src/modelchorus/cli/ (command-line interface)\n- modelchorus/src/modelchorus/utils/ (shared utilities)\n\nAll directories include proper __init__.py files with docstrings. Root package includes version 0.1.0 and package metadata. Verified that the package can be successfully imported with no errors.",
+      "metadata": {},
+      "task_id": "task-1-1-1"
+    }
+  ]
+}
