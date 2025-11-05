@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T20:33:23.715943Z",
+    "generated_at": "2025-11-05T21:10:18.452900Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 33,
-    "total_lines": 6746,
-    "total_classes": 41,
+    "total_files": 34,
+    "total_lines": 7105,
+    "total_classes": 42,
     "total_functions": 12,
     "avg_complexity": 2.75,
     "max_complexity": 16,
@@ -20,9 +20,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 33,
-        "lines": 6746,
-        "classes": 41,
+        "files": 34,
+        "lines": 7105,
+        "classes": 42,
         "functions": 12,
         "avg_complexity": 2.75
       }
@@ -31,7 +31,7 @@
   "modules": [
     {
       "name": "basic_workflow",
-      "file": "modelchorus/examples/basic_workflow.py",
+      "file": "examples/basic_workflow.py",
       "language": "python",
       "docstring": "Basic workflow example for ModelChorus.\n\nThis example demonstrates how to create and execute a simple workflow\nusing the ModelChorus framework.",
       "classes": [
@@ -52,7 +52,7 @@
     },
     {
       "name": "provider_integration",
-      "file": "modelchorus/examples/provider_integration.py",
+      "file": "examples/provider_integration.py",
       "language": "python",
       "docstring": "Provider integration example for ModelChorus.\n\nThis example demonstrates how to integrate and use different AI providers\nwith ModelChorus.",
       "classes": [
@@ -74,7 +74,7 @@
     },
     {
       "name": "__init__",
-      "file": "modelchorus/src/modelchorus/__init__.py",
+      "file": "src/modelchorus/__init__.py",
       "language": "python",
       "docstring": "ModelChorus - Standalone Multi-Model Workflow Package\n\nA flexible orchestration engine for multi-model AI workflows including\nthinking, debugging, consensus building, code review, and more.",
       "classes": [],
@@ -85,7 +85,7 @@
     },
     {
       "name": "__init__",
-      "file": "modelchorus/src/modelchorus/cli/__init__.py",
+      "file": "src/modelchorus/cli/__init__.py",
       "language": "python",
       "docstring": "Command-line interface for ModelChorus.\n\nThis module provides CLI commands for running workflows and\nmanaging ModelChorus operations.",
       "classes": [],
@@ -99,7 +99,7 @@
     },
     {
       "name": "main",
-      "file": "modelchorus/src/modelchorus/cli/main.py",
+      "file": "src/modelchorus/cli/main.py",
       "language": "python",
       "docstring": "CLI interface for ModelChorus.\n\nTyper-based command-line application for running multi-model workflows.",
       "classes": [],
@@ -134,7 +134,7 @@
     },
     {
       "name": "__init__",
-      "file": "modelchorus/src/modelchorus/core/__init__.py",
+      "file": "src/modelchorus/core/__init__.py",
       "language": "python",
       "docstring": "Core orchestration logic for ModelChorus workflows.\n\nThis module contains the main workflow engine and model orchestration\ncomponents that power multi-model AI workflows.",
       "classes": [],
@@ -160,7 +160,7 @@
     },
     {
       "name": "base_workflow",
-      "file": "modelchorus/src/modelchorus/core/base_workflow.py",
+      "file": "src/modelchorus/core/base_workflow.py",
       "language": "python",
       "docstring": "Base workflow abstract class for ModelChorus.\n\nThis module defines the abstract base class that all workflow implementations\nmust inherit from, providing a consistent interface for multi-model orchestration.",
       "classes": [
@@ -188,7 +188,7 @@
     },
     {
       "name": "conversation",
-      "file": "modelchorus/src/modelchorus/core/conversation.py",
+      "file": "src/modelchorus/core/conversation.py",
       "language": "python",
       "docstring": "Conversation memory management for ModelChorus.\n\nProvides file-based persistence for multi-turn conversations with continuation support.\nBased on Zen MCP patterns but adapted for CLI-based orchestration architecture.\n\nKey Features:\n- UUID-based thread identification (continuation_id)\n- File-based persistence (survives process restarts)\n- Thread-safe operations with file locking\n- TTL-based automatic cleanup\n- Context window management for long conversations",
       "classes": [
@@ -218,7 +218,7 @@
     },
     {
       "name": "models",
-      "file": "modelchorus/src/modelchorus/core/models.py",
+      "file": "src/modelchorus/core/models.py",
       "language": "python",
       "docstring": "Pydantic models for ModelChorus workflow requests and responses.\n\nThis module defines the data models used for workflow communication,\nproviding validation and serialization for workflow inputs and outputs.\n\nAdditionally defines conversation infrastructure models for multi-turn\nconversations with continuation support, adapted from Zen MCP patterns.",
       "classes": [
@@ -248,7 +248,7 @@
     },
     {
       "name": "registry",
-      "file": "modelchorus/src/modelchorus/core/registry.py",
+      "file": "src/modelchorus/core/registry.py",
       "language": "python",
       "docstring": "Workflow registry for ModelChorus plugin system.\n\nThis module provides a registry for dynamically registering and loading\nworkflow implementations, enabling a flexible plugin architecture.",
       "classes": [
@@ -268,7 +268,7 @@
     },
     {
       "name": "state",
-      "file": "modelchorus/src/modelchorus/core/state.py",
+      "file": "src/modelchorus/core/state.py",
       "language": "python",
       "docstring": "State persistence layer for ModelChorus workflows.\n\nProvides thread-safe in-memory and optional file-based persistence\nfor workflow state. Complements ConversationMemory by focusing on\nworkflow execution state rather than conversation history.\n\nKey Features:\n- Thread-safe in-memory state storage\n- JSON serialization for Pydantic models\n- Optional file-based persistence\n- State isolation per workflow instance",
       "classes": [
@@ -294,7 +294,7 @@
     },
     {
       "name": "__init__",
-      "file": "modelchorus/src/modelchorus/providers/__init__.py",
+      "file": "src/modelchorus/providers/__init__.py",
       "language": "python",
       "docstring": "Provider integrations for ModelChorus.\n\nThis module contains abstractions and implementations for different\nAI model providers via CLI tools.",
       "classes": [],
@@ -316,7 +316,7 @@
     },
     {
       "name": "base_provider",
-      "file": "modelchorus/src/modelchorus/providers/base_provider.py",
+      "file": "src/modelchorus/providers/base_provider.py",
       "language": "python",
       "docstring": "Base provider abstract class for ModelChorus.\n\nThis module defines the abstract base class that all model provider implementations\nmust inherit from, providing a consistent interface for different AI providers\n(Anthropic, OpenAI, Google, etc.).",
       "classes": [
@@ -343,7 +343,7 @@
     },
     {
       "name": "claude_provider",
-      "file": "modelchorus/src/modelchorus/providers/claude_provider.py",
+      "file": "src/modelchorus/providers/claude_provider.py",
       "language": "python",
       "docstring": "Claude CLI provider for ModelChorus.\n\nThis module provides integration with Anthropic's Claude models via the `claude` CLI tool.",
       "classes": [
@@ -368,7 +368,7 @@
     },
     {
       "name": "cli_provider",
-      "file": "modelchorus/src/modelchorus/providers/cli_provider.py",
+      "file": "src/modelchorus/providers/cli_provider.py",
       "language": "python",
       "docstring": "CLI-based provider for ModelChorus.\n\nThis module provides the base class for providers that interact with AI models\nvia command-line interface tools (e.g., claude CLI, gemini CLI, codex CLI).",
       "classes": [
@@ -394,7 +394,7 @@
     },
     {
       "name": "codex_provider",
-      "file": "modelchorus/src/modelchorus/providers/codex_provider.py",
+      "file": "src/modelchorus/providers/codex_provider.py",
       "language": "python",
       "docstring": "Codex CLI provider for ModelChorus.\n\nThis module provides integration with OpenAI's Codex models via the `codex` CLI tool.",
       "classes": [
@@ -419,7 +419,7 @@
     },
     {
       "name": "cursor_agent_provider",
-      "file": "modelchorus/src/modelchorus/providers/cursor_agent_provider.py",
+      "file": "src/modelchorus/providers/cursor_agent_provider.py",
       "language": "python",
       "docstring": "Cursor Agent CLI provider for ModelChorus.\n\nThis module provides integration with Cursor's AI agent via the `cursor-agent` CLI tool.",
       "classes": [
@@ -444,7 +444,7 @@
     },
     {
       "name": "gemini_provider",
-      "file": "modelchorus/src/modelchorus/providers/gemini_provider.py",
+      "file": "src/modelchorus/providers/gemini_provider.py",
       "language": "python",
       "docstring": "Gemini CLI provider for ModelChorus.\n\nThis module provides integration with Google's Gemini models via the `gemini` CLI tool.",
       "classes": [
@@ -469,7 +469,7 @@
     },
     {
       "name": "__init__",
-      "file": "modelchorus/src/modelchorus/utils/__init__.py",
+      "file": "src/modelchorus/utils/__init__.py",
       "language": "python",
       "docstring": "Utility functions and helpers for ModelChorus.\n\nThis module contains shared utilities, helpers, and common functions\nused across the ModelChorus package.",
       "classes": [],
@@ -480,23 +480,52 @@
     },
     {
       "name": "__init__",
-      "file": "modelchorus/src/modelchorus/workflows/__init__.py",
+      "file": "src/modelchorus/workflows/__init__.py",
       "language": "python",
       "docstring": "Workflow implementations for ModelChorus.\n\nThis module contains specific workflow types such as thinkdeep, debug,\nconsensus, codereview, precommit, and planner.",
       "classes": [],
       "functions": [],
       "imports": [
+        "chat.ChatWorkflow",
         "consensus.ConsensusWorkflow",
         "consensus.ConsensusStrategy",
         "consensus.ConsensusResult",
         "consensus.ProviderConfig"
       ],
       "exports": [],
-      "lines": 20
+      "lines": 22
+    },
+    {
+      "name": "chat",
+      "file": "src/modelchorus/workflows/chat.py",
+      "language": "python",
+      "docstring": "Chat workflow for single-model peer consultation with conversation threading.\n\nThis module implements the ChatWorkflow which provides simple, straightforward\nconsultation with a single AI model while maintaining conversation continuity\nthrough threading.",
+      "classes": [
+        "ChatWorkflow"
+      ],
+      "functions": [],
+      "imports": [
+        "logging",
+        "uuid",
+        "typing.Optional",
+        "typing.Dict",
+        "typing.Any",
+        "typing.List",
+        "core.base_workflow.BaseWorkflow",
+        "core.base_workflow.WorkflowResult",
+        "core.base_workflow.WorkflowStep",
+        "core.conversation.ConversationMemory",
+        "providers.ModelProvider",
+        "providers.GenerationRequest",
+        "providers.GenerationResponse",
+        "core.models.ConversationMessage"
+      ],
+      "exports": [],
+      "lines": 357
     },
     {
       "name": "consensus",
-      "file": "modelchorus/src/modelchorus/workflows/consensus.py",
+      "file": "src/modelchorus/workflows/consensus.py",
       "language": "python",
       "docstring": "Consensus workflow for multi-model coordination.\n\nThis module implements the ConsensusWorkflow which enables querying multiple\nAI models simultaneously and synthesizing their responses for improved accuracy\nand reliability.",
       "classes": [
@@ -525,7 +554,7 @@
     },
     {
       "name": "__init__",
-      "file": "modelchorus/tests/__init__.py",
+      "file": "tests/__init__.py",
       "language": "python",
       "docstring": "Tests for ModelChorus CLI-based multi-model workflow package.\n\nThis test suite covers:\n- CLI providers (ClaudeProvider, CodexProvider)\n- Consensus workflow\n- Integration tests",
       "classes": [],
@@ -536,7 +565,7 @@
     },
     {
       "name": "conftest",
-      "file": "modelchorus/tests/conftest.py",
+      "file": "tests/conftest.py",
       "language": "python",
       "docstring": "Pytest configuration and fixtures for ModelChorus tests.",
       "classes": [],
@@ -556,7 +585,7 @@
     },
     {
       "name": "test_claude_provider",
-      "file": "modelchorus/tests/test_claude_provider.py",
+      "file": "tests/test_claude_provider.py",
       "language": "python",
       "docstring": "Tests for ClaudeProvider CLI integration.",
       "classes": [
@@ -576,7 +605,7 @@
     },
     {
       "name": "test_codex_provider",
-      "file": "modelchorus/tests/test_codex_provider.py",
+      "file": "tests/test_codex_provider.py",
       "language": "python",
       "docstring": "Tests for CodexProvider CLI integration.",
       "classes": [
@@ -596,7 +625,7 @@
     },
     {
       "name": "test_consensus_workflow",
-      "file": "modelchorus/tests/test_consensus_workflow.py",
+      "file": "tests/test_consensus_workflow.py",
       "language": "python",
       "docstring": "Tests for Consensus workflow.",
       "classes": [
@@ -616,7 +645,7 @@
     },
     {
       "name": "test_conversation",
-      "file": "modelchorus/tests/test_conversation.py",
+      "file": "tests/test_conversation.py",
       "language": "python",
       "docstring": "Unit tests for conversation infrastructure.\n\nTests verify ConversationMemory functionality including:\n- Thread creation with UUID generation\n- Continuation ID handling\n- Message persistence\n- Thread lifecycle management\n- File-based storage",
       "classes": [
@@ -639,7 +668,7 @@
     },
     {
       "name": "test_gemini_integration",
-      "file": "modelchorus/tests/test_gemini_integration.py",
+      "file": "tests/test_gemini_integration.py",
       "language": "python",
       "docstring": "Integration tests for GeminiProvider.\n\nThese tests verify that the Gemini CLI integration works correctly with real CLI calls.",
       "classes": [
@@ -657,7 +686,7 @@
     },
     {
       "name": "test_integration",
-      "file": "modelchorus/tests/test_integration.py",
+      "file": "tests/test_integration.py",
       "language": "python",
       "docstring": "Integration tests for ModelChorus.\n\nThese tests verify that components work together correctly.\nNote: These tests use mocks to avoid calling actual CLI tools.",
       "classes": [
@@ -680,7 +709,7 @@
     },
     {
       "name": "test_state",
-      "file": "modelchorus/tests/test_state.py",
+      "file": "tests/test_state.py",
       "language": "python",
       "docstring": "Unit tests for state persistence layer.\n\nTests verify StateManager functionality including:\n- In-memory state storage and retrieval\n- Thread-safe concurrent operations\n- JSON serialization and deserialization\n- File-based persistence (when enabled)\n- Error handling and edge cases",
       "classes": [
@@ -706,7 +735,7 @@
     },
     {
       "name": "__init__",
-      "file": "tests/__init__.py",
+      "file": "__init__.py",
       "language": "python",
       "docstring": "Tests for ModelChorus package.",
       "classes": [],
@@ -717,7 +746,7 @@
     },
     {
       "name": "__init__",
-      "file": "tests/test_providers/__init__.py",
+      "file": "__init__.py",
       "language": "python",
       "docstring": "Tests for provider implementations.",
       "classes": [],
@@ -728,7 +757,7 @@
     },
     {
       "name": "test_cli_interface",
-      "file": "tests/test_providers/test_cli_interface.py",
+      "file": "test_cli_interface.py",
       "language": "python",
       "docstring": "Test CLI providers implement the ModelProvider interface correctly.\n\nThis test suite verifies that all CLI-based providers (CLIProvider, ClaudeProvider,\nCodexProvider, GeminiProvider, CursorAgentProvider) properly implement the\nModelProvider abstract interface.",
       "classes": [
@@ -754,7 +783,7 @@
   "classes": [
     {
       "name": "ExampleWorkflow",
-      "file": "modelchorus/examples/basic_workflow.py",
+      "file": "examples/basic_workflow.py",
       "line": 14,
       "language": "python",
       "docstring": "Example workflow that demonstrates basic workflow structure.\n\nThis is a placeholder implementation showing the minimal structure\nneeded to create a working workflow.",
@@ -772,7 +801,7 @@
     },
     {
       "name": "ExampleProvider",
-      "file": "modelchorus/examples/provider_integration.py",
+      "file": "examples/provider_integration.py",
       "line": 18,
       "language": "python",
       "docstring": "Example provider implementation.\n\nThis is a placeholder showing how to implement a custom provider\nfor ModelChorus. In a real implementation, this would integrate\nwith an actual AI provider's API.",
@@ -790,7 +819,7 @@
       "instantiated_by": [
         {
           "instantiator": "main",
-          "file": "modelchorus/examples/provider_integration.py",
+          "file": "examples/provider_integration.py",
           "line": 108,
           "context": [
             "main"
@@ -802,7 +831,7 @@
     },
     {
       "name": "WorkflowStep",
-      "file": "modelchorus/src/modelchorus/core/base_workflow.py",
+      "file": "src/modelchorus/core/base_workflow.py",
       "line": 18,
       "language": "python",
       "docstring": "Represents a single step in a workflow execution.",
@@ -814,7 +843,7 @@
       "instantiated_by": [
         {
           "instantiator": "add_step",
-          "file": "modelchorus/src/modelchorus/core/base_workflow.py",
+          "file": "src/modelchorus/core/base_workflow.py",
           "line": 41,
           "context": [
             "WorkflowResult",
@@ -827,7 +856,7 @@
     },
     {
       "name": "WorkflowResult",
-      "file": "modelchorus/src/modelchorus/core/base_workflow.py",
+      "file": "src/modelchorus/core/base_workflow.py",
       "line": 29,
       "language": "python",
       "docstring": "Result of a workflow execution.",
@@ -841,20 +870,29 @@
       "instantiated_by": [
         {
           "instantiator": "run",
-          "file": "modelchorus/examples/basic_workflow.py",
+          "file": "examples/basic_workflow.py",
           "line": 34,
           "context": [
             "ExampleWorkflow",
             "run"
           ]
+        },
+        {
+          "instantiator": "run",
+          "file": "src/modelchorus/workflows/chat.py",
+          "line": 149,
+          "context": [
+            "ChatWorkflow",
+            "run"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 1
+      "instantiation_count": 2
     },
     {
       "name": "BaseWorkflow",
-      "file": "modelchorus/src/modelchorus/core/base_workflow.py",
+      "file": "src/modelchorus/core/base_workflow.py",
       "line": 50,
       "language": "python",
       "docstring": "Abstract base class for all ModelChorus workflows.\n\nAll workflow implementations (thinkdeep, debug, consensus, etc.) must inherit\nfrom this class and implement the run() method.\n\nAttributes:\n    name: Human-readable name of the workflow\n    description: Brief description of what this workflow does\n    config: Configuration dictionary for the workflow\n    conversation_memory: Optional ConversationMemory instance for multi-turn conversations",
@@ -880,7 +918,7 @@
     },
     {
       "name": "ConversationMemory",
-      "file": "modelchorus/src/modelchorus/core/conversation.py",
+      "file": "src/modelchorus/core/conversation.py",
       "line": 36,
       "language": "python",
       "docstring": "Manages conversation threads with file-based persistence.\n\nProvides thread-safe storage and retrieval of conversation history,\nenabling multi-turn conversations across workflow executions.\n\nArchitecture:\n    - Each thread stored as JSON file: ~/.modelchorus/conversations/{thread_id}.json\n    - File locking prevents concurrent access corruption\n    - TTL-based cleanup removes expired threads\n    - Supports conversation chains via parent_thread_id\n\nAttributes:\n    conversations_dir: Directory where conversation files are stored\n    ttl_hours: Time-to-live for conversation threads in hours\n    max_messages: Maximum messages per thread before truncation",
@@ -907,7 +945,7 @@
       "instantiated_by": [
         {
           "instantiator": "test_create_thread_generates_valid_uuid",
-          "file": "modelchorus/tests/test_conversation.py",
+          "file": "tests/test_conversation.py",
           "line": 31,
           "context": [
             "TestConversationMemory",
@@ -916,7 +954,7 @@
         },
         {
           "instantiator": "test_create_thread_unique_ids",
-          "file": "modelchorus/tests/test_conversation.py",
+          "file": "tests/test_conversation.py",
           "line": 45,
           "context": [
             "TestConversationMemory",
@@ -925,7 +963,7 @@
         },
         {
           "instantiator": "test_create_thread_with_initial_context",
-          "file": "modelchorus/tests/test_conversation.py",
+          "file": "tests/test_conversation.py",
           "line": 58,
           "context": [
             "TestConversationMemory",
@@ -934,7 +972,7 @@
         },
         {
           "instantiator": "test_create_thread_persists_to_file",
-          "file": "modelchorus/tests/test_conversation.py",
+          "file": "tests/test_conversation.py",
           "line": 78,
           "context": [
             "TestConversationMemory",
@@ -943,7 +981,7 @@
         },
         {
           "instantiator": "test_create_thread_with_parent",
-          "file": "modelchorus/tests/test_conversation.py",
+          "file": "tests/test_conversation.py",
           "line": 94,
           "context": [
             "TestConversationMemory",
@@ -952,7 +990,7 @@
         },
         {
           "instantiator": "test_add_message_to_thread",
-          "file": "modelchorus/tests/test_conversation.py",
+          "file": "tests/test_conversation.py",
           "line": 116,
           "context": [
             "TestConversationMemory",
@@ -961,7 +999,7 @@
         },
         {
           "instantiator": "test_add_multiple_messages",
-          "file": "modelchorus/tests/test_conversation.py",
+          "file": "tests/test_conversation.py",
           "line": 134,
           "context": [
             "TestConversationMemory",
@@ -970,7 +1008,7 @@
         },
         {
           "instantiator": "test_add_message_with_metadata",
-          "file": "modelchorus/tests/test_conversation.py",
+          "file": "tests/test_conversation.py",
           "line": 153,
           "context": [
             "TestConversationMemory",
@@ -979,7 +1017,7 @@
         },
         {
           "instantiator": "test_get_messages_returns_chronological_order",
-          "file": "modelchorus/tests/test_conversation.py",
+          "file": "tests/test_conversation.py",
           "line": 177,
           "context": [
             "TestConversationMemory",
@@ -988,7 +1026,7 @@
         },
         {
           "instantiator": "test_message_persistence_across_instances",
-          "file": "modelchorus/tests/test_conversation.py",
+          "file": "tests/test_conversation.py",
           "line": 197,
           "context": [
             "TestConversationMemory",
@@ -997,7 +1035,7 @@
         },
         {
           "instantiator": "test_message_persistence_across_instances",
-          "file": "modelchorus/tests/test_conversation.py",
+          "file": "tests/test_conversation.py",
           "line": 202,
           "context": [
             "TestConversationMemory",
@@ -1006,7 +1044,7 @@
         },
         {
           "instantiator": "test_thread_context_window_management",
-          "file": "modelchorus/tests/test_conversation.py",
+          "file": "tests/test_conversation.py",
           "line": 213,
           "context": [
             "TestConversationMemory",
@@ -1015,7 +1053,7 @@
         },
         {
           "instantiator": "test_get_thread_context_includes_state",
-          "file": "modelchorus/tests/test_conversation.py",
+          "file": "tests/test_conversation.py",
           "line": 229,
           "context": [
             "TestConversationMemory",
@@ -1028,7 +1066,7 @@
     },
     {
       "name": "WorkflowRequest",
-      "file": "modelchorus/src/modelchorus/core/models.py",
+      "file": "src/modelchorus/core/models.py",
       "line": 15,
       "language": "python",
       "docstring": "Request model for workflow execution.\n\nEncapsulates all the information needed to execute a workflow,\nincluding the prompt, model specifications, and configuration.\n\nAttributes:\n    prompt: The main input prompt/task for the workflow\n    models: List of model identifiers to use (e.g., [\"gpt-4\", \"claude-3\"])\n    config: Optional workflow-specific configuration dictionary\n    system_prompt: Optional system prompt for model context\n    temperature: Optional temperature setting (0.0-1.0)\n    max_tokens: Optional maximum tokens for generation\n    images: Optional list of image paths or URLs for vision-capable models\n    metadata: Additional metadata for the workflow execution",
@@ -1042,7 +1080,7 @@
       "instantiated_by": [
         {
           "instantiator": "main",
-          "file": "modelchorus/examples/basic_workflow.py",
+          "file": "examples/basic_workflow.py",
           "line": 60,
           "context": [
             "main"
@@ -1054,7 +1092,7 @@
     },
     {
       "name": "WorkflowResponse",
-      "file": "modelchorus/src/modelchorus/core/models.py",
+      "file": "src/modelchorus/core/models.py",
       "line": 89,
       "language": "python",
       "docstring": "Response model for workflow execution.\n\nContains the results of a workflow execution along with metadata\nabout the execution process.\n\nAttributes:\n    result: The main result/output from the workflow\n    success: Whether the workflow executed successfully\n    workflow_name: Name of the workflow that was executed\n    steps: Number of steps executed in the workflow\n    models_used: List of models that were used\n    error: Error message if the workflow failed\n    metadata: Additional metadata about the execution",
@@ -1070,7 +1108,7 @@
     },
     {
       "name": "ModelSelection",
-      "file": "modelchorus/src/modelchorus/core/models.py",
+      "file": "src/modelchorus/core/models.py",
       "line": 156,
       "language": "python",
       "docstring": "Model for specifying model selection criteria.\n\nUsed to configure which models should be used for specific\nworkflow steps or roles.\n\nAttributes:\n    model_id: The model identifier (e.g., \"gpt-4\", \"claude-3-opus\")\n    role: Optional role for this model (e.g., \"analyzer\", \"synthesizer\")\n    config: Optional model-specific configuration",
@@ -1086,7 +1124,7 @@
     },
     {
       "name": "WorkflowStep",
-      "file": "modelchorus/src/modelchorus/core/models.py",
+      "file": "src/modelchorus/core/models.py",
       "line": 196,
       "language": "python",
       "docstring": "Model for a single workflow execution step.\n\nRepresents one step in a multi-step workflow, capturing what\nwas done, which model was used, and the results.\n\nAttributes:\n    step_number: Sequential step number (1-indexed)\n    description: Human-readable description of this step\n    model: Model that executed this step\n    prompt: The prompt used for this step\n    response: The response from this step\n    metadata: Additional step metadata",
@@ -1100,7 +1138,7 @@
       "instantiated_by": [
         {
           "instantiator": "add_step",
-          "file": "modelchorus/src/modelchorus/core/base_workflow.py",
+          "file": "src/modelchorus/core/base_workflow.py",
           "line": 41,
           "context": [
             "WorkflowResult",
@@ -1113,7 +1151,7 @@
     },
     {
       "name": "ModelResponse",
-      "file": "modelchorus/src/modelchorus/core/models.py",
+      "file": "src/modelchorus/core/models.py",
       "line": 258,
       "language": "python",
       "docstring": "Model for a response from a single model.\n\nRepresents the output from querying a specific model, used in\nmulti-model workflows to track individual model contributions.\n\nAttributes:\n    model: Identifier of the model that generated this response\n    content: The response content/text\n    role: Optional role this model played (e.g., \"for\", \"against\", \"neutral\")\n    metadata: Additional response metadata (tokens, latency, etc.)",
@@ -1129,7 +1167,7 @@
     },
     {
       "name": "ConsensusConfig",
-      "file": "modelchorus/src/modelchorus/core/models.py",
+      "file": "src/modelchorus/core/models.py",
       "line": 306,
       "language": "python",
       "docstring": "Configuration for consensus-building workflows.\n\nSpecifies how multiple models should be consulted and how their\nresponses should be synthesized into a consensus.\n\nAttributes:\n    mode: Consensus mode (\"debate\", \"vote\", \"synthesis\")\n    stances: Optional list of stances to assign to models (e.g., [\"for\", \"against\", \"neutral\"])\n    temperature: Temperature for model responses\n    min_agreement: Minimum agreement threshold (0.0-1.0) for consensus\n    synthesis_model: Optional model to use for final synthesis\n    max_rounds: Maximum number of consensus rounds",
@@ -1145,7 +1183,7 @@
     },
     {
       "name": "ConversationMessage",
-      "file": "modelchorus/src/modelchorus/core/models.py",
+      "file": "src/modelchorus/core/models.py",
       "line": 379,
       "language": "python",
       "docstring": "Single message in a conversation thread.\n\nBased on Zen MCP's ConversationTurn but adapted for CLI-based architecture.\nTracks who said what, when, and with what context (files, models, workflow).\n\nAttributes:\n    role: Message role - 'user' or 'assistant'\n    content: The actual message text/content\n    timestamp: ISO format timestamp of when message was created\n    files: Optional list of file paths referenced in this message\n    workflow_name: Optional workflow that generated this message (for assistant messages)\n    model_provider: Optional provider type used (cli, api, mcp)\n    model_name: Optional specific model identifier (e.g., claude-3-opus, gpt-5)\n    metadata: Additional message metadata (tokens, latency, cost, etc.)",
@@ -1159,7 +1197,7 @@
       "instantiated_by": [
         {
           "instantiator": "add_message",
-          "file": "modelchorus/src/modelchorus/core/conversation.py",
+          "file": "src/modelchorus/core/conversation.py",
           "line": 272,
           "context": [
             "ConversationMemory",
@@ -1172,7 +1210,7 @@
     },
     {
       "name": "ConversationThread",
-      "file": "modelchorus/src/modelchorus/core/models.py",
+      "file": "src/modelchorus/core/models.py",
       "line": 451,
       "language": "python",
       "docstring": "Complete conversation context for a thread.\n\nAdapted from Zen MCP's ThreadContext with enhancements for CLI orchestration:\n- Provider-agnostic design supporting multiple CLI providers\n- Explicit lifecycle management (status field)\n- Support for conversation branching (future enhancement)\n- Workflow-specific state persistence\n\nAttributes:\n    thread_id: UUID identifying this conversation thread\n    parent_thread_id: Optional parent thread ID for conversation chains\n    created_at: ISO timestamp of thread creation\n    last_updated_at: ISO timestamp of last update\n    workflow_name: Workflow that created this thread\n    messages: All messages in chronological order\n    state: Workflow-specific state data (persisted across turns)\n    initial_context: Original request parameters\n    status: Thread lifecycle status (active, completed, archived)\n    branch_point: Optional message ID where branch occurred\n    sibling_threads: Other thread IDs branched from same point",
@@ -1186,7 +1224,7 @@
       "instantiated_by": [
         {
           "instantiator": "create_thread",
-          "file": "modelchorus/src/modelchorus/core/conversation.py",
+          "file": "src/modelchorus/core/conversation.py",
           "line": 116,
           "context": [
             "ConversationMemory",
@@ -1195,7 +1233,7 @@
         },
         {
           "instantiator": "get_thread",
-          "file": "modelchorus/src/modelchorus/core/conversation.py",
+          "file": "src/modelchorus/core/conversation.py",
           "line": 173,
           "context": [
             "ConversationMemory",
@@ -1208,7 +1246,7 @@
     },
     {
       "name": "ConversationState",
-      "file": "modelchorus/src/modelchorus/core/models.py",
+      "file": "src/modelchorus/core/models.py",
       "line": 561,
       "language": "python",
       "docstring": "Generic state container for workflow-specific conversation data.\n\nProvides type-safe structure for storing arbitrary workflow state\nwhile maintaining serializability for file-based persistence.\nIncludes versioning to support schema evolution.\n\nAttributes:\n    workflow_name: Workflow this state belongs to\n    data: Arbitrary workflow-specific state data\n    schema_version: State schema version for compatibility\n    created_at: ISO timestamp of state creation\n    updated_at: ISO timestamp of last state update",
@@ -1222,7 +1260,7 @@
       "instantiated_by": [
         {
           "instantiator": "set_state",
-          "file": "modelchorus/src/modelchorus/core/state.py",
+          "file": "src/modelchorus/core/state.py",
           "line": 114,
           "context": [
             "StateManager",
@@ -1235,7 +1273,7 @@
     },
     {
       "name": "WorkflowRegistry",
-      "file": "modelchorus/src/modelchorus/core/registry.py",
+      "file": "src/modelchorus/core/registry.py",
       "line": 13,
       "language": "python",
       "docstring": "Registry for workflow implementations.\n\nProvides a plugin system for registering and retrieving workflow classes\ndynamically. Workflows can be registered using the @register decorator or\nprogrammatically via register_workflow().\n\nExample:\n    ```python\n    @WorkflowRegistry.register(\"thinkdeep\")\n    class ThinkDeepWorkflow(BaseWorkflow):\n        async def run(self, prompt: str, **kwargs):\n            # Implementation\n            pass\n\n    # Later, retrieve the workflow\n    workflow_class = WorkflowRegistry.get(\"thinkdeep\")\n    workflow = workflow_class(\"My Workflow\", \"Description\")\n    ```",
@@ -1257,7 +1295,7 @@
     },
     {
       "name": "StateManager",
-      "file": "modelchorus/src/modelchorus/core/state.py",
+      "file": "src/modelchorus/core/state.py",
       "line": 32,
       "language": "python",
       "docstring": "Thread-safe state persistence manager for workflows.\n\nManages workflow execution state separately from conversation history.\nProvides in-memory storage with optional file-based persistence.\n\nWorkflow state typically includes:\n- Current step/phase information\n- Intermediate results\n- Configuration and settings\n- Workflow-specific metadata\n\nAttributes:\n    state_dir: Directory for file-based state persistence\n    enable_file_persistence: Whether to persist state to disk\n    _state_store: Thread-safe in-memory state storage\n    _lock: Lock for thread-safe operations",
@@ -1287,7 +1325,7 @@
       "instantiated_by": [
         {
           "instantiator": "get_default_state_manager",
-          "file": "modelchorus/src/modelchorus/core/state.py",
+          "file": "src/modelchorus/core/state.py",
           "line": 531,
           "context": [
             "get_default_state_manager"
@@ -1295,7 +1333,7 @@
         },
         {
           "instantiator": "test_set_and_get_state",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 32,
           "context": [
             "TestStateManager",
@@ -1304,7 +1342,7 @@
         },
         {
           "instantiator": "test_get_state_object_with_metadata",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 50,
           "context": [
             "TestStateManager",
@@ -1313,7 +1351,7 @@
         },
         {
           "instantiator": "test_update_state_existing",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 66,
           "context": [
             "TestStateManager",
@@ -1322,7 +1360,7 @@
         },
         {
           "instantiator": "test_update_state_nonexistent",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 91,
           "context": [
             "TestStateManager",
@@ -1331,7 +1369,7 @@
         },
         {
           "instantiator": "test_delete_state",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 104,
           "context": [
             "TestStateManager",
@@ -1340,7 +1378,7 @@
         },
         {
           "instantiator": "test_list_workflows",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 120,
           "context": [
             "TestStateManager",
@@ -1349,7 +1387,7 @@
         },
         {
           "instantiator": "test_clear_all",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 138,
           "context": [
             "TestStateManager",
@@ -1358,7 +1396,7 @@
         },
         {
           "instantiator": "test_concurrent_set_state",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 159,
           "context": [
             "TestStateManager",
@@ -1367,7 +1405,7 @@
         },
         {
           "instantiator": "test_concurrent_read_write",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 191,
           "context": [
             "TestStateManager",
@@ -1376,7 +1414,7 @@
         },
         {
           "instantiator": "test_state_isolation",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 240,
           "context": [
             "TestStateManager",
@@ -1385,7 +1423,7 @@
         },
         {
           "instantiator": "test_serialize_state",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 265,
           "context": [
             "TestStateManager",
@@ -1394,7 +1432,7 @@
         },
         {
           "instantiator": "test_deserialize_state",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 287,
           "context": [
             "TestStateManager",
@@ -1403,7 +1441,7 @@
         },
         {
           "instantiator": "test_roundtrip_serialization",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 308,
           "context": [
             "TestStateManager",
@@ -1412,7 +1450,7 @@
         },
         {
           "instantiator": "test_export_state",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 334,
           "context": [
             "TestStateManager",
@@ -1421,7 +1459,7 @@
         },
         {
           "instantiator": "test_import_state",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 353,
           "context": [
             "TestStateManager",
@@ -1430,7 +1468,7 @@
         },
         {
           "instantiator": "test_deserialize_invalid_json",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 380,
           "context": [
             "TestStateManager",
@@ -1439,7 +1477,7 @@
         },
         {
           "instantiator": "test_file_persistence_on_set",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 394,
           "context": [
             "TestStateManager",
@@ -1448,7 +1486,7 @@
         },
         {
           "instantiator": "test_load_from_disk",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 426,
           "context": [
             "TestStateManager",
@@ -1457,7 +1495,7 @@
         },
         {
           "instantiator": "test_load_all_from_disk",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 455,
           "context": [
             "TestStateManager",
@@ -1466,7 +1504,7 @@
         },
         {
           "instantiator": "test_sync_to_disk",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 470,
           "context": [
             "TestStateManager",
@@ -1475,7 +1513,7 @@
         },
         {
           "instantiator": "test_delete_removes_file",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 492,
           "context": [
             "TestStateManager",
@@ -1484,7 +1522,7 @@
         },
         {
           "instantiator": "test_persistence_disabled_no_files",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 508,
           "context": [
             "TestStateManager",
@@ -1493,7 +1531,7 @@
         },
         {
           "instantiator": "test_get_nonexistent_workflow",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 526,
           "context": [
             "TestStateManager",
@@ -1502,7 +1540,7 @@
         },
         {
           "instantiator": "test_delete_nonexistent_workflow",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 533,
           "context": [
             "TestStateManager",
@@ -1511,7 +1549,7 @@
         },
         {
           "instantiator": "test_serialize_nonexistent",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 540,
           "context": [
             "TestStateManager",
@@ -1520,7 +1558,7 @@
         },
         {
           "instantiator": "test_import_malformed_json",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 547,
           "context": [
             "TestStateManager",
@@ -1529,7 +1567,7 @@
         },
         {
           "instantiator": "test_state_timestamps_update",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 557,
           "context": [
             "TestStateManager",
@@ -1538,7 +1576,7 @@
         },
         {
           "instantiator": "test_schema_version_preservation",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 579,
           "context": [
             "TestStateManager",
@@ -1547,7 +1585,7 @@
         },
         {
           "instantiator": "test_export_import_roundtrip",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 615,
           "context": [
             "TestStateManagerExportImportRoundtrip",
@@ -1556,7 +1594,7 @@
         },
         {
           "instantiator": "test_export_import_roundtrip",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 633,
           "context": [
             "TestStateManagerExportImportRoundtrip",
@@ -1565,7 +1603,7 @@
         },
         {
           "instantiator": "test_process_restart_recovery",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 655,
           "context": [
             "TestStateManagerFileRecovery",
@@ -1574,7 +1612,7 @@
         },
         {
           "instantiator": "test_process_restart_recovery",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 665,
           "context": [
             "TestStateManagerFileRecovery",
@@ -1587,7 +1625,7 @@
     },
     {
       "name": "ModelCapability",
-      "file": "modelchorus/src/modelchorus/providers/base_provider.py",
+      "file": "src/modelchorus/providers/base_provider.py",
       "line": 15,
       "language": "python",
       "docstring": "Enumeration of model capabilities.",
@@ -1603,7 +1641,7 @@
     },
     {
       "name": "ModelConfig",
-      "file": "modelchorus/src/modelchorus/providers/base_provider.py",
+      "file": "src/modelchorus/providers/base_provider.py",
       "line": 26,
       "language": "python",
       "docstring": "Configuration for a model.",
@@ -1615,7 +1653,7 @@
       "instantiated_by": [
         {
           "instantiator": "__init__",
-          "file": "modelchorus/examples/provider_integration.py",
+          "file": "examples/provider_integration.py",
           "line": 36,
           "context": [
             "ExampleProvider",
@@ -1624,7 +1662,7 @@
         },
         {
           "instantiator": "__init__",
-          "file": "modelchorus/examples/provider_integration.py",
+          "file": "examples/provider_integration.py",
           "line": 45,
           "context": [
             "ExampleProvider",
@@ -1633,7 +1671,7 @@
         },
         {
           "instantiator": "_initialize_models",
-          "file": "modelchorus/src/modelchorus/providers/claude_provider.py",
+          "file": "src/modelchorus/providers/claude_provider.py",
           "line": 82,
           "context": [
             "ClaudeProvider",
@@ -1642,7 +1680,7 @@
         },
         {
           "instantiator": "_initialize_models",
-          "file": "modelchorus/src/modelchorus/providers/claude_provider.py",
+          "file": "src/modelchorus/providers/claude_provider.py",
           "line": 93,
           "context": [
             "ClaudeProvider",
@@ -1651,7 +1689,7 @@
         },
         {
           "instantiator": "_initialize_models",
-          "file": "modelchorus/src/modelchorus/providers/claude_provider.py",
+          "file": "src/modelchorus/providers/claude_provider.py",
           "line": 104,
           "context": [
             "ClaudeProvider",
@@ -1660,7 +1698,7 @@
         },
         {
           "instantiator": "_initialize_models",
-          "file": "modelchorus/src/modelchorus/providers/codex_provider.py",
+          "file": "src/modelchorus/providers/codex_provider.py",
           "line": 82,
           "context": [
             "CodexProvider",
@@ -1669,7 +1707,7 @@
         },
         {
           "instantiator": "_initialize_models",
-          "file": "modelchorus/src/modelchorus/providers/codex_provider.py",
+          "file": "src/modelchorus/providers/codex_provider.py",
           "line": 92,
           "context": [
             "CodexProvider",
@@ -1678,7 +1716,7 @@
         },
         {
           "instantiator": "_initialize_models",
-          "file": "modelchorus/src/modelchorus/providers/codex_provider.py",
+          "file": "src/modelchorus/providers/codex_provider.py",
           "line": 102,
           "context": [
             "CodexProvider",
@@ -1687,7 +1725,7 @@
         },
         {
           "instantiator": "_initialize_models",
-          "file": "modelchorus/src/modelchorus/providers/cursor_agent_provider.py",
+          "file": "src/modelchorus/providers/cursor_agent_provider.py",
           "line": 84,
           "context": [
             "CursorAgentProvider",
@@ -1696,7 +1734,7 @@
         },
         {
           "instantiator": "_initialize_models",
-          "file": "modelchorus/src/modelchorus/providers/cursor_agent_provider.py",
+          "file": "src/modelchorus/providers/cursor_agent_provider.py",
           "line": 93,
           "context": [
             "CursorAgentProvider",
@@ -1705,7 +1743,7 @@
         },
         {
           "instantiator": "_initialize_models",
-          "file": "modelchorus/src/modelchorus/providers/cursor_agent_provider.py",
+          "file": "src/modelchorus/providers/cursor_agent_provider.py",
           "line": 102,
           "context": [
             "CursorAgentProvider",
@@ -1714,7 +1752,7 @@
         },
         {
           "instantiator": "_initialize_models",
-          "file": "modelchorus/src/modelchorus/providers/gemini_provider.py",
+          "file": "src/modelchorus/providers/gemini_provider.py",
           "line": 83,
           "context": [
             "GeminiProvider",
@@ -1723,7 +1761,7 @@
         },
         {
           "instantiator": "_initialize_models",
-          "file": "modelchorus/src/modelchorus/providers/gemini_provider.py",
+          "file": "src/modelchorus/providers/gemini_provider.py",
           "line": 94,
           "context": [
             "GeminiProvider",
@@ -1732,7 +1770,7 @@
         },
         {
           "instantiator": "_initialize_models",
-          "file": "modelchorus/src/modelchorus/providers/gemini_provider.py",
+          "file": "src/modelchorus/providers/gemini_provider.py",
           "line": 104,
           "context": [
             "GeminiProvider",
@@ -1745,7 +1783,7 @@
     },
     {
       "name": "GenerationRequest",
-      "file": "modelchorus/src/modelchorus/providers/base_provider.py",
+      "file": "src/modelchorus/providers/base_provider.py",
       "line": 37,
       "language": "python",
       "docstring": "Request for text generation.",
@@ -1757,7 +1795,7 @@
       "instantiated_by": [
         {
           "instantiator": "main",
-          "file": "modelchorus/examples/provider_integration.py",
+          "file": "examples/provider_integration.py",
           "line": 127,
           "context": [
             "main"
@@ -1765,15 +1803,24 @@
         },
         {
           "instantiator": "consensus",
-          "file": "modelchorus/src/modelchorus/cli/main.py",
+          "file": "src/modelchorus/cli/main.py",
           "line": 145,
           "context": [
             "consensus"
           ]
         },
         {
+          "instantiator": "run",
+          "file": "src/modelchorus/workflows/chat.py",
+          "line": 156,
+          "context": [
+            "ChatWorkflow",
+            "run"
+          ]
+        },
+        {
           "instantiator": "sample_generation_request",
-          "file": "modelchorus/tests/conftest.py",
+          "file": "tests/conftest.py",
           "line": 59,
           "context": [
             "sample_generation_request"
@@ -1781,7 +1828,7 @@
         },
         {
           "instantiator": "test_build_command_with_model",
-          "file": "modelchorus/tests/test_claude_provider.py",
+          "file": "tests/test_claude_provider.py",
           "line": 39,
           "context": [
             "TestClaudeProvider",
@@ -1790,7 +1837,7 @@
         },
         {
           "instantiator": "test_build_command_without_system_prompt",
-          "file": "modelchorus/tests/test_claude_provider.py",
+          "file": "tests/test_claude_provider.py",
           "line": 51,
           "context": [
             "TestClaudeProvider",
@@ -1799,7 +1846,7 @@
         },
         {
           "instantiator": "test_generate_success",
-          "file": "modelchorus/tests/test_claude_provider.py",
+          "file": "tests/test_claude_provider.py",
           "line": 104,
           "context": [
             "TestClaudeProvider",
@@ -1808,7 +1855,7 @@
         },
         {
           "instantiator": "test_generate_with_retry",
-          "file": "modelchorus/tests/test_claude_provider.py",
+          "file": "tests/test_claude_provider.py",
           "line": 122,
           "context": [
             "TestClaudeProvider",
@@ -1817,7 +1864,7 @@
         },
         {
           "instantiator": "test_generate_all_retries_fail",
-          "file": "modelchorus/tests/test_claude_provider.py",
+          "file": "tests/test_claude_provider.py",
           "line": 141,
           "context": [
             "TestClaudeProvider",
@@ -1826,7 +1873,7 @@
         },
         {
           "instantiator": "test_build_command_with_model",
-          "file": "modelchorus/tests/test_codex_provider.py",
+          "file": "tests/test_codex_provider.py",
           "line": 37,
           "context": [
             "TestCodexProvider",
@@ -1835,7 +1882,7 @@
         },
         {
           "instantiator": "test_build_command_with_images",
-          "file": "modelchorus/tests/test_codex_provider.py",
+          "file": "tests/test_codex_provider.py",
           "line": 49,
           "context": [
             "TestCodexProvider",
@@ -1844,7 +1891,7 @@
         },
         {
           "instantiator": "test_generate_success",
-          "file": "modelchorus/tests/test_codex_provider.py",
+          "file": "tests/test_codex_provider.py",
           "line": 118,
           "context": [
             "TestCodexProvider",
@@ -1853,7 +1900,7 @@
         },
         {
           "instantiator": "test_generate_with_retry",
-          "file": "modelchorus/tests/test_codex_provider.py",
+          "file": "tests/test_codex_provider.py",
           "line": 136,
           "context": [
             "TestCodexProvider",
@@ -1862,7 +1909,7 @@
         },
         {
           "instantiator": "test_generate_all_retries_fail",
-          "file": "modelchorus/tests/test_codex_provider.py",
+          "file": "tests/test_codex_provider.py",
           "line": 155,
           "context": [
             "TestCodexProvider",
@@ -1871,7 +1918,7 @@
         },
         {
           "instantiator": "test_execute_all_responses_strategy",
-          "file": "modelchorus/tests/test_consensus_workflow.py",
+          "file": "tests/test_consensus_workflow.py",
           "line": 65,
           "context": [
             "TestConsensusWorkflow",
@@ -1880,7 +1927,7 @@
         },
         {
           "instantiator": "test_execute_first_valid_strategy",
-          "file": "modelchorus/tests/test_consensus_workflow.py",
+          "file": "tests/test_consensus_workflow.py",
           "line": 91,
           "context": [
             "TestConsensusWorkflow",
@@ -1889,7 +1936,7 @@
         },
         {
           "instantiator": "test_execute_with_parameters",
-          "file": "modelchorus/tests/test_consensus_workflow.py",
+          "file": "tests/test_consensus_workflow.py",
           "line": 111,
           "context": [
             "TestConsensusWorkflow",
@@ -1898,7 +1945,7 @@
         },
         {
           "instantiator": "test_execute_all_providers_fail",
-          "file": "modelchorus/tests/test_consensus_workflow.py",
+          "file": "tests/test_consensus_workflow.py",
           "line": 137,
           "context": [
             "TestConsensusWorkflow",
@@ -1907,7 +1954,7 @@
         },
         {
           "instantiator": "simple_request",
-          "file": "modelchorus/tests/test_gemini_integration.py",
+          "file": "tests/test_gemini_integration.py",
           "line": 24,
           "context": [
             "TestGeminiIntegration",
@@ -1916,7 +1963,7 @@
         },
         {
           "instantiator": "test_build_command_with_model",
-          "file": "modelchorus/tests/test_gemini_integration.py",
+          "file": "tests/test_gemini_integration.py",
           "line": 65,
           "context": [
             "TestGeminiIntegration",
@@ -1925,7 +1972,7 @@
         },
         {
           "instantiator": "test_end_to_end_consensus",
-          "file": "modelchorus/tests/test_integration.py",
+          "file": "tests/test_integration.py",
           "line": 51,
           "context": [
             "TestIntegration",
@@ -1934,7 +1981,7 @@
         },
         {
           "instantiator": "test_provider_initialization_and_generation",
-          "file": "modelchorus/tests/test_integration.py",
+          "file": "tests/test_integration.py",
           "line": 76,
           "context": [
             "TestIntegration",
@@ -1943,7 +1990,7 @@
         },
         {
           "instantiator": "test_error_handling_across_workflow",
-          "file": "modelchorus/tests/test_integration.py",
+          "file": "tests/test_integration.py",
           "line": 95,
           "context": [
             "TestIntegration",
@@ -1952,7 +1999,7 @@
         },
         {
           "instantiator": "test_multiple_strategy_comparison",
-          "file": "modelchorus/tests/test_integration.py",
+          "file": "tests/test_integration.py",
           "line": 130,
           "context": [
             "TestIntegration",
@@ -1961,7 +2008,7 @@
         },
         {
           "instantiator": "test_concurrent_provider_execution",
-          "file": "modelchorus/tests/test_integration.py",
+          "file": "tests/test_integration.py",
           "line": 179,
           "context": [
             "TestIntegration",
@@ -1970,7 +2017,7 @@
         },
         {
           "instantiator": "test_build_command_returns_list",
-          "file": "tests/test_providers/test_cli_interface.py",
+          "file": "test_cli_interface.py",
           "line": 143,
           "context": [
             "TestCLIProvidersImplementInterface",
@@ -1979,7 +2026,7 @@
         },
         {
           "instantiator": "test_build_command_includes_cli_command",
-          "file": "tests/test_providers/test_cli_interface.py",
+          "file": "test_cli_interface.py",
           "line": 159,
           "context": [
             "TestCLIProvidersImplementInterface",
@@ -1988,11 +2035,11 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 26
+      "instantiation_count": 27
     },
     {
       "name": "GenerationResponse",
-      "file": "modelchorus/src/modelchorus/providers/base_provider.py",
+      "file": "src/modelchorus/providers/base_provider.py",
       "line": 51,
       "language": "python",
       "docstring": "Response from text generation.",
@@ -2004,7 +2051,7 @@
       "instantiated_by": [
         {
           "instantiator": "generate",
-          "file": "modelchorus/examples/provider_integration.py",
+          "file": "examples/provider_integration.py",
           "line": 81,
           "context": [
             "ExampleProvider",
@@ -2013,7 +2060,7 @@
         },
         {
           "instantiator": "parse_response",
-          "file": "modelchorus/src/modelchorus/providers/claude_provider.py",
+          "file": "src/modelchorus/providers/claude_provider.py",
           "line": 201,
           "context": [
             "ClaudeProvider",
@@ -2022,7 +2069,7 @@
         },
         {
           "instantiator": "parse_response",
-          "file": "modelchorus/src/modelchorus/providers/codex_provider.py",
+          "file": "src/modelchorus/providers/codex_provider.py",
           "line": 208,
           "context": [
             "CodexProvider",
@@ -2031,7 +2078,7 @@
         },
         {
           "instantiator": "parse_response",
-          "file": "modelchorus/src/modelchorus/providers/cursor_agent_provider.py",
+          "file": "src/modelchorus/providers/cursor_agent_provider.py",
           "line": 193,
           "context": [
             "CursorAgentProvider",
@@ -2040,7 +2087,7 @@
         },
         {
           "instantiator": "parse_response",
-          "file": "modelchorus/src/modelchorus/providers/gemini_provider.py",
+          "file": "src/modelchorus/providers/gemini_provider.py",
           "line": 211,
           "context": [
             "GeminiProvider",
@@ -2049,7 +2096,7 @@
         },
         {
           "instantiator": "test_execute_all_responses_strategy",
-          "file": "modelchorus/tests/test_consensus_workflow.py",
+          "file": "tests/test_consensus_workflow.py",
           "line": 49,
           "context": [
             "TestConsensusWorkflow",
@@ -2058,7 +2105,7 @@
         },
         {
           "instantiator": "test_execute_all_responses_strategy",
-          "file": "modelchorus/tests/test_consensus_workflow.py",
+          "file": "tests/test_consensus_workflow.py",
           "line": 57,
           "context": [
             "TestConsensusWorkflow",
@@ -2067,7 +2114,7 @@
         },
         {
           "instantiator": "test_execute_first_valid_strategy",
-          "file": "modelchorus/tests/test_consensus_workflow.py",
+          "file": "tests/test_consensus_workflow.py",
           "line": 83,
           "context": [
             "TestConsensusWorkflow",
@@ -2076,7 +2123,7 @@
         },
         {
           "instantiator": "test_execute_with_parameters",
-          "file": "modelchorus/tests/test_consensus_workflow.py",
+          "file": "tests/test_consensus_workflow.py",
           "line": 103,
           "context": [
             "TestConsensusWorkflow",
@@ -2089,7 +2136,7 @@
     },
     {
       "name": "ModelProvider",
-      "file": "modelchorus/src/modelchorus/providers/base_provider.py",
+      "file": "src/modelchorus/providers/base_provider.py",
       "line": 61,
       "language": "python",
       "docstring": "Abstract base class for all model providers.\n\nAll provider implementations (Anthropic, OpenAI, Google, etc.) must inherit\nfrom this class and implement the required methods.\n\nAttributes:\n    provider_name: Name of the provider (e.g., \"anthropic\", \"openai\")\n    api_key: API key for authentication\n    config: Provider-specific configuration",
@@ -2114,7 +2161,7 @@
     },
     {
       "name": "ClaudeProvider",
-      "file": "modelchorus/src/modelchorus/providers/claude_provider.py",
+      "file": "src/modelchorus/providers/claude_provider.py",
       "line": 22,
       "language": "python",
       "docstring": "Provider for Anthropic's Claude models via the `claude` CLI tool.\n\nThis provider wraps the `claude` command-line interface to enable\ntext generation with Claude models (Opus, Sonnet, Haiku).\n\nSupported features:\n- Text generation with customizable prompts\n- System prompts\n- Temperature and token control\n- Vision capabilities (model-dependent)\n- Thinking mode (extended reasoning)\n\nExample:\n    >>> provider = ClaudeProvider()\n    >>> request = GenerationRequest(\n    ...     prompt=\"Explain quantum computing\",\n    ...     temperature=0.7,\n    ...     max_tokens=1000\n    ... )\n    >>> response = await provider.generate(request)\n    >>> print(response.content)",
@@ -2135,7 +2182,7 @@
       "instantiated_by": [
         {
           "instantiator": "list_providers",
-          "file": "modelchorus/src/modelchorus/cli/main.py",
+          "file": "src/modelchorus/cli/main.py",
           "line": 242,
           "context": [
             "list_providers"
@@ -2143,7 +2190,7 @@
         },
         {
           "instantiator": "test_initialization",
-          "file": "modelchorus/tests/test_claude_provider.py",
+          "file": "tests/test_claude_provider.py",
           "line": 18,
           "context": [
             "TestClaudeProvider",
@@ -2152,7 +2199,7 @@
         },
         {
           "instantiator": "test_build_command_basic",
-          "file": "modelchorus/tests/test_claude_provider.py",
+          "file": "tests/test_claude_provider.py",
           "line": 26,
           "context": [
             "TestClaudeProvider",
@@ -2161,7 +2208,7 @@
         },
         {
           "instantiator": "test_build_command_with_model",
-          "file": "modelchorus/tests/test_claude_provider.py",
+          "file": "tests/test_claude_provider.py",
           "line": 38,
           "context": [
             "TestClaudeProvider",
@@ -2170,7 +2217,7 @@
         },
         {
           "instantiator": "test_build_command_without_system_prompt",
-          "file": "modelchorus/tests/test_claude_provider.py",
+          "file": "tests/test_claude_provider.py",
           "line": 50,
           "context": [
             "TestClaudeProvider",
@@ -2179,7 +2226,7 @@
         },
         {
           "instantiator": "test_parse_response_success",
-          "file": "modelchorus/tests/test_claude_provider.py",
+          "file": "tests/test_claude_provider.py",
           "line": 61,
           "context": [
             "TestClaudeProvider",
@@ -2188,7 +2235,7 @@
         },
         {
           "instantiator": "test_parse_response_failure",
-          "file": "modelchorus/tests/test_claude_provider.py",
+          "file": "tests/test_claude_provider.py",
           "line": 77,
           "context": [
             "TestClaudeProvider",
@@ -2197,7 +2244,7 @@
         },
         {
           "instantiator": "test_parse_response_invalid_json",
-          "file": "modelchorus/tests/test_claude_provider.py",
+          "file": "tests/test_claude_provider.py",
           "line": 90,
           "context": [
             "TestClaudeProvider",
@@ -2206,7 +2253,7 @@
         },
         {
           "instantiator": "test_generate_success",
-          "file": "modelchorus/tests/test_claude_provider.py",
+          "file": "tests/test_claude_provider.py",
           "line": 103,
           "context": [
             "TestClaudeProvider",
@@ -2215,7 +2262,7 @@
         },
         {
           "instantiator": "test_generate_with_retry",
-          "file": "modelchorus/tests/test_claude_provider.py",
+          "file": "tests/test_claude_provider.py",
           "line": 121,
           "context": [
             "TestClaudeProvider",
@@ -2224,7 +2271,7 @@
         },
         {
           "instantiator": "test_generate_all_retries_fail",
-          "file": "modelchorus/tests/test_claude_provider.py",
+          "file": "tests/test_claude_provider.py",
           "line": 140,
           "context": [
             "TestClaudeProvider",
@@ -2233,7 +2280,7 @@
         },
         {
           "instantiator": "test_supports_vision",
-          "file": "modelchorus/tests/test_claude_provider.py",
+          "file": "tests/test_claude_provider.py",
           "line": 154,
           "context": [
             "TestClaudeProvider",
@@ -2242,7 +2289,7 @@
         },
         {
           "instantiator": "test_supports_thinking",
-          "file": "modelchorus/tests/test_claude_provider.py",
+          "file": "tests/test_claude_provider.py",
           "line": 162,
           "context": [
             "TestClaudeProvider",
@@ -2251,7 +2298,7 @@
         },
         {
           "instantiator": "test_end_to_end_consensus",
-          "file": "modelchorus/tests/test_integration.py",
+          "file": "tests/test_integration.py",
           "line": 24,
           "context": [
             "TestIntegration",
@@ -2260,7 +2307,7 @@
         },
         {
           "instantiator": "test_provider_initialization_and_generation",
-          "file": "modelchorus/tests/test_integration.py",
+          "file": "tests/test_integration.py",
           "line": 63,
           "context": [
             "TestIntegration",
@@ -2269,7 +2316,7 @@
         },
         {
           "instantiator": "test_error_handling_across_workflow",
-          "file": "modelchorus/tests/test_integration.py",
+          "file": "tests/test_integration.py",
           "line": 85,
           "context": [
             "TestIntegration",
@@ -2278,7 +2325,7 @@
         },
         {
           "instantiator": "test_multiple_strategy_comparison",
-          "file": "modelchorus/tests/test_integration.py",
+          "file": "tests/test_integration.py",
           "line": 127,
           "context": [
             "TestIntegration",
@@ -2287,7 +2334,7 @@
         },
         {
           "instantiator": "test_multiple_strategy_comparison",
-          "file": "modelchorus/tests/test_integration.py",
+          "file": "tests/test_integration.py",
           "line": 136,
           "context": [
             "TestIntegration",
@@ -2296,7 +2343,7 @@
         },
         {
           "instantiator": "test_concurrent_provider_execution",
-          "file": "modelchorus/tests/test_integration.py",
+          "file": "tests/test_integration.py",
           "line": 150,
           "context": [
             "TestIntegration",
@@ -2305,7 +2352,7 @@
         },
         {
           "instantiator": "providers",
-          "file": "tests/test_providers/test_cli_interface.py",
+          "file": "test_cli_interface.py",
           "line": 34,
           "context": [
             "TestCLIProvidersImplementInterface",
@@ -2318,7 +2365,7 @@
     },
     {
       "name": "CLIProvider",
-      "file": "modelchorus/src/modelchorus/providers/cli_provider.py",
+      "file": "src/modelchorus/providers/cli_provider.py",
       "line": 24,
       "language": "python",
       "docstring": "Base class for CLI-based model providers.\n\nThis class extends ModelProvider to handle interactions with AI models\nvia CLI tools, providing common functionality for:\n- Building CLI commands\n- Executing commands asynchronously via subprocess\n- Parsing CLI output\n- Error handling and retries\n\nSubclasses must implement:\n- build_command(): Construct the CLI command for a request\n- parse_response(): Parse CLI output into GenerationResponse\n\nAttributes:\n    cli_command: Base CLI command (e.g., \"claude\", \"gemini\")\n    timeout: Command timeout in seconds\n    retry_limit: Maximum number of retry attempts",
@@ -2343,7 +2390,7 @@
     },
     {
       "name": "CodexProvider",
-      "file": "modelchorus/src/modelchorus/providers/codex_provider.py",
+      "file": "src/modelchorus/providers/codex_provider.py",
       "line": 22,
       "language": "python",
       "docstring": "Provider for OpenAI's Codex models via the `codex` CLI tool.\n\nThis provider wraps the `codex` command-line interface to enable\ncode generation and completion with Codex models (GPT-4, GPT-3.5, etc.).\n\nSupported features:\n- Text and code generation\n- System prompts\n- Temperature and token control\n- Function calling capabilities\n- Vision support (model-dependent)\n\nExample:\n    >>> provider = CodexProvider()\n    >>> request = GenerationRequest(\n    ...     prompt=\"Write a Python function to sort a list\",\n    ...     temperature=0.5,\n    ...     max_tokens=500\n    ... )\n    >>> response = await provider.generate(request)\n    >>> print(response.content)",
@@ -2364,7 +2411,7 @@
       "instantiated_by": [
         {
           "instantiator": "list_providers",
-          "file": "modelchorus/src/modelchorus/cli/main.py",
+          "file": "src/modelchorus/cli/main.py",
           "line": 243,
           "context": [
             "list_providers"
@@ -2372,7 +2419,7 @@
         },
         {
           "instantiator": "test_initialization",
-          "file": "modelchorus/tests/test_codex_provider.py",
+          "file": "tests/test_codex_provider.py",
           "line": 18,
           "context": [
             "TestCodexProvider",
@@ -2381,7 +2428,7 @@
         },
         {
           "instantiator": "test_build_command_basic",
-          "file": "modelchorus/tests/test_codex_provider.py",
+          "file": "tests/test_codex_provider.py",
           "line": 26,
           "context": [
             "TestCodexProvider",
@@ -2390,7 +2437,7 @@
         },
         {
           "instantiator": "test_build_command_with_model",
-          "file": "modelchorus/tests/test_codex_provider.py",
+          "file": "tests/test_codex_provider.py",
           "line": 36,
           "context": [
             "TestCodexProvider",
@@ -2399,7 +2446,7 @@
         },
         {
           "instantiator": "test_build_command_with_images",
-          "file": "modelchorus/tests/test_codex_provider.py",
+          "file": "tests/test_codex_provider.py",
           "line": 48,
           "context": [
             "TestCodexProvider",
@@ -2408,7 +2455,7 @@
         },
         {
           "instantiator": "test_parse_response_success",
-          "file": "modelchorus/tests/test_codex_provider.py",
+          "file": "tests/test_codex_provider.py",
           "line": 60,
           "context": [
             "TestCodexProvider",
@@ -2417,7 +2464,7 @@
         },
         {
           "instantiator": "test_parse_response_failure",
-          "file": "modelchorus/tests/test_codex_provider.py",
+          "file": "tests/test_codex_provider.py",
           "line": 77,
           "context": [
             "TestCodexProvider",
@@ -2426,7 +2473,7 @@
         },
         {
           "instantiator": "test_parse_response_invalid_jsonl",
-          "file": "modelchorus/tests/test_codex_provider.py",
+          "file": "tests/test_codex_provider.py",
           "line": 90,
           "context": [
             "TestCodexProvider",
@@ -2435,7 +2482,7 @@
         },
         {
           "instantiator": "test_parse_response_missing_agent_message",
-          "file": "modelchorus/tests/test_codex_provider.py",
+          "file": "tests/test_codex_provider.py",
           "line": 102,
           "context": [
             "TestCodexProvider",
@@ -2444,7 +2491,7 @@
         },
         {
           "instantiator": "test_generate_success",
-          "file": "modelchorus/tests/test_codex_provider.py",
+          "file": "tests/test_codex_provider.py",
           "line": 117,
           "context": [
             "TestCodexProvider",
@@ -2453,7 +2500,7 @@
         },
         {
           "instantiator": "test_generate_with_retry",
-          "file": "modelchorus/tests/test_codex_provider.py",
+          "file": "tests/test_codex_provider.py",
           "line": 135,
           "context": [
             "TestCodexProvider",
@@ -2462,7 +2509,7 @@
         },
         {
           "instantiator": "test_generate_all_retries_fail",
-          "file": "modelchorus/tests/test_codex_provider.py",
+          "file": "tests/test_codex_provider.py",
           "line": 154,
           "context": [
             "TestCodexProvider",
@@ -2471,7 +2518,7 @@
         },
         {
           "instantiator": "test_supports_vision",
-          "file": "modelchorus/tests/test_codex_provider.py",
+          "file": "tests/test_codex_provider.py",
           "line": 168,
           "context": [
             "TestCodexProvider",
@@ -2480,7 +2527,7 @@
         },
         {
           "instantiator": "test_supports_function_calling",
-          "file": "modelchorus/tests/test_codex_provider.py",
+          "file": "tests/test_codex_provider.py",
           "line": 176,
           "context": [
             "TestCodexProvider",
@@ -2489,7 +2536,7 @@
         },
         {
           "instantiator": "test_end_to_end_consensus",
-          "file": "modelchorus/tests/test_integration.py",
+          "file": "tests/test_integration.py",
           "line": 25,
           "context": [
             "TestIntegration",
@@ -2498,7 +2545,7 @@
         },
         {
           "instantiator": "test_multiple_strategy_comparison",
-          "file": "modelchorus/tests/test_integration.py",
+          "file": "tests/test_integration.py",
           "line": 128,
           "context": [
             "TestIntegration",
@@ -2507,7 +2554,7 @@
         },
         {
           "instantiator": "test_multiple_strategy_comparison",
-          "file": "modelchorus/tests/test_integration.py",
+          "file": "tests/test_integration.py",
           "line": 137,
           "context": [
             "TestIntegration",
@@ -2516,7 +2563,7 @@
         },
         {
           "instantiator": "test_concurrent_provider_execution",
-          "file": "modelchorus/tests/test_integration.py",
+          "file": "tests/test_integration.py",
           "line": 151,
           "context": [
             "TestIntegration",
@@ -2525,7 +2572,7 @@
         },
         {
           "instantiator": "providers",
-          "file": "tests/test_providers/test_cli_interface.py",
+          "file": "test_cli_interface.py",
           "line": 35,
           "context": [
             "TestCLIProvidersImplementInterface",
@@ -2538,7 +2585,7 @@
     },
     {
       "name": "CursorAgentProvider",
-      "file": "modelchorus/src/modelchorus/providers/cursor_agent_provider.py",
+      "file": "src/modelchorus/providers/cursor_agent_provider.py",
       "line": 22,
       "language": "python",
       "docstring": "Provider for Cursor's AI agent via the `cursor-agent` CLI tool.\n\nThis provider wraps the `cursor-agent` command-line interface to enable\ncode-focused AI interactions with Cursor's agent models.\n\nSupported features:\n- Code generation and completion\n- Natural language to code conversion\n- Code explanation and documentation\n- System prompts for context\n- Temperature control\n- Working directory support for context-aware code generation\n\nExample:\n    >>> provider = CursorAgentProvider()\n    >>> request = GenerationRequest(\n    ...     prompt=\"Write a function to validate email addresses\",\n    ...     temperature=0.3,\n    ...     max_tokens=500,\n    ...     metadata={\"working_directory\": \"/path/to/project\"}\n    ... )\n    >>> response = await provider.generate(request)\n    >>> print(response.content)",
@@ -2559,7 +2606,7 @@
       "instantiated_by": [
         {
           "instantiator": "list_providers",
-          "file": "modelchorus/src/modelchorus/cli/main.py",
+          "file": "src/modelchorus/cli/main.py",
           "line": 245,
           "context": [
             "list_providers"
@@ -2567,7 +2614,7 @@
         },
         {
           "instantiator": "providers",
-          "file": "tests/test_providers/test_cli_interface.py",
+          "file": "test_cli_interface.py",
           "line": 37,
           "context": [
             "TestCLIProvidersImplementInterface",
@@ -2580,7 +2627,7 @@
     },
     {
       "name": "GeminiProvider",
-      "file": "modelchorus/src/modelchorus/providers/gemini_provider.py",
+      "file": "src/modelchorus/providers/gemini_provider.py",
       "line": 22,
       "language": "python",
       "docstring": "Provider for Google's Gemini models via the `gemini` CLI tool.\n\nThis provider wraps the `gemini` command-line interface to enable\ntext generation with Gemini models (Pro, Flash, Ultra).\n\nSupported features:\n- Text generation with customizable prompts\n- System instructions\n- Temperature and token control\n- Vision capabilities (multimodal support)\n- Function calling\n- Thinking/reasoning mode\n\nExample:\n    >>> provider = GeminiProvider()\n    >>> request = GenerationRequest(\n    ...     prompt=\"Explain machine learning\",\n    ...     temperature=0.7,\n    ...     max_tokens=1000\n    ... )\n    >>> response = await provider.generate(request)\n    >>> print(response.content)",
@@ -2601,7 +2648,7 @@
       "instantiated_by": [
         {
           "instantiator": "list_providers",
-          "file": "modelchorus/src/modelchorus/cli/main.py",
+          "file": "src/modelchorus/cli/main.py",
           "line": 244,
           "context": [
             "list_providers"
@@ -2609,7 +2656,7 @@
         },
         {
           "instantiator": "provider",
-          "file": "modelchorus/tests/test_gemini_integration.py",
+          "file": "tests/test_gemini_integration.py",
           "line": 19,
           "context": [
             "TestGeminiIntegration",
@@ -2618,7 +2665,7 @@
         },
         {
           "instantiator": "providers",
-          "file": "tests/test_providers/test_cli_interface.py",
+          "file": "test_cli_interface.py",
           "line": 36,
           "context": [
             "TestCLIProvidersImplementInterface",
@@ -2630,8 +2677,34 @@
       "instantiation_count": 3
     },
     {
+      "name": "ChatWorkflow",
+      "file": "src/modelchorus/workflows/chat.py",
+      "line": 21,
+      "language": "python",
+      "docstring": "Simple single-model chat workflow with conversation continuity.\n\nThis workflow provides straightforward peer consultation with a single AI model,\nsupporting conversation threading for multi-turn interactions. Unlike multi-model\nworkflows like Consensus, Chat focuses on simplicity and conversational flow.\n\nKey features:\n- Single provider (not multi-model)\n- Conversation threading via continuation_id\n- Inherits conversation support from BaseWorkflow\n- Automatic conversation history management\n- Simple request/response pattern\n\nThe ChatWorkflow is ideal for:\n- Quick second opinions from an AI model\n- Iterative conversations and refinement\n- Simple consultations without orchestration overhead\n- Building conversational applications\n\nExample:\n    >>> from modelchorus.providers import ClaudeProvider\n    >>> from modelchorus.workflows import ChatWorkflow\n    >>> from modelchorus.core.conversation import ConversationMemory\n    >>>\n    >>> # Create provider and conversation memory\n    >>> provider = ClaudeProvider()\n    >>> memory = ConversationMemory()\n    >>>\n    >>> # Create workflow\n    >>> workflow = ChatWorkflow(provider, conversation_memory=memory)\n    >>>\n    >>> # First message (creates new conversation)\n    >>> result1 = await workflow.run(\"What is quantum computing?\")\n    >>> thread_id = result1.metadata.get('thread_id')\n    >>> print(result1.synthesis)\n    >>>\n    >>> # Follow-up message (continues conversation)\n    >>> result2 = await workflow.run(\n    ...     \"How does it differ from classical computing?\",\n    ...     continuation_id=thread_id\n    ... )\n    >>> print(result2.synthesis)\n    >>>\n    >>> # Check conversation history\n    >>> thread = workflow.get_thread(thread_id)\n    >>> print(f\"Total messages: {len(thread.messages)}\")",
+      "bases": [
+        "BaseWorkflow"
+      ],
+      "methods": [
+        "__init__",
+        "run",
+        "_build_prompt_with_history",
+        "_get_conversation_length",
+        "get_provider",
+        "clear_conversation",
+        "get_message_count",
+        "validate_config",
+        "__repr__"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
       "name": "ConsensusStrategy",
-      "file": "modelchorus/src/modelchorus/workflows/consensus.py",
+      "file": "src/modelchorus/workflows/consensus.py",
       "line": 24,
       "language": "python",
       "docstring": "Strategy for reaching consensus among multiple model responses.",
@@ -2647,7 +2720,7 @@
     },
     {
       "name": "ProviderConfig",
-      "file": "modelchorus/src/modelchorus/workflows/consensus.py",
+      "file": "src/modelchorus/workflows/consensus.py",
       "line": 35,
       "language": "python",
       "docstring": "Configuration for a provider in the consensus workflow.",
@@ -2659,7 +2732,7 @@
       "instantiated_by": [
         {
           "instantiator": "__init__",
-          "file": "modelchorus/src/modelchorus/workflows/consensus.py",
+          "file": "src/modelchorus/workflows/consensus.py",
           "line": 109,
           "context": [
             "ConsensusWorkflow",
@@ -2668,7 +2741,7 @@
         },
         {
           "instantiator": "add_provider",
-          "file": "modelchorus/src/modelchorus/workflows/consensus.py",
+          "file": "src/modelchorus/workflows/consensus.py",
           "line": 129,
           "context": [
             "ConsensusWorkflow",
@@ -2681,7 +2754,7 @@
     },
     {
       "name": "ConsensusResult",
-      "file": "modelchorus/src/modelchorus/workflows/consensus.py",
+      "file": "src/modelchorus/workflows/consensus.py",
       "line": 45,
       "language": "python",
       "docstring": "Result from a consensus workflow execution.",
@@ -2693,7 +2766,7 @@
       "instantiated_by": [
         {
           "instantiator": "execute",
-          "file": "modelchorus/src/modelchorus/workflows/consensus.py",
+          "file": "src/modelchorus/workflows/consensus.py",
           "line": 234,
           "context": [
             "ConsensusWorkflow",
@@ -2706,7 +2779,7 @@
     },
     {
       "name": "ConsensusWorkflow",
-      "file": "modelchorus/src/modelchorus/workflows/consensus.py",
+      "file": "src/modelchorus/workflows/consensus.py",
       "line": 56,
       "language": "python",
       "docstring": "Workflow for coordinating multiple AI models to reach consensus.\n\nThis workflow allows querying multiple models simultaneously and applying\nvarious strategies to synthesize or select from their responses.\n\nKey features:\n- Parallel execution across multiple providers\n- Configurable consensus strategies\n- Error handling and fallback mechanisms\n- Response weighting and prioritization\n- Timeout management per provider\n\nExample:\n    >>> from modelchorus.providers import ClaudeProvider, GeminiProvider\n    >>> from modelchorus.workflows import ConsensusWorkflow\n    >>>\n    >>> # Create providers\n    >>> claude = ClaudeProvider()\n    >>> gemini = GeminiProvider()\n    >>>\n    >>> # Create workflow with providers\n    >>> workflow = ConsensusWorkflow([claude, gemini])\n    >>>\n    >>> # Execute consensus query\n    >>> request = GenerationRequest(prompt=\"Explain quantum computing\")\n    >>> result = await workflow.execute(request)\n    >>>\n    >>> # Access consensus or individual responses\n    >>> print(result.consensus_response)\n    >>> for provider, response in result.provider_results.items():\n    ...     print(f\"{provider}: {response.content}\")",
@@ -2728,7 +2801,7 @@
       "instantiated_by": [
         {
           "instantiator": "consensus",
-          "file": "modelchorus/src/modelchorus/cli/main.py",
+          "file": "src/modelchorus/cli/main.py",
           "line": 135,
           "context": [
             "consensus"
@@ -2736,7 +2809,7 @@
         },
         {
           "instantiator": "test_initialization",
-          "file": "modelchorus/tests/test_consensus_workflow.py",
+          "file": "tests/test_consensus_workflow.py",
           "line": 20,
           "context": [
             "TestConsensusWorkflow",
@@ -2745,7 +2818,7 @@
         },
         {
           "instantiator": "test_initialization_multiple_providers",
-          "file": "modelchorus/tests/test_consensus_workflow.py",
+          "file": "tests/test_consensus_workflow.py",
           "line": 32,
           "context": [
             "TestConsensusWorkflow",
@@ -2754,7 +2827,7 @@
         },
         {
           "instantiator": "test_initialization_with_strategy",
-          "file": "modelchorus/tests/test_consensus_workflow.py",
+          "file": "tests/test_consensus_workflow.py",
           "line": 40,
           "context": [
             "TestConsensusWorkflow",
@@ -2763,7 +2836,7 @@
         },
         {
           "instantiator": "test_execute_all_responses_strategy",
-          "file": "modelchorus/tests/test_consensus_workflow.py",
+          "file": "tests/test_consensus_workflow.py",
           "line": 63,
           "context": [
             "TestConsensusWorkflow",
@@ -2772,7 +2845,7 @@
         },
         {
           "instantiator": "test_execute_first_valid_strategy",
-          "file": "modelchorus/tests/test_consensus_workflow.py",
+          "file": "tests/test_consensus_workflow.py",
           "line": 89,
           "context": [
             "TestConsensusWorkflow",
@@ -2781,7 +2854,7 @@
         },
         {
           "instantiator": "test_execute_with_parameters",
-          "file": "modelchorus/tests/test_consensus_workflow.py",
+          "file": "tests/test_consensus_workflow.py",
           "line": 109,
           "context": [
             "TestConsensusWorkflow",
@@ -2790,7 +2863,7 @@
         },
         {
           "instantiator": "test_execute_all_providers_fail",
-          "file": "modelchorus/tests/test_consensus_workflow.py",
+          "file": "tests/test_consensus_workflow.py",
           "line": 135,
           "context": [
             "TestConsensusWorkflow",
@@ -2799,7 +2872,7 @@
         },
         {
           "instantiator": "test_end_to_end_consensus",
-          "file": "modelchorus/tests/test_integration.py",
+          "file": "tests/test_integration.py",
           "line": 27,
           "context": [
             "TestIntegration",
@@ -2808,7 +2881,7 @@
         },
         {
           "instantiator": "test_error_handling_across_workflow",
-          "file": "modelchorus/tests/test_integration.py",
+          "file": "tests/test_integration.py",
           "line": 86,
           "context": [
             "TestIntegration",
@@ -2817,7 +2890,7 @@
         },
         {
           "instantiator": "test_multiple_strategy_comparison",
-          "file": "modelchorus/tests/test_integration.py",
+          "file": "tests/test_integration.py",
           "line": 129,
           "context": [
             "TestIntegration",
@@ -2826,7 +2899,7 @@
         },
         {
           "instantiator": "test_multiple_strategy_comparison",
-          "file": "modelchorus/tests/test_integration.py",
+          "file": "tests/test_integration.py",
           "line": 138,
           "context": [
             "TestIntegration",
@@ -2835,7 +2908,7 @@
         },
         {
           "instantiator": "test_concurrent_provider_execution",
-          "file": "modelchorus/tests/test_integration.py",
+          "file": "tests/test_integration.py",
           "line": 152,
           "context": [
             "TestIntegration",
@@ -2848,7 +2921,7 @@
     },
     {
       "name": "TestClaudeProvider",
-      "file": "modelchorus/tests/test_claude_provider.py",
+      "file": "tests/test_claude_provider.py",
       "line": 13,
       "language": "python",
       "docstring": "Test suite for ClaudeProvider.",
@@ -2875,7 +2948,7 @@
     },
     {
       "name": "TestCodexProvider",
-      "file": "modelchorus/tests/test_codex_provider.py",
+      "file": "tests/test_codex_provider.py",
       "line": 13,
       "language": "python",
       "docstring": "Test suite for CodexProvider.",
@@ -2903,7 +2976,7 @@
     },
     {
       "name": "TestConsensusWorkflow",
-      "file": "modelchorus/tests/test_consensus_workflow.py",
+      "file": "tests/test_consensus_workflow.py",
       "line": 12,
       "language": "python",
       "docstring": "Test suite for ConsensusWorkflow.",
@@ -2925,7 +2998,7 @@
     },
     {
       "name": "TestConversationMemory",
-      "file": "modelchorus/tests/test_conversation.py",
+      "file": "tests/test_conversation.py",
       "line": 22,
       "language": "python",
       "docstring": "Test suite for ConversationMemory class.",
@@ -2952,7 +3025,7 @@
     },
     {
       "name": "TestGeminiIntegration",
-      "file": "modelchorus/tests/test_gemini_integration.py",
+      "file": "tests/test_gemini_integration.py",
       "line": 13,
       "language": "python",
       "docstring": "Integration tests for Gemini provider.",
@@ -2977,7 +3050,7 @@
     },
     {
       "name": "TestIntegration",
-      "file": "modelchorus/tests/test_integration.py",
+      "file": "tests/test_integration.py",
       "line": 17,
       "language": "python",
       "docstring": "Integration test suite.",
@@ -2997,7 +3070,7 @@
     },
     {
       "name": "TestStateManager",
-      "file": "modelchorus/tests/test_state.py",
+      "file": "tests/test_state.py",
       "line": 23,
       "language": "python",
       "docstring": "Test suite for StateManager class.",
@@ -3041,7 +3114,7 @@
     },
     {
       "name": "TestStateManagerExportImportRoundtrip",
-      "file": "modelchorus/tests/test_state.py",
+      "file": "tests/test_state.py",
       "line": 609,
       "language": "python",
       "docstring": "Test complete export/import workflow.",
@@ -3057,7 +3130,7 @@
     },
     {
       "name": "TestStateManagerFileRecovery",
-      "file": "modelchorus/tests/test_state.py",
+      "file": "tests/test_state.py",
       "line": 647,
       "language": "python",
       "docstring": "Test state recovery after simulated process restart.",
@@ -3073,7 +3146,7 @@
     },
     {
       "name": "TestCLIProvidersImplementInterface",
-      "file": "tests/test_providers/test_cli_interface.py",
+      "file": "test_cli_interface.py",
       "line": 27,
       "language": "python",
       "docstring": "Test that all CLI providers implement the ModelProvider interface.",
@@ -3104,7 +3177,7 @@
   "functions": [
     {
       "name": "main",
-      "file": "modelchorus/examples/basic_workflow.py",
+      "file": "examples/basic_workflow.py",
       "line": 56,
       "language": "python",
       "docstring": "Main entry point for the example.",
@@ -3118,19 +3191,19 @@
       "callers": [
         {
           "name": "<module>",
-          "file": "modelchorus/examples/basic_workflow.py",
+          "file": "examples/basic_workflow.py",
           "line": 105,
           "call_type": "function_call"
         },
         {
           "name": "<module>",
-          "file": "modelchorus/examples/provider_integration.py",
+          "file": "examples/provider_integration.py",
           "line": 157,
           "call_type": "function_call"
         },
         {
           "name": "<module>",
-          "file": "modelchorus/src/modelchorus/cli/main.py",
+          "file": "src/modelchorus/cli/main.py",
           "line": 283,
           "call_type": "function_call"
         }
@@ -3267,7 +3340,7 @@
     },
     {
       "name": "main",
-      "file": "modelchorus/examples/provider_integration.py",
+      "file": "examples/provider_integration.py",
       "line": 101,
       "language": "python",
       "docstring": "Main entry point for the provider example.",
@@ -3281,19 +3354,19 @@
       "callers": [
         {
           "name": "<module>",
-          "file": "modelchorus/examples/basic_workflow.py",
+          "file": "examples/basic_workflow.py",
           "line": 105,
           "call_type": "function_call"
         },
         {
           "name": "<module>",
-          "file": "modelchorus/examples/provider_integration.py",
+          "file": "examples/provider_integration.py",
           "line": 157,
           "call_type": "function_call"
         },
         {
           "name": "<module>",
-          "file": "modelchorus/src/modelchorus/cli/main.py",
+          "file": "src/modelchorus/cli/main.py",
           "line": 283,
           "call_type": "function_call"
         }
@@ -3502,7 +3575,7 @@
     },
     {
       "name": "get_provider_by_name",
-      "file": "modelchorus/src/modelchorus/cli/main.py",
+      "file": "src/modelchorus/cli/main.py",
       "line": 35,
       "language": "python",
       "docstring": "Get provider instance by name.",
@@ -3522,7 +3595,7 @@
       "callers": [
         {
           "name": "consensus",
-          "file": "modelchorus/src/modelchorus/cli/main.py",
+          "file": "src/modelchorus/cli/main.py",
           "line": 126,
           "call_type": "function_call"
         }
@@ -3581,7 +3654,7 @@
     },
     {
       "name": "consensus",
-      "file": "modelchorus/src/modelchorus/cli/main.py",
+      "file": "src/modelchorus/cli/main.py",
       "line": 54,
       "language": "python",
       "docstring": "Run consensus workflow across multiple AI models.\n\nExample:\n    modelchorus consensus \"Explain quantum computing\" -p claude -p gemini -s synthesize",
@@ -4000,7 +4073,7 @@
     },
     {
       "name": "list_providers",
-      "file": "modelchorus/src/modelchorus/cli/main.py",
+      "file": "src/modelchorus/cli/main.py",
       "line": 239,
       "language": "python",
       "docstring": "List all available providers and their models.",
@@ -4091,7 +4164,7 @@
     },
     {
       "name": "version",
-      "file": "modelchorus/src/modelchorus/cli/main.py",
+      "file": "src/modelchorus/cli/main.py",
       "line": 266,
       "language": "python",
       "docstring": "Show version information.",
@@ -4158,7 +4231,7 @@
     },
     {
       "name": "main",
-      "file": "modelchorus/src/modelchorus/cli/main.py",
+      "file": "src/modelchorus/cli/main.py",
       "line": 277,
       "language": "python",
       "docstring": "Main entry point for CLI.",
@@ -4172,19 +4245,19 @@
       "callers": [
         {
           "name": "<module>",
-          "file": "modelchorus/examples/basic_workflow.py",
+          "file": "examples/basic_workflow.py",
           "line": 105,
           "call_type": "function_call"
         },
         {
           "name": "<module>",
-          "file": "modelchorus/examples/provider_integration.py",
+          "file": "examples/provider_integration.py",
           "line": 157,
           "call_type": "function_call"
         },
         {
           "name": "<module>",
-          "file": "modelchorus/src/modelchorus/cli/main.py",
+          "file": "src/modelchorus/cli/main.py",
           "line": 283,
           "call_type": "function_call"
         }
@@ -4201,7 +4274,7 @@
     },
     {
       "name": "get_default_state_manager",
-      "file": "modelchorus/src/modelchorus/core/state.py",
+      "file": "src/modelchorus/core/state.py",
       "line": 517,
       "language": "python",
       "docstring": "Get singleton default state manager instance.\n\nReturns:\n    Default StateManager instance\n\nExample:\n    >>> from modelchorus.core.state import get_default_state_manager\n    >>> manager = get_default_state_manager()\n    >>> manager.set_state(\"my_workflow\", {\"step\": 1})",
@@ -4215,13 +4288,13 @@
       "callers": [
         {
           "name": "test_get_default_state_manager",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 596,
           "call_type": "function_call"
         },
         {
           "name": "test_get_default_state_manager",
-          "file": "modelchorus/tests/test_state.py",
+          "file": "tests/test_state.py",
           "line": 597,
           "call_type": "function_call"
         }
@@ -4231,7 +4304,7 @@
     },
     {
       "name": "mock_claude_response",
-      "file": "modelchorus/tests/conftest.py",
+      "file": "tests/conftest.py",
       "line": 10,
       "language": "python",
       "docstring": "Mock response from Claude CLI --output-format json.",
@@ -4249,7 +4322,7 @@
     },
     {
       "name": "mock_codex_response",
-      "file": "modelchorus/tests/conftest.py",
+      "file": "tests/conftest.py",
       "line": 35,
       "language": "python",
       "docstring": "Mock JSONL response from Codex CLI --json.",
@@ -4267,7 +4340,7 @@
     },
     {
       "name": "mock_subprocess_run",
-      "file": "modelchorus/tests/conftest.py",
+      "file": "tests/conftest.py",
       "line": 45,
       "language": "python",
       "docstring": "Mock subprocess.run for CLI command execution.",
@@ -4285,7 +4358,7 @@
     },
     {
       "name": "sample_generation_request",
-      "file": "modelchorus/tests/conftest.py",
+      "file": "tests/conftest.py",
       "line": 55,
       "language": "python",
       "docstring": "Sample GenerationRequest for testing.",
@@ -4303,14 +4376,14 @@
     }
   ],
   "dependencies": {
-    "modelchorus/examples/basic_workflow.py": [
+    "examples/basic_workflow.py": [
       "asyncio",
       "modelchorus.core.BaseWorkflow",
       "modelchorus.core.WorkflowResult",
       "modelchorus.core.WorkflowRegistry",
       "modelchorus.core.WorkflowRequest"
     ],
-    "modelchorus/examples/provider_integration.py": [
+    "examples/provider_integration.py": [
       "asyncio",
       "modelchorus.providers.ModelProvider",
       "modelchorus.providers.ModelConfig",
@@ -4318,11 +4391,11 @@
       "modelchorus.providers.GenerationRequest",
       "modelchorus.providers.GenerationResponse"
     ],
-    "modelchorus/src/modelchorus/cli/__init__.py": [
+    "src/modelchorus/cli/__init__.py": [
       "main.app",
       "main.main"
     ],
-    "modelchorus/src/modelchorus/cli/main.py": [
+    "src/modelchorus/cli/main.py": [
       "asyncio",
       "json",
       "sys",
@@ -4341,7 +4414,7 @@
       "workflows.ConsensusWorkflow",
       "workflows.ConsensusStrategy"
     ],
-    "modelchorus/src/modelchorus/core/__init__.py": [
+    "src/modelchorus/core/__init__.py": [
       "base_workflow.BaseWorkflow",
       "base_workflow.WorkflowResult",
       "base_workflow.WorkflowStep",
@@ -4357,7 +4430,7 @@
       "models.ConversationState",
       "conversation.ConversationMemory"
     ],
-    "modelchorus/src/modelchorus/core/base_workflow.py": [
+    "src/modelchorus/core/base_workflow.py": [
       "abc.ABC",
       "abc.abstractmethod",
       "typing.Any",
@@ -4371,7 +4444,7 @@
       "models.ConversationThread",
       "models.ConversationMessage"
     ],
-    "modelchorus/src/modelchorus/core/conversation.py": [
+    "src/modelchorus/core/conversation.py": [
       "json",
       "uuid",
       "logging",
@@ -4389,7 +4462,7 @@
       "models.ConversationThread",
       "models.ConversationState"
     ],
-    "modelchorus/src/modelchorus/core/models.py": [
+    "src/modelchorus/core/models.py": [
       "typing.Any",
       "typing.Dict",
       "typing.List",
@@ -4399,7 +4472,7 @@
       "pydantic.Field",
       "pydantic.ConfigDict"
     ],
-    "modelchorus/src/modelchorus/core/registry.py": [
+    "src/modelchorus/core/registry.py": [
       "typing.Dict",
       "typing.Type",
       "typing.Optional",
@@ -4407,7 +4480,7 @@
       "inspect",
       "base_workflow.BaseWorkflow"
     ],
-    "modelchorus/src/modelchorus/core/state.py": [
+    "src/modelchorus/core/state.py": [
       "json",
       "logging",
       "threading",
@@ -4419,7 +4492,7 @@
       "datetime.timezone",
       "models.ConversationState"
     ],
-    "modelchorus/src/modelchorus/providers/__init__.py": [
+    "src/modelchorus/providers/__init__.py": [
       "base_provider.ModelProvider",
       "base_provider.ModelConfig",
       "base_provider.ModelCapability",
@@ -4431,7 +4504,7 @@
       "gemini_provider.GeminiProvider",
       "cursor_agent_provider.CursorAgentProvider"
     ],
-    "modelchorus/src/modelchorus/providers/base_provider.py": [
+    "src/modelchorus/providers/base_provider.py": [
       "abc.ABC",
       "abc.abstractmethod",
       "typing.Any",
@@ -4442,7 +4515,7 @@
       "dataclasses.field",
       "enum.Enum"
     ],
-    "modelchorus/src/modelchorus/providers/claude_provider.py": [
+    "src/modelchorus/providers/claude_provider.py": [
       "json",
       "logging",
       "typing.Any",
@@ -4455,7 +4528,7 @@
       "base_provider.ModelConfig",
       "base_provider.ModelCapability"
     ],
-    "modelchorus/src/modelchorus/providers/cli_provider.py": [
+    "src/modelchorus/providers/cli_provider.py": [
       "asyncio",
       "json",
       "logging",
@@ -4469,7 +4542,7 @@
       "base_provider.GenerationRequest",
       "base_provider.GenerationResponse"
     ],
-    "modelchorus/src/modelchorus/providers/codex_provider.py": [
+    "src/modelchorus/providers/codex_provider.py": [
       "json",
       "logging",
       "typing.Any",
@@ -4482,7 +4555,7 @@
       "base_provider.ModelConfig",
       "base_provider.ModelCapability"
     ],
-    "modelchorus/src/modelchorus/providers/cursor_agent_provider.py": [
+    "src/modelchorus/providers/cursor_agent_provider.py": [
       "json",
       "logging",
       "typing.Any",
@@ -4495,7 +4568,7 @@
       "base_provider.ModelConfig",
       "base_provider.ModelCapability"
     ],
-    "modelchorus/src/modelchorus/providers/gemini_provider.py": [
+    "src/modelchorus/providers/gemini_provider.py": [
       "json",
       "logging",
       "typing.Any",
@@ -4508,13 +4581,30 @@
       "base_provider.ModelConfig",
       "base_provider.ModelCapability"
     ],
-    "modelchorus/src/modelchorus/workflows/__init__.py": [
+    "src/modelchorus/workflows/__init__.py": [
+      "chat.ChatWorkflow",
       "consensus.ConsensusWorkflow",
       "consensus.ConsensusStrategy",
       "consensus.ConsensusResult",
       "consensus.ProviderConfig"
     ],
-    "modelchorus/src/modelchorus/workflows/consensus.py": [
+    "src/modelchorus/workflows/chat.py": [
+      "logging",
+      "uuid",
+      "typing.Optional",
+      "typing.Dict",
+      "typing.Any",
+      "typing.List",
+      "core.base_workflow.BaseWorkflow",
+      "core.base_workflow.WorkflowResult",
+      "core.base_workflow.WorkflowStep",
+      "core.conversation.ConversationMemory",
+      "providers.ModelProvider",
+      "providers.GenerationRequest",
+      "providers.GenerationResponse",
+      "core.models.ConversationMessage"
+    ],
+    "src/modelchorus/workflows/consensus.py": [
       "asyncio",
       "logging",
       "typing.List",
@@ -4528,12 +4618,12 @@
       "providers.GenerationRequest",
       "providers.GenerationResponse"
     ],
-    "modelchorus/tests/conftest.py": [
+    "tests/conftest.py": [
       "pytest",
       "unittest.mock.AsyncMock",
       "unittest.mock.MagicMock"
     ],
-    "modelchorus/tests/test_claude_provider.py": [
+    "tests/test_claude_provider.py": [
       "json",
       "pytest",
       "unittest.mock.AsyncMock",
@@ -4541,7 +4631,7 @@
       "modelchorus.providers.claude_provider.ClaudeProvider",
       "modelchorus.providers.base_provider.GenerationRequest"
     ],
-    "modelchorus/tests/test_codex_provider.py": [
+    "tests/test_codex_provider.py": [
       "json",
       "pytest",
       "unittest.mock.AsyncMock",
@@ -4549,7 +4639,7 @@
       "modelchorus.providers.codex_provider.CodexProvider",
       "modelchorus.providers.base_provider.GenerationRequest"
     ],
-    "modelchorus/tests/test_consensus_workflow.py": [
+    "tests/test_consensus_workflow.py": [
       "pytest",
       "unittest.mock.AsyncMock",
       "modelchorus.workflows.consensus.ConsensusWorkflow",
@@ -4557,7 +4647,7 @@
       "modelchorus.providers.base_provider.GenerationResponse",
       "modelchorus.providers.base_provider.GenerationRequest"
     ],
-    "modelchorus/tests/test_conversation.py": [
+    "tests/test_conversation.py": [
       "json",
       "pytest",
       "uuid",
@@ -4568,13 +4658,13 @@
       "modelchorus.core.models.ConversationMessage",
       "modelchorus.core.models.ConversationThread"
     ],
-    "modelchorus/tests/test_gemini_integration.py": [
+    "tests/test_gemini_integration.py": [
       "pytest",
       "subprocess",
       "modelchorus.providers.gemini_provider.GeminiProvider",
       "modelchorus.providers.base_provider.GenerationRequest"
     ],
-    "modelchorus/tests/test_integration.py": [
+    "tests/test_integration.py": [
       "pytest",
       "unittest.mock.patch",
       "unittest.mock.AsyncMock",
@@ -4585,7 +4675,7 @@
       "modelchorus.providers.claude_provider.ClaudeProvider",
       "modelchorus.providers.codex_provider.CodexProvider"
     ],
-    "modelchorus/tests/test_state.py": [
+    "tests/test_state.py": [
       "json",
       "pytest",
       "threading",
@@ -4597,7 +4687,7 @@
       "modelchorus.core.state.get_default_state_manager",
       "modelchorus.core.models.ConversationState"
     ],
-    "tests/test_providers/test_cli_interface.py": [
+    "test_cli_interface.py": [
       "sys",
       "pathlib.Path",
       "pytest",

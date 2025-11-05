@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 15:33:23
+**Generated:** 2025-11-05 16:10:18
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 33
-- **Total Lines:** 6746
-- **Total Classes:** 41
+- **Total Files:** 34
+- **Total Lines:** 7105
+- **Total Classes:** 42
 - **Total Functions:** 12
 - **Avg Complexity:** 2.75
 - **Max Complexity:** 16
@@ -24,7 +24,7 @@
 
 **Language:** python
 **Inherits from:** `ABC`
-**Defined in:** `modelchorus/src/modelchorus/core/base_workflow.py:50`
+**Defined in:** `src/modelchorus/core/base_workflow.py:50`
 
 **Description:**
 > Abstract base class for all ModelChorus workflows.
@@ -55,7 +55,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `ModelProvider`
-**Defined in:** `modelchorus/src/modelchorus/providers/cli_provider.py:24`
+**Defined in:** `src/modelchorus/providers/cli_provider.py:24`
 
 **Description:**
 > Base class for CLI-based model providers.
@@ -88,11 +88,78 @@ Attributes:
 
 ---
 
+### `ChatWorkflow`
+
+**Language:** python
+**Inherits from:** `BaseWorkflow`
+**Defined in:** `src/modelchorus/workflows/chat.py:21`
+
+**Description:**
+> Simple single-model chat workflow with conversation continuity.
+
+This workflow provides straightforward peer consultation with a single AI model,
+supporting conversation threading for multi-turn interactions. Unlike multi-model
+workflows like Consensus, Chat focuses on simplicity and conversational flow.
+
+Key features:
+- Single provider (not multi-model)
+- Conversation threading via continuation_id
+- Inherits conversation support from BaseWorkflow
+- Automatic conversation history management
+- Simple request/response pattern
+
+The ChatWorkflow is ideal for:
+- Quick second opinions from an AI model
+- Iterative conversations and refinement
+- Simple consultations without orchestration overhead
+- Building conversational applications
+
+Example:
+    >>> from modelchorus.providers import ClaudeProvider
+    >>> from modelchorus.workflows import ChatWorkflow
+    >>> from modelchorus.core.conversation import ConversationMemory
+    >>>
+    >>> # Create provider and conversation memory
+    >>> provider = ClaudeProvider()
+    >>> memory = ConversationMemory()
+    >>>
+    >>> # Create workflow
+    >>> workflow = ChatWorkflow(provider, conversation_memory=memory)
+    >>>
+    >>> # First message (creates new conversation)
+    >>> result1 = await workflow.run("What is quantum computing?")
+    >>> thread_id = result1.metadata.get('thread_id')
+    >>> print(result1.synthesis)
+    >>>
+    >>> # Follow-up message (continues conversation)
+    >>> result2 = await workflow.run(
+    ...     "How does it differ from classical computing?",
+    ...     continuation_id=thread_id
+    ... )
+    >>> print(result2.synthesis)
+    >>>
+    >>> # Check conversation history
+    >>> thread = workflow.get_thread(thread_id)
+    >>> print(f"Total messages: {len(thread.messages)}")
+
+**Methods:**
+- `__init__()`
+- `run()`
+- `_build_prompt_with_history()`
+- `_get_conversation_length()`
+- `get_provider()`
+- `clear_conversation()`
+- `get_message_count()`
+- `validate_config()`
+- `__repr__()`
+
+---
+
 ### `ClaudeProvider`
 
 **Language:** python
 **Inherits from:** `CLIProvider`
-**Defined in:** `modelchorus/src/modelchorus/providers/claude_provider.py:22`
+**Defined in:** `src/modelchorus/providers/claude_provider.py:22`
 
 **Description:**
 > Provider for Anthropic's Claude models via the `claude` CLI tool.
@@ -131,7 +198,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `CLIProvider`
-**Defined in:** `modelchorus/src/modelchorus/providers/codex_provider.py:22`
+**Defined in:** `src/modelchorus/providers/codex_provider.py:22`
 
 **Description:**
 > Provider for OpenAI's Codex models via the `codex` CLI tool.
@@ -170,7 +237,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:306`
+**Defined in:** `src/modelchorus/core/models.py:306`
 
 **Description:**
 > Configuration for consensus-building workflows.
@@ -191,7 +258,7 @@ Attributes:
 ### `ConsensusResult`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/workflows/consensus.py:45`
+**Defined in:** `src/modelchorus/workflows/consensus.py:45`
 
 **Description:**
 > Result from a consensus workflow execution.
@@ -202,7 +269,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `Enum`
-**Defined in:** `modelchorus/src/modelchorus/workflows/consensus.py:24`
+**Defined in:** `src/modelchorus/workflows/consensus.py:24`
 
 **Description:**
 > Strategy for reaching consensus among multiple model responses.
@@ -212,7 +279,7 @@ Attributes:
 ### `ConsensusWorkflow`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/workflows/consensus.py:56`
+**Defined in:** `src/modelchorus/workflows/consensus.py:56`
 
 **Description:**
 > Workflow for coordinating multiple AI models to reach consensus.
@@ -263,7 +330,7 @@ Example:
 ### `ConversationMemory`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/core/conversation.py:36`
+**Defined in:** `src/modelchorus/core/conversation.py:36`
 
 **Description:**
 > Manages conversation threads with file-based persistence.
@@ -304,7 +371,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:379`
+**Defined in:** `src/modelchorus/core/models.py:379`
 
 **Description:**
 > Single message in a conversation thread.
@@ -328,7 +395,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:561`
+**Defined in:** `src/modelchorus/core/models.py:561`
 
 **Description:**
 > Generic state container for workflow-specific conversation data.
@@ -350,7 +417,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:451`
+**Defined in:** `src/modelchorus/core/models.py:451`
 
 **Description:**
 > Complete conversation context for a thread.
@@ -380,7 +447,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `CLIProvider`
-**Defined in:** `modelchorus/src/modelchorus/providers/cursor_agent_provider.py:22`
+**Defined in:** `src/modelchorus/providers/cursor_agent_provider.py:22`
 
 **Description:**
 > Provider for Cursor's AI agent via the `cursor-agent` CLI tool.
@@ -421,7 +488,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `ModelProvider`
-**Defined in:** `modelchorus/examples/provider_integration.py:18`
+**Defined in:** `examples/provider_integration.py:18`
 
 **Description:**
 > Example provider implementation.
@@ -441,7 +508,7 @@ with an actual AI provider's API.
 
 **Language:** python
 **Inherits from:** `BaseWorkflow`
-**Defined in:** `modelchorus/examples/basic_workflow.py:14`
+**Defined in:** `examples/basic_workflow.py:14`
 
 **Description:**
 > Example workflow that demonstrates basic workflow structure.
@@ -458,7 +525,7 @@ needed to create a working workflow.
 
 **Language:** python
 **Inherits from:** `CLIProvider`
-**Defined in:** `modelchorus/src/modelchorus/providers/gemini_provider.py:22`
+**Defined in:** `src/modelchorus/providers/gemini_provider.py:22`
 
 **Description:**
 > Provider for Google's Gemini models via the `gemini` CLI tool.
@@ -497,7 +564,7 @@ Example:
 ### `GenerationRequest`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/providers/base_provider.py:37`
+**Defined in:** `src/modelchorus/providers/base_provider.py:37`
 
 **Description:**
 > Request for text generation.
@@ -507,7 +574,7 @@ Example:
 ### `GenerationResponse`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/providers/base_provider.py:51`
+**Defined in:** `src/modelchorus/providers/base_provider.py:51`
 
 **Description:**
 > Response from text generation.
@@ -518,7 +585,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `Enum`
-**Defined in:** `modelchorus/src/modelchorus/providers/base_provider.py:15`
+**Defined in:** `src/modelchorus/providers/base_provider.py:15`
 
 **Description:**
 > Enumeration of model capabilities.
@@ -528,7 +595,7 @@ Example:
 ### `ModelConfig`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/providers/base_provider.py:26`
+**Defined in:** `src/modelchorus/providers/base_provider.py:26`
 
 **Description:**
 > Configuration for a model.
@@ -539,7 +606,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `ABC`
-**Defined in:** `modelchorus/src/modelchorus/providers/base_provider.py:61`
+**Defined in:** `src/modelchorus/providers/base_provider.py:61`
 
 **Description:**
 > Abstract base class for all model providers.
@@ -568,7 +635,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:258`
+**Defined in:** `src/modelchorus/core/models.py:258`
 
 **Description:**
 > Model for a response from a single model.
@@ -588,7 +655,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:156`
+**Defined in:** `src/modelchorus/core/models.py:156`
 
 **Description:**
 > Model for specifying model selection criteria.
@@ -606,7 +673,7 @@ Attributes:
 ### `ProviderConfig`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/workflows/consensus.py:35`
+**Defined in:** `src/modelchorus/workflows/consensus.py:35`
 
 **Description:**
 > Configuration for a provider in the consensus workflow.
@@ -616,7 +683,7 @@ Attributes:
 ### `StateManager`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/core/state.py:32`
+**Defined in:** `src/modelchorus/core/state.py:32`
 
 **Description:**
 > Thread-safe state persistence manager for workflows.
@@ -660,7 +727,7 @@ Attributes:
 ### `TestCLIProvidersImplementInterface`
 
 **Language:** python
-**Defined in:** `tests/test_providers/test_cli_interface.py:27`
+**Defined in:** `test_cli_interface.py:27`
 
 **Description:**
 > Test that all CLI providers implement the ModelProvider interface.
@@ -686,7 +753,7 @@ Attributes:
 ### `TestClaudeProvider`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_claude_provider.py:13`
+**Defined in:** `tests/test_claude_provider.py:13`
 
 **Description:**
 > Test suite for ClaudeProvider.
@@ -710,7 +777,7 @@ Attributes:
 ### `TestCodexProvider`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_codex_provider.py:13`
+**Defined in:** `tests/test_codex_provider.py:13`
 
 **Description:**
 > Test suite for CodexProvider.
@@ -735,7 +802,7 @@ Attributes:
 ### `TestConsensusWorkflow`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_consensus_workflow.py:12`
+**Defined in:** `tests/test_consensus_workflow.py:12`
 
 **Description:**
 > Test suite for ConsensusWorkflow.
@@ -754,7 +821,7 @@ Attributes:
 ### `TestConversationMemory`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_conversation.py:22`
+**Defined in:** `tests/test_conversation.py:22`
 
 **Description:**
 > Test suite for ConversationMemory class.
@@ -778,7 +845,7 @@ Attributes:
 ### `TestGeminiIntegration`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_gemini_integration.py:13`
+**Defined in:** `tests/test_gemini_integration.py:13`
 
 **Description:**
 > Integration tests for Gemini provider.
@@ -800,7 +867,7 @@ Attributes:
 ### `TestIntegration`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_integration.py:17`
+**Defined in:** `tests/test_integration.py:17`
 
 **Description:**
 > Integration test suite.
@@ -817,7 +884,7 @@ Attributes:
 ### `TestStateManager`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_state.py:23`
+**Defined in:** `tests/test_state.py:23`
 
 **Description:**
 > Test suite for StateManager class.
@@ -858,7 +925,7 @@ Attributes:
 ### `TestStateManagerExportImportRoundtrip`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_state.py:609`
+**Defined in:** `tests/test_state.py:609`
 
 **Description:**
 > Test complete export/import workflow.
@@ -871,7 +938,7 @@ Attributes:
 ### `TestStateManagerFileRecovery`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_state.py:647`
+**Defined in:** `tests/test_state.py:647`
 
 **Description:**
 > Test state recovery after simulated process restart.
@@ -884,7 +951,7 @@ Attributes:
 ### `WorkflowRegistry`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/core/registry.py:13`
+**Defined in:** `src/modelchorus/core/registry.py:13`
 
 **Description:**
 > Registry for workflow implementations.
@@ -921,7 +988,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:15`
+**Defined in:** `src/modelchorus/core/models.py:15`
 
 **Description:**
 > Request model for workflow execution.
@@ -945,7 +1012,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:89`
+**Defined in:** `src/modelchorus/core/models.py:89`
 
 **Description:**
 > Response model for workflow execution.
@@ -967,7 +1034,7 @@ Attributes:
 ### `WorkflowResult`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/core/base_workflow.py:29`
+**Defined in:** `src/modelchorus/core/base_workflow.py:29`
 
 **Description:**
 > Result of a workflow execution.
@@ -980,7 +1047,7 @@ Attributes:
 ### `WorkflowStep`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/core/base_workflow.py:18`
+**Defined in:** `src/modelchorus/core/base_workflow.py:18`
 
 **Description:**
 > Represents a single step in a workflow execution.
@@ -991,7 +1058,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:196`
+**Defined in:** `src/modelchorus/core/models.py:196`
 
 **Description:**
 > Model for a single workflow execution step.
@@ -1015,7 +1082,7 @@ Attributes:
 ### `consensus(prompt, providers, strategy, system, temperature, max_tokens, timeout, output, verbose) -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/cli/main.py:54`
+**Defined in:** `src/modelchorus/cli/main.py:54`
 ⚠️ **Complexity:** 16 (High)
 
 **Decorators:** `@app.command()`
@@ -1042,7 +1109,7 @@ Example:
 ### `get_default_state_manager() -> StateManager`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/core/state.py:517`
+**Defined in:** `src/modelchorus/core/state.py:517`
 **Complexity:** 2
 
 **Description:**
@@ -1061,7 +1128,7 @@ Example:
 ### `get_provider_by_name(name) -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/cli/main.py:35`
+**Defined in:** `src/modelchorus/cli/main.py:35`
 **Complexity:** 2
 
 **Description:**
@@ -1075,7 +1142,7 @@ Example:
 ### `list_providers() -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/cli/main.py:239`
+**Defined in:** `src/modelchorus/cli/main.py:239`
 **Complexity:** 3
 
 **Decorators:** `@app.command()`
@@ -1088,7 +1155,7 @@ Example:
 ### `async main() -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/examples/basic_workflow.py:56`
+**Defined in:** `examples/basic_workflow.py:56`
 **Complexity:** 2
 
 **Description:**
@@ -1099,7 +1166,7 @@ Example:
 ### `async main() -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/examples/provider_integration.py:101`
+**Defined in:** `examples/provider_integration.py:101`
 **Complexity:** 2
 
 **Description:**
@@ -1110,7 +1177,7 @@ Example:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/cli/main.py:277`
+**Defined in:** `src/modelchorus/cli/main.py:277`
 **Complexity:** 1
 
 **Description:**
@@ -1121,7 +1188,7 @@ Example:
 ### `mock_claude_response() -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/conftest.py:10`
+**Defined in:** `tests/conftest.py:10`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -1134,7 +1201,7 @@ Example:
 ### `mock_codex_response() -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/conftest.py:35`
+**Defined in:** `tests/conftest.py:35`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -1147,7 +1214,7 @@ Example:
 ### `mock_subprocess_run() -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/conftest.py:45`
+**Defined in:** `tests/conftest.py:45`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -1160,7 +1227,7 @@ Example:
 ### `sample_generation_request() -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/conftest.py:55`
+**Defined in:** `tests/conftest.py:55`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -1173,7 +1240,7 @@ Example:
 ### `version() -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/cli/main.py:266`
+**Defined in:** `src/modelchorus/cli/main.py:266`
 **Complexity:** 1
 
 **Decorators:** `@app.command()`
@@ -1186,7 +1253,7 @@ Example:
 
 ## 📦 Dependencies
 
-### `modelchorus/examples/basic_workflow.py`
+### `examples/basic_workflow.py`
 
 - `asyncio`
 - `modelchorus.core.BaseWorkflow`
@@ -1194,7 +1261,7 @@ Example:
 - `modelchorus.core.WorkflowRequest`
 - `modelchorus.core.WorkflowResult`
 
-### `modelchorus/examples/provider_integration.py`
+### `examples/provider_integration.py`
 
 - `asyncio`
 - `modelchorus.providers.GenerationRequest`
@@ -1203,12 +1270,12 @@ Example:
 - `modelchorus.providers.ModelConfig`
 - `modelchorus.providers.ModelProvider`
 
-### `modelchorus/src/modelchorus/cli/__init__.py`
+### `src/modelchorus/cli/__init__.py`
 
 - `main.app`
 - `main.main`
 
-### `modelchorus/src/modelchorus/cli/main.py`
+### `src/modelchorus/cli/main.py`
 
 - `asyncio`
 - `json`
@@ -1228,7 +1295,7 @@ Example:
 - `workflows.ConsensusStrategy`
 - `workflows.ConsensusWorkflow`
 
-### `modelchorus/src/modelchorus/core/__init__.py`
+### `src/modelchorus/core/__init__.py`
 
 - `base_workflow.BaseWorkflow`
 - `base_workflow.WorkflowResult`
@@ -1245,7 +1312,7 @@ Example:
 - `models.WorkflowStep`
 - `registry.WorkflowRegistry`
 
-### `modelchorus/src/modelchorus/core/base_workflow.py`
+### `src/modelchorus/core/base_workflow.py`
 
 - `abc.ABC`
 - `abc.abstractmethod`
@@ -1260,7 +1327,7 @@ Example:
 - `typing.List`
 - `typing.Optional`
 
-### `modelchorus/src/modelchorus/core/conversation.py`
+### `src/modelchorus/core/conversation.py`
 
 - `datetime.datetime`
 - `datetime.timedelta`
@@ -1279,7 +1346,7 @@ Example:
 - `typing.Tuple`
 - `uuid`
 
-### `modelchorus/src/modelchorus/core/models.py`
+### `src/modelchorus/core/models.py`
 
 - `pydantic.BaseModel`
 - `pydantic.ConfigDict`
@@ -1290,7 +1357,7 @@ Example:
 - `typing.Literal`
 - `typing.Optional`
 
-### `modelchorus/src/modelchorus/core/registry.py`
+### `src/modelchorus/core/registry.py`
 
 - `base_workflow.BaseWorkflow`
 - `inspect`
@@ -1299,7 +1366,7 @@ Example:
 - `typing.Optional`
 - `typing.Type`
 
-### `modelchorus/src/modelchorus/core/state.py`
+### `src/modelchorus/core/state.py`
 
 - `datetime.datetime`
 - `datetime.timezone`
@@ -1312,7 +1379,7 @@ Example:
 - `typing.Dict`
 - `typing.Optional`
 
-### `modelchorus/src/modelchorus/providers/__init__.py`
+### `src/modelchorus/providers/__init__.py`
 
 - `base_provider.GenerationRequest`
 - `base_provider.GenerationResponse`
@@ -1325,7 +1392,7 @@ Example:
 - `cursor_agent_provider.CursorAgentProvider`
 - `gemini_provider.GeminiProvider`
 
-### `modelchorus/src/modelchorus/providers/base_provider.py`
+### `src/modelchorus/providers/base_provider.py`
 
 - `abc.ABC`
 - `abc.abstractmethod`
@@ -1337,7 +1404,7 @@ Example:
 - `typing.List`
 - `typing.Optional`
 
-### `modelchorus/src/modelchorus/providers/claude_provider.py`
+### `src/modelchorus/providers/claude_provider.py`
 
 - `base_provider.GenerationRequest`
 - `base_provider.GenerationResponse`
@@ -1351,7 +1418,7 @@ Example:
 - `typing.List`
 - `typing.Optional`
 
-### `modelchorus/src/modelchorus/providers/cli_provider.py`
+### `src/modelchorus/providers/cli_provider.py`
 
 - `abc.abstractmethod`
 - `asyncio`
@@ -1366,7 +1433,7 @@ Example:
 - `typing.List`
 - `typing.Optional`
 
-### `modelchorus/src/modelchorus/providers/codex_provider.py`
+### `src/modelchorus/providers/codex_provider.py`
 
 - `base_provider.GenerationRequest`
 - `base_provider.GenerationResponse`
@@ -1380,7 +1447,7 @@ Example:
 - `typing.List`
 - `typing.Optional`
 
-### `modelchorus/src/modelchorus/providers/cursor_agent_provider.py`
+### `src/modelchorus/providers/cursor_agent_provider.py`
 
 - `base_provider.GenerationRequest`
 - `base_provider.GenerationResponse`
@@ -1394,7 +1461,7 @@ Example:
 - `typing.List`
 - `typing.Optional`
 
-### `modelchorus/src/modelchorus/providers/gemini_provider.py`
+### `src/modelchorus/providers/gemini_provider.py`
 
 - `base_provider.GenerationRequest`
 - `base_provider.GenerationResponse`
@@ -1408,14 +1475,32 @@ Example:
 - `typing.List`
 - `typing.Optional`
 
-### `modelchorus/src/modelchorus/workflows/__init__.py`
+### `src/modelchorus/workflows/__init__.py`
 
+- `chat.ChatWorkflow`
 - `consensus.ConsensusResult`
 - `consensus.ConsensusStrategy`
 - `consensus.ConsensusWorkflow`
 - `consensus.ProviderConfig`
 
-### `modelchorus/src/modelchorus/workflows/consensus.py`
+### `src/modelchorus/workflows/chat.py`
+
+- `core.base_workflow.BaseWorkflow`
+- `core.base_workflow.WorkflowResult`
+- `core.base_workflow.WorkflowStep`
+- `core.conversation.ConversationMemory`
+- `core.models.ConversationMessage`
+- `logging`
+- `providers.GenerationRequest`
+- `providers.GenerationResponse`
+- `providers.ModelProvider`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+- `uuid`
+
+### `src/modelchorus/workflows/consensus.py`
 
 - `asyncio`
 - `dataclasses.dataclass`
@@ -1430,84 +1515,7 @@ Example:
 - `typing.List`
 - `typing.Optional`
 
-### `modelchorus/tests/conftest.py`
-
-- `pytest`
-- `unittest.mock.AsyncMock`
-- `unittest.mock.MagicMock`
-
-### `modelchorus/tests/test_claude_provider.py`
-
-- `json`
-- `modelchorus.providers.base_provider.GenerationRequest`
-- `modelchorus.providers.claude_provider.ClaudeProvider`
-- `pytest`
-- `unittest.mock.AsyncMock`
-- `unittest.mock.patch`
-
-### `modelchorus/tests/test_codex_provider.py`
-
-- `json`
-- `modelchorus.providers.base_provider.GenerationRequest`
-- `modelchorus.providers.codex_provider.CodexProvider`
-- `pytest`
-- `unittest.mock.AsyncMock`
-- `unittest.mock.patch`
-
-### `modelchorus/tests/test_consensus_workflow.py`
-
-- `modelchorus.providers.base_provider.GenerationRequest`
-- `modelchorus.providers.base_provider.GenerationResponse`
-- `modelchorus.workflows.consensus.ConsensusStrategy`
-- `modelchorus.workflows.consensus.ConsensusWorkflow`
-- `pytest`
-- `unittest.mock.AsyncMock`
-
-### `modelchorus/tests/test_conversation.py`
-
-- `datetime.datetime`
-- `datetime.timezone`
-- `json`
-- `modelchorus.core.conversation.ConversationMemory`
-- `modelchorus.core.models.ConversationMessage`
-- `modelchorus.core.models.ConversationThread`
-- `pathlib.Path`
-- `pytest`
-- `uuid`
-
-### `modelchorus/tests/test_gemini_integration.py`
-
-- `modelchorus.providers.base_provider.GenerationRequest`
-- `modelchorus.providers.gemini_provider.GeminiProvider`
-- `pytest`
-- `subprocess`
-
-### `modelchorus/tests/test_integration.py`
-
-- `modelchorus.providers.base_provider.GenerationRequest`
-- `modelchorus.providers.base_provider.GenerationResponse`
-- `modelchorus.providers.claude_provider.ClaudeProvider`
-- `modelchorus.providers.codex_provider.CodexProvider`
-- `modelchorus.workflows.consensus.ConsensusStrategy`
-- `modelchorus.workflows.consensus.ConsensusWorkflow`
-- `pytest`
-- `unittest.mock.AsyncMock`
-- `unittest.mock.patch`
-
-### `modelchorus/tests/test_state.py`
-
-- `datetime.datetime`
-- `datetime.timezone`
-- `json`
-- `modelchorus.core.models.ConversationState`
-- `modelchorus.core.state.StateManager`
-- `modelchorus.core.state.get_default_state_manager`
-- `pathlib.Path`
-- `pytest`
-- `threading`
-- `time`
-
-### `tests/test_providers/test_cli_interface.py`
+### `test_cli_interface.py`
 
 - `modelchorus.providers.CLIProvider`
 - `modelchorus.providers.ClaudeProvider`
@@ -1519,3 +1527,80 @@ Example:
 - `pathlib.Path`
 - `pytest`
 - `sys`
+
+### `tests/conftest.py`
+
+- `pytest`
+- `unittest.mock.AsyncMock`
+- `unittest.mock.MagicMock`
+
+### `tests/test_claude_provider.py`
+
+- `json`
+- `modelchorus.providers.base_provider.GenerationRequest`
+- `modelchorus.providers.claude_provider.ClaudeProvider`
+- `pytest`
+- `unittest.mock.AsyncMock`
+- `unittest.mock.patch`
+
+### `tests/test_codex_provider.py`
+
+- `json`
+- `modelchorus.providers.base_provider.GenerationRequest`
+- `modelchorus.providers.codex_provider.CodexProvider`
+- `pytest`
+- `unittest.mock.AsyncMock`
+- `unittest.mock.patch`
+
+### `tests/test_consensus_workflow.py`
+
+- `modelchorus.providers.base_provider.GenerationRequest`
+- `modelchorus.providers.base_provider.GenerationResponse`
+- `modelchorus.workflows.consensus.ConsensusStrategy`
+- `modelchorus.workflows.consensus.ConsensusWorkflow`
+- `pytest`
+- `unittest.mock.AsyncMock`
+
+### `tests/test_conversation.py`
+
+- `datetime.datetime`
+- `datetime.timezone`
+- `json`
+- `modelchorus.core.conversation.ConversationMemory`
+- `modelchorus.core.models.ConversationMessage`
+- `modelchorus.core.models.ConversationThread`
+- `pathlib.Path`
+- `pytest`
+- `uuid`
+
+### `tests/test_gemini_integration.py`
+
+- `modelchorus.providers.base_provider.GenerationRequest`
+- `modelchorus.providers.gemini_provider.GeminiProvider`
+- `pytest`
+- `subprocess`
+
+### `tests/test_integration.py`
+
+- `modelchorus.providers.base_provider.GenerationRequest`
+- `modelchorus.providers.base_provider.GenerationResponse`
+- `modelchorus.providers.claude_provider.ClaudeProvider`
+- `modelchorus.providers.codex_provider.CodexProvider`
+- `modelchorus.workflows.consensus.ConsensusStrategy`
+- `modelchorus.workflows.consensus.ConsensusWorkflow`
+- `pytest`
+- `unittest.mock.AsyncMock`
+- `unittest.mock.patch`
+
+### `tests/test_state.py`
+
+- `datetime.datetime`
+- `datetime.timezone`
+- `json`
+- `modelchorus.core.models.ConversationState`
+- `modelchorus.core.state.StateManager`
+- `modelchorus.core.state.get_default_state_manager`
+- `pathlib.Path`
+- `pytest`
+- `threading`
+- `time`
