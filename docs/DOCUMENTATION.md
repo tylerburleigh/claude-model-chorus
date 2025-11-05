@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 13:22:03
+**Generated:** 2025-11-05 13:35:02
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 29
-- **Total Lines:** 4455
-- **Total Classes:** 35
+- **Total Files:** 30
+- **Total Lines:** 5138
+- **Total Classes:** 36
 - **Total Functions:** 11
 - **Avg Complexity:** 2.82
 - **Max Complexity:** 16
@@ -252,6 +252,46 @@ Example:
 - `get_providers()`
 - `set_strategy()`
 - `__repr__()`
+
+---
+
+### `ConversationMemory`
+
+**Language:** python
+**Defined in:** `src/modelchorus/core/conversation.py:36`
+
+**Description:**
+> Manages conversation threads with file-based persistence.
+
+Provides thread-safe storage and retrieval of conversation history,
+enabling multi-turn conversations across workflow executions.
+
+Architecture:
+    - Each thread stored as JSON file: ~/.modelchorus/conversations/{thread_id}.json
+    - File locking prevents concurrent access corruption
+    - TTL-based cleanup removes expired threads
+    - Supports conversation chains via parent_thread_id
+
+Attributes:
+    conversations_dir: Directory where conversation files are stored
+    ttl_hours: Time-to-live for conversation threads in hours
+    max_messages: Maximum messages per thread before truncation
+
+**Methods:**
+- `__init__()`
+- `create_thread()`
+- `get_thread()`
+- `get_thread_chain()`
+- `add_message()`
+- `get_messages()`
+- `build_conversation_history()`
+- `get_context_summary()`
+- `complete_thread()`
+- `archive_thread()`
+- `cleanup_expired_threads()`
+- `cleanup_archived_threads()`
+- `_save_thread()`
+- `_delete_thread()`
 
 ---
 
@@ -1053,6 +1093,25 @@ Example:
 - `typing.Dict`
 - `typing.List`
 - `typing.Optional`
+
+### `src/modelchorus/core/conversation.py`
+
+- `datetime.datetime`
+- `datetime.timedelta`
+- `datetime.timezone`
+- `filelock`
+- `json`
+- `logging`
+- `models.ConversationMessage`
+- `models.ConversationState`
+- `models.ConversationThread`
+- `pathlib.Path`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+- `typing.Tuple`
+- `uuid`
 
 ### `src/modelchorus/core/models.py`
 

@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T18:22:03.393519Z",
+    "generated_at": "2025-11-05T18:35:02.357082Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 29,
-    "total_lines": 4455,
-    "total_classes": 35,
+    "total_files": 30,
+    "total_lines": 5138,
+    "total_classes": 36,
     "total_functions": 11,
     "avg_complexity": 2.82,
     "max_complexity": 16,
@@ -20,9 +20,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 29,
-        "lines": 4455,
-        "classes": 35,
+        "files": 30,
+        "lines": 5138,
+        "classes": 36,
         "functions": 11,
         "avg_complexity": 2.82
       }
@@ -178,6 +178,36 @@
       ],
       "exports": [],
       "lines": 142
+    },
+    {
+      "name": "conversation",
+      "file": "src/modelchorus/core/conversation.py",
+      "language": "python",
+      "docstring": "Conversation memory management for ModelChorus.\n\nProvides file-based persistence for multi-turn conversations with continuation support.\nBased on Zen MCP patterns but adapted for CLI-based orchestration architecture.\n\nKey Features:\n- UUID-based thread identification (continuation_id)\n- File-based persistence (survives process restarts)\n- Thread-safe operations with file locking\n- TTL-based automatic cleanup\n- Context window management for long conversations",
+      "classes": [
+        "ConversationMemory"
+      ],
+      "functions": [],
+      "imports": [
+        "json",
+        "uuid",
+        "logging",
+        "pathlib.Path",
+        "datetime.datetime",
+        "datetime.timezone",
+        "datetime.timedelta",
+        "typing.Optional",
+        "typing.List",
+        "typing.Tuple",
+        "typing.Dict",
+        "typing.Any",
+        "filelock",
+        "models.ConversationMessage",
+        "models.ConversationThread",
+        "models.ConversationState"
+      ],
+      "exports": [],
+      "lines": 683
     },
     {
       "name": "models",
@@ -763,6 +793,35 @@
       "imported_by": []
     },
     {
+      "name": "ConversationMemory",
+      "file": "src/modelchorus/core/conversation.py",
+      "line": 36,
+      "language": "python",
+      "docstring": "Manages conversation threads with file-based persistence.\n\nProvides thread-safe storage and retrieval of conversation history,\nenabling multi-turn conversations across workflow executions.\n\nArchitecture:\n    - Each thread stored as JSON file: ~/.modelchorus/conversations/{thread_id}.json\n    - File locking prevents concurrent access corruption\n    - TTL-based cleanup removes expired threads\n    - Supports conversation chains via parent_thread_id\n\nAttributes:\n    conversations_dir: Directory where conversation files are stored\n    ttl_hours: Time-to-live for conversation threads in hours\n    max_messages: Maximum messages per thread before truncation",
+      "bases": [],
+      "methods": [
+        "__init__",
+        "create_thread",
+        "get_thread",
+        "get_thread_chain",
+        "add_message",
+        "get_messages",
+        "build_conversation_history",
+        "get_context_summary",
+        "complete_thread",
+        "archive_thread",
+        "cleanup_expired_threads",
+        "cleanup_archived_threads",
+        "_save_thread",
+        "_delete_thread"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
       "name": "WorkflowRequest",
       "file": "src/modelchorus/core/models.py",
       "line": 15,
@@ -892,8 +951,19 @@
       "properties": [],
       "is_exported": false,
       "is_public": true,
-      "instantiated_by": [],
-      "imported_by": []
+      "instantiated_by": [
+        {
+          "instantiator": "add_message",
+          "file": "src/modelchorus/core/conversation.py",
+          "line": 272,
+          "context": [
+            "ConversationMemory",
+            "add_message"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 1
     },
     {
       "name": "ConversationThread",
@@ -908,8 +978,28 @@
       "properties": [],
       "is_exported": false,
       "is_public": true,
-      "instantiated_by": [],
-      "imported_by": []
+      "instantiated_by": [
+        {
+          "instantiator": "create_thread",
+          "file": "src/modelchorus/core/conversation.py",
+          "line": 116,
+          "context": [
+            "ConversationMemory",
+            "create_thread"
+          ]
+        },
+        {
+          "instantiator": "get_thread",
+          "file": "src/modelchorus/core/conversation.py",
+          "line": 173,
+          "context": [
+            "ConversationMemory",
+            "get_thread"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 2
     },
     {
       "name": "ConversationState",
@@ -3593,6 +3683,24 @@
       "dataclasses.dataclass",
       "dataclasses.field",
       "datetime.datetime"
+    ],
+    "src/modelchorus/core/conversation.py": [
+      "json",
+      "uuid",
+      "logging",
+      "pathlib.Path",
+      "datetime.datetime",
+      "datetime.timezone",
+      "datetime.timedelta",
+      "typing.Optional",
+      "typing.List",
+      "typing.Tuple",
+      "typing.Dict",
+      "typing.Any",
+      "filelock",
+      "models.ConversationMessage",
+      "models.ConversationThread",
+      "models.ConversationState"
     ],
     "src/modelchorus/core/models.py": [
       "typing.Any",
