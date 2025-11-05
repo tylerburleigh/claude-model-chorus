@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T23:20:27.552980Z",
+    "generated_at": "2025-11-05T23:24:20.232140Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 37,
-    "total_lines": 8893,
+    "total_lines": 9051,
     "total_classes": 53,
     "total_functions": 21,
     "avg_complexity": 3.29,
@@ -22,7 +22,7 @@
     "by_language": {
       "python": {
         "files": 37,
-        "lines": 8893,
+        "lines": 9051,
         "classes": 53,
         "functions": 21,
         "avg_complexity": 3.29
@@ -619,7 +619,7 @@
         "core.models.ConfidenceLevel"
       ],
       "exports": [],
-      "lines": 746
+      "lines": 904
     },
     {
       "name": "__init__",
@@ -991,7 +991,7 @@
         {
           "instantiator": "run",
           "file": "modelchorus/src/modelchorus/workflows/thinkdeep.py",
-          "line": 178,
+          "line": 194,
           "context": [
             "ThinkDeepWorkflow",
             "run"
@@ -1437,7 +1437,7 @@
         {
           "instantiator": "add_hypothesis",
           "file": "modelchorus/src/modelchorus/workflows/thinkdeep.py",
-          "line": 478,
+          "line": 636,
           "context": [
             "ThinkDeepWorkflow",
             "add_hypothesis"
@@ -1464,7 +1464,7 @@
         {
           "instantiator": "run",
           "file": "modelchorus/src/modelchorus/workflows/thinkdeep.py",
-          "line": 230,
+          "line": 246,
           "context": [
             "ThinkDeepWorkflow",
             "run"
@@ -1491,7 +1491,7 @@
         {
           "instantiator": "_get_or_create_state",
           "file": "modelchorus/src/modelchorus/workflows/thinkdeep.py",
-          "line": 293,
+          "line": 323,
           "context": [
             "ThinkDeepWorkflow",
             "_get_or_create_state"
@@ -1500,7 +1500,7 @@
         {
           "instantiator": "_get_or_create_state",
           "file": "modelchorus/src/modelchorus/workflows/thinkdeep.py",
-          "line": 297,
+          "line": 327,
           "context": [
             "ThinkDeepWorkflow",
             "_get_or_create_state"
@@ -1509,7 +1509,7 @@
         {
           "instantiator": "_get_or_create_state",
           "file": "modelchorus/src/modelchorus/workflows/thinkdeep.py",
-          "line": 302,
+          "line": 332,
           "context": [
             "ThinkDeepWorkflow",
             "_get_or_create_state"
@@ -1518,7 +1518,7 @@
         {
           "instantiator": "_get_or_create_state",
           "file": "modelchorus/src/modelchorus/workflows/thinkdeep.py",
-          "line": 305,
+          "line": 335,
           "context": [
             "ThinkDeepWorkflow",
             "_get_or_create_state"
@@ -2105,10 +2105,19 @@
         {
           "instantiator": "run",
           "file": "modelchorus/src/modelchorus/workflows/thinkdeep.py",
-          "line": 190,
+          "line": 206,
           "context": [
             "ThinkDeepWorkflow",
             "run"
+          ]
+        },
+        {
+          "instantiator": "_perform_expert_validation",
+          "file": "modelchorus/src/modelchorus/workflows/thinkdeep.py",
+          "line": 516,
+          "context": [
+            "ThinkDeepWorkflow",
+            "_perform_expert_validation"
           ]
         },
         {
@@ -2328,7 +2337,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 28
+      "instantiation_count": 29
     },
     {
       "name": "GenerationResponse",
@@ -3373,6 +3382,8 @@
         "_save_state",
         "_build_investigation_prompt",
         "_extract_findings",
+        "_perform_expert_validation",
+        "_build_expert_validation_prompt",
         "get_investigation_state",
         "add_hypothesis",
         "update_hypothesis",

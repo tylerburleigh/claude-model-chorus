@@ -22,7 +22,7 @@ from ..providers import (
     CursorAgentProvider,
     GenerationRequest,
 )
-from ..workflows import ChatWorkflow, ConsensusWorkflow, ConsensusStrategy
+from ..workflows import ChatWorkflow, ConsensusWorkflow, ConsensusStrategy, ThinkDeepWorkflow
 from ..core.conversation import ConversationMemory
 
 app = typer.Typer(
@@ -401,6 +401,235 @@ def consensus(
             if len(result.all_responses) == 0:
                 console.print("[red]Error: All providers failed[/red]")
                 raise typer.Exit(1)
+
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Interrupted by user[/yellow]")
+        raise typer.Exit(130)
+    except Exception as e:
+        console.print(f"\n[red]Error: {e}[/red]")
+        if verbose:
+            import traceback
+            console.print(f"\n[red]{traceback.format_exc()}[/red]")
+        raise typer.Exit(1)
+
+
+@app.command()
+def thinkdeep(
+    prompt: str = typer.Argument(..., help="Investigation problem statement or query"),
+    provider: str = typer.Option(
+        "claude",
+        "--provider",
+        "-p",
+        help="Provider to use for investigation (claude, gemini, codex, cursor-agent)",
+    ),
+    expert_provider: Optional[str] = typer.Option(
+        None,
+        "--expert",
+        "-e",
+        help="Expert provider for validation (optional, uses different model for validation)",
+    ),
+    continuation_id: Optional[str] = typer.Option(
+        None,
+        "--continue",
+        "-c",
+        help="Thread ID to continue an existing investigation",
+    ),
+    files: Optional[List[str]] = typer.Option(
+        None,
+        "--file",
+        "-f",
+        help="File paths to examine during investigation (can specify multiple times)",
+    ),
+    system: Optional[str] = typer.Option(
+        None,
+        "--system",
+        help="System prompt for context",
+    ),
+    temperature: float = typer.Option(
+        0.7,
+        "--temperature",
+        "-t",
+        help="Temperature for generation (0.0-1.0)",
+    ),
+    max_tokens: Optional[int] = typer.Option(
+        None,
+        "--max-tokens",
+        help="Maximum tokens to generate",
+    ),
+    disable_expert: bool = typer.Option(
+        False,
+        "--disable-expert",
+        help="Disable expert validation even if expert provider is specified",
+    ),
+    output: Optional[Path] = typer.Option(
+        None,
+        "--output",
+        "-o",
+        help="Output file for result (JSON format)",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Show detailed execution information",
+    ),
+):
+    """
+    Start a ThinkDeep investigation for systematic problem analysis.
+
+    ThinkDeep provides extended reasoning with hypothesis tracking, confidence
+    progression, and optional expert validation.
+
+    Example:
+        # Start new investigation
+        modelchorus thinkdeep "Why is authentication failing?" -p claude
+
+        # Continue investigation
+        modelchorus thinkdeep "Check async patterns" --continue thread-id-123
+
+        # Include files and expert validation
+        modelchorus thinkdeep "Analyze bug" -f src/auth.py -e gemini
+    """
+    try:
+        # Create primary provider instance
+        if verbose:
+            console.print(f"[cyan]Initializing primary provider: {provider}[/cyan]")
+
+        try:
+            provider_instance = get_provider_by_name(provider)
+            if verbose:
+                console.print(f"[green]✓ {provider} initialized[/green]")
+        except Exception as e:
+            console.print(f"[red]Failed to initialize {provider}: {e}[/red]")
+            raise typer.Exit(1)
+
+        # Create expert provider if specified
+        expert_instance = None
+        if expert_provider:
+            if verbose:
+                console.print(f"[cyan]Initializing expert provider: {expert_provider}[/cyan]")
+            try:
+                expert_instance = get_provider_by_name(expert_provider)
+                if verbose:
+                    console.print(f"[green]✓ {expert_provider} initialized as expert[/green]")
+            except Exception as e:
+                console.print(f"[yellow]Warning: Failed to initialize expert provider: {e}[/yellow]")
+                console.print("[yellow]Continuing without expert validation[/yellow]")
+
+        # Create conversation memory
+        memory = ConversationMemory()
+
+        # Create workflow config
+        config = {}
+        if disable_expert:
+            config['enable_expert_validation'] = False
+
+        # Create workflow
+        workflow = ThinkDeepWorkflow(
+            provider=provider_instance,
+            expert_provider=expert_instance,
+            conversation_memory=memory,
+            config=config if config else None,
+        )
+
+        if verbose:
+            console.print(f"[cyan]Workflow: {workflow}[/cyan]")
+
+        # Validate files exist
+        if files:
+            for file_path in files:
+                if not Path(file_path).exists():
+                    console.print(f"[red]Error: File not found: {file_path}[/red]")
+                    raise typer.Exit(1)
+
+        # Display investigation info
+        console.print(f"\n[bold cyan]{'Continuing' if continuation_id else 'Starting new'} ThinkDeep investigation...[/bold cyan]")
+        console.print(f"Problem: {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
+        console.print(f"Primary Provider: {provider}")
+        if expert_instance:
+            expert_status = "disabled" if disable_expert else "enabled"
+            console.print(f"Expert Provider: {expert_provider} ({expert_status})")
+        if continuation_id:
+            console.print(f"Thread ID: {continuation_id}")
+        if files:
+            console.print(f"Files: {', '.join(files)}")
+        console.print()
+
+        # Run async workflow
+        result = asyncio.run(
+            workflow.run(
+                prompt=prompt,
+                continuation_id=continuation_id,
+                files=files,
+                system_prompt=system,
+                temperature=temperature,
+                max_tokens=max_tokens,
+            )
+        )
+
+        # Display results
+        if result.success:
+            console.print(f"[bold green]✓ Investigation step completed[/bold green]\n")
+
+            # Show thread info
+            thread_id = result.metadata.get('thread_id')
+            is_continuation = result.metadata.get('is_continuation', False)
+            step_number = result.metadata.get('investigation_step', 1)
+            confidence = result.metadata.get('confidence', 'exploring')
+            hypotheses_count = result.metadata.get('hypotheses_count', 0)
+            expert_performed = result.metadata.get('expert_validation_performed', False)
+
+            console.print(f"[cyan]Thread ID:[/cyan] {thread_id}")
+            console.print(f"[cyan]Investigation Step:[/cyan] {step_number}")
+            console.print(f"[cyan]Confidence Level:[/cyan] {confidence}")
+            console.print(f"[cyan]Hypotheses:[/cyan] {hypotheses_count}")
+            if expert_performed:
+                console.print(f"[cyan]Expert Validation:[/cyan] ✓ Performed")
+            console.print()
+
+            # Show response
+            console.print("[bold]Investigation Findings:[/bold]\n")
+            console.print(result.synthesis)
+
+            # Show expert validation if present
+            if expert_performed and len(result.steps) > 1:
+                console.print("\n[bold]Expert Validation:[/bold]\n")
+                console.print(result.steps[-1].content)
+
+            # Show usage info if available
+            usage = result.metadata.get('usage', {})
+            if usage and verbose:
+                console.print(f"\n[dim]Tokens: {usage.get('total_tokens', 'N/A')}[/dim]")
+
+            # Save to file if requested
+            if output:
+                output_data = {
+                    "prompt": prompt,
+                    "provider": provider,
+                    "expert_provider": expert_provider,
+                    "thread_id": thread_id,
+                    "is_continuation": is_continuation,
+                    "investigation_step": step_number,
+                    "confidence": confidence,
+                    "hypotheses_count": hypotheses_count,
+                    "expert_validation_performed": expert_performed,
+                    "response": result.synthesis,
+                    "model": result.metadata.get('model'),
+                    "usage": usage,
+                }
+                if files:
+                    output_data["files"] = files
+                if expert_performed and len(result.steps) > 1:
+                    output_data["expert_validation"] = result.steps[-1].content
+
+                output.write_text(json.dumps(output_data, indent=2))
+                console.print(f"\n[green]✓ Result saved to {output}[/green]")
+
+            console.print(f"\n[dim]To continue this investigation, use: --continue {thread_id}[/dim]")
+
+        else:
+            console.print(f"[red]✗ Investigation failed: {result.error}[/red]")
+            raise typer.Exit(1)
 
     except KeyboardInterrupt:
         console.print("\n[yellow]Interrupted by user[/yellow]")

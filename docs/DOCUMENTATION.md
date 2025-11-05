@@ -1,14 +1,14 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 18:20:27
+**Generated:** 2025-11-05 18:24:20
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 37
-- **Total Lines:** 8893
+- **Total Lines:** 9051
 - **Total Classes:** 53
 - **Total Functions:** 21
 - **Avg Complexity:** 3.29
@@ -1197,6 +1197,8 @@ Example:
 - `_save_state()`
 - `_build_investigation_prompt()`
 - `_extract_findings()`
+- `_perform_expert_validation()`
+- `_build_expert_validation_prompt()`
 - `get_investigation_state()`
 - `add_hypothesis()`
 - `update_hypothesis()`
