@@ -2,29 +2,29 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T18:35:02.357082Z",
+    "generated_at": "2025-11-05T18:38:27.602524Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 30,
-    "total_lines": 5138,
-    "total_classes": 36,
-    "total_functions": 11,
-    "avg_complexity": 2.82,
+    "total_files": 31,
+    "total_lines": 5670,
+    "total_classes": 37,
+    "total_functions": 12,
+    "avg_complexity": 2.75,
     "max_complexity": 16,
     "high_complexity_functions": [
       "consensus (16)"
     ],
     "by_language": {
       "python": {
-        "files": 30,
-        "lines": 5138,
-        "classes": 36,
-        "functions": 11,
-        "avg_complexity": 2.82
+        "files": 31,
+        "lines": 5670,
+        "classes": 37,
+        "functions": 12,
+        "avg_complexity": 2.75
       }
     }
   },
@@ -258,6 +258,32 @@
       ],
       "exports": [],
       "lines": 220
+    },
+    {
+      "name": "state",
+      "file": "src/modelchorus/core/state.py",
+      "language": "python",
+      "docstring": "State persistence layer for ModelChorus workflows.\n\nProvides thread-safe in-memory and optional file-based persistence\nfor workflow state. Complements ConversationMemory by focusing on\nworkflow execution state rather than conversation history.\n\nKey Features:\n- Thread-safe in-memory state storage\n- JSON serialization for Pydantic models\n- Optional file-based persistence\n- State isolation per workflow instance",
+      "classes": [
+        "StateManager"
+      ],
+      "functions": [
+        "get_default_state_manager"
+      ],
+      "imports": [
+        "json",
+        "logging",
+        "threading",
+        "pathlib.Path",
+        "typing.Any",
+        "typing.Dict",
+        "typing.Optional",
+        "datetime.datetime",
+        "datetime.timezone",
+        "models.ConversationState"
+      ],
+      "exports": [],
+      "lines": 532
     },
     {
       "name": "__init__",
@@ -1014,8 +1040,19 @@
       "properties": [],
       "is_exported": false,
       "is_public": true,
-      "instantiated_by": [],
-      "imported_by": []
+      "instantiated_by": [
+        {
+          "instantiator": "set_state",
+          "file": "src/modelchorus/core/state.py",
+          "line": 114,
+          "context": [
+            "StateManager",
+            "set_state"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 1
     },
     {
       "name": "WorkflowRegistry",
@@ -1038,6 +1075,48 @@
       "is_public": true,
       "instantiated_by": [],
       "imported_by": []
+    },
+    {
+      "name": "StateManager",
+      "file": "src/modelchorus/core/state.py",
+      "line": 32,
+      "language": "python",
+      "docstring": "Thread-safe state persistence manager for workflows.\n\nManages workflow execution state separately from conversation history.\nProvides in-memory storage with optional file-based persistence.\n\nWorkflow state typically includes:\n- Current step/phase information\n- Intermediate results\n- Configuration and settings\n- Workflow-specific metadata\n\nAttributes:\n    state_dir: Directory for file-based state persistence\n    enable_file_persistence: Whether to persist state to disk\n    _state_store: Thread-safe in-memory state storage\n    _lock: Lock for thread-safe operations",
+      "bases": [],
+      "methods": [
+        "__init__",
+        "set_state",
+        "get_state",
+        "get_state_object",
+        "update_state",
+        "delete_state",
+        "list_workflows",
+        "clear_all",
+        "serialize_state",
+        "deserialize_state",
+        "export_state",
+        "import_state",
+        "_save_to_file",
+        "_delete_file",
+        "load_from_disk",
+        "load_all_from_disk",
+        "sync_to_disk"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "get_default_state_manager",
+          "file": "src/modelchorus/core/state.py",
+          "line": 531,
+          "context": [
+            "get_default_state_manager"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 1
     },
     {
       "name": "ModelCapability",
@@ -3550,6 +3629,22 @@
       "call_count": 3
     },
     {
+      "name": "get_default_state_manager",
+      "file": "src/modelchorus/core/state.py",
+      "line": 517,
+      "language": "python",
+      "docstring": "Get singleton default state manager instance.\n\nReturns:\n    Default StateManager instance\n\nExample:\n    >>> from modelchorus.core.state import get_default_state_manager\n    >>> manager = get_default_state_manager()\n    >>> manager.set_state(\"my_workflow\", {\"step\": 1})",
+      "parameters": [],
+      "return_type": "StateManager",
+      "complexity": 2,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": []
+    },
+    {
       "name": "mock_claude_response",
       "file": "tests/conftest.py",
       "line": 10,
@@ -3719,6 +3814,18 @@
       "typing.Callable",
       "inspect",
       "base_workflow.BaseWorkflow"
+    ],
+    "src/modelchorus/core/state.py": [
+      "json",
+      "logging",
+      "threading",
+      "pathlib.Path",
+      "typing.Any",
+      "typing.Dict",
+      "typing.Optional",
+      "datetime.datetime",
+      "datetime.timezone",
+      "models.ConversationState"
     ],
     "src/modelchorus/providers/__init__.py": [
       "base_provider.ModelProvider",

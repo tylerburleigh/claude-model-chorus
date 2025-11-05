@@ -1,17 +1,17 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 13:35:02
+**Generated:** 2025-11-05 13:38:27
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 30
-- **Total Lines:** 5138
-- **Total Classes:** 36
-- **Total Functions:** 11
-- **Avg Complexity:** 2.82
+- **Total Files:** 31
+- **Total Lines:** 5670
+- **Total Classes:** 37
+- **Total Functions:** 12
+- **Avg Complexity:** 2.75
 - **Max Complexity:** 16
 - **High Complexity Functions:**
   - consensus (16)
@@ -608,6 +608,50 @@ Attributes:
 
 ---
 
+### `StateManager`
+
+**Language:** python
+**Defined in:** `src/modelchorus/core/state.py:32`
+
+**Description:**
+> Thread-safe state persistence manager for workflows.
+
+Manages workflow execution state separately from conversation history.
+Provides in-memory storage with optional file-based persistence.
+
+Workflow state typically includes:
+- Current step/phase information
+- Intermediate results
+- Configuration and settings
+- Workflow-specific metadata
+
+Attributes:
+    state_dir: Directory for file-based state persistence
+    enable_file_persistence: Whether to persist state to disk
+    _state_store: Thread-safe in-memory state storage
+    _lock: Lock for thread-safe operations
+
+**Methods:**
+- `__init__()`
+- `set_state()`
+- `get_state()`
+- `get_state_object()`
+- `update_state()`
+- `delete_state()`
+- `list_workflows()`
+- `clear_all()`
+- `serialize_state()`
+- `deserialize_state()`
+- `export_state()`
+- `import_state()`
+- `_save_to_file()`
+- `_delete_file()`
+- `load_from_disk()`
+- `load_all_from_disk()`
+- `sync_to_disk()`
+
+---
+
 ### `TestCLIProvidersImplementInterface`
 
 **Language:** python
@@ -899,6 +943,25 @@ Example:
 
 ---
 
+### `get_default_state_manager() -> StateManager`
+
+**Language:** python
+**Defined in:** `src/modelchorus/core/state.py:517`
+**Complexity:** 2
+
+**Description:**
+> Get singleton default state manager instance.
+
+Returns:
+    Default StateManager instance
+
+Example:
+    >>> from modelchorus.core.state import get_default_state_manager
+    >>> manager = get_default_state_manager()
+    >>> manager.set_state("my_workflow", {"step": 1})
+
+---
+
 ### `get_provider_by_name(name) -> None`
 
 **Language:** python
@@ -1132,6 +1195,19 @@ Example:
 - `typing.Dict`
 - `typing.Optional`
 - `typing.Type`
+
+### `src/modelchorus/core/state.py`
+
+- `datetime.datetime`
+- `datetime.timezone`
+- `json`
+- `logging`
+- `models.ConversationState`
+- `pathlib.Path`
+- `threading`
+- `typing.Any`
+- `typing.Dict`
+- `typing.Optional`
 
 ### `src/modelchorus/providers/__init__.py`
 
