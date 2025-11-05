@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 18:03:35
+**Generated:** 2025-11-05 18:05:44
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 36
-- **Total Lines:** 8145
-- **Total Classes:** 52
+- **Total Files:** 37
+- **Total Lines:** 8603
+- **Total Classes:** 53
 - **Total Functions:** 21
 - **Avg Complexity:** 3.29
 - **Max Complexity:** 19
@@ -1130,6 +1130,79 @@ Attributes:
 
 ---
 
+### `ThinkDeepWorkflow`
+
+**Language:** python
+**Inherits from:** `BaseWorkflow`
+**Defined in:** `modelchorus/src/modelchorus/workflows/thinkdeep.py:27`
+
+**Description:**
+> Extended reasoning workflow with systematic investigation and hypothesis tracking.
+
+This workflow provides multi-step investigation capabilities where hypotheses
+are formed, tested, and refined across conversation turns. It maintains state
+including hypothesis evolution, investigation steps, confidence levels, and
+relevant files examined.
+
+Key features:
+- Single provider with extended reasoning
+- Hypothesis tracking and evolution
+- Investigation step progression
+- Confidence level tracking
+- File examination history
+- State persistence across turns via conversation threading
+
+The ThinkDeepWorkflow is ideal for:
+- Complex problem analysis requiring systematic investigation
+- Debugging scenarios with hypothesis testing
+- Architecture decisions with evidence-based reasoning
+- Security analysis with confidence tracking
+- Any task requiring methodical, step-by-step investigation
+
+Example:
+    >>> from modelchorus.providers import ClaudeProvider
+    >>> from modelchorus.workflows import ThinkDeepWorkflow
+    >>> from modelchorus.core.conversation import ConversationMemory
+    >>>
+    >>> # Create provider and conversation memory
+    >>> provider = ClaudeProvider()
+    >>> memory = ConversationMemory()
+    >>>
+    >>> # Create workflow
+    >>> workflow = ThinkDeepWorkflow(provider, conversation_memory=memory)
+    >>>
+    >>> # First step (creates new investigation)
+    >>> result1 = await workflow.run(
+    ...     "Why is authentication failing intermittently?",
+    ...     files=["src/auth.py", "tests/test_auth.py"]
+    ... )
+    >>> thread_id = result1.metadata.get('thread_id')
+    >>>
+    >>> # Follow-up investigation (continues thread with state)
+    >>> result2 = await workflow.run(
+    ...     "Check if it's related to async/await patterns",
+    ...     continuation_id=thread_id,
+    ...     files=["src/services/user.py"]
+    ... )
+    >>>
+    >>> # Check investigation state
+    >>> state = workflow.get_investigation_state(thread_id)
+    >>> print(f"Hypotheses: {len(state.hypotheses)}")
+    >>> print(f"Confidence: {state.current_confidence}")
+
+**Methods:**
+- `__init__()`
+- `run()`
+- `_get_or_create_state()`
+- `_save_state()`
+- `_build_investigation_prompt()`
+- `get_investigation_state()`
+- `get_provider()`
+- `validate_config()`
+- `__repr__()`
+
+---
+
 ### `WorkflowRegistry`
 
 **Language:** python
@@ -1811,6 +1884,7 @@ Example:
 - `consensus.ConsensusStrategy`
 - `consensus.ConsensusWorkflow`
 - `consensus.ProviderConfig`
+- `thinkdeep.ThinkDeepWorkflow`
 
 ### `modelchorus/src/modelchorus/workflows/chat.py`
 
@@ -1843,6 +1917,27 @@ Example:
 - `typing.Dict`
 - `typing.List`
 - `typing.Optional`
+
+### `modelchorus/src/modelchorus/workflows/thinkdeep.py`
+
+- `core.base_workflow.BaseWorkflow`
+- `core.base_workflow.WorkflowResult`
+- `core.base_workflow.WorkflowStep`
+- `core.conversation.ConversationMemory`
+- `core.models.ConfidenceLevel`
+- `core.models.ConversationMessage`
+- `core.models.Hypothesis`
+- `core.models.InvestigationStep`
+- `core.models.ThinkDeepState`
+- `logging`
+- `providers.GenerationRequest`
+- `providers.GenerationResponse`
+- `providers.ModelProvider`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+- `uuid`
 
 ### `modelchorus/tests/conftest.py`
 

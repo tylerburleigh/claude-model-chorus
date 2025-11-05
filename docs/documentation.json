@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T23:03:35.433234Z",
+    "generated_at": "2025-11-05T23:05:44.417650Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 36,
-    "total_lines": 8145,
-    "total_classes": 52,
+    "total_files": 37,
+    "total_lines": 8603,
+    "total_classes": 53,
     "total_functions": 21,
     "avg_complexity": 3.29,
     "max_complexity": 19,
@@ -21,9 +21,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 36,
-        "lines": 8145,
-        "classes": 52,
+        "files": 37,
+        "lines": 8603,
+        "classes": 53,
         "functions": 21,
         "avg_complexity": 3.29
       }
@@ -526,10 +526,11 @@
         "consensus.ConsensusWorkflow",
         "consensus.ConsensusStrategy",
         "consensus.ConsensusResult",
-        "consensus.ProviderConfig"
+        "consensus.ProviderConfig",
+        "thinkdeep.ThinkDeepWorkflow"
       ],
       "exports": [],
-      "lines": 22
+      "lines": 24
     },
     {
       "name": "chat",
@@ -587,6 +588,38 @@
       ],
       "exports": [],
       "lines": 352
+    },
+    {
+      "name": "thinkdeep",
+      "file": "modelchorus/src/modelchorus/workflows/thinkdeep.py",
+      "language": "python",
+      "docstring": "ThinkDeep workflow for extended reasoning and systematic investigation.\n\nThis module implements the ThinkDeepWorkflow which provides multi-step\ninvestigation with hypothesis tracking, evidence collection, and confidence\nprogression across conversation turns.",
+      "classes": [
+        "ThinkDeepWorkflow"
+      ],
+      "functions": [],
+      "imports": [
+        "logging",
+        "uuid",
+        "typing.Optional",
+        "typing.Dict",
+        "typing.Any",
+        "typing.List",
+        "core.base_workflow.BaseWorkflow",
+        "core.base_workflow.WorkflowResult",
+        "core.base_workflow.WorkflowStep",
+        "core.conversation.ConversationMemory",
+        "providers.ModelProvider",
+        "providers.GenerationRequest",
+        "providers.GenerationResponse",
+        "core.models.ConversationMessage",
+        "core.models.ThinkDeepState",
+        "core.models.Hypothesis",
+        "core.models.InvestigationStep",
+        "core.models.ConfidenceLevel"
+      ],
+      "exports": [],
+      "lines": 456
     },
     {
       "name": "__init__",
@@ -954,10 +987,19 @@
             "ChatWorkflow",
             "run"
           ]
+        },
+        {
+          "instantiator": "run",
+          "file": "modelchorus/src/modelchorus/workflows/thinkdeep.py",
+          "line": 178,
+          "context": [
+            "ThinkDeepWorkflow",
+            "run"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 2
+      "instantiation_count": 3
     },
     {
       "name": "BaseWorkflow",
@@ -1423,8 +1465,46 @@
       "properties": [],
       "is_exported": false,
       "is_public": true,
-      "instantiated_by": [],
-      "imported_by": []
+      "instantiated_by": [
+        {
+          "instantiator": "_get_or_create_state",
+          "file": "modelchorus/src/modelchorus/workflows/thinkdeep.py",
+          "line": 285,
+          "context": [
+            "ThinkDeepWorkflow",
+            "_get_or_create_state"
+          ]
+        },
+        {
+          "instantiator": "_get_or_create_state",
+          "file": "modelchorus/src/modelchorus/workflows/thinkdeep.py",
+          "line": 289,
+          "context": [
+            "ThinkDeepWorkflow",
+            "_get_or_create_state"
+          ]
+        },
+        {
+          "instantiator": "_get_or_create_state",
+          "file": "modelchorus/src/modelchorus/workflows/thinkdeep.py",
+          "line": 294,
+          "context": [
+            "ThinkDeepWorkflow",
+            "_get_or_create_state"
+          ]
+        },
+        {
+          "instantiator": "_get_or_create_state",
+          "file": "modelchorus/src/modelchorus/workflows/thinkdeep.py",
+          "line": 297,
+          "context": [
+            "ThinkDeepWorkflow",
+            "_get_or_create_state"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 4
     },
     {
       "name": "ConversationState",
@@ -2001,6 +2081,15 @@
           ]
         },
         {
+          "instantiator": "run",
+          "file": "modelchorus/src/modelchorus/workflows/thinkdeep.py",
+          "line": 190,
+          "context": [
+            "ThinkDeepWorkflow",
+            "run"
+          ]
+        },
+        {
           "instantiator": "sample_generation_request",
           "file": "modelchorus/tests/conftest.py",
           "line": 59,
@@ -2217,7 +2306,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 27
+      "instantiation_count": 28
     },
     {
       "name": "GenerationResponse",
@@ -3245,6 +3334,32 @@
       ],
       "imported_by": [],
       "instantiation_count": 13
+    },
+    {
+      "name": "ThinkDeepWorkflow",
+      "file": "modelchorus/src/modelchorus/workflows/thinkdeep.py",
+      "line": 27,
+      "language": "python",
+      "docstring": "Extended reasoning workflow with systematic investigation and hypothesis tracking.\n\nThis workflow provides multi-step investigation capabilities where hypotheses\nare formed, tested, and refined across conversation turns. It maintains state\nincluding hypothesis evolution, investigation steps, confidence levels, and\nrelevant files examined.\n\nKey features:\n- Single provider with extended reasoning\n- Hypothesis tracking and evolution\n- Investigation step progression\n- Confidence level tracking\n- File examination history\n- State persistence across turns via conversation threading\n\nThe ThinkDeepWorkflow is ideal for:\n- Complex problem analysis requiring systematic investigation\n- Debugging scenarios with hypothesis testing\n- Architecture decisions with evidence-based reasoning\n- Security analysis with confidence tracking\n- Any task requiring methodical, step-by-step investigation\n\nExample:\n    >>> from modelchorus.providers import ClaudeProvider\n    >>> from modelchorus.workflows import ThinkDeepWorkflow\n    >>> from modelchorus.core.conversation import ConversationMemory\n    >>>\n    >>> # Create provider and conversation memory\n    >>> provider = ClaudeProvider()\n    >>> memory = ConversationMemory()\n    >>>\n    >>> # Create workflow\n    >>> workflow = ThinkDeepWorkflow(provider, conversation_memory=memory)\n    >>>\n    >>> # First step (creates new investigation)\n    >>> result1 = await workflow.run(\n    ...     \"Why is authentication failing intermittently?\",\n    ...     files=[\"src/auth.py\", \"tests/test_auth.py\"]\n    ... )\n    >>> thread_id = result1.metadata.get('thread_id')\n    >>>\n    >>> # Follow-up investigation (continues thread with state)\n    >>> result2 = await workflow.run(\n    ...     \"Check if it's related to async/await patterns\",\n    ...     continuation_id=thread_id,\n    ...     files=[\"src/services/user.py\"]\n    ... )\n    >>>\n    >>> # Check investigation state\n    >>> state = workflow.get_investigation_state(thread_id)\n    >>> print(f\"Hypotheses: {len(state.hypotheses)}\")\n    >>> print(f\"Confidence: {state.current_confidence}\")",
+      "bases": [
+        "BaseWorkflow"
+      ],
+      "methods": [
+        "__init__",
+        "run",
+        "_get_or_create_state",
+        "_save_state",
+        "_build_investigation_prompt",
+        "get_investigation_state",
+        "get_provider",
+        "validate_config",
+        "__repr__"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
     },
     {
       "name": "TestChatWorkflowInitialization",
@@ -6021,7 +6136,8 @@
       "consensus.ConsensusWorkflow",
       "consensus.ConsensusStrategy",
       "consensus.ConsensusResult",
-      "consensus.ProviderConfig"
+      "consensus.ProviderConfig",
+      "thinkdeep.ThinkDeepWorkflow"
     ],
     "modelchorus/src/modelchorus/workflows/chat.py": [
       "logging",
@@ -6052,6 +6168,26 @@
       "providers.ModelProvider",
       "providers.GenerationRequest",
       "providers.GenerationResponse"
+    ],
+    "modelchorus/src/modelchorus/workflows/thinkdeep.py": [
+      "logging",
+      "uuid",
+      "typing.Optional",
+      "typing.Dict",
+      "typing.Any",
+      "typing.List",
+      "core.base_workflow.BaseWorkflow",
+      "core.base_workflow.WorkflowResult",
+      "core.base_workflow.WorkflowStep",
+      "core.conversation.ConversationMemory",
+      "providers.ModelProvider",
+      "providers.GenerationRequest",
+      "providers.GenerationResponse",
+      "core.models.ConversationMessage",
+      "core.models.ThinkDeepState",
+      "core.models.Hypothesis",
+      "core.models.InvestigationStep",
+      "core.models.ConfidenceLevel"
     ],
     "modelchorus/tests/conftest.py": [
       "pytest",

@@ -225,9 +225,17 @@ class ThinkDeepWorkflow(BaseWorkflow):
                     model_name=response.model
                 )
 
-            # Update investigation state (placeholder - will be implemented in later tasks)
-            # This will parse the response and extract hypotheses, findings, confidence
-            # For now, just track files examined
+            # Create and add investigation step
+            step_number = len(state.steps) + 1
+            investigation_step = InvestigationStep(
+                step_number=step_number,
+                findings=self._extract_findings(response.content),
+                files_checked=files if files else [],
+                confidence=state.current_confidence  # Will be updated with confidence extraction later
+            )
+            state.steps.append(investigation_step)
+
+            # Track files examined
             if files:
                 for file in files:
                     if file not in state.relevant_files:
@@ -403,6 +411,33 @@ class ThinkDeepWorkflow(BaseWorkflow):
         )
 
         return full_prompt
+
+    def _extract_findings(self, response_content: str) -> str:
+        """
+        Extract key findings from investigation response.
+
+        This is a simple extraction that takes the first paragraph or
+        first 500 characters as the key findings summary. Future enhancement
+        could use structured output parsing or LLM-based extraction.
+
+        Args:
+            response_content: Full response content from the model
+
+        Returns:
+            Extracted findings summary
+        """
+        # Simple extraction: take first paragraph or first 500 chars
+        lines = response_content.strip().split('\n\n')
+        if lines:
+            first_paragraph = lines[0].strip()
+            if len(first_paragraph) > 500:
+                return first_paragraph[:497] + "..."
+            return first_paragraph
+
+        # Fallback: truncate to 500 chars
+        if len(response_content) > 500:
+            return response_content[:497] + "..."
+        return response_content.strip()
 
     def get_investigation_state(self, thread_id: str) -> Optional[ThinkDeepState]:
         """
