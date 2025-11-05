@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T23:02:05.621075Z",
+    "generated_at": "2025-11-05T23:03:35.433234Z",
     "languages": [
       "python"
     ],
@@ -10,8 +10,8 @@
   },
   "statistics": {
     "total_files": 36,
-    "total_lines": 8068,
-    "total_classes": 51,
+    "total_lines": 8145,
+    "total_classes": 52,
     "total_functions": 21,
     "avg_complexity": 3.29,
     "max_complexity": 19,
@@ -22,8 +22,8 @@
     "by_language": {
       "python": {
         "files": 36,
-        "lines": 8068,
-        "classes": 51,
+        "lines": 8145,
+        "classes": 52,
         "functions": 21,
         "avg_complexity": 3.29
       }
@@ -183,10 +183,11 @@
         "models.ConversationState",
         "models.Hypothesis",
         "models.InvestigationStep",
+        "models.ThinkDeepState",
         "conversation.ConversationMemory"
       ],
       "exports": [],
-      "lines": 44
+      "lines": 46
     },
     {
       "name": "base_workflow",
@@ -263,6 +264,7 @@
         "ConversationThread",
         "Hypothesis",
         "InvestigationStep",
+        "ThinkDeepState",
         "ConversationState"
       ],
       "functions": [],
@@ -278,7 +280,7 @@
         "pydantic.ConfigDict"
       ],
       "exports": [],
-      "lines": 745
+      "lines": 820
     },
     {
       "name": "registry",
@@ -1409,9 +1411,25 @@
       "imported_by": []
     },
     {
-      "name": "ConversationState",
+      "name": "ThinkDeepState",
       "file": "modelchorus/src/modelchorus/core/models.py",
       "line": 688,
+      "language": "python",
+      "docstring": "State model for Thinkdeep workflow multi-turn conversations.\n\nMaintains the complete investigation state across conversation turns,\ntracking hypothesis evolution, investigation steps, confidence progression,\nand files examined.\n\nAttributes:\n    hypotheses: List of all hypotheses tracked during investigation\n    steps: List of all investigation steps completed\n    current_confidence: Current overall confidence level\n    relevant_files: All files identified as relevant to the investigation",
+      "bases": [
+        "BaseModel"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "ConversationState",
+      "file": "modelchorus/src/modelchorus/core/models.py",
+      "line": 763,
       "language": "python",
       "docstring": "Generic state container for workflow-specific conversation data.\n\nProvides type-safe structure for storing arbitrary workflow state\nwhile maintaining serializability for file-based persistence.\nIncludes versioning to support schema evolution.\n\nAttributes:\n    workflow_name: Workflow this state belongs to\n    data: Arbitrary workflow-specific state data\n    schema_version: State schema version for compatibility\n    created_at: ISO timestamp of state creation\n    updated_at: ISO timestamp of last state update",
       "bases": [
@@ -5843,6 +5861,7 @@
       "models.ConversationState",
       "models.Hypothesis",
       "models.InvestigationStep",
+      "models.ThinkDeepState",
       "conversation.ConversationMemory"
     ],
     "modelchorus/src/modelchorus/core/base_workflow.py": [

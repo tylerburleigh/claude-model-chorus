@@ -12,6 +12,7 @@ from .consensus import (
     ConsensusResult,
     ProviderConfig,
 )
+from .thinkdeep import ThinkDeepWorkflow
 
 __all__ = [
     "ChatWorkflow",
@@ -19,4 +20,5 @@ __all__ = [
     "ConsensusStrategy",
     "ConsensusResult",
     "ProviderConfig",
+    "ThinkDeepWorkflow",
 ]

@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 18:02:05
+**Generated:** 2025-11-05 18:03:35
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 36
-- **Total Lines:** 8068
-- **Total Classes:** 51
+- **Total Lines:** 8145
+- **Total Classes:** 52
 - **Total Functions:** 21
 - **Avg Complexity:** 3.29
 - **Max Complexity:** 19
@@ -420,7 +420,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:688`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:763`
 
 **Description:**
 > Generic state container for workflow-specific conversation data.
@@ -1109,6 +1109,27 @@ Attributes:
 
 ---
 
+### `ThinkDeepState`
+
+**Language:** python
+**Inherits from:** `BaseModel`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:688`
+
+**Description:**
+> State model for Thinkdeep workflow multi-turn conversations.
+
+Maintains the complete investigation state across conversation turns,
+tracking hypothesis evolution, investigation steps, confidence progression,
+and files examined.
+
+Attributes:
+    hypotheses: List of all hypotheses tracked during investigation
+    steps: List of all investigation steps completed
+    current_confidence: Current overall confidence level
+    relevant_files: All files identified as relevant to the investigation
+
+---
+
 ### `WorkflowRegistry`
 
 **Language:** python
@@ -1613,6 +1634,7 @@ Example:
 - `models.InvestigationStep`
 - `models.ModelResponse`
 - `models.ModelSelection`
+- `models.ThinkDeepState`
 - `models.WorkflowRequest`
 - `models.WorkflowResponse`
 - `models.WorkflowStep`
