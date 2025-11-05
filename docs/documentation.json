@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T21:10:18.452900Z",
+    "generated_at": "2025-11-05T21:15:11.438763Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 34,
-    "total_lines": 7105,
+    "total_lines": 7142,
     "total_classes": 42,
     "total_functions": 12,
     "avg_complexity": 2.75,
@@ -21,7 +21,7 @@
     "by_language": {
       "python": {
         "files": 34,
-        "lines": 7105,
+        "lines": 7142,
         "classes": 42,
         "functions": 12,
         "avg_complexity": 2.75
@@ -521,7 +521,7 @@
         "core.models.ConversationMessage"
       ],
       "exports": [],
-      "lines": 357
+      "lines": 394
     },
     {
       "name": "consensus",
@@ -880,7 +880,7 @@
         {
           "instantiator": "run",
           "file": "src/modelchorus/workflows/chat.py",
-          "line": 149,
+          "line": 158,
           "context": [
             "ChatWorkflow",
             "run"
@@ -1812,7 +1812,7 @@
         {
           "instantiator": "run",
           "file": "src/modelchorus/workflows/chat.py",
-          "line": 156,
+          "line": 165,
           "context": [
             "ChatWorkflow",
             "run"

@@ -22,7 +22,8 @@ from ..providers import (
     CursorAgentProvider,
     GenerationRequest,
 )
-from ..workflows import ConsensusWorkflow, ConsensusStrategy
+from ..workflows import ChatWorkflow, ConsensusWorkflow, ConsensusStrategy
+from ..core.conversation import ConversationMemory
 
 app = typer.Typer(
     name="modelchorus",
@@ -48,6 +49,183 @@ def get_provider_by_name(name: str):
         raise typer.Exit(1)
 
     return provider_class()
+
+
+@app.command()
+def chat(
+    prompt: str = typer.Argument(..., help="Message to send to the AI model"),
+    provider: str = typer.Option(
+        "claude",
+        "--provider",
+        "-p",
+        help="Provider to use (claude, gemini, codex, cursor-agent)",
+    ),
+    continuation_id: Optional[str] = typer.Option(
+        None,
+        "--continue",
+        "-c",
+        help="Thread ID to continue an existing conversation",
+    ),
+    files: Optional[List[str]] = typer.Option(
+        None,
+        "--file",
+        "-f",
+        help="File paths to include in conversation context (can specify multiple times)",
+    ),
+    system: Optional[str] = typer.Option(
+        None,
+        "--system",
+        help="System prompt for context",
+    ),
+    temperature: float = typer.Option(
+        0.7,
+        "--temperature",
+        "-t",
+        help="Temperature for generation (0.0-1.0)",
+    ),
+    max_tokens: Optional[int] = typer.Option(
+        None,
+        "--max-tokens",
+        help="Maximum tokens to generate",
+    ),
+    output: Optional[Path] = typer.Option(
+        None,
+        "--output",
+        "-o",
+        help="Output file for result (JSON format)",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Show detailed execution information",
+    ),
+):
+    """
+    Chat with a single AI model with conversation continuity.
+
+    Example:
+        # Start new conversation
+        modelchorus chat "What is quantum computing?" -p claude
+
+        # Continue conversation
+        modelchorus chat "Give me an example" --continue thread-id-123
+
+        # Include files
+        modelchorus chat "Review this code" -f src/main.py -f tests/test_main.py
+    """
+    try:
+        # Create provider instance
+        if verbose:
+            console.print(f"[cyan]Initializing provider: {provider}[/cyan]")
+
+        try:
+            provider_instance = get_provider_by_name(provider)
+            if verbose:
+                console.print(f"[green]✓ {provider} initialized[/green]")
+        except Exception as e:
+            console.print(f"[red]Failed to initialize {provider}: {e}[/red]")
+            raise typer.Exit(1)
+
+        # Create conversation memory (in-memory for now)
+        memory = ConversationMemory()
+
+        # Create workflow
+        workflow = ChatWorkflow(
+            provider=provider_instance,
+            conversation_memory=memory,
+        )
+
+        if verbose:
+            console.print(f"[cyan]Workflow: {workflow}[/cyan]")
+
+        # Validate files exist
+        if files:
+            for file_path in files:
+                if not Path(file_path).exists():
+                    console.print(f"[red]Error: File not found: {file_path}[/red]")
+                    raise typer.Exit(1)
+
+        # Display conversation info
+        console.print(f"\n[bold cyan]{'Continuing' if continuation_id else 'Starting new'} chat conversation...[/bold cyan]")
+        console.print(f"Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
+        console.print(f"Provider: {provider}")
+        if continuation_id:
+            console.print(f"Thread ID: {continuation_id}")
+        if files:
+            console.print(f"Files: {', '.join(files)}")
+        console.print()
+
+        # Run async workflow
+        result = asyncio.run(
+            workflow.run(
+                prompt=prompt,
+                continuation_id=continuation_id,
+                files=files,
+                system_prompt=system,
+                temperature=temperature,
+                max_tokens=max_tokens,
+            )
+        )
+
+        # Display results
+        if result.success:
+            console.print(f"[bold green]✓ Chat completed[/bold green]\n")
+
+            # Show thread info
+            thread_id = result.metadata.get('thread_id')
+            is_continuation = result.metadata.get('is_continuation', False)
+            conv_length = result.metadata.get('conversation_length', 0)
+
+            console.print(f"[cyan]Thread ID:[/cyan] {thread_id}")
+            if not is_continuation:
+                console.print("[cyan]Status:[/cyan] New conversation started")
+            else:
+                console.print(f"[cyan]Status:[/cyan] Continued ({conv_length} messages in thread)")
+            console.print()
+
+            # Show response
+            console.print("[bold]Response:[/bold]\n")
+            console.print(result.synthesis)
+
+            # Show usage info if available
+            usage = result.metadata.get('usage', {})
+            if usage and verbose:
+                console.print(f"\n[dim]Tokens: {usage.get('total_tokens', 'N/A')}[/dim]")
+
+            # Save to file if requested
+            if output:
+                output_data = {
+                    "prompt": prompt,
+                    "provider": provider,
+                    "thread_id": thread_id,
+                    "is_continuation": is_continuation,
+                    "response": result.synthesis,
+                    "model": result.metadata.get('model'),
+                    "usage": usage,
+                    "conversation_length": conv_length,
+                }
+                if files:
+                    output_data["files"] = files
+
+                output.write_text(json.dumps(output_data, indent=2))
+                console.print(f"\n[green]✓ Result saved to {output}[/green]")
+
+            console.print(f"\n[dim]To continue this conversation, use: --continue {thread_id}[/dim]")
+
+        else:
+            console.print(f"[red]✗ Chat failed: {result.error}[/red]")
+            raise typer.Exit(1)
+
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Interrupted by user[/yellow]")
+        raise typer.Exit(130)
+    except Exception as e:
+        console.print(f"\n[red]Error: {e}[/red]")
+        if verbose:
+            import traceback
+            console.print(f"\n[red]{traceback.format_exc()}[/red]")
+        raise typer.Exit(1)
 
 
 @app.command()
