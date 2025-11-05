@@ -16,6 +16,7 @@ from .cli_provider import CLIProvider
 from .claude_provider import ClaudeProvider
 from .codex_provider import CodexProvider
 from .gemini_provider import GeminiProvider
+from .cursor_agent_provider import CursorAgentProvider
 
 __all__ = [
     "ModelProvider",
@@ -27,4 +28,5 @@ __all__ = [
     "ClaudeProvider",
     "CodexProvider",
     "GeminiProvider",
+    "CursorAgentProvider",
 ]
