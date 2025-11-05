@@ -1,0 +1,1165 @@
+{
+  "spec_id": "modelchorus-cli-2025-11-05-002",
+  "generated": "2025-11-05T14:00:00Z",
+  "last_updated": "2025-11-05T13:52:33.911742Z",
+  "metadata": {
+    "title": "ModelChorus: CLI-Based Multi-Model Workflow Package",
+    "description": "Create a standalone Python package for multi-model AI workflow orchestration using CLI tool integrations (codex, gemini, claude, cursor-agent). Distributed via PyPI, completely independent from sdd-toolkit.",
+    "status": "active",
+    "complexity": "high",
+    "estimated_hours": 32,
+    "objectives": [
+      "Create standalone Python package structure with pyproject.toml",
+      "Implement core abstractions for workflows and CLI-based model providers",
+      "Build provider wrappers that call external CLI tools via subprocess",
+      "Build consensus workflow with stance-based coordination",
+      "Provide CLI interface (modelchorus consensus ...)",
+      "Enable PyPI distribution for any Python developer"
+    ],
+    "progress_percentage": 48,
+    "current_phase": "phase-2",
+    "activated_date": "2025-11-05T13:50:10.521577Z"
+  },
+  "hierarchy": {
+    "spec-root": {
+      "type": "spec",
+      "title": "ModelChorus: CLI-Based Multi-Model Workflow Package",
+      "status": "in_progress",
+      "parent": null,
+      "children": [
+        "phase-1",
+        "phase-2",
+        "phase-3",
+        "phase-4",
+        "phase-5"
+      ],
+      "total_tasks": 27,
+      "completed_tasks": 13,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "phase-2": {
+      "type": "phase",
+      "title": "CLI-Based Model Provider Integrations",
+      "status": "in_progress",
+      "parent": "spec-root",
+      "children": [
+        "phase-2-files",
+        "phase-2-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-3"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 9,
+      "completed_tasks": 1,
+      "metadata": {
+        "purpose": "Implement CLI-based provider wrappers for codex, gemini, claude, and cursor-agent",
+        "risk_level": "medium",
+        "estimated_hours": 10
+      }
+    },
+    "phase-2-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "in_progress",
+      "parent": "phase-2",
+      "children": [
+        "task-2-1",
+        "task-2-2",
+        "task-2-3",
+        "task-2-4",
+        "task-2-5"
+      ],
+      "total_tasks": 7,
+      "completed_tasks": 1,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-2-verify"
+        ]
+      }
+    },
+    "task-2-1": {
+      "type": "task",
+      "title": "src/modelchorus/providers/cli_provider.py",
+      "status": "in_progress",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-1-1",
+        "task-2-1-2"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-2-2",
+          "task-2-3",
+          "task-2-4",
+          "task-2-5"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 1,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/providers/cli_provider.py",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "description": "Base class for CLI-based providers with subprocess handling"
+      }
+    },
+    "task-2-1-1": {
+      "type": "subtask",
+      "title": "Implement base CLIProvider class",
+      "status": "completed",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "changes": "Create CLIProvider inheriting ModelProvider, async subprocess execution, command building",
+        "started_at": "2025-11-05T13:51:31.505117Z",
+        "completed_at": "2025-11-05T13:52:33.900389Z",
+        "needs_journaling": false,
+        "actual_hours": 0.017,
+        "journaled_at": "2025-11-05T13:52:33.909903Z"
+      }
+    },
+    "task-2-1-2": {
+      "type": "subtask",
+      "title": "Add output parsing and error handling",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Parse CLI stdout/stderr, handle timeouts, retry logic, process errors"
+      }
+    },
+    "task-2-2": {
+      "type": "task",
+      "title": "src/modelchorus/providers/claude_provider.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-2-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/providers/claude_provider.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "description": "CLI wrapper calling `claude` command"
+      }
+    },
+    "task-2-2-1": {
+      "type": "subtask",
+      "title": "Implement ClaudeProvider",
+      "status": "pending",
+      "parent": "task-2-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Inherit CLIProvider, implement generate() calling `claude --prompt ...`"
+      }
+    },
+    "task-2-3": {
+      "type": "task",
+      "title": "src/modelchorus/providers/codex_provider.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-3-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/providers/codex_provider.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "description": "CLI wrapper calling `codex` command"
+      }
+    },
+    "task-2-3-1": {
+      "type": "subtask",
+      "title": "Implement CodexProvider",
+      "status": "pending",
+      "parent": "task-2-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Inherit CLIProvider, implement generate() calling `codex --prompt ...`"
+      }
+    },
+    "task-2-4": {
+      "type": "task",
+      "title": "src/modelchorus/providers/gemini_provider.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-4-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/providers/gemini_provider.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "description": "CLI wrapper calling `gemini` command"
+      }
+    },
+    "task-2-4-1": {
+      "type": "subtask",
+      "title": "Implement GeminiProvider",
+      "status": "pending",
+      "parent": "task-2-4",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Inherit CLIProvider, implement generate() calling `gemini --prompt ...`"
+      }
+    },
+    "task-2-5": {
+      "type": "task",
+      "title": "src/modelchorus/providers/cursor_agent_provider.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-5-1",
+        "task-2-5-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/providers/cursor_agent_provider.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "description": "CLI wrapper calling `cursor-agent` command"
+      }
+    },
+    "task-2-5-1": {
+      "type": "subtask",
+      "title": "Implement CursorAgentProvider",
+      "status": "pending",
+      "parent": "task-2-5",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Inherit CLIProvider, implement generate() calling `cursor-agent --prompt ...`"
+      }
+    },
+    "task-2-5-2": {
+      "type": "subtask",
+      "title": "Add working directory support",
+      "status": "pending",
+      "parent": "task-2-5",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Support --working-directory parameter for cursor-agent context"
+      }
+    },
+    "phase-2-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "verify-2-1",
+        "verify-2-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-2-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-2-1": {
+      "type": "verify",
+      "title": "CLI providers implement ModelProvider interface",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "python -m pytest tests/test_providers/test_cli_interface.py",
+        "expected": "All CLI providers implement required methods"
+      }
+    },
+    "verify-2-2": {
+      "type": "verify",
+      "title": "CLI providers can execute commands",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Each provider successfully calls its CLI tool and returns response (requires CLI tools installed)",
+        "command": ""
+      }
+    },
+    "phase-3": {
+      "type": "phase",
+      "title": "Consensus Workflow Implementation",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-3-files",
+        "phase-3-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-4"
+        ],
+        "blocked_by": [
+          "phase-2",
+          "phase-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Build consensus workflow using CLI-based providers",
+        "risk_level": "medium",
+        "estimated_hours": 8
+      }
+    },
+    "phase-3-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "task-3-1"
+      ],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-3-verify"
+        ]
+      }
+    },
+    "task-3-1": {
+      "type": "task",
+      "title": "src/modelchorus/workflows/consensus.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/workflows/consensus.py",
+        "task_category": "implementation",
+        "estimated_hours": 8,
+        "description": "ConsensusWorkflow using CLI providers for multi-model coordination"
+      }
+    },
+    "phase-3-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "verify-3-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-3-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-3-1": {
+      "type": "verify",
+      "title": "Consensus workflow executes with CLI providers",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Consensus workflow calls multiple CLI providers and synthesizes results",
+        "command": ""
+      }
+    },
+    "phase-4": {
+      "type": "phase",
+      "title": "CLI Interface",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-4-files",
+        "phase-4-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-5"
+        ],
+        "blocked_by": [
+          "phase-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Typer-based CLI for invoking workflows from command line",
+        "risk_level": "low",
+        "estimated_hours": 4
+      }
+    },
+    "phase-4-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "task-4-1"
+      ],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-4-verify"
+        ]
+      }
+    },
+    "task-4-1": {
+      "type": "task",
+      "title": "src/modelchorus/cli/main.py",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/cli/main.py",
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "description": "Typer-based CLI application (modelchorus consensus ...)"
+      }
+    },
+    "phase-4-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "verify-4-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-4-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-4-1": {
+      "type": "verify",
+      "title": "CLI commands work",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "modelchorus consensus --prompt works with CLI providers",
+        "command": "modelchorus consensus --prompt 'test' --models claude,codex"
+      }
+    },
+    "phase-5": {
+      "type": "phase",
+      "title": "Testing, Documentation & Distribution",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-5-files",
+        "phase-5-verify"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Tests, docs, PyPI packaging for CLI-based ModelChorus",
+        "risk_level": "low",
+        "estimated_hours": 5
+      }
+    },
+    "phase-5-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "task-5-1"
+      ],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-5-verify"
+        ]
+      }
+    },
+    "task-5-1": {
+      "type": "task",
+      "title": "tests/ directory",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/tests/",
+        "task_category": "implementation",
+        "estimated_hours": 5,
+        "description": "Pytest tests for CLI providers and workflows"
+      }
+    },
+    "phase-5-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "verify-5-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-5-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-5-1": {
+      "type": "verify",
+      "title": "Package can be published to PyPI",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Package builds and can be uploaded to PyPI",
+        "command": "python -m build && twine check dist/*"
+      }
+    },
+    "phase-1": {
+      "type": "phase",
+      "title": "Package Foundation & Core Abstractions",
+      "status": "completed",
+      "parent": "spec-root",
+      "children": [
+        "phase-1-files",
+        "phase-1-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-2",
+          "phase-3"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 12,
+      "completed_tasks": 12,
+      "metadata": {
+        "purpose": "Establish package structure, core base classes, and Pydantic models",
+        "risk_level": "low",
+        "estimated_hours": 5,
+        "needs_journaling": false,
+        "completed_at": "2025-11-05T12:39:18.182520Z",
+        "journaled_at": "2025-11-05T12:39:18.202929Z"
+      }
+    },
+    "phase-1-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "completed",
+      "parent": "phase-1",
+      "children": [
+        "task-1-1",
+        "task-1-2",
+        "task-1-3",
+        "task-1-4",
+        "task-1-5"
+      ],
+      "total_tasks": 10,
+      "completed_tasks": 10,
+      "metadata": {
+        "needs_journaling": false,
+        "completed_at": "2025-11-05T12:36:04.590573Z",
+        "journaled_at": "2025-11-05T12:36:04.605052Z"
+      },
+      "dependencies": {
+        "blocks": [
+          "phase-1-verify"
+        ]
+      }
+    },
+    "task-1-1": {
+      "type": "task",
+      "title": "Create package directory structure",
+      "status": "completed",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-1-1"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-1-2",
+          "task-1-3",
+          "task-1-4",
+          "task-1-5"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "description": "Create modelchorus/ directory structure with src/modelchorus/ Python package layout",
+        "file_path": "task-1-1.md"
+      }
+    },
+    "task-1-1-1": {
+      "type": "subtask",
+      "title": "Create directory structure and __init__.py files",
+      "status": "completed",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "changes": "Create: modelchorus/src/modelchorus/{__init__.py,core/,workflows/,providers/,cli/,utils/}",
+        "completed_at": "2025-11-05T12:14:52.821910Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-05T12:14:52.830689Z"
+      }
+    },
+    "task-1-2": {
+      "type": "task",
+      "title": "pyproject.toml",
+      "status": "completed",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-2-1",
+        "task-1-2-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 2,
+      "metadata": {
+        "file_path": "modelchorus/pyproject.toml",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "description": "Package configuration with dependencies and metadata"
+      }
+    },
+    "task-1-2-1": {
+      "type": "subtask",
+      "title": "Define project metadata and dependencies",
+      "status": "completed",
+      "parent": "task-1-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "changes": "Add: name='modelchorus', dependencies: anthropic, openai, google-generativeai, pydantic, httpx, rich, typer",
+        "completed_at": "2025-11-05T12:16:06.628041Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-05T12:16:06.631954Z"
+      }
+    },
+    "task-1-2-2": {
+      "type": "subtask",
+      "title": "Configure CLI entry point and optional dependencies",
+      "status": "completed",
+      "parent": "task-1-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "changes": "Add: [project.scripts] modelchorus = 'modelchorus.cli:main', [project.optional-dependencies] dev",
+        "completed_at": "2025-11-05T12:16:44.937809Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-05T12:16:44.945244Z"
+      }
+    },
+    "task-1-3": {
+      "type": "task",
+      "title": "src/modelchorus/core/base.py",
+      "status": "completed",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-3-1",
+        "task-1-3-2",
+        "task-1-3-3"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-1-4"
+        ],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 3,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/core/base.py",
+        "task_category": "implementation",
+        "estimated_hours": 1.5,
+        "description": "Base classes for workflows and providers"
+      }
+    },
+    "task-1-3-1": {
+      "type": "subtask",
+      "title": "Implement BaseWorkflow abstract class",
+      "status": "completed",
+      "parent": "task-1-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "changes": "Define: BaseWorkflow with abstract run() method, synthesize() helper",
+        "completed_at": "2025-11-05T12:18:46.611698Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-05T12:18:46.615949Z"
+      }
+    },
+    "task-1-3-2": {
+      "type": "subtask",
+      "title": "Implement ModelProvider abstract class",
+      "status": "completed",
+      "parent": "task-1-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "changes": "Define: ModelProvider with abstract generate() method, supports_vision() check",
+        "completed_at": "2025-11-05T12:20:43.571946Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-05T12:20:43.575842Z"
+      }
+    },
+    "task-1-3-3": {
+      "type": "subtask",
+      "title": "Implement WorkflowRegistry for plugin system",
+      "status": "completed",
+      "parent": "task-1-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "changes": "Add: WorkflowRegistry.register() decorator, .get() method for dynamic workflow loading",
+        "completed_at": "2025-11-05T12:24:27.806735Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-05T12:24:27.811103Z"
+      }
+    },
+    "task-1-4": {
+      "type": "task",
+      "title": "src/modelchorus/core/models.py",
+      "status": "completed",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-4-1",
+        "task-1-4-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1",
+          "task-1-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 2,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/core/models.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "description": "Pydantic models for requests and responses"
+      }
+    },
+    "task-1-4-1": {
+      "type": "subtask",
+      "title": "Define WorkflowRequest and WorkflowResponse models",
+      "status": "completed",
+      "parent": "task-1-4",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "changes": "Create Pydantic models: WorkflowRequest(prompt, models, config), WorkflowResponse(result, metadata)",
+        "completed_at": "2025-11-05T12:26:27.443286Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-05T12:26:27.448188Z"
+      }
+    },
+    "task-1-4-2": {
+      "type": "subtask",
+      "title": "Define ModelResponse and ConsensusConfig models",
+      "status": "completed",
+      "parent": "task-1-4",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "changes": "Create: ModelResponse(model, content, metadata), ConsensusConfig(mode, stances, temperature)",
+        "completed_at": "2025-11-05T12:32:24.848057Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-05T12:32:24.855412Z"
+      }
+    },
+    "task-1-5": {
+      "type": "task",
+      "title": "README.md",
+      "status": "completed",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-5-1",
+        "task-1-5-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 2,
+      "metadata": {
+        "file_path": "modelchorus/README.md",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "description": "Package README with overview and placeholder examples"
+      }
+    },
+    "task-1-5-1": {
+      "type": "subtask",
+      "title": "Write package overview and installation",
+      "status": "completed",
+      "parent": "task-1-5",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "changes": "Add: Project description, pip install modelchorus, feature list",
+        "completed_at": "2025-11-05T12:33:34.333196Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-05T12:33:34.339836Z"
+      }
+    },
+    "task-1-5-2": {
+      "type": "subtask",
+      "title": "Add quick start examples",
+      "status": "completed",
+      "parent": "task-1-5",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "changes": "Add: Programmatic and CLI usage examples (placeholder for now)",
+        "completed_at": "2025-11-05T12:36:04.590502Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-05T12:36:04.595799Z"
+      }
+    },
+    "phase-1-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "completed",
+      "parent": "phase-1",
+      "children": [
+        "verify-1-1",
+        "verify-1-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-1-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 2,
+      "metadata": {
+        "needs_journaling": false,
+        "completed_at": "2025-11-05T12:39:18.182511Z",
+        "journaled_at": "2025-11-05T12:39:18.198299Z"
+      }
+    },
+    "verify-1-1": {
+      "type": "verify",
+      "title": "Package structure is correct",
+      "status": "completed",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "python -m modelchorus.core.base",
+        "expected": "Module imports successfully, base classes defined",
+        "completed_at": "2025-11-05T12:37:15.626842Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-05T12:37:15.632498Z"
+      }
+    },
+    "verify-1-2": {
+      "type": "verify",
+      "title": "pyproject.toml is valid",
+      "status": "completed",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pip install -e modelchorus/",
+        "expected": "Package installs in editable mode without errors",
+        "completed_at": "2025-11-05T12:39:18.182435Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-05T12:39:18.186747Z"
+      }
+    }
+  },
+  "journal": [
+    {
+      "timestamp": "2025-11-05T13:52:33.909892Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Implement base CLIProvider class",
+      "author": "claude-code",
+      "content": "Successfully implemented CLIProvider base class with the following features:\n- Inherits from ModelProvider as required\n- Implements async subprocess execution via execute_command() with timeout and error handling\n- Provides abstract methods build_command() and parse_response() for subclasses to implement\n- Includes generate() method that orchestrates command building, execution with retries (exponential backoff), and response parsing\n- Implements supports_vision() with capability checking\n- Includes comprehensive logging throughout\n- Added CLIProvider to __init__.py exports\n- Verified import works correctly and class structure is valid\n\nThe class provides a solid foundation for CLI-based provider implementations (Claude, Gemini, Codex, etc.).",
+      "metadata": {},
+      "task_id": "task-2-1-1"
+    }
+  ]
+}

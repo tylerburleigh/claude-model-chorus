@@ -2,17 +2,9 @@
 Provider integrations for ModelChorus.
 
 This module contains abstractions and implementations for different
-AI model providers (Anthropic, OpenAI, etc.).
+AI model providers via CLI tools.
 """
 
-from .anthropic_provider import (
-    AnthropicProvider,
-    ProviderError,
-    ProviderAuthenticationError,
-    ProviderRateLimitError,
-    ProviderTimeoutError,
-    ProviderConnectionError,
-)
 from .base_provider import (
     ModelProvider,
     ModelConfig,
@@ -20,21 +12,13 @@ from .base_provider import (
     GenerationRequest,
     GenerationResponse,
 )
-from .google_provider import GoogleProvider
-from .openai_provider import OpenAIProvider
+from .cli_provider import CLIProvider
 
 __all__ = [
-    "AnthropicProvider",
-    "GoogleProvider",
-    "OpenAIProvider",
     "ModelProvider",
     "ModelConfig",
     "ModelCapability",
     "GenerationRequest",
     "GenerationResponse",
-    "ProviderError",
-    "ProviderAuthenticationError",
-    "ProviderRateLimitError",
-    "ProviderTimeoutError",
-    "ProviderConnectionError",
+    "CLIProvider",
 ]
