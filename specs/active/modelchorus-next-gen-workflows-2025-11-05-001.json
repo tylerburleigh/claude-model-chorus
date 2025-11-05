@@ -1,7 +1,7 @@
 {
   "spec_id": "modelchorus-next-gen-workflows-2025-11-05-001",
   "generated": "2025-11-05T12:00:00Z",
-  "last_updated": "2025-11-05T23:09:19.949387Z",
+  "last_updated": "2025-11-05T23:23:57.527333Z",
   "metadata": {
     "title": "ModelChorus Next-Generation Workflows",
     "description": "Extend ModelChorus with conversation infrastructure, CHAT workflow for peer consultation, and THINKDEEP workflow for deep reasoning. Strategic implementation based on multi-model consensus (Claude, Gemini, Codex).",
@@ -16,7 +16,7 @@
       "history": []
     },
     "activated_date": "2025-11-05T17:44:07.657627Z",
-    "progress_percentage": 54,
+    "progress_percentage": 55,
     "current_phase": "phase-3"
   },
   "hierarchy": {
@@ -33,7 +33,7 @@
         "phase-5"
       ],
       "total_tasks": 88,
-      "completed_tasks": 48,
+      "completed_tasks": 49,
       "metadata": {
         "objectives": [
           "Establish conversation infrastructure as foundation for all workflows",
@@ -1503,7 +1503,7 @@
         "depends": []
       },
       "total_tasks": 23,
-      "completed_tasks": 8,
+      "completed_tasks": 9,
       "metadata": {
         "purpose": "Implement multi-step investigation workflow with hypothesis tracking",
         "risk_level": "medium",
@@ -1526,7 +1526,7 @@
         "task-3-8"
       ],
       "total_tasks": 19,
-      "completed_tasks": 8,
+      "completed_tasks": 9,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1654,7 +1654,7 @@
     "task-3-2": {
       "type": "task",
       "title": "src/modelchorus/workflows/thinkdeep.py",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-3-files",
       "children": [
         "task-3-2-1",
@@ -1674,7 +1674,7 @@
         "depends": []
       },
       "total_tasks": 5,
-      "completed_tasks": 4,
+      "completed_tasks": 5,
       "metadata": {
         "file_path": "src/modelchorus/workflows/thinkdeep.py",
         "task_category": "implementation",
@@ -1773,7 +1773,7 @@
     "task-3-2-5": {
       "type": "subtask",
       "title": "Implement optional expert validation",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-3-2",
       "children": [],
       "dependencies": {
@@ -1782,9 +1782,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "implementation_details": "Optional second-pass with different model when not 'certain'"
+        "implementation_details": "Optional second-pass with different model when not 'certain'",
+        "started_at": "2025-11-05T23:21:02.165696Z",
+        "completed_at": "2025-11-05T23:23:57.503476Z",
+        "needs_journaling": false,
+        "actual_hours": 0.049,
+        "journaled_at": "2025-11-05T23:23:57.519676Z"
       }
     },
     "task-3-3": {
@@ -3425,6 +3430,15 @@
       "content": "Successfully implemented confidence tracking and progression in ThinkDeepWorkflow with comprehensive functionality:\n\n- update_confidence(): Update confidence level with validation against ConfidenceLevel enum values, logs transitions\n- get_confidence(): Retrieve current confidence level for investigation\n- is_investigation_complete(): Determine completion based on criteria (confidence=\"certain\" OR \"almost_certain\", has hypotheses, has steps)\n- get_investigation_summary(): Generate comprehensive summary with thread_id, confidence, completion status, step counts, hypothesis counts by status (active/validated/disproven), files examined\n\nAll methods properly:\n- Use thread_id to identify investigation\n- Load/save state via helper methods\n- Include logging for important operations\n- Validate inputs (confidence levels checked against ConfidenceLevel enum)\n\nAll tests pass: method existence, confidence updates through all levels, completion criteria (empty/incomplete/complete states), summary structure validation.",
       "metadata": {},
       "task_id": "task-3-2-4"
+    },
+    {
+      "timestamp": "2025-11-05T23:23:57.519654Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Implement optional expert validation",
+      "author": "claude-code",
+      "content": "Successfully implemented optional expert validation for ThinkDeepWorkflow. The implementation includes:\n\n1. Added expert_provider parameter to __init__ constructor\n2. Added enable_expert_validation configuration option (defaults to True when expert_provider is provided)\n3. Created _perform_expert_validation() method that:\n   - Checks if expert validation is enabled and expert provider is configured\n   - Skips validation when confidence level is \"certain\"\n   - Builds expert validation prompt with investigation state summary\n   - Sends request to expert provider for second-pass validation\n   - Adds expert validation response to conversation history\n4. Created _build_expert_validation_prompt() helper method\n5. Integrated expert validation into run() workflow after primary provider response\n6. Added expert_validation_performed metadata field to WorkflowResult\n7. Fixed _save_state() to use correct ConversationMemory API (_save_thread)\n\nAll functionality verified with comprehensive tests covering:\n- Basic expert validation with two providers\n- Expert validation disabled via config\n- Workflow without expert provider\n\nThe implementation enables optional second-pass validation with a different model when confidence is not \"certain\", following the specification requirements.",
+      "metadata": {},
+      "task_id": "task-3-2-5"
     }
   ]
 }

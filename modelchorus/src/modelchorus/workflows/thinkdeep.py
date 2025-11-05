@@ -84,7 +84,8 @@ class ThinkDeepWorkflow(BaseWorkflow):
         self,
         provider: ModelProvider,
         config: Optional[Dict[str, Any]] = None,
-        conversation_memory: Optional[ConversationMemory] = None
+        conversation_memory: Optional[ConversationMemory] = None,
+        expert_provider: Optional[ModelProvider] = None
     ):
         """
         Initialize ThinkDeepWorkflow with a single provider.
@@ -93,6 +94,7 @@ class ThinkDeepWorkflow(BaseWorkflow):
             provider: ModelProvider instance to use for investigation
             config: Optional configuration dictionary
             conversation_memory: Optional ConversationMemory for multi-turn investigations
+            expert_provider: Optional secondary ModelProvider for expert validation
 
         Raises:
             ValueError: If provider is None
@@ -107,8 +109,22 @@ class ThinkDeepWorkflow(BaseWorkflow):
             conversation_memory=conversation_memory
         )
         self.provider = provider
+        self.expert_provider = expert_provider
 
-        logger.info(f"ThinkDeepWorkflow initialized with provider: {provider.provider_name}")
+        # Get expert validation config (default: enabled if expert_provider provided)
+        if config:
+            self.enable_expert_validation = config.get(
+                'enable_expert_validation',
+                expert_provider is not None
+            )
+        else:
+            self.enable_expert_validation = expert_provider is not None
+
+        logger.info(
+            f"ThinkDeepWorkflow initialized with provider: {provider.provider_name}, "
+            f"expert_provider: {expert_provider.provider_name if expert_provider else 'None'}, "
+            f"expert_validation: {self.enable_expert_validation}"
+        )
 
     async def run(
         self,
@@ -241,7 +257,12 @@ class ThinkDeepWorkflow(BaseWorkflow):
                     if file not in state.relevant_files:
                         state.relevant_files.append(file)
 
-            # Save updated state
+            # Perform expert validation if configured and confidence not "certain"
+            expert_validation = await self._perform_expert_validation(
+                thread_id, state, response.content, **kwargs
+            )
+
+            # Save updated state (after expert validation)
             self._save_state(thread_id, state)
 
             # Build successful result
@@ -252,6 +273,14 @@ class ThinkDeepWorkflow(BaseWorkflow):
                 content=response.content,
                 model=response.model
             )
+
+            # Add expert validation to result if performed
+            if expert_validation:
+                result.add_step(
+                    step_number=len(state.steps) + 2,
+                    content=expert_validation,
+                    model=f"{self.expert_provider.provider_name} (expert validation)"
+                )
 
             # Add metadata
             result.metadata.update({
@@ -264,7 +293,8 @@ class ThinkDeepWorkflow(BaseWorkflow):
                 'investigation_step': len(state.steps) + 1,
                 'hypotheses_count': len(state.hypotheses),
                 'confidence': state.current_confidence,
-                'files_examined': len(state.relevant_files)
+                'files_examined': len(state.relevant_files),
+                'expert_validation_performed': expert_validation is not None
             })
 
             logger.info(f"ThinkDeep investigation step completed for thread: {thread_id}")
@@ -322,7 +352,7 @@ class ThinkDeepWorkflow(BaseWorkflow):
 
         # Save state to thread.state dict
         thread.state['thinkdeep'] = state.model_dump()
-        self.conversation_memory.save_thread(thread)
+        self.conversation_memory._save_thread(thread)
 
     def _build_investigation_prompt(
         self,
@@ -438,6 +468,134 @@ class ThinkDeepWorkflow(BaseWorkflow):
         if len(response_content) > 500:
             return response_content[:497] + "..."
         return response_content.strip()
+
+    async def _perform_expert_validation(
+        self,
+        thread_id: str,
+        state: ThinkDeepState,
+        primary_response: str,
+        **kwargs
+    ) -> Optional[str]:
+        """
+        Perform optional expert validation with a different model.
+
+        This method is called when confidence is not "certain" and an expert
+        provider is configured. The expert provider reviews the investigation
+        findings and provides validation or additional insights.
+
+        Args:
+            thread_id: Thread ID of the investigation
+            state: Current investigation state
+            primary_response: Response from the primary model
+            **kwargs: Additional parameters passed to expert provider.generate()
+
+        Returns:
+            Expert validation response or None if validation not needed/available
+        """
+        # Skip if expert validation disabled or no expert provider
+        if not self.enable_expert_validation or not self.expert_provider:
+            return None
+
+        # Skip if confidence is already "certain"
+        if state.current_confidence == ConfidenceLevel.CERTAIN.value:
+            logger.info("Skipping expert validation - confidence is 'certain'")
+            return None
+
+        logger.info(
+            f"Performing expert validation for investigation {thread_id} "
+            f"(confidence: {state.current_confidence})"
+        )
+
+        # Build expert validation prompt
+        validation_prompt = self._build_expert_validation_prompt(
+            state, primary_response
+        )
+
+        try:
+            # Create generation request for expert
+            request = GenerationRequest(
+                prompt=validation_prompt,
+                continuation_id=thread_id,
+                **kwargs
+            )
+
+            logger.info(
+                f"Sending expert validation request to provider: "
+                f"{self.expert_provider.provider_name}"
+            )
+
+            # Generate expert response
+            expert_response: GenerationResponse = await self.expert_provider.generate(request)
+
+            logger.info(
+                f"Received expert validation from {self.expert_provider.provider_name}: "
+                f"{len(expert_response.content)} chars"
+            )
+
+            # Add expert validation to conversation history
+            if self.conversation_memory:
+                self.add_message(
+                    thread_id,
+                    "assistant",
+                    f"[Expert Validation from {self.expert_provider.provider_name}]\n\n{expert_response.content}",
+                    workflow_name=self.name,
+                    model_provider=self.expert_provider.provider_name,
+                    model_name=expert_response.model
+                )
+
+            return expert_response.content
+
+        except Exception as e:
+            logger.error(f"Expert validation failed: {e}", exc_info=True)
+            return None
+
+    def _build_expert_validation_prompt(
+        self,
+        state: ThinkDeepState,
+        primary_response: str
+    ) -> str:
+        """
+        Build prompt for expert validation.
+
+        Args:
+            state: Current investigation state
+            primary_response: Response from primary model
+
+        Returns:
+            Expert validation prompt
+        """
+        prompt_parts = [
+            "You are acting as an expert reviewer for an ongoing investigation.",
+            "Review the investigation findings and provide validation, additional insights, or corrections.\n",
+            f"Current Investigation State:",
+            f"- Confidence Level: {state.current_confidence}",
+            f"- Hypotheses: {len(state.hypotheses)}",
+            f"- Steps Completed: {len(state.steps)}",
+            f"- Files Examined: {len(state.relevant_files)}\n"
+        ]
+
+        # Add hypotheses summary
+        if state.hypotheses:
+            prompt_parts.append("Hypotheses:")
+            for i, hyp in enumerate(state.hypotheses, 1):
+                prompt_parts.append(f"{i}. [{hyp.status.upper()}] {hyp.hypothesis}")
+            prompt_parts.append("")
+
+        # Add primary model's latest findings
+        prompt_parts.extend([
+            "Latest Investigation Findings:",
+            primary_response,
+            "",
+            "Expert Validation Task:",
+            "1. Assess the validity of the hypotheses and findings",
+            "2. Identify any gaps or alternative explanations",
+            "3. Suggest additional investigation steps if needed",
+            "4. Recommend whether to increase or maintain confidence level",
+            "",
+            "Provide your expert assessment:"
+        ])
+
+        return "\n".join(prompt_parts)
 
     def get_investigation_state(self, thread_id: str) -> Optional[ThinkDeepState]:
         """

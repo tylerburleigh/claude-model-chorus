@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T23:08:19.199066Z",
+    "generated_at": "2025-11-05T23:20:27.552980Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 37,
-    "total_lines": 8768,
+    "total_lines": 8893,
     "total_classes": 53,
     "total_functions": 21,
     "avg_complexity": 3.29,
@@ -22,7 +22,7 @@
     "by_language": {
       "python": {
         "files": 37,
-        "lines": 8768,
+        "lines": 8893,
         "classes": 53,
         "functions": 21,
         "avg_complexity": 3.29
@@ -619,7 +619,7 @@
         "core.models.ConfidenceLevel"
       ],
       "exports": [],
-      "lines": 621
+      "lines": 746
     },
     {
       "name": "__init__",
@@ -3380,6 +3380,10 @@
         "disprove_hypothesis",
         "get_active_hypotheses",
         "get_all_hypotheses",
+        "update_confidence",
+        "get_confidence",
+        "is_investigation_complete",
+        "get_investigation_summary",
         "get_provider",
         "validate_config",
         "__repr__"
