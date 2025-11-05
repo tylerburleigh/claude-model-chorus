@@ -454,6 +454,136 @@ class ThinkDeepWorkflow(BaseWorkflow):
 
         return self._get_or_create_state(thread_id)
 
+    def add_hypothesis(
+        self,
+        thread_id: str,
+        hypothesis_text: str,
+        evidence: Optional[List[str]] = None
+    ) -> bool:
+        """
+        Add a new hypothesis to an investigation.
+
+        Args:
+            thread_id: Thread ID of the investigation
+            hypothesis_text: The hypothesis statement
+            evidence: Optional initial evidence supporting the hypothesis
+
+        Returns:
+            True if hypothesis was added, False if investigation not found
+        """
+        state = self._get_or_create_state(thread_id)
+        if not state:
+            return False
+
+        hypothesis = Hypothesis(
+            hypothesis=hypothesis_text,
+            evidence=evidence if evidence else [],
+            status="active"
+        )
+        state.hypotheses.append(hypothesis)
+        self._save_state(thread_id, state)
+
+        logger.info(f"Added hypothesis to investigation {thread_id}: {hypothesis_text}")
+        return True
+
+    def update_hypothesis(
+        self,
+        thread_id: str,
+        hypothesis_text: str,
+        new_evidence: Optional[List[str]] = None,
+        new_status: Optional[str] = None
+    ) -> bool:
+        """
+        Update an existing hypothesis with new evidence or status.
+
+        Args:
+            thread_id: Thread ID of the investigation
+            hypothesis_text: The hypothesis to update (matched by text)
+            new_evidence: Optional new evidence to add
+            new_status: Optional new status ("active", "disproven", "validated")
+
+        Returns:
+            True if hypothesis was updated, False if not found
+        """
+        state = self._get_or_create_state(thread_id)
+        if not state:
+            return False
+
+        # Find hypothesis by text
+        hypothesis_found = False
+        for hyp in state.hypotheses:
+            if hyp.hypothesis == hypothesis_text:
+                hypothesis_found = True
+                if new_evidence:
+                    hyp.evidence.extend(new_evidence)
+                if new_status and new_status in ["active", "disproven", "validated"]:
+                    hyp.status = new_status
+                break
+
+        if hypothesis_found:
+            self._save_state(thread_id, state)
+            logger.info(f"Updated hypothesis in investigation {thread_id}: {hypothesis_text}")
+
+        return hypothesis_found
+
+    def validate_hypothesis(self, thread_id: str, hypothesis_text: str) -> bool:
+        """
+        Mark a hypothesis as validated.
+
+        Args:
+            thread_id: Thread ID of the investigation
+            hypothesis_text: The hypothesis to validate (matched by text)
+
+        Returns:
+            True if hypothesis was validated, False if not found
+        """
+        return self.update_hypothesis(thread_id, hypothesis_text, new_status="validated")
+
+    def disprove_hypothesis(self, thread_id: str, hypothesis_text: str) -> bool:
+        """
+        Mark a hypothesis as disproven.
+
+        Args:
+            thread_id: Thread ID of the investigation
+            hypothesis_text: The hypothesis to disprove (matched by text)
+
+        Returns:
+            True if hypothesis was disproven, False if not found
+        """
+        return self.update_hypothesis(thread_id, hypothesis_text, new_status="disproven")
+
+    def get_active_hypotheses(self, thread_id: str) -> List[Hypothesis]:
+        """
+        Get all active (not disproven or validated) hypotheses.
+
+        Args:
+            thread_id: Thread ID of the investigation
+
+        Returns:
+            List of active hypotheses
+        """
+        state = self._get_or_create_state(thread_id)
+        if not state:
+            return []
+
+        return [h for h in state.hypotheses if h.status == "active"]
+
+    def get_all_hypotheses(self, thread_id: str) -> List[Hypothesis]:
+        """
+        Get all hypotheses regardless of status.
+
+        Args:
+            thread_id: Thread ID of the investigation
+
+        Returns:
+            List of all hypotheses
+        """
+        state = self._get_or_create_state(thread_id)
+        if not state:
+            return []
+
+        return state.hypotheses
+
     def get_provider(self) -> ModelProvider:
         """
         Get the configured provider.

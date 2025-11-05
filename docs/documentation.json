@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T23:05:44.417650Z",
+    "generated_at": "2025-11-05T23:07:03.603053Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 37,
-    "total_lines": 8603,
+    "total_lines": 8638,
     "total_classes": 53,
     "total_functions": 21,
     "avg_complexity": 3.29,
@@ -22,7 +22,7 @@
     "by_language": {
       "python": {
         "files": 37,
-        "lines": 8603,
+        "lines": 8638,
         "classes": 53,
         "functions": 21,
         "avg_complexity": 3.29
@@ -619,7 +619,7 @@
         "core.models.ConfidenceLevel"
       ],
       "exports": [],
-      "lines": 456
+      "lines": 491
     },
     {
       "name": "__init__",
@@ -1449,8 +1449,19 @@
       "properties": [],
       "is_exported": false,
       "is_public": true,
-      "instantiated_by": [],
-      "imported_by": []
+      "instantiated_by": [
+        {
+          "instantiator": "run",
+          "file": "modelchorus/src/modelchorus/workflows/thinkdeep.py",
+          "line": 230,
+          "context": [
+            "ThinkDeepWorkflow",
+            "run"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 1
     },
     {
       "name": "ThinkDeepState",
@@ -1469,25 +1480,7 @@
         {
           "instantiator": "_get_or_create_state",
           "file": "modelchorus/src/modelchorus/workflows/thinkdeep.py",
-          "line": 285,
-          "context": [
-            "ThinkDeepWorkflow",
-            "_get_or_create_state"
-          ]
-        },
-        {
-          "instantiator": "_get_or_create_state",
-          "file": "modelchorus/src/modelchorus/workflows/thinkdeep.py",
-          "line": 289,
-          "context": [
-            "ThinkDeepWorkflow",
-            "_get_or_create_state"
-          ]
-        },
-        {
-          "instantiator": "_get_or_create_state",
-          "file": "modelchorus/src/modelchorus/workflows/thinkdeep.py",
-          "line": 294,
+          "line": 293,
           "context": [
             "ThinkDeepWorkflow",
             "_get_or_create_state"
@@ -1497,6 +1490,24 @@
           "instantiator": "_get_or_create_state",
           "file": "modelchorus/src/modelchorus/workflows/thinkdeep.py",
           "line": 297,
+          "context": [
+            "ThinkDeepWorkflow",
+            "_get_or_create_state"
+          ]
+        },
+        {
+          "instantiator": "_get_or_create_state",
+          "file": "modelchorus/src/modelchorus/workflows/thinkdeep.py",
+          "line": 302,
+          "context": [
+            "ThinkDeepWorkflow",
+            "_get_or_create_state"
+          ]
+        },
+        {
+          "instantiator": "_get_or_create_state",
+          "file": "modelchorus/src/modelchorus/workflows/thinkdeep.py",
+          "line": 305,
           "context": [
             "ThinkDeepWorkflow",
             "_get_or_create_state"
@@ -3350,6 +3361,7 @@
         "_get_or_create_state",
         "_save_state",
         "_build_investigation_prompt",
+        "_extract_findings",
         "get_investigation_state",
         "get_provider",
         "validate_config",

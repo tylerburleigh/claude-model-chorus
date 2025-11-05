@@ -1,7 +1,7 @@
 {
   "spec_id": "modelchorus-next-gen-workflows-2025-11-05-001",
   "generated": "2025-11-05T12:00:00Z",
-  "last_updated": "2025-11-05T23:06:44.192471Z",
+  "last_updated": "2025-11-05T23:08:01.436095Z",
   "metadata": {
     "title": "ModelChorus Next-Generation Workflows",
     "description": "Extend ModelChorus with conversation infrastructure, CHAT workflow for peer consultation, and THINKDEEP workflow for deep reasoning. Strategic implementation based on multi-model consensus (Claude, Gemini, Codex).",
@@ -16,7 +16,7 @@
       "history": []
     },
     "activated_date": "2025-11-05T17:44:07.657627Z",
-    "progress_percentage": 52,
+    "progress_percentage": 53,
     "current_phase": "phase-3"
   },
   "hierarchy": {
@@ -33,7 +33,7 @@
         "phase-5"
       ],
       "total_tasks": 88,
-      "completed_tasks": 46,
+      "completed_tasks": 47,
       "metadata": {
         "objectives": [
           "Establish conversation infrastructure as foundation for all workflows",
@@ -1503,7 +1503,7 @@
         "depends": []
       },
       "total_tasks": 23,
-      "completed_tasks": 6,
+      "completed_tasks": 7,
       "metadata": {
         "purpose": "Implement multi-step investigation workflow with hypothesis tracking",
         "risk_level": "medium",
@@ -1526,7 +1526,7 @@
         "task-3-8"
       ],
       "total_tasks": 19,
-      "completed_tasks": 6,
+      "completed_tasks": 7,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1674,7 +1674,7 @@
         "depends": []
       },
       "total_tasks": 5,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "file_path": "src/modelchorus/workflows/thinkdeep.py",
         "task_category": "implementation",
@@ -1729,7 +1729,7 @@
     "task-3-2-3": {
       "type": "subtask",
       "title": "Implement hypothesis management",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-3-2",
       "children": [],
       "dependencies": {
@@ -1738,9 +1738,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "implementation_details": "Add, update, validate, disprove hypotheses"
+        "implementation_details": "Add, update, validate, disprove hypotheses",
+        "started_at": "2025-11-05T23:07:09.324341Z",
+        "completed_at": "2025-11-05T23:08:01.419149Z",
+        "needs_journaling": false,
+        "actual_hours": 0.014,
+        "journaled_at": "2025-11-05T23:08:01.430705Z"
       }
     },
     "task-3-2-4": {
@@ -3397,6 +3402,15 @@
       "content": "Successfully implemented investigation step execution in ThinkDeepWorkflow:\n\n- Enhanced run() method to create InvestigationStep objects after each provider response\n- Step creation includes: step_number (auto-incremented), findings (extracted), files_checked (from input), confidence (from current state)\n- Added _extract_findings() helper method to extract key findings from model response (uses first paragraph or first 500 chars as summary)\n- Investigation steps are appended to state.steps list\n- Files examined are tracked in state.relevant_files (deduplicated)\n- State is persisted after each investigation step via _save_state()\n- Metadata updated to include investigation_step number\n\nAll tests pass: findings extraction (short/multi-paragraph/long responses), InvestigationStep creation, state updates with step tracking.",
       "metadata": {},
       "task_id": "task-3-2-2"
+    },
+    {
+      "timestamp": "2025-11-05T23:08:01.430692Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Implement hypothesis management",
+      "author": "claude-code",
+      "content": "Successfully implemented hypothesis management in ThinkDeepWorkflow with comprehensive methods:\n\n- add_hypothesis(): Add new hypothesis to investigation with optional initial evidence, defaults to \"active\" status\n- update_hypothesis(): Update existing hypothesis with new evidence and/or status change, matches by hypothesis text\n- validate_hypothesis(): Convenience method to mark hypothesis as \"validated\"\n- disprove_hypothesis(): Convenience method to mark hypothesis as \"disproven\"\n- get_active_hypotheses(): Retrieve all hypotheses with status=\"active\"\n- get_all_hypotheses(): Retrieve all hypotheses regardless of status\n\nAll methods:\n- Accept thread_id to identify investigation\n- Load state via _get_or_create_state()\n- Save updated state via _save_state()\n- Include logging for operations\n- Return bool for success/failure or List[Hypothesis] for retrieval methods\n\nAll tests pass: method existence, hypothesis addition, filtering by status, evidence updates, status changes.",
+      "metadata": {},
+      "task_id": "task-3-2-3"
     }
   ]
 }
