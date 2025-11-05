@@ -43,6 +43,7 @@ class GenerationRequest:
     max_tokens: Optional[int] = None
     stream: bool = False
     images: Optional[List[str]] = None
+    continuation_id: Optional[str] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
