@@ -20,9 +20,11 @@ from .base_provider import (
     GenerationRequest,
     GenerationResponse,
 )
+from .openai_provider import OpenAIProvider
 
 __all__ = [
     "AnthropicProvider",
+    "OpenAIProvider",
     "ModelProvider",
     "ModelConfig",
     "ModelCapability",
