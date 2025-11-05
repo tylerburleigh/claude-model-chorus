@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T16:32:23.906695Z",
+    "generated_at": "2025-11-05T17:47:47.185006Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 28,
-    "total_lines": 4048,
-    "total_classes": 31,
+    "total_files": 29,
+    "total_lines": 4204,
+    "total_classes": 32,
     "total_functions": 11,
     "avg_complexity": 2.82,
     "max_complexity": 16,
@@ -20,9 +20,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 28,
-        "lines": 4048,
-        "classes": 31,
+        "files": 29,
+        "lines": 4204,
+        "classes": 32,
         "functions": 11,
         "avg_complexity": 2.82
       }
@@ -397,7 +397,7 @@
         "base_provider.ModelCapability"
       ],
       "exports": [],
-      "lines": 247
+      "lines": 255
     },
     {
       "name": "__init__",
@@ -545,6 +545,24 @@
       ],
       "exports": [],
       "lines": 142
+    },
+    {
+      "name": "test_gemini_integration",
+      "file": "modelchorus/tests/test_gemini_integration.py",
+      "language": "python",
+      "docstring": "Integration tests for GeminiProvider.\n\nThese tests verify that the Gemini CLI integration works correctly with real CLI calls.",
+      "classes": [
+        "TestGeminiIntegration"
+      ],
+      "functions": [],
+      "imports": [
+        "pytest",
+        "subprocess",
+        "modelchorus.providers.gemini_provider.GeminiProvider",
+        "modelchorus.providers.base_provider.GenerationRequest"
+      ],
+      "exports": [],
+      "lines": 148
     },
     {
       "name": "test_integration",
@@ -1200,6 +1218,24 @@
           ]
         },
         {
+          "instantiator": "simple_request",
+          "file": "modelchorus/tests/test_gemini_integration.py",
+          "line": 24,
+          "context": [
+            "TestGeminiIntegration",
+            "simple_request"
+          ]
+        },
+        {
+          "instantiator": "test_build_command_with_model",
+          "file": "modelchorus/tests/test_gemini_integration.py",
+          "line": 65,
+          "context": [
+            "TestGeminiIntegration",
+            "test_build_command_with_model"
+          ]
+        },
+        {
           "instantiator": "test_end_to_end_consensus",
           "file": "modelchorus/tests/test_integration.py",
           "line": 51,
@@ -1264,7 +1300,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 24
+      "instantiation_count": 26
     },
     {
       "name": "GenerationResponse",
@@ -1317,7 +1353,7 @@
         {
           "instantiator": "parse_response",
           "file": "modelchorus/src/modelchorus/providers/gemini_provider.py",
-          "line": 202,
+          "line": 211,
           "context": [
             "GeminiProvider",
             "parse_response"
@@ -1883,6 +1919,15 @@
           ]
         },
         {
+          "instantiator": "provider",
+          "file": "modelchorus/tests/test_gemini_integration.py",
+          "line": 19,
+          "context": [
+            "TestGeminiIntegration",
+            "provider"
+          ]
+        },
+        {
           "instantiator": "providers",
           "file": "tests/test_providers/test_cli_interface.py",
           "line": 36,
@@ -1893,7 +1938,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 2
+      "instantiation_count": 3
     },
     {
       "name": "ConsensusStrategy",
@@ -2182,6 +2227,31 @@
         "test_execute_first_valid_strategy",
         "test_execute_with_parameters",
         "test_execute_all_providers_fail"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestGeminiIntegration",
+      "file": "modelchorus/tests/test_gemini_integration.py",
+      "line": 13,
+      "language": "python",
+      "docstring": "Integration tests for Gemini provider.",
+      "bases": [],
+      "methods": [
+        "provider",
+        "simple_request",
+        "test_gemini_cli_available",
+        "test_build_command_basic",
+        "test_build_command_with_model",
+        "test_generate_simple_query",
+        "test_parse_response_format",
+        "test_parse_response_error_handling",
+        "test_supports_vision",
+        "test_supports_thinking"
       ],
       "properties": [],
       "is_exported": false,
@@ -3624,6 +3694,12 @@
       "modelchorus.workflows.consensus.ConsensusWorkflow",
       "modelchorus.workflows.consensus.ConsensusStrategy",
       "modelchorus.providers.base_provider.GenerationResponse",
+      "modelchorus.providers.base_provider.GenerationRequest"
+    ],
+    "modelchorus/tests/test_gemini_integration.py": [
+      "pytest",
+      "subprocess",
+      "modelchorus.providers.gemini_provider.GeminiProvider",
       "modelchorus.providers.base_provider.GenerationRequest"
     ],
     "modelchorus/tests/test_integration.py": [

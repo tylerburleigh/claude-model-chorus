@@ -120,7 +120,7 @@ class GeminiProvider(CLIProvider):
         Build the CLI command for a Gemini generation request.
 
         Constructs a command like:
-            gemini chat --prompt "..." --model pro --temperature 0.7
+            gemini "prompt text" --model pro -o json
 
         Args:
             request: GenerationRequest containing prompt and parameters
@@ -128,52 +128,43 @@ class GeminiProvider(CLIProvider):
         Returns:
             List of command parts for subprocess execution
         """
-        command = [self.cli_command, "chat"]
+        command = [self.cli_command]
 
-        # Add prompt
-        command.extend(["--prompt", request.prompt])
-
-        # Add system prompt if provided (Gemini calls this "system instruction")
-        if request.system_prompt:
-            command.extend(["--system-instruction", request.system_prompt])
-
-        # Add model from metadata if specified
+        # Add model from metadata if specified (must come before prompt)
         if "model" in request.metadata:
-            command.extend(["--model", request.metadata["model"]])
+            command.extend(["-m", request.metadata["model"]])
 
-        # Add temperature
-        temperature = request.temperature if request.temperature is not None else 0.7
-        command.extend(["--temperature", str(temperature)])
+        # Note: Gemini CLI doesn't support --temperature or --max-tokens via CLI flags
+        # These parameters are controlled through the Gemini CLI settings/config
 
-        # Add max tokens if specified
-        if request.max_tokens:
-            command.extend(["--max-tokens", str(request.max_tokens)])
-
-        # Add thinking mode if specified
-        if request.metadata.get("thinking"):
-            command.append("--thinking")
-
-        # Add images if provided (vision/multimodal capability)
-        if request.images:
-            for image_path in request.images:
-                command.extend(["--image", image_path])
+        # Add prompt as positional argument (must be after flags, before options)
+        command.append(request.prompt)
 
         # Add JSON output format for easier parsing
-        command.append("--json")
+        command.extend(["-o", "json"])
 
         logger.debug(f"Built Gemini command: {' '.join(command)}")
+        logger.warning(
+            "Note: Gemini CLI does not support temperature, max_tokens, system_prompt, "
+            "thinking mode, or images via command-line arguments. "
+            "These features require Gemini CLI configuration or are not supported."
+        )
         return command
 
     def parse_response(self, stdout: str, stderr: str, returncode: int) -> GenerationResponse:
         """
         Parse CLI output into a GenerationResponse.
 
-        The `gemini` CLI returns JSON output with --json flag:
+        The `gemini` CLI returns JSON output with -o json flag:
         {
-            "content": "...",
-            "model": "gemini-2.0-pro",
-            "usage": {"input_tokens": 10, "output_tokens": 50},
-            "finish_reason": "STOP"
+            "response": "...",
+            "stats": {
+                "models": {
+                    "gemini-2.5-pro": {
+                        "tokens": {"prompt": 10, "candidates": 50, "total": 60}
+                    }
+                }
+            }
         }
 
         Args:
@@ -199,21 +190,38 @@ class GeminiProvider(CLIProvider):
         try:
             data = json.loads(stdout)
 
+            # Extract model name from stats if available
+            model_name = "unknown"
+            usage = {}
+            if "stats" in data and "models" in data["stats"]:
+                # Get the first (and usually only) model from stats
+                models = data["stats"]["models"]
+                if models:
+                    model_name = list(models.keys())[0]
+                    model_stats = models[model_name]
+                    # Convert token stats to standard usage format
+                    if "tokens" in model_stats:
+                        tokens = model_stats["tokens"]
+                        usage = {
+                            "input_tokens": tokens.get("prompt", 0),
+                            "output_tokens": tokens.get("candidates", 0),
+                            "total_tokens": tokens.get("total", 0),
+                        }
+
             response = GenerationResponse(
-                content=data.get("content", ""),
-                model=data.get("model", "unknown"),
-                usage=data.get("usage", {}),
-                stop_reason=data.get("finish_reason"),
+                content=data.get("response", ""),
+                model=model_name,
+                usage=usage,
+                stop_reason=None,  # Gemini CLI doesn't provide finish_reason
                 metadata={
-                    "thinking": data.get("thinking"),
-                    "safety_ratings": data.get("safety_ratings"),
+                    "stats": data.get("stats"),
                     "raw_response": data,
                 },
             )
 
             logger.info(
                 f"Successfully parsed Gemini response: {len(response.content)} chars, "
-                f"model={response.model}, stop_reason={response.stop_reason}"
+                f"model={response.model}"
             )
             return response
 

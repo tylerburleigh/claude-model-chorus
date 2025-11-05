@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 11:32:23
+**Generated:** 2025-11-05 12:47:47
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 28
-- **Total Lines:** 4048
-- **Total Classes:** 31
+- **Total Files:** 29
+- **Total Lines:** 4204
+- **Total Classes:** 32
 - **Total Functions:** 11
 - **Avg Complexity:** 2.82
 - **Max Complexity:** 16
@@ -586,6 +586,28 @@ Attributes:
 
 ---
 
+### `TestGeminiIntegration`
+
+**Language:** python
+**Defined in:** `modelchorus/tests/test_gemini_integration.py:13`
+
+**Description:**
+> Integration tests for Gemini provider.
+
+**Methods:**
+- `provider()`
+- `simple_request()`
+- `test_gemini_cli_available()`
+- `test_build_command_basic()`
+- `test_build_command_with_model()`
+- `test_generate_simple_query()`
+- `test_parse_response_format()`
+- `test_parse_response_error_handling()`
+- `test_supports_vision()`
+- `test_supports_thinking()`
+
+---
+
 ### `TestIntegration`
 
 **Language:** python
@@ -1124,6 +1146,13 @@ Example:
 - `modelchorus.workflows.consensus.ConsensusWorkflow`
 - `pytest`
 - `unittest.mock.AsyncMock`
+
+### `modelchorus/tests/test_gemini_integration.py`
+
+- `modelchorus.providers.base_provider.GenerationRequest`
+- `modelchorus.providers.gemini_provider.GeminiProvider`
+- `pytest`
+- `subprocess`
 
 ### `modelchorus/tests/test_integration.py`
 

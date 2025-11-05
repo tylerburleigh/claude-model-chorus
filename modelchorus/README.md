@@ -82,6 +82,28 @@ print(f"Result: {result.synthesis}")
 - **OpenAI** (GPT-4, GPT-3.5)
 - **Google** (Gemini Pro, Gemini Flash)
 
+### CLI Provider Compatibility
+
+ModelChorus supports integration with AI model CLIs. Each CLI has different argument support:
+
+| Provider | CLI Command | Temperature | Max Tokens | System Prompt | Output Format | Notes |
+|----------|-------------|-------------|------------|---------------|---------------|-------|
+| **Claude** | `claude` | ❌ | ❌ | ✅ | ✅ `--output-format json` | Uses config for model params |
+| **Gemini** | `gemini` | ❌ | ❌ | ❌ | ✅ `-o json` | Positional prompt, limited CLI options |
+| **Codex** | `codex` | ❌ | ❌ | ✅ | ✅ `--json` | Uses config for model params |
+| **Cursor Agent** | `cursor-agent` | ⚠️ | ⚠️ | ⚠️ | ⚠️ | Untested (CLI not available) |
+
+**Legend:**
+- ✅ Supported via CLI arguments
+- ❌ Not supported via CLI (may use config files)
+- ⚠️ Unknown/untested
+
+**Important Notes:**
+- **Gemini CLI** uses positional arguments for prompts, not `--prompt` flag
+- **Gemini CLI** doesn't support temperature, max_tokens, system_prompt, or images via CLI
+- **Claude CLI** and **Codex CLI** use configuration files for model parameters
+- All providers support JSON output for structured parsing
+
 ## Configuration
 
 ### Environment Variables
