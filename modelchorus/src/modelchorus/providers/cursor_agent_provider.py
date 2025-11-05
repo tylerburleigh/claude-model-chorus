@@ -32,13 +32,15 @@ class CursorAgentProvider(CLIProvider):
     - Code explanation and documentation
     - System prompts for context
     - Temperature control
+    - Working directory support for context-aware code generation
 
     Example:
         >>> provider = CursorAgentProvider()
         >>> request = GenerationRequest(
         ...     prompt="Write a function to validate email addresses",
         ...     temperature=0.3,
-        ...     max_tokens=500
+        ...     max_tokens=500,
+        ...     metadata={"working_directory": "/path/to/project"}
         ... )
         >>> response = await provider.generate(request)
         >>> print(response.content)
@@ -142,6 +144,10 @@ class CursorAgentProvider(CLIProvider):
         # Add max tokens if specified
         if request.max_tokens:
             command.extend(["--max-tokens", str(request.max_tokens)])
+
+        # Add working directory if specified (for context-aware code generation)
+        if "working_directory" in request.metadata:
+            command.extend(["--working-directory", request.metadata["working_directory"]])
 
         # Add JSON output format for easier parsing
         command.append("--json")
