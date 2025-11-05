@@ -102,6 +102,7 @@ class ChatWorkflow(BaseWorkflow):
         self,
         prompt: str,
         continuation_id: Optional[str] = None,
+        files: Optional[List[str]] = None,
         **kwargs
     ) -> WorkflowResult:
         """
@@ -114,6 +115,7 @@ class ChatWorkflow(BaseWorkflow):
         Args:
             prompt: The user's message/query
             continuation_id: Optional thread ID to continue an existing conversation
+            files: Optional list of file paths to include in conversation context
             **kwargs: Additional parameters passed to provider.generate()
                      (e.g., temperature, max_tokens, system_prompt)
 
@@ -136,10 +138,17 @@ class ChatWorkflow(BaseWorkflow):
             ...     "Give me an example",
             ...     continuation_id=result.metadata['thread_id']
             ... )
+            >>>
+            >>> # With file context
+            >>> result3 = await workflow.run(
+            ...     "Review this code",
+            ...     files=["/path/to/file.py"]
+            ... )
         """
         logger.info(
             f"Starting chat workflow - prompt length: {len(prompt)}, "
-            f"continuation: {continuation_id is not None}"
+            f"continuation: {continuation_id is not None}, "
+            f"files: {len(files) if files else 0}"
         )
 
         # Generate thread ID if not provided
@@ -149,8 +158,8 @@ class ChatWorkflow(BaseWorkflow):
         result = WorkflowResult(success=False)
 
         try:
-            # Build the full prompt with conversation history if available
-            full_prompt = self._build_prompt_with_history(prompt, thread_id)
+            # Build the full prompt with conversation history and file context if available
+            full_prompt = self._build_prompt_with_history(prompt, thread_id, files)
 
             # Create generation request
             request = GenerationRequest(
@@ -175,6 +184,7 @@ class ChatWorkflow(BaseWorkflow):
                     thread_id,
                     "user",
                     prompt,
+                    files=files,
                     workflow_name=self.name,
                     model_provider=self.provider.provider_name
                 )
@@ -222,41 +232,68 @@ class ChatWorkflow(BaseWorkflow):
         self._result = result
         return result
 
-    def _build_prompt_with_history(self, prompt: str, thread_id: str) -> str:
+    def _build_prompt_with_history(
+        self,
+        prompt: str,
+        thread_id: str,
+        files: Optional[List[str]] = None
+    ) -> str:
         """
-        Build prompt with conversation history if available.
+        Build prompt with conversation history and file context if available.
 
         Args:
             prompt: Current user prompt
             thread_id: Thread ID to load history from
+            files: Optional list of file paths to include in context
 
         Returns:
-            Full prompt string with conversation history prepended
+            Full prompt string with conversation history and file contents prepended
         """
-        # If no conversation memory, return prompt as-is
+        context_parts = []
+
+        # Add file contents if provided
+        if files:
+            context_parts.append("File context:\n")
+            for file_path in files:
+                try:
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        file_content = f.read()
+                    context_parts.append(f"\n--- File: {file_path} ---\n")
+                    context_parts.append(file_content)
+                    context_parts.append(f"\n--- End of {file_path} ---\n")
+                except Exception as e:
+                    logger.warning(f"Failed to read file {file_path}: {e}")
+                    context_parts.append(f"\n--- File: {file_path} (Failed to read: {e}) ---\n")
+
+        # If no conversation memory, return prompt with file context only
         if not self.conversation_memory:
+            if context_parts:
+                context_parts.append(f"\n{prompt}")
+                return "\n".join(context_parts)
             return prompt
 
         # Try to load conversation history
         messages = self.resume_conversation(thread_id)
 
-        # If no history or empty history, return prompt as-is
-        if not messages:
-            return prompt
+        # Add conversation history
+        if messages:
+            context_parts.append("\nPrevious conversation:\n")
+            for msg in messages:
+                role_label = msg.role.upper()
+                context_parts.append(f"{role_label}: {msg.content}\n")
 
-        # Build conversation context
-        context_parts = ["Previous conversation:\n"]
-        for msg in messages:
-            role_label = msg.role.upper()
-            context_parts.append(f"{role_label}: {msg.content}\n")
+                # Include file references from history if present
+                if msg.files:
+                    context_parts.append(f"  [Referenced files: {', '.join(msg.files)}]\n")
 
+        # Add current user prompt
         context_parts.append(f"\nUSER: {prompt}")
 
         full_prompt = "\n".join(context_parts)
 
         logger.debug(
-            f"Built prompt with {len(messages)} previous messages, "
-            f"total length: {len(full_prompt)}"
+            f"Built prompt with {len(messages) if messages else 0} previous messages, "
+            f"{len(files) if files else 0} files, total length: {len(full_prompt)}"
         )
 
         return full_prompt
