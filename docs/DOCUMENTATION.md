@@ -1,14 +1,14 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 13:45:21
+**Generated:** 2025-11-05 13:48:06
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 32
-- **Total Lines:** 6352
+- **Total Lines:** 6363
 - **Total Classes:** 40
 - **Total Functions:** 12
 - **Avg Complexity:** 2.75
@@ -24,7 +24,7 @@
 
 **Language:** python
 **Inherits from:** `ABC`
-**Defined in:** `src/modelchorus/core/base_workflow.py:47`
+**Defined in:** `src/modelchorus/core/base_workflow.py:49`
 
 **Description:**
 > Abstract base class for all ModelChorus workflows.
@@ -36,6 +36,7 @@ Attributes:
     name: Human-readable name of the workflow
     description: Brief description of what this workflow does
     config: Configuration dictionary for the workflow
+    conversation_memory: Optional ConversationMemory instance for multi-turn conversations
 
 **Methods:**
 - `__init__()`
@@ -938,7 +939,7 @@ Attributes:
 ### `WorkflowResult`
 
 **Language:** python
-**Defined in:** `src/modelchorus/core/base_workflow.py:26`
+**Defined in:** `src/modelchorus/core/base_workflow.py:28`
 
 **Description:**
 > Result of a workflow execution.
@@ -951,7 +952,7 @@ Attributes:
 ### `WorkflowStep`
 
 **Language:** python
-**Defined in:** `src/modelchorus/core/base_workflow.py:15`
+**Defined in:** `src/modelchorus/core/base_workflow.py:17`
 
 **Description:**
 > Represents a single step in a workflow execution.
@@ -1216,6 +1217,7 @@ Example:
 
 - `abc.ABC`
 - `abc.abstractmethod`
+- `conversation.ConversationMemory`
 - `dataclasses.dataclass`
 - `dataclasses.field`
 - `datetime.datetime`

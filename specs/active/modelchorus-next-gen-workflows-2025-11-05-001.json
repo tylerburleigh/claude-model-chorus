@@ -1,7 +1,7 @@
 {
   "spec_id": "modelchorus-next-gen-workflows-2025-11-05-001",
   "generated": "2025-11-05T12:00:00Z",
-  "last_updated": "2025-11-05T18:47:49.765735Z",
+  "last_updated": "2025-11-05T18:50:17.863491Z",
   "metadata": {
     "title": "ModelChorus Next-Generation Workflows",
     "description": "Extend ModelChorus with conversation infrastructure, CHAT workflow for peer consultation, and THINKDEEP workflow for deep reasoning. Strategic implementation based on multi-model consensus (Claude, Gemini, Codex).",
@@ -16,7 +16,7 @@
       "history": []
     },
     "activated_date": "2025-11-05T17:44:07.657627Z",
-    "progress_percentage": 17,
+    "progress_percentage": 18,
     "current_phase": "phase-1"
   },
   "hierarchy": {
@@ -33,7 +33,7 @@
         "phase-5"
       ],
       "total_tasks": 88,
-      "completed_tasks": 15,
+      "completed_tasks": 16,
       "metadata": {
         "objectives": [
           "Establish conversation infrastructure as foundation for all workflows",
@@ -54,7 +54,7 @@
         "phase-1-verify"
       ],
       "total_tasks": 25,
-      "completed_tasks": 15,
+      "completed_tasks": 16,
       "metadata": {
         "purpose": "Build foundational conversation threading, state management, and context preservation",
         "risk_level": "medium",
@@ -88,7 +88,7 @@
         "task-1-10"
       ],
       "total_tasks": 21,
-      "completed_tasks": 15,
+      "completed_tasks": 16,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -470,7 +470,7 @@
     "task-1-5": {
       "type": "task",
       "title": "src/modelchorus/core/base_workflow.py",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-1-files",
       "children": [
         "task-1-5-1",
@@ -484,7 +484,7 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "file_path": "src/modelchorus/core/base_workflow.py",
         "task_category": "refactoring",
@@ -517,7 +517,7 @@
     "task-1-5-2": {
       "type": "subtask",
       "title": "Add conversation utility methods to BaseWorkflow",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-1-5",
       "children": [],
       "dependencies": {
@@ -526,9 +526,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "implementation_details": "get_thread(), add_message(), resume_conversation() helpers"
+        "implementation_details": "get_thread(), add_message(), resume_conversation() helpers",
+        "started_at": "2025-11-05T18:48:31.106039Z",
+        "completed_at": "2025-11-05T18:50:17.841859Z",
+        "needs_journaling": false,
+        "actual_hours": 0.03,
+        "journaled_at": "2025-11-05T18:50:17.856420Z"
       }
     },
     "task-1-6": {
@@ -2934,6 +2939,15 @@
       "content": "Successfully added optional conversation_memory parameter to BaseWorkflow class. Changes made:\n\n1. Added import: from .conversation import ConversationMemory\n2. Added parameter to __init__: conversation_memory: Optional[ConversationMemory] = None\n3. Stored as instance attribute: self.conversation_memory = conversation_memory  \n4. Updated docstrings to document the new parameter in both class-level and __init__ docstrings\n\nThe implementation is backward compatible - all 76 existing tests pass without modification. The parameter is properly typed using Optional[ConversationMemory] with a default value of None, allowing workflows to opt-in to conversation support when needed. Verified via inspect that the parameter signature and type hints are correct.",
       "metadata": {},
       "task_id": "task-1-5-1"
+    },
+    {
+      "timestamp": "2025-11-05T18:50:17.856400Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add conversation utility methods to BaseWorkflow",
+      "author": "claude-code",
+      "content": "Successfully added three conversation utility methods to BaseWorkflow class:\n\n1. get_thread(thread_id) - Retrieves conversation thread by ID, returns None if conversation_memory not available or thread not found\n2. add_message(thread_id, role, content, **kwargs) - Adds message to thread, returns False if conversation_memory not available\n3. resume_conversation(thread_id) - Convenience method that retrieves thread and returns messages list for context\n\nAll methods are defensive - they check if conversation_memory exists before delegating to it, returning None/False gracefully when not available. This maintains backward compatibility for workflows that don't use conversation support.\n\nAdded import for ConversationThread and ConversationMessage models. All 76 tests pass without modification. Verified with integration test that shows correct behavior both with and without conversation_memory.",
+      "metadata": {},
+      "task_id": "task-1-5-2"
     }
   ]
 }
