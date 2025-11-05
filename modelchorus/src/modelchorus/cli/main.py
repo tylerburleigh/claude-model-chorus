@@ -578,13 +578,31 @@ def thinkdeep(
             confidence = result.metadata.get('confidence', 'exploring')
             hypotheses_count = result.metadata.get('hypotheses_count', 0)
             expert_performed = result.metadata.get('expert_validation_performed', False)
+            files_examined = result.metadata.get('files_examined', 0)
 
             console.print(f"[cyan]Thread ID:[/cyan] {thread_id}")
             console.print(f"[cyan]Investigation Step:[/cyan] {step_number}")
             console.print(f"[cyan]Confidence Level:[/cyan] {confidence}")
             console.print(f"[cyan]Hypotheses:[/cyan] {hypotheses_count}")
+            console.print(f"[cyan]Files Examined:[/cyan] {files_examined}")
             if expert_performed:
                 console.print(f"[cyan]Expert Validation:[/cyan] ✓ Performed")
+
+            # Show hypothesis details if continuing investigation
+            if is_continuation and hypotheses_count > 0:
+                console.print("\n[bold]Current Hypotheses:[/bold]")
+                # Get investigation state to show hypotheses
+                state = workflow.get_investigation_state(thread_id)
+                if state and state.hypotheses:
+                    for i, hyp in enumerate(state.hypotheses, 1):
+                        status_color = {
+                            'active': 'yellow',
+                            'validated': 'green',
+                            'disproven': 'red'
+                        }.get(hyp.status, 'white')
+                        console.print(f"  {i}. [{status_color}]{hyp.status.upper()}[/{status_color}] {hyp.hypothesis}")
+                        if hyp.evidence and verbose:
+                            console.print(f"     Evidence: {', '.join(hyp.evidence[:3])}")
             console.print()
 
             # Show response
