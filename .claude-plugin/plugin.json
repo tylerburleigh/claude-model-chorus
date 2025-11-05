@@ -1,7 +1,7 @@
 {
   "name": "model-chorus",
-  "displayName": "ModelChorus - Multi-Model AI Workflow Orchestration",
-  "description": "Orchestrate complex AI workflows across multiple models with built-in workflows for debugging, code review, consensus building, and deep thinking",
+  "displayName": "ModelChorus - Multi-Model Consensus",
+  "description": "Multi-model consensus building through CLI-based AI provider orchestration. Coordinates responses from Claude, Gemini, Codex, and Cursor Agent to build robust, well-reasoned answers.",
   "version": "0.1.0",
   "author": {
     "name": "ModelChorus Contributors"
@@ -16,11 +16,10 @@
     "llm",
     "orchestration",
     "multi-model",
-    "workflows",
-    "debugging",
-    "code-review",
     "consensus",
-    "planning"
+    "claude",
+    "gemini",
+    "openai"
   ],
   "requirements": {
     "python": ">=3.9"
@@ -30,18 +29,7 @@
   },
   "components": {
     "skills": [
-      "chat",
-      "thinkdeep",
-      "debug",
-      "consensus",
-      "codereview",
-      "precommit",
-      "planner"
-    ],
-    "commands": [
-      "mc-chat",
-      "mc-debug",
-      "mc-review"
+      "consensus"
     ]
   }
 }

@@ -1,264 +1,397 @@
 ---
 name: model-chorus:consensus
-description: Builds multi-model consensus through systematic analysis and structured debate for complex decisions, architectural choices, feature proposals, and technology evaluations
+description: Multi-model consensus building by orchestrating multiple AI providers through CLI-based execution
 ---
 
 # ModelChorus: Consensus
 
-Multi-model consensus building through systematic consultation and analysis. Gathers perspectives from multiple AI models with different stances to synthesize comprehensive recommendations.
+Build consensus across multiple AI models by coordinating responses from different providers (Claude, Gemini, Codex, Cursor Agent) using the ModelChorus CLI.
 
 ## When to Use
 
 Use this skill when you need:
-- **Complex decisions** - Multiple valid approaches, need expert input
-- **Architectural choices** - Technology selection, design patterns
-- **Feature proposals** - Evaluating new feature designs
-- **Technology evaluation** - Comparing frameworks, libraries, tools
-- **Risk assessment** - Getting diverse perspectives on risks
-- **Code design review** - Multiple opinions on implementation approaches
+- **Multiple perspectives** - Get opinions from different AI models
+- **Consensus building** - Synthesize insights from multiple models
+- **Model comparison** - See how different models approach the same problem
+- **Robust answers** - Reduce single-model bias through multi-model consultation
+- **Parallel execution** - Run multiple models concurrently for speed
 
 ## How It Works
 
-The consensus workflow:
+The consensus skill runs the `modelchorus consensus` CLI command, which:
 
-1. **Your Analysis** - You analyze the problem first (not shared with models)
-2. **Multi-Model Consultation** - Each model evaluates independently
-3. **Stance Assignment** - Models can be "for", "against", or "neutral"
-4. **Structured Debate** - Each model presents their perspective
-5. **Synthesis** - Results are synthesized into comprehensive recommendation
+1. **Sends prompt to multiple providers** - Executes in parallel
+2. **Collects all responses** - Gathers results from each model
+3. **Applies consensus strategy** - Processes responses based on strategy
+4. **Returns synthesized result** - Provides combined output
 
-This prevents groupthink and ensures diverse perspectives.
+**Supported Providers:**
+- `claude` - Anthropic Claude (via CLI)
+- `gemini` - Google Gemini (via CLI)
+- `codex` - OpenAI Codex (via CLI)
+- `cursor-agent` - Cursor Agent (via CLI)
 
 ## Usage
 
-Invoke Consensus with your decision or proposal:
+To use this skill, invoke the `modelchorus consensus` command:
 
-```
-Use Consensus to evaluate:
-[Your proposal or decision to evaluate]
-
-Models to consult:
-- Model 1: [model name] - Stance: [for/against/neutral]
-- Model 2: [model name] - Stance: [for/against/neutral]
-
-Files: [relevant file paths]
+```bash
+modelchorus consensus "Your prompt here" \
+  --provider claude \
+  --provider gemini \
+  --strategy synthesize \
+  --verbose
 ```
 
 ## Parameters
 
-- **step** (required): Current consultation step
-- **step_number** (required): Current step (starts at 1)
-- **total_steps** (required): Total consultation steps
-- **next_step_required** (required): True if more models to consult
-- **findings** (required): Your analysis (step 1) or summary of model response (steps 2+)
+### Required
+- **prompt** (positional argument): The question or task to send to all models
 
-**Required (Step 1 only):**
-- **models**: List of models with optional stance and stance_prompt
-  - Each entry: `{model: "name", stance: "for/against/neutral", stance_prompt: "..."}`
-  - Minimum 2 models
-  - Each (model, stance) pair must be unique
+### Optional
+- `--provider, -p`: Provider to use (can specify multiple times)
+  - Default: `["claude", "gemini"]`
+  - Options: `claude`, `gemini`, `codex`, `cursor-agent`
 
-**Optional:**
-- **relevant_files**: Supporting files for context (absolute paths)
-- **images**: Diagrams or screenshots
-- **continuation_id**: Resume previous consensus session
-- **current_model_index**: Internally managed, tracks progress
-- **model_responses**: Internally managed, logs responses
+- `--strategy, -s`: Consensus strategy to use
+  - Default: `all_responses`
+  - Options:
+    - `all_responses` - Return all model responses
+    - `first_valid` - Return first successful response
+    - `majority` - Return most common response
+    - `weighted` - Weight responses by model confidence
+    - `synthesize` - Combine all responses into synthesis
 
-## Stances Explained
+- `--system`: System prompt for context (optional)
 
-**for** - Model argues in favor of the proposal
-**against** - Model argues against the proposal
-**neutral** - Model provides balanced analysis
+- `--temperature, -t`: Temperature for generation (0.0-1.0)
+  - Default: `0.7`
 
-**Example:**
-```javascript
-models: [
-  {model: "gpt-5-pro", stance: "for", stance_prompt: "Argue why this is good"},
-  {model: "gemini-2.5-pro", stance: "against", stance_prompt: "Identify risks"},
-  {model: "gpt-5-codex", stance: "neutral"}
-]
+- `--max-tokens`: Maximum tokens to generate per model
+
+- `--timeout`: Timeout per provider in seconds
+  - Default: `120.0`
+
+- `--output, -o`: Save results to JSON file
+
+- `--verbose, -v`: Show detailed execution information
+
+## Consensus Strategies
+
+### 1. all_responses
+Returns all responses from all providers.
+
+**Use when:** You want to see every model's perspective
+
+```bash
+modelchorus consensus "Explain quantum computing" \
+  -p claude -p gemini -p codex \
+  -s all_responses
+```
+
+### 2. first_valid
+Returns the first successful response.
+
+**Use when:** You want a quick answer, don't care which model provides it
+
+```bash
+modelchorus consensus "What is 2+2?" \
+  -p claude -p gemini \
+  -s first_valid
+```
+
+### 3. majority
+Returns the most common response (by similarity).
+
+**Use when:** You want the answer most models agree on
+
+```bash
+modelchorus consensus "Is Python better than JavaScript?" \
+  -p claude -p gemini -p codex \
+  -s majority
+```
+
+### 4. weighted
+Weights responses by model confidence scores.
+
+**Use when:** You want to favor higher-confidence answers
+
+```bash
+modelchorus consensus "Estimate project timeline" \
+  -p claude -p gemini \
+  -s weighted
+```
+
+### 5. synthesize
+Combines all responses into a synthesized answer.
+
+**Use when:** You want a comprehensive answer incorporating all perspectives
+
+```bash
+modelchorus consensus "Design a caching strategy" \
+  -p claude -p gemini -p codex \
+  -s synthesize
 ```
 
 ## Examples
 
-### Example 1: Technology Selection
+### Example 1: Technical Question with Synthesis
 
-```
-Consensus Evaluation:
-
-Step 1: Your Independent Analysis
-
-Proposal: "Should we migrate from REST to GraphQL for our API?"
-
-Your analysis: "GraphQL offers better flexibility for mobile clients,
-but adds complexity. Team has minimal GraphQL experience."
-
-Models:
-- gpt-5-pro (for): "Argue benefits of GraphQL migration"
-- gemini-2.5-pro (against): "Identify risks and downsides"
-- gpt-5 (neutral): "Provide balanced analysis"
-
-Relevant files:
-- /home/user/project/api/endpoints.py
-- /home/user/project/docs/api_spec.yaml
-
-Step: 1/4
-Next: true
+```bash
+modelchorus consensus \
+  "What's the best way to handle authentication in a microservices architecture?" \
+  --provider claude \
+  --provider gemini \
+  --strategy synthesize \
+  --system "You are an expert in distributed systems" \
+  --verbose
 ```
 
-### Example 2: Architecture Decision
+**What happens:**
+1. Sends question to Claude and Gemini
+2. Both models respond with their perspective
+3. Responses are synthesized into comprehensive answer
+4. Shows execution details (--verbose)
 
-```
-Consensus Evaluation:
+### Example 2: Quick Answer
 
-Step 1: Analyze microservices vs monolith
-
-Proposal: "Split our monolith into 5 microservices for scalability"
-
-Your findings: "Current monolith handles 10k req/sec fine. Team size: 4 developers.
-Microservices add operational overhead but enable independent scaling."
-
-Models:
-- gemini-2.5-pro (for)
-- gpt-5-pro (against)
-- gpt-5-codex (neutral)
-
-Relevant files:
-- /home/user/project/architecture.md
-- /home/user/project/performance/benchmarks.py
-
-Step: 1/4
-Next: true
+```bash
+modelchorus consensus \
+  "How do I reverse a string in Python?" \
+  -p claude -p codex \
+  -s first_valid
 ```
 
-### Example 3: Feature Design
+**What happens:**
+1. Sends to Claude and Codex
+2. Returns first successful response
+3. Fast result, no synthesis needed
 
-```
-Consensus Evaluation:
+### Example 3: Multiple Perspectives
 
-Step 1: Evaluate new caching strategy
-
-Proposal: "Implement read-through cache with Redis for all API responses"
-
-Your analysis: "Would reduce database load by ~60% based on access patterns.
-Adds Redis dependency and cache invalidation complexity."
-
-Models:
-- gpt-5-pro (for): "Focus on performance benefits"
-- gemini-2.5-pro (neutral): "Balanced cost-benefit"
-- gpt-5-codex (against): "Highlight complexity and risks"
-
-Step: 1/4
-Next: true
+```bash
+modelchorus consensus \
+  "Should we use REST or GraphQL for our new API?" \
+  -p claude -p gemini -p codex \
+  -s all_responses \
+  --temperature 0.8 \
+  --output api-decision.json
 ```
 
-### Example 4: Code Design Review
+**What happens:**
+1. All 3 models give their perspective
+2. Results saved to api-decision.json
+3. Higher temperature (0.8) for more creative responses
+4. You can compare all opinions
 
-```
-Consensus Evaluation:
+### Example 4: With System Prompt
 
-Step 1: Review authentication refactoring approach
-
-Proposal: "Refactor auth middleware to use decorator pattern"
-
-Your findings: "Current middleware is 300 lines, hard to test. Decorator
-pattern would improve testability and reusability."
-
-Models:
-- gpt-5-codex (for)
-- gemini-2.5-pro (neutral)
-
-Relevant files:
-- /home/user/project/auth/middleware.py
-- /home/user/project/auth/decorators.py (proposed)
-
-Step: 1/3
-Next: true
+```bash
+modelchorus consensus \
+  "Estimate the complexity of implementing real-time notifications" \
+  -p claude -p gemini \
+  -s synthesize \
+  --system "You are a senior software architect with 15 years experience. Focus on practical considerations and trade-offs." \
+  --max-tokens 1000
 ```
 
-## Workflow Steps
+**What happens:**
+1. System prompt sets expertise level
+2. Both models answer with that context
+3. Responses synthesized
+4. Limited to 1000 tokens per response
 
-**Step 1: Your Independent Analysis**
-- Write exact proposal/question for models
-- Document your analysis (not shared with models)
-- Define models and stances
-- Gather relevant files
+## Output Format
 
-**Steps 2-N: Model Consultations**
-- Each model evaluates independently
-- You summarize their response in findings
-- Track model_responses internally
-- Continue until all models consulted
+**Terminal Output:**
+```
+Executing consensus workflow...
+Prompt: What's the best caching strategy?
+Providers: 2
+Strategy: synthesize
 
-**Final Step: Synthesis**
-- External model synthesizes all perspectives
-- Provides comprehensive recommendation
-- Balances different viewpoints
-- Includes action items
+✓ Workflow completed
+
+┌──────────┬─────────┬─────────────────┐
+│ Provider │ Status  │ Response Length │
+├──────────┼─────────┼─────────────────┤
+│ claude   │ ✓ Success│ 450 chars      │
+│ gemini   │ ✓ Success│ 523 chars      │
+└──────────┴─────────┴─────────────────┘
+
+Consensus Response:
+[Synthesized answer combining both perspectives...]
+```
+
+**JSON Output (with --output):**
+```json
+{
+  "prompt": "What's the best caching strategy?",
+  "strategy": "synthesize",
+  "providers": ["claude", "gemini"],
+  "consensus_response": "...",
+  "responses": {
+    "claude": {
+      "content": "...",
+      "model": "claude-3-opus",
+      "usage": {...},
+      "stop_reason": "end_turn"
+    },
+    "gemini": {
+      "content": "...",
+      "model": "gemini-pro",
+      "usage": {...},
+      "stop_reason": "stop"
+    }
+  },
+  "failed_providers": [],
+  "metadata": {...}
+}
+```
+
+## Provider Configuration
+
+Providers require CLI tools to be installed and configured:
+
+**Claude:**
+```bash
+# Install Anthropic CLI
+pip install anthropic-cli
+
+# Configure API key
+export ANTHROPIC_API_KEY="your-key"
+```
+
+**Gemini:**
+```bash
+# Install Google CLI
+pip install google-generativeai
+
+# Configure API key
+export GOOGLE_API_KEY="your-key"
+```
+
+**Codex (OpenAI):**
+```bash
+# Install OpenAI CLI
+pip install openai-cli
+
+# Configure API key
+export OPENAI_API_KEY="your-key"
+```
+
+**Cursor Agent:**
+```bash
+# Cursor CLI must be installed
+# Usually available if Cursor IDE is installed
+```
 
 ## Best Practices
 
 **DO:**
-- ✅ Do your own analysis first (step 1)
-- ✅ Use clear, specific proposals
-- ✅ Assign diverse stances (for/against/neutral)
-- ✅ Provide relevant code/docs
-- ✅ Use minimum 2 models (3-4 recommended)
-- ✅ Make each (model, stance) pair unique
+- ✅ Use multiple providers for important decisions
+- ✅ Choose appropriate consensus strategy
+- ✅ Save results with `--output` for later reference
+- ✅ Use `--verbose` to understand what's happening
+- ✅ Adjust `--temperature` based on task (lower for factual, higher for creative)
 
 **DON'T:**
-- ❌ Share your analysis with models
-- ❌ Use vague proposals
-- ❌ Assign same stance to all models
-- ❌ Skip your independent analysis
-- ❌ Use more than 4 models (diminishing returns)
-- ❌ Repeat (model, stance) combinations
+- ❌ Use too many providers (2-3 is usually enough)
+- ❌ Expect identical responses (models differ)
+- ❌ Use `synthesize` for simple factual questions (overkill)
+- ❌ Forget to configure provider API keys
 
-## Model Selection
+## Error Handling
 
-**Recommended models:**
-- `gemini-2.5-pro` - Excellent for analysis
-- `gpt-5-pro` - Strong reasoning capabilities
-- `gpt-5-codex` - Best for code-specific decisions
-- `gpt-5` - Balanced general analysis
+**If a provider fails:**
+- Other providers continue execution
+- Failed providers listed in `failed_providers`
+- Consensus built from successful responses only
+- Exit code 1 if ALL providers fail
 
-Use listmodels tool for complete list.
-
-## Stance Strategies
-
-**Balanced** (Recommended):
-- 1 for, 1 against, 1 neutral
-- Ensures diverse perspectives
-
-**Devil's Advocate**:
-- 2 for, 1 against
-- Use when you're leaning toward proposal
-
-**Risk Assessment**:
-- 1 for, 2 against
-- Use for high-risk decisions
-
-**Neutral Analysis**:
-- All neutral
-- Pure objective evaluation
-
-## Expert Synthesis
-
-Default: External model synthesizes responses. Set `use_assistant_model: false` to synthesize yourself.
+**Common issues:**
+- **Provider not found**: CLI tool not installed or not in PATH
+- **API key missing**: Set environment variable for provider
+- **Timeout**: Increase `--timeout` value
+- **Rate limit**: Reduce concurrent providers or add delays
 
 ## Integration with ModelChorus
 
-Uses `mcp__zen__consensus` tool from Zen MCP server for structured multi-model consensus building.
+This skill uses the ModelChorus Python package and CLI:
 
-Can also use CLI directly:
+**CLI Command:**
 ```bash
-modelchorus consensus "Your prompt" -p claude -p gemini -s synthesize
+modelchorus consensus [options]
 ```
+
+**Python API (advanced):**
+```python
+from modelchorus.workflows import ConsensusWorkflow
+from modelchorus.providers import ClaudeProvider, GeminiProvider
+
+providers = [ClaudeProvider(), GeminiProvider()]
+workflow = ConsensusWorkflow(providers, strategy=ConsensusStrategy.SYNTHESIZE)
+result = await workflow.execute(request)
+```
+
+## Advanced Usage
+
+### Programmatic Execution
+
+You can call the consensus workflow from Python code:
+
+```python
+import asyncio
+from modelchorus.workflows import ConsensusWorkflow, ConsensusStrategy
+from modelchorus.providers import ClaudeProvider, GeminiProvider, GenerationRequest
+
+async def main():
+    providers = [ClaudeProvider(), GeminiProvider()]
+    workflow = ConsensusWorkflow(
+        providers=providers,
+        strategy=ConsensusStrategy.SYNTHESIZE,
+        default_timeout=120.0
+    )
+
+    request = GenerationRequest(
+        prompt="Explain quantum computing",
+        system_prompt="You are a physics professor",
+        temperature=0.7
+    )
+
+    result = await workflow.execute(request, strategy=ConsensusStrategy.SYNTHESIZE)
+    print(f"Consensus: {result.consensus_response}")
+
+asyncio.run(main())
+```
+
+### Custom Providers
+
+List available providers:
+
+```bash
+modelchorus list-providers
+```
+
+Output shows all configured providers and their available models.
+
+## Performance
+
+- **Parallel execution**: All providers run concurrently
+- **Async architecture**: Non-blocking I/O
+- **Timeout handling**: Configurable per-provider timeout
+- **Typical latency**: 2-10 seconds depending on providers and response length
+
+## Limitations
+
+- Requires provider CLI tools installed
+- Requires valid API keys for each provider
+- Network connectivity required
+- Rate limits apply per provider
+- Cost: Each provider call incurs API costs
 
 ## See Also
 
-- **planner** - For breaking down implementation plans
-- **codereview** - For code-specific reviews
-- **thinkdeep** - For deep investigation
-- **chat** - For single-model consultations
+- **ModelChorus CLI**: Run `modelchorus --help` for all options
+- **Provider Docs**: Check each provider's CLI documentation
+- **Python Package**: See `modelchorus/README.md` for API details

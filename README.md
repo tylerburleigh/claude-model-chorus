@@ -1,10 +1,17 @@
-# ModelChorus - Claude Code Plugin
+# ModelChorus - Multi-Model Consensus
 
-Multi-model AI workflow orchestration for Claude Code. Provides powerful skills for debugging, code review, consensus building, deep thinking, and more.
+Multi-model AI consensus building for Claude Code. Orchestrate responses from multiple AI providers (Claude, Gemini, Codex, Cursor Agent) to get robust, well-reasoned answers.
 
 ## Overview
 
-ModelChorus brings sophisticated multi-model AI workflows to Claude Code through an easy-to-use plugin. Access advanced workflows like systematic debugging, comprehensive code reviews, and multi-perspective consensus building directly from your Claude Code sessions.
+ModelChorus is both a **Python package** for multi-model AI orchestration and a **Claude Code plugin** for seamless consensus building within your development workflow.
+
+**Key Features:**
+- **Multi-Provider Support** - Coordinate Claude, Gemini, OpenAI Codex, and Cursor Agent
+- **Flexible Consensus Strategies** - Choose from 5 strategies: all_responses, first_valid, majority, weighted, synthesize
+- **CLI & Python API** - Use via command-line or programmatically
+- **Async Execution** - Parallel provider calls for speed
+- **Rich Output** - Beautiful terminal output with detailed results
 
 ## Installation
 
@@ -31,203 +38,249 @@ cd ~/.claude/plugins/model-chorus/modelchorus
 pip install -e .
 ```
 
-## Available Skills
-
-The plugin provides 7 powerful workflow skills:
-
-### 1. **Chat** - Collaborative Thinking Partner
-```
-Use Skill(model-chorus:chat) for:
-- Brainstorming and idea exploration
-- Getting second opinions on technical decisions
-- Quick consultations on development questions
-```
-
-### 2. **ThinkDeep** - Deep Problem Analysis
-```
-Use Skill(model-chorus:thinkdeep) for:
-- Complex architecture decisions
-- Performance challenge analysis
-- Security assessments
-- Multi-step investigation and reasoning
-```
-
-### 3. **Debug** - Systematic Debugging
-```
-Use Skill(model-chorus:debug) for:
-- Root cause analysis of bugs
-- Investigating mysterious errors
-- Performance debugging
-- Race conditions and timing issues
-```
-
-### 4. **Consensus** - Multi-Model Decision Making
-```
-Use Skill(model-chorus:consensus) for:
-- Technology evaluation
-- Architecture decisions
-- Feature proposal reviews
-- Risk assessments
-- Getting diverse AI perspectives
-```
-
-### 5. **CodeReview** - Comprehensive Code Review
-```
-Use Skill(model-chorus:codereview) for:
-- Quality, security, performance, architecture review
-- Pre-commit code validation
-- Pull request analysis
-- Finding bugs and vulnerabilities
-```
-
-### 6. **PreCommit** - Git Change Validation
-```
-Use Skill(model-chorus:precommit) for:
-- Reviewing changes before commit
-- Security scanning for exposed secrets
-- Test coverage verification
-- Impact assessment
-```
-
-### 7. **Planner** - Complex Task Planning
-```
-Use Skill(model-chorus:planner) for:
-- Breaking down complex projects
-- System design planning
-- Migration strategies
-- Incremental planning with revisions
-```
-
-## Quick Start Commands
-
-The plugin provides convenient slash commands:
-
-- `/mc-chat` - Quick chat with external AI models
-- `/mc-debug` - Start debugging workflow
-- `/mc-review` - Launch code review
-
-### Examples
-
-```
-/mc-chat What's the best caching strategy for a high-traffic API?
-```
-
-```
-/mc-debug API endpoint randomly returns 500 errors under load
-```
-
-```
-/mc-review src/auth/middleware.py --focus security
-```
-
-## Skill Usage Examples
-
-### Example 1: Debug a Performance Issue
-
-```
-Use Skill(model-chorus:debug) to investigate:
-
-Issue: "Memory usage grows from 200MB to 4GB over 24 hours"
-
-Files:
-- /home/user/project/upload/handler.py
-- /home/user/project/storage/files.py
-
-Steps to reproduce:
-1. Start service
-2. Upload 1000 files
-3. Wait 24 hours
-4. Memory at 4GB, never releases
-```
-
-### Example 2: Get Consensus on Architecture
-
-```
-Use Skill(model-chorus:consensus) to evaluate:
-
-Proposal: "Migrate from REST to GraphQL for our API"
-
-Models to consult:
-- gpt-5-pro (stance: for) - Argue benefits
-- gemini-2.5-pro (stance: against) - Identify risks
-- gpt-5-codex (stance: neutral) - Balanced analysis
-
-Files:
-- /home/user/project/api/endpoints.py
-- /home/user/project/docs/api_spec.yaml
-```
-
-### Example 3: Comprehensive Code Review
-
-```
-Use Skill(model-chorus:codereview) to review:
-
-Files:
-- /home/user/project/auth/middleware.py
-- /home/user/project/auth/jwt_handler.py
-- /home/user/project/tests/test_auth.py
-
-Review type: full
-Focus: security, test coverage
-```
-
-### Example 4: Pre-Commit Validation
-
-```
-Use Skill(model-chorus:precommit) to validate:
-
-Repository: /home/user/project
-Review: staged changes
-Focus: security, missing tests, completeness
-```
-
-## Requirements
-
-- **Python**: >=3.9
-- **Claude Code**: Latest version
-- **Zen MCP Server**: Required for workflow execution (usually auto-installed)
-
-## Python Package
-
-ModelChorus is also available as a standalone Python package for direct use:
+### As a Python Package (Standalone)
 
 ```bash
-cd modelchorus/
+# From source
+git clone https://github.com/tylerburleigh/claude-model-chorus.git
+cd claude-model-chorus/modelchorus
 pip install -e .
+
+# For development
+pip install -e ".[dev]"
 ```
 
-See [`modelchorus/README.md`](modelchorus/README.md) for Python package documentation.
+## Quick Start
 
-## CLI Usage
-
-The Python package includes a CLI for running workflows:
+### Via CLI
 
 ```bash
-# Run consensus workflow
-modelchorus consensus "Explain quantum computing" -p claude -p gemini
+# Basic consensus with 2 providers
+modelchorus consensus "Explain quantum computing" \
+  --provider claude \
+  --provider gemini
 
-# List available providers
+# With synthesis strategy
+modelchorus consensus "What's the best caching strategy?" \
+  -p claude -p gemini -p codex \
+  -s synthesize \
+  --verbose
+
+# Save results to JSON
+modelchorus consensus "Design a microservices architecture" \
+  -p claude -p gemini \
+  -s synthesize \
+  --output results.json
+```
+
+### Via Python API
+
+```python
+import asyncio
+from modelchorus.workflows import ConsensusWorkflow, ConsensusStrategy
+from modelchorus.providers import ClaudeProvider, GeminiProvider, GenerationRequest
+
+async def main():
+    # Create providers
+    providers = [ClaudeProvider(), GeminiProvider()]
+
+    # Create workflow
+    workflow = ConsensusWorkflow(
+        providers=providers,
+        strategy=ConsensusStrategy.SYNTHESIZE,
+        default_timeout=120.0
+    )
+
+    # Create request
+    request = GenerationRequest(
+        prompt="Explain the trade-offs between REST and GraphQL",
+        system_prompt="You are a senior software architect",
+        temperature=0.7
+    )
+
+    # Execute
+    result = await workflow.execute(request, strategy=ConsensusStrategy.SYNTHESIZE)
+
+    print(f"Consensus: {result.consensus_response}")
+    print(f"Responses from {len(result.provider_results)} providers")
+
+asyncio.run(main())
+```
+
+### Via Claude Code Skill
+
+```
+Use Skill(model-chorus:consensus) by running:
+
+modelchorus consensus "Should we use TypeScript or JavaScript?" \
+  --provider claude \
+  --provider gemini \
+  --strategy synthesize
+```
+
+## Consensus Strategies
+
+### 1. all_responses (default)
+Returns all responses from all providers. Use when you want to see every perspective.
+
+### 2. first_valid
+Returns the first successful response. Use for quick answers.
+
+### 3. majority
+Returns the most common response. Use when you want agreement.
+
+### 4. weighted
+Weights responses by confidence scores. Use to favor higher-confidence answers.
+
+### 5. synthesize
+Combines all responses into a comprehensive answer. **Recommended for complex questions.**
+
+## Supported Providers
+
+- **Claude** - Anthropic Claude (via CLI)
+- **Gemini** - Google Gemini (via CLI)
+- **Codex** - OpenAI Codex (via CLI)
+- **Cursor Agent** - Cursor Agent (via CLI)
+
+### Provider Setup
+
+Each provider requires its CLI tool and API key:
+
+**Claude:**
+```bash
+pip install anthropic-cli
+export ANTHROPIC_API_KEY="your-key"
+```
+
+**Gemini:**
+```bash
+pip install google-generativeai
+export GOOGLE_API_KEY="your-key"
+```
+
+**Codex:**
+```bash
+pip install openai-cli
+export OPENAI_API_KEY="your-key"
+```
+
+**Cursor Agent:**
+```bash
+# Cursor CLI (usually installed with Cursor IDE)
+```
+
+## CLI Commands
+
+```bash
+# Run consensus
+modelchorus consensus "prompt" [options]
+
+# List available providers and models
 modelchorus list-providers
 
 # Show version
 modelchorus version
+
+# Help
+modelchorus --help
+modelchorus consensus --help
 ```
 
-## Supported AI Models
+## CLI Options
 
-ModelChorus supports multiple AI providers:
+```
+modelchorus consensus [PROMPT]
 
-### Via Zen MCP (Skills)
-- Claude (Sonnet, Opus)
-- GPT-5 Pro, GPT-5 Codex, GPT-5, GPT-5 Mini
-- Gemini 2.5 Pro
-- And more (see `/listmodels`)
+Arguments:
+  PROMPT                    Question or task for all models [required]
 
-### Via CLI (Direct)
-- Claude (Anthropic)
-- Codex (OpenAI CLI)
-- Gemini (Google)
-- Cursor Agent (Cursor CLI)
+Options:
+  -p, --provider TEXT       Provider to use (repeatable) [default: claude, gemini]
+  -s, --strategy TEXT       Consensus strategy [default: all_responses]
+  --system TEXT            System prompt for context
+  -t, --temperature FLOAT   Temperature (0.0-1.0) [default: 0.7]
+  --max-tokens INTEGER      Maximum tokens to generate
+  --timeout FLOAT          Timeout per provider (seconds) [default: 120.0]
+  -o, --output PATH        Save results to JSON file
+  -v, --verbose            Show detailed execution info
+  --help                   Show help message
+```
+
+## Examples
+
+### Example 1: Technical Decision
+
+```bash
+modelchorus consensus \
+  "Should we use REST or GraphQL for our API?" \
+  -p claude -p gemini -p codex \
+  -s all_responses \
+  --output decision.json
+```
+
+Result: See all three perspectives, save for team review.
+
+### Example 2: Architecture Design
+
+```bash
+modelchorus consensus \
+  "Design a caching strategy for 100k concurrent users" \
+  -p claude -p gemini \
+  -s synthesize \
+  --system "You are a senior distributed systems architect" \
+  --verbose
+```
+
+Result: Synthesized design incorporating both models' expertise.
+
+### Example 3: Quick Answer
+
+```bash
+modelchorus consensus \
+  "How do I reverse a list in Python?" \
+  -p claude -p codex \
+  -s first_valid
+```
+
+Result: Fast answer from whichever provider responds first.
+
+## Output Format
+
+**Terminal:**
+```
+Executing consensus workflow...
+Prompt: What's the best caching strategy?
+Providers: 2
+Strategy: synthesize
+
+✓ Workflow completed
+
+┌──────────┬─────────┬─────────────────┐
+│ Provider │ Status  │ Response Length │
+├──────────┼─────────┼─────────────────┤
+│ claude   │ ✓ Success│ 450 chars      │
+│ gemini   │ ✓ Success│ 523 chars      │
+└──────────┴─────────┴─────────────────┘
+
+Consensus Response:
+[Combined answer from both models...]
+```
+
+**JSON (with --output):**
+```json
+{
+  "prompt": "...",
+  "strategy": "synthesize",
+  "providers": ["claude", "gemini"],
+  "consensus_response": "...",
+  "responses": {
+    "claude": {"content": "...", "model": "...", "usage": {...}},
+    "gemini": {"content": "...", "model": "...", "usage": {...}}
+  },
+  "failed_providers": [],
+  "metadata": {...}
+}
+```
 
 ## Architecture
 
@@ -237,48 +290,20 @@ claude-model-chorus/
 │   ├── plugin.json          # Plugin manifest
 │   └── marketplace.json     # Marketplace distribution
 ├── skills/                  # Skill definitions
-│   ├── chat/
-│   ├── thinkdeep/
-│   ├── debug/
-│   ├── consensus/
-│   ├── codereview/
-│   ├── precommit/
-│   └── planner/
-├── commands/                # Slash commands
-│   ├── mc-chat.md
-│   ├── mc-debug.md
-│   └── mc-review.md
+│   └── consensus/
+│       └── SKILL.md         # Consensus skill documentation
 └── modelchorus/            # Python package
-    ├── src/modelchorus/    # Source code
+    ├── src/modelchorus/
+    │   ├── core/           # Base workflow abstractions
+    │   ├── providers/      # AI provider implementations
+    │   ├── workflows/      # Consensus workflow
+    │   ├── cli/            # CLI interface
+    │   └── utils/          # Utilities
     ├── tests/              # Test suite
     └── README.md           # Python package docs
 ```
 
 ## Development
-
-### Local Plugin Development
-
-1. Clone the repository:
-```bash
-git clone https://github.com/tylerburleigh/claude-model-chorus.git
-cd claude-model-chorus
-```
-
-2. Install Python package:
-```bash
-cd modelchorus
-pip install -e ".[dev]"
-```
-
-3. Add plugin to Claude Code:
-```
-/plugin add /path/to/claude-model-chorus
-```
-
-4. Test skills:
-```
-Use Skill(model-chorus:chat): "Test question"
-```
 
 ### Running Tests
 
@@ -300,6 +325,42 @@ ruff check .
 mypy modelchorus
 ```
 
+### Local Plugin Development
+
+```bash
+# Install plugin locally
+/plugin add /path/to/claude-model-chorus
+
+# Test the skill
+Use Skill(model-chorus:consensus): modelchorus consensus "test prompt" -p claude -p gemini
+```
+
+## Python Package
+
+For detailed Python API documentation, see [`modelchorus/README.md`](modelchorus/README.md).
+
+The package provides:
+- **Workflow abstractions** - Base classes for building workflows
+- **Provider system** - Unified interface for AI providers
+- **Type-safe models** - Pydantic models for requests/responses
+- **Async architecture** - Built with async/await patterns
+- **Extensible** - Easy to add new workflows and providers
+
+## Performance
+
+- **Parallel execution**: All providers run concurrently
+- **Async I/O**: Non-blocking architecture
+- **Configurable timeouts**: Per-provider control
+- **Typical latency**: 2-10 seconds (depends on providers and response length)
+
+## Limitations
+
+- Requires provider CLI tools installed
+- Requires valid API keys for each provider
+- Network connectivity required
+- Subject to provider rate limits
+- API costs apply per provider call
+
 ## Contributing
 
 Contributions welcome! Please:
@@ -317,22 +378,23 @@ Contributions welcome! Please:
 - Verify `plugin.json` is valid JSON
 - Restart Claude Code
 
-**Skills not working?**
-- Ensure Zen MCP server is installed
-- Check Python package is installed
+**Consensus skill not working?**
+- Ensure Python package is installed: `cd ~/.claude/plugins/model-chorus/modelchorus && pip install -e .`
+- Check provider CLI tools are installed
 - Verify API keys are configured
 
-**Command not found?**
-- Check `commands/` directory exists
-- Verify command files are `.md` format
-- Restart Claude Code
+**Provider failures?**
+- Check API key environment variables
+- Verify CLI tool is in PATH
+- Check network connectivity
+- Review provider-specific errors with `--verbose`
 
 ## Links
 
 - **GitHub**: https://github.com/tylerburleigh/claude-model-chorus
 - **Issues**: https://github.com/tylerburleigh/claude-model-chorus/issues
-- **Documentation**: See individual skill SKILL.md files
-- **Python Package**: [`modelchorus/README.md`](modelchorus/README.md)
+- **Python Package Docs**: [`modelchorus/README.md`](modelchorus/README.md)
+- **Skill Documentation**: [`skills/consensus/SKILL.md`](skills/consensus/SKILL.md)
 
 ## License
 
@@ -340,4 +402,4 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## Acknowledgments
 
-ModelChorus leverages the power of multiple AI models to deliver robust, well-reasoned results for complex development tasks. Built for the Claude Code community.
+ModelChorus leverages the power of multiple AI models to deliver robust, well-reasoned results through consensus building.
