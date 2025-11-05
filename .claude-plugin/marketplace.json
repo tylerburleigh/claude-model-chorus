@@ -1,0 +1,16 @@
+{
+  "name": "claude-model-chorus",
+  "owner": {
+    "name": "tylerburleigh",
+    "email": "tylerburleigh@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "model-chorus",
+      "source": {
+        "source": "github",
+        "repo": "tylerburleigh/claude-model-chorus"
+      }
+    }
+  ]
+}

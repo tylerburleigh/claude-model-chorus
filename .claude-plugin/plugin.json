@@ -1,0 +1,47 @@
+{
+  "name": "model-chorus",
+  "displayName": "ModelChorus - Multi-Model AI Workflow Orchestration",
+  "description": "Orchestrate complex AI workflows across multiple models with built-in workflows for debugging, code review, consensus building, and deep thinking",
+  "version": "0.1.0",
+  "author": {
+    "name": "ModelChorus Contributors"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tylerburleigh/claude-model-chorus"
+  },
+  "license": "MIT",
+  "keywords": [
+    "ai",
+    "llm",
+    "orchestration",
+    "multi-model",
+    "workflows",
+    "debugging",
+    "code-review",
+    "consensus",
+    "planning"
+  ],
+  "requirements": {
+    "python": ">=3.9"
+  },
+  "setup": {
+    "postInstall": "Please run: cd ~/.claude/plugins/model-chorus/modelchorus && pip install -e ."
+  },
+  "components": {
+    "skills": [
+      "chat",
+      "thinkdeep",
+      "debug",
+      "consensus",
+      "codereview",
+      "precommit",
+      "planner"
+    ],
+    "commands": [
+      "mc-chat",
+      "mc-debug",
+      "mc-review"
+    ]
+  }
+}
