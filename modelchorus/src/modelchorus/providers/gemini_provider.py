@@ -1,0 +1,247 @@
+"""
+Gemini CLI provider for ModelChorus.
+
+This module provides integration with Google's Gemini models via the `gemini` CLI tool.
+"""
+
+import json
+import logging
+from typing import Any, Dict, List, Optional
+
+from .cli_provider import CLIProvider
+from .base_provider import (
+    GenerationRequest,
+    GenerationResponse,
+    ModelConfig,
+    ModelCapability,
+)
+
+logger = logging.getLogger(__name__)
+
+
+class GeminiProvider(CLIProvider):
+    """
+    Provider for Google's Gemini models via the `gemini` CLI tool.
+
+    This provider wraps the `gemini` command-line interface to enable
+    text generation with Gemini models (Pro, Flash, Ultra).
+
+    Supported features:
+    - Text generation with customizable prompts
+    - System instructions
+    - Temperature and token control
+    - Vision capabilities (multimodal support)
+    - Function calling
+    - Thinking/reasoning mode
+
+    Example:
+        >>> provider = GeminiProvider()
+        >>> request = GenerationRequest(
+        ...     prompt="Explain machine learning",
+        ...     temperature=0.7,
+        ...     max_tokens=1000
+        ... )
+        >>> response = await provider.generate(request)
+        >>> print(response.content)
+    """
+
+    # Model capability mappings
+    VISION_MODELS = {"pro", "ultra", "flash"}  # All Gemini models support vision
+    THINKING_MODELS = {"pro", "ultra"}  # Models that support extended thinking
+
+    def __init__(
+        self,
+        api_key: Optional[str] = None,
+        config: Optional[Dict[str, Any]] = None,
+        timeout: int = 120,
+        retry_limit: int = 3,
+    ):
+        """
+        Initialize the Gemini provider.
+
+        Args:
+            api_key: API key for Google AI (optional if set via env vars)
+            config: Provider-specific configuration
+            timeout: Command execution timeout in seconds (default: 120)
+            retry_limit: Maximum retry attempts for failed commands (default: 3)
+        """
+        super().__init__(
+            provider_name="gemini",
+            cli_command="gemini",
+            api_key=api_key,
+            config=config,
+            timeout=timeout,
+            retry_limit=retry_limit,
+        )
+
+        # Initialize available models
+        self._initialize_models()
+
+    def _initialize_models(self) -> None:
+        """Initialize the list of available Gemini models with their capabilities."""
+        models = [
+            ModelConfig(
+                model_id="pro",
+                temperature=0.7,
+                capabilities=[
+                    ModelCapability.TEXT_GENERATION,
+                    ModelCapability.VISION,
+                    ModelCapability.FUNCTION_CALLING,
+                    ModelCapability.THINKING,
+                ],
+                metadata={"family": "gemini-2.0", "size": "large"},
+            ),
+            ModelConfig(
+                model_id="flash",
+                temperature=0.7,
+                capabilities=[
+                    ModelCapability.TEXT_GENERATION,
+                    ModelCapability.VISION,
+                    ModelCapability.FUNCTION_CALLING,
+                ],
+                metadata={"family": "gemini-2.0", "size": "medium"},
+            ),
+            ModelConfig(
+                model_id="ultra",
+                temperature=0.7,
+                capabilities=[
+                    ModelCapability.TEXT_GENERATION,
+                    ModelCapability.VISION,
+                    ModelCapability.FUNCTION_CALLING,
+                    ModelCapability.THINKING,
+                ],
+                metadata={"family": "gemini-ultra", "size": "xlarge"},
+            ),
+        ]
+        self.set_model_list(models)
+
+    def build_command(self, request: GenerationRequest) -> List[str]:
+        """
+        Build the CLI command for a Gemini generation request.
+
+        Constructs a command like:
+            gemini chat --prompt "..." --model pro --temperature 0.7
+
+        Args:
+            request: GenerationRequest containing prompt and parameters
+
+        Returns:
+            List of command parts for subprocess execution
+        """
+        command = [self.cli_command, "chat"]
+
+        # Add prompt
+        command.extend(["--prompt", request.prompt])
+
+        # Add system prompt if provided (Gemini calls this "system instruction")
+        if request.system_prompt:
+            command.extend(["--system-instruction", request.system_prompt])
+
+        # Add model from metadata if specified
+        if "model" in request.metadata:
+            command.extend(["--model", request.metadata["model"]])
+
+        # Add temperature
+        temperature = request.temperature if request.temperature is not None else 0.7
+        command.extend(["--temperature", str(temperature)])
+
+        # Add max tokens if specified
+        if request.max_tokens:
+            command.extend(["--max-tokens", str(request.max_tokens)])
+
+        # Add thinking mode if specified
+        if request.metadata.get("thinking"):
+            command.append("--thinking")
+
+        # Add images if provided (vision/multimodal capability)
+        if request.images:
+            for image_path in request.images:
+                command.extend(["--image", image_path])
+
+        # Add JSON output format for easier parsing
+        command.append("--json")
+
+        logger.debug(f"Built Gemini command: {' '.join(command)}")
+        return command
+
+    def parse_response(self, stdout: str, stderr: str, returncode: int) -> GenerationResponse:
+        """
+        Parse CLI output into a GenerationResponse.
+
+        The `gemini` CLI returns JSON output with --json flag:
+        {
+            "content": "...",
+            "model": "gemini-2.0-pro",
+            "usage": {"input_tokens": 10, "output_tokens": 50},
+            "finish_reason": "STOP"
+        }
+
+        Args:
+            stdout: Standard output from CLI command
+            stderr: Standard error from CLI command
+            returncode: Process exit code
+
+        Returns:
+            GenerationResponse with parsed content
+
+        Raises:
+            ValueError: If output cannot be parsed or command failed
+        """
+        # Check for command failure
+        if returncode != 0:
+            error_msg = f"Gemini CLI failed with return code {returncode}"
+            if stderr:
+                error_msg += f"\nError: {stderr}"
+            logger.error(error_msg)
+            raise ValueError(error_msg)
+
+        # Parse JSON output
+        try:
+            data = json.loads(stdout)
+
+            response = GenerationResponse(
+                content=data.get("content", ""),
+                model=data.get("model", "unknown"),
+                usage=data.get("usage", {}),
+                stop_reason=data.get("finish_reason"),
+                metadata={
+                    "thinking": data.get("thinking"),
+                    "safety_ratings": data.get("safety_ratings"),
+                    "raw_response": data,
+                },
+            )
+
+            logger.info(
+                f"Successfully parsed Gemini response: {len(response.content)} chars, "
+                f"model={response.model}, stop_reason={response.stop_reason}"
+            )
+            return response
+
+        except json.JSONDecodeError as e:
+            error_msg = f"Failed to parse Gemini CLI JSON output: {e}\nOutput: {stdout[:200]}"
+            logger.error(error_msg)
+            raise ValueError(error_msg)
+
+    def supports_vision(self, model_id: str) -> bool:
+        """
+        Check if a specific Gemini model supports vision capabilities.
+
+        Args:
+            model_id: The model identifier (e.g., "pro", "flash", "ultra")
+
+        Returns:
+            True if the model supports vision, False otherwise
+        """
+        return model_id in self.VISION_MODELS
+
+    def supports_thinking(self, model_id: str) -> bool:
+        """
+        Check if a specific Gemini model supports thinking mode.
+
+        Args:
+            model_id: The model identifier
+
+        Returns:
+            True if the model supports thinking mode, False otherwise
+        """
+        return model_id in self.THINKING_MODELS

@@ -2,7 +2,7 @@
 Provider integrations for ModelChorus.
 
 This module contains abstractions and implementations for different
-AI model providers (Anthropic, OpenAI, etc.).
+AI model providers via CLI tools.
 """
 
 from .base_provider import (
@@ -12,6 +12,11 @@ from .base_provider import (
     GenerationRequest,
     GenerationResponse,
 )
+from .cli_provider import CLIProvider
+from .claude_provider import ClaudeProvider
+from .codex_provider import CodexProvider
+from .gemini_provider import GeminiProvider
+from .cursor_agent_provider import CursorAgentProvider
 
 __all__ = [
     "ModelProvider",
@@ -19,4 +24,9 @@ __all__ = [
     "ModelCapability",
     "GenerationRequest",
     "GenerationResponse",
+    "CLIProvider",
+    "ClaudeProvider",
+    "CodexProvider",
+    "GeminiProvider",
+    "CursorAgentProvider",
 ]
