@@ -20,10 +20,12 @@ from .base_provider import (
     GenerationRequest,
     GenerationResponse,
 )
+from .google_provider import GoogleProvider
 from .openai_provider import OpenAIProvider
 
 __all__ = [
     "AnthropicProvider",
+    "GoogleProvider",
     "OpenAIProvider",
     "ModelProvider",
     "ModelConfig",
