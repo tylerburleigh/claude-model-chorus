@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 18:00:42
+**Generated:** 2025-11-05 18:02:05
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 36
-- **Total Lines:** 8012
-- **Total Classes:** 50
+- **Total Lines:** 8068
+- **Total Classes:** 51
 - **Total Functions:** 21
 - **Avg Complexity:** 3.29
 - **Max Complexity:** 19
@@ -420,7 +420,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:634`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:688`
 
 **Description:**
 > Generic state container for workflow-specific conversation data.
@@ -623,6 +623,27 @@ Attributes:
     hypothesis: The hypothesis text/statement being investigated
     evidence: List of evidence items supporting or refuting this hypothesis
     status: Current validation status (active, disproven, validated)
+
+---
+
+### `InvestigationStep`
+
+**Language:** python
+**Inherits from:** `BaseModel`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:634`
+
+**Description:**
+> Model for a single investigation step in Thinkdeep workflow.
+
+Captures the details of one step in a systematic investigation,
+including what was found, which files were examined, and the
+current confidence level in the hypothesis.
+
+Attributes:
+    step_number: Sequential step number (1-indexed)
+    findings: Key findings and insights discovered in this step
+    files_checked: List of files examined during this step
+    confidence: Current confidence level after this step
 
 ---
 
@@ -1589,6 +1610,7 @@ Example:
 - `models.ConversationState`
 - `models.ConversationThread`
 - `models.Hypothesis`
+- `models.InvestigationStep`
 - `models.ModelResponse`
 - `models.ModelSelection`
 - `models.WorkflowRequest`

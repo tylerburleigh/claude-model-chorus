@@ -685,6 +685,81 @@ class InvestigationStep(BaseModel):
     )
 
 
+class ThinkDeepState(BaseModel):
+    """
+    State model for Thinkdeep workflow multi-turn conversations.
+
+    Maintains the complete investigation state across conversation turns,
+    tracking hypothesis evolution, investigation steps, confidence progression,
+    and files examined.
+
+    Attributes:
+        hypotheses: List of all hypotheses tracked during investigation
+        steps: List of all investigation steps completed
+        current_confidence: Current overall confidence level
+        relevant_files: All files identified as relevant to the investigation
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "hypotheses": [
+                    {
+                        "hypothesis": "API uses async/await pattern",
+                        "evidence": ["Found async def in auth.py", "Tests use asyncio"],
+                        "status": "validated"
+                    },
+                    {
+                        "hypothesis": "Error handling uses custom exceptions",
+                        "evidence": ["Found CustomError class", "Used in auth service"],
+                        "status": "active"
+                    }
+                ],
+                "steps": [
+                    {
+                        "step_number": 1,
+                        "findings": "Examined auth service implementation",
+                        "files_checked": ["src/auth.py"],
+                        "confidence": "medium"
+                    },
+                    {
+                        "step_number": 2,
+                        "findings": "Validated hypothesis with tests",
+                        "files_checked": ["tests/test_auth.py"],
+                        "confidence": "high"
+                    }
+                ],
+                "current_confidence": "high",
+                "relevant_files": [
+                    "src/services/auth.py",
+                    "src/api/users.py",
+                    "tests/test_auth.py"
+                ]
+            }
+        }
+    )
+
+    hypotheses: List[Hypothesis] = Field(
+        default_factory=list,
+        description="List of all hypotheses tracked during investigation",
+    )
+
+    steps: List[InvestigationStep] = Field(
+        default_factory=list,
+        description="List of all investigation steps completed",
+    )
+
+    current_confidence: str = Field(
+        default="exploring",
+        description="Current overall confidence level (ConfidenceLevel value)",
+    )
+
+    relevant_files: List[str] = Field(
+        default_factory=list,
+        description="All files identified as relevant to the investigation",
+    )
+
+
 class ConversationState(BaseModel):
     """
     Generic state container for workflow-specific conversation data.

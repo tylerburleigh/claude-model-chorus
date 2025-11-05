@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T23:00:42.352122Z",
+    "generated_at": "2025-11-05T23:02:05.621075Z",
     "languages": [
       "python"
     ],
@@ -10,8 +10,8 @@
   },
   "statistics": {
     "total_files": 36,
-    "total_lines": 8012,
-    "total_classes": 50,
+    "total_lines": 8068,
+    "total_classes": 51,
     "total_functions": 21,
     "avg_complexity": 3.29,
     "max_complexity": 19,
@@ -22,8 +22,8 @@
     "by_language": {
       "python": {
         "files": 36,
-        "lines": 8012,
-        "classes": 50,
+        "lines": 8068,
+        "classes": 51,
         "functions": 21,
         "avg_complexity": 3.29
       }
@@ -182,10 +182,11 @@
         "models.ConversationThread",
         "models.ConversationState",
         "models.Hypothesis",
+        "models.InvestigationStep",
         "conversation.ConversationMemory"
       ],
       "exports": [],
-      "lines": 42
+      "lines": 44
     },
     {
       "name": "base_workflow",
@@ -261,6 +262,7 @@
         "ConversationMessage",
         "ConversationThread",
         "Hypothesis",
+        "InvestigationStep",
         "ConversationState"
       ],
       "functions": [],
@@ -276,7 +278,7 @@
         "pydantic.ConfigDict"
       ],
       "exports": [],
-      "lines": 691
+      "lines": 745
     },
     {
       "name": "registry",
@@ -1391,9 +1393,25 @@
       "imported_by": []
     },
     {
-      "name": "ConversationState",
+      "name": "InvestigationStep",
       "file": "modelchorus/src/modelchorus/core/models.py",
       "line": 634,
+      "language": "python",
+      "docstring": "Model for a single investigation step in Thinkdeep workflow.\n\nCaptures the details of one step in a systematic investigation,\nincluding what was found, which files were examined, and the\ncurrent confidence level in the hypothesis.\n\nAttributes:\n    step_number: Sequential step number (1-indexed)\n    findings: Key findings and insights discovered in this step\n    files_checked: List of files examined during this step\n    confidence: Current confidence level after this step",
+      "bases": [
+        "BaseModel"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "ConversationState",
+      "file": "modelchorus/src/modelchorus/core/models.py",
+      "line": 688,
       "language": "python",
       "docstring": "Generic state container for workflow-specific conversation data.\n\nProvides type-safe structure for storing arbitrary workflow state\nwhile maintaining serializability for file-based persistence.\nIncludes versioning to support schema evolution.\n\nAttributes:\n    workflow_name: Workflow this state belongs to\n    data: Arbitrary workflow-specific state data\n    schema_version: State schema version for compatibility\n    created_at: ISO timestamp of state creation\n    updated_at: ISO timestamp of last state update",
       "bases": [
@@ -5824,6 +5842,7 @@
       "models.ConversationThread",
       "models.ConversationState",
       "models.Hypothesis",
+      "models.InvestigationStep",
       "conversation.ConversationMemory"
     ],
     "modelchorus/src/modelchorus/core/base_workflow.py": [
