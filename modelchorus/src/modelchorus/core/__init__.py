@@ -17,6 +17,7 @@ from .models import (
     ConversationMessage,
     ConversationThread,
     ConversationState,
+    Hypothesis,
 )
 from .conversation import ConversationMemory
 
@@ -35,4 +36,5 @@ __all__ = [
     "ConversationMessage",
     "ConversationThread",
     "ConversationState",
+    "Hypothesis",
 ]

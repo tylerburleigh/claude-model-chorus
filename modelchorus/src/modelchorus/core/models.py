@@ -558,6 +558,51 @@ class ConversationThread(BaseModel):
     )
 
 
+class Hypothesis(BaseModel):
+    """
+    Model for tracking hypotheses in investigation workflows.
+
+    Used in Thinkdeep workflow to track hypothesis evolution during
+    systematic investigation, including the hypothesis text, supporting
+    evidence, and current validation status.
+
+    Attributes:
+        hypothesis: The hypothesis text/statement being investigated
+        evidence: List of evidence items supporting or refuting this hypothesis
+        status: Current validation status (active, disproven, validated)
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "hypothesis": "API uses async/await pattern instead of callbacks",
+                "evidence": [
+                    "Found async def in auth.py line 45",
+                    "Tests use asyncio.run() in test_auth.py",
+                    "No callback patterns found in service layer"
+                ],
+                "status": "validated"
+            }
+        }
+    )
+
+    hypothesis: str = Field(
+        ...,
+        description="The hypothesis text/statement being investigated",
+        min_length=1,
+    )
+
+    evidence: List[str] = Field(
+        default_factory=list,
+        description="List of evidence items supporting or refuting this hypothesis",
+    )
+
+    status: Literal["active", "disproven", "validated"] = Field(
+        default="active",
+        description="Current validation status of the hypothesis",
+    )
+
+
 class ConversationState(BaseModel):
     """
     Generic state container for workflow-specific conversation data.
