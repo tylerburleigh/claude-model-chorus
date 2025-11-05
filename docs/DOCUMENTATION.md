@@ -1,14 +1,14 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 15:28:31
+**Generated:** 2025-11-05 15:29:49
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 32
-- **Total Lines:** 6492
+- **Total Lines:** 6500
 - **Total Classes:** 40
 - **Total Functions:** 12
 - **Avg Complexity:** 2.75
@@ -1209,7 +1209,11 @@ Example:
 - `base_workflow.BaseWorkflow`
 - `base_workflow.WorkflowResult`
 - `base_workflow.WorkflowStep`
+- `conversation.ConversationMemory`
 - `models.ConsensusConfig`
+- `models.ConversationMessage`
+- `models.ConversationState`
+- `models.ConversationThread`
 - `models.ModelResponse`
 - `models.ModelSelection`
 - `models.WorkflowRequest`

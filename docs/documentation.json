@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T20:28:31.908645Z",
+    "generated_at": "2025-11-05T20:29:49.294752Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 32,
-    "total_lines": 6492,
+    "total_lines": 6500,
     "total_classes": 40,
     "total_functions": 12,
     "avg_complexity": 2.75,
@@ -21,7 +21,7 @@
     "by_language": {
       "python": {
         "files": 32,
-        "lines": 6492,
+        "lines": 6500,
         "classes": 40,
         "functions": 12,
         "avg_complexity": 2.75
@@ -149,10 +149,14 @@
         "models.ModelSelection",
         "models.WorkflowStep",
         "models.ModelResponse",
-        "models.ConsensusConfig"
+        "models.ConsensusConfig",
+        "models.ConversationMessage",
+        "models.ConversationThread",
+        "models.ConversationState",
+        "conversation.ConversationMemory"
       ],
       "exports": [],
-      "lines": 30
+      "lines": 38
     },
     {
       "name": "base_workflow",
@@ -4178,7 +4182,11 @@
       "models.ModelSelection",
       "models.WorkflowStep",
       "models.ModelResponse",
-      "models.ConsensusConfig"
+      "models.ConsensusConfig",
+      "models.ConversationMessage",
+      "models.ConversationThread",
+      "models.ConversationState",
+      "conversation.ConversationMemory"
     ],
     "src/modelchorus/core/base_workflow.py": [
       "abc.ABC",
