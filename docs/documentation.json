@@ -2,18 +2,18 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T23:50:15.079705Z",
+    "generated_at": "2025-11-05T23:52:25.000559Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 37,
-    "total_lines": 9433,
+    "total_files": 38,
+    "total_lines": 9900,
     "total_classes": 53,
-    "total_functions": 23,
-    "avg_complexity": 5.35,
+    "total_functions": 29,
+    "avg_complexity": 5.21,
     "max_complexity": 36,
     "high_complexity_functions": [
       "thinkdeep (36)",
@@ -23,11 +23,11 @@
     ],
     "by_language": {
       "python": {
-        "files": 37,
-        "lines": 9433,
+        "files": 38,
+        "lines": 9900,
         "classes": 53,
-        "functions": 23,
-        "avg_complexity": 5.35
+        "functions": 29,
+        "avg_complexity": 5.21
       }
     }
   },
@@ -97,6 +97,35 @@
       ],
       "exports": [],
       "lines": 157
+    },
+    {
+      "name": "thinkdeep_example",
+      "file": "examples/thinkdeep_example.py",
+      "language": "python",
+      "docstring": "Multi-step investigation example using ThinkDeepWorkflow.\n\nThis example demonstrates how to:\n1. Start a systematic investigation with ThinkDeep\n2. Continue multi-turn investigations with hypothesis tracking\n3. Track confidence progression across investigation steps\n4. Accumulate findings and evidence\n5. Use expert validation for additional insights\n6. Inspect investigation state and progress",
+      "classes": [],
+      "functions": [
+        "basic_investigation_example",
+        "multi_step_investigation_example",
+        "investigation_with_expert_validation",
+        "hypothesis_management_example",
+        "confidence_progression_example",
+        "main"
+      ],
+      "imports": [
+        "asyncio",
+        "pathlib.Path",
+        "modelchorus.providers.ClaudeProvider",
+        "modelchorus.providers.GeminiProvider",
+        "modelchorus.workflows.ThinkDeepWorkflow",
+        "modelchorus.workflows.ConfidenceLevel",
+        "modelchorus.workflows.Hypothesis",
+        "modelchorus.workflows.InvestigationStep",
+        "modelchorus.workflows.ThinkDeepState",
+        "modelchorus.core.conversation.ConversationMemory"
+      ],
+      "exports": [],
+      "lines": 467
     },
     {
       "name": "__init__",
@@ -1096,6 +1125,46 @@
           ]
         },
         {
+          "instantiator": "basic_investigation_example",
+          "file": "examples/thinkdeep_example.py",
+          "line": 35,
+          "context": [
+            "basic_investigation_example"
+          ]
+        },
+        {
+          "instantiator": "multi_step_investigation_example",
+          "file": "examples/thinkdeep_example.py",
+          "line": 115,
+          "context": [
+            "multi_step_investigation_example"
+          ]
+        },
+        {
+          "instantiator": "investigation_with_expert_validation",
+          "file": "examples/thinkdeep_example.py",
+          "line": 234,
+          "context": [
+            "investigation_with_expert_validation"
+          ]
+        },
+        {
+          "instantiator": "hypothesis_management_example",
+          "file": "examples/thinkdeep_example.py",
+          "line": 288,
+          "context": [
+            "hypothesis_management_example"
+          ]
+        },
+        {
+          "instantiator": "confidence_progression_example",
+          "file": "examples/thinkdeep_example.py",
+          "line": 377,
+          "context": [
+            "confidence_progression_example"
+          ]
+        },
+        {
           "instantiator": "chat",
           "file": "src/modelchorus/cli/main.py",
           "line": 131,
@@ -1246,7 +1315,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 21
+      "instantiation_count": 26
     },
     {
       "name": "ConfidenceLevel",
@@ -2549,6 +2618,46 @@
           ]
         },
         {
+          "instantiator": "basic_investigation_example",
+          "file": "examples/thinkdeep_example.py",
+          "line": 34,
+          "context": [
+            "basic_investigation_example"
+          ]
+        },
+        {
+          "instantiator": "multi_step_investigation_example",
+          "file": "examples/thinkdeep_example.py",
+          "line": 114,
+          "context": [
+            "multi_step_investigation_example"
+          ]
+        },
+        {
+          "instantiator": "investigation_with_expert_validation",
+          "file": "examples/thinkdeep_example.py",
+          "line": 232,
+          "context": [
+            "investigation_with_expert_validation"
+          ]
+        },
+        {
+          "instantiator": "hypothesis_management_example",
+          "file": "examples/thinkdeep_example.py",
+          "line": 287,
+          "context": [
+            "hypothesis_management_example"
+          ]
+        },
+        {
+          "instantiator": "confidence_progression_example",
+          "file": "examples/thinkdeep_example.py",
+          "line": 376,
+          "context": [
+            "confidence_progression_example"
+          ]
+        },
+        {
           "instantiator": "thinkdeep_status",
           "file": "src/modelchorus/cli/main.py",
           "line": 705,
@@ -2737,7 +2846,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 25
+      "instantiation_count": 30
     },
     {
       "name": "CLIProvider",
@@ -3023,6 +3132,14 @@
       "is_public": true,
       "instantiated_by": [
         {
+          "instantiator": "investigation_with_expert_validation",
+          "file": "examples/thinkdeep_example.py",
+          "line": 233,
+          "context": [
+            "investigation_with_expert_validation"
+          ]
+        },
+        {
           "instantiator": "list_providers",
           "file": "src/modelchorus/cli/main.py",
           "line": 794,
@@ -3050,7 +3167,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 3
+      "instantiation_count": 4
     },
     {
       "name": "ChatWorkflow",
@@ -3437,6 +3554,46 @@
       "is_public": true,
       "instantiated_by": [
         {
+          "instantiator": "basic_investigation_example",
+          "file": "examples/thinkdeep_example.py",
+          "line": 38,
+          "context": [
+            "basic_investigation_example"
+          ]
+        },
+        {
+          "instantiator": "multi_step_investigation_example",
+          "file": "examples/thinkdeep_example.py",
+          "line": 118,
+          "context": [
+            "multi_step_investigation_example"
+          ]
+        },
+        {
+          "instantiator": "investigation_with_expert_validation",
+          "file": "examples/thinkdeep_example.py",
+          "line": 237,
+          "context": [
+            "investigation_with_expert_validation"
+          ]
+        },
+        {
+          "instantiator": "hypothesis_management_example",
+          "file": "examples/thinkdeep_example.py",
+          "line": 289,
+          "context": [
+            "hypothesis_management_example"
+          ]
+        },
+        {
+          "instantiator": "confidence_progression_example",
+          "file": "examples/thinkdeep_example.py",
+          "line": 378,
+          "context": [
+            "confidence_progression_example"
+          ]
+        },
+        {
           "instantiator": "thinkdeep",
           "file": "src/modelchorus/cli/main.py",
           "line": 528,
@@ -3454,7 +3611,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 2
+      "instantiation_count": 7
     },
     {
       "name": "TestChatWorkflowInitialization",
@@ -3859,6 +4016,12 @@
         },
         {
           "name": "<module>",
+          "file": "examples/thinkdeep_example.py",
+          "line": 467,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
           "file": "src/modelchorus/cli/main.py",
           "line": 833,
           "call_type": "function_call"
@@ -3992,7 +4155,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 4
+      "call_count": 5
     },
     {
       "name": "basic_chat_example",
@@ -4440,6 +4603,12 @@
         },
         {
           "name": "<module>",
+          "file": "examples/thinkdeep_example.py",
+          "line": 467,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
           "file": "src/modelchorus/cli/main.py",
           "line": 833,
           "call_type": "function_call"
@@ -4489,7 +4658,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 4
+      "call_count": 5
     },
     {
       "name": "main",
@@ -4521,6 +4690,12 @@
           "name": "<module>",
           "file": "examples/provider_integration.py",
           "line": 157,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "examples/thinkdeep_example.py",
+          "line": 467,
           "call_type": "function_call"
         },
         {
@@ -4730,7 +4905,1051 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 4
+      "call_count": 5
+    },
+    {
+      "name": "basic_investigation_example",
+      "file": "examples/thinkdeep_example.py",
+      "line": 27,
+      "language": "python",
+      "docstring": "Basic single-step investigation.",
+      "parameters": [],
+      "return_type": null,
+      "complexity": 2,
+      "decorators": [],
+      "is_async": true,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "main",
+          "file": "examples/thinkdeep_example.py",
+          "line": 440,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 29,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 30,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 31,
+          "call_type": "function_call"
+        },
+        {
+          "name": "run",
+          "file": "unknown",
+          "line": 44,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 54,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 55,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 56,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 57,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 58,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 60,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "multi_step_investigation_example",
+      "file": "examples/thinkdeep_example.py",
+      "line": 63,
+      "language": "python",
+      "docstring": "Multi-step investigation showing hypothesis evolution and confidence progression.\n\nThis example demonstrates a systematic investigation of a performance issue,\nshowing how hypotheses are formed, tested, and confidence evolves across steps.",
+      "parameters": [],
+      "return_type": null,
+      "complexity": 10,
+      "decorators": [],
+      "is_async": true,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "main",
+          "file": "examples/thinkdeep_example.py",
+          "line": 443,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 70,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 71,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 72,
+          "call_type": "function_call"
+        },
+        {
+          "name": "items",
+          "file": "unknown",
+          "line": 110,
+          "call_type": "method_call"
+        },
+        {
+          "name": "write_text",
+          "file": "unknown",
+          "line": 111,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 124,
+          "call_type": "function_call"
+        },
+        {
+          "name": "run",
+          "file": "unknown",
+          "line": 125,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 132,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 136,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 137,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 138,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 139,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 140,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 143,
+          "call_type": "function_call"
+        },
+        {
+          "name": "run",
+          "file": "unknown",
+          "line": 144,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 152,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 153,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 154,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 155,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 156,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 159,
+          "call_type": "function_call"
+        },
+        {
+          "name": "run",
+          "file": "unknown",
+          "line": 160,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 168,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 169,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 170,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 171,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 172,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 175,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get_investigation_state",
+          "file": "unknown",
+          "line": 176,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 178,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 178,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 179,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 180,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 180,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 181,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 181,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 184,
+          "call_type": "function_call"
+        },
+        {
+          "name": "enumerate",
+          "file": "unknown",
+          "line": 185,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 186,
+          "call_type": "function_call"
+        },
+        {
+          "name": "upper",
+          "file": "unknown",
+          "line": 186,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 188,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 188,
+          "call_type": "function_call"
+        },
+        {
+          "name": "keys",
+          "file": "unknown",
+          "line": 191,
+          "call_type": "method_call"
+        },
+        {
+          "name": "unlink",
+          "file": "unknown",
+          "line": 192,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "investigation_with_expert_validation",
+      "file": "examples/thinkdeep_example.py",
+      "line": 195,
+      "language": "python",
+      "docstring": "Investigation with expert validation from a different model.\n\nDemonstrates how ThinkDeep can use a second model for validation\nand additional insights when confidence hasn't reached \"certain\" level.",
+      "parameters": [],
+      "return_type": null,
+      "complexity": 4,
+      "decorators": [],
+      "is_async": true,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "main",
+          "file": "examples/thinkdeep_example.py",
+          "line": 446,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 202,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 203,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 204,
+          "call_type": "function_call"
+        },
+        {
+          "name": "write_text",
+          "file": "unknown",
+          "line": 208,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 245,
+          "call_type": "function_call"
+        },
+        {
+          "name": "run",
+          "file": "unknown",
+          "line": 246,
+          "call_type": "method_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 248,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 256,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 257,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 258,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 261,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 262,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 265,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 266,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 267,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 269,
+          "call_type": "function_call"
+        },
+        {
+          "name": "unlink",
+          "file": "unknown",
+          "line": 272,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "hypothesis_management_example",
+      "file": "examples/thinkdeep_example.py",
+      "line": 275,
+      "language": "python",
+      "docstring": "Demonstrate manual hypothesis management and state inspection.\n\nShows how to programmatically add, update, and track hypotheses\nduring an investigation.",
+      "parameters": [],
+      "return_type": null,
+      "complexity": 6,
+      "decorators": [],
+      "is_async": true,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "main",
+          "file": "examples/thinkdeep_example.py",
+          "line": 449,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 282,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 283,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 284,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 295,
+          "call_type": "function_call"
+        },
+        {
+          "name": "run",
+          "file": "unknown",
+          "line": 296,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 302,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 306,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 307,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 310,
+          "call_type": "function_call"
+        },
+        {
+          "name": "add_hypothesis",
+          "file": "unknown",
+          "line": 311,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_hypothesis",
+          "file": "unknown",
+          "line": 318,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get_investigation_summary",
+          "file": "unknown",
+          "line": 325,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 327,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 328,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 329,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 330,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 333,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get_active_hypotheses",
+          "file": "unknown",
+          "line": 334,
+          "call_type": "method_call"
+        },
+        {
+          "name": "enumerate",
+          "file": "unknown",
+          "line": 335,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 336,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 337,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 337,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 340,
+          "call_type": "function_call"
+        },
+        {
+          "name": "update_hypothesis",
+          "file": "unknown",
+          "line": 343,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 349,
+          "call_type": "function_call"
+        },
+        {
+          "name": "update_confidence",
+          "file": "unknown",
+          "line": 352,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 353,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get_confidence",
+          "file": "unknown",
+          "line": 353,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 356,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get_investigation_summary",
+          "file": "unknown",
+          "line": 357,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 359,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 360,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 361,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 362,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "confidence_progression_example",
+      "file": "examples/thinkdeep_example.py",
+      "line": 365,
+      "language": "python",
+      "docstring": "Demonstrate confidence progression through investigation steps.\n\nShows how confidence should naturally increase as evidence accumulates\nand hypotheses are validated.",
+      "parameters": [],
+      "return_type": null,
+      "complexity": 5,
+      "decorators": [],
+      "is_async": true,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "main",
+          "file": "examples/thinkdeep_example.py",
+          "line": 452,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 372,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 373,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 374,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 387,
+          "call_type": "function_call"
+        },
+        {
+          "name": "run",
+          "file": "unknown",
+          "line": 388,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 395,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 396,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 399,
+          "call_type": "function_call"
+        },
+        {
+          "name": "run",
+          "file": "unknown",
+          "line": 400,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 407,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 408,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 411,
+          "call_type": "function_call"
+        },
+        {
+          "name": "run",
+          "file": "unknown",
+          "line": 412,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 419,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 420,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 423,
+          "call_type": "function_call"
+        },
+        {
+          "name": "enumerate",
+          "file": "unknown",
+          "line": 425,
+          "call_type": "function_call"
+        },
+        {
+          "name": "index",
+          "file": "unknown",
+          "line": 426,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 427,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 428,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "main",
+      "file": "examples/thinkdeep_example.py",
+      "line": 431,
+      "language": "python",
+      "docstring": "Run all examples.",
+      "parameters": [],
+      "return_type": null,
+      "complexity": 1,
+      "decorators": [],
+      "is_async": true,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "<module>",
+          "file": "examples/basic_workflow.py",
+          "line": 105,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "examples/chat_example.py",
+          "line": 216,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "examples/provider_integration.py",
+          "line": 157,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "examples/thinkdeep_example.py",
+          "line": 467,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "src/modelchorus/cli/main.py",
+          "line": 833,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 433,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 434,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 435,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 436,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 437,
+          "call_type": "function_call"
+        },
+        {
+          "name": "basic_investigation_example",
+          "file": "unknown",
+          "line": 440,
+          "call_type": "function_call"
+        },
+        {
+          "name": "multi_step_investigation_example",
+          "file": "unknown",
+          "line": 443,
+          "call_type": "function_call"
+        },
+        {
+          "name": "investigation_with_expert_validation",
+          "file": "unknown",
+          "line": 446,
+          "call_type": "function_call"
+        },
+        {
+          "name": "hypothesis_management_example",
+          "file": "unknown",
+          "line": 449,
+          "call_type": "function_call"
+        },
+        {
+          "name": "confidence_progression_example",
+          "file": "unknown",
+          "line": 452,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 454,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 455,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 456,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 457,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 458,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 459,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 460,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 461,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 462,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 463,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 5
     },
     {
       "name": "get_provider_by_name",
@@ -6742,6 +7961,12 @@
         },
         {
           "name": "<module>",
+          "file": "examples/thinkdeep_example.py",
+          "line": 467,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
           "file": "src/modelchorus/cli/main.py",
           "line": 833,
           "call_type": "function_call"
@@ -6755,7 +7980,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 4
+      "call_count": 5
     },
     {
       "name": "get_default_state_manager",
@@ -6947,6 +8172,18 @@
       "modelchorus.providers.ModelCapability",
       "modelchorus.providers.GenerationRequest",
       "modelchorus.providers.GenerationResponse"
+    ],
+    "examples/thinkdeep_example.py": [
+      "asyncio",
+      "pathlib.Path",
+      "modelchorus.providers.ClaudeProvider",
+      "modelchorus.providers.GeminiProvider",
+      "modelchorus.workflows.ThinkDeepWorkflow",
+      "modelchorus.workflows.ConfidenceLevel",
+      "modelchorus.workflows.Hypothesis",
+      "modelchorus.workflows.InvestigationStep",
+      "modelchorus.workflows.ThinkDeepState",
+      "modelchorus.core.conversation.ConversationMemory"
     ],
     "src/modelchorus/cli/__init__.py": [
       "main.app",

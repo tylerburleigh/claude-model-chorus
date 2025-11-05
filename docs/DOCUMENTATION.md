@@ -1,17 +1,17 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 18:50:15
+**Generated:** 2025-11-05 18:52:24
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 37
-- **Total Lines:** 9433
+- **Total Files:** 38
+- **Total Lines:** 9900
 - **Total Classes:** 53
-- **Total Functions:** 23
-- **Avg Complexity:** 5.35
+- **Total Functions:** 29
+- **Avg Complexity:** 5.21
 - **Max Complexity:** 36
 - **High Complexity Functions:**
   - thinkdeep (36)
@@ -1360,6 +1360,17 @@ Attributes:
 
 ---
 
+### `async basic_investigation_example() -> None`
+
+**Language:** python
+**Defined in:** `examples/thinkdeep_example.py:27`
+**Complexity:** 2
+
+**Description:**
+> Basic single-step investigation.
+
+---
+
 ### `chat(prompt, provider, continuation_id, files, system, temperature, max_tokens, output, verbose) -> None`
 
 **Language:** python
@@ -1419,6 +1430,20 @@ Example:
 **Parameters:**
 - `mock_provider`: None
 - `conversation_memory`: None
+
+---
+
+### `async confidence_progression_example() -> None`
+
+**Language:** python
+**Defined in:** `examples/thinkdeep_example.py:365`
+**Complexity:** 5
+
+**Description:**
+> Demonstrate confidence progression through investigation steps.
+
+Shows how confidence should naturally increase as evidence accumulates
+and hypotheses are validated.
 
 ---
 
@@ -1506,6 +1531,34 @@ Example:
 
 ---
 
+### `async hypothesis_management_example() -> None`
+
+**Language:** python
+**Defined in:** `examples/thinkdeep_example.py:275`
+**Complexity:** 6
+
+**Description:**
+> Demonstrate manual hypothesis management and state inspection.
+
+Shows how to programmatically add, update, and track hypotheses
+during an investigation.
+
+---
+
+### `async investigation_with_expert_validation() -> None`
+
+**Language:** python
+**Defined in:** `examples/thinkdeep_example.py:195`
+**Complexity:** 4
+
+**Description:**
+> Investigation with expert validation from a different model.
+
+Demonstrates how ThinkDeep can use a second model for validation
+and additional insights when confidence hasn't reached "certain" level.
+
+---
+
 ### `list_providers() -> None`
 
 **Language:** python
@@ -1549,6 +1602,17 @@ Example:
 
 **Description:**
 > Main entry point for the provider example.
+
+---
+
+### `async main() -> None`
+
+**Language:** python
+**Defined in:** `examples/thinkdeep_example.py:431`
+**Complexity:** 1
+
+**Description:**
+> Run all examples.
 
 ---
 
@@ -1612,6 +1676,20 @@ Example:
 
 **Description:**
 > Mock subprocess.run for CLI command execution.
+
+---
+
+### `async multi_step_investigation_example() -> None`
+
+**Language:** python
+**Defined in:** `examples/thinkdeep_example.py:63`
+**Complexity:** 10
+
+**Description:**
+> Multi-step investigation showing hypothesis evolution and confidence progression.
+
+This example demonstrates a systematic investigation of a performance issue,
+showing how hypotheses are formed, tested, and confidence evolves across steps.
 
 ---
 
@@ -1750,6 +1828,19 @@ Example:
 - `modelchorus.providers.ModelCapability`
 - `modelchorus.providers.ModelConfig`
 - `modelchorus.providers.ModelProvider`
+
+### `examples/thinkdeep_example.py`
+
+- `asyncio`
+- `modelchorus.core.conversation.ConversationMemory`
+- `modelchorus.providers.ClaudeProvider`
+- `modelchorus.providers.GeminiProvider`
+- `modelchorus.workflows.ConfidenceLevel`
+- `modelchorus.workflows.Hypothesis`
+- `modelchorus.workflows.InvestigationStep`
+- `modelchorus.workflows.ThinkDeepState`
+- `modelchorus.workflows.ThinkDeepWorkflow`
+- `pathlib.Path`
 
 ### `src/modelchorus/cli/__init__.py`
 
