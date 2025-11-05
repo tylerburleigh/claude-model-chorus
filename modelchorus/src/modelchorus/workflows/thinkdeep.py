@@ -584,6 +584,131 @@ class ThinkDeepWorkflow(BaseWorkflow):
 
         return state.hypotheses
 
+    def update_confidence(
+        self,
+        thread_id: str,
+        new_confidence: str
+    ) -> bool:
+        """
+        Update the current confidence level for an investigation.
+
+        Args:
+            thread_id: Thread ID of the investigation
+            new_confidence: New confidence level (ConfidenceLevel value)
+
+        Returns:
+            True if confidence was updated, False if investigation not found
+        """
+        state = self._get_or_create_state(thread_id)
+        if not state:
+            return False
+
+        # Validate confidence level
+        valid_levels = [level.value for level in ConfidenceLevel]
+        if new_confidence not in valid_levels:
+            logger.warning(
+                f"Invalid confidence level '{new_confidence}'. "
+                f"Valid levels: {valid_levels}"
+            )
+            return False
+
+        old_confidence = state.current_confidence
+        state.current_confidence = new_confidence
+        self._save_state(thread_id, state)
+
+        logger.info(
+            f"Updated confidence for investigation {thread_id}: "
+            f"{old_confidence} → {new_confidence}"
+        )
+        return True
+
+    def get_confidence(self, thread_id: str) -> Optional[str]:
+        """
+        Get the current confidence level for an investigation.
+
+        Args:
+            thread_id: Thread ID of the investigation
+
+        Returns:
+            Current confidence level or None if investigation not found
+        """
+        state = self._get_or_create_state(thread_id)
+        if not state:
+            return None
+
+        return state.current_confidence
+
+    def is_investigation_complete(self, thread_id: str) -> bool:
+        """
+        Determine if investigation has reached completion criteria.
+
+        An investigation is considered complete when:
+        - Confidence level is "certain" OR "almost_certain"
+        - At least one hypothesis exists
+        - At least one investigation step has been completed
+
+        Args:
+            thread_id: Thread ID of the investigation
+
+        Returns:
+            True if investigation meets completion criteria, False otherwise
+        """
+        state = self._get_or_create_state(thread_id)
+        if not state:
+            return False
+
+        # Check confidence level
+        high_confidence = state.current_confidence in [
+            ConfidenceLevel.CERTAIN.value,
+            ConfidenceLevel.ALMOST_CERTAIN.value
+        ]
+
+        # Check if any work has been done
+        has_hypotheses = len(state.hypotheses) > 0
+        has_steps = len(state.steps) > 0
+
+        is_complete = high_confidence and has_hypotheses and has_steps
+
+        if is_complete:
+            logger.info(
+                f"Investigation {thread_id} meets completion criteria: "
+                f"confidence={state.current_confidence}, "
+                f"hypotheses={len(state.hypotheses)}, "
+                f"steps={len(state.steps)}"
+            )
+
+        return is_complete
+
+    def get_investigation_summary(self, thread_id: str) -> Optional[Dict[str, Any]]:
+        """
+        Get a summary of the investigation progress.
+
+        Args:
+            thread_id: Thread ID of the investigation
+
+        Returns:
+            Dictionary with investigation summary or None if not found
+        """
+        state = self._get_or_create_state(thread_id)
+        if not state:
+            return None
+
+        active_hypotheses = [h for h in state.hypotheses if h.status == "active"]
+        validated_hypotheses = [h for h in state.hypotheses if h.status == "validated"]
+        disproven_hypotheses = [h for h in state.hypotheses if h.status == "disproven"]
+
+        return {
+            "thread_id": thread_id,
+            "confidence": state.current_confidence,
+            "is_complete": self.is_investigation_complete(thread_id),
+            "total_steps": len(state.steps),
+            "total_hypotheses": len(state.hypotheses),
+            "active_hypotheses": len(active_hypotheses),
+            "validated_hypotheses": len(validated_hypotheses),
+            "disproven_hypotheses": len(disproven_hypotheses),
+            "files_examined": len(state.relevant_files)
+        }
+
     def get_provider(self) -> ModelProvider:
         """
         Get the configured provider.

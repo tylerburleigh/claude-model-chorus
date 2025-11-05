@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T23:07:03.603053Z",
+    "generated_at": "2025-11-05T23:08:19.199066Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 37,
-    "total_lines": 8638,
+    "total_lines": 8768,
     "total_classes": 53,
     "total_functions": 21,
     "avg_complexity": 3.29,
@@ -22,7 +22,7 @@
     "by_language": {
       "python": {
         "files": 37,
-        "lines": 8638,
+        "lines": 8768,
         "classes": 53,
         "functions": 21,
         "avg_complexity": 3.29
@@ -619,7 +619,7 @@
         "core.models.ConfidenceLevel"
       ],
       "exports": [],
-      "lines": 491
+      "lines": 621
     },
     {
       "name": "__init__",
@@ -1433,8 +1433,19 @@
       "properties": [],
       "is_exported": false,
       "is_public": true,
-      "instantiated_by": [],
-      "imported_by": []
+      "instantiated_by": [
+        {
+          "instantiator": "add_hypothesis",
+          "file": "modelchorus/src/modelchorus/workflows/thinkdeep.py",
+          "line": 478,
+          "context": [
+            "ThinkDeepWorkflow",
+            "add_hypothesis"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 1
     },
     {
       "name": "InvestigationStep",
@@ -3363,6 +3374,12 @@
         "_build_investigation_prompt",
         "_extract_findings",
         "get_investigation_state",
+        "add_hypothesis",
+        "update_hypothesis",
+        "validate_hypothesis",
+        "disprove_hypothesis",
+        "get_active_hypotheses",
+        "get_all_hypotheses",
         "get_provider",
         "validate_config",
         "__repr__"
