@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T20:29:49.294752Z",
+    "generated_at": "2025-11-05T20:31:27.774624Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 32,
-    "total_lines": 6500,
-    "total_classes": 40,
+    "total_files": 33,
+    "total_lines": 6608,
+    "total_classes": 41,
     "total_functions": 12,
     "avg_complexity": 2.75,
     "max_complexity": 16,
@@ -20,9 +20,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 32,
-        "lines": 6500,
-        "classes": 40,
+        "files": 33,
+        "lines": 6608,
+        "classes": 41,
         "functions": 12,
         "avg_complexity": 2.75
       }
@@ -615,6 +615,29 @@
       "lines": 142
     },
     {
+      "name": "test_conversation",
+      "file": "tests/test_conversation.py",
+      "language": "python",
+      "docstring": "Unit tests for conversation infrastructure.\n\nTests verify ConversationMemory functionality including:\n- Thread creation with UUID generation\n- Continuation ID handling\n- Message persistence\n- Thread lifecycle management\n- File-based storage",
+      "classes": [
+        "TestConversationMemory"
+      ],
+      "functions": [],
+      "imports": [
+        "json",
+        "pytest",
+        "uuid",
+        "pathlib.Path",
+        "datetime.datetime",
+        "datetime.timezone",
+        "modelchorus.core.conversation.ConversationMemory",
+        "modelchorus.core.models.ConversationMessage",
+        "modelchorus.core.models.ConversationThread"
+      ],
+      "exports": [],
+      "lines": 108
+    },
+    {
       "name": "test_gemini_integration",
       "file": "tests/test_gemini_integration.py",
       "language": "python",
@@ -881,8 +904,55 @@
       "properties": [],
       "is_exported": false,
       "is_public": true,
-      "instantiated_by": [],
-      "imported_by": []
+      "instantiated_by": [
+        {
+          "instantiator": "test_create_thread_generates_valid_uuid",
+          "file": "tests/test_conversation.py",
+          "line": 31,
+          "context": [
+            "TestConversationMemory",
+            "test_create_thread_generates_valid_uuid"
+          ]
+        },
+        {
+          "instantiator": "test_create_thread_unique_ids",
+          "file": "tests/test_conversation.py",
+          "line": 45,
+          "context": [
+            "TestConversationMemory",
+            "test_create_thread_unique_ids"
+          ]
+        },
+        {
+          "instantiator": "test_create_thread_with_initial_context",
+          "file": "tests/test_conversation.py",
+          "line": 58,
+          "context": [
+            "TestConversationMemory",
+            "test_create_thread_with_initial_context"
+          ]
+        },
+        {
+          "instantiator": "test_create_thread_persists_to_file",
+          "file": "tests/test_conversation.py",
+          "line": 78,
+          "context": [
+            "TestConversationMemory",
+            "test_create_thread_persists_to_file"
+          ]
+        },
+        {
+          "instantiator": "test_create_thread_with_parent",
+          "file": "tests/test_conversation.py",
+          "line": 94,
+          "context": [
+            "TestConversationMemory",
+            "test_create_thread_with_parent"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 5
     },
     {
       "name": "WorkflowRequest",
@@ -2782,6 +2852,26 @@
       "imported_by": []
     },
     {
+      "name": "TestConversationMemory",
+      "file": "tests/test_conversation.py",
+      "line": 22,
+      "language": "python",
+      "docstring": "Test suite for ConversationMemory class.",
+      "bases": [],
+      "methods": [
+        "test_create_thread_generates_valid_uuid",
+        "test_create_thread_unique_ids",
+        "test_create_thread_with_initial_context",
+        "test_create_thread_persists_to_file",
+        "test_create_thread_with_parent"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
       "name": "TestGeminiIntegration",
       "file": "tests/test_gemini_integration.py",
       "line": 13,
@@ -4387,6 +4477,17 @@
       "modelchorus.workflows.consensus.ConsensusStrategy",
       "modelchorus.providers.base_provider.GenerationResponse",
       "modelchorus.providers.base_provider.GenerationRequest"
+    ],
+    "tests/test_conversation.py": [
+      "json",
+      "pytest",
+      "uuid",
+      "pathlib.Path",
+      "datetime.datetime",
+      "datetime.timezone",
+      "modelchorus.core.conversation.ConversationMemory",
+      "modelchorus.core.models.ConversationMessage",
+      "modelchorus.core.models.ConversationThread"
     ],
     "tests/test_gemini_integration.py": [
       "pytest",

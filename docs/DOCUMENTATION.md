@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 15:29:49
+**Generated:** 2025-11-05 15:31:27
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 32
-- **Total Lines:** 6500
-- **Total Classes:** 40
+- **Total Files:** 33
+- **Total Lines:** 6608
+- **Total Classes:** 41
 - **Total Functions:** 12
 - **Avg Complexity:** 2.75
 - **Max Complexity:** 16
@@ -751,6 +751,23 @@ Attributes:
 
 ---
 
+### `TestConversationMemory`
+
+**Language:** python
+**Defined in:** `tests/test_conversation.py:22`
+
+**Description:**
+> Test suite for ConversationMemory class.
+
+**Methods:**
+- `test_create_thread_generates_valid_uuid()`
+- `test_create_thread_unique_ids()`
+- `test_create_thread_with_initial_context()`
+- `test_create_thread_persists_to_file()`
+- `test_create_thread_with_parent()`
+
+---
+
 ### `TestGeminiIntegration`
 
 **Language:** python
@@ -1451,6 +1468,18 @@ Example:
 - `modelchorus.workflows.consensus.ConsensusWorkflow`
 - `pytest`
 - `unittest.mock.AsyncMock`
+
+### `tests/test_conversation.py`
+
+- `datetime.datetime`
+- `datetime.timezone`
+- `json`
+- `modelchorus.core.conversation.ConversationMemory`
+- `modelchorus.core.models.ConversationMessage`
+- `modelchorus.core.models.ConversationThread`
+- `pathlib.Path`
+- `pytest`
+- `uuid`
 
 ### `tests/test_gemini_integration.py`
 
