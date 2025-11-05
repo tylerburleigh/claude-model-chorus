@@ -1,20 +1,20 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 18:26:43
+**Generated:** 2025-11-05 18:28:11
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 37
-- **Total Lines:** 9280
+- **Total Lines:** 9298
 - **Total Classes:** 53
 - **Total Functions:** 22
-- **Avg Complexity:** 4.45
-- **Max Complexity:** 29
+- **Avg Complexity:** 4.77
+- **Max Complexity:** 36
 - **High Complexity Functions:**
-  - thinkdeep (29)
+  - thinkdeep (36)
   - chat (19)
   - consensus (16)
 
@@ -1508,7 +1508,7 @@ Example:
 ### `list_providers() -> None`
 
 **Language:** python
-**Defined in:** `src/modelchorus/cli/main.py:646`
+**Defined in:** `src/modelchorus/cli/main.py:664`
 **Complexity:** 3
 
 **Decorators:** `@app.command()`
@@ -1554,7 +1554,7 @@ Example:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `src/modelchorus/cli/main.py:684`
+**Defined in:** `src/modelchorus/cli/main.py:702`
 **Complexity:** 1
 
 **Description:**
@@ -1642,7 +1642,7 @@ Example:
 
 **Language:** python
 **Defined in:** `src/modelchorus/cli/main.py:417`
-⚠️ **Complexity:** 29 (High)
+⚠️ **Complexity:** 36 (High)
 
 **Decorators:** `@app.command()`
 
@@ -1680,7 +1680,7 @@ Example:
 ### `version() -> None`
 
 **Language:** python
-**Defined in:** `src/modelchorus/cli/main.py:673`
+**Defined in:** `src/modelchorus/cli/main.py:691`
 **Complexity:** 1
 
 **Decorators:** `@app.command()`

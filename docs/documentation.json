@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T23:26:43.008974Z",
+    "generated_at": "2025-11-05T23:28:11.318761Z",
     "languages": [
       "python"
     ],
@@ -10,23 +10,23 @@
   },
   "statistics": {
     "total_files": 37,
-    "total_lines": 9280,
+    "total_lines": 9298,
     "total_classes": 53,
     "total_functions": 22,
-    "avg_complexity": 4.45,
-    "max_complexity": 29,
+    "avg_complexity": 4.77,
+    "max_complexity": 36,
     "high_complexity_functions": [
-      "thinkdeep (29)",
+      "thinkdeep (36)",
       "chat (19)",
       "consensus (16)"
     ],
     "by_language": {
       "python": {
         "files": 37,
-        "lines": 9280,
+        "lines": 9298,
         "classes": 53,
         "functions": 22,
-        "avg_complexity": 4.45
+        "avg_complexity": 4.77
       }
     }
   },
@@ -160,7 +160,7 @@
         "core.conversation.ConversationMemory"
       ],
       "exports": [],
-      "lines": 690
+      "lines": 708
     },
     {
       "name": "__init__",
@@ -2537,7 +2537,7 @@
         {
           "instantiator": "list_providers",
           "file": "src/modelchorus/cli/main.py",
-          "line": 649,
+          "line": 667,
           "context": [
             "list_providers"
           ]
@@ -2766,7 +2766,7 @@
         {
           "instantiator": "list_providers",
           "file": "src/modelchorus/cli/main.py",
-          "line": 650,
+          "line": 668,
           "context": [
             "list_providers"
           ]
@@ -2961,7 +2961,7 @@
         {
           "instantiator": "list_providers",
           "file": "src/modelchorus/cli/main.py",
-          "line": 652,
+          "line": 670,
           "context": [
             "list_providers"
           ]
@@ -3003,7 +3003,7 @@
         {
           "instantiator": "list_providers",
           "file": "src/modelchorus/cli/main.py",
-          "line": 651,
+          "line": 669,
           "context": [
             "list_providers"
           ]
@@ -3830,7 +3830,7 @@
         {
           "name": "<module>",
           "file": "src/modelchorus/cli/main.py",
-          "line": 690,
+          "line": 708,
           "call_type": "function_call"
         }
       ],
@@ -4411,7 +4411,7 @@
         {
           "name": "<module>",
           "file": "src/modelchorus/cli/main.py",
-          "line": 690,
+          "line": 708,
           "call_type": "function_call"
         }
       ],
@@ -4496,7 +4496,7 @@
         {
           "name": "<module>",
           "file": "src/modelchorus/cli/main.py",
-          "line": 690,
+          "line": 708,
           "call_type": "function_call"
         }
       ],
@@ -5677,7 +5677,7 @@
         }
       ],
       "return_type": null,
-      "complexity": 29,
+      "complexity": 36,
       "decorators": [
         "app.command()"
       ],
@@ -5945,9 +5945,9 @@
           "call_type": "method_call"
         },
         {
-          "name": "print",
+          "name": "get",
           "file": "unknown",
-          "line": 582,
+          "line": 581,
           "call_type": "method_call"
         },
         {
@@ -5971,145 +5971,205 @@
         {
           "name": "print",
           "file": "unknown",
+          "line": 586,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
           "line": 587,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 588,
+          "line": 589,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 591,
+          "line": 593,
           "call_type": "method_call"
         },
         {
-          "name": "print",
-          "file": "unknown",
-          "line": 592,
-          "call_type": "method_call"
-        },
-        {
-          "name": "len",
+          "name": "get_investigation_state",
           "file": "unknown",
           "line": 595,
+          "call_type": "method_call"
+        },
+        {
+          "name": "enumerate",
+          "file": "unknown",
+          "line": 597,
           "call_type": "function_call"
         },
         {
-          "name": "print",
-          "file": "unknown",
-          "line": 596,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 597,
-          "call_type": "method_call"
-        },
-        {
           "name": "get",
           "file": "unknown",
-          "line": 600,
+          "line": 598,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 602,
+          "line": 603,
           "call_type": "method_call"
         },
         {
-          "name": "get",
+          "name": "upper",
           "file": "unknown",
-          "line": 602,
+          "line": 603,
           "call_type": "method_call"
         },
         {
-          "name": "get",
+          "name": "print",
           "file": "unknown",
-          "line": 617,
+          "line": 605,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 605,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 606,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 609,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 610,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 622,
+          "line": 613,
           "call_type": "function_call"
         },
         {
-          "name": "write_text",
+          "name": "print",
           "file": "unknown",
-          "line": 625,
-          "call_type": "method_call"
-        },
-        {
-          "name": "dumps",
-          "file": "unknown",
-          "line": 625,
+          "line": 614,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 626,
+          "line": 615,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 618,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 628,
+          "line": 620,
           "call_type": "method_call"
         },
         {
-          "name": "print",
+          "name": "get",
           "file": "unknown",
-          "line": 631,
+          "line": 620,
           "call_type": "method_call"
         },
         {
-          "name": "Exit",
-          "file": "unknown",
-          "line": 632,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
+          "name": "get",
           "file": "unknown",
           "line": 635,
           "call_type": "method_call"
         },
         {
+          "name": "len",
+          "file": "unknown",
+          "line": 640,
+          "call_type": "function_call"
+        },
+        {
+          "name": "write_text",
+          "file": "unknown",
+          "line": 643,
+          "call_type": "method_call"
+        },
+        {
+          "name": "dumps",
+          "file": "unknown",
+          "line": 643,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 644,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 646,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 649,
+          "call_type": "method_call"
+        },
+        {
           "name": "Exit",
           "file": "unknown",
-          "line": 636,
+          "line": 650,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 638,
+          "line": 653,
+          "call_type": "method_call"
+        },
+        {
+          "name": "Exit",
+          "file": "unknown",
+          "line": 654,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 641,
+          "line": 656,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 659,
           "call_type": "method_call"
         },
         {
           "name": "format_exc",
           "file": "unknown",
-          "line": 641,
+          "line": 659,
           "call_type": "method_call"
         },
         {
           "name": "Exit",
           "file": "unknown",
-          "line": 642,
+          "line": 660,
           "call_type": "method_call"
         },
         {
@@ -6123,7 +6183,7 @@
     {
       "name": "list_providers",
       "file": "src/modelchorus/cli/main.py",
-      "line": 646,
+      "line": 664,
       "language": "python",
       "docstring": "List all available providers and their models.",
       "parameters": [],
@@ -6140,96 +6200,11 @@
         {
           "name": "print",
           "file": "unknown",
-          "line": 655,
+          "line": 673,
           "call_type": "method_call"
         },
         {
           "name": "items",
-          "file": "unknown",
-          "line": 657,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 658,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 659,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 660,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get_available_models",
-          "file": "unknown",
-          "line": 662,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 663,
-          "call_type": "method_call"
-        },
-        {
-          "name": "len",
-          "file": "unknown",
-          "line": 663,
-          "call_type": "function_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 667,
-          "call_type": "method_call"
-        },
-        {
-          "name": "join",
-          "file": "unknown",
-          "line": 667,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 669,
-          "call_type": "method_call"
-        },
-        {
-          "name": "command",
-          "file": "unknown",
-          "line": 645,
-          "call_type": "method_call"
-        }
-      ]
-    },
-    {
-      "name": "version",
-      "file": "src/modelchorus/cli/main.py",
-      "line": 673,
-      "language": "python",
-      "docstring": "Show version information.",
-      "parameters": [],
-      "return_type": null,
-      "complexity": 1,
-      "decorators": [
-        "app.command()"
-      ],
-      "is_async": false,
-      "is_exported": false,
-      "is_public": true,
-      "callers": [],
-      "calls": [
-        {
-          "name": "print",
           "file": "unknown",
           "line": 675,
           "call_type": "method_call"
@@ -6253,13 +6228,7 @@
           "call_type": "method_call"
         },
         {
-          "name": "print",
-          "file": "unknown",
-          "line": 679,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
+          "name": "get_available_models",
           "file": "unknown",
           "line": 680,
           "call_type": "method_call"
@@ -6271,9 +6240,100 @@
           "call_type": "method_call"
         },
         {
+          "name": "len",
+          "file": "unknown",
+          "line": 681,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 685,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 685,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 687,
+          "call_type": "method_call"
+        },
+        {
           "name": "command",
           "file": "unknown",
-          "line": 672,
+          "line": 663,
+          "call_type": "method_call"
+        }
+      ]
+    },
+    {
+      "name": "version",
+      "file": "src/modelchorus/cli/main.py",
+      "line": 691,
+      "language": "python",
+      "docstring": "Show version information.",
+      "parameters": [],
+      "return_type": null,
+      "complexity": 1,
+      "decorators": [
+        "app.command()"
+      ],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 693,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 694,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 695,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 696,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 697,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 698,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 699,
+          "call_type": "method_call"
+        },
+        {
+          "name": "command",
+          "file": "unknown",
+          "line": 690,
           "call_type": "method_call"
         }
       ]
@@ -6281,7 +6341,7 @@
     {
       "name": "main",
       "file": "src/modelchorus/cli/main.py",
-      "line": 684,
+      "line": 702,
       "language": "python",
       "docstring": "Main entry point for CLI.",
       "parameters": [],
@@ -6313,7 +6373,7 @@
         {
           "name": "<module>",
           "file": "src/modelchorus/cli/main.py",
-          "line": 690,
+          "line": 708,
           "call_type": "function_call"
         }
       ],
@@ -6321,7 +6381,7 @@
         {
           "name": "app",
           "file": "unknown",
-          "line": 686,
+          "line": 704,
           "call_type": "function_call"
         }
       ],

@@ -660,6 +660,131 @@ def thinkdeep(
         raise typer.Exit(1)
 
 
+@app.command(name="thinkdeep-status")
+def thinkdeep_status(
+    thread_id: str = typer.Argument(..., help="Thread ID of the investigation to inspect"),
+    show_steps: bool = typer.Option(
+        False,
+        "--steps",
+        help="Show all investigation steps",
+    ),
+    show_files: bool = typer.Option(
+        False,
+        "--files",
+        help="Show all examined files",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Show detailed information including evidence",
+    ),
+):
+    """
+    Inspect the state of an ongoing ThinkDeep investigation.
+
+    Shows current hypotheses, confidence level, investigation progress,
+    and optionally all steps and examined files.
+
+    Example:
+        # View basic status
+        modelchorus thinkdeep-status thread-id-123
+
+        # View with all steps
+        modelchorus thinkdeep-status thread-id-123 --steps
+
+        # View with files
+        modelchorus thinkdeep-status thread-id-123 --files --verbose
+    """
+    try:
+        # Create conversation memory to access thread
+        memory = ConversationMemory()
+
+        # Create a dummy workflow to access state
+        # (We need a provider but won't use it for inspection)
+        dummy_provider = ClaudeProvider()
+        workflow = ThinkDeepWorkflow(
+            provider=dummy_provider,
+            conversation_memory=memory,
+        )
+
+        # Get investigation state
+        state = workflow.get_investigation_state(thread_id)
+
+        if not state:
+            console.print(f"[red]Error: Investigation thread not found: {thread_id}[/red]")
+            console.print("[yellow]Make sure you're using the correct thread ID from a previous investigation.[/yellow]")
+            raise typer.Exit(1)
+
+        # Get investigation summary
+        summary = workflow.get_investigation_summary(thread_id)
+
+        # Display header
+        console.print(f"\n[bold cyan]Investigation Status[/bold cyan]")
+        console.print(f"[cyan]Thread ID:[/cyan] {thread_id}\n")
+
+        # Display summary metrics
+        console.print(f"[cyan]Confidence Level:[/cyan] {state.current_confidence}")
+        console.print(f"[cyan]Total Steps:[/cyan] {len(state.steps)}")
+        console.print(f"[cyan]Total Hypotheses:[/cyan] {len(state.hypotheses)}")
+        console.print(f"[cyan]Files Examined:[/cyan] {len(state.relevant_files)}")
+
+        if summary:
+            console.print(f"[cyan]Active Hypotheses:[/cyan] {summary['active_hypotheses']}")
+            console.print(f"[cyan]Validated Hypotheses:[/cyan] {summary['validated_hypotheses']}")
+            console.print(f"[cyan]Disproven Hypotheses:[/cyan] {summary['disproven_hypotheses']}")
+            console.print(f"[cyan]Complete:[/cyan] {'Yes' if summary['is_complete'] else 'No'}")
+
+        # Display hypotheses
+        if state.hypotheses:
+            console.print("\n[bold]Hypotheses:[/bold]")
+            for i, hyp in enumerate(state.hypotheses, 1):
+                status_color = {
+                    'active': 'yellow',
+                    'validated': 'green',
+                    'disproven': 'red'
+                }.get(hyp.status, 'white')
+                console.print(f"  {i}. [{status_color}]{hyp.status.upper()}[/{status_color}] {hyp.hypothesis}")
+                if hyp.evidence and verbose:
+                    console.print(f"     [dim]Evidence ({len(hyp.evidence)}):[/dim]")
+                    for evidence in hyp.evidence:
+                        console.print(f"       • {evidence}")
+        else:
+            console.print("\n[yellow]No hypotheses yet.[/yellow]")
+
+        # Display investigation steps if requested
+        if show_steps and state.steps:
+            console.print("\n[bold]Investigation Steps:[/bold]")
+            for i, step in enumerate(state.steps, 1):
+                console.print(f"\n  [cyan]Step {step.step_number}:[/cyan]")
+                console.print(f"  Confidence: {step.confidence}")
+                console.print(f"  Files checked: {len(step.files_checked)}")
+                if verbose:
+                    console.print(f"  Findings: {step.findings}")
+                else:
+                    # Truncate findings if not verbose
+                    findings_preview = step.findings[:150] + "..." if len(step.findings) > 150 else step.findings
+                    console.print(f"  Findings: {findings_preview}")
+
+        # Display examined files if requested
+        if show_files and state.relevant_files:
+            console.print("\n[bold]Examined Files:[/bold]")
+            for file in state.relevant_files:
+                console.print(f"  • {file}")
+
+        console.print()
+
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Interrupted by user[/yellow]")
+        raise typer.Exit(130)
+    except Exception as e:
+        console.print(f"\n[red]Error: {e}[/red]")
+        if verbose:
+            import traceback
+            console.print(f"\n[red]{traceback.format_exc()}[/red]")
+        raise typer.Exit(1)
+
+
 @app.command()
 def list_providers():
     """List all available providers and their models."""
