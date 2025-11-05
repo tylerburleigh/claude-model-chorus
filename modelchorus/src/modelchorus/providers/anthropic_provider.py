@@ -6,10 +6,20 @@ Python SDK. It supports text generation, vision capabilities, and streaming for
 Claude 3 model family.
 """
 
+import asyncio
 import os
 from typing import Optional
+import logging
 
-from anthropic import Anthropic, AsyncAnthropic
+from anthropic import (
+    AsyncAnthropic,
+    APIError,
+    APIConnectionError,
+    APITimeoutError,
+    RateLimitError,
+    AuthenticationError,
+    BadRequestError,
+)
 
 from .base_provider import (
     GenerationRequest,
@@ -18,6 +28,34 @@ from .base_provider import (
     ModelConfig,
     ModelProvider,
 )
+
+# Configure logger
+logger = logging.getLogger(__name__)
+
+
+class ProviderError(Exception):
+    """Base exception for provider errors."""
+    pass
+
+
+class ProviderAuthenticationError(ProviderError):
+    """Raised when API authentication fails."""
+    pass
+
+
+class ProviderRateLimitError(ProviderError):
+    """Raised when rate limit is exceeded."""
+    pass
+
+
+class ProviderTimeoutError(ProviderError):
+    """Raised when API request times out."""
+    pass
+
+
+class ProviderConnectionError(ProviderError):
+    """Raised when connection to API fails."""
+    pass
 
 
 class AnthropicProvider(ModelProvider):
@@ -34,12 +72,20 @@ class AnthropicProvider(ModelProvider):
         api_key: Anthropic API key (from parameter or ANTHROPIC_API_KEY env var)
     """
 
-    def __init__(self, api_key: Optional[str] = None, **kwargs) -> None:
+    def __init__(
+        self,
+        api_key: Optional[str] = None,
+        max_retries: int = 3,
+        timeout: float = 60.0,
+        **kwargs
+    ) -> None:
         """
         Initialize the Anthropic provider.
 
         Args:
             api_key: Anthropic API key. If None, reads from ANTHROPIC_API_KEY env var
+            max_retries: Maximum number of retry attempts for failed requests (default: 3)
+            timeout: Request timeout in seconds (default: 60.0)
             **kwargs: Additional configuration passed to parent class
 
         Raises:
@@ -48,6 +94,10 @@ class AnthropicProvider(ModelProvider):
         # Get API key from parameter or environment
         resolved_api_key = api_key or os.environ.get("ANTHROPIC_API_KEY")
 
+        # Store retry configuration
+        self.max_retries = max_retries
+        self.timeout = timeout
+
         # Initialize parent class
         super().__init__(
             provider_name="anthropic",
@@ -55,9 +105,13 @@ class AnthropicProvider(ModelProvider):
             config=kwargs
         )
 
-        # Initialize Anthropic async client
+        # Initialize Anthropic async client with timeout
         if resolved_api_key:
-            self.client = AsyncAnthropic(api_key=resolved_api_key)
+            self.client = AsyncAnthropic(
+                api_key=resolved_api_key,
+                timeout=timeout,
+                max_retries=0,  # We handle retries ourselves for better control
+            )
         else:
             # Allow initialization without key, but generate() will fail
             self.client = None
@@ -111,6 +165,108 @@ class AnthropicProvider(ModelProvider):
         ]
 
         self.set_model_list(models)
+
+    async def _retry_with_backoff(
+        self,
+        func,
+        *args,
+        **kwargs
+    ):
+        """
+        Execute a function with exponential backoff retry logic.
+
+        Args:
+            func: Async function to execute
+            *args: Positional arguments for the function
+            **kwargs: Keyword arguments for the function
+
+        Returns:
+            Result from the function
+
+        Raises:
+            ProviderError: If all retries are exhausted
+        """
+        last_exception = None
+
+        for attempt in range(self.max_retries + 1):
+            try:
+                return await func(*args, **kwargs)
+
+            except RateLimitError as e:
+                last_exception = e
+                if attempt < self.max_retries:
+                    # Exponential backoff: 2^attempt seconds
+                    wait_time = 2 ** attempt
+                    logger.warning(
+                        f"Rate limit exceeded, retrying in {wait_time}s "
+                        f"(attempt {attempt + 1}/{self.max_retries + 1})"
+                    )
+                    await asyncio.sleep(wait_time)
+                else:
+                    raise ProviderRateLimitError(
+                        f"Rate limit exceeded after {self.max_retries + 1} attempts"
+                    ) from e
+
+            except APITimeoutError as e:
+                last_exception = e
+                if attempt < self.max_retries:
+                    wait_time = 2 ** attempt
+                    logger.warning(
+                        f"Request timeout, retrying in {wait_time}s "
+                        f"(attempt {attempt + 1}/{self.max_retries + 1})"
+                    )
+                    await asyncio.sleep(wait_time)
+                else:
+                    raise ProviderTimeoutError(
+                        f"Request timed out after {self.max_retries + 1} attempts"
+                    ) from e
+
+            except APIConnectionError as e:
+                last_exception = e
+                if attempt < self.max_retries:
+                    wait_time = 2 ** attempt
+                    logger.warning(
+                        f"Connection error, retrying in {wait_time}s "
+                        f"(attempt {attempt + 1}/{self.max_retries + 1})"
+                    )
+                    await asyncio.sleep(wait_time)
+                else:
+                    raise ProviderConnectionError(
+                        f"Connection failed after {self.max_retries + 1} attempts"
+                    ) from e
+
+            except AuthenticationError as e:
+                # Don't retry authentication errors
+                raise ProviderAuthenticationError(
+                    "API authentication failed. Check your API key."
+                ) from e
+
+            except BadRequestError as e:
+                # Don't retry bad requests - the input is invalid
+                raise ProviderError(
+                    f"Invalid request: {str(e)}"
+                ) from e
+
+            except APIError as e:
+                # Generic API error - retry if not the last attempt
+                last_exception = e
+                if attempt < self.max_retries:
+                    wait_time = 2 ** attempt
+                    logger.warning(
+                        f"API error, retrying in {wait_time}s "
+                        f"(attempt {attempt + 1}/{self.max_retries + 1}): {str(e)}"
+                    )
+                    await asyncio.sleep(wait_time)
+                else:
+                    raise ProviderError(
+                        f"API request failed after {self.max_retries + 1} attempts: {str(e)}"
+                    ) from e
+
+        # Should never reach here, but just in case
+        if last_exception:
+            raise ProviderError(
+                f"Request failed: {str(last_exception)}"
+            ) from last_exception
 
     async def generate(self, request: GenerationRequest) -> GenerationResponse:
         """
@@ -191,12 +347,12 @@ class AnthropicProvider(ModelProvider):
         if request.temperature is not None:
             api_params["temperature"] = request.temperature
 
-        # Make API call
-        try:
-            response = await self.client.messages.create(**api_params)
-        except Exception as e:
-            # Re-raise with more context
-            raise Exception(f"Anthropic API error: {str(e)}") from e
+        # Make API call with retry logic
+        async def _make_request():
+            """Internal function for making the API request."""
+            return await self.client.messages.create(**api_params)
+
+        response = await self._retry_with_backoff(_make_request)
 
         # Extract content from response
         content = ""
