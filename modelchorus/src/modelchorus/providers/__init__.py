@@ -5,6 +5,7 @@ This module contains abstractions and implementations for different
 AI model providers (Anthropic, OpenAI, etc.).
 """
 
+from .anthropic_provider import AnthropicProvider
 from .base_provider import (
     ModelProvider,
     ModelConfig,
@@ -14,6 +15,7 @@ from .base_provider import (
 )
 
 __all__ = [
+    "AnthropicProvider",
     "ModelProvider",
     "ModelConfig",
     "ModelCapability",
