@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T20:26:28.917331Z",
+    "generated_at": "2025-11-05T20:28:31.908645Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 32,
-    "total_lines": 6455,
+    "total_lines": 6492,
     "total_classes": 40,
     "total_functions": 12,
     "avg_complexity": 2.75,
@@ -21,7 +21,7 @@
     "by_language": {
       "python": {
         "files": 32,
-        "lines": 6455,
+        "lines": 6492,
         "classes": 40,
         "functions": 12,
         "avg_complexity": 2.75
@@ -376,6 +376,7 @@
         "json",
         "logging",
         "abc.abstractmethod",
+        "pathlib.Path",
         "typing.Any",
         "typing.Dict",
         "typing.List",
@@ -385,7 +386,7 @@
         "base_provider.GenerationResponse"
       ],
       "exports": [],
-      "lines": 228
+      "lines": 265
     },
     {
       "name": "codex_provider",
@@ -2172,7 +2173,7 @@
     {
       "name": "CLIProvider",
       "file": "src/modelchorus/providers/cli_provider.py",
-      "line": 23,
+      "line": 24,
       "language": "python",
       "docstring": "Base class for CLI-based model providers.\n\nThis class extends ModelProvider to handle interactions with AI models\nvia CLI tools, providing common functionality for:\n- Building CLI commands\n- Executing commands asynchronously via subprocess\n- Parsing CLI output\n- Error handling and retries\n\nSubclasses must implement:\n- build_command(): Construct the CLI command for a request\n- parse_response(): Parse CLI output into GenerationResponse\n\nAttributes:\n    cli_command: Base CLI command (e.g., \"claude\", \"gemini\")\n    timeout: Command timeout in seconds\n    retry_limit: Maximum number of retry attempts",
       "bases": [
@@ -2180,6 +2181,7 @@
       ],
       "methods": [
         "__init__",
+        "_load_conversation_context",
         "build_command",
         "parse_response",
         "execute_command",
@@ -4281,6 +4283,7 @@
       "json",
       "logging",
       "abc.abstractmethod",
+      "pathlib.Path",
       "typing.Any",
       "typing.Dict",
       "typing.List",

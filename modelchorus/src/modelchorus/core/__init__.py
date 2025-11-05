@@ -14,7 +14,11 @@ from .models import (
     WorkflowStep as WorkflowStepModel,
     ModelResponse,
     ConsensusConfig,
+    ConversationMessage,
+    ConversationThread,
+    ConversationState,
 )
+from .conversation import ConversationMemory
 
 __all__ = [
     "BaseWorkflow",
@@ -27,4 +31,8 @@ __all__ = [
     "WorkflowStepModel",
     "ModelResponse",
     "ConsensusConfig",
+    "ConversationMemory",
+    "ConversationMessage",
+    "ConversationThread",
+    "ConversationState",
 ]

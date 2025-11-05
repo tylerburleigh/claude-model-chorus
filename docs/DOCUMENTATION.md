@@ -1,14 +1,14 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 15:26:28
+**Generated:** 2025-11-05 15:28:31
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 32
-- **Total Lines:** 6455
+- **Total Lines:** 6492
 - **Total Classes:** 40
 - **Total Functions:** 12
 - **Avg Complexity:** 2.75
@@ -55,7 +55,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `ModelProvider`
-**Defined in:** `src/modelchorus/providers/cli_provider.py:23`
+**Defined in:** `src/modelchorus/providers/cli_provider.py:24`
 
 **Description:**
 > Base class for CLI-based model providers.
@@ -78,6 +78,7 @@ Attributes:
 
 **Methods:**
 - `__init__()`
+- `_load_conversation_context()`
 - `build_command()`
 - `parse_response()`
 - `execute_command()`
@@ -1331,6 +1332,7 @@ Example:
 - `base_provider.ModelProvider`
 - `json`
 - `logging`
+- `pathlib.Path`
 - `typing.Any`
 - `typing.Dict`
 - `typing.List`
