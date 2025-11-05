@@ -118,7 +118,7 @@ class ClaudeProvider(CLIProvider):
         Build the CLI command for a Claude generation request.
 
         Constructs a command like:
-            claude chat --prompt "..." --model sonnet --temperature 0.7
+            claude --print --output-format json --system-prompt "..." --model sonnet "..."
 
         Args:
             request: GenerationRequest containing prompt and parameters
@@ -126,38 +126,27 @@ class ClaudeProvider(CLIProvider):
         Returns:
             List of command parts for subprocess execution
         """
-        command = [self.cli_command, "chat"]
+        command = [self.cli_command]
 
-        # Add prompt
-        command.extend(["--prompt", request.prompt])
+        # Use print mode for non-interactive output
+        command.append("--print")
+
+        # Use JSON output format for easier parsing
+        command.extend(["--output-format", "json"])
 
         # Add system prompt if provided
         if request.system_prompt:
-            command.extend(["--system", request.system_prompt])
+            command.extend(["--system-prompt", request.system_prompt])
 
         # Add model from metadata if specified
         if "model" in request.metadata:
             command.extend(["--model", request.metadata["model"]])
 
-        # Add temperature
-        temperature = request.temperature if request.temperature is not None else 0.7
-        command.extend(["--temperature", str(temperature)])
+        # Note: Claude CLI doesn't support --temperature, --max-tokens flags
+        # These would need to be set via config or are model defaults
 
-        # Add max tokens if specified
-        if request.max_tokens:
-            command.extend(["--max-tokens", str(request.max_tokens)])
-
-        # Add thinking mode if specified
-        if request.metadata.get("thinking"):
-            command.append("--thinking")
-
-        # Add images if provided (vision capability)
-        if request.images:
-            for image_path in request.images:
-                command.extend(["--image", image_path])
-
-        # Add JSON output format for easier parsing
-        command.append("--json")
+        # Add prompt as final positional argument
+        command.append(request.prompt)
 
         logger.debug(f"Built Claude command: {' '.join(command)}")
         return command
@@ -166,12 +155,14 @@ class ClaudeProvider(CLIProvider):
         """
         Parse CLI output into a GenerationResponse.
 
-        The `claude` CLI returns JSON output with --json flag:
+        The `claude --print --output-format json` returns:
         {
-            "content": "...",
-            "model": "claude-sonnet-4.5",
-            "usage": {"input_tokens": 10, "output_tokens": 50},
-            "stop_reason": "end_turn"
+            "type": "result",
+            "subtype": "success",
+            "result": "...",  # The actual response content
+            "usage": {"input_tokens": 10, "output_tokens": 50, ...},
+            "modelUsage": {"claude-sonnet-4-5-20250929": {...}},
+            ...
         }
 
         Args:
@@ -197,20 +188,31 @@ class ClaudeProvider(CLIProvider):
         try:
             data = json.loads(stdout)
 
+            # Extract the result content
+            content = data.get("result", "")
+
+            # Extract model info from modelUsage if available
+            model_usage = data.get("modelUsage", {})
+            model = list(model_usage.keys())[0] if model_usage else "unknown"
+
+            # Extract usage info
+            usage = data.get("usage", {})
+
             response = GenerationResponse(
-                content=data.get("content", ""),
-                model=data.get("model", "unknown"),
-                usage=data.get("usage", {}),
-                stop_reason=data.get("stop_reason"),
+                content=content,
+                model=model,
+                usage=usage,
+                stop_reason=data.get("subtype"),  # "success" or error type
                 metadata={
-                    "thinking": data.get("thinking"),
                     "raw_response": data,
+                    "duration_ms": data.get("duration_ms"),
+                    "total_cost_usd": data.get("total_cost_usd"),
                 },
             )
 
             logger.info(
                 f"Successfully parsed Claude response: {len(response.content)} chars, "
-                f"model={response.model}, stop_reason={response.stop_reason}"
+                f"model={response.model}"
             )
             return response
 

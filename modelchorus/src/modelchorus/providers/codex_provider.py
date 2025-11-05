@@ -116,7 +116,7 @@ class CodexProvider(CLIProvider):
         Build the CLI command for a Codex generation request.
 
         Constructs a command like:
-            codex chat --prompt "..." --model gpt4 --temperature 0.7
+            codex exec --json --model gpt4 "..."
 
         Args:
             request: GenerationRequest containing prompt and parameters
@@ -124,34 +124,26 @@ class CodexProvider(CLIProvider):
         Returns:
             List of command parts for subprocess execution
         """
-        command = [self.cli_command, "chat"]
+        command = [self.cli_command, "exec"]
 
-        # Add prompt
-        command.extend(["--prompt", request.prompt])
-
-        # Add system prompt if provided
-        if request.system_prompt:
-            command.extend(["--system", request.system_prompt])
+        # Use JSON output for easier parsing
+        command.append("--json")
 
         # Add model from metadata if specified
         if "model" in request.metadata:
             command.extend(["--model", request.metadata["model"]])
 
-        # Add temperature
-        temperature = request.temperature if request.temperature is not None else 0.7
-        command.extend(["--temperature", str(temperature)])
-
-        # Add max tokens if specified
-        if request.max_tokens:
-            command.extend(["--max-tokens", str(request.max_tokens)])
+        # Note: Codex CLI uses config for most parameters
+        # Temperature, max tokens, etc. are set via -c config overrides
+        # For simplicity, we'll use defaults
 
         # Add images if provided (vision capability)
         if request.images:
             for image_path in request.images:
                 command.extend(["--image", image_path])
 
-        # Add JSON output format for easier parsing
-        command.append("--json")
+        # Add prompt as final positional argument
+        command.append(request.prompt)
 
         logger.debug(f"Built Codex command: {' '.join(command)}")
         return command
@@ -160,16 +152,14 @@ class CodexProvider(CLIProvider):
         """
         Parse CLI output into a GenerationResponse.
 
-        The `codex` CLI returns JSON output with --json flag:
-        {
-            "content": "...",
-            "model": "gpt-4",
-            "usage": {"prompt_tokens": 10, "completion_tokens": 50, "total_tokens": 60},
-            "finish_reason": "stop"
-        }
+        The `codex exec --json` returns JSONL (JSON Lines) format with events:
+        {"type":"thread.started","thread_id":"..."}
+        {"type":"turn.started"}
+        {"type":"item.completed","item":{"id":"item_1","type":"agent_message","text":"..."}}
+        {"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":50}}
 
         Args:
-            stdout: Standard output from CLI command
+            stdout: Standard output from CLI command (JSONL format)
             stderr: Standard error from CLI command
             returncode: Process exit code
 
@@ -187,38 +177,51 @@ class CodexProvider(CLIProvider):
             logger.error(error_msg)
             raise ValueError(error_msg)
 
-        # Parse JSON output
+        # Parse JSONL output
         try:
-            data = json.loads(stdout)
-
-            # Convert OpenAI usage format to our standard format
+            content = ""
             usage = {}
-            if "usage" in data:
-                usage_data = data["usage"]
-                usage = {
-                    "input_tokens": usage_data.get("prompt_tokens", 0),
-                    "output_tokens": usage_data.get("completion_tokens", 0),
-                    "total_tokens": usage_data.get("total_tokens", 0),
-                }
+            thread_id = None
+
+            # Process each line as a JSON event
+            for line in stdout.strip().split('\n'):
+                if not line:
+                    continue
+
+                event = json.loads(line)
+                event_type = event.get("type")
+
+                if event_type == "thread.started":
+                    thread_id = event.get("thread_id")
+                elif event_type == "item.completed":
+                    item = event.get("item", {})
+                    if item.get("type") == "agent_message":
+                        content = item.get("text", "")
+                elif event_type == "turn.completed":
+                    usage_data = event.get("usage", {})
+                    usage = {
+                        "input_tokens": usage_data.get("input_tokens", 0),
+                        "output_tokens": usage_data.get("output_tokens", 0),
+                        "cached_input_tokens": usage_data.get("cached_input_tokens", 0),
+                    }
 
             response = GenerationResponse(
-                content=data.get("content", ""),
-                model=data.get("model", "unknown"),
+                content=content,
+                model="gpt-5-codex",  # Default model from help output
                 usage=usage,
-                stop_reason=data.get("finish_reason"),
+                stop_reason="completed",
                 metadata={
-                    "raw_response": data,
+                    "thread_id": thread_id,
                 },
             )
 
             logger.info(
-                f"Successfully parsed Codex response: {len(response.content)} chars, "
-                f"model={response.model}, stop_reason={response.stop_reason}"
+                f"Successfully parsed Codex response: {len(response.content)} chars"
             )
             return response
 
-        except json.JSONDecodeError as e:
-            error_msg = f"Failed to parse Codex CLI JSON output: {e}\nOutput: {stdout[:200]}"
+        except (json.JSONDecodeError, KeyError) as e:
+            error_msg = f"Failed to parse Codex CLI JSONL output: {e}\nOutput: {stdout[:200]}"
             logger.error(error_msg)
             raise ValueError(error_msg)
 
