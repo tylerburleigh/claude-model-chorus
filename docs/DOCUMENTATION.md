@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 17:21:40
+**Generated:** 2025-11-05 17:59:31
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 36
-- **Total Lines:** 7935
-- **Total Classes:** 48
+- **Total Lines:** 7982
+- **Total Classes:** 49
 - **Total Functions:** 21
 - **Avg Complexity:** 3.29
 - **Max Complexity:** 19
@@ -396,7 +396,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:561`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:606`
 
 **Description:**
 > Generic state container for workflow-specific conversation data.
@@ -579,6 +579,26 @@ Example:
 
 **Description:**
 > Response from text generation.
+
+---
+
+### `Hypothesis`
+
+**Language:** python
+**Inherits from:** `BaseModel`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:561`
+
+**Description:**
+> Model for tracking hypotheses in investigation workflows.
+
+Used in Thinkdeep workflow to track hypothesis evolution during
+systematic investigation, including the hypothesis text, supporting
+evidence, and current validation status.
+
+Attributes:
+    hypothesis: The hypothesis text/statement being investigated
+    evidence: List of evidence items supporting or refuting this hypothesis
+    status: Current validation status (active, disproven, validated)
 
 ---
 
@@ -1543,6 +1563,7 @@ Example:
 - `models.ConversationMessage`
 - `models.ConversationState`
 - `models.ConversationThread`
+- `models.Hypothesis`
 - `models.ModelResponse`
 - `models.ModelSelection`
 - `models.WorkflowRequest`

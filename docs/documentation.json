@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T22:21:40.186609Z",
+    "generated_at": "2025-11-05T22:59:31.364968Z",
     "languages": [
       "python"
     ],
@@ -10,8 +10,8 @@
   },
   "statistics": {
     "total_files": 36,
-    "total_lines": 7935,
-    "total_classes": 48,
+    "total_lines": 7982,
+    "total_classes": 49,
     "total_functions": 21,
     "avg_complexity": 3.29,
     "max_complexity": 19,
@@ -22,8 +22,8 @@
     "by_language": {
       "python": {
         "files": 36,
-        "lines": 7935,
-        "classes": 48,
+        "lines": 7982,
+        "classes": 49,
         "functions": 21,
         "avg_complexity": 3.29
       }
@@ -180,10 +180,11 @@
         "models.ConversationMessage",
         "models.ConversationThread",
         "models.ConversationState",
+        "models.Hypothesis",
         "conversation.ConversationMemory"
       ],
       "exports": [],
-      "lines": 38
+      "lines": 40
     },
     {
       "name": "base_workflow",
@@ -257,6 +258,7 @@
         "ConsensusConfig",
         "ConversationMessage",
         "ConversationThread",
+        "Hypothesis",
         "ConversationState"
       ],
       "functions": [],
@@ -271,7 +273,7 @@
         "pydantic.ConfigDict"
       ],
       "exports": [],
-      "lines": 618
+      "lines": 663
     },
     {
       "name": "registry",
@@ -1353,9 +1355,25 @@
       "instantiation_count": 2
     },
     {
-      "name": "ConversationState",
+      "name": "Hypothesis",
       "file": "modelchorus/src/modelchorus/core/models.py",
       "line": 561,
+      "language": "python",
+      "docstring": "Model for tracking hypotheses in investigation workflows.\n\nUsed in Thinkdeep workflow to track hypothesis evolution during\nsystematic investigation, including the hypothesis text, supporting\nevidence, and current validation status.\n\nAttributes:\n    hypothesis: The hypothesis text/statement being investigated\n    evidence: List of evidence items supporting or refuting this hypothesis\n    status: Current validation status (active, disproven, validated)",
+      "bases": [
+        "BaseModel"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "ConversationState",
+      "file": "modelchorus/src/modelchorus/core/models.py",
+      "line": 606,
       "language": "python",
       "docstring": "Generic state container for workflow-specific conversation data.\n\nProvides type-safe structure for storing arbitrary workflow state\nwhile maintaining serializability for file-based persistence.\nIncludes versioning to support schema evolution.\n\nAttributes:\n    workflow_name: Workflow this state belongs to\n    data: Arbitrary workflow-specific state data\n    schema_version: State schema version for compatibility\n    created_at: ISO timestamp of state creation\n    updated_at: ISO timestamp of last state update",
       "bases": [
@@ -5784,6 +5802,7 @@
       "models.ConversationMessage",
       "models.ConversationThread",
       "models.ConversationState",
+      "models.Hypothesis",
       "conversation.ConversationMemory"
     ],
     "modelchorus/src/modelchorus/core/base_workflow.py": [

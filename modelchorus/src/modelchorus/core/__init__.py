@@ -8,6 +8,7 @@ components that power multi-model AI workflows.
 from .base_workflow import BaseWorkflow, WorkflowResult, WorkflowStep
 from .registry import WorkflowRegistry
 from .models import (
+    ConfidenceLevel,
     WorkflowRequest,
     WorkflowResponse,
     ModelSelection,
@@ -26,6 +27,7 @@ __all__ = [
     "WorkflowResult",
     "WorkflowStep",
     "WorkflowRegistry",
+    "ConfidenceLevel",
     "WorkflowRequest",
     "WorkflowResponse",
     "ModelSelection",

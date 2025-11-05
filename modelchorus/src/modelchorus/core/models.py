@@ -8,8 +8,36 @@ Additionally defines conversation infrastructure models for multi-turn
 conversations with continuation support, adapted from Zen MCP patterns.
 """
 
+from enum import Enum
 from typing import Any, Dict, List, Optional, Literal
 from pydantic import BaseModel, Field, ConfigDict
+
+
+class ConfidenceLevel(str, Enum):
+    """
+    Confidence level enum for investigation workflows.
+
+    Used in Thinkdeep workflow to track the investigator's confidence
+    in their hypothesis as evidence accumulates. Levels progress from
+    initial exploration through to complete certainty.
+
+    Values:
+        EXPLORING: Just starting investigation, no clear hypothesis yet
+        LOW: Early investigation with initial hypothesis forming
+        MEDIUM: Some supporting evidence found
+        HIGH: Strong evidence supporting hypothesis
+        VERY_HIGH: Very strong evidence, high confidence
+        ALMOST_CERTAIN: Near complete confidence, comprehensive evidence
+        CERTAIN: 100% confidence, hypothesis validated beyond reasonable doubt
+    """
+
+    EXPLORING = "exploring"
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    VERY_HIGH = "very_high"
+    ALMOST_CERTAIN = "almost_certain"
+    CERTAIN = "certain"
 
 
 class WorkflowRequest(BaseModel):
