@@ -14,6 +14,7 @@ from .base_provider import (
 )
 from .cli_provider import CLIProvider
 from .claude_provider import ClaudeProvider
+from .codex_provider import CodexProvider
 
 __all__ = [
     "ModelProvider",
@@ -23,4 +24,5 @@ __all__ = [
     "GenerationResponse",
     "CLIProvider",
     "ClaudeProvider",
+    "CodexProvider",
 ]
