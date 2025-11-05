@@ -1,19 +1,20 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 16:15:11
+**Generated:** 2025-11-05 16:17:27
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 34
-- **Total Lines:** 7142
+- **Total Lines:** 7320
 - **Total Classes:** 42
-- **Total Functions:** 12
-- **Avg Complexity:** 2.75
-- **Max Complexity:** 16
+- **Total Functions:** 13
+- **Avg Complexity:** 4.0
+- **Max Complexity:** 19
 - **High Complexity Functions:**
+  - chat (19)
   - consensus (16)
 
 
@@ -1079,10 +1080,44 @@ Attributes:
 
 ## ⚡ Functions
 
+### `chat(prompt, provider, continuation_id, files, system, temperature, max_tokens, output, verbose) -> None`
+
+**Language:** python
+**Defined in:** `src/modelchorus/cli/main.py:55`
+⚠️ **Complexity:** 19 (High)
+
+**Decorators:** `@app.command()`
+
+**Description:**
+> Chat with a single AI model with conversation continuity.
+
+Example:
+    # Start new conversation
+    modelchorus chat "What is quantum computing?" -p claude
+
+    # Continue conversation
+    modelchorus chat "Give me an example" --continue thread-id-123
+
+    # Include files
+    modelchorus chat "Review this code" -f src/main.py -f tests/test_main.py
+
+**Parameters:**
+- `prompt`: str
+- `provider`: str
+- `continuation_id`: Optional[str]
+- `files`: Optional[List[str]]
+- `system`: Optional[str]
+- `temperature`: float
+- `max_tokens`: Optional[int]
+- `output`: Optional[Path]
+- `verbose`: bool
+
+---
+
 ### `consensus(prompt, providers, strategy, system, temperature, max_tokens, timeout, output, verbose) -> None`
 
 **Language:** python
-**Defined in:** `src/modelchorus/cli/main.py:54`
+**Defined in:** `src/modelchorus/cli/main.py:232`
 ⚠️ **Complexity:** 16 (High)
 
 **Decorators:** `@app.command()`
@@ -1128,7 +1163,7 @@ Example:
 ### `get_provider_by_name(name) -> None`
 
 **Language:** python
-**Defined in:** `src/modelchorus/cli/main.py:35`
+**Defined in:** `src/modelchorus/cli/main.py:36`
 **Complexity:** 2
 
 **Description:**
@@ -1142,7 +1177,7 @@ Example:
 ### `list_providers() -> None`
 
 **Language:** python
-**Defined in:** `src/modelchorus/cli/main.py:239`
+**Defined in:** `src/modelchorus/cli/main.py:417`
 **Complexity:** 3
 
 **Decorators:** `@app.command()`
@@ -1177,7 +1212,7 @@ Example:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `src/modelchorus/cli/main.py:277`
+**Defined in:** `src/modelchorus/cli/main.py:455`
 **Complexity:** 1
 
 **Description:**
@@ -1240,7 +1275,7 @@ Example:
 ### `version() -> None`
 
 **Language:** python
-**Defined in:** `src/modelchorus/cli/main.py:266`
+**Defined in:** `src/modelchorus/cli/main.py:444`
 **Complexity:** 1
 
 **Decorators:** `@app.command()`
@@ -1278,6 +1313,7 @@ Example:
 ### `src/modelchorus/cli/main.py`
 
 - `asyncio`
+- `core.conversation.ConversationMemory`
 - `json`
 - `pathlib.Path`
 - `providers.ClaudeProvider`
@@ -1292,6 +1328,7 @@ Example:
 - `typer`
 - `typing.List`
 - `typing.Optional`
+- `workflows.ChatWorkflow`
 - `workflows.ConsensusStrategy`
 - `workflows.ConsensusWorkflow`
 
