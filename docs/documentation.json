@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T22:59:31.364968Z",
+    "generated_at": "2025-11-05T23:00:42.352122Z",
     "languages": [
       "python"
     ],
@@ -10,8 +10,8 @@
   },
   "statistics": {
     "total_files": 36,
-    "total_lines": 7982,
-    "total_classes": 49,
+    "total_lines": 8012,
+    "total_classes": 50,
     "total_functions": 21,
     "avg_complexity": 3.29,
     "max_complexity": 19,
@@ -22,8 +22,8 @@
     "by_language": {
       "python": {
         "files": 36,
-        "lines": 7982,
-        "classes": 49,
+        "lines": 8012,
+        "classes": 50,
         "functions": 21,
         "avg_complexity": 3.29
       }
@@ -171,6 +171,7 @@
         "base_workflow.WorkflowResult",
         "base_workflow.WorkflowStep",
         "registry.WorkflowRegistry",
+        "models.ConfidenceLevel",
         "models.WorkflowRequest",
         "models.WorkflowResponse",
         "models.ModelSelection",
@@ -184,7 +185,7 @@
         "conversation.ConversationMemory"
       ],
       "exports": [],
-      "lines": 40
+      "lines": 42
     },
     {
       "name": "base_workflow",
@@ -250,6 +251,7 @@
       "language": "python",
       "docstring": "Pydantic models for ModelChorus workflow requests and responses.\n\nThis module defines the data models used for workflow communication,\nproviding validation and serialization for workflow inputs and outputs.\n\nAdditionally defines conversation infrastructure models for multi-turn\nconversations with continuation support, adapted from Zen MCP patterns.",
       "classes": [
+        "ConfidenceLevel",
         "WorkflowRequest",
         "WorkflowResponse",
         "ModelSelection",
@@ -263,6 +265,7 @@
       ],
       "functions": [],
       "imports": [
+        "enum.Enum",
         "typing.Any",
         "typing.Dict",
         "typing.List",
@@ -273,7 +276,7 @@
         "pydantic.ConfigDict"
       ],
       "exports": [],
-      "lines": 663
+      "lines": 691
     },
     {
       "name": "registry",
@@ -1175,9 +1178,26 @@
       "instantiation_count": 19
     },
     {
+      "name": "ConfidenceLevel",
+      "file": "modelchorus/src/modelchorus/core/models.py",
+      "line": 16,
+      "language": "python",
+      "docstring": "Confidence level enum for investigation workflows.\n\nUsed in Thinkdeep workflow to track the investigator's confidence\nin their hypothesis as evidence accumulates. Levels progress from\ninitial exploration through to complete certainty.\n\nValues:\n    EXPLORING: Just starting investigation, no clear hypothesis yet\n    LOW: Early investigation with initial hypothesis forming\n    MEDIUM: Some supporting evidence found\n    HIGH: Strong evidence supporting hypothesis\n    VERY_HIGH: Very strong evidence, high confidence\n    ALMOST_CERTAIN: Near complete confidence, comprehensive evidence\n    CERTAIN: 100% confidence, hypothesis validated beyond reasonable doubt",
+      "bases": [
+        "str",
+        "Enum"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
       "name": "WorkflowRequest",
       "file": "modelchorus/src/modelchorus/core/models.py",
-      "line": 15,
+      "line": 43,
       "language": "python",
       "docstring": "Request model for workflow execution.\n\nEncapsulates all the information needed to execute a workflow,\nincluding the prompt, model specifications, and configuration.\n\nAttributes:\n    prompt: The main input prompt/task for the workflow\n    models: List of model identifiers to use (e.g., [\"gpt-4\", \"claude-3\"])\n    config: Optional workflow-specific configuration dictionary\n    system_prompt: Optional system prompt for model context\n    temperature: Optional temperature setting (0.0-1.0)\n    max_tokens: Optional maximum tokens for generation\n    images: Optional list of image paths or URLs for vision-capable models\n    metadata: Additional metadata for the workflow execution",
       "bases": [
@@ -1203,7 +1223,7 @@
     {
       "name": "WorkflowResponse",
       "file": "modelchorus/src/modelchorus/core/models.py",
-      "line": 89,
+      "line": 117,
       "language": "python",
       "docstring": "Response model for workflow execution.\n\nContains the results of a workflow execution along with metadata\nabout the execution process.\n\nAttributes:\n    result: The main result/output from the workflow\n    success: Whether the workflow executed successfully\n    workflow_name: Name of the workflow that was executed\n    steps: Number of steps executed in the workflow\n    models_used: List of models that were used\n    error: Error message if the workflow failed\n    metadata: Additional metadata about the execution",
       "bases": [
@@ -1219,7 +1239,7 @@
     {
       "name": "ModelSelection",
       "file": "modelchorus/src/modelchorus/core/models.py",
-      "line": 156,
+      "line": 184,
       "language": "python",
       "docstring": "Model for specifying model selection criteria.\n\nUsed to configure which models should be used for specific\nworkflow steps or roles.\n\nAttributes:\n    model_id: The model identifier (e.g., \"gpt-4\", \"claude-3-opus\")\n    role: Optional role for this model (e.g., \"analyzer\", \"synthesizer\")\n    config: Optional model-specific configuration",
       "bases": [
@@ -1235,7 +1255,7 @@
     {
       "name": "WorkflowStep",
       "file": "modelchorus/src/modelchorus/core/models.py",
-      "line": 196,
+      "line": 224,
       "language": "python",
       "docstring": "Model for a single workflow execution step.\n\nRepresents one step in a multi-step workflow, capturing what\nwas done, which model was used, and the results.\n\nAttributes:\n    step_number: Sequential step number (1-indexed)\n    description: Human-readable description of this step\n    model: Model that executed this step\n    prompt: The prompt used for this step\n    response: The response from this step\n    metadata: Additional step metadata",
       "bases": [
@@ -1262,7 +1282,7 @@
     {
       "name": "ModelResponse",
       "file": "modelchorus/src/modelchorus/core/models.py",
-      "line": 258,
+      "line": 286,
       "language": "python",
       "docstring": "Model for a response from a single model.\n\nRepresents the output from querying a specific model, used in\nmulti-model workflows to track individual model contributions.\n\nAttributes:\n    model: Identifier of the model that generated this response\n    content: The response content/text\n    role: Optional role this model played (e.g., \"for\", \"against\", \"neutral\")\n    metadata: Additional response metadata (tokens, latency, etc.)",
       "bases": [
@@ -1278,7 +1298,7 @@
     {
       "name": "ConsensusConfig",
       "file": "modelchorus/src/modelchorus/core/models.py",
-      "line": 306,
+      "line": 334,
       "language": "python",
       "docstring": "Configuration for consensus-building workflows.\n\nSpecifies how multiple models should be consulted and how their\nresponses should be synthesized into a consensus.\n\nAttributes:\n    mode: Consensus mode (\"debate\", \"vote\", \"synthesis\")\n    stances: Optional list of stances to assign to models (e.g., [\"for\", \"against\", \"neutral\"])\n    temperature: Temperature for model responses\n    min_agreement: Minimum agreement threshold (0.0-1.0) for consensus\n    synthesis_model: Optional model to use for final synthesis\n    max_rounds: Maximum number of consensus rounds",
       "bases": [
@@ -1294,7 +1314,7 @@
     {
       "name": "ConversationMessage",
       "file": "modelchorus/src/modelchorus/core/models.py",
-      "line": 379,
+      "line": 407,
       "language": "python",
       "docstring": "Single message in a conversation thread.\n\nBased on Zen MCP's ConversationTurn but adapted for CLI-based architecture.\nTracks who said what, when, and with what context (files, models, workflow).\n\nAttributes:\n    role: Message role - 'user' or 'assistant'\n    content: The actual message text/content\n    timestamp: ISO format timestamp of when message was created\n    files: Optional list of file paths referenced in this message\n    workflow_name: Optional workflow that generated this message (for assistant messages)\n    model_provider: Optional provider type used (cli, api, mcp)\n    model_name: Optional specific model identifier (e.g., claude-3-opus, gpt-5)\n    metadata: Additional message metadata (tokens, latency, cost, etc.)",
       "bases": [
@@ -1321,7 +1341,7 @@
     {
       "name": "ConversationThread",
       "file": "modelchorus/src/modelchorus/core/models.py",
-      "line": 451,
+      "line": 479,
       "language": "python",
       "docstring": "Complete conversation context for a thread.\n\nAdapted from Zen MCP's ThreadContext with enhancements for CLI orchestration:\n- Provider-agnostic design supporting multiple CLI providers\n- Explicit lifecycle management (status field)\n- Support for conversation branching (future enhancement)\n- Workflow-specific state persistence\n\nAttributes:\n    thread_id: UUID identifying this conversation thread\n    parent_thread_id: Optional parent thread ID for conversation chains\n    created_at: ISO timestamp of thread creation\n    last_updated_at: ISO timestamp of last update\n    workflow_name: Workflow that created this thread\n    messages: All messages in chronological order\n    state: Workflow-specific state data (persisted across turns)\n    initial_context: Original request parameters\n    status: Thread lifecycle status (active, completed, archived)\n    branch_point: Optional message ID where branch occurred\n    sibling_threads: Other thread IDs branched from same point",
       "bases": [
@@ -1357,7 +1377,7 @@
     {
       "name": "Hypothesis",
       "file": "modelchorus/src/modelchorus/core/models.py",
-      "line": 561,
+      "line": 589,
       "language": "python",
       "docstring": "Model for tracking hypotheses in investigation workflows.\n\nUsed in Thinkdeep workflow to track hypothesis evolution during\nsystematic investigation, including the hypothesis text, supporting\nevidence, and current validation status.\n\nAttributes:\n    hypothesis: The hypothesis text/statement being investigated\n    evidence: List of evidence items supporting or refuting this hypothesis\n    status: Current validation status (active, disproven, validated)",
       "bases": [
@@ -1373,7 +1393,7 @@
     {
       "name": "ConversationState",
       "file": "modelchorus/src/modelchorus/core/models.py",
-      "line": 606,
+      "line": 634,
       "language": "python",
       "docstring": "Generic state container for workflow-specific conversation data.\n\nProvides type-safe structure for storing arbitrary workflow state\nwhile maintaining serializability for file-based persistence.\nIncludes versioning to support schema evolution.\n\nAttributes:\n    workflow_name: Workflow this state belongs to\n    data: Arbitrary workflow-specific state data\n    schema_version: State schema version for compatibility\n    created_at: ISO timestamp of state creation\n    updated_at: ISO timestamp of last state update",
       "bases": [
@@ -5793,6 +5813,7 @@
       "base_workflow.WorkflowResult",
       "base_workflow.WorkflowStep",
       "registry.WorkflowRegistry",
+      "models.ConfidenceLevel",
       "models.WorkflowRequest",
       "models.WorkflowResponse",
       "models.ModelSelection",
@@ -5838,6 +5859,7 @@
       "models.ConversationState"
     ],
     "modelchorus/src/modelchorus/core/models.py": [
+      "enum.Enum",
       "typing.Any",
       "typing.Dict",
       "typing.List",

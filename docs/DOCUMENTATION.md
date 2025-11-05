@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 17:59:31
+**Generated:** 2025-11-05 18:00:42
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 36
-- **Total Lines:** 7982
-- **Total Classes:** 49
+- **Total Lines:** 8012
+- **Total Classes:** 50
 - **Total Functions:** 21
 - **Avg Complexity:** 3.29
 - **Max Complexity:** 19
@@ -234,11 +234,35 @@ Example:
 
 ---
 
+### `ConfidenceLevel`
+
+**Language:** python
+**Inherits from:** `str`, `Enum`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:16`
+
+**Description:**
+> Confidence level enum for investigation workflows.
+
+Used in Thinkdeep workflow to track the investigator's confidence
+in their hypothesis as evidence accumulates. Levels progress from
+initial exploration through to complete certainty.
+
+Values:
+    EXPLORING: Just starting investigation, no clear hypothesis yet
+    LOW: Early investigation with initial hypothesis forming
+    MEDIUM: Some supporting evidence found
+    HIGH: Strong evidence supporting hypothesis
+    VERY_HIGH: Very strong evidence, high confidence
+    ALMOST_CERTAIN: Near complete confidence, comprehensive evidence
+    CERTAIN: 100% confidence, hypothesis validated beyond reasonable doubt
+
+---
+
 ### `ConsensusConfig`
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:306`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:334`
 
 **Description:**
 > Configuration for consensus-building workflows.
@@ -372,7 +396,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:379`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:407`
 
 **Description:**
 > Single message in a conversation thread.
@@ -396,7 +420,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:606`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:634`
 
 **Description:**
 > Generic state container for workflow-specific conversation data.
@@ -418,7 +442,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:451`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:479`
 
 **Description:**
 > Complete conversation context for a thread.
@@ -586,7 +610,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:561`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:589`
 
 **Description:**
 > Model for tracking hypotheses in investigation workflows.
@@ -656,7 +680,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:258`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:286`
 
 **Description:**
 > Model for a response from a single model.
@@ -676,7 +700,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:156`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:184`
 
 **Description:**
 > Model for specifying model selection criteria.
@@ -1104,7 +1128,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:15`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:43`
 
 **Description:**
 > Request model for workflow execution.
@@ -1128,7 +1152,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:89`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:117`
 
 **Description:**
 > Response model for workflow execution.
@@ -1174,7 +1198,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:196`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:224`
 
 **Description:**
 > Model for a single workflow execution step.
@@ -1559,6 +1583,7 @@ Example:
 - `base_workflow.WorkflowResult`
 - `base_workflow.WorkflowStep`
 - `conversation.ConversationMemory`
+- `models.ConfidenceLevel`
 - `models.ConsensusConfig`
 - `models.ConversationMessage`
 - `models.ConversationState`
@@ -1607,6 +1632,7 @@ Example:
 
 ### `modelchorus/src/modelchorus/core/models.py`
 
+- `enum.Enum`
 - `pydantic.BaseModel`
 - `pydantic.ConfigDict`
 - `pydantic.Field`

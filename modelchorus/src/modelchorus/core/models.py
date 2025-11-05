@@ -631,6 +631,60 @@ class Hypothesis(BaseModel):
     )
 
 
+class InvestigationStep(BaseModel):
+    """
+    Model for a single investigation step in Thinkdeep workflow.
+
+    Captures the details of one step in a systematic investigation,
+    including what was found, which files were examined, and the
+    current confidence level in the hypothesis.
+
+    Attributes:
+        step_number: Sequential step number (1-indexed)
+        findings: Key findings and insights discovered in this step
+        files_checked: List of files examined during this step
+        confidence: Current confidence level after this step
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "step_number": 1,
+                "findings": "Found async/await pattern in auth service. No callbacks detected in user-facing API.",
+                "files_checked": [
+                    "src/services/auth.py",
+                    "src/api/users.py",
+                    "tests/test_auth.py"
+                ],
+                "confidence": "high"
+            }
+        }
+    )
+
+    step_number: int = Field(
+        ...,
+        ge=1,
+        description="Sequential step number in the investigation",
+    )
+
+    findings: str = Field(
+        ...,
+        description="Key findings and insights discovered in this step",
+        min_length=1,
+    )
+
+    files_checked: List[str] = Field(
+        default_factory=list,
+        description="List of files examined during this step",
+    )
+
+    confidence: str = Field(
+        ...,
+        description="Current confidence level after this step (ConfidenceLevel value)",
+        min_length=1,
+    )
+
+
 class ConversationState(BaseModel):
     """
     Generic state container for workflow-specific conversation data.
