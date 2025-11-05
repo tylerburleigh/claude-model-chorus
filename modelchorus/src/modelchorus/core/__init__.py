@@ -12,6 +12,8 @@ from .models import (
     WorkflowResponse,
     ModelSelection,
     WorkflowStep as WorkflowStepModel,
+    ModelResponse,
+    ConsensusConfig,
 )
 
 __all__ = [
@@ -23,4 +25,6 @@ __all__ = [
     "WorkflowResponse",
     "ModelSelection",
     "WorkflowStepModel",
+    "ModelResponse",
+    "ConsensusConfig",
 ]

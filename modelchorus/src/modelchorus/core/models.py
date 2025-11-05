@@ -250,3 +250,118 @@ class WorkflowStep(BaseModel):
         default_factory=dict,
         description="Additional metadata for this step",
     )
+
+
+class ModelResponse(BaseModel):
+    """
+    Model for a response from a single model.
+
+    Represents the output from querying a specific model, used in
+    multi-model workflows to track individual model contributions.
+
+    Attributes:
+        model: Identifier of the model that generated this response
+        content: The response content/text
+        role: Optional role this model played (e.g., "for", "against", "neutral")
+        metadata: Additional response metadata (tokens, latency, etc.)
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "model": "claude-3-opus",
+                "content": "I recommend approach A because...",
+                "role": "advocate",
+                "metadata": {"tokens": 350, "latency_ms": 1200},
+            }
+        }
+    )
+
+    model: str = Field(
+        ...,
+        description="Model identifier that generated this response",
+        min_length=1,
+    )
+
+    content: str = Field(
+        ...,
+        description="The response content from the model",
+        min_length=1,
+    )
+
+    role: Optional[str] = Field(
+        default=None,
+        description="Optional role this model played in the workflow",
+    )
+
+    metadata: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Additional metadata (tokens, latency, cost, etc.)",
+    )
+
+
+class ConsensusConfig(BaseModel):
+    """
+    Configuration for consensus-building workflows.
+
+    Specifies how multiple models should be consulted and how their
+    responses should be synthesized into a consensus.
+
+    Attributes:
+        mode: Consensus mode ("debate", "vote", "synthesis")
+        stances: Optional list of stances to assign to models (e.g., ["for", "against", "neutral"])
+        temperature: Temperature for model responses
+        min_agreement: Minimum agreement threshold (0.0-1.0) for consensus
+        synthesis_model: Optional model to use for final synthesis
+        max_rounds: Maximum number of consensus rounds
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "mode": "debate",
+                "stances": ["for", "against", "neutral"],
+                "temperature": 0.7,
+                "min_agreement": 0.6,
+                "synthesis_model": "claude-3-opus",
+                "max_rounds": 3,
+            }
+        }
+    )
+
+    mode: str = Field(
+        ...,
+        description="Consensus mode: 'debate', 'vote', or 'synthesis'",
+        pattern="^(debate|vote|synthesis)$",
+    )
+
+    stances: Optional[List[str]] = Field(
+        default=None,
+        description="Optional stances to assign to models",
+    )
+
+    temperature: float = Field(
+        default=0.7,
+        ge=0.0,
+        le=1.0,
+        description="Temperature for model responses",
+    )
+
+    min_agreement: float = Field(
+        default=0.5,
+        ge=0.0,
+        le=1.0,
+        description="Minimum agreement threshold for consensus (0.0-1.0)",
+    )
+
+    synthesis_model: Optional[str] = Field(
+        default=None,
+        description="Optional model to use for final synthesis",
+    )
+
+    max_rounds: int = Field(
+        default=1,
+        ge=1,
+        le=10,
+        description="Maximum number of consensus rounds",
+    )
