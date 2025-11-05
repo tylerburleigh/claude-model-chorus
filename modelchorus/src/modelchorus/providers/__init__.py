@@ -13,6 +13,7 @@ from .base_provider import (
     GenerationResponse,
 )
 from .cli_provider import CLIProvider
+from .claude_provider import ClaudeProvider
 
 __all__ = [
     "ModelProvider",
@@ -21,4 +22,5 @@ __all__ = [
     "GenerationRequest",
     "GenerationResponse",
     "CLIProvider",
+    "ClaudeProvider",
 ]
