@@ -5,4 +5,6 @@ This module provides CLI commands for running workflows and
 managing ModelChorus operations.
 """
 
-__all__ = []
+from .main import app, main
+
+__all__ = ["app", "main"]
