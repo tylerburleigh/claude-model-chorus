@@ -1130,3 +1130,481 @@ class TestHypothesisEvolution:
         )
 
         assert result2.metadata["hypotheses_count"] == 2
+
+
+class TestConfidenceProgression:
+    """Test suite for confidence level progression in ThinkDeepWorkflow."""
+
+    @pytest.fixture
+    def mock_provider(self):
+        """Create a mock provider for testing."""
+        provider = AsyncMock()
+        provider.provider_name = "test_provider"
+        provider.validate_api_key.return_value = True
+        return provider
+
+    @pytest.fixture
+    def conversation_memory(self):
+        """Create conversation memory for testing."""
+        return ConversationMemory()
+
+    @pytest.mark.asyncio
+    async def test_initial_confidence_level(
+        self, mock_provider, conversation_memory
+    ):
+        """Test that investigations start with 'exploring' confidence."""
+        # Setup mock response
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Starting investigation.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        # Create workflow
+        workflow = ThinkDeepWorkflow(
+            provider=mock_provider,
+            conversation_memory=conversation_memory
+        )
+
+        # Start investigation
+        result = await workflow.run(prompt="Begin investigation")
+        thread_id = result.metadata["thread_id"]
+
+        # Verify initial confidence
+        state = workflow.get_investigation_state(thread_id)
+        assert state.current_confidence == ConfidenceLevel.EXPLORING.value
+
+        # Also verify in result metadata
+        assert result.metadata["confidence"] == ConfidenceLevel.EXPLORING.value
+
+    @pytest.mark.asyncio
+    async def test_update_confidence_level(
+        self, mock_provider, conversation_memory
+    ):
+        """Test manually updating confidence level."""
+        # Setup workflow
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        workflow = ThinkDeepWorkflow(
+            provider=mock_provider,
+            conversation_memory=conversation_memory
+        )
+
+        result = await workflow.run(prompt="Start investigation")
+        thread_id = result.metadata["thread_id"]
+
+        # Update confidence through all levels
+        confidence_levels = [
+            ConfidenceLevel.LOW,
+            ConfidenceLevel.MEDIUM,
+            ConfidenceLevel.HIGH,
+            ConfidenceLevel.VERY_HIGH,
+            ConfidenceLevel.ALMOST_CERTAIN,
+            ConfidenceLevel.CERTAIN,
+        ]
+
+        for level in confidence_levels:
+            success = workflow.update_confidence(thread_id, level.value)
+            assert success is True
+
+            state = workflow.get_investigation_state(thread_id)
+            assert state.current_confidence == level.value
+
+    @pytest.mark.asyncio
+    async def test_get_confidence_level(
+        self, mock_provider, conversation_memory
+    ):
+        """Test retrieving current confidence level."""
+        # Setup workflow
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        workflow = ThinkDeepWorkflow(
+            provider=mock_provider,
+            conversation_memory=conversation_memory
+        )
+
+        result = await workflow.run(prompt="Start investigation")
+        thread_id = result.metadata["thread_id"]
+
+        # Initial confidence
+        confidence = workflow.get_confidence(thread_id)
+        assert confidence == ConfidenceLevel.EXPLORING.value
+
+        # After update
+        workflow.update_confidence(thread_id, ConfidenceLevel.HIGH.value)
+        confidence = workflow.get_confidence(thread_id)
+        assert confidence == ConfidenceLevel.HIGH.value
+
+    @pytest.mark.asyncio
+    async def test_confidence_progression_across_steps(
+        self, mock_provider, conversation_memory
+    ):
+        """Test confidence increases as investigation progresses."""
+        # Create workflow
+        workflow = ThinkDeepWorkflow(
+            provider=mock_provider,
+            conversation_memory=conversation_memory
+        )
+
+        # Step 1: Initial exploration
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Initial exploration shows potential issue.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        result1 = await workflow.run(prompt="Start investigation")
+        thread_id = result1.metadata["thread_id"]
+
+        # Verify exploring confidence
+        state1 = workflow.get_investigation_state(thread_id)
+        assert state1.current_confidence == ConfidenceLevel.EXPLORING.value
+
+        # Step 2: Hypothesis formed - increase to low
+        workflow.update_confidence(thread_id, ConfidenceLevel.LOW.value)
+
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Hypothesis: Database connection pool issue.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        result2 = await workflow.run(
+            prompt="Form hypothesis",
+            continuation_id=thread_id
+        )
+
+        state2 = workflow.get_investigation_state(thread_id)
+        assert state2.current_confidence == ConfidenceLevel.LOW.value
+
+        # Step 3: Evidence gathered - increase to medium
+        workflow.update_confidence(thread_id, ConfidenceLevel.MEDIUM.value)
+
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Evidence supports hypothesis.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        result3 = await workflow.run(
+            prompt="Gather evidence",
+            continuation_id=thread_id
+        )
+
+        state3 = workflow.get_investigation_state(thread_id)
+        assert state3.current_confidence == ConfidenceLevel.MEDIUM.value
+
+        # Step 4: Hypothesis validated - increase to high
+        workflow.update_confidence(thread_id, ConfidenceLevel.HIGH.value)
+
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Hypothesis validated with strong evidence.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        result4 = await workflow.run(
+            prompt="Validate hypothesis",
+            continuation_id=thread_id
+        )
+
+        state4 = workflow.get_investigation_state(thread_id)
+        assert state4.current_confidence == ConfidenceLevel.HIGH.value
+
+        # Verify progression in steps
+        assert len(state4.steps) == 4
+        assert state4.steps[0].confidence == ConfidenceLevel.EXPLORING.value
+        assert state4.steps[1].confidence == ConfidenceLevel.LOW.value
+        assert state4.steps[2].confidence == ConfidenceLevel.MEDIUM.value
+        assert state4.steps[3].confidence == ConfidenceLevel.HIGH.value
+
+    @pytest.mark.asyncio
+    async def test_confidence_tracked_in_metadata(
+        self, mock_provider, conversation_memory
+    ):
+        """Test confidence level appears in result metadata."""
+        # Setup workflow
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        workflow = ThinkDeepWorkflow(
+            provider=mock_provider,
+            conversation_memory=conversation_memory
+        )
+
+        # Initial investigation
+        result1 = await workflow.run(prompt="Start")
+        assert result1.metadata["confidence"] == ConfidenceLevel.EXPLORING.value
+
+        thread_id = result1.metadata["thread_id"]
+
+        # Update confidence
+        workflow.update_confidence(thread_id, ConfidenceLevel.MEDIUM.value)
+
+        # Continue investigation
+        result2 = await workflow.run(prompt="Continue", continuation_id=thread_id)
+        assert result2.metadata["confidence"] == ConfidenceLevel.MEDIUM.value
+
+    @pytest.mark.asyncio
+    async def test_invalid_confidence_level_rejected(
+        self, mock_provider, conversation_memory
+    ):
+        """Test that invalid confidence levels are rejected."""
+        # Setup workflow
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        workflow = ThinkDeepWorkflow(
+            provider=mock_provider,
+            conversation_memory=conversation_memory
+        )
+
+        result = await workflow.run(prompt="Start investigation")
+        thread_id = result.metadata["thread_id"]
+
+        # Try invalid confidence level
+        success = workflow.update_confidence(thread_id, "invalid_level")
+        assert success is False
+
+        # Verify confidence unchanged
+        state = workflow.get_investigation_state(thread_id)
+        assert state.current_confidence == ConfidenceLevel.EXPLORING.value
+
+    @pytest.mark.asyncio
+    async def test_confidence_complete_progression(
+        self, mock_provider, conversation_memory
+    ):
+        """Test complete confidence progression from exploring to certain."""
+        # Setup workflow
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        workflow = ThinkDeepWorkflow(
+            provider=mock_provider,
+            conversation_memory=conversation_memory
+        )
+
+        result = await workflow.run(prompt="Start investigation")
+        thread_id = result.metadata["thread_id"]
+
+        # Progress through all confidence levels
+        progression = [
+            ConfidenceLevel.EXPLORING,  # Start
+            ConfidenceLevel.LOW,
+            ConfidenceLevel.MEDIUM,
+            ConfidenceLevel.HIGH,
+            ConfidenceLevel.VERY_HIGH,
+            ConfidenceLevel.ALMOST_CERTAIN,
+            ConfidenceLevel.CERTAIN,
+        ]
+
+        # Verify initial state
+        state = workflow.get_investigation_state(thread_id)
+        assert state.current_confidence == progression[0].value
+
+        # Progress through levels
+        for i in range(1, len(progression)):
+            success = workflow.update_confidence(thread_id, progression[i].value)
+            assert success is True
+
+            state = workflow.get_investigation_state(thread_id)
+            assert state.current_confidence == progression[i].value
+
+        # Verify reached certain
+        final_state = workflow.get_investigation_state(thread_id)
+        assert final_state.current_confidence == ConfidenceLevel.CERTAIN.value
+
+    @pytest.mark.asyncio
+    async def test_investigation_completion_criteria(
+        self, mock_provider, conversation_memory
+    ):
+        """Test investigation completion based on confidence level."""
+        # Setup workflow
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        workflow = ThinkDeepWorkflow(
+            provider=mock_provider,
+            conversation_memory=conversation_memory
+        )
+
+        result = await workflow.run(prompt="Start investigation")
+        thread_id = result.metadata["thread_id"]
+
+        # Not complete initially (no hypotheses, low confidence)
+        assert workflow.is_investigation_complete(thread_id) is False
+
+        # Add hypothesis but confidence still exploring
+        workflow.add_hypothesis(thread_id, "Test hypothesis")
+        assert workflow.is_investigation_complete(thread_id) is False
+
+        # Increase confidence but not high enough
+        workflow.update_confidence(thread_id, ConfidenceLevel.MEDIUM.value)
+        assert workflow.is_investigation_complete(thread_id) is False
+
+        # Increase to high - still not enough
+        workflow.update_confidence(thread_id, ConfidenceLevel.HIGH.value)
+        assert workflow.is_investigation_complete(thread_id) is False
+
+        # Increase to almost certain - should be complete
+        workflow.update_confidence(thread_id, ConfidenceLevel.ALMOST_CERTAIN.value)
+        assert workflow.is_investigation_complete(thread_id) is True
+
+        # Certain should also be complete
+        workflow.update_confidence(thread_id, ConfidenceLevel.CERTAIN.value)
+        assert workflow.is_investigation_complete(thread_id) is True
+
+    @pytest.mark.asyncio
+    async def test_investigation_summary_includes_confidence(
+        self, mock_provider, conversation_memory
+    ):
+        """Test that investigation summary includes confidence level."""
+        # Setup workflow
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        workflow = ThinkDeepWorkflow(
+            provider=mock_provider,
+            conversation_memory=conversation_memory
+        )
+
+        result = await workflow.run(prompt="Start investigation")
+        thread_id = result.metadata["thread_id"]
+
+        # Get summary with initial confidence
+        summary1 = workflow.get_investigation_summary(thread_id)
+        assert summary1 is not None
+        assert "confidence" in summary1
+        assert summary1["confidence"] == ConfidenceLevel.EXPLORING.value
+
+        # Update confidence and get new summary
+        workflow.update_confidence(thread_id, ConfidenceLevel.HIGH.value)
+        summary2 = workflow.get_investigation_summary(thread_id)
+        assert summary2["confidence"] == ConfidenceLevel.HIGH.value
+
+    @pytest.mark.asyncio
+    async def test_confidence_cannot_decrease(
+        self, mock_provider, conversation_memory
+    ):
+        """Test that confidence can be updated to lower values (no restriction)."""
+        # Note: The workflow doesn't enforce that confidence only increases,
+        # which allows for scenarios where new evidence might reduce confidence.
+        # This test verifies that behavior is allowed.
+
+        # Setup workflow
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        workflow = ThinkDeepWorkflow(
+            provider=mock_provider,
+            conversation_memory=conversation_memory
+        )
+
+        result = await workflow.run(prompt="Start investigation")
+        thread_id = result.metadata["thread_id"]
+
+        # Increase confidence
+        workflow.update_confidence(thread_id, ConfidenceLevel.HIGH.value)
+        state1 = workflow.get_investigation_state(thread_id)
+        assert state1.current_confidence == ConfidenceLevel.HIGH.value
+
+        # Decrease confidence (allowed - new evidence might reduce confidence)
+        success = workflow.update_confidence(thread_id, ConfidenceLevel.MEDIUM.value)
+        assert success is True
+
+        state2 = workflow.get_investigation_state(thread_id)
+        assert state2.current_confidence == ConfidenceLevel.MEDIUM.value
+
+    @pytest.mark.asyncio
+    async def test_confidence_persistence_across_turns(
+        self, mock_provider, conversation_memory
+    ):
+        """Test that confidence persists across investigation turns."""
+        # Setup workflow
+        workflow = ThinkDeepWorkflow(
+            provider=mock_provider,
+            conversation_memory=conversation_memory
+        )
+
+        # Turn 1: Start with exploring
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Initial exploration.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        result1 = await workflow.run(prompt="Start")
+        thread_id = result1.metadata["thread_id"]
+
+        # Turn 2: Update to medium
+        workflow.update_confidence(thread_id, ConfidenceLevel.MEDIUM.value)
+
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Continuing investigation.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        result2 = await workflow.run(prompt="Continue", continuation_id=thread_id)
+
+        # Turn 3: Update to high
+        workflow.update_confidence(thread_id, ConfidenceLevel.HIGH.value)
+
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Final analysis.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        result3 = await workflow.run(prompt="Finalize", continuation_id=thread_id)
+
+        # Verify confidence persisted and progressed
+        state = workflow.get_investigation_state(thread_id)
+        assert state.current_confidence == ConfidenceLevel.HIGH.value
+
+        # Verify each turn had correct confidence in metadata
+        assert result1.metadata["confidence"] == ConfidenceLevel.EXPLORING.value
+        assert result2.metadata["confidence"] == ConfidenceLevel.MEDIUM.value
+        assert result3.metadata["confidence"] == ConfidenceLevel.HIGH.value

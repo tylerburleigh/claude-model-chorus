@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 19:22:14
+**Generated:** 2025-11-05 19:23:57
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 40
-- **Total Lines:** 11182
-- **Total Classes:** 59
+- **Total Lines:** 11719
+- **Total Classes:** 60
 - **Total Functions:** 29
 - **Avg Complexity:** 5.21
 - **Max Complexity:** 36
@@ -1061,6 +1061,31 @@ Attributes:
 - `test_hypothesis_serialization()`
 - `test_hypothesis_json_serialization()`
 - `test_hypothesis_from_dict()`
+
+---
+
+### `TestHypothesisEvolution`
+
+**Language:** python
+**Defined in:** `tests/test_thinkdeep_workflow.py:598`
+
+**Description:**
+> Test suite for hypothesis evolution in ThinkDeepWorkflow.
+
+**Methods:**
+- `mock_provider()`
+- `conversation_memory()`
+- `test_add_hypothesis_to_investigation()`
+- `test_update_hypothesis_with_evidence()`
+- `test_validate_hypothesis()`
+- `test_disprove_hypothesis()`
+- `test_multiple_hypothesis_evolution()`
+- `test_get_active_hypotheses()`
+- `test_get_all_hypotheses()`
+- `test_hypothesis_persistence_across_turns()`
+- `test_hypothesis_update_with_status_change()`
+- `test_hypothesis_not_found_handling()`
+- `test_hypothesis_metadata_tracking()`
 
 ---
 

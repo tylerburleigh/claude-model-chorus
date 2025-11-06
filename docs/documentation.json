@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T00:22:14.235332Z",
+    "generated_at": "2025-11-06T00:23:57.334388Z",
     "languages": [
       "python"
     ],
@@ -10,8 +10,8 @@
   },
   "statistics": {
     "total_files": 40,
-    "total_lines": 11182,
-    "total_classes": 59,
+    "total_lines": 11719,
+    "total_classes": 60,
     "total_functions": 29,
     "avg_complexity": 5.21,
     "max_complexity": 36,
@@ -24,8 +24,8 @@
     "by_language": {
       "python": {
         "files": 40,
-        "lines": 11182,
-        "classes": 59,
+        "lines": 11719,
+        "classes": 60,
         "functions": 29,
         "avg_complexity": 5.21
       }
@@ -950,7 +950,8 @@
       "language": "python",
       "docstring": "Integration tests for ThinkDeep workflow.\n\nTests verify ThinkDeepWorkflow functionality including:\n- Investigation step execution and tracking\n- Multi-step investigation with state management\n- Conversation threading and continuation\n- Hypothesis management through workflow\n- Confidence progression tracking\n- File examination tracking\n- Expert validation integration",
       "classes": [
-        "TestInvestigationStepExecution"
+        "TestInvestigationStepExecution",
+        "TestHypothesisEvolution"
       ],
       "functions": [],
       "imports": [
@@ -969,7 +970,7 @@
         "modelchorus.core.models.ThinkDeepState"
       ],
       "exports": [],
-      "lines": 595
+      "lines": 1132
     }
   ],
   "classes": [
@@ -1373,10 +1374,19 @@
             "TestInvestigationStepExecution",
             "conversation_memory"
           ]
+        },
+        {
+          "instantiator": "conversation_memory",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 612,
+          "context": [
+            "TestHypothesisEvolution",
+            "conversation_memory"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 27
+      "instantiation_count": 28
     },
     {
       "name": "ConfidenceLevel",
@@ -3333,10 +3343,127 @@
             "TestInvestigationStepExecution",
             "test_investigation_without_conversation_memory"
           ]
+        },
+        {
+          "instantiator": "test_add_hypothesis_to_investigation",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 620,
+          "context": [
+            "TestHypothesisEvolution",
+            "test_add_hypothesis_to_investigation"
+          ]
+        },
+        {
+          "instantiator": "test_update_hypothesis_with_evidence",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 660,
+          "context": [
+            "TestHypothesisEvolution",
+            "test_update_hypothesis_with_evidence"
+          ]
+        },
+        {
+          "instantiator": "test_validate_hypothesis",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 705,
+          "context": [
+            "TestHypothesisEvolution",
+            "test_validate_hypothesis"
+          ]
+        },
+        {
+          "instantiator": "test_disprove_hypothesis",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 746,
+          "context": [
+            "TestHypothesisEvolution",
+            "test_disprove_hypothesis"
+          ]
+        },
+        {
+          "instantiator": "test_multiple_hypothesis_evolution",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 787,
+          "context": [
+            "TestHypothesisEvolution",
+            "test_multiple_hypothesis_evolution"
+          ]
+        },
+        {
+          "instantiator": "test_get_active_hypotheses",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 858,
+          "context": [
+            "TestHypothesisEvolution",
+            "test_get_active_hypotheses"
+          ]
+        },
+        {
+          "instantiator": "test_get_all_hypotheses",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 897,
+          "context": [
+            "TestHypothesisEvolution",
+            "test_get_all_hypotheses"
+          ]
+        },
+        {
+          "instantiator": "test_hypothesis_persistence_across_turns",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 942,
+          "context": [
+            "TestHypothesisEvolution",
+            "test_hypothesis_persistence_across_turns"
+          ]
+        },
+        {
+          "instantiator": "test_hypothesis_persistence_across_turns",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 959,
+          "context": [
+            "TestHypothesisEvolution",
+            "test_hypothesis_persistence_across_turns"
+          ]
+        },
+        {
+          "instantiator": "test_hypothesis_persistence_across_turns",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 979,
+          "context": [
+            "TestHypothesisEvolution",
+            "test_hypothesis_persistence_across_turns"
+          ]
+        },
+        {
+          "instantiator": "test_hypothesis_update_with_status_change",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1014,
+          "context": [
+            "TestHypothesisEvolution",
+            "test_hypothesis_update_with_status_change"
+          ]
+        },
+        {
+          "instantiator": "test_hypothesis_not_found_handling",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1058,
+          "context": [
+            "TestHypothesisEvolution",
+            "test_hypothesis_not_found_handling"
+          ]
+        },
+        {
+          "instantiator": "test_hypothesis_metadata_tracking",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1104,
+          "context": [
+            "TestHypothesisEvolution",
+            "test_hypothesis_metadata_tracking"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 26
+      "instantiation_count": 39
     },
     {
       "name": "ModelProvider",
@@ -4515,10 +4642,109 @@
             "TestInvestigationStepExecution",
             "test_investigation_without_conversation_memory"
           ]
+        },
+        {
+          "instantiator": "test_add_hypothesis_to_investigation",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 628,
+          "context": [
+            "TestHypothesisEvolution",
+            "test_add_hypothesis_to_investigation"
+          ]
+        },
+        {
+          "instantiator": "test_update_hypothesis_with_evidence",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 667,
+          "context": [
+            "TestHypothesisEvolution",
+            "test_update_hypothesis_with_evidence"
+          ]
+        },
+        {
+          "instantiator": "test_validate_hypothesis",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 712,
+          "context": [
+            "TestHypothesisEvolution",
+            "test_validate_hypothesis"
+          ]
+        },
+        {
+          "instantiator": "test_disprove_hypothesis",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 753,
+          "context": [
+            "TestHypothesisEvolution",
+            "test_disprove_hypothesis"
+          ]
+        },
+        {
+          "instantiator": "test_multiple_hypothesis_evolution",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 794,
+          "context": [
+            "TestHypothesisEvolution",
+            "test_multiple_hypothesis_evolution"
+          ]
+        },
+        {
+          "instantiator": "test_get_active_hypotheses",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 865,
+          "context": [
+            "TestHypothesisEvolution",
+            "test_get_active_hypotheses"
+          ]
+        },
+        {
+          "instantiator": "test_get_all_hypotheses",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 904,
+          "context": [
+            "TestHypothesisEvolution",
+            "test_get_all_hypotheses"
+          ]
+        },
+        {
+          "instantiator": "test_hypothesis_persistence_across_turns",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 936,
+          "context": [
+            "TestHypothesisEvolution",
+            "test_hypothesis_persistence_across_turns"
+          ]
+        },
+        {
+          "instantiator": "test_hypothesis_update_with_status_change",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1021,
+          "context": [
+            "TestHypothesisEvolution",
+            "test_hypothesis_update_with_status_change"
+          ]
+        },
+        {
+          "instantiator": "test_hypothesis_not_found_handling",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1065,
+          "context": [
+            "TestHypothesisEvolution",
+            "test_hypothesis_not_found_handling"
+          ]
+        },
+        {
+          "instantiator": "test_hypothesis_metadata_tracking",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1111,
+          "context": [
+            "TestHypothesisEvolution",
+            "test_hypothesis_metadata_tracking"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 19
+      "instantiation_count": 30
     },
     {
       "name": "TestChatWorkflowInitialization",
@@ -5018,6 +5244,34 @@
         "test_investigation_step_metadata_completeness",
         "test_investigation_step_error_handling",
         "test_investigation_without_conversation_memory"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestHypothesisEvolution",
+      "file": "tests/test_thinkdeep_workflow.py",
+      "line": 598,
+      "language": "python",
+      "docstring": "Test suite for hypothesis evolution in ThinkDeepWorkflow.",
+      "bases": [],
+      "methods": [
+        "mock_provider",
+        "conversation_memory",
+        "test_add_hypothesis_to_investigation",
+        "test_update_hypothesis_with_evidence",
+        "test_validate_hypothesis",
+        "test_disprove_hypothesis",
+        "test_multiple_hypothesis_evolution",
+        "test_get_active_hypotheses",
+        "test_get_all_hypotheses",
+        "test_hypothesis_persistence_across_turns",
+        "test_hypothesis_update_with_status_change",
+        "test_hypothesis_not_found_handling",
+        "test_hypothesis_metadata_tracking"
       ],
       "properties": [],
       "is_exported": false,
