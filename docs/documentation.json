@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T23:52:25.000559Z",
+    "generated_at": "2025-11-05T23:54:53.801326Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 38,
-    "total_lines": 9900,
-    "total_classes": 53,
+    "total_files": 39,
+    "total_lines": 10587,
+    "total_classes": 58,
     "total_functions": 29,
     "avg_complexity": 5.21,
     "max_complexity": 36,
@@ -23,9 +23,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 38,
-        "lines": 9900,
-        "classes": 53,
+        "files": 39,
+        "lines": 10587,
+        "classes": 58,
         "functions": 29,
         "avg_complexity": 5.21
       }
@@ -874,6 +874,31 @@
       "lines": 682
     },
     {
+      "name": "test_thinkdeep_models",
+      "file": "tests/test_thinkdeep_models.py",
+      "language": "python",
+      "docstring": "Unit tests for ThinkDeep workflow models.\n\nTests verify ThinkDeep model functionality including:\n- ConfidenceLevel enum values and progression\n- Hypothesis model creation, validation, and evidence tracking\n- InvestigationStep model with findings and confidence\n- ThinkDeepState model with hypothesis and step management\n- Model serialization and deserialization\n- Edge cases and validation errors",
+      "classes": [
+        "TestConfidenceLevel",
+        "TestHypothesis",
+        "TestInvestigationStep",
+        "TestThinkDeepState",
+        "TestModelIntegration"
+      ],
+      "functions": [],
+      "imports": [
+        "json",
+        "pytest",
+        "pydantic.ValidationError",
+        "modelchorus.core.models.ConfidenceLevel",
+        "modelchorus.core.models.Hypothesis",
+        "modelchorus.core.models.InvestigationStep",
+        "modelchorus.core.models.ThinkDeepState"
+      ],
+      "exports": [],
+      "lines": 687
+    },
+    {
       "name": "__init__",
       "file": "__init__.py",
       "language": "python",
@@ -1536,10 +1561,244 @@
             "ThinkDeepWorkflow",
             "add_hypothesis"
           ]
+        },
+        {
+          "instantiator": "test_hypothesis_creation",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 74,
+          "context": [
+            "TestHypothesis",
+            "test_hypothesis_creation"
+          ]
+        },
+        {
+          "instantiator": "test_hypothesis_default_values",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 87,
+          "context": [
+            "TestHypothesis",
+            "test_hypothesis_default_values"
+          ]
+        },
+        {
+          "instantiator": "test_hypothesis_all_statuses",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 98,
+          "context": [
+            "TestHypothesis",
+            "test_hypothesis_all_statuses"
+          ]
+        },
+        {
+          "instantiator": "test_hypothesis_invalid_status",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 107,
+          "context": [
+            "TestHypothesis",
+            "test_hypothesis_invalid_status"
+          ]
+        },
+        {
+          "instantiator": "test_hypothesis_empty_hypothesis_text",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 115,
+          "context": [
+            "TestHypothesis",
+            "test_hypothesis_empty_hypothesis_text"
+          ]
+        },
+        {
+          "instantiator": "test_hypothesis_with_multiple_evidence",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 126,
+          "context": [
+            "TestHypothesis",
+            "test_hypothesis_with_multiple_evidence"
+          ]
+        },
+        {
+          "instantiator": "test_hypothesis_serialization",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 137,
+          "context": [
+            "TestHypothesis",
+            "test_hypothesis_serialization"
+          ]
+        },
+        {
+          "instantiator": "test_hypothesis_json_serialization",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 151,
+          "context": [
+            "TestHypothesis",
+            "test_hypothesis_json_serialization"
+          ]
+        },
+        {
+          "instantiator": "test_hypothesis_from_dict",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 173,
+          "context": [
+            "TestHypothesis",
+            "test_hypothesis_from_dict"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_creation",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 319,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_creation"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_multiple_hypotheses",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 355,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_multiple_hypotheses"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_multiple_hypotheses",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 356,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_multiple_hypotheses"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_multiple_hypotheses",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 357,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_multiple_hypotheses"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_multiple_hypotheses",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 358,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_multiple_hypotheses"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_complex_scenario",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 422,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_complex_scenario"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_complex_scenario",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 431,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_complex_scenario"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_serialization",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 494,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_serialization"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_json_roundtrip",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 520,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_json_roundtrip"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_json_roundtrip",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 525,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_json_roundtrip"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_nested_validation",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 574,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_nested_validation"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_nested_validation",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 575,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_nested_validation"
+          ]
+        },
+        {
+          "instantiator": "test_hypothesis_lifecycle",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 598,
+          "context": [
+            "TestModelIntegration",
+            "test_hypothesis_lifecycle"
+          ]
+        },
+        {
+          "instantiator": "test_investigation_progression",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 624,
+          "context": [
+            "TestModelIntegration",
+            "test_investigation_progression"
+          ]
+        },
+        {
+          "instantiator": "test_multiple_hypothesis_tracking",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 668,
+          "context": [
+            "TestModelIntegration",
+            "test_multiple_hypothesis_tracking"
+          ]
+        },
+        {
+          "instantiator": "test_multiple_hypothesis_tracking",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 669,
+          "context": [
+            "TestModelIntegration",
+            "test_multiple_hypothesis_tracking"
+          ]
+        },
+        {
+          "instantiator": "test_multiple_hypothesis_tracking",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 670,
+          "context": [
+            "TestModelIntegration",
+            "test_multiple_hypothesis_tracking"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 1
+      "instantiation_count": 27
     },
     {
       "name": "InvestigationStep",
@@ -1563,10 +1822,253 @@
             "ThinkDeepWorkflow",
             "run"
           ]
+        },
+        {
+          "instantiator": "test_investigation_step_creation",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 185,
+          "context": [
+            "TestInvestigationStep",
+            "test_investigation_step_creation"
+          ]
+        },
+        {
+          "instantiator": "test_investigation_step_default_files",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 199,
+          "context": [
+            "TestInvestigationStep",
+            "test_investigation_step_default_files"
+          ]
+        },
+        {
+          "instantiator": "test_investigation_step_multiple_files",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 216,
+          "context": [
+            "TestInvestigationStep",
+            "test_investigation_step_multiple_files"
+          ]
+        },
+        {
+          "instantiator": "test_investigation_step_number_validation",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 229,
+          "context": [
+            "TestInvestigationStep",
+            "test_investigation_step_number_validation"
+          ]
+        },
+        {
+          "instantiator": "test_investigation_step_number_validation",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 236,
+          "context": [
+            "TestInvestigationStep",
+            "test_investigation_step_number_validation"
+          ]
+        },
+        {
+          "instantiator": "test_investigation_step_number_validation",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 245,
+          "context": [
+            "TestInvestigationStep",
+            "test_investigation_step_number_validation"
+          ]
+        },
+        {
+          "instantiator": "test_investigation_step_number_validation",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 252,
+          "context": [
+            "TestInvestigationStep",
+            "test_investigation_step_number_validation"
+          ]
+        },
+        {
+          "instantiator": "test_investigation_step_empty_findings",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 261,
+          "context": [
+            "TestInvestigationStep",
+            "test_investigation_step_empty_findings"
+          ]
+        },
+        {
+          "instantiator": "test_investigation_step_empty_confidence",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 270,
+          "context": [
+            "TestInvestigationStep",
+            "test_investigation_step_empty_confidence"
+          ]
+        },
+        {
+          "instantiator": "test_investigation_step_serialization",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 278,
+          "context": [
+            "TestInvestigationStep",
+            "test_investigation_step_serialization"
+          ]
+        },
+        {
+          "instantiator": "test_investigation_step_json_roundtrip",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 294,
+          "context": [
+            "TestInvestigationStep",
+            "test_investigation_step_json_roundtrip"
+          ]
+        },
+        {
+          "instantiator": "test_investigation_step_json_roundtrip",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 306,
+          "context": [
+            "TestInvestigationStep",
+            "test_investigation_step_json_roundtrip"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_creation",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 325,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_creation"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_multiple_steps",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 370,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_multiple_steps"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_multiple_steps",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 375,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_multiple_steps"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_multiple_steps",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 380,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_multiple_steps"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_multiple_steps",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 385,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_multiple_steps"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_complex_scenario",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 443,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_complex_scenario"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_complex_scenario",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 449,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_complex_scenario"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_complex_scenario",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 455,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_complex_scenario"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_serialization",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 495,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_serialization"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_json_roundtrip",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 528,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_json_roundtrip"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_json_roundtrip",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 534,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_json_roundtrip"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_nested_validation",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 583,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_nested_validation"
+          ]
+        },
+        {
+          "instantiator": "test_investigation_progression",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 629,
+          "context": [
+            "TestModelIntegration",
+            "test_investigation_progression"
+          ]
+        },
+        {
+          "instantiator": "test_investigation_progression",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 639,
+          "context": [
+            "TestModelIntegration",
+            "test_investigation_progression"
+          ]
+        },
+        {
+          "instantiator": "test_investigation_progression",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 648,
+          "context": [
+            "TestModelIntegration",
+            "test_investigation_progression"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 1
+      "instantiation_count": 28
     },
     {
       "name": "ThinkDeepState",
@@ -1617,10 +2119,127 @@
             "ThinkDeepWorkflow",
             "_get_or_create_state"
           ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_creation",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 331,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_creation"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_default_values",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 345,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_default_values"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_multiple_hypotheses",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 361,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_multiple_hypotheses"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_multiple_steps",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 392,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_multiple_steps"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_file_accumulation",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 412,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_file_accumulation"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_complex_scenario",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 464,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_complex_scenario"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_serialization",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 501,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_serialization"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_json_roundtrip",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 518,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_json_roundtrip"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_json_roundtrip",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 550,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_json_roundtrip"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_nested_validation",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 572,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_nested_validation"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_state_nested_validation",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 581,
+          "context": [
+            "TestThinkDeepState",
+            "test_thinkdeep_state_nested_validation"
+          ]
+        },
+        {
+          "instantiator": "test_investigation_progression",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 616,
+          "context": [
+            "TestModelIntegration",
+            "test_investigation_progression"
+          ]
+        },
+        {
+          "instantiator": "test_multiple_hypothesis_tracking",
+          "file": "tests/test_thinkdeep_models.py",
+          "line": 664,
+          "context": [
+            "TestModelIntegration",
+            "test_multiple_hypothesis_tracking"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 4
+      "instantiation_count": 17
     },
     {
       "name": "ConversationState",
@@ -3944,6 +4563,114 @@
       "bases": [],
       "methods": [
         "test_process_restart_recovery"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestConfidenceLevel",
+      "file": "tests/test_thinkdeep_models.py",
+      "line": 25,
+      "language": "python",
+      "docstring": "Test suite for ConfidenceLevel enum.",
+      "bases": [],
+      "methods": [
+        "test_confidence_level_values",
+        "test_confidence_level_count",
+        "test_confidence_level_progression",
+        "test_confidence_level_string_representation"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestHypothesis",
+      "file": "tests/test_thinkdeep_models.py",
+      "line": 69,
+      "language": "python",
+      "docstring": "Test suite for Hypothesis model.",
+      "bases": [],
+      "methods": [
+        "test_hypothesis_creation",
+        "test_hypothesis_default_values",
+        "test_hypothesis_all_statuses",
+        "test_hypothesis_invalid_status",
+        "test_hypothesis_empty_hypothesis_text",
+        "test_hypothesis_with_multiple_evidence",
+        "test_hypothesis_serialization",
+        "test_hypothesis_json_serialization",
+        "test_hypothesis_from_dict"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestInvestigationStep",
+      "file": "tests/test_thinkdeep_models.py",
+      "line": 180,
+      "language": "python",
+      "docstring": "Test suite for InvestigationStep model.",
+      "bases": [],
+      "methods": [
+        "test_investigation_step_creation",
+        "test_investigation_step_default_files",
+        "test_investigation_step_multiple_files",
+        "test_investigation_step_number_validation",
+        "test_investigation_step_empty_findings",
+        "test_investigation_step_empty_confidence",
+        "test_investigation_step_serialization",
+        "test_investigation_step_json_roundtrip"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestThinkDeepState",
+      "file": "tests/test_thinkdeep_models.py",
+      "line": 314,
+      "language": "python",
+      "docstring": "Test suite for ThinkDeepState model.",
+      "bases": [],
+      "methods": [
+        "test_thinkdeep_state_creation",
+        "test_thinkdeep_state_default_values",
+        "test_thinkdeep_state_multiple_hypotheses",
+        "test_thinkdeep_state_multiple_steps",
+        "test_thinkdeep_state_file_accumulation",
+        "test_thinkdeep_state_complex_scenario",
+        "test_thinkdeep_state_serialization",
+        "test_thinkdeep_state_json_roundtrip",
+        "test_thinkdeep_state_nested_validation"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestModelIntegration",
+      "file": "tests/test_thinkdeep_models.py",
+      "line": 592,
+      "language": "python",
+      "docstring": "Test integration scenarios using multiple models together.",
+      "bases": [],
+      "methods": [
+        "test_hypothesis_lifecycle",
+        "test_investigation_progression",
+        "test_multiple_hypothesis_tracking"
       ],
       "properties": [],
       "is_exported": false,
@@ -8525,6 +9252,15 @@
       "modelchorus.core.state.StateManager",
       "modelchorus.core.state.get_default_state_manager",
       "modelchorus.core.models.ConversationState"
+    ],
+    "tests/test_thinkdeep_models.py": [
+      "json",
+      "pytest",
+      "pydantic.ValidationError",
+      "modelchorus.core.models.ConfidenceLevel",
+      "modelchorus.core.models.Hypothesis",
+      "modelchorus.core.models.InvestigationStep",
+      "modelchorus.core.models.ThinkDeepState"
     ],
     "test_cli_interface.py": [
       "sys",

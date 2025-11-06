@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 18:52:24
+**Generated:** 2025-11-05 18:54:53
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 38
-- **Total Lines:** 9900
-- **Total Classes:** 53
+- **Total Files:** 39
+- **Total Lines:** 10587
+- **Total Classes:** 58
 - **Total Functions:** 29
 - **Avg Complexity:** 5.21
 - **Max Complexity:** 36
@@ -884,6 +884,22 @@ Attributes:
 
 ---
 
+### `TestConfidenceLevel`
+
+**Language:** python
+**Defined in:** `tests/test_thinkdeep_models.py:25`
+
+**Description:**
+> Test suite for ConfidenceLevel enum.
+
+**Methods:**
+- `test_confidence_level_values()`
+- `test_confidence_level_count()`
+- `test_confidence_level_progression()`
+- `test_confidence_level_string_representation()`
+
+---
+
 ### `TestConsensusWorkflow`
 
 **Language:** python
@@ -1027,6 +1043,27 @@ Attributes:
 
 ---
 
+### `TestHypothesis`
+
+**Language:** python
+**Defined in:** `tests/test_thinkdeep_models.py:69`
+
+**Description:**
+> Test suite for Hypothesis model.
+
+**Methods:**
+- `test_hypothesis_creation()`
+- `test_hypothesis_default_values()`
+- `test_hypothesis_all_statuses()`
+- `test_hypothesis_invalid_status()`
+- `test_hypothesis_empty_hypothesis_text()`
+- `test_hypothesis_with_multiple_evidence()`
+- `test_hypothesis_serialization()`
+- `test_hypothesis_json_serialization()`
+- `test_hypothesis_from_dict()`
+
+---
+
 ### `TestIntegration`
 
 **Language:** python
@@ -1041,6 +1078,41 @@ Attributes:
 - `test_error_handling_across_workflow()`
 - `test_multiple_strategy_comparison()`
 - `test_concurrent_provider_execution()`
+
+---
+
+### `TestInvestigationStep`
+
+**Language:** python
+**Defined in:** `tests/test_thinkdeep_models.py:180`
+
+**Description:**
+> Test suite for InvestigationStep model.
+
+**Methods:**
+- `test_investigation_step_creation()`
+- `test_investigation_step_default_files()`
+- `test_investigation_step_multiple_files()`
+- `test_investigation_step_number_validation()`
+- `test_investigation_step_empty_findings()`
+- `test_investigation_step_empty_confidence()`
+- `test_investigation_step_serialization()`
+- `test_investigation_step_json_roundtrip()`
+
+---
+
+### `TestModelIntegration`
+
+**Language:** python
+**Defined in:** `tests/test_thinkdeep_models.py:592`
+
+**Description:**
+> Test integration scenarios using multiple models together.
+
+**Methods:**
+- `test_hypothesis_lifecycle()`
+- `test_investigation_progression()`
+- `test_multiple_hypothesis_tracking()`
 
 ---
 
@@ -1108,6 +1180,27 @@ Attributes:
 
 **Methods:**
 - `test_process_restart_recovery()`
+
+---
+
+### `TestThinkDeepState`
+
+**Language:** python
+**Defined in:** `tests/test_thinkdeep_models.py:314`
+
+**Description:**
+> Test suite for ThinkDeepState model.
+
+**Methods:**
+- `test_thinkdeep_state_creation()`
+- `test_thinkdeep_state_default_values()`
+- `test_thinkdeep_state_multiple_hypotheses()`
+- `test_thinkdeep_state_multiple_steps()`
+- `test_thinkdeep_state_file_accumulation()`
+- `test_thinkdeep_state_complex_scenario()`
+- `test_thinkdeep_state_serialization()`
+- `test_thinkdeep_state_json_roundtrip()`
+- `test_thinkdeep_state_nested_validation()`
 
 ---
 
@@ -2223,3 +2316,13 @@ Example:
 - `pytest`
 - `threading`
 - `time`
+
+### `tests/test_thinkdeep_models.py`
+
+- `json`
+- `modelchorus.core.models.ConfidenceLevel`
+- `modelchorus.core.models.Hypothesis`
+- `modelchorus.core.models.InvestigationStep`
+- `modelchorus.core.models.ThinkDeepState`
+- `pydantic.ValidationError`
+- `pytest`
