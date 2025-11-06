@@ -1,17 +1,17 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 11:40:36
+**Generated:** 2025-11-06 11:42:31
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 45
-- **Total Lines:** 15448
-- **Total Classes:** 78
-- **Total Functions:** 34
-- **Avg Complexity:** 4.62
+- **Total Files:** 46
+- **Total Lines:** 15674
+- **Total Classes:** 79
+- **Total Functions:** 39
+- **Avg Complexity:** 4.69
 - **Max Complexity:** 36
 - **High Complexity Functions:**
   - thinkdeep (36)
@@ -198,6 +198,17 @@ Attributes:
     citations: List of Citation objects supporting this claim
     strength: Overall strength of citation support (0.0-1.0)
     metadata: Additional mapping metadata (argument_type, verification_status, etc.)
+
+---
+
+### `CitationStyle`
+
+**Language:** python
+**Inherits from:** `str`, `Enum`
+**Defined in:** `src/modelchorus/utils/citation_formatter.py:12`
+
+**Description:**
+> Supported citation formatting styles.
 
 ---
 
@@ -1803,6 +1814,72 @@ Attributes:
 
 ## ⚡ Functions
 
+### `_format_apa(citation) -> str`
+
+**Language:** python
+**Defined in:** `src/modelchorus/utils/citation_formatter.py:55`
+**Complexity:** 6
+
+**Description:**
+> Format citation in APA style.
+
+APA format: Author(s). (Year). Title. Source.
+
+Args:
+    citation: The Citation object to format
+
+Returns:
+    APA-formatted citation string
+
+**Parameters:**
+- `citation`: 'Citation'
+
+---
+
+### `_format_chicago(citation) -> str`
+
+**Language:** python
+**Defined in:** `src/modelchorus/utils/citation_formatter.py:135`
+**Complexity:** 6
+
+**Description:**
+> Format citation in Chicago style.
+
+Chicago format: Author(s). "Title." Source (Year): Location.
+
+Args:
+    citation: The Citation object to format
+
+Returns:
+    Chicago-formatted citation string
+
+**Parameters:**
+- `citation`: 'Citation'
+
+---
+
+### `_format_mla(citation) -> str`
+
+**Language:** python
+**Defined in:** `src/modelchorus/utils/citation_formatter.py:95`
+**Complexity:** 6
+
+**Description:**
+> Format citation in MLA style.
+
+MLA format: Author(s). "Title." Source, Year. Location.
+
+Args:
+    citation: The Citation object to format
+
+Returns:
+    MLA-formatted citation string
+
+**Parameters:**
+- `citation`: 'Citation'
+
+---
+
 ### `async basic_chat_example() -> None`
 
 **Language:** python
@@ -1979,6 +2056,72 @@ Example:
 
 **Description:**
 > Demonstrate conversation history tracking.
+
+---
+
+### `format_citation(citation, style) -> str`
+
+**Language:** python
+**Defined in:** `src/modelchorus/utils/citation_formatter.py:20`
+**Complexity:** 4
+
+**Description:**
+> Format a Citation object according to the specified style.
+
+Args:
+    citation: The Citation object to format
+    style: The citation style to use (APA, MLA, or Chicago)
+
+Returns:
+    Formatted citation string according to the specified style
+
+Example:
+    >>> from modelchorus.core.models import Citation
+    >>> from modelchorus.utils.citation_formatter import format_citation, CitationStyle
+    >>> c = Citation(
+    ...     source="https://arxiv.org/abs/2401.12345",
+    ...     confidence=0.95,
+    ...     metadata={"author": "Smith, J.", "year": "2024", "title": "Machine Learning"}
+    ... )
+    >>> format_citation(c, CitationStyle.APA)
+    'Smith, J. (2024). Machine Learning. Retrieved from https://arxiv.org/abs/2401.12345'
+
+**Parameters:**
+- `citation`: 'Citation'
+- `style`: CitationStyle
+
+---
+
+### `format_citation_map(citation_map, style, include_claim) -> str`
+
+**Language:** python
+**Defined in:** `src/modelchorus/utils/citation_formatter.py:177`
+**Complexity:** 4
+
+**Description:**
+> Format a CitationMap object with all its citations.
+
+Args:
+    citation_map: The CitationMap object to format
+    style: The citation style to use (APA, MLA, or Chicago)
+    include_claim: Whether to include the claim text in the output
+
+Returns:
+    Formatted string with claim and all citations
+
+Example:
+    >>> formatted = format_citation_map(cm, CitationStyle.APA, include_claim=True)
+    >>> print(formatted)
+    Claim: Machine learning improves accuracy by 23%
+
+    Citations:
+    1. Smith, J. (2024). ML Research. Retrieved from https://arxiv.org/abs/2401.12345
+    2. Doe, A. (2024). AI Studies. Retrieved from paper2.pdf
+
+**Parameters:**
+- `citation_map`: 'CitationMap'
+- `style`: CitationStyle
+- `include_claim`: bool
 
 ---
 
@@ -2569,6 +2712,17 @@ Example:
 - `typing.Any`
 - `typing.Dict`
 - `typing.List`
+- `typing.Optional`
+
+### `src/modelchorus/utils/__init__.py`
+
+- `modelchorus.utils.citation_formatter.CitationStyle`
+- `modelchorus.utils.citation_formatter.format_citation`
+- `modelchorus.utils.citation_formatter.format_citation_map`
+
+### `src/modelchorus/utils/citation_formatter.py`
+
+- `enum.Enum`
 - `typing.Optional`
 
 ### `src/modelchorus/workflows/__init__.py`

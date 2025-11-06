@@ -2,18 +2,18 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T16:40:36.470711Z",
+    "generated_at": "2025-11-06T16:42:31.100287Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 45,
-    "total_lines": 15448,
-    "total_classes": 78,
-    "total_functions": 34,
-    "avg_complexity": 4.62,
+    "total_files": 46,
+    "total_lines": 15674,
+    "total_classes": 79,
+    "total_functions": 39,
+    "avg_complexity": 4.69,
     "max_complexity": 36,
     "high_complexity_functions": [
       "thinkdeep (36)",
@@ -23,11 +23,11 @@
     ],
     "by_language": {
       "python": {
-        "files": 45,
-        "lines": 15448,
-        "classes": 78,
-        "functions": 34,
-        "avg_complexity": 4.62
+        "files": 46,
+        "lines": 15674,
+        "classes": 79,
+        "functions": 39,
+        "avg_complexity": 4.69
       }
     }
   },
@@ -521,9 +521,35 @@
       "docstring": "Utility functions and helpers for ModelChorus.\n\nThis module contains shared utilities, helpers, and common functions\nused across the ModelChorus package.",
       "classes": [],
       "functions": [],
-      "imports": [],
+      "imports": [
+        "modelchorus.utils.citation_formatter.CitationStyle",
+        "modelchorus.utils.citation_formatter.format_citation",
+        "modelchorus.utils.citation_formatter.format_citation_map"
+      ],
       "exports": [],
-      "lines": 8
+      "lines": 18
+    },
+    {
+      "name": "citation_formatter",
+      "file": "src/modelchorus/utils/citation_formatter.py",
+      "language": "python",
+      "docstring": "Citation formatting utilities for ModelChorus ARGUMENT workflow.\n\nProvides formatting functions to convert Citation objects into standard\ncitation formats (APA, MLA, Chicago) for academic and professional use.",
+      "classes": [
+        "CitationStyle"
+      ],
+      "functions": [
+        "format_citation",
+        "_format_apa",
+        "_format_mla",
+        "_format_chicago",
+        "format_citation_map"
+      ],
+      "imports": [
+        "typing.Optional",
+        "enum.Enum"
+      ],
+      "exports": [],
+      "lines": 216
     },
     {
       "name": "__init__",
@@ -5043,6 +5069,23 @@
       ],
       "imported_by": [],
       "instantiation_count": 2
+    },
+    {
+      "name": "CitationStyle",
+      "file": "src/modelchorus/utils/citation_formatter.py",
+      "line": 12,
+      "language": "python",
+      "docstring": "Supported citation formatting styles.",
+      "bases": [
+        "str",
+        "Enum"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
     },
     {
       "name": "ChatWorkflow",
@@ -11074,6 +11117,468 @@
       "call_count": 2
     },
     {
+      "name": "format_citation",
+      "file": "src/modelchorus/utils/citation_formatter.py",
+      "line": 20,
+      "language": "python",
+      "docstring": "Format a Citation object according to the specified style.\n\nArgs:\n    citation: The Citation object to format\n    style: The citation style to use (APA, MLA, or Chicago)\n\nReturns:\n    Formatted citation string according to the specified style\n\nExample:\n    >>> from modelchorus.core.models import Citation\n    >>> from modelchorus.utils.citation_formatter import format_citation, CitationStyle\n    >>> c = Citation(\n    ...     source=\"https://arxiv.org/abs/2401.12345\",\n    ...     confidence=0.95,\n    ...     metadata={\"author\": \"Smith, J.\", \"year\": \"2024\", \"title\": \"Machine Learning\"}\n    ... )\n    >>> format_citation(c, CitationStyle.APA)\n    'Smith, J. (2024). Machine Learning. Retrieved from https://arxiv.org/abs/2401.12345'",
+      "parameters": [
+        {
+          "name": "citation",
+          "type": "'Citation'",
+          "default": null
+        },
+        {
+          "name": "style",
+          "type": "CitationStyle",
+          "default": null
+        }
+      ],
+      "return_type": "str",
+      "complexity": 4,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "format_citation_map",
+          "file": "src/modelchorus/utils/citation_formatter.py",
+          "line": 211,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "_format_apa",
+          "file": "unknown",
+          "line": 46,
+          "call_type": "function_call"
+        },
+        {
+          "name": "_format_mla",
+          "file": "unknown",
+          "line": 48,
+          "call_type": "function_call"
+        },
+        {
+          "name": "_format_chicago",
+          "file": "unknown",
+          "line": 50,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "_format_apa",
+      "file": "src/modelchorus/utils/citation_formatter.py",
+      "line": 55,
+      "language": "python",
+      "docstring": "Format citation in APA style.\n\nAPA format: Author(s). (Year). Title. Source.\n\nArgs:\n    citation: The Citation object to format\n\nReturns:\n    APA-formatted citation string",
+      "parameters": [
+        {
+          "name": "citation",
+          "type": "'Citation'",
+          "default": null
+        }
+      ],
+      "return_type": "str",
+      "complexity": 6,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [
+        {
+          "name": "format_citation",
+          "file": "src/modelchorus/utils/citation_formatter.py",
+          "line": 46,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 70,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 72,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 75,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 75,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 78,
+          "call_type": "function_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 78,
+          "call_type": "function_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 78,
+          "call_type": "function_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 78,
+          "call_type": "function_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 79,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 82,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 84,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 90,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 92,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "_format_mla",
+      "file": "src/modelchorus/utils/citation_formatter.py",
+      "line": 95,
+      "language": "python",
+      "docstring": "Format citation in MLA style.\n\nMLA format: Author(s). \"Title.\" Source, Year. Location.\n\nArgs:\n    citation: The Citation object to format\n\nReturns:\n    MLA-formatted citation string",
+      "parameters": [
+        {
+          "name": "citation",
+          "type": "'Citation'",
+          "default": null
+        }
+      ],
+      "return_type": "str",
+      "complexity": 6,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [
+        {
+          "name": "format_citation",
+          "file": "src/modelchorus/utils/citation_formatter.py",
+          "line": 48,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 110,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 112,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 115,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 117,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 120,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 123,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 123,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 125,
+          "call_type": "function_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 125,
+          "call_type": "function_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 125,
+          "call_type": "function_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 125,
+          "call_type": "function_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 126,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 130,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 132,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "_format_chicago",
+      "file": "src/modelchorus/utils/citation_formatter.py",
+      "line": 135,
+      "language": "python",
+      "docstring": "Format citation in Chicago style.\n\nChicago format: Author(s). \"Title.\" Source (Year): Location.\n\nArgs:\n    citation: The Citation object to format\n\nReturns:\n    Chicago-formatted citation string",
+      "parameters": [
+        {
+          "name": "citation",
+          "type": "'Citation'",
+          "default": null
+        }
+      ],
+      "return_type": "str",
+      "complexity": 6,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [
+        {
+          "name": "format_citation",
+          "file": "src/modelchorus/utils/citation_formatter.py",
+          "line": 50,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 150,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 152,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 155,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 157,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 163,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 163,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 165,
+          "call_type": "function_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 165,
+          "call_type": "function_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 165,
+          "call_type": "function_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 165,
+          "call_type": "function_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 172,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 174,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "format_citation_map",
+      "file": "src/modelchorus/utils/citation_formatter.py",
+      "line": 177,
+      "language": "python",
+      "docstring": "Format a CitationMap object with all its citations.\n\nArgs:\n    citation_map: The CitationMap object to format\n    style: The citation style to use (APA, MLA, or Chicago)\n    include_claim: Whether to include the claim text in the output\n\nReturns:\n    Formatted string with claim and all citations\n\nExample:\n    >>> formatted = format_citation_map(cm, CitationStyle.APA, include_claim=True)\n    >>> print(formatted)\n    Claim: Machine learning improves accuracy by 23%\n\n    Citations:\n    1. Smith, J. (2024). ML Research. Retrieved from https://arxiv.org/abs/2401.12345\n    2. Doe, A. (2024). AI Studies. Retrieved from paper2.pdf",
+      "parameters": [
+        {
+          "name": "citation_map",
+          "type": "'CitationMap'",
+          "default": null
+        },
+        {
+          "name": "style",
+          "type": "CitationStyle",
+          "default": null
+        },
+        {
+          "name": "include_claim",
+          "type": "bool",
+          "default": null
+        }
+      ],
+      "return_type": "str",
+      "complexity": 4,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 205,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 206,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 209,
+          "call_type": "method_call"
+        },
+        {
+          "name": "enumerate",
+          "file": "unknown",
+          "line": 210,
+          "call_type": "function_call"
+        },
+        {
+          "name": "format_citation",
+          "file": "unknown",
+          "line": 211,
+          "call_type": "function_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 212,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 214,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 216,
+          "call_type": "method_call"
+        }
+      ]
+    },
+    {
       "name": "mock_claude_response",
       "file": "tests/conftest.py",
       "line": 10,
@@ -11623,6 +12128,15 @@
       "base_provider.GenerationResponse",
       "base_provider.ModelConfig",
       "base_provider.ModelCapability"
+    ],
+    "src/modelchorus/utils/__init__.py": [
+      "modelchorus.utils.citation_formatter.CitationStyle",
+      "modelchorus.utils.citation_formatter.format_citation",
+      "modelchorus.utils.citation_formatter.format_citation_map"
+    ],
+    "src/modelchorus/utils/citation_formatter.py": [
+      "typing.Optional",
+      "enum.Enum"
     ],
     "src/modelchorus/workflows/__init__.py": [
       "chat.ChatWorkflow",

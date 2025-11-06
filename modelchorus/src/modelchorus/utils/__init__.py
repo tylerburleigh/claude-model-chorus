@@ -9,10 +9,16 @@ from modelchorus.utils.citation_formatter import (
     CitationStyle,
     format_citation,
     format_citation_map,
+    validate_citation,
+    calculate_citation_confidence,
+    calculate_citation_map_confidence,
 )
 
 __all__ = [
     "CitationStyle",
     "format_citation",
     "format_citation_map",
+    "validate_citation",
+    "calculate_citation_confidence",
+    "calculate_citation_map_confidence",
 ]

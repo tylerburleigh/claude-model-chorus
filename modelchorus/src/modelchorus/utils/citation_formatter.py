@@ -3,9 +3,12 @@ Citation formatting utilities for ModelChorus ARGUMENT workflow.
 
 Provides formatting functions to convert Citation objects into standard
 citation formats (APA, MLA, Chicago) for academic and professional use.
+
+Also includes validation and confidence scoring utilities for citation quality
+assessment and verification.
 """
 
-from typing import Optional
+from typing import Optional, List, Dict, Any, Tuple
 from enum import Enum
 
 
@@ -214,3 +217,219 @@ def format_citation_map(
         lines.append("No citations available")
 
     return "\n".join(lines)
+
+
+# ============================================================================
+# Citation Validation and Confidence Scoring
+# ============================================================================
+
+
+def validate_citation(citation: "Citation") -> Tuple[bool, List[str]]:  # type: ignore
+    """
+    Validate a Citation object for completeness and quality.
+
+    Args:
+        citation: The Citation object to validate
+
+    Returns:
+        Tuple of (is_valid, issues) where:
+        - is_valid: True if citation meets minimum requirements
+        - issues: List of validation issue messages
+
+    Example:
+        >>> is_valid, issues = validate_citation(citation)
+        >>> if not is_valid:
+        ...     print(f"Validation issues: {', '.join(issues)}")
+    """
+    issues = []
+
+    # Check required fields
+    if not citation.source or not citation.source.strip():
+        issues.append("Missing or empty source")
+
+    if citation.confidence < 0.0 or citation.confidence > 1.0:
+        issues.append(f"Confidence {citation.confidence} out of valid range [0.0, 1.0]")
+
+    # Check recommended metadata for quality
+    metadata = citation.metadata or {}
+
+    if not metadata.get("author"):
+        issues.append("Missing author metadata (recommended)")
+
+    if not metadata.get("year") and not metadata.get("publication_date"):
+        issues.append("Missing year/publication_date metadata (recommended)")
+
+    if not metadata.get("title"):
+        issues.append("Missing title metadata (recommended)")
+
+    # Check source format
+    source_lower = citation.source.lower()
+    if not (
+        source_lower.startswith("http://")
+        or source_lower.startswith("https://")
+        or source_lower.endswith((".pdf", ".doc", ".docx", ".txt"))
+        or "doi:" in source_lower
+    ):
+        issues.append("Source format not recognized (should be URL, file path, or DOI)")
+
+    is_valid = len(issues) == 0
+    return is_valid, issues
+
+
+def calculate_citation_confidence(citation: "Citation") -> Dict[str, Any]:  # type: ignore
+    """
+    Calculate a detailed confidence score for a citation's reliability.
+
+    Evaluates multiple factors:
+    - Base confidence score (from citation.confidence)
+    - Metadata completeness (author, year, title presence)
+    - Source quality (URL vs file, academic domains)
+    - Location specificity (page numbers, sections)
+
+    Args:
+        citation: The Citation object to score
+
+    Returns:
+        Dictionary with:
+        - overall_confidence: Final confidence score (0.0-1.0)
+        - base_confidence: Original confidence value
+        - metadata_score: Completeness score for metadata (0.0-1.0)
+        - source_quality_score: Quality score for source type (0.0-1.0)
+        - location_score: Specificity score for location (0.0-1.0)
+        - factors: Detailed breakdown of scoring factors
+
+    Example:
+        >>> scores = calculate_citation_confidence(citation)
+        >>> print(f"Overall confidence: {scores['overall_confidence']:.2f}")
+        >>> print(f"Metadata completeness: {scores['metadata_score']:.2f}")
+    """
+    metadata = citation.metadata or {}
+
+    # Base confidence from citation
+    base_confidence = citation.confidence
+
+    # Metadata completeness score
+    metadata_factors = {
+        "has_author": bool(metadata.get("author")),
+        "has_year": bool(metadata.get("year") or metadata.get("publication_date")),
+        "has_title": bool(metadata.get("title")),
+        "has_snippet": bool(citation.snippet),
+    }
+    metadata_score = sum(metadata_factors.values()) / len(metadata_factors)
+
+    # Source quality score
+    source_lower = citation.source.lower()
+    source_quality = 0.5  # Default for unknown sources
+
+    if "arxiv.org" in source_lower or "doi:" in source_lower:
+        source_quality = 1.0  # Academic/peer-reviewed
+    elif source_lower.startswith("https://"):
+        source_quality = 0.8  # Secure web source
+    elif source_lower.startswith("http://"):
+        source_quality = 0.6  # Unsecure web source
+    elif source_lower.endswith((".pdf", ".doc", ".docx")):
+        source_quality = 0.7  # Document file
+
+    # Location specificity score
+    location_score = 0.0
+    if citation.location:
+        location_lower = citation.location.lower()
+        location_score = 0.5  # Base for having location
+
+        # Bonus for specific references
+        if any(term in location_lower for term in ["page", "p.", "pp."]):
+            location_score += 0.25
+        if any(term in location_lower for term in ["section", "chapter", "§"]):
+            location_score += 0.25
+
+    # Calculate overall confidence (weighted average)
+    overall_confidence = (
+        base_confidence * 0.4 +      # 40% from original confidence
+        metadata_score * 0.3 +        # 30% from metadata completeness
+        source_quality * 0.2 +        # 20% from source quality
+        location_score * 0.1          # 10% from location specificity
+    )
+
+    return {
+        "overall_confidence": round(overall_confidence, 3),
+        "base_confidence": base_confidence,
+        "metadata_score": round(metadata_score, 3),
+        "source_quality_score": round(source_quality, 3),
+        "location_score": round(location_score, 3),
+        "factors": {
+            "metadata_completeness": metadata_factors,
+            "source_type": "academic" if source_quality >= 0.9 else "web" if "http" in source_lower else "file",
+            "has_specific_location": location_score > 0.5,
+        },
+    }
+
+
+def calculate_citation_map_confidence(citation_map: "CitationMap") -> Dict[str, Any]:  # type: ignore
+    """
+    Calculate aggregate confidence scores for a CitationMap.
+
+    Evaluates the overall quality of citations supporting a claim.
+
+    Args:
+        citation_map: The CitationMap object to score
+
+    Returns:
+        Dictionary with:
+        - overall_confidence: Aggregate confidence for the claim (0.0-1.0)
+        - citation_count: Number of citations
+        - average_citation_confidence: Mean confidence across citations
+        - min_confidence: Lowest confidence citation
+        - max_confidence: Highest confidence citation
+        - strength: Original strength value from CitationMap
+        - individual_scores: List of confidence scores per citation
+
+    Example:
+        >>> scores = calculate_citation_map_confidence(citation_map)
+        >>> print(f"Claim supported by {scores['citation_count']} citations")
+        >>> print(f"Overall confidence: {scores['overall_confidence']:.2f}")
+    """
+    if not citation_map.citations:
+        return {
+            "overall_confidence": 0.0,
+            "citation_count": 0,
+            "average_citation_confidence": 0.0,
+            "min_confidence": 0.0,
+            "max_confidence": 0.0,
+            "strength": citation_map.strength,
+            "individual_scores": [],
+        }
+
+    # Calculate confidence for each citation
+    individual_scores = [
+        calculate_citation_confidence(citation)
+        for citation in citation_map.citations
+    ]
+
+    overall_confidences = [score["overall_confidence"] for score in individual_scores]
+
+    # Calculate aggregate metrics
+    average_confidence = sum(overall_confidences) / len(overall_confidences)
+    min_confidence = min(overall_confidences)
+    max_confidence = max(overall_confidences)
+
+    # Overall confidence combines:
+    # - Average citation confidence (50%)
+    # - CitationMap strength (30%)
+    # - Citation count factor (20%) - more citations = higher confidence, plateaus at 5
+    citation_count_factor = min(len(citation_map.citations) / 5.0, 1.0)
+
+    overall_confidence = (
+        average_confidence * 0.5 +
+        citation_map.strength * 0.3 +
+        citation_count_factor * 0.2
+    )
+
+    return {
+        "overall_confidence": round(overall_confidence, 3),
+        "citation_count": len(citation_map.citations),
+        "average_citation_confidence": round(average_confidence, 3),
+        "min_confidence": round(min_confidence, 3),
+        "max_confidence": round(max_confidence, 3),
+        "strength": citation_map.strength,
+        "individual_scores": individual_scores,
+    }
