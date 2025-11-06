@@ -247,6 +247,249 @@ The workflow maintains comprehensive state across conversation turns:
 
 ---
 
+### Conversation Infrastructure
+
+**Multi-turn conversation support with state persistence**
+
+ModelChorus provides robust conversation infrastructure that enables multi-turn interactions across all workflows. This infrastructure handles conversation threading, state management, and context preservation.
+
+**Core Components:**
+
+1. **ConversationMemory** - Thread-safe conversation storage with file-based persistence
+2. **ConversationThread** - Complete conversation context with messages and workflow state
+3. **ConversationMessage** - Individual messages with metadata tracking
+4. **continuation_id** - Thread identifier for resuming conversations
+
+**Key Features:**
+- **Thread-safe storage** with file locking prevents corruption
+- **File-based persistence** at `~/.modelchorus/conversations/`
+- **TTL-based cleanup** removes expired threads automatically
+- **Conversation chains** via parent_thread_id for branching
+- **State preservation** maintains workflow-specific data across turns
+- **Context window management** with automatic truncation
+
+**continuation_id Pattern:**
+
+All workflows support the `continuation_id` parameter to resume multi-turn conversations:
+
+```python
+# First turn - creates new thread
+result1 = await workflow.run("Initial question")
+thread_id = result1.metadata.get('thread_id')
+
+# Subsequent turns - continues thread
+result2 = await workflow.run(
+    "Follow-up question",
+    continuation_id=thread_id
+)
+
+# Even later - resumes from file-based persistence
+result3 = await workflow.run(
+    "Another question",
+    continuation_id=thread_id
+)
+```
+
+**State Management:**
+
+Each workflow can maintain custom state across conversation turns:
+
+```python
+from modelchorus.core.conversation import ConversationMemory
+from modelchorus.workflows import ThinkDeepWorkflow
+
+memory = ConversationMemory()
+workflow = ThinkDeepWorkflow(provider, conversation_memory=memory)
+
+# First turn - state is initialized
+result1 = await workflow.run("Start investigation")
+thread_id = result1.metadata.get('thread_id')
+
+# Get state from thread
+thread = memory.get_thread(thread_id)
+state = thread.state  # Workflow-specific state (e.g., ThinkDeepState)
+
+# State persists across turns automatically
+result2 = await workflow.run("Continue", continuation_id=thread_id)
+# State from result1 is automatically loaded and updated
+```
+
+**Context Preservation:**
+
+The conversation infrastructure preserves complete context:
+
+```python
+# Messages with metadata
+message = ConversationMessage(
+    role="user",
+    content="Analyze this code",
+    timestamp="2025-11-06T10:00:00Z",
+    files=["src/auth.py"],
+    workflow_name="thinkdeep",
+    model_provider="cli",
+    model_name="claude-3-opus",
+    metadata={"tokens": 150, "latency": 1.2}
+)
+
+# Add to thread
+memory.add_message(thread_id, message)
+
+# Build conversation history for model
+history = memory.build_conversation_history(
+    thread_id,
+    max_turns=10,  # Limit for context window
+    include_system=True
+)
+```
+
+**Conversation Chains:**
+
+Create conversation branches from any point:
+
+```python
+# Original conversation
+result1 = await workflow.run("Original question")
+original_thread_id = result1.metadata.get('thread_id')
+
+# Branch from original at specific point
+branched_thread_id = memory.create_thread(
+    workflow_name="chat",
+    parent_thread_id=original_thread_id,
+    initial_context={"branched_at": "message_id_123"}
+)
+
+# Get full chain (original + branch)
+chain = memory.get_thread_chain(branched_thread_id)
+```
+
+**Thread Lifecycle:**
+
+```python
+# Create thread
+thread_id = memory.create_thread(
+    workflow_name="thinkdeep",
+    initial_context={"task": "debug auth issue"}
+)
+
+# Active conversation
+memory.add_message(thread_id, message)
+
+# Mark complete
+memory.complete_thread(thread_id)
+
+# Archive (keeps data, marks archived)
+memory.archive_thread(thread_id)
+
+# Cleanup expired threads (runs automatically)
+memory.cleanup_expired_threads(max_age_hours=72)
+```
+
+**CLI Usage:**
+
+All CLI commands support conversation continuation:
+
+```bash
+# Chat workflow
+modelchorus chat "First message" -p claude
+# Returns: Thread ID: abc-123
+
+modelchorus chat "Follow-up" --continue abc-123
+
+# ThinkDeep workflow
+modelchorus thinkdeep "Start investigation" -p claude
+# Returns: Thread ID: def-456
+
+modelchorus thinkdeep "Continue investigation" --continue def-456
+
+# Check thread status
+modelchorus thinkdeep-status def-456
+```
+
+**Storage Details:**
+
+**Location:** `~/.modelchorus/conversations/`
+
+**File format:** Each thread is stored as JSON:
+```json
+{
+  "thread_id": "uuid-here",
+  "workflow_name": "thinkdeep",
+  "created_at": "2025-11-06T10:00:00Z",
+  "last_updated_at": "2025-11-06T11:30:00Z",
+  "status": "active",
+  "messages": [
+    {
+      "role": "user",
+      "content": "...",
+      "timestamp": "...",
+      "files": [],
+      "metadata": {}
+    }
+  ],
+  "state": {
+    "workflow_name": "thinkdeep",
+    "data": {
+      "hypotheses": [],
+      "steps": [],
+      "current_confidence": "exploring"
+    }
+  }
+}
+```
+
+**File locking:** Concurrent access is protected with `filelock` to prevent corruption.
+
+**Benefits:**
+
+- **Resume anywhere** - Pick up conversations across sessions
+- **State preservation** - Workflow state persists automatically
+- **Thread safety** - Safe for concurrent access
+- **Automatic cleanup** - Expired threads removed automatically
+- **Conversation chains** - Branch and explore alternatives
+- **Full context** - Complete history available to workflows
+
+**Use Cases:**
+
+1. **Long-running investigations:**
+   ```bash
+   # Day 1
+   modelchorus thinkdeep "Debug memory leak" -p claude
+   # Thread: thread-001
+
+   # Day 2 - resume
+   modelchorus thinkdeep "Found malloc patterns" --continue thread-001
+   ```
+
+2. **Iterative refinement:**
+   ```bash
+   # Initial draft
+   modelchorus chat "Write API design" -p claude
+   # Thread: thread-002
+
+   # Multiple revisions
+   modelchorus chat "Add rate limiting" --continue thread-002
+   modelchorus chat "Add authentication" --continue thread-002
+   ```
+
+3. **Exploring alternatives:**
+   ```python
+   # Original approach
+   result1 = await chat.run("Design caching strategy")
+   thread1 = result1.metadata['thread_id']
+
+   # Branch to explore alternative
+   thread2 = memory.create_thread(
+       workflow_name="chat",
+       parent_thread_id=thread1
+   )
+   result2 = await chat.run(
+       "What about Redis instead?",
+       continuation_id=thread2
+   )
+   ```
+
+---
+
 ## 🏛️ Classes
 
 ### `BaseWorkflow`
