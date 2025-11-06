@@ -22,7 +22,7 @@ from ..providers import (
     CursorAgentProvider,
     GenerationRequest,
 )
-from ..workflows import ArgumentWorkflow, ChatWorkflow, ConsensusWorkflow, ConsensusStrategy, IdeateWorkflow, ThinkDeepWorkflow
+from ..workflows import ArgumentWorkflow, ChatWorkflow, ConsensusWorkflow, ConsensusStrategy, IdeateWorkflow, ResearchWorkflow, ThinkDeepWorkflow
 from ..core.conversation import ConversationMemory
 
 app = typer.Typer(
@@ -570,6 +570,232 @@ def ideate(
                 json.dump(output_data, f, indent=2)
 
             console.print(f"\n[green]Results saved to: {output}[/green]")
+
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Interrupted by user[/yellow]")
+        raise typer.Exit(130)
+    except Exception as e:
+        console.print(f"\n[red]Error: {e}[/red]")
+        if verbose:
+            import traceback
+            console.print(f"\n[red]{traceback.format_exc()}[/red]")
+        raise typer.Exit(1)
+
+
+@app.command()
+def research(
+    prompt: str = typer.Argument(..., help="Research question or topic to investigate"),
+    provider: str = typer.Option(
+        "claude",
+        "--provider",
+        "-p",
+        help="Provider to use (claude, gemini, codex, cursor-agent)",
+    ),
+    continuation_id: Optional[str] = typer.Option(
+        None,
+        "--continue",
+        "-c",
+        help="Thread ID to continue an existing research session",
+    ),
+    files: Optional[List[str]] = typer.Option(
+        None,
+        "--file",
+        "-f",
+        help="Source files to include in research (can specify multiple times)",
+    ),
+    citation_style: str = typer.Option(
+        "informal",
+        "--citation-style",
+        help="Citation format: informal, academic, or technical",
+    ),
+    research_depth: str = typer.Option(
+        "thorough",
+        "--depth",
+        "-d",
+        help="Research depth: shallow, moderate, thorough, or comprehensive",
+    ),
+    system: Optional[str] = typer.Option(
+        None,
+        "--system",
+        help="System prompt for context",
+    ),
+    temperature: float = typer.Option(
+        0.5,
+        "--temperature",
+        "-t",
+        help="Temperature for generation (0.0-1.0)",
+    ),
+    max_tokens: Optional[int] = typer.Option(
+        None,
+        "--max-tokens",
+        help="Maximum tokens to generate",
+    ),
+    output: Optional[Path] = typer.Option(
+        None,
+        "--output",
+        "-o",
+        help="Output file for research dossier (JSON format)",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Show detailed execution information",
+    ),
+):
+    """
+    Conduct systematic research with evidence extraction and citations.
+
+    The research workflow gathers information from multiple sources, extracts evidence,
+    validates claims, and generates a comprehensive research dossier with proper citations.
+
+    Example:
+        # Basic research
+        modelchorus research "What are the latest trends in AI orchestration?"
+
+        # With source files and citations
+        modelchorus research "Analyze user feedback" -f feedback.txt --citation-style academic
+
+        # Deep research with comprehensive analysis
+        modelchorus research "Security vulnerabilities in microservices" --depth comprehensive
+    """
+    try:
+        # Validate citation style
+        valid_styles = ['informal', 'academic', 'technical']
+        if citation_style not in valid_styles:
+            console.print(f"[red]Error: Invalid citation style '{citation_style}'[/red]")
+            console.print(f"Valid styles: {', '.join(valid_styles)}")
+            raise typer.Exit(1)
+
+        # Validate research depth
+        valid_depths = ['shallow', 'moderate', 'thorough', 'comprehensive']
+        if research_depth not in valid_depths:
+            console.print(f"[red]Error: Invalid research depth '{research_depth}'[/red]")
+            console.print(f"Valid depths: {', '.join(valid_depths)}")
+            raise typer.Exit(1)
+
+        # Create provider instance
+        if verbose:
+            console.print(f"[cyan]Initializing provider: {provider}[/cyan]")
+
+        try:
+            provider_instance = get_provider_by_name(provider)
+            if verbose:
+                console.print(f"[green]✓ {provider} initialized[/green]")
+        except Exception as e:
+            console.print(f"[red]Failed to initialize {provider}: {e}[/red]")
+            raise typer.Exit(1)
+
+        # Create conversation memory
+        memory = ConversationMemory()
+
+        # Create workflow
+        workflow = ResearchWorkflow(
+            provider=provider_instance,
+            conversation_memory=memory,
+        )
+
+        if verbose:
+            console.print(f"[cyan]Workflow: {workflow}[/cyan]")
+
+        # Validate and ingest source files
+        if files:
+            for file_path in files:
+                path = Path(file_path)
+                if not path.exists():
+                    console.print(f"[red]Error: File not found: {file_path}[/red]")
+                    raise typer.Exit(1)
+
+                # Read file content and ingest as source
+                try:
+                    with open(path, 'r', encoding='utf-8') as f:
+                        content = f.read()
+
+                    workflow.ingest_source(
+                        title=path.name,
+                        url=str(path.absolute()),
+                        source_type='document',
+                        credibility='high'
+                    )
+
+                    if verbose:
+                        console.print(f"[green]✓ Ingested source: {path.name}[/green]")
+                except Exception as e:
+                    console.print(f"[yellow]Warning: Could not read {file_path}: {e}[/yellow]")
+
+        # Display research info
+        console.print(f"\n[bold cyan]Conducting systematic research...[/bold cyan]")
+        console.print(f"[dim]Question: {prompt[:100]}{'...' if len(prompt) > 100 else ''}[/dim]")
+        console.print(f"[dim]Depth: {research_depth} | Citations: {citation_style}[/dim]")
+        if files:
+            console.print(f"[dim]Sources: {len(files)} file(s)[/dim]")
+        console.print()
+
+        # Build config
+        config = {
+            'citation_style': citation_style,
+            'research_depth': research_depth,
+            'temperature': temperature,
+        }
+        if system:
+            config['system_prompt'] = system
+        if max_tokens is not None:
+            config['max_tokens'] = max_tokens
+
+        # Execute workflow
+        result = asyncio.run(
+            workflow.run(
+                prompt=prompt,
+                continuation_id=continuation_id,
+                files=files,
+                **config
+            )
+        )
+
+        # Display results
+        console.print("\n[bold green]Research Complete[/bold green]")
+
+        # Show research findings
+        if result.steps:
+            for i, step in enumerate(result.steps, 1):
+                console.print(f"\n[bold cyan]{step.name if hasattr(step, 'name') else f'Finding {i}'}:[/bold cyan]")
+                console.print(step.content)
+
+        # Show synthesis/dossier
+        if result.synthesis:
+            console.print(f"\n[bold magenta]Research Dossier:[/bold magenta]")
+            console.print(result.synthesis)
+
+        # Show metadata
+        if verbose and result.metadata:
+            console.print(f"\n[dim]Thread ID: {result.metadata.get('thread_id', 'N/A')}[/dim]")
+            console.print(f"[dim]Model: {result.metadata.get('model', 'N/A')}[/dim]")
+            if 'sources_analyzed' in result.metadata:
+                console.print(f"[dim]Sources analyzed: {result.metadata['sources_analyzed']}[/dim]")
+
+        # Save output if requested
+        if output:
+            output_data = {
+                'success': result.success,
+                'research_question': prompt,
+                'dossier': result.synthesis,
+                'findings': [
+                    {
+                        'name': step.name if hasattr(step, 'name') else f'Finding {i}',
+                        'content': step.content,
+                        'metadata': step.metadata if hasattr(step, 'metadata') else {}
+                    }
+                    for i, step in enumerate(result.steps, 1)
+                ],
+                'metadata': result.metadata,
+                'citation_style': citation_style,
+                'research_depth': research_depth,
+            }
+
+            with open(output, 'w') as f:
+                json.dump(output_data, f, indent=2)
+
+            console.print(f"\n[green]Research dossier saved to: {output}[/green]")
 
     except KeyboardInterrupt:
         console.print("\n[yellow]Interrupted by user[/yellow]")
