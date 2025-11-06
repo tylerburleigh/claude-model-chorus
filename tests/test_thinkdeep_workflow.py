@@ -593,3 +593,540 @@ Recommended action: Implement LRU eviction policy with maximum size limit."""
         thread_id = result.metadata["thread_id"]
         state = workflow.get_investigation_state(thread_id)
         assert state is None or len(state.steps) == 0
+
+
+class TestHypothesisEvolution:
+    """Test suite for hypothesis evolution in ThinkDeepWorkflow."""
+
+    @pytest.fixture
+    def mock_provider(self):
+        """Create a mock provider for testing."""
+        provider = AsyncMock()
+        provider.provider_name = "test_provider"
+        provider.validate_api_key.return_value = True
+        return provider
+
+    @pytest.fixture
+    def conversation_memory(self):
+        """Create conversation memory for testing."""
+        return ConversationMemory()
+
+    @pytest.mark.asyncio
+    async def test_add_hypothesis_to_investigation(
+        self, mock_provider, conversation_memory
+    ):
+        """Test adding a hypothesis to an ongoing investigation."""
+        # Setup mock response
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Initial investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        # Create workflow and start investigation
+        workflow = ThinkDeepWorkflow(
+            provider=mock_provider,
+            conversation_memory=conversation_memory
+        )
+
+        result = await workflow.run(prompt="Start investigation")
+        thread_id = result.metadata["thread_id"]
+
+        # Add hypothesis
+        success = workflow.add_hypothesis(
+            thread_id,
+            "Database connection pool is undersized",
+            evidence=["Pool size is 5", "Peak connections exceed 20"]
+        )
+
+        assert success is True
+
+        # Verify hypothesis was added
+        state = workflow.get_investigation_state(thread_id)
+        assert len(state.hypotheses) == 1
+
+        hyp = state.hypotheses[0]
+        assert hyp.hypothesis == "Database connection pool is undersized"
+        assert len(hyp.evidence) == 2
+        assert hyp.status == "active"
+
+    @pytest.mark.asyncio
+    async def test_update_hypothesis_with_evidence(
+        self, mock_provider, conversation_memory
+    ):
+        """Test adding evidence to an existing hypothesis."""
+        # Setup workflow and investigation
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        workflow = ThinkDeepWorkflow(
+            provider=mock_provider,
+            conversation_memory=conversation_memory
+        )
+
+        result = await workflow.run(prompt="Start investigation")
+        thread_id = result.metadata["thread_id"]
+
+        # Add initial hypothesis
+        workflow.add_hypothesis(
+            thread_id,
+            "Memory leak in cache layer",
+            evidence=["Memory grows over time"]
+        )
+
+        # Update with new evidence
+        success = workflow.update_hypothesis(
+            thread_id,
+            "Memory leak in cache layer",
+            new_evidence=["No eviction policy found", "Cache size unbounded"]
+        )
+
+        assert success is True
+
+        # Verify evidence was added
+        state = workflow.get_investigation_state(thread_id)
+        hyp = state.hypotheses[0]
+        assert len(hyp.evidence) == 3
+        assert "Memory grows over time" in hyp.evidence
+        assert "No eviction policy found" in hyp.evidence
+        assert "Cache size unbounded" in hyp.evidence
+
+    @pytest.mark.asyncio
+    async def test_validate_hypothesis(
+        self, mock_provider, conversation_memory
+    ):
+        """Test marking a hypothesis as validated."""
+        # Setup workflow and investigation
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Investigation complete.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        workflow = ThinkDeepWorkflow(
+            provider=mock_provider,
+            conversation_memory=conversation_memory
+        )
+
+        result = await workflow.run(prompt="Start investigation")
+        thread_id = result.metadata["thread_id"]
+
+        # Add hypothesis
+        workflow.add_hypothesis(
+            thread_id,
+            "API uses async/await pattern",
+            evidence=["Found async def in code"]
+        )
+
+        # Validate hypothesis
+        success = workflow.validate_hypothesis(
+            thread_id,
+            "API uses async/await pattern"
+        )
+
+        assert success is True
+
+        # Verify status changed
+        state = workflow.get_investigation_state(thread_id)
+        hyp = state.hypotheses[0]
+        assert hyp.status == "validated"
+
+    @pytest.mark.asyncio
+    async def test_disprove_hypothesis(
+        self, mock_provider, conversation_memory
+    ):
+        """Test marking a hypothesis as disproven."""
+        # Setup workflow and investigation
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        workflow = ThinkDeepWorkflow(
+            provider=mock_provider,
+            conversation_memory=conversation_memory
+        )
+
+        result = await workflow.run(prompt="Start investigation")
+        thread_id = result.metadata["thread_id"]
+
+        # Add hypothesis
+        workflow.add_hypothesis(
+            thread_id,
+            "Network latency causes timeout",
+            evidence=["Initial suspicion"]
+        )
+
+        # Disprove hypothesis
+        success = workflow.disprove_hypothesis(
+            thread_id,
+            "Network latency causes timeout"
+        )
+
+        assert success is True
+
+        # Verify status changed
+        state = workflow.get_investigation_state(thread_id)
+        hyp = state.hypotheses[0]
+        assert hyp.status == "disproven"
+
+    @pytest.mark.asyncio
+    async def test_multiple_hypothesis_evolution(
+        self, mock_provider, conversation_memory
+    ):
+        """Test evolution of multiple competing hypotheses."""
+        # Setup workflow
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        workflow = ThinkDeepWorkflow(
+            provider=mock_provider,
+            conversation_memory=conversation_memory
+        )
+
+        result = await workflow.run(prompt="Start investigation")
+        thread_id = result.metadata["thread_id"]
+
+        # Add multiple hypotheses
+        workflow.add_hypothesis(
+            thread_id,
+            "H1: Database connection issue",
+            evidence=["Slow queries observed"]
+        )
+
+        workflow.add_hypothesis(
+            thread_id,
+            "H2: Network congestion",
+            evidence=["High latency reported"]
+        )
+
+        workflow.add_hypothesis(
+            thread_id,
+            "H3: Application code bug",
+            evidence=["Error logs present"]
+        )
+
+        # Evolve hypotheses over investigation
+        # Add evidence to H1
+        workflow.update_hypothesis(
+            thread_id,
+            "H1: Database connection issue",
+            new_evidence=["Connection pool exhausted", "Timeout errors in logs"]
+        )
+
+        # Disprove H2
+        workflow.disprove_hypothesis(thread_id, "H2: Network congestion")
+
+        # Validate H1
+        workflow.validate_hypothesis(thread_id, "H1: Database connection issue")
+
+        # Verify final state
+        state = workflow.get_investigation_state(thread_id)
+        assert len(state.hypotheses) == 3
+
+        # H1 should be validated with 3 pieces of evidence
+        h1 = [h for h in state.hypotheses if "H1" in h.hypothesis][0]
+        assert h1.status == "validated"
+        assert len(h1.evidence) == 3
+
+        # H2 should be disproven
+        h2 = [h for h in state.hypotheses if "H2" in h.hypothesis][0]
+        assert h2.status == "disproven"
+
+        # H3 should still be active
+        h3 = [h for h in state.hypotheses if "H3" in h.hypothesis][0]
+        assert h3.status == "active"
+
+    @pytest.mark.asyncio
+    async def test_get_active_hypotheses(
+        self, mock_provider, conversation_memory
+    ):
+        """Test filtering active hypotheses."""
+        # Setup workflow
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        workflow = ThinkDeepWorkflow(
+            provider=mock_provider,
+            conversation_memory=conversation_memory
+        )
+
+        result = await workflow.run(prompt="Start investigation")
+        thread_id = result.metadata["thread_id"]
+
+        # Add hypotheses with different statuses
+        workflow.add_hypothesis(thread_id, "H1: Active hypothesis 1")
+        workflow.add_hypothesis(thread_id, "H2: Active hypothesis 2")
+        workflow.add_hypothesis(thread_id, "H3: To be validated")
+        workflow.add_hypothesis(thread_id, "H4: To be disproven")
+
+        # Change statuses
+        workflow.validate_hypothesis(thread_id, "H3: To be validated")
+        workflow.disprove_hypothesis(thread_id, "H4: To be disproven")
+
+        # Get active hypotheses
+        active = workflow.get_active_hypotheses(thread_id)
+
+        assert len(active) == 2
+        assert all(h.status == "active" for h in active)
+        assert any("H1" in h.hypothesis for h in active)
+        assert any("H2" in h.hypothesis for h in active)
+
+    @pytest.mark.asyncio
+    async def test_get_all_hypotheses(
+        self, mock_provider, conversation_memory
+    ):
+        """Test getting all hypotheses regardless of status."""
+        # Setup workflow
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        workflow = ThinkDeepWorkflow(
+            provider=mock_provider,
+            conversation_memory=conversation_memory
+        )
+
+        result = await workflow.run(prompt="Start investigation")
+        thread_id = result.metadata["thread_id"]
+
+        # Add hypotheses with different statuses
+        workflow.add_hypothesis(thread_id, "H1: Active")
+        workflow.add_hypothesis(thread_id, "H2: Validated")
+        workflow.add_hypothesis(thread_id, "H3: Disproven")
+
+        workflow.validate_hypothesis(thread_id, "H2: Validated")
+        workflow.disprove_hypothesis(thread_id, "H3: Disproven")
+
+        # Get all hypotheses
+        all_hyps = workflow.get_all_hypotheses(thread_id)
+
+        assert len(all_hyps) == 3
+
+        statuses = [h.status for h in all_hyps]
+        assert "active" in statuses
+        assert "validated" in statuses
+        assert "disproven" in statuses
+
+    @pytest.mark.asyncio
+    async def test_hypothesis_persistence_across_turns(
+        self, mock_provider, conversation_memory
+    ):
+        """Test that hypotheses persist across investigation turns."""
+        # Setup workflow
+        workflow = ThinkDeepWorkflow(
+            provider=mock_provider,
+            conversation_memory=conversation_memory
+        )
+
+        # Turn 1: Start investigation and add hypothesis
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Initial findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        result1 = await workflow.run(prompt="Start investigation")
+        thread_id = result1.metadata["thread_id"]
+
+        workflow.add_hypothesis(
+            thread_id,
+            "Performance bottleneck in database",
+            evidence=["Slow query times"]
+        )
+
+        # Turn 2: Continue investigation
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Additional findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        result2 = await workflow.run(
+            prompt="Continue investigation",
+            continuation_id=thread_id
+        )
+
+        # Add more evidence
+        workflow.update_hypothesis(
+            thread_id,
+            "Performance bottleneck in database",
+            new_evidence=["Missing index found"]
+        )
+
+        # Turn 3: Conclude investigation
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Final analysis.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        result3 = await workflow.run(
+            prompt="Finalize",
+            continuation_id=thread_id
+        )
+
+        # Validate hypothesis
+        workflow.validate_hypothesis(
+            thread_id,
+            "Performance bottleneck in database"
+        )
+
+        # Verify hypothesis persisted and evolved
+        state = workflow.get_investigation_state(thread_id)
+        assert len(state.hypotheses) == 1
+
+        hyp = state.hypotheses[0]
+        assert hyp.hypothesis == "Performance bottleneck in database"
+        assert len(hyp.evidence) == 2
+        assert "Slow query times" in hyp.evidence
+        assert "Missing index found" in hyp.evidence
+        assert hyp.status == "validated"
+
+    @pytest.mark.asyncio
+    async def test_hypothesis_update_with_status_change(
+        self, mock_provider, conversation_memory
+    ):
+        """Test updating hypothesis evidence and status simultaneously."""
+        # Setup workflow
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        workflow = ThinkDeepWorkflow(
+            provider=mock_provider,
+            conversation_memory=conversation_memory
+        )
+
+        result = await workflow.run(prompt="Start investigation")
+        thread_id = result.metadata["thread_id"]
+
+        # Add hypothesis
+        workflow.add_hypothesis(
+            thread_id,
+            "Cache eviction policy missing",
+            evidence=["Memory grows unbounded"]
+        )
+
+        # Update with evidence and status
+        success = workflow.update_hypothesis(
+            thread_id,
+            "Cache eviction policy missing",
+            new_evidence=["Confirmed no LRU implementation", "No max size configured"],
+            new_status="validated"
+        )
+
+        assert success is True
+
+        # Verify both updates applied
+        state = workflow.get_investigation_state(thread_id)
+        hyp = state.hypotheses[0]
+        assert len(hyp.evidence) == 3
+        assert hyp.status == "validated"
+
+    @pytest.mark.asyncio
+    async def test_hypothesis_not_found_handling(
+        self, mock_provider, conversation_memory
+    ):
+        """Test handling of operations on non-existent hypothesis."""
+        # Setup workflow
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        workflow = ThinkDeepWorkflow(
+            provider=mock_provider,
+            conversation_memory=conversation_memory
+        )
+
+        result = await workflow.run(prompt="Start investigation")
+        thread_id = result.metadata["thread_id"]
+
+        # Try to update non-existent hypothesis
+        success = workflow.update_hypothesis(
+            thread_id,
+            "Non-existent hypothesis",
+            new_evidence=["Some evidence"]
+        )
+
+        assert success is False
+
+        # Try to validate non-existent hypothesis
+        success = workflow.validate_hypothesis(
+            thread_id,
+            "Non-existent hypothesis"
+        )
+
+        assert success is False
+
+        # Try to disprove non-existent hypothesis
+        success = workflow.disprove_hypothesis(
+            thread_id,
+            "Non-existent hypothesis"
+        )
+
+        assert success is False
+
+    @pytest.mark.asyncio
+    async def test_hypothesis_metadata_tracking(
+        self, mock_provider, conversation_memory
+    ):
+        """Test that hypothesis count is tracked in result metadata."""
+        # Setup workflow
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        workflow = ThinkDeepWorkflow(
+            provider=mock_provider,
+            conversation_memory=conversation_memory
+        )
+
+        # Initial investigation - no hypotheses
+        result1 = await workflow.run(prompt="Start investigation")
+        assert result1.metadata["hypotheses_count"] == 0
+
+        thread_id = result1.metadata["thread_id"]
+
+        # Add hypotheses
+        workflow.add_hypothesis(thread_id, "H1")
+        workflow.add_hypothesis(thread_id, "H2")
+
+        # Continue investigation - should show hypothesis count
+        result2 = await workflow.run(
+            prompt="Continue",
+            continuation_id=thread_id
+        )
+
+        assert result2.metadata["hypotheses_count"] == 2
