@@ -1249,3 +1249,219 @@ class Evidence(BaseModel):
             'Test'
         """
         return cls(**data)
+
+
+class ArgumentPerspective(BaseModel):
+    """
+    Represents a single perspective in an argument analysis.
+
+    Each perspective captures one role's analysis (Creator, Skeptic, or Moderator)
+    with their stance, reasoning, and key points.
+
+    Attributes:
+        role: The role name (creator, skeptic, moderator)
+        stance: The perspective's stance (for, against, neutral)
+        content: Full response content from this perspective
+        key_points: List of key points or arguments
+        model: Model used for this perspective
+        metadata: Additional perspective metadata
+
+    Example:
+        >>> perspective = ArgumentPerspective(
+        ...     role="creator",
+        ...     stance="for",
+        ...     content="Universal basic income would reduce poverty...",
+        ...     key_points=["Ensures basic needs", "Reduces wealth gap"],
+        ...     model="claude-sonnet-4"
+        ... )
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "role": "creator",
+                "stance": "for",
+                "content": "Universal basic income would reduce poverty...",
+                "key_points": ["Ensures basic needs", "Reduces wealth gap"],
+                "model": "claude-sonnet-4",
+                "metadata": {}
+            }
+        }
+    )
+
+    role: Literal["creator", "skeptic", "moderator"] = Field(
+        ...,
+        description="The role name (creator, skeptic, moderator)"
+    )
+
+    stance: Literal["for", "against", "neutral"] = Field(
+        ...,
+        description="The perspective's stance (for, against, neutral)"
+    )
+
+    content: str = Field(
+        ...,
+        description="Full response content from this perspective",
+        min_length=1
+    )
+
+    key_points: List[str] = Field(
+        default_factory=list,
+        description="List of key points or arguments"
+    )
+
+    model: str = Field(
+        ...,
+        description="Model used for this perspective",
+        min_length=1
+    )
+
+    metadata: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Additional perspective metadata"
+    )
+
+
+class ArgumentMap(BaseModel):
+    """
+    Structured output from ARGUMENT workflow containing all perspectives.
+
+    ArgumentMap provides a comprehensive view of the dialectical analysis,
+    including the thesis (Creator), rebuttal (Skeptic), and synthesis (Moderator).
+    This structured format enables programmatic access to different perspectives
+    and supports downstream analysis, visualization, and decision-making.
+
+    Attributes:
+        topic: The argument topic or claim being analyzed
+        perspectives: List of perspectives (Creator, Skeptic, Moderator)
+        synthesis: Final balanced synthesis from Moderator
+        metadata: Additional workflow metadata (thread_id, model, timestamps, etc.)
+
+    Example:
+        >>> arg_map = ArgumentMap(
+        ...     topic="Universal basic income would reduce poverty",
+        ...     perspectives=[creator_perspective, skeptic_perspective, moderator_perspective],
+        ...     synthesis="After examining both perspectives...",
+        ...     metadata={"thread_id": "abc123", "model": "claude-sonnet-4"}
+        ... )
+        >>> print(arg_map.perspectives[0].role)  # 'creator'
+        >>> print(arg_map.perspectives[1].role)  # 'skeptic'
+        >>> print(arg_map.perspectives[2].role)  # 'moderator'
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "topic": "Universal basic income would reduce poverty",
+                "perspectives": [
+                    {
+                        "role": "creator",
+                        "stance": "for",
+                        "content": "Universal basic income would reduce poverty...",
+                        "key_points": ["Ensures basic needs", "Reduces wealth gap"],
+                        "model": "claude-sonnet-4",
+                        "metadata": {}
+                    }
+                ],
+                "synthesis": "After examining both perspectives...",
+                "metadata": {"thread_id": "abc123"}
+            }
+        }
+    )
+
+    topic: str = Field(
+        ...,
+        description="The argument topic or claim being analyzed",
+        min_length=1
+    )
+
+    perspectives: List[ArgumentPerspective] = Field(
+        ...,
+        description="List of perspectives (Creator, Skeptic, Moderator)",
+        min_length=1
+    )
+
+    synthesis: str = Field(
+        ...,
+        description="Final balanced synthesis from Moderator",
+        min_length=1
+    )
+
+    metadata: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Additional workflow metadata (thread_id, model, timestamps, etc.)"
+    )
+
+    def get_perspective(self, role: str) -> Optional[ArgumentPerspective]:
+        """
+        Get a specific perspective by role name.
+
+        Args:
+            role: Role name (creator, skeptic, or moderator)
+
+        Returns:
+            ArgumentPerspective if found, None otherwise
+
+        Example:
+            >>> creator = arg_map.get_perspective("creator")
+            >>> print(creator.stance)  # 'for'
+        """
+        for perspective in self.perspectives:
+            if perspective.role == role:
+                return perspective
+        return None
+
+    def to_dict(self) -> Dict[str, Any]:
+        """
+        Convert ArgumentMap to dictionary for serialization.
+
+        Returns:
+            Dictionary representation of the argument map
+
+        Example:
+            >>> arg_map.to_dict()
+            {
+                'topic': 'Universal basic income...',
+                'perspectives': [...],
+                'synthesis': '...',
+                'metadata': {...}
+            }
+        """
+        return {
+            "topic": self.topic,
+            "perspectives": [p.model_dump() for p in self.perspectives],
+            "synthesis": self.synthesis,
+            "metadata": self.metadata
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "ArgumentMap":
+        """
+        Create an ArgumentMap from a dictionary.
+
+        Args:
+            data: Dictionary containing argument map fields
+
+        Returns:
+            New ArgumentMap instance
+
+        Example:
+            >>> data = {
+            ...     'topic': 'Test topic',
+            ...     'perspectives': [{'role': 'creator', ...}],
+            ...     'synthesis': 'Test synthesis',
+            ...     'metadata': {}
+            ... }
+            >>> arg_map = ArgumentMap.from_dict(data)
+        """
+        # Convert perspective dicts to ArgumentPerspective objects
+        perspectives = [
+            ArgumentPerspective(**p) if isinstance(p, dict) else p
+            for p in data["perspectives"]
+        ]
+        return cls(
+            topic=data["topic"],
+            perspectives=perspectives,
+            synthesis=data["synthesis"],
+            metadata=data.get("metadata", {})
+        )

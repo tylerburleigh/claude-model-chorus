@@ -20,7 +20,7 @@ from ...core.role_orchestration import (
     OrchestrationResult,
 )
 from ...providers import ModelProvider, GenerationRequest, GenerationResponse
-from ...core.models import ConversationMessage
+from ...core.models import ConversationMessage, ArgumentMap, ArgumentPerspective
 
 logger = logging.getLogger(__name__)
 
@@ -253,6 +253,84 @@ class ArgumentWorkflow(BaseWorkflow):
             },
         )
 
+    def _generate_argument_map(
+        self,
+        prompt: str,
+        creator_response,
+        skeptic_response,
+        moderator_response,
+        synthesis: str,
+        metadata: Dict[str, Any]
+    ) -> ArgumentMap:
+        """
+        Generate structured ArgumentMap from role responses.
+
+        Creates an ArgumentMap containing all three perspectives (Creator, Skeptic,
+        Moderator) with their stances, content, and metadata. This provides
+        programmatic access to the dialectical analysis.
+
+        Args:
+            prompt: Original argument topic/claim
+            creator_response: Response from Creator role
+            skeptic_response: Response from Skeptic role
+            moderator_response: Response from Moderator role
+            synthesis: Final synthesis text
+            metadata: Workflow metadata
+
+        Returns:
+            ArgumentMap with all perspectives structured
+
+        Example:
+            >>> arg_map = workflow._generate_argument_map(
+            ...     "Universal basic income reduces poverty",
+            ...     creator_response,
+            ...     skeptic_response,
+            ...     moderator_response,
+            ...     "After examining...",
+            ...     {"thread_id": "123"}
+            ... )
+            >>> print(arg_map.perspectives[0].role)  # 'creator'
+        """
+        # Create perspective for Creator
+        creator_perspective = ArgumentPerspective(
+            role="creator",
+            stance="for",
+            content=creator_response.content,
+            key_points=[],  # Could be extracted via NLP in future
+            model=creator_response.model,
+            metadata={"step": 1, "step_name": "Thesis Generation"}
+        )
+
+        # Create perspective for Skeptic
+        skeptic_perspective = ArgumentPerspective(
+            role="skeptic",
+            stance="against",
+            content=skeptic_response.content,
+            key_points=[],  # Could be extracted via NLP in future
+            model=skeptic_response.model,
+            metadata={"step": 2, "step_name": "Critical Rebuttal"}
+        )
+
+        # Create perspective for Moderator
+        moderator_perspective = ArgumentPerspective(
+            role="moderator",
+            stance="neutral",
+            content=moderator_response.content,
+            key_points=[],  # Could be extracted via NLP in future
+            model=moderator_response.model,
+            metadata={"step": 3, "step_name": "Balanced Synthesis"}
+        )
+
+        # Create ArgumentMap with all perspectives
+        argument_map = ArgumentMap(
+            topic=prompt,
+            perspectives=[creator_perspective, skeptic_perspective, moderator_perspective],
+            synthesis=synthesis,
+            metadata=metadata
+        )
+
+        return argument_map
+
     async def run(
         self,
         prompt: str,
@@ -283,7 +361,8 @@ class ArgumentWorkflow(BaseWorkflow):
                 - success: True if analysis succeeded
                 - synthesis: Combined analysis from all role perspectives
                 - steps: Three steps (Creator thesis, Skeptic rebuttal, Moderator synthesis)
-                - metadata: thread_id, model info, role execution details
+                - metadata: thread_id, model info, role execution details, and argument_map
+                  - argument_map: ArgumentMap with structured perspectives and synthesis
 
         Raises:
             Exception: If role orchestration fails
@@ -296,6 +375,12 @@ class ArgumentWorkflow(BaseWorkflow):
             >>> print(result.steps[0].content)  # Creator's thesis
             >>> print(result.steps[1].content)  # Skeptic's rebuttal
             >>> print(result.steps[2].content)  # Moderator's synthesis
+            >>>
+            >>> # Access structured ArgumentMap
+            >>> arg_map = result.metadata['argument_map']
+            >>> creator = arg_map.get_perspective('creator')
+            >>> print(creator.stance)  # 'for'
+            >>> print(arg_map.synthesis)  # Final balanced synthesis
             >>>
             >>> # Continuation
             >>> result2 = await workflow.run(
@@ -425,8 +510,8 @@ class ArgumentWorkflow(BaseWorkflow):
             result.success = True
             result.synthesis = synthesis
 
-            # Add metadata
-            result.metadata.update({
+            # Generate structured ArgumentMap
+            base_metadata = {
                 'thread_id': thread_id,
                 'provider': self.provider.provider_name,
                 'model': creator_response.model,
@@ -436,7 +521,20 @@ class ArgumentWorkflow(BaseWorkflow):
                 'orchestration_pattern': OrchestrationPattern.SEQUENTIAL.value,
                 'roles_executed': ['creator', 'skeptic', 'moderator'],
                 'steps_completed': 3,  # Creator + Skeptic + Moderator
-            })
+            }
+
+            argument_map = self._generate_argument_map(
+                prompt=prompt,
+                creator_response=creator_response,
+                skeptic_response=skeptic_response,
+                moderator_response=moderator_response,
+                synthesis=synthesis,
+                metadata=base_metadata
+            )
+
+            # Add metadata including ArgumentMap
+            result.metadata.update(base_metadata)
+            result.metadata['argument_map'] = argument_map
 
             logger.info(f"ARGUMENT workflow completed successfully for thread: {thread_id}")
             logger.info(f"Creator role: {len(creator_response.content)} chars thesis")
