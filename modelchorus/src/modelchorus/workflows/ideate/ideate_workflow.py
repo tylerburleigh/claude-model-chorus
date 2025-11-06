@@ -7,6 +7,7 @@ through structured brainstorming sessions with creative prompting.
 
 import logging
 import uuid
+from datetime import datetime, timezone
 from typing import Optional, Dict, Any, List
 
 from ...core.base_workflow import BaseWorkflow, WorkflowResult, WorkflowStep
@@ -169,10 +170,11 @@ class IdeateWorkflow(BaseWorkflow):
 
         # Create generation request
         request = GenerationRequest(
-            messages=history + [ConversationMessage(role="user", content=user_message)],
+            prompt=user_message,
             system_prompt=system_prompt,
             temperature=temperature,
-            max_tokens=kwargs.get('max_tokens', 4096)
+            max_tokens=kwargs.get('max_tokens', 4096),
+            continuation_id=thread_id if continuation_id else None
         )
 
         logger.info(f"Executing ideation for prompt: {prompt[:100]}...")
@@ -189,23 +191,28 @@ class IdeateWorkflow(BaseWorkflow):
                 metadata={
                     "title": "Ideation Round",
                     "temperature": temperature,
-                    "tokens_used": response.usage.total_tokens if response.usage else 0
+                    "tokens_used": response.usage.get('total_tokens', 0) if response.usage else 0
                 }
             )
 
             # Update conversation memory
             if self.conversation_memory:
                 self.conversation_memory.add_message(
-                    thread_id,
-                    ConversationMessage(role="user", content=prompt)
+                    thread_id=thread_id,
+                    role="user",
+                    content=prompt
                 )
                 self.conversation_memory.add_message(
-                    thread_id,
-                    ConversationMessage(role="assistant", content=response.content)
+                    thread_id=thread_id,
+                    role="assistant",
+                    content=response.content,
+                    workflow_name=self.name,
+                    model_provider=self.provider.provider_name
                 )
 
             # Create workflow result
             result = WorkflowResult(
+                success=True,
                 synthesis=response.content,
                 steps=[step],
                 metadata={
@@ -404,7 +411,7 @@ Generate diverse, innovative ideas. Think broadly and explore multiple approache
                         "title": f"Brainstorming ({perspective})",
                         "perspective": perspective,
                         "role": role_name,
-                        "tokens": response.usage.total_tokens if response.usage else 0
+                        "tokens": response.usage.get('total_tokens', 0) if response.usage else 0
                     }
                 )
                 steps.append(step)
@@ -413,7 +420,7 @@ Generate diverse, innovative ideas. Think broadly and explore multiple approache
             synthesis = self._synthesize_brainstorming_results(steps, perspectives)
 
             # Create workflow result
-            result = WorkflowResult(
+            result = WorkflowResult(success=True, 
                 synthesis=synthesis,
                 steps=steps,
                 metadata={
@@ -540,7 +547,7 @@ Generate diverse, innovative ideas. Think broadly and explore multiple approache
         ]
 
         # Create workflow result
-        result = WorkflowResult(
+        result = WorkflowResult(success=True, 
             synthesis=synthesis,
             steps=steps,
             metadata={
@@ -593,7 +600,7 @@ Generate diverse, innovative ideas. Think broadly and explore multiple approache
 
         # Create generation request
         request = GenerationRequest(
-            messages=[ConversationMessage(role="user", content=extraction_prompt)],
+            prompt=extraction_prompt,
             system_prompt=self._get_extraction_system_prompt(),
             temperature=temperature,
             max_tokens=kwargs.get('max_tokens', 3000)
@@ -785,7 +792,7 @@ Use the requested format exactly."""
 
         # Create generation request
         request = GenerationRequest(
-            messages=[ConversationMessage(role="user", content=clustering_prompt)],
+            prompt=clustering_prompt,
             system_prompt=self._get_clustering_system_prompt(),
             temperature=temperature,
             max_tokens=kwargs.get('max_tokens', 3000)
@@ -1004,7 +1011,7 @@ Use the requested format exactly."""
 
         # Create generation request
         request = GenerationRequest(
-            messages=[ConversationMessage(role="user", content=scoring_prompt)],
+            prompt=scoring_prompt,
             system_prompt=self._get_scoring_system_prompt(),
             temperature=temperature,
             max_tokens=kwargs.get('max_tokens', 3000)
@@ -1481,7 +1488,7 @@ Use the requested format exactly."""
         }
 
         # Create final result with convergent analysis as synthesis
-        result = WorkflowResult(
+        result = WorkflowResult(success=True, 
             synthesis=convergent_result.synthesis,
             steps=all_steps,
             metadata=combined_metadata
@@ -1936,7 +1943,7 @@ Use the requested format exactly."""
         )
 
         # Create workflow result
-        result = WorkflowResult(
+        result = WorkflowResult(success=True, 
             synthesis=synthesis,
             steps=elaboration_steps,
             metadata={
@@ -1977,7 +1984,7 @@ Use the requested format exactly."""
 
         # Create generation request
         request = GenerationRequest(
-            messages=[ConversationMessage(role="user", content=elaboration_prompt)],
+            prompt=elaboration_prompt,
             system_prompt=self._get_elaboration_system_prompt(),
             temperature=temperature,
             max_tokens=kwargs.get('max_tokens', 3000)

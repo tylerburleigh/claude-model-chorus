@@ -763,6 +763,7 @@ class TestErrorHandling:
         from modelchorus.core.base_workflow import WorkflowResult
 
         empty_result = WorkflowResult(
+            success=True,
             synthesis="Empty",
             steps=[],
             metadata={}
