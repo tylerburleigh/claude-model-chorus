@@ -5,6 +5,7 @@ This module contains specific workflow types such as thinkdeep, debug,
 consensus, codereview, precommit, and planner.
 """
 
+from .argument import ArgumentWorkflow
 from .chat import ChatWorkflow
 from .consensus import (
     ConsensusWorkflow,
@@ -21,6 +22,7 @@ from ..core.models import (
 )
 
 __all__ = [
+    "ArgumentWorkflow",
     "ChatWorkflow",
     "ConsensusWorkflow",
     "ConsensusStrategy",

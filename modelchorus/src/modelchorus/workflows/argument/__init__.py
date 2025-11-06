@@ -5,6 +5,7 @@ Provides semantic similarity computation, claim comparison, clustering,
 and citation analysis for research and argumentation workflows.
 """
 
+from modelchorus.workflows.argument.argument_workflow import ArgumentWorkflow
 from modelchorus.workflows.argument.semantic import (
     compute_claim_similarity,
     find_similar_claims,
@@ -17,6 +18,7 @@ from modelchorus.workflows.argument.semantic import (
 )
 
 __all__ = [
+    "ArgumentWorkflow",
     "compute_claim_similarity",
     "find_similar_claims",
     "compute_embedding",
