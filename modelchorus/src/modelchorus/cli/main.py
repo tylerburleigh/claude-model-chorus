@@ -22,7 +22,7 @@ from ..providers import (
     CursorAgentProvider,
     GenerationRequest,
 )
-from ..workflows import ArgumentWorkflow, ChatWorkflow, ConsensusWorkflow, ConsensusStrategy, ThinkDeepWorkflow
+from ..workflows import ArgumentWorkflow, ChatWorkflow, ConsensusWorkflow, ConsensusStrategy, IdeateWorkflow, ThinkDeepWorkflow
 from ..core.conversation import ConversationMemory
 
 app = typer.Typer(
@@ -378,6 +378,186 @@ def argument(
                 'steps': [
                     {
                         'name': step.name if hasattr(step, 'name') else f'Step {i}',
+                        'content': step.content,
+                        'metadata': step.metadata if hasattr(step, 'metadata') else {}
+                    }
+                    for i, step in enumerate(result.steps, 1)
+                ],
+                'metadata': result.metadata,
+            }
+
+            with open(output, 'w') as f:
+                json.dump(output_data, f, indent=2)
+
+            console.print(f"\n[green]Results saved to: {output}[/green]")
+
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Interrupted by user[/yellow]")
+        raise typer.Exit(130)
+    except Exception as e:
+        console.print(f"\n[red]Error: {e}[/red]")
+        if verbose:
+            import traceback
+            console.print(f"\n[red]{traceback.format_exc()}[/red]")
+        raise typer.Exit(1)
+
+
+@app.command()
+def ideate(
+    prompt: str = typer.Argument(..., help="Topic or problem to brainstorm ideas for"),
+    provider: str = typer.Option(
+        "claude",
+        "--provider",
+        "-p",
+        help="Provider to use (claude, gemini, codex, cursor-agent)",
+    ),
+    continuation_id: Optional[str] = typer.Option(
+        None,
+        "--continue",
+        "-c",
+        help="Thread ID to continue an existing ideation session",
+    ),
+    files: Optional[List[str]] = typer.Option(
+        None,
+        "--file",
+        "-f",
+        help="File paths to include in context (can specify multiple times)",
+    ),
+    num_ideas: int = typer.Option(
+        5,
+        "--num-ideas",
+        "-n",
+        help="Number of ideas to generate",
+    ),
+    system: Optional[str] = typer.Option(
+        None,
+        "--system",
+        help="System prompt for context",
+    ),
+    temperature: float = typer.Option(
+        0.9,
+        "--temperature",
+        "-t",
+        help="Temperature for generation (0.0-1.0, higher = more creative)",
+    ),
+    max_tokens: Optional[int] = typer.Option(
+        None,
+        "--max-tokens",
+        help="Maximum tokens to generate",
+    ),
+    output: Optional[Path] = typer.Option(
+        None,
+        "--output",
+        "-o",
+        help="Output file for results (JSON format)",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Show detailed execution information",
+    ),
+):
+    """
+    Generate creative ideas through structured brainstorming.
+
+    The ideate workflow uses enhanced creative prompting to generate diverse
+    and innovative ideas for any topic or problem.
+
+    Example:
+        # Generate ideas
+        modelchorus ideate "New features for a task management app"
+
+        # Control creativity and quantity
+        modelchorus ideate "Marketing campaign ideas" -n 10 -t 1.0
+
+        # Continue brainstorming
+        modelchorus ideate "Refine the third idea" --continue thread-id-123
+    """
+    try:
+        # Create provider instance
+        if verbose:
+            console.print(f"[cyan]Initializing provider: {provider}[/cyan]")
+
+        try:
+            provider_instance = get_provider_by_name(provider)
+            if verbose:
+                console.print(f"[green]✓ {provider} initialized[/green]")
+        except Exception as e:
+            console.print(f"[red]Failed to initialize {provider}: {e}[/red]")
+            raise typer.Exit(1)
+
+        # Create conversation memory
+        memory = ConversationMemory()
+
+        # Create workflow
+        workflow = IdeateWorkflow(
+            provider=provider_instance,
+            conversation_memory=memory,
+        )
+
+        if verbose:
+            console.print(f"[cyan]Workflow: {workflow}[/cyan]")
+
+        # Validate files exist
+        if files:
+            for file_path in files:
+                if not Path(file_path).exists():
+                    console.print(f"[red]Error: File not found: {file_path}[/red]")
+                    raise typer.Exit(1)
+
+        # Display ideation info
+        console.print(f"\n[bold cyan]Generating creative ideas...[/bold cyan]")
+        console.print(f"[dim]Topic: {prompt[:100]}{'...' if len(prompt) > 100 else ''}[/dim]")
+        console.print(f"[dim]Ideas requested: {num_ideas}[/dim]\n")
+
+        # Build config
+        config = {
+            'num_ideas': num_ideas,
+            'temperature': temperature,
+        }
+        if system:
+            config['system_prompt'] = system
+        if max_tokens is not None:
+            config['max_tokens'] = max_tokens
+
+        # Execute workflow
+        result = asyncio.run(
+            workflow.run(
+                prompt=prompt,
+                continuation_id=continuation_id,
+                files=files,
+                **config
+            )
+        )
+
+        # Display results
+        console.print("\n[bold green]Ideation Complete[/bold green]")
+
+        # Show ideas from steps
+        if result.steps:
+            for i, step in enumerate(result.steps, 1):
+                console.print(f"\n[bold cyan]{step.name if hasattr(step, 'name') else f'Idea {i}'}:[/bold cyan]")
+                console.print(step.content)
+
+        # Show synthesis
+        if result.synthesis:
+            console.print(f"\n[bold magenta]Summary & Recommendations:[/bold magenta]")
+            console.print(result.synthesis)
+
+        # Show metadata
+        if verbose and result.metadata:
+            console.print(f"\n[dim]Thread ID: {result.metadata.get('thread_id', 'N/A')}[/dim]")
+            console.print(f"[dim]Model: {result.metadata.get('model', 'N/A')}[/dim]")
+
+        # Save output if requested
+        if output:
+            output_data = {
+                'success': result.success,
+                'synthesis': result.synthesis,
+                'ideas': [
+                    {
+                        'name': step.name if hasattr(step, 'name') else f'Idea {i}',
                         'content': step.content,
                         'metadata': step.metadata if hasattr(step, 'metadata') else {}
                     }
