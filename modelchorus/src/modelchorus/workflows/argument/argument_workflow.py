@@ -38,12 +38,12 @@ class ArgumentWorkflow(BaseWorkflow):
     - Uses RoleOrchestrator for sequential role execution
     - Creator role: Generates strong thesis advocating FOR the position (Step 1)
     - Skeptic role: Provides critical rebuttal AGAINST the position (Step 2)
-    - Moderator role: Synthesizes perspectives into balanced analysis (Step 3 - future)
+    - Moderator role: Synthesizes perspectives into balanced analysis (Step 3)
 
     Current Implementation Status:
     - Step 1 (Creator): ✓ Implemented - Generates thesis with supporting arguments
     - Step 2 (Skeptic): ✓ Implemented - Provides critical rebuttal and counter-arguments
-    - Step 3 (Moderator): ⏳ Pending - Will synthesize final analysis
+    - Step 3 (Moderator): ✓ Implemented - Synthesizes both perspectives into balanced analysis
 
     Key Features:
     - Role-based orchestration using RoleOrchestrator
@@ -77,12 +77,14 @@ class ArgumentWorkflow(BaseWorkflow):
         >>> # Create workflow
         >>> workflow = ArgumentWorkflow(provider, conversation_memory=memory)
         >>>
-        >>> # Analyze an argument (currently only Creator role executes)
+        >>> # Analyze an argument (all three roles execute)
         >>> result = await workflow.run(
         ...     "Universal basic income would reduce poverty"
         ... )
         >>> print(result.steps[0].content)  # Creator's thesis
-        >>> print(result.metadata['roles_executed'])  # ['creator']
+        >>> print(result.steps[1].content)  # Skeptic's rebuttal
+        >>> print(result.steps[2].content)  # Moderator's synthesis
+        >>> print(result.metadata['roles_executed'])  # ['creator', 'skeptic', 'moderator']
         >>>
         >>> # Continue analysis with follow-up
         >>> result2 = await workflow.run(
@@ -206,6 +208,51 @@ class ArgumentWorkflow(BaseWorkflow):
             },
         )
 
+    def _create_moderator_role(self) -> ModelRole:
+        """
+        Create Moderator role for balanced synthesis (Step 3 of ARGUMENT workflow).
+
+        The Moderator role is responsible for synthesizing the Creator's thesis
+        and the Skeptic's rebuttal into a balanced, nuanced analysis. This role
+        takes a NEUTRAL stance, weighing both perspectives fairly and producing
+        a comprehensive assessment that acknowledges strengths and weaknesses.
+
+        Returns:
+            ModelRole configured for Moderator with "neutral" stance
+
+        Example:
+            >>> moderator = workflow._create_moderator_role()
+            >>> print(moderator.role, moderator.stance)
+            moderator neutral
+        """
+        return ModelRole(
+            role="moderator",
+            model=self.provider.provider_name,
+            stance="neutral",
+            stance_prompt=(
+                "You are an impartial moderator and synthesizer. Your role is to integrate "
+                "the thesis and rebuttal into a balanced, comprehensive analysis. Acknowledge "
+                "the valid points from both perspectives, identify areas of agreement and "
+                "disagreement, and provide nuanced insights. Be fair, thorough, and intellectually "
+                "honest in your synthesis."
+            ),
+            system_prompt=(
+                "You are an expert at synthesizing diverse perspectives into balanced analysis. Focus on:\n"
+                "1. Summarizing the key points from both the thesis and rebuttal\n"
+                "2. Identifying areas where both perspectives have merit\n"
+                "3. Highlighting unresolved tensions or genuine disagreements\n"
+                "4. Providing nuanced conclusions that acknowledge complexity\n"
+                "5. Offering actionable insights or recommendations where appropriate\n"
+                "6. Maintaining intellectual rigor while being accessible and clear"
+            ),
+            temperature=0.7,  # Balanced creativity and coherence
+            metadata={
+                "step": 3,
+                "step_name": "Balanced Synthesis",
+                "role_type": "synthesizer",
+            },
+        )
+
     async def run(
         self,
         prompt: str,
@@ -216,14 +263,13 @@ class ArgumentWorkflow(BaseWorkflow):
         """
         Execute argument analysis workflow using role-based orchestration.
 
-        This method performs structured dialectical analysis using the Creator role
-        to generate a strong initial thesis. This is Step 1 of the complete ARGUMENT
-        workflow (Creator → Skeptic → Moderator).
+        This method performs structured dialectical analysis through three sequential
+        roles in the complete ARGUMENT workflow (Creator → Skeptic → Moderator).
 
         The workflow uses RoleOrchestrator to coordinate role-based execution:
         - Creator role: Generates thesis advocating FOR the position
-        - Skeptic role: (future task) Provides critical rebuttal AGAINST the position
-        - Moderator role: (future task) Synthesizes perspectives into balanced analysis
+        - Skeptic role: Provides critical rebuttal AGAINST the position
+        - Moderator role: Synthesizes perspectives into balanced analysis
 
         Args:
             prompt: The argument, claim, or question to analyze
@@ -236,7 +282,7 @@ class ArgumentWorkflow(BaseWorkflow):
             WorkflowResult containing:
                 - success: True if analysis succeeded
                 - synthesis: Combined analysis from all role perspectives
-                - steps: One step per role (currently only Creator)
+                - steps: Three steps (Creator thesis, Skeptic rebuttal, Moderator synthesis)
                 - metadata: thread_id, model info, role execution details
 
         Raises:
@@ -248,6 +294,8 @@ class ArgumentWorkflow(BaseWorkflow):
             ...     "Universal basic income would reduce poverty"
             ... )
             >>> print(result.steps[0].content)  # Creator's thesis
+            >>> print(result.steps[1].content)  # Skeptic's rebuttal
+            >>> print(result.steps[2].content)  # Moderator's synthesis
             >>>
             >>> # Continuation
             >>> result2 = await workflow.run(
@@ -283,31 +331,33 @@ class ArgumentWorkflow(BaseWorkflow):
             # Create roles for ARGUMENT workflow
             creator_role = self._create_creator_role()  # Step 1: Thesis generation
             skeptic_role = self._create_skeptic_role()  # Step 2: Critical rebuttal
+            moderator_role = self._create_moderator_role()  # Step 3: Balanced synthesis
 
             # Set up provider map for orchestrator
             provider_map = {
                 self.provider.provider_name: self.provider
             }
 
-            # Create orchestrator with Creator and Skeptic roles (SEQUENTIAL pattern)
+            # Create orchestrator with all three roles (SEQUENTIAL pattern)
             orchestrator = RoleOrchestrator(
-                roles=[creator_role, skeptic_role],  # Will add Moderator in future task
+                roles=[creator_role, skeptic_role, moderator_role],
                 provider_map=provider_map,
                 pattern=OrchestrationPattern.SEQUENTIAL,
             )
 
-            logger.info("Executing ARGUMENT workflow with Creator → Skeptic roles...")
+            logger.info("Executing ARGUMENT workflow with Creator → Skeptic → Moderator roles...")
 
-            # Execute orchestration (Creator generates thesis, then Skeptic provides rebuttal)
+            # Execute orchestration (Creator generates thesis, Skeptic rebuts, Moderator synthesizes)
             orchestration_result: OrchestrationResult = await orchestrator.execute(
                 base_prompt=full_prompt,
                 context=None,  # No prior context for first step
             )
 
             # Extract role responses from orchestration result
-            if len(orchestration_result.role_responses) >= 2:
+            if len(orchestration_result.role_responses) >= 3:
                 creator_response = orchestration_result.role_responses[0]
                 skeptic_response = orchestration_result.role_responses[1]
+                moderator_response = orchestration_result.role_responses[2]
 
                 # Add Creator's thesis as Step 1
                 result.add_step(
@@ -330,9 +380,20 @@ class ArgumentWorkflow(BaseWorkflow):
                 )
 
                 logger.info(f"Skeptic role generated rebuttal: {len(skeptic_response.content)} chars")
+
+                # Add Moderator's synthesis as Step 3
+                result.add_step(
+                    step_number=3,
+                    content=moderator_response.content,
+                    model=moderator_response.model,
+                    role="moderator",
+                    step_name="Balanced Synthesis (Moderator)"
+                )
+
+                logger.info(f"Moderator role generated synthesis: {len(moderator_response.content)} chars")
             else:
                 raise ValueError(
-                    f"Expected 2 role responses, got {len(orchestration_result.role_responses)}"
+                    f"Expected 3 role responses, got {len(orchestration_result.role_responses)}"
                 )
 
             # Add user message to conversation history
@@ -373,13 +434,14 @@ class ArgumentWorkflow(BaseWorkflow):
                 'conversation_length': self._get_conversation_length(thread_id),
                 'workflow_pattern': 'role_orchestration',
                 'orchestration_pattern': OrchestrationPattern.SEQUENTIAL.value,
-                'roles_executed': ['creator', 'skeptic'],  # Will add Moderator in future task
-                'steps_completed': 2,  # Creator + Skeptic
+                'roles_executed': ['creator', 'skeptic', 'moderator'],
+                'steps_completed': 3,  # Creator + Skeptic + Moderator
             })
 
             logger.info(f"ARGUMENT workflow completed successfully for thread: {thread_id}")
             logger.info(f"Creator role: {len(creator_response.content)} chars thesis")
             logger.info(f"Skeptic role: {len(skeptic_response.content)} chars rebuttal")
+            logger.info(f"Moderator role: {len(moderator_response.content)} chars synthesis")
 
         except Exception as e:
             logger.error(f"Argument workflow failed: {e}", exc_info=True)
