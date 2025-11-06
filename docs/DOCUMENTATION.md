@@ -1,17 +1,17 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 19:34:05
+**Generated:** 2025-11-06 07:33:37
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 40
-- **Total Lines:** 12478
-- **Total Classes:** 62
-- **Total Functions:** 29
-- **Avg Complexity:** 5.21
+- **Total Files:** 41
+- **Total Lines:** 12762
+- **Total Classes:** 65
+- **Total Functions:** 34
+- **Avg Complexity:** 4.62
 - **Max Complexity:** 36
 - **High Complexity Functions:**
   - thinkdeep (36)
@@ -21,482 +21,13 @@
 
 
 
-## 🌊 Workflows
-
-### CHAT Workflow
-
-**Simple single-model conversation with continuity**
-
-The CHAT workflow provides straightforward peer consultation with a single AI model, supporting conversation threading for multi-turn interactions.
-
-**When to use:**
-- Quick second opinions from an AI model
-- Iterative conversations and refinement
-- Simple consultations without orchestration overhead
-
-**Key features:**
-- Single provider (not multi-model)
-- Conversation threading via continuation_id
-- Automatic conversation history management
-- Simple request/response pattern
-
-**Example:**
-```python
-from modelchorus.providers import ClaudeProvider
-from modelchorus.workflows import ChatWorkflow
-from modelchorus.core.conversation import ConversationMemory
-
-# Create provider and conversation memory
-provider = ClaudeProvider()
-memory = ConversationMemory()
-
-# Create workflow
-workflow = ChatWorkflow(provider, conversation_memory=memory)
-
-# First message (creates new conversation)
-result1 = await workflow.run("What is quantum computing?")
-thread_id = result1.metadata.get('thread_id')
-
-# Follow-up message (continues conversation)
-result2 = await workflow.run(
-    "How does it differ from classical computing?",
-    continuation_id=thread_id
-)
-```
-
-**CLI Usage:**
-```bash
-# Start new conversation
-modelchorus chat "What is quantum computing?" -p claude
-
-# Continue conversation
-modelchorus chat "Give me an example" --continue thread-id-123
-
-# Include files
-modelchorus chat "Review this code" -f src/main.py
-```
-
----
-
-### THINKDEEP Workflow
-
-**Extended reasoning with systematic investigation and hypothesis tracking**
-
-The THINKDEEP workflow provides multi-step investigation capabilities where hypotheses are formed, tested, and refined across conversation turns. It maintains state including hypothesis evolution, investigation steps, confidence levels, and relevant files examined.
-
-**When to use:**
-- Complex problem analysis requiring systematic investigation
-- Debugging scenarios with hypothesis testing
-- Architecture decisions with evidence-based reasoning
-- Security analysis with confidence tracking
-- Any task requiring methodical, step-by-step investigation
-
-**Key features:**
-- Single provider with extended reasoning
-- Hypothesis tracking and evolution
-- Investigation step progression with findings capture
-- Confidence level tracking (exploring → low → medium → high → very_high → almost_certain → certain)
-- File examination history
-- State persistence across turns via conversation threading
-- Optional expert validation from second model
-
-**Hypothesis Evolution:**
-- **Add hypotheses** during investigation
-- **Update with evidence** as findings accumulate
-- **Validate** when evidence confirms hypothesis
-- **Disprove** when evidence contradicts hypothesis
-- Track multiple hypotheses simultaneously
-
-**Confidence Progression:**
-The workflow tracks confidence level throughout the investigation:
-- `exploring` - Just starting, no clear hypothesis
-- `low` - Early investigation with initial hypothesis
-- `medium` - Some supporting evidence found
-- `high` - Strong evidence supporting hypothesis
-- `very_high` - Very strong evidence, high confidence
-- `almost_certain` - Near complete confidence
-- `certain` - 100% confidence, hypothesis validated
-
-**Expert Validation:**
-When confidence hasn't reached "certain" level, ThinkDeep can optionally consult a second model (expert provider) for validation and additional insights.
-
-**Example:**
-```python
-from modelchorus.providers import ClaudeProvider, GeminiProvider
-from modelchorus.workflows import ThinkDeepWorkflow
-from modelchorus.core.conversation import ConversationMemory
-
-# Create provider and conversation memory
-provider = ClaudeProvider()
-expert_provider = GeminiProvider()  # Optional second model for validation
-memory = ConversationMemory()
-
-# Create workflow
-workflow = ThinkDeepWorkflow(
-    provider,
-    expert_provider=expert_provider,  # Optional
-    conversation_memory=memory
-)
-
-# First investigation step (creates new investigation)
-result1 = await workflow.run(
-    "Why is authentication failing intermittently?",
-    files=["src/auth.py", "tests/test_auth.py"]
-)
-thread_id = result1.metadata.get('thread_id')
-
-# Follow-up investigation (continues thread with state)
-result2 = await workflow.run(
-    "Check if it's related to async/await patterns",
-    continuation_id=thread_id,
-    files=["src/services/user.py"]
-)
-
-# Check investigation state
-state = workflow.get_investigation_state(thread_id)
-print(f"Hypotheses: {len(state.hypotheses)}")
-print(f"Confidence: {state.current_confidence}")
-print(f"Steps completed: {len(state.steps)}")
-```
-
-**Manual Hypothesis Management:**
-```python
-# Add hypothesis during investigation
-workflow.add_hypothesis(
-    thread_id,
-    "Race condition in async user creation causes auth failures"
-)
-
-# Update hypothesis with evidence
-workflow.update_hypothesis(
-    thread_id,
-    "Race condition in async user creation",
-    evidence="Found concurrent DB writes in logs without proper locking"
-)
-
-# Validate hypothesis when confirmed
-workflow.validate_hypothesis(thread_id, "Race condition in async user creation")
-
-# Get active hypotheses
-active = workflow.get_active_hypotheses(thread_id)
-```
-
-**CLI Usage:**
-```bash
-# Start new investigation
-modelchorus thinkdeep "Why is authentication failing?" -p claude
-
-# Continue investigation
-modelchorus thinkdeep "Check async patterns" --continue thread-id-123
-
-# Include files and expert validation
-modelchorus thinkdeep "Analyze bug" -f src/auth.py -e gemini
-
-# Disable expert validation
-modelchorus thinkdeep "Quick investigation" -p claude --disable-expert
-
-# Check investigation status
-modelchorus thinkdeep-status thread-id-123
-modelchorus thinkdeep-status thread-id-123 --steps --files
-```
-
-**Use Cases:**
-
-1. **Debugging Complex Issues:**
-   ```bash
-   modelchorus thinkdeep "Users report intermittent 500 errors" \
-     -f src/api/users.py -f logs/error.log \
-     -p claude -e gemini
-   ```
-
-2. **Architecture Analysis:**
-   ```bash
-   modelchorus thinkdeep "Evaluate microservices vs monolith for our scale" \
-     -p claude --system "You are a senior architect"
-   ```
-
-3. **Security Investigation:**
-   ```bash
-   modelchorus thinkdeep "Analyze potential SQL injection vectors" \
-     -f src/db/queries.py -f src/api/handlers.py \
-     -p claude -e gemini
-   ```
-
-4. **Performance Analysis:**
-   ```bash
-   modelchorus thinkdeep "Why is response time degrading under load?" \
-     -f src/cache/redis.py -f monitoring/metrics.json \
-     -p claude
-   ```
-
-**Investigation State:**
-The workflow maintains comprehensive state across conversation turns:
-- All hypotheses with status (active, validated, disproven)
-- Investigation steps with findings and files examined
-- Current confidence level
-- Relevant files identified
-- Evidence accumulation
-
-**Benefits:**
-- **Systematic approach** prevents jumping to conclusions
-- **Hypothesis tracking** maintains focus and progress
-- **Confidence progression** signals investigation maturity
-- **Expert validation** provides second opinion when needed
-- **File tracking** keeps context of what's been examined
-- **State persistence** enables resuming complex investigations
-
----
-
-### Conversation Infrastructure
-
-**Multi-turn conversation support with state persistence**
-
-ModelChorus provides robust conversation infrastructure that enables multi-turn interactions across all workflows. This infrastructure handles conversation threading, state management, and context preservation.
-
-**Core Components:**
-
-1. **ConversationMemory** - Thread-safe conversation storage with file-based persistence
-2. **ConversationThread** - Complete conversation context with messages and workflow state
-3. **ConversationMessage** - Individual messages with metadata tracking
-4. **continuation_id** - Thread identifier for resuming conversations
-
-**Key Features:**
-- **Thread-safe storage** with file locking prevents corruption
-- **File-based persistence** at `~/.modelchorus/conversations/`
-- **TTL-based cleanup** removes expired threads automatically
-- **Conversation chains** via parent_thread_id for branching
-- **State preservation** maintains workflow-specific data across turns
-- **Context window management** with automatic truncation
-
-**continuation_id Pattern:**
-
-All workflows support the `continuation_id` parameter to resume multi-turn conversations:
-
-```python
-# First turn - creates new thread
-result1 = await workflow.run("Initial question")
-thread_id = result1.metadata.get('thread_id')
-
-# Subsequent turns - continues thread
-result2 = await workflow.run(
-    "Follow-up question",
-    continuation_id=thread_id
-)
-
-# Even later - resumes from file-based persistence
-result3 = await workflow.run(
-    "Another question",
-    continuation_id=thread_id
-)
-```
-
-**State Management:**
-
-Each workflow can maintain custom state across conversation turns:
-
-```python
-from modelchorus.core.conversation import ConversationMemory
-from modelchorus.workflows import ThinkDeepWorkflow
-
-memory = ConversationMemory()
-workflow = ThinkDeepWorkflow(provider, conversation_memory=memory)
-
-# First turn - state is initialized
-result1 = await workflow.run("Start investigation")
-thread_id = result1.metadata.get('thread_id')
-
-# Get state from thread
-thread = memory.get_thread(thread_id)
-state = thread.state  # Workflow-specific state (e.g., ThinkDeepState)
-
-# State persists across turns automatically
-result2 = await workflow.run("Continue", continuation_id=thread_id)
-# State from result1 is automatically loaded and updated
-```
-
-**Context Preservation:**
-
-The conversation infrastructure preserves complete context:
-
-```python
-# Messages with metadata
-message = ConversationMessage(
-    role="user",
-    content="Analyze this code",
-    timestamp="2025-11-06T10:00:00Z",
-    files=["src/auth.py"],
-    workflow_name="thinkdeep",
-    model_provider="cli",
-    model_name="claude-3-opus",
-    metadata={"tokens": 150, "latency": 1.2}
-)
-
-# Add to thread
-memory.add_message(thread_id, message)
-
-# Build conversation history for model
-history = memory.build_conversation_history(
-    thread_id,
-    max_turns=10,  # Limit for context window
-    include_system=True
-)
-```
-
-**Conversation Chains:**
-
-Create conversation branches from any point:
-
-```python
-# Original conversation
-result1 = await workflow.run("Original question")
-original_thread_id = result1.metadata.get('thread_id')
-
-# Branch from original at specific point
-branched_thread_id = memory.create_thread(
-    workflow_name="chat",
-    parent_thread_id=original_thread_id,
-    initial_context={"branched_at": "message_id_123"}
-)
-
-# Get full chain (original + branch)
-chain = memory.get_thread_chain(branched_thread_id)
-```
-
-**Thread Lifecycle:**
-
-```python
-# Create thread
-thread_id = memory.create_thread(
-    workflow_name="thinkdeep",
-    initial_context={"task": "debug auth issue"}
-)
-
-# Active conversation
-memory.add_message(thread_id, message)
-
-# Mark complete
-memory.complete_thread(thread_id)
-
-# Archive (keeps data, marks archived)
-memory.archive_thread(thread_id)
-
-# Cleanup expired threads (runs automatically)
-memory.cleanup_expired_threads(max_age_hours=72)
-```
-
-**CLI Usage:**
-
-All CLI commands support conversation continuation:
-
-```bash
-# Chat workflow
-modelchorus chat "First message" -p claude
-# Returns: Thread ID: abc-123
-
-modelchorus chat "Follow-up" --continue abc-123
-
-# ThinkDeep workflow
-modelchorus thinkdeep "Start investigation" -p claude
-# Returns: Thread ID: def-456
-
-modelchorus thinkdeep "Continue investigation" --continue def-456
-
-# Check thread status
-modelchorus thinkdeep-status def-456
-```
-
-**Storage Details:**
-
-**Location:** `~/.modelchorus/conversations/`
-
-**File format:** Each thread is stored as JSON:
-```json
-{
-  "thread_id": "uuid-here",
-  "workflow_name": "thinkdeep",
-  "created_at": "2025-11-06T10:00:00Z",
-  "last_updated_at": "2025-11-06T11:30:00Z",
-  "status": "active",
-  "messages": [
-    {
-      "role": "user",
-      "content": "...",
-      "timestamp": "...",
-      "files": [],
-      "metadata": {}
-    }
-  ],
-  "state": {
-    "workflow_name": "thinkdeep",
-    "data": {
-      "hypotheses": [],
-      "steps": [],
-      "current_confidence": "exploring"
-    }
-  }
-}
-```
-
-**File locking:** Concurrent access is protected with `filelock` to prevent corruption.
-
-**Benefits:**
-
-- **Resume anywhere** - Pick up conversations across sessions
-- **State preservation** - Workflow state persists automatically
-- **Thread safety** - Safe for concurrent access
-- **Automatic cleanup** - Expired threads removed automatically
-- **Conversation chains** - Branch and explore alternatives
-- **Full context** - Complete history available to workflows
-
-**Use Cases:**
-
-1. **Long-running investigations:**
-   ```bash
-   # Day 1
-   modelchorus thinkdeep "Debug memory leak" -p claude
-   # Thread: thread-001
-
-   # Day 2 - resume
-   modelchorus thinkdeep "Found malloc patterns" --continue thread-001
-   ```
-
-2. **Iterative refinement:**
-   ```bash
-   # Initial draft
-   modelchorus chat "Write API design" -p claude
-   # Thread: thread-002
-
-   # Multiple revisions
-   modelchorus chat "Add rate limiting" --continue thread-002
-   modelchorus chat "Add authentication" --continue thread-002
-   ```
-
-3. **Exploring alternatives:**
-   ```python
-   # Original approach
-   result1 = await chat.run("Design caching strategy")
-   thread1 = result1.metadata['thread_id']
-
-   # Branch to explore alternative
-   thread2 = memory.create_thread(
-       workflow_name="chat",
-       parent_thread_id=thread1
-   )
-   result2 = await chat.run(
-       "What about Redis instead?",
-       continuation_id=thread2
-   )
-   ```
-
----
-
 ## 🏛️ Classes
 
 ### `BaseWorkflow`
 
 **Language:** python
 **Inherits from:** `ABC`
-**Defined in:** `modelchorus/src/modelchorus/core/base_workflow.py:50`
+**Defined in:** `src/modelchorus/core/base_workflow.py:50`
 
 **Description:**
 > Abstract base class for all ModelChorus workflows.
@@ -527,7 +58,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `ModelProvider`
-**Defined in:** `modelchorus/src/modelchorus/providers/cli_provider.py:24`
+**Defined in:** `src/modelchorus/providers/cli_provider.py:24`
 
 **Description:**
 > Base class for CLI-based model providers.
@@ -564,7 +95,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseWorkflow`
-**Defined in:** `modelchorus/src/modelchorus/workflows/chat.py:21`
+**Defined in:** `src/modelchorus/workflows/chat.py:21`
 
 **Description:**
 > Simple single-model chat workflow with conversation continuity.
@@ -631,7 +162,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `CLIProvider`
-**Defined in:** `modelchorus/src/modelchorus/providers/claude_provider.py:22`
+**Defined in:** `src/modelchorus/providers/claude_provider.py:22`
 
 **Description:**
 > Provider for Anthropic's Claude models via the `claude` CLI tool.
@@ -670,7 +201,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `CLIProvider`
-**Defined in:** `modelchorus/src/modelchorus/providers/codex_provider.py:22`
+**Defined in:** `src/modelchorus/providers/codex_provider.py:22`
 
 **Description:**
 > Provider for OpenAI's Codex models via the `codex` CLI tool.
@@ -709,7 +240,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `str`, `Enum`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:16`
+**Defined in:** `src/modelchorus/core/models.py:16`
 
 **Description:**
 > Confidence level enum for investigation workflows.
@@ -733,7 +264,7 @@ Values:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:334`
+**Defined in:** `src/modelchorus/core/models.py:334`
 
 **Description:**
 > Configuration for consensus-building workflows.
@@ -754,7 +285,7 @@ Attributes:
 ### `ConsensusResult`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/workflows/consensus.py:45`
+**Defined in:** `src/modelchorus/workflows/consensus.py:45`
 
 **Description:**
 > Result from a consensus workflow execution.
@@ -765,7 +296,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `Enum`
-**Defined in:** `modelchorus/src/modelchorus/workflows/consensus.py:24`
+**Defined in:** `src/modelchorus/workflows/consensus.py:24`
 
 **Description:**
 > Strategy for reaching consensus among multiple model responses.
@@ -775,7 +306,7 @@ Attributes:
 ### `ConsensusWorkflow`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/workflows/consensus.py:56`
+**Defined in:** `src/modelchorus/workflows/consensus.py:56`
 
 **Description:**
 > Workflow for coordinating multiple AI models to reach consensus.
@@ -826,7 +357,7 @@ Example:
 ### `ConversationMemory`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/core/conversation.py:36`
+**Defined in:** `src/modelchorus/core/conversation.py:36`
 
 **Description:**
 > Manages conversation threads with file-based persistence.
@@ -867,7 +398,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:407`
+**Defined in:** `src/modelchorus/core/models.py:407`
 
 **Description:**
 > Single message in a conversation thread.
@@ -891,7 +422,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:763`
+**Defined in:** `src/modelchorus/core/models.py:763`
 
 **Description:**
 > Generic state container for workflow-specific conversation data.
@@ -913,7 +444,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:479`
+**Defined in:** `src/modelchorus/core/models.py:479`
 
 **Description:**
 > Complete conversation context for a thread.
@@ -943,7 +474,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `CLIProvider`
-**Defined in:** `modelchorus/src/modelchorus/providers/cursor_agent_provider.py:22`
+**Defined in:** `src/modelchorus/providers/cursor_agent_provider.py:22`
 
 **Description:**
 > Provider for Cursor's AI agent via the `cursor-agent` CLI tool.
@@ -984,7 +515,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `ModelProvider`
-**Defined in:** `modelchorus/examples/provider_integration.py:18`
+**Defined in:** `examples/provider_integration.py:18`
 
 **Description:**
 > Example provider implementation.
@@ -1004,7 +535,7 @@ with an actual AI provider's API.
 
 **Language:** python
 **Inherits from:** `BaseWorkflow`
-**Defined in:** `modelchorus/examples/basic_workflow.py:14`
+**Defined in:** `examples/basic_workflow.py:14`
 
 **Description:**
 > Example workflow that demonstrates basic workflow structure.
@@ -1021,7 +552,7 @@ needed to create a working workflow.
 
 **Language:** python
 **Inherits from:** `CLIProvider`
-**Defined in:** `modelchorus/src/modelchorus/providers/gemini_provider.py:22`
+**Defined in:** `src/modelchorus/providers/gemini_provider.py:22`
 
 **Description:**
 > Provider for Google's Gemini models via the `gemini` CLI tool.
@@ -1060,7 +591,7 @@ Example:
 ### `GenerationRequest`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/providers/base_provider.py:37`
+**Defined in:** `src/modelchorus/providers/base_provider.py:37`
 
 **Description:**
 > Request for text generation.
@@ -1070,7 +601,7 @@ Example:
 ### `GenerationResponse`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/providers/base_provider.py:51`
+**Defined in:** `src/modelchorus/providers/base_provider.py:51`
 
 **Description:**
 > Response from text generation.
@@ -1081,7 +612,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:589`
+**Defined in:** `src/modelchorus/core/models.py:589`
 
 **Description:**
 > Model for tracking hypotheses in investigation workflows.
@@ -1101,7 +632,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:634`
+**Defined in:** `src/modelchorus/core/models.py:634`
 
 **Description:**
 > Model for a single investigation step in Thinkdeep workflow.
@@ -1122,7 +653,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `Enum`
-**Defined in:** `modelchorus/src/modelchorus/providers/base_provider.py:15`
+**Defined in:** `src/modelchorus/providers/base_provider.py:15`
 
 **Description:**
 > Enumeration of model capabilities.
@@ -1132,7 +663,7 @@ Attributes:
 ### `ModelConfig`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/providers/base_provider.py:26`
+**Defined in:** `src/modelchorus/providers/base_provider.py:26`
 
 **Description:**
 > Configuration for a model.
@@ -1143,7 +674,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `ABC`
-**Defined in:** `modelchorus/src/modelchorus/providers/base_provider.py:61`
+**Defined in:** `src/modelchorus/providers/base_provider.py:61`
 
 **Description:**
 > Abstract base class for all model providers.
@@ -1172,7 +703,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:286`
+**Defined in:** `src/modelchorus/core/models.py:286`
 
 **Description:**
 > Model for a response from a single model.
@@ -1192,7 +723,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:184`
+**Defined in:** `src/modelchorus/core/models.py:184`
 
 **Description:**
 > Model for specifying model selection criteria.
@@ -1210,7 +741,7 @@ Attributes:
 ### `ProviderConfig`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/workflows/consensus.py:35`
+**Defined in:** `src/modelchorus/workflows/consensus.py:35`
 
 **Description:**
 > Configuration for a provider in the consensus workflow.
@@ -1220,7 +751,7 @@ Attributes:
 ### `StateManager`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/core/state.py:32`
+**Defined in:** `src/modelchorus/core/state.py:32`
 
 **Description:**
 > Thread-safe state persistence manager for workflows.
@@ -1264,7 +795,7 @@ Attributes:
 ### `TestCLIProvidersImplementInterface`
 
 **Language:** python
-**Defined in:** `tests/test_providers/test_cli_interface.py:27`
+**Defined in:** `test_cli_interface.py:27`
 
 **Description:**
 > Test that all CLI providers implement the ModelProvider interface.
@@ -1287,10 +818,39 @@ Attributes:
 
 ---
 
+### `TestChatErrorHandling`
+
+**Language:** python
+**Defined in:** `tests/test_chat_integration.py:180`
+
+**Description:**
+> Test error handling in chat workflow.
+
+**Methods:**
+- `test_invalid_continuation_id()`
+- `test_empty_prompt()`
+- `test_very_long_conversation()`
+
+---
+
+### `TestChatThreadManagement`
+
+**Language:** python
+**Defined in:** `tests/test_chat_integration.py:234`
+
+**Description:**
+> Test conversation thread management.
+
+**Methods:**
+- `test_multiple_concurrent_threads()`
+- `test_thread_retrieval()`
+
+---
+
 ### `TestChatWorkflowInitialization`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_chat_workflow.py:52`
+**Defined in:** `tests/test_chat_workflow.py:52`
 
 **Description:**
 > Test ChatWorkflow initialization.
@@ -1307,7 +867,7 @@ Attributes:
 ### `TestClaudeProvider`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_claude_provider.py:13`
+**Defined in:** `tests/test_claude_provider.py:13`
 
 **Description:**
 > Test suite for ClaudeProvider.
@@ -1331,7 +891,7 @@ Attributes:
 ### `TestCodexProvider`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_codex_provider.py:13`
+**Defined in:** `tests/test_codex_provider.py:13`
 
 **Description:**
 > Test suite for CodexProvider.
@@ -1356,7 +916,7 @@ Attributes:
 ### `TestConfidenceLevel`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_thinkdeep_models.py:25`
+**Defined in:** `tests/test_thinkdeep_models.py:25`
 
 **Description:**
 > Test suite for ConfidenceLevel enum.
@@ -1372,7 +932,7 @@ Attributes:
 ### `TestConfidenceProgression`
 
 **Language:** python
-**Defined in:** `tests/test_thinkdeep_workflow.py:1135`
+**Defined in:** `test_thinkdeep_workflow.py:1135`
 
 **Description:**
 > Test suite for confidence level progression in ThinkDeepWorkflow.
@@ -1397,7 +957,7 @@ Attributes:
 ### `TestConsensusWorkflow`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_consensus_workflow.py:12`
+**Defined in:** `tests/test_consensus_workflow.py:12`
 
 **Description:**
 > Test suite for ConsensusWorkflow.
@@ -1416,7 +976,7 @@ Attributes:
 ### `TestConversationContinuation`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_chat_workflow.py:140`
+**Defined in:** `tests/test_chat_workflow.py:140`
 
 **Description:**
 > Test conversation continuation functionality.
@@ -1432,7 +992,7 @@ Attributes:
 ### `TestConversationInitiation`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_chat_workflow.py:88`
+**Defined in:** `tests/test_chat_workflow.py:88`
 
 **Description:**
 > Test conversation creation and initiation.
@@ -1448,7 +1008,7 @@ Attributes:
 ### `TestConversationMemory`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_conversation.py:22`
+**Defined in:** `tests/test_conversation.py:22`
 
 **Description:**
 > Test suite for ConversationMemory class.
@@ -1472,7 +1032,7 @@ Attributes:
 ### `TestConversationTracking`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_chat_workflow.py:303`
+**Defined in:** `tests/test_chat_workflow.py:303`
 
 **Description:**
 > Test conversation history and tracking.
@@ -1488,7 +1048,7 @@ Attributes:
 ### `TestEndToEndIntegration`
 
 **Language:** python
-**Defined in:** `tests/test_thinkdeep_workflow.py:1613`
+**Defined in:** `test_thinkdeep_workflow.py:1613`
 
 **Description:**
 > End-to-end integration tests for complete investigation scenarios.
@@ -1504,7 +1064,7 @@ Attributes:
 ### `TestErrorHandling`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_chat_workflow.py:348`
+**Defined in:** `tests/test_chat_workflow.py:348`
 
 **Description:**
 > Test error handling in ChatWorkflow.
@@ -1518,7 +1078,7 @@ Attributes:
 ### `TestFileContext`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_chat_workflow.py:222`
+**Defined in:** `tests/test_chat_workflow.py:222`
 
 **Description:**
 > Test file context handling.
@@ -1534,7 +1094,7 @@ Attributes:
 ### `TestGeminiIntegration`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_gemini_integration.py:13`
+**Defined in:** `tests/test_gemini_integration.py:13`
 
 **Description:**
 > Integration tests for Gemini provider.
@@ -1556,7 +1116,7 @@ Attributes:
 ### `TestHypothesis`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_thinkdeep_models.py:69`
+**Defined in:** `tests/test_thinkdeep_models.py:69`
 
 **Description:**
 > Test suite for Hypothesis model.
@@ -1577,7 +1137,7 @@ Attributes:
 ### `TestHypothesisEvolution`
 
 **Language:** python
-**Defined in:** `tests/test_thinkdeep_workflow.py:598`
+**Defined in:** `test_thinkdeep_workflow.py:598`
 
 **Description:**
 > Test suite for hypothesis evolution in ThinkDeepWorkflow.
@@ -1602,7 +1162,7 @@ Attributes:
 ### `TestIntegration`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_integration.py:17`
+**Defined in:** `tests/test_integration.py:17`
 
 **Description:**
 > Integration test suite.
@@ -1619,7 +1179,7 @@ Attributes:
 ### `TestInvestigationStep`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_thinkdeep_models.py:180`
+**Defined in:** `tests/test_thinkdeep_models.py:180`
 
 **Description:**
 > Test suite for InvestigationStep model.
@@ -1639,7 +1199,7 @@ Attributes:
 ### `TestInvestigationStepExecution`
 
 **Language:** python
-**Defined in:** `tests/test_thinkdeep_workflow.py:29`
+**Defined in:** `test_thinkdeep_workflow.py:29`
 
 **Description:**
 > Test suite for investigation step execution in ThinkDeepWorkflow.
@@ -1666,7 +1226,7 @@ Attributes:
 ### `TestModelIntegration`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_thinkdeep_models.py:592`
+**Defined in:** `tests/test_thinkdeep_models.py:592`
 
 **Description:**
 > Test integration scenarios using multiple models together.
@@ -1678,10 +1238,26 @@ Attributes:
 
 ---
 
+### `TestMultiProviderChat`
+
+**Language:** python
+**Defined in:** `tests/test_chat_integration.py:71`
+
+**Description:**
+> Test chat functionality across multiple providers.
+
+**Methods:**
+- `test_basic_conversation()`
+- `test_multi_turn_conversation()`
+- `test_conversation_with_file_context()`
+- `test_conversation_persistence()`
+
+---
+
 ### `TestStateManager`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_state.py:23`
+**Defined in:** `tests/test_state.py:23`
 
 **Description:**
 > Test suite for StateManager class.
@@ -1722,7 +1298,7 @@ Attributes:
 ### `TestStateManagerExportImportRoundtrip`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_state.py:609`
+**Defined in:** `tests/test_state.py:609`
 
 **Description:**
 > Test complete export/import workflow.
@@ -1735,7 +1311,7 @@ Attributes:
 ### `TestStateManagerFileRecovery`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_state.py:647`
+**Defined in:** `tests/test_state.py:647`
 
 **Description:**
 > Test state recovery after simulated process restart.
@@ -1748,7 +1324,7 @@ Attributes:
 ### `TestThinkDeepState`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_thinkdeep_models.py:314`
+**Defined in:** `tests/test_thinkdeep_models.py:314`
 
 **Description:**
 > Test suite for ThinkDeepState model.
@@ -1770,7 +1346,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:688`
+**Defined in:** `src/modelchorus/core/models.py:688`
 
 **Description:**
 > State model for Thinkdeep workflow multi-turn conversations.
@@ -1791,7 +1367,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseWorkflow`
-**Defined in:** `modelchorus/src/modelchorus/workflows/thinkdeep.py:27`
+**Defined in:** `src/modelchorus/workflows/thinkdeep.py:27`
 
 **Description:**
 > Extended reasoning workflow with systematic investigation and hypothesis tracking.
@@ -1876,7 +1452,7 @@ Example:
 ### `WorkflowRegistry`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/core/registry.py:13`
+**Defined in:** `src/modelchorus/core/registry.py:13`
 
 **Description:**
 > Registry for workflow implementations.
@@ -1913,7 +1489,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:43`
+**Defined in:** `src/modelchorus/core/models.py:43`
 
 **Description:**
 > Request model for workflow execution.
@@ -1937,7 +1513,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:117`
+**Defined in:** `src/modelchorus/core/models.py:117`
 
 **Description:**
 > Response model for workflow execution.
@@ -1959,7 +1535,7 @@ Attributes:
 ### `WorkflowResult`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/core/base_workflow.py:29`
+**Defined in:** `src/modelchorus/core/base_workflow.py:29`
 
 **Description:**
 > Result of a workflow execution.
@@ -1972,7 +1548,7 @@ Attributes:
 ### `WorkflowStep`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/core/base_workflow.py:18`
+**Defined in:** `src/modelchorus/core/base_workflow.py:18`
 
 **Description:**
 > Represents a single step in a workflow execution.
@@ -1983,7 +1559,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/models.py:224`
+**Defined in:** `src/modelchorus/core/models.py:224`
 
 **Description:**
 > Model for a single workflow execution step.
@@ -2007,7 +1583,7 @@ Attributes:
 ### `async basic_chat_example() -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/examples/chat_example.py:19`
+**Defined in:** `examples/chat_example.py:19`
 **Complexity:** 2
 
 **Description:**
@@ -2018,7 +1594,7 @@ Attributes:
 ### `async basic_investigation_example() -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/examples/thinkdeep_example.py:27`
+**Defined in:** `examples/thinkdeep_example.py:27`
 **Complexity:** 2
 
 **Description:**
@@ -2029,7 +1605,7 @@ Attributes:
 ### `chat(prompt, provider, continuation_id, files, system, temperature, max_tokens, output, verbose) -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/cli/main.py:55`
+**Defined in:** `src/modelchorus/cli/main.py:55`
 ⚠️ **Complexity:** 19 (High)
 
 **Decorators:** `@app.command()`
@@ -2063,7 +1639,7 @@ Example:
 ### `async chat_with_file_context_example() -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/examples/chat_example.py:106`
+**Defined in:** `examples/chat_example.py:106`
 **Complexity:** 2
 
 **Description:**
@@ -2071,10 +1647,27 @@ Example:
 
 ---
 
+### `chat_workflow(provider, conversation_memory) -> None`
+
+**Language:** python
+**Defined in:** `tests/test_chat_integration.py:62`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create ChatWorkflow instance with real provider.
+
+**Parameters:**
+- `provider`: None
+- `conversation_memory`: None
+
+---
+
 ### `chat_workflow(mock_provider, conversation_memory) -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_chat_workflow.py:44`
+**Defined in:** `tests/test_chat_workflow.py:44`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -2091,7 +1684,7 @@ Example:
 ### `async confidence_progression_example() -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/examples/thinkdeep_example.py:365`
+**Defined in:** `examples/thinkdeep_example.py:365`
 **Complexity:** 5
 
 **Description:**
@@ -2105,7 +1698,7 @@ and hypotheses are validated.
 ### `consensus(prompt, providers, strategy, system, temperature, max_tokens, timeout, output, verbose) -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/cli/main.py:232`
+**Defined in:** `src/modelchorus/cli/main.py:232`
 ⚠️ **Complexity:** 16 (High)
 
 **Decorators:** `@app.command()`
@@ -2132,7 +1725,20 @@ Example:
 ### `conversation_memory() -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_chat_workflow.py:38`
+**Defined in:** `tests/test_chat_integration.py:35`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create ConversationMemory instance for testing.
+
+---
+
+### `conversation_memory() -> None`
+
+**Language:** python
+**Defined in:** `tests/test_chat_workflow.py:38`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -2145,7 +1751,7 @@ Example:
 ### `async conversation_tracking_example() -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/examples/chat_example.py:152`
+**Defined in:** `examples/chat_example.py:152`
 **Complexity:** 5
 
 **Description:**
@@ -2156,7 +1762,7 @@ Example:
 ### `get_default_state_manager() -> StateManager`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/core/state.py:517`
+**Defined in:** `src/modelchorus/core/state.py:517`
 **Complexity:** 2
 
 **Description:**
@@ -2175,7 +1781,7 @@ Example:
 ### `get_provider_by_name(name) -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/cli/main.py:36`
+**Defined in:** `src/modelchorus/cli/main.py:36`
 **Complexity:** 2
 
 **Description:**
@@ -2189,7 +1795,7 @@ Example:
 ### `async hypothesis_management_example() -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/examples/thinkdeep_example.py:275`
+**Defined in:** `examples/thinkdeep_example.py:275`
 **Complexity:** 6
 
 **Description:**
@@ -2203,7 +1809,7 @@ during an investigation.
 ### `async investigation_with_expert_validation() -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/examples/thinkdeep_example.py:195`
+**Defined in:** `examples/thinkdeep_example.py:195`
 **Complexity:** 4
 
 **Description:**
@@ -2214,10 +1820,24 @@ and additional insights when confidence hasn't reached "certain" level.
 
 ---
 
+### `is_provider_available(provider_class) -> None`
+
+**Language:** python
+**Defined in:** `tests/test_chat_integration.py:18`
+**Complexity:** 2
+
+**Description:**
+> Check if a provider is available (API key configured).
+
+**Parameters:**
+- `provider_class`: None
+
+---
+
 ### `list_providers() -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/cli/main.py:789`
+**Defined in:** `src/modelchorus/cli/main.py:789`
 **Complexity:** 3
 
 **Decorators:** `@app.command()`
@@ -2230,7 +1850,7 @@ and additional insights when confidence hasn't reached "certain" level.
 ### `async main() -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/examples/basic_workflow.py:56`
+**Defined in:** `examples/basic_workflow.py:56`
 **Complexity:** 2
 
 **Description:**
@@ -2241,7 +1861,7 @@ and additional insights when confidence hasn't reached "certain" level.
 ### `async main() -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/examples/chat_example.py:196`
+**Defined in:** `examples/chat_example.py:196`
 **Complexity:** 1
 
 **Description:**
@@ -2252,7 +1872,7 @@ and additional insights when confidence hasn't reached "certain" level.
 ### `async main() -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/examples/provider_integration.py:101`
+**Defined in:** `examples/provider_integration.py:101`
 **Complexity:** 2
 
 **Description:**
@@ -2263,7 +1883,7 @@ and additional insights when confidence hasn't reached "certain" level.
 ### `async main() -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/examples/thinkdeep_example.py:431`
+**Defined in:** `examples/thinkdeep_example.py:431`
 **Complexity:** 1
 
 **Description:**
@@ -2274,7 +1894,7 @@ and additional insights when confidence hasn't reached "certain" level.
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/cli/main.py:827`
+**Defined in:** `src/modelchorus/cli/main.py:827`
 **Complexity:** 1
 
 **Description:**
@@ -2285,7 +1905,7 @@ and additional insights when confidence hasn't reached "certain" level.
 ### `mock_claude_response() -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/conftest.py:10`
+**Defined in:** `tests/conftest.py:10`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -2298,7 +1918,7 @@ and additional insights when confidence hasn't reached "certain" level.
 ### `mock_codex_response() -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/conftest.py:35`
+**Defined in:** `tests/conftest.py:35`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -2311,7 +1931,7 @@ and additional insights when confidence hasn't reached "certain" level.
 ### `mock_provider() -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/test_chat_workflow.py:18`
+**Defined in:** `tests/test_chat_workflow.py:18`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -2324,7 +1944,7 @@ and additional insights when confidence hasn't reached "certain" level.
 ### `mock_subprocess_run() -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/conftest.py:45`
+**Defined in:** `tests/conftest.py:45`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -2337,7 +1957,7 @@ and additional insights when confidence hasn't reached "certain" level.
 ### `async multi_step_investigation_example() -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/examples/thinkdeep_example.py:63`
+**Defined in:** `examples/thinkdeep_example.py:63`
 **Complexity:** 10
 
 **Description:**
@@ -2351,7 +1971,7 @@ showing how hypotheses are formed, tested, and confidence evolves across steps.
 ### `async multi_turn_conversation_example() -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/examples/chat_example.py:48`
+**Defined in:** `examples/chat_example.py:48`
 **Complexity:** 4
 
 **Description:**
@@ -2359,10 +1979,42 @@ showing how hypotheses are formed, tested, and confidence evolves across steps.
 
 ---
 
+### `provider(provider_name) -> None`
+
+**Language:** python
+**Defined in:** `tests/test_chat_integration.py:51`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create provider instance based on provider name.
+
+**Parameters:**
+- `provider_name`: None
+
+---
+
+### `provider_name(request) -> None`
+
+**Language:** python
+**Defined in:** `tests/test_chat_integration.py:45`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture(params=[pytest.param('claude', marks=pytest.mark.skipif(not CLAUDE_AVAILABLE, reason='Claude API not configured')), pytest.param('gemini', marks=pytest.mark.skipif(not GEMINI_AVAILABLE, reason='Gemini API not configured')), pytest.param('codex', marks=pytest.mark.skipif(not CODEX_AVAILABLE, reason='Codex API not configured'))])`
+
+**Description:**
+> Parameterized fixture for provider names.
+
+**Parameters:**
+- `request`: None
+
+---
+
 ### `sample_generation_request() -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/tests/conftest.py:55`
+**Defined in:** `tests/conftest.py:55`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -2375,7 +2027,7 @@ showing how hypotheses are formed, tested, and confidence evolves across steps.
 ### `thinkdeep(prompt, provider, expert_provider, continuation_id, files, system, temperature, max_tokens, disable_expert, output, verbose) -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/cli/main.py:417`
+**Defined in:** `src/modelchorus/cli/main.py:417`
 ⚠️ **Complexity:** 36 (High)
 
 **Decorators:** `@app.command()`
@@ -2414,7 +2066,7 @@ Example:
 ### `thinkdeep_status(thread_id, show_steps, show_files, verbose) -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/cli/main.py:664`
+**Defined in:** `src/modelchorus/cli/main.py:664`
 ⚠️ **Complexity:** 18 (High)
 
 **Decorators:** `@app.command(name='thinkdeep-status')`
@@ -2446,7 +2098,7 @@ Example:
 ### `version() -> None`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/cli/main.py:816`
+**Defined in:** `src/modelchorus/cli/main.py:816`
 **Complexity:** 1
 
 **Decorators:** `@app.command()`
@@ -2459,7 +2111,7 @@ Example:
 
 ## 📦 Dependencies
 
-### `modelchorus/examples/basic_workflow.py`
+### `examples/basic_workflow.py`
 
 - `asyncio`
 - `modelchorus.core.BaseWorkflow`
@@ -2467,7 +2119,7 @@ Example:
 - `modelchorus.core.WorkflowRequest`
 - `modelchorus.core.WorkflowResult`
 
-### `modelchorus/examples/chat_example.py`
+### `examples/chat_example.py`
 
 - `asyncio`
 - `modelchorus.core.conversation.ConversationMemory`
@@ -2475,7 +2127,7 @@ Example:
 - `modelchorus.workflows.ChatWorkflow`
 - `pathlib.Path`
 
-### `modelchorus/examples/provider_integration.py`
+### `examples/provider_integration.py`
 
 - `asyncio`
 - `modelchorus.providers.GenerationRequest`
@@ -2484,7 +2136,7 @@ Example:
 - `modelchorus.providers.ModelConfig`
 - `modelchorus.providers.ModelProvider`
 
-### `modelchorus/examples/thinkdeep_example.py`
+### `examples/thinkdeep_example.py`
 
 - `asyncio`
 - `modelchorus.core.conversation.ConversationMemory`
@@ -2497,12 +2149,12 @@ Example:
 - `modelchorus.workflows.ThinkDeepWorkflow`
 - `pathlib.Path`
 
-### `modelchorus/src/modelchorus/cli/__init__.py`
+### `src/modelchorus/cli/__init__.py`
 
 - `main.app`
 - `main.main`
 
-### `modelchorus/src/modelchorus/cli/main.py`
+### `src/modelchorus/cli/main.py`
 
 - `asyncio`
 - `core.conversation.ConversationMemory`
@@ -2525,7 +2177,7 @@ Example:
 - `workflows.ConsensusWorkflow`
 - `workflows.ThinkDeepWorkflow`
 
-### `modelchorus/src/modelchorus/core/__init__.py`
+### `src/modelchorus/core/__init__.py`
 
 - `base_workflow.BaseWorkflow`
 - `base_workflow.WorkflowResult`
@@ -2546,7 +2198,7 @@ Example:
 - `models.WorkflowStep`
 - `registry.WorkflowRegistry`
 
-### `modelchorus/src/modelchorus/core/base_workflow.py`
+### `src/modelchorus/core/base_workflow.py`
 
 - `abc.ABC`
 - `abc.abstractmethod`
@@ -2561,7 +2213,7 @@ Example:
 - `typing.List`
 - `typing.Optional`
 
-### `modelchorus/src/modelchorus/core/conversation.py`
+### `src/modelchorus/core/conversation.py`
 
 - `datetime.datetime`
 - `datetime.timedelta`
@@ -2580,7 +2232,7 @@ Example:
 - `typing.Tuple`
 - `uuid`
 
-### `modelchorus/src/modelchorus/core/models.py`
+### `src/modelchorus/core/models.py`
 
 - `enum.Enum`
 - `pydantic.BaseModel`
@@ -2592,7 +2244,7 @@ Example:
 - `typing.Literal`
 - `typing.Optional`
 
-### `modelchorus/src/modelchorus/core/registry.py`
+### `src/modelchorus/core/registry.py`
 
 - `base_workflow.BaseWorkflow`
 - `inspect`
@@ -2601,7 +2253,7 @@ Example:
 - `typing.Optional`
 - `typing.Type`
 
-### `modelchorus/src/modelchorus/core/state.py`
+### `src/modelchorus/core/state.py`
 
 - `datetime.datetime`
 - `datetime.timezone`
@@ -2614,7 +2266,7 @@ Example:
 - `typing.Dict`
 - `typing.Optional`
 
-### `modelchorus/src/modelchorus/providers/__init__.py`
+### `src/modelchorus/providers/__init__.py`
 
 - `base_provider.GenerationRequest`
 - `base_provider.GenerationResponse`
@@ -2627,7 +2279,7 @@ Example:
 - `cursor_agent_provider.CursorAgentProvider`
 - `gemini_provider.GeminiProvider`
 
-### `modelchorus/src/modelchorus/providers/base_provider.py`
+### `src/modelchorus/providers/base_provider.py`
 
 - `abc.ABC`
 - `abc.abstractmethod`
@@ -2639,7 +2291,7 @@ Example:
 - `typing.List`
 - `typing.Optional`
 
-### `modelchorus/src/modelchorus/providers/claude_provider.py`
+### `src/modelchorus/providers/claude_provider.py`
 
 - `base_provider.GenerationRequest`
 - `base_provider.GenerationResponse`
@@ -2653,7 +2305,7 @@ Example:
 - `typing.List`
 - `typing.Optional`
 
-### `modelchorus/src/modelchorus/providers/cli_provider.py`
+### `src/modelchorus/providers/cli_provider.py`
 
 - `abc.abstractmethod`
 - `asyncio`
@@ -2668,7 +2320,7 @@ Example:
 - `typing.List`
 - `typing.Optional`
 
-### `modelchorus/src/modelchorus/providers/codex_provider.py`
+### `src/modelchorus/providers/codex_provider.py`
 
 - `base_provider.GenerationRequest`
 - `base_provider.GenerationResponse`
@@ -2682,7 +2334,7 @@ Example:
 - `typing.List`
 - `typing.Optional`
 
-### `modelchorus/src/modelchorus/providers/cursor_agent_provider.py`
+### `src/modelchorus/providers/cursor_agent_provider.py`
 
 - `base_provider.GenerationRequest`
 - `base_provider.GenerationResponse`
@@ -2696,7 +2348,7 @@ Example:
 - `typing.List`
 - `typing.Optional`
 
-### `modelchorus/src/modelchorus/providers/gemini_provider.py`
+### `src/modelchorus/providers/gemini_provider.py`
 
 - `base_provider.GenerationRequest`
 - `base_provider.GenerationResponse`
@@ -2710,7 +2362,7 @@ Example:
 - `typing.List`
 - `typing.Optional`
 
-### `modelchorus/src/modelchorus/workflows/__init__.py`
+### `src/modelchorus/workflows/__init__.py`
 
 - `chat.ChatWorkflow`
 - `consensus.ConsensusResult`
@@ -2723,7 +2375,7 @@ Example:
 - `core.models.ThinkDeepState`
 - `thinkdeep.ThinkDeepWorkflow`
 
-### `modelchorus/src/modelchorus/workflows/chat.py`
+### `src/modelchorus/workflows/chat.py`
 
 - `core.base_workflow.BaseWorkflow`
 - `core.base_workflow.WorkflowResult`
@@ -2740,7 +2392,7 @@ Example:
 - `typing.Optional`
 - `uuid`
 
-### `modelchorus/src/modelchorus/workflows/consensus.py`
+### `src/modelchorus/workflows/consensus.py`
 
 - `asyncio`
 - `dataclasses.dataclass`
@@ -2755,7 +2407,7 @@ Example:
 - `typing.List`
 - `typing.Optional`
 
-### `modelchorus/src/modelchorus/workflows/thinkdeep.py`
+### `src/modelchorus/workflows/thinkdeep.py`
 
 - `core.base_workflow.BaseWorkflow`
 - `core.base_workflow.WorkflowResult`
@@ -2776,107 +2428,7 @@ Example:
 - `typing.Optional`
 - `uuid`
 
-### `modelchorus/tests/conftest.py`
-
-- `pytest`
-- `unittest.mock.AsyncMock`
-- `unittest.mock.MagicMock`
-
-### `modelchorus/tests/test_chat_workflow.py`
-
-- `modelchorus.core.conversation.ConversationMemory`
-- `modelchorus.providers.base_provider.GenerationRequest`
-- `modelchorus.providers.base_provider.GenerationResponse`
-- `modelchorus.workflows.ChatWorkflow`
-- `pathlib.Path`
-- `pytest`
-- `unittest.mock.AsyncMock`
-- `unittest.mock.MagicMock`
-- `unittest.mock.patch`
-- `uuid`
-
-### `modelchorus/tests/test_claude_provider.py`
-
-- `json`
-- `modelchorus.providers.base_provider.GenerationRequest`
-- `modelchorus.providers.claude_provider.ClaudeProvider`
-- `pytest`
-- `unittest.mock.AsyncMock`
-- `unittest.mock.patch`
-
-### `modelchorus/tests/test_codex_provider.py`
-
-- `json`
-- `modelchorus.providers.base_provider.GenerationRequest`
-- `modelchorus.providers.codex_provider.CodexProvider`
-- `pytest`
-- `unittest.mock.AsyncMock`
-- `unittest.mock.patch`
-
-### `modelchorus/tests/test_consensus_workflow.py`
-
-- `modelchorus.providers.base_provider.GenerationRequest`
-- `modelchorus.providers.base_provider.GenerationResponse`
-- `modelchorus.workflows.consensus.ConsensusStrategy`
-- `modelchorus.workflows.consensus.ConsensusWorkflow`
-- `pytest`
-- `unittest.mock.AsyncMock`
-
-### `modelchorus/tests/test_conversation.py`
-
-- `datetime.datetime`
-- `datetime.timezone`
-- `json`
-- `modelchorus.core.conversation.ConversationMemory`
-- `modelchorus.core.models.ConversationMessage`
-- `modelchorus.core.models.ConversationThread`
-- `pathlib.Path`
-- `pytest`
-- `uuid`
-
-### `modelchorus/tests/test_gemini_integration.py`
-
-- `modelchorus.providers.base_provider.GenerationRequest`
-- `modelchorus.providers.gemini_provider.GeminiProvider`
-- `pytest`
-- `subprocess`
-
-### `modelchorus/tests/test_integration.py`
-
-- `modelchorus.providers.base_provider.GenerationRequest`
-- `modelchorus.providers.base_provider.GenerationResponse`
-- `modelchorus.providers.claude_provider.ClaudeProvider`
-- `modelchorus.providers.codex_provider.CodexProvider`
-- `modelchorus.workflows.consensus.ConsensusStrategy`
-- `modelchorus.workflows.consensus.ConsensusWorkflow`
-- `pytest`
-- `unittest.mock.AsyncMock`
-- `unittest.mock.patch`
-
-### `modelchorus/tests/test_state.py`
-
-- `datetime.datetime`
-- `datetime.timezone`
-- `json`
-- `modelchorus.core.models.ConversationState`
-- `modelchorus.core.state.StateManager`
-- `modelchorus.core.state.get_default_state_manager`
-- `pathlib.Path`
-- `pytest`
-- `threading`
-- `time`
-
-### `modelchorus/tests/test_thinkdeep_models.py`
-
-- `json`
-- `modelchorus.core.models.ConfidenceLevel`
-- `modelchorus.core.models.Hypothesis`
-- `modelchorus.core.models.InvestigationStep`
-- `modelchorus.core.models.ThinkDeepState`
-- `pydantic.ValidationError`
-- `pytest`
-
-### `tests/test_providers/test_cli_interface.py`
+### `test_cli_interface.py`
 
 - `modelchorus.providers.CLIProvider`
 - `modelchorus.providers.ClaudeProvider`
@@ -2889,7 +2441,7 @@ Example:
 - `pytest`
 - `sys`
 
-### `tests/test_thinkdeep_workflow.py`
+### `test_thinkdeep_workflow.py`
 
 - `modelchorus.core.conversation.ConversationMemory`
 - `modelchorus.core.models.ConfidenceLevel`
@@ -2904,3 +2456,114 @@ Example:
 - `unittest.mock.MagicMock`
 - `unittest.mock.patch`
 - `uuid`
+
+### `tests/conftest.py`
+
+- `pytest`
+- `unittest.mock.AsyncMock`
+- `unittest.mock.MagicMock`
+
+### `tests/test_chat_integration.py`
+
+- `modelchorus.core.conversation.ConversationMemory`
+- `modelchorus.providers.ClaudeProvider`
+- `modelchorus.providers.CodexProvider`
+- `modelchorus.providers.GeminiProvider`
+- `modelchorus.workflows.ChatWorkflow`
+- `os`
+- `pathlib.Path`
+- `pytest`
+
+### `tests/test_chat_workflow.py`
+
+- `modelchorus.core.conversation.ConversationMemory`
+- `modelchorus.providers.base_provider.GenerationRequest`
+- `modelchorus.providers.base_provider.GenerationResponse`
+- `modelchorus.workflows.ChatWorkflow`
+- `pathlib.Path`
+- `pytest`
+- `unittest.mock.AsyncMock`
+- `unittest.mock.MagicMock`
+- `unittest.mock.patch`
+- `uuid`
+
+### `tests/test_claude_provider.py`
+
+- `json`
+- `modelchorus.providers.base_provider.GenerationRequest`
+- `modelchorus.providers.claude_provider.ClaudeProvider`
+- `pytest`
+- `unittest.mock.AsyncMock`
+- `unittest.mock.patch`
+
+### `tests/test_codex_provider.py`
+
+- `json`
+- `modelchorus.providers.base_provider.GenerationRequest`
+- `modelchorus.providers.codex_provider.CodexProvider`
+- `pytest`
+- `unittest.mock.AsyncMock`
+- `unittest.mock.patch`
+
+### `tests/test_consensus_workflow.py`
+
+- `modelchorus.providers.base_provider.GenerationRequest`
+- `modelchorus.providers.base_provider.GenerationResponse`
+- `modelchorus.workflows.consensus.ConsensusStrategy`
+- `modelchorus.workflows.consensus.ConsensusWorkflow`
+- `pytest`
+- `unittest.mock.AsyncMock`
+
+### `tests/test_conversation.py`
+
+- `datetime.datetime`
+- `datetime.timezone`
+- `json`
+- `modelchorus.core.conversation.ConversationMemory`
+- `modelchorus.core.models.ConversationMessage`
+- `modelchorus.core.models.ConversationThread`
+- `pathlib.Path`
+- `pytest`
+- `uuid`
+
+### `tests/test_gemini_integration.py`
+
+- `modelchorus.providers.base_provider.GenerationRequest`
+- `modelchorus.providers.gemini_provider.GeminiProvider`
+- `pytest`
+- `subprocess`
+
+### `tests/test_integration.py`
+
+- `modelchorus.providers.base_provider.GenerationRequest`
+- `modelchorus.providers.base_provider.GenerationResponse`
+- `modelchorus.providers.claude_provider.ClaudeProvider`
+- `modelchorus.providers.codex_provider.CodexProvider`
+- `modelchorus.workflows.consensus.ConsensusStrategy`
+- `modelchorus.workflows.consensus.ConsensusWorkflow`
+- `pytest`
+- `unittest.mock.AsyncMock`
+- `unittest.mock.patch`
+
+### `tests/test_state.py`
+
+- `datetime.datetime`
+- `datetime.timezone`
+- `json`
+- `modelchorus.core.models.ConversationState`
+- `modelchorus.core.state.StateManager`
+- `modelchorus.core.state.get_default_state_manager`
+- `pathlib.Path`
+- `pytest`
+- `threading`
+- `time`
+
+### `tests/test_thinkdeep_models.py`
+
+- `json`
+- `modelchorus.core.models.ConfidenceLevel`
+- `modelchorus.core.models.Hypothesis`
+- `modelchorus.core.models.InvestigationStep`
+- `modelchorus.core.models.ThinkDeepState`
+- `pydantic.ValidationError`
+- `pytest`

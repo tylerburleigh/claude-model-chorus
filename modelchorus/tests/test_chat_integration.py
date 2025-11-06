@@ -282,3 +282,208 @@ class TestChatThreadManagement:
         assert thread.messages[0].role == "user"
         assert thread.messages[0].content == "Hello!"
         assert thread.messages[1].role == "assistant"
+
+
+@pytest.mark.skipif(not ANY_PROVIDER_AVAILABLE, reason="No providers configured")
+class TestLongConversations:
+    """Test handling of long multi-turn conversations (20+ turns)."""
+
+    @pytest.mark.asyncio
+    async def test_20_turn_conversation(self, chat_workflow, provider_name):
+        """Test conversation with 20 turns maintains context and stability."""
+        thread_id = None
+        conversation_topics = []
+
+        # Create 20-turn conversation with varied topics
+        for turn in range(20):
+            # Vary the prompts to test different conversation patterns
+            if turn == 0:
+                prompt = "Let's count together. I'll say 1."
+                conversation_topics.append("counting")
+            elif turn < 5:
+                prompt = f"Now you say {turn + 1}."
+            elif turn == 5:
+                prompt = "Good! Now let's switch to colors. My favorite is red."
+                conversation_topics.append("colors")
+            elif turn < 10:
+                colors = ["blue", "green", "yellow", "purple"]
+                prompt = f"What about {colors[turn - 6]}?"
+            elif turn == 10:
+                prompt = "Great! Let's talk about animals now. I like cats."
+                conversation_topics.append("animals")
+            elif turn < 15:
+                animals = ["dogs", "birds", "fish", "rabbits"]
+                prompt = f"What do you think about {animals[turn - 11]}?"
+            else:
+                prompt = f"This is turn {turn + 1}. Are you still following our conversation?"
+
+            result = await chat_workflow.run(
+                prompt=prompt,
+                continuation_id=thread_id,
+                temperature=0.7,
+            )
+
+            # Verify each turn succeeds
+            assert result.success is True, f"Turn {turn + 1} failed with {provider_name}"
+
+            if turn == 0:
+                thread_id = result.metadata["thread_id"]
+                assert result.metadata["is_continuation"] is False
+            else:
+                assert result.metadata["thread_id"] == thread_id
+                assert result.metadata["is_continuation"] is True
+
+            # Verify conversation length grows correctly
+            expected_length = (turn + 1) * 2
+            assert result.metadata["conversation_length"] == expected_length
+
+        # After 20 turns, verify we can still reference early conversation
+        result_final = await chat_workflow.run(
+            prompt="What number did we start counting with at the very beginning?",
+            continuation_id=thread_id,
+            temperature=0.0,
+        )
+
+        assert result_final.success
+        assert "1" in result_final.synthesis or "one" in result_final.synthesis.lower()
+
+    @pytest.mark.asyncio
+    async def test_25_turn_conversation_with_context_retention(self, chat_workflow, provider_name):
+        """Test 25-turn conversation maintains context across topic changes."""
+        thread_id = None
+
+        # Initial context establishment
+        result_0 = await chat_workflow.run(
+            prompt="Remember this important fact: my birthday is July 15th.",
+            temperature=0.0,
+        )
+
+        assert result_0.success
+        thread_id = result_0.metadata["thread_id"]
+
+        # Have a long conversation about other topics (23 turns)
+        for turn in range(1, 24):
+            if turn % 3 == 0:
+                prompt = f"Tell me about topic number {turn}."
+            elif turn % 3 == 1:
+                prompt = f"Interesting! What else about that?"
+            else:
+                prompt = f"Got it. Let's move to something different."
+
+            result = await chat_workflow.run(
+                prompt=prompt,
+                continuation_id=thread_id,
+                temperature=0.7,
+            )
+
+            assert result.success, f"Turn {turn + 1} failed"
+
+        # On turn 25, ask about the initial fact
+        result_final = await chat_workflow.run(
+            prompt="What is my birthday that I told you at the very start?",
+            continuation_id=thread_id,
+            temperature=0.0,
+        )
+
+        assert result_final.success
+        # Should remember the birthday despite 23 intervening turns
+        assert "july" in result_final.synthesis.lower() or "7" in result_final.synthesis
+        assert "15" in result_final.synthesis
+
+    @pytest.mark.asyncio
+    async def test_conversation_length_tracking(self, chat_workflow, provider_name):
+        """Test that conversation length is accurately tracked over many turns."""
+        thread_id = None
+        expected_lengths = []
+
+        # Create 22 turns
+        for turn in range(22):
+            result = await chat_workflow.run(
+                prompt=f"Message {turn + 1}",
+                continuation_id=thread_id,
+                temperature=0.0,
+            )
+
+            assert result.success
+
+            if turn == 0:
+                thread_id = result.metadata["thread_id"]
+
+            # Each turn adds 2 messages (user + assistant)
+            expected_length = (turn + 1) * 2
+            expected_lengths.append(expected_length)
+
+            assert result.metadata["conversation_length"] == expected_length, \
+                f"Turn {turn + 1}: expected {expected_length}, got {result.metadata['conversation_length']}"
+
+        # Verify thread state
+        thread = chat_workflow.get_thread(thread_id)
+        assert len(thread.messages) == 44  # 22 turns * 2 messages
+
+    @pytest.mark.asyncio
+    async def test_long_conversation_with_file_references(self, chat_workflow, provider_name, tmp_path):
+        """Test long conversation with file context referenced across turns."""
+        # Create test file
+        test_file = tmp_path / "config.txt"
+        test_file.write_text("SECRET_KEY=abc123\nDEBUG=true\n")
+
+        # Start with file context
+        result_0 = await chat_workflow.run(
+            prompt="What is the SECRET_KEY in this file?",
+            files=[str(test_file)],
+            temperature=0.0,
+        )
+
+        assert result_0.success
+        thread_id = result_0.metadata["thread_id"]
+        assert "abc123" in result_0.synthesis
+
+        # Continue for 20 more turns without the file
+        for turn in range(1, 21):
+            result = await chat_workflow.run(
+                prompt=f"Conversation turn {turn + 1}. Just acknowledge this.",
+                continuation_id=thread_id,
+                temperature=0.7,
+            )
+
+            assert result.success
+
+        # On turn 21, ask about the file content again
+        result_final = await chat_workflow.run(
+            prompt="What was that SECRET_KEY from the file I showed you earlier?",
+            continuation_id=thread_id,
+            temperature=0.0,
+        )
+
+        assert result_final.success
+        # Should still remember the file content
+        assert "abc123" in result_final.synthesis.lower()
+
+    @pytest.mark.asyncio
+    async def test_conversation_stability_under_load(self, chat_workflow, provider_name):
+        """Test that conversation remains stable over 30 rapid turns."""
+        thread_id = None
+
+        # Rapid-fire 30 turns
+        for turn in range(30):
+            result = await chat_workflow.run(
+                prompt=f"Turn {turn + 1}",
+                continuation_id=thread_id,
+                temperature=0.0,
+            )
+
+            # Every turn should succeed
+            assert result.success, f"Failed at turn {turn + 1}"
+
+            if turn == 0:
+                thread_id = result.metadata["thread_id"]
+
+            # Metadata should be consistent
+            assert "thread_id" in result.metadata
+            assert "conversation_length" in result.metadata
+            assert result.metadata["conversation_length"] == (turn + 1) * 2
+
+        # Verify final state
+        thread = chat_workflow.get_thread(thread_id)
+        assert thread is not None
+        assert len(thread.messages) == 60  # 30 turns * 2 messages
