@@ -134,9 +134,6 @@ class GeminiProvider(CLIProvider):
         """
         command = [self.cli_command]
 
-<<<<<<< HEAD
-        # Add model from metadata if specified (must come before prompt)
-=======
         # Build full prompt (system + user prompt)
         full_prompt = request.prompt
         if request.system_prompt:
@@ -146,23 +143,11 @@ class GeminiProvider(CLIProvider):
         command.append(full_prompt)
 
         # Add model from metadata if specified
->>>>>>> 397c12f (Add chat and thinkdeep skills with comprehensive documentation)
         if "model" in request.metadata:
             command.extend(["-m", request.metadata["model"]])
 
-<<<<<<< HEAD
-        # Note: Gemini CLI doesn't support --temperature or --max-tokens via CLI flags
-        # These parameters are controlled through the Gemini CLI settings/config
-
-        # Add prompt as positional argument (must be after flags, before options)
-        command.append(request.prompt)
-
-        # Add JSON output format for easier parsing
-        command.extend(["-o", "json"])
-=======
         # Add JSON output format for easier parsing
         command.extend(["--output-format", "json"])
->>>>>>> 397c12f (Add chat and thinkdeep skills with comprehensive documentation)
 
         logger.debug(f"Built Gemini command: {' '.join(command)}")
         logger.warning(
