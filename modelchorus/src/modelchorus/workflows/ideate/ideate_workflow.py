@@ -1867,6 +1867,355 @@ Use the requested format exactly."""
 
         return "".join(synthesis_parts)
 
+    async def run_elaboration(
+        self,
+        selection_result: WorkflowResult,
+        **kwargs
+    ) -> WorkflowResult:
+        """
+        Elaborate selected clusters into detailed, actionable outlines.
+
+        Takes selected idea clusters from run_interactive_selection and generates
+        comprehensive outlines with implementation details, steps, considerations,
+        and next actions for each selected cluster.
+
+        This is the fourth and final step in the complete IDEATE workflow pattern.
+
+        Args:
+            selection_result: WorkflowResult from run_interactive_selection()
+            **kwargs: Additional parameters for provider (temperature, max_tokens)
+
+        Returns:
+            WorkflowResult containing:
+                - synthesis: Formatted collection of detailed outlines
+                - steps: Elaboration steps for each selected cluster
+                - metadata: Elaboration parameters and statistics
+
+        Raises:
+            ValueError: If selection_result is invalid or has no selected clusters
+            Exception: If elaboration fails
+
+        Example:
+            >>> # After interactive selection
+            >>> selection_result = workflow.run_interactive_selection(convergent_result)
+            >>>
+            >>> # Elaborate selected clusters into detailed outlines
+            >>> elaboration_result = await workflow.run_elaboration(selection_result)
+            >>>
+            >>> # Access detailed outlines
+            >>> print(elaboration_result.synthesis)
+            >>> for step in elaboration_result.steps:
+            ...     print(f"{step.metadata['theme']}: {len(step.metadata['outline_sections'])} sections")
+        """
+        if not selection_result or not selection_result.metadata:
+            raise ValueError("Selection result must have metadata")
+
+        selected_clusters = selection_result.metadata.get('selected_clusters', [])
+
+        if not selected_clusters:
+            raise ValueError("No selected clusters found in selection result")
+
+        logger.info(f"Starting elaboration for {len(selected_clusters)} selected clusters")
+
+        # Elaborate each selected cluster
+        elaboration_steps = []
+        for i, cluster in enumerate(selected_clusters, 1):
+            logger.info(f"Elaborating cluster {i}/{len(selected_clusters)}: {cluster.get('theme', 'Untitled')}")
+
+            elaboration_step = await self._elaborate_cluster(
+                cluster=cluster,
+                step_number=i,
+                **kwargs
+            )
+            elaboration_steps.append(elaboration_step)
+
+        # Create synthesis combining all elaborated outlines
+        synthesis = self._synthesize_elaborations(
+            elaboration_steps=elaboration_steps,
+            selected_clusters=selected_clusters
+        )
+
+        # Create workflow result
+        result = WorkflowResult(
+            synthesis=synthesis,
+            steps=elaboration_steps,
+            metadata={
+                'workflow': 'ideate-elaboration',
+                'num_elaborated': len(elaboration_steps),
+                'selection_metadata': selection_result.metadata
+            }
+        )
+
+        logger.info(f"Elaboration completed for {len(elaboration_steps)} clusters")
+        return result
+
+    async def _elaborate_cluster(
+        self,
+        cluster: Dict[str, Any],
+        step_number: int,
+        **kwargs
+    ) -> WorkflowStep:
+        """
+        Elaborate a single cluster into a detailed outline.
+
+        Args:
+            cluster: Selected cluster dictionary with theme, scores, ideas
+            step_number: Step number for this elaboration
+            **kwargs: Additional parameters for provider
+
+        Returns:
+            WorkflowStep containing detailed outline with metadata
+        """
+        theme = cluster.get('theme', 'Untitled')
+        logger.info(f"Elaborating cluster: {theme}")
+
+        # Create elaboration prompt
+        elaboration_prompt = self._create_elaboration_prompt(cluster)
+
+        # Set moderate temperature for creative but structured elaboration
+        temperature = kwargs.get('temperature', 0.6)
+
+        # Create generation request
+        request = GenerationRequest(
+            messages=[ConversationMessage(role="user", content=elaboration_prompt)],
+            system_prompt=self._get_elaboration_system_prompt(),
+            temperature=temperature,
+            max_tokens=kwargs.get('max_tokens', 3000)
+        )
+
+        try:
+            # Generate elaborated outline
+            response: GenerationResponse = await self.provider.generate(request)
+
+            # Parse outline sections from response
+            outline_sections = self._parse_outline_sections(response.content)
+
+            # Create workflow step
+            step = WorkflowStep(
+                step_number=step_number,
+                content=response.content,
+                model=self.provider.provider_name,
+                metadata={
+                    'title': f'Elaboration: {theme}',
+                    'theme': theme,
+                    'cluster_id': cluster.get('cluster_id', ''),
+                    'overall_score': cluster.get('overall_score', 0),
+                    'num_ideas': len(cluster.get('ideas', [])),
+                    'outline_sections': outline_sections,
+                    'temperature': temperature
+                }
+            )
+
+            logger.info(f"Elaborated '{theme}' into {len(outline_sections)} sections")
+            return step
+
+        except Exception as e:
+            logger.error(f"Cluster elaboration failed for '{theme}': {e}")
+            raise
+
+    def _create_elaboration_prompt(self, cluster: Dict[str, Any]) -> str:
+        """
+        Create prompt for elaborating a cluster into a detailed outline.
+
+        Args:
+            cluster: Cluster dictionary with theme, scores, ideas
+
+        Returns:
+            Formatted elaboration prompt
+        """
+        theme = cluster.get('theme', 'Untitled')
+        description = cluster.get('description', '')
+        scores = cluster.get('scores', {})
+        ideas = cluster.get('ideas', [])
+
+        prompt_parts = [
+            f"You are creating a detailed, actionable outline for implementing the following idea cluster:\n\n",
+            f"**Theme**: {theme}\n\n"
+        ]
+
+        if description:
+            prompt_parts.append(f"**Description**: {description}\n\n")
+
+        # Add evaluation scores
+        if scores:
+            prompt_parts.append("**Evaluation**:\n")
+            for criterion, data in scores.items():
+                score_val = data.get('score', 0)
+                explanation = data.get('explanation', '')
+                prompt_parts.append(f"- {criterion.title()}: {score_val}/5 - {explanation}\n")
+            prompt_parts.append("\n")
+
+        # Add related ideas
+        if ideas:
+            prompt_parts.append(f"**Related Ideas** ({len(ideas)}):\n")
+            for idea_ref in ideas:
+                idea_id = idea_ref.get('idea_id', '')
+                reason = idea_ref.get('reason', '')
+                prompt_parts.append(f"- {idea_id}: {reason}\n")
+            prompt_parts.append("\n")
+
+        prompt_parts.append(
+            "---\n\n"
+            "Create a comprehensive, actionable outline for implementing this idea cluster. "
+            "Your outline should include:\n\n"
+            "1. **Overview**: Brief summary of what this entails (2-3 sentences)\n"
+            "2. **Goals & Objectives**: What this aims to achieve (3-5 bullet points)\n"
+            "3. **Implementation Approach**: High-level strategy and methodology\n"
+            "4. **Detailed Steps**: Concrete, sequential steps to implement (numbered list)\n"
+            "5. **Key Considerations**: Important factors to keep in mind (technical, UX, business)\n"
+            "6. **Success Metrics**: How to measure success\n"
+            "7. **Potential Challenges**: Anticipated obstacles and mitigation strategies\n"
+            "8. **Next Actions**: Immediate next steps to get started\n\n"
+            "Make the outline specific, practical, and actionable. Include sufficient detail "
+            "for someone to understand how to proceed with implementation."
+        )
+
+        return "".join(prompt_parts)
+
+    def _get_elaboration_system_prompt(self) -> str:
+        """
+        Get system prompt for elaboration task.
+
+        Returns:
+            System prompt for detailed outline generation
+        """
+        return """You are an expert at taking creative ideas and developing them into detailed, actionable plans.
+
+Your task is to create comprehensive outlines that transform high-level concepts into concrete implementation roadmaps.
+
+Guidelines:
+1. **Be specific**: Provide concrete details, not vague generalities
+2. **Be practical**: Focus on actionable steps and realistic approaches
+3. **Be thorough**: Cover all important aspects (technical, user, business)
+4. **Be structured**: Organize information logically with clear sections
+5. **Anticipate challenges**: Identify potential obstacles proactively
+6. **Define success**: Include measurable outcomes and metrics
+
+Your outline should give the reader a clear understanding of:
+- What needs to be built/implemented
+- How to approach the implementation
+- What to watch out for
+- How to know when it's successful
+
+Write in a professional, clear style. Use markdown formatting for structure."""
+
+    def _parse_outline_sections(self, elaboration_content: str) -> List[Dict[str, str]]:
+        """
+        Parse outline sections from elaboration response.
+
+        Args:
+            elaboration_content: LLM response with detailed outline
+
+        Returns:
+            List of section dictionaries with titles and content
+        """
+        sections = []
+        lines = elaboration_content.split('\n')
+        current_section = None
+
+        for line in lines:
+            line_stripped = line.strip()
+
+            # Check for main section headers (## Header or **number. Header**)
+            if line_stripped.startswith('##') and not line_stripped.startswith('###'):
+                # Save previous section
+                if current_section and current_section.get('content'):
+                    sections.append(current_section)
+
+                # Start new section
+                section_title = line_stripped.lstrip('#').strip()
+                current_section = {
+                    'title': section_title,
+                    'content': ''
+                }
+
+            elif line_stripped.startswith('**') and any(char.isdigit() for char in line_stripped[:10]):
+                # Handle numbered sections like "**1. Overview**"
+                if ']' not in line_stripped:  # Ignore IDEA-X references
+                    # Save previous section
+                    if current_section and current_section.get('content'):
+                        sections.append(current_section)
+
+                    # Extract title from **1. Title**
+                    try:
+                        title_part = line_stripped.split('**')[1]
+                        # Remove leading number and period
+                        if '.' in title_part:
+                            title_part = title_part.split('.', 1)[1].strip()
+
+                        current_section = {
+                            'title': title_part,
+                            'content': ''
+                        }
+                    except (IndexError, ValueError):
+                        # If parsing fails, just accumulate content
+                        if current_section is not None:
+                            current_section['content'] += line + '\n'
+
+            elif current_section is not None:
+                # Accumulate content for current section
+                current_section['content'] += line + '\n'
+
+        # Don't forget the last section
+        if current_section and current_section.get('content'):
+            sections.append(current_section)
+
+        logger.info(f"Parsed {len(sections)} outline sections")
+        return sections
+
+    def _synthesize_elaborations(
+        self,
+        elaboration_steps: List[WorkflowStep],
+        selected_clusters: List[Dict[str, Any]]
+    ) -> str:
+        """
+        Synthesize all elaborated outlines into formatted collection.
+
+        Args:
+            elaboration_steps: List of elaboration WorkflowSteps
+            selected_clusters: Original selected clusters
+
+        Returns:
+            Formatted synthesis combining all outlines
+        """
+        synthesis_parts = [
+            "# Detailed Implementation Outlines\n",
+            f"\nElaborated {len(elaboration_steps)} selected idea cluster(s) into actionable outlines:\n\n",
+            "---\n\n"
+        ]
+
+        for i, step in enumerate(elaboration_steps, 1):
+            theme = step.metadata.get('theme', 'Untitled')
+            score = step.metadata.get('overall_score', 0)
+            num_sections = len(step.metadata.get('outline_sections', []))
+
+            synthesis_parts.append(f"## Outline {i}: {theme}\n\n")
+            synthesis_parts.append(f"**Score**: {score:.1f}/5.0 | **Sections**: {num_sections}\n\n")
+            synthesis_parts.append(step.content)
+            synthesis_parts.append("\n\n---\n\n")
+
+        # Add summary and next steps
+        synthesis_parts.append("## Summary\n\n")
+        synthesis_parts.append(
+            f"Created {len(elaboration_steps)} detailed implementation outline(s) from selected idea clusters. "
+            f"Each outline includes:\n\n"
+            "- Overview and objectives\n"
+            "- Implementation approach and steps\n"
+            "- Key considerations and challenges\n"
+            "- Success metrics and next actions\n\n"
+        )
+
+        synthesis_parts.append("## Recommended Workflow\n\n")
+        synthesis_parts.append(
+            "1. **Review Outlines**: Read through all elaborated outlines above\n"
+            "2. **Prioritize**: Choose which outline(s) to implement first based on scores and feasibility\n"
+            "3. **Plan Resources**: Estimate time, team, and budget requirements\n"
+            "4. **Create Tasks**: Break down detailed steps into trackable work items\n"
+            "5. **Begin Implementation**: Start with first actionable steps from chosen outline\n"
+        )
+
+        return "".join(synthesis_parts)
+
     def validate_config(self, config: Dict[str, Any]) -> bool:
         """
         Validate ideation workflow configuration.
