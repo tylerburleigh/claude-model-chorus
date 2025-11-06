@@ -1,7 +1,7 @@
 {
   "spec_id": "general-purpose-workflows-2025-11-06-001",
   "generated": "2025-11-06T12:45:00Z",
-  "last_updated": "2025-11-06T12:57:20.996144Z",
+  "last_updated": "2025-11-06T16:38:54.084436Z",
   "metadata": {
     "title": "General-Purpose Workflows (ARGUMENT, IDEATE, RESEARCH)",
     "description": "Implement foundation infrastructure and three general-purpose workflows for ModelChorus: ARGUMENT (structured debate), IDEATE (creative ideation), and RESEARCH (evidence-based research with citations)",
@@ -21,13 +21,17 @@
       "Role-based orchestration framework supports sequential and parallel execution",
       "All tests pass with >80% coverage",
       "User documentation complete for each workflow"
-    ]
+    ],
+    "status": "active",
+    "activated_date": "2025-11-06T16:35:09.389143Z",
+    "progress_percentage": 1,
+    "current_phase": "phase-1"
   },
   "hierarchy": {
     "spec-root": {
       "type": "spec",
       "title": "General-Purpose Workflows (ARGUMENT, IDEATE, RESEARCH)",
-      "status": "pending",
+      "status": "in_progress",
       "parent": null,
       "children": [
         "phase-1",
@@ -38,7 +42,7 @@
         "phase-6"
       ],
       "total_tasks": 71,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {},
       "dependencies": {
         "blocks": [],
@@ -49,14 +53,14 @@
     "phase-1": {
       "type": "phase",
       "title": "Foundation Infrastructure",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "spec-root",
       "children": [
         "phase-1-files",
         "phase-1-verify"
       ],
       "total_tasks": 23,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "purpose": "Build shared infrastructure components for citations, clustering, and role-based orchestration",
         "risk_level": "high",
@@ -73,7 +77,7 @@
     "phase-1-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-1",
       "children": [
         "task-1-1",
@@ -86,7 +90,7 @@
         "task-1-8"
       ],
       "total_tasks": 19,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -99,7 +103,7 @@
     "task-1-1": {
       "type": "task",
       "title": "modelchorus/src/modelchorus/core/citation.py",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-1-files",
       "children": [
         "task-1-1-1",
@@ -117,7 +121,7 @@
         "depends": []
       },
       "total_tasks": 4,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "modelchorus/src/modelchorus/core/citation.py",
         "task_category": "implementation",
@@ -128,7 +132,7 @@
     "task-1-1-1": {
       "type": "subtask",
       "title": "Create Citation data model with source, location, confidence tracking",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-1-1",
       "children": [],
       "dependencies": {
@@ -137,8 +141,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
-      "metadata": {}
+      "completed_tasks": 1,
+      "metadata": {
+        "started_at": "2025-11-06T16:36:03.640554Z",
+        "completed_at": "2025-11-06T16:38:54.069611Z",
+        "needs_journaling": false,
+        "actual_hours": 0.047,
+        "journaled_at": "2025-11-06T16:38:54.080784Z"
+      }
     },
     "task-1-1-2": {
       "type": "subtask",
@@ -2031,5 +2041,16 @@
         "command": ""
       }
     }
-  }
+  },
+  "journal": [
+    {
+      "timestamp": "2025-11-06T16:38:54.080761Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Create Citation data model with source, location, confidence tracking",
+      "author": "claude-code",
+      "content": "Successfully created the Citation data model in modelchorus/src/modelchorus/core/models.py with the following features:\n\n1. Source tracking - Required string field for source identifier (URL, file path, document ID)\n2. Location tracking - Optional string field for specific location within source (page, line, section, timestamp)\n3. Confidence tracking - Required float field (0.0-1.0) with Pydantic validation\n4. Snippet field - Optional text snippet from the source\n5. Metadata dict - Additional citation metadata (author, date, context)\n\nThe model follows the established patterns in the codebase:\n- Uses Pydantic BaseModel\n- Includes comprehensive docstrings\n- Provides example in model_config\n- Has proper field validation (min_length, ge/le constraints)\n- Follows the same style as other models (ConversationMessage, WorkflowStep, etc.)\n\nTesting confirmed:\n\u2705 Model imports successfully\n\u2705 Required fields work (source, confidence)\n\u2705 Optional fields work (location, snippet, metadata)\n\u2705 Validation works (confidence must be 0.0-1.0)\n\u2705 JSON serialization works via model_dump()\n\nThe Citation model is ready for use in the ARGUMENT workflow implementation.",
+      "metadata": {},
+      "task_id": "task-1-1-1"
+    }
+  ]
 }

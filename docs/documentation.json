@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T14:06:00.376834Z",
+    "generated_at": "2025-11-06T16:35:37.077570Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 46,
-    "total_lines": 15568,
-    "total_classes": 77,
+    "total_files": 45,
+    "total_lines": 15313,
+    "total_classes": 76,
     "total_functions": 34,
     "avg_complexity": 4.62,
     "max_complexity": 36,
@@ -23,9 +23,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 46,
-        "lines": 15568,
-        "classes": 77,
+        "files": 45,
+        "lines": 15313,
+        "classes": 76,
         "functions": 34,
         "avg_complexity": 4.62
       }
@@ -511,31 +511,6 @@
       ],
       "exports": [],
       "lines": 240
-    },
-    {
-      "name": "gemini_provider",
-      "file": "modelchorus/src/modelchorus/providers/gemini_provider.py",
-      "language": "python",
-      "docstring": "Gemini CLI provider for ModelChorus.\n\nThis module provides integration with Google's Gemini models via the `gemini` CLI tool.",
-      "classes": [
-        "GeminiProvider"
-      ],
-      "functions": [],
-      "imports": [
-        "json",
-        "logging",
-        "typing.Any",
-        "typing.Dict",
-        "typing.List",
-        "typing.Optional",
-        "cli_provider.CLIProvider",
-        "base_provider.GenerationRequest",
-        "base_provider.GenerationResponse",
-        "base_provider.ModelConfig",
-        "base_provider.ModelCapability"
-      ],
-      "exports": [],
-      "lines": 255
     },
     {
       "name": "__init__",
@@ -3085,37 +3060,10 @@
             "CursorAgentProvider",
             "_initialize_models"
           ]
-        },
-        {
-          "instantiator": "_initialize_models",
-          "file": "modelchorus/src/modelchorus/providers/gemini_provider.py",
-          "line": 83,
-          "context": [
-            "GeminiProvider",
-            "_initialize_models"
-          ]
-        },
-        {
-          "instantiator": "_initialize_models",
-          "file": "modelchorus/src/modelchorus/providers/gemini_provider.py",
-          "line": 94,
-          "context": [
-            "GeminiProvider",
-            "_initialize_models"
-          ]
-        },
-        {
-          "instantiator": "_initialize_models",
-          "file": "modelchorus/src/modelchorus/providers/gemini_provider.py",
-          "line": 104,
-          "context": [
-            "GeminiProvider",
-            "_initialize_models"
-          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 14
+      "instantiation_count": 11
     },
     {
       "name": "GenerationRequest",
@@ -3454,15 +3402,6 @@
           "line": 193,
           "context": [
             "CursorAgentProvider",
-            "parse_response"
-          ]
-        },
-        {
-          "instantiator": "parse_response",
-          "file": "modelchorus/src/modelchorus/providers/gemini_provider.py",
-          "line": 211,
-          "context": [
-            "GeminiProvider",
             "parse_response"
           ]
         },
@@ -4498,7 +4437,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 119
+      "instantiation_count": 118
     },
     {
       "name": "ModelProvider",
@@ -5070,65 +5009,6 @@
       ],
       "imported_by": [],
       "instantiation_count": 2
-    },
-    {
-      "name": "GeminiProvider",
-      "file": "modelchorus/src/modelchorus/providers/gemini_provider.py",
-      "line": 22,
-      "language": "python",
-      "docstring": "Provider for Google's Gemini models via the `gemini` CLI tool.\n\nThis provider wraps the `gemini` command-line interface to enable\ntext generation with Gemini models (Pro, Flash, Ultra).\n\nSupported features:\n- Text generation with customizable prompts\n- System instructions\n- Temperature and token control\n- Vision capabilities (multimodal support)\n- Function calling\n- Thinking/reasoning mode\n\nExample:\n    >>> provider = GeminiProvider()\n    >>> request = GenerationRequest(\n    ...     prompt=\"Explain machine learning\",\n    ...     temperature=0.7,\n    ...     max_tokens=1000\n    ... )\n    >>> response = await provider.generate(request)\n    >>> print(response.content)",
-      "bases": [
-        "CLIProvider"
-      ],
-      "methods": [
-        "__init__",
-        "_initialize_models",
-        "build_command",
-        "parse_response",
-        "supports_vision",
-        "supports_thinking"
-      ],
-      "properties": [],
-      "is_exported": false,
-      "is_public": true,
-      "instantiated_by": [
-        {
-          "instantiator": "investigation_with_expert_validation",
-          "file": "modelchorus/examples/thinkdeep_example.py",
-          "line": 233,
-          "context": [
-            "investigation_with_expert_validation"
-          ]
-        },
-        {
-          "instantiator": "list_providers",
-          "file": "modelchorus/src/modelchorus/cli/main.py",
-          "line": 794,
-          "context": [
-            "list_providers"
-          ]
-        },
-        {
-          "instantiator": "provider",
-          "file": "modelchorus/tests/test_gemini_integration.py",
-          "line": 19,
-          "context": [
-            "TestGeminiIntegration",
-            "provider"
-          ]
-        },
-        {
-          "instantiator": "providers",
-          "file": "tests/test_providers/test_cli_interface.py",
-          "line": 36,
-          "context": [
-            "TestCLIProvidersImplementInterface",
-            "providers"
-          ]
-        }
-      ],
-      "imported_by": [],
-      "instantiation_count": 4
     },
     {
       "name": "ChatWorkflow",
@@ -11698,19 +11578,6 @@
       "base_provider.ModelCapability"
     ],
     "modelchorus/src/modelchorus/providers/cursor_agent_provider.py": [
-      "json",
-      "logging",
-      "typing.Any",
-      "typing.Dict",
-      "typing.List",
-      "typing.Optional",
-      "cli_provider.CLIProvider",
-      "base_provider.GenerationRequest",
-      "base_provider.GenerationResponse",
-      "base_provider.ModelConfig",
-      "base_provider.ModelCapability"
-    ],
-    "modelchorus/src/modelchorus/providers/gemini_provider.py": [
       "json",
       "logging",
       "typing.Any",

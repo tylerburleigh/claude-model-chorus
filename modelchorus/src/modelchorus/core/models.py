@@ -818,3 +818,63 @@ class ConversationState(BaseModel):
         ...,
         description="ISO timestamp of last state update",
     )
+
+
+class Citation(BaseModel):
+    """
+    Citation model for tracking sources in ARGUMENT workflow.
+
+    Tracks the source of information, its location, and confidence level
+    for evidence-based argumentation and research workflows.
+
+    Attributes:
+        source: The source identifier (URL, file path, document ID, etc.)
+        location: Specific location within source (page, line, section, timestamp)
+        confidence: Confidence level in the citation accuracy (0.0-1.0)
+        snippet: Optional text snippet from the source
+        metadata: Additional citation metadata (author, date, context, etc.)
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "source": "https://arxiv.org/abs/2401.12345",
+                "location": "Section 3.2, Figure 4",
+                "confidence": 0.95,
+                "snippet": "Our experiments show a 23% improvement in accuracy...",
+                "metadata": {
+                    "author": "Smith et al.",
+                    "publication_date": "2024-01-15",
+                    "citation_type": "academic_paper",
+                },
+            }
+        }
+    )
+
+    source: str = Field(
+        ...,
+        description="Source identifier (URL, file path, document ID, etc.)",
+        min_length=1,
+    )
+
+    location: Optional[str] = Field(
+        default=None,
+        description="Specific location within source (page, line, section, timestamp)",
+    )
+
+    confidence: float = Field(
+        ...,
+        ge=0.0,
+        le=1.0,
+        description="Confidence level in citation accuracy (0.0-1.0)",
+    )
+
+    snippet: Optional[str] = Field(
+        default=None,
+        description="Optional text snippet from the source",
+    )
+
+    metadata: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Additional citation metadata (author, date, context, etc.)",
+    )

@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 09:06:00
+**Generated:** 2025-11-06 11:35:37
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 46
-- **Total Lines:** 15568
-- **Total Classes:** 77
+- **Total Files:** 45
+- **Total Lines:** 15313
+- **Total Classes:** 76
 - **Total Functions:** 34
 - **Avg Complexity:** 4.62
 - **Max Complexity:** 36
@@ -545,46 +545,6 @@ needed to create a working workflow.
 
 **Methods:**
 - `run()`
-
----
-
-### `GeminiProvider`
-
-**Language:** python
-**Inherits from:** `CLIProvider`
-**Defined in:** `modelchorus/src/modelchorus/providers/gemini_provider.py:22`
-
-**Description:**
-> Provider for Google's Gemini models via the `gemini` CLI tool.
-
-This provider wraps the `gemini` command-line interface to enable
-text generation with Gemini models (Pro, Flash, Ultra).
-
-Supported features:
-- Text generation with customizable prompts
-- System instructions
-- Temperature and token control
-- Vision capabilities (multimodal support)
-- Function calling
-- Thinking/reasoning mode
-
-Example:
-    >>> provider = GeminiProvider()
-    >>> request = GenerationRequest(
-    ...     prompt="Explain machine learning",
-    ...     temperature=0.7,
-    ...     max_tokens=1000
-    ... )
-    >>> response = await provider.generate(request)
-    >>> print(response.content)
-
-**Methods:**
-- `__init__()`
-- `_initialize_models()`
-- `build_command()`
-- `parse_response()`
-- `supports_vision()`
-- `supports_thinking()`
 
 ---
 
@@ -2555,20 +2515,6 @@ Example:
 - `typing.Optional`
 
 ### `modelchorus/src/modelchorus/providers/cursor_agent_provider.py`
-
-- `base_provider.GenerationRequest`
-- `base_provider.GenerationResponse`
-- `base_provider.ModelCapability`
-- `base_provider.ModelConfig`
-- `cli_provider.CLIProvider`
-- `json`
-- `logging`
-- `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
-
-### `modelchorus/src/modelchorus/providers/gemini_provider.py`
 
 - `base_provider.GenerationRequest`
 - `base_provider.GenerationResponse`
