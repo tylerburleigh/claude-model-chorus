@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T12:47:44.268834Z",
+    "generated_at": "2025-11-06T12:51:10.283777Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 42,
-    "total_lines": 13811,
-    "total_classes": 69,
+    "total_files": 43,
+    "total_lines": 14516,
+    "total_classes": 74,
     "total_functions": 34,
     "avg_complexity": 4.62,
     "max_complexity": 36,
@@ -23,9 +23,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 42,
-        "lines": 13811,
-        "classes": 69,
+        "files": 43,
+        "lines": 14516,
+        "classes": 74,
         "functions": 34,
         "avg_complexity": 4.62
       }
@@ -1005,6 +1005,37 @@
       "lines": 844
     },
     {
+      "name": "test_thinkdeep_expert_validation",
+      "file": "tests/test_thinkdeep_expert_validation.py",
+      "language": "python",
+      "docstring": "Expert validation flow tests for ThinkDeep workflow.\n\nTests verify expert validation functionality including:\n- Expert provider integration and triggering\n- Confidence-based validation triggering\n- Multiple expert models coordination\n- Expert validation result handling\n- Error handling when expert validation fails",
+      "classes": [
+        "TestExpertProviderIntegration",
+        "TestExpertValidationTriggering",
+        "TestExpertValidationResultHandling",
+        "TestExpertValidationErrorHandling",
+        "TestExpertValidationWithHypotheses"
+      ],
+      "functions": [],
+      "imports": [
+        "pytest",
+        "unittest.mock.AsyncMock",
+        "unittest.mock.MagicMock",
+        "unittest.mock.patch",
+        "uuid",
+        "modelchorus.workflows.thinkdeep.ThinkDeepWorkflow",
+        "modelchorus.providers.base_provider.GenerationResponse",
+        "modelchorus.providers.base_provider.GenerationRequest",
+        "modelchorus.core.conversation.ConversationMemory",
+        "modelchorus.core.models.ConfidenceLevel",
+        "modelchorus.core.models.Hypothesis",
+        "modelchorus.core.models.InvestigationStep",
+        "modelchorus.core.models.ThinkDeepState"
+      ],
+      "exports": [],
+      "lines": 705
+    },
+    {
       "name": "test_thinkdeep_workflow",
       "file": "tests/test_thinkdeep_workflow.py",
       "language": "python",
@@ -1465,6 +1496,51 @@
         },
         {
           "instantiator": "conversation_memory",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 49,
+          "context": [
+            "TestExpertProviderIntegration",
+            "conversation_memory"
+          ]
+        },
+        {
+          "instantiator": "conversation_memory",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 138,
+          "context": [
+            "TestExpertValidationTriggering",
+            "conversation_memory"
+          ]
+        },
+        {
+          "instantiator": "conversation_memory",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 336,
+          "context": [
+            "TestExpertValidationResultHandling",
+            "conversation_memory"
+          ]
+        },
+        {
+          "instantiator": "conversation_memory",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 450,
+          "context": [
+            "TestExpertValidationErrorHandling",
+            "conversation_memory"
+          ]
+        },
+        {
+          "instantiator": "conversation_memory",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 601,
+          "context": [
+            "TestExpertValidationWithHypotheses",
+            "conversation_memory"
+          ]
+        },
+        {
+          "instantiator": "conversation_memory",
           "file": "tests/test_thinkdeep_workflow.py",
           "line": 51,
           "context": [
@@ -1501,7 +1577,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 34
+      "instantiation_count": 39
     },
     {
       "name": "ConfidenceLevel",
@@ -3523,6 +3599,168 @@
           ]
         },
         {
+          "instantiator": "test_expert_validation_triggered_at_medium_confidence",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 146,
+          "context": [
+            "TestExpertValidationTriggering",
+            "test_expert_validation_triggered_at_medium_confidence"
+          ]
+        },
+        {
+          "instantiator": "test_expert_validation_triggered_at_medium_confidence",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 153,
+          "context": [
+            "TestExpertValidationTriggering",
+            "test_expert_validation_triggered_at_medium_confidence"
+          ]
+        },
+        {
+          "instantiator": "test_expert_validation_not_triggered_at_exploring_confidence",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 194,
+          "context": [
+            "TestExpertValidationTriggering",
+            "test_expert_validation_not_triggered_at_exploring_confidence"
+          ]
+        },
+        {
+          "instantiator": "test_expert_validation_triggered_at_high_confidence",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 233,
+          "context": [
+            "TestExpertValidationTriggering",
+            "test_expert_validation_triggered_at_high_confidence"
+          ]
+        },
+        {
+          "instantiator": "test_expert_validation_triggered_at_high_confidence",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 240,
+          "context": [
+            "TestExpertValidationTriggering",
+            "test_expert_validation_triggered_at_high_confidence"
+          ]
+        },
+        {
+          "instantiator": "test_expert_validation_not_triggered_when_disabled",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 281,
+          "context": [
+            "TestExpertValidationTriggering",
+            "test_expert_validation_not_triggered_when_disabled"
+          ]
+        },
+        {
+          "instantiator": "test_expert_validation_result_included_in_metadata",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 344,
+          "context": [
+            "TestExpertValidationResultHandling",
+            "test_expert_validation_result_included_in_metadata"
+          ]
+        },
+        {
+          "instantiator": "test_expert_validation_result_included_in_metadata",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 351,
+          "context": [
+            "TestExpertValidationResultHandling",
+            "test_expert_validation_result_included_in_metadata"
+          ]
+        },
+        {
+          "instantiator": "test_expert_validation_conversation_history_updated",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 387,
+          "context": [
+            "TestExpertValidationResultHandling",
+            "test_expert_validation_conversation_history_updated"
+          ]
+        },
+        {
+          "instantiator": "test_expert_validation_conversation_history_updated",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 395,
+          "context": [
+            "TestExpertValidationResultHandling",
+            "test_expert_validation_conversation_history_updated"
+          ]
+        },
+        {
+          "instantiator": "test_expert_validation_failure_does_not_crash_investigation",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 458,
+          "context": [
+            "TestExpertValidationErrorHandling",
+            "test_expert_validation_failure_does_not_crash_investigation"
+          ]
+        },
+        {
+          "instantiator": "test_expert_validation_timeout_handling",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 500,
+          "context": [
+            "TestExpertValidationErrorHandling",
+            "test_expert_validation_timeout_handling"
+          ]
+        },
+        {
+          "instantiator": "test_expert_validation_with_empty_response",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 541,
+          "context": [
+            "TestExpertValidationErrorHandling",
+            "test_expert_validation_with_empty_response"
+          ]
+        },
+        {
+          "instantiator": "test_expert_validation_with_empty_response",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 549,
+          "context": [
+            "TestExpertValidationErrorHandling",
+            "test_expert_validation_with_empty_response"
+          ]
+        },
+        {
+          "instantiator": "test_expert_validation_validates_hypothesis",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 609,
+          "context": [
+            "TestExpertValidationWithHypotheses",
+            "test_expert_validation_validates_hypothesis"
+          ]
+        },
+        {
+          "instantiator": "test_expert_validation_validates_hypothesis",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 616,
+          "context": [
+            "TestExpertValidationWithHypotheses",
+            "test_expert_validation_validates_hypothesis"
+          ]
+        },
+        {
+          "instantiator": "test_expert_validation_with_multiple_hypotheses",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 663,
+          "context": [
+            "TestExpertValidationWithHypotheses",
+            "test_expert_validation_with_multiple_hypotheses"
+          ]
+        },
+        {
+          "instantiator": "test_expert_validation_with_multiple_hypotheses",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 670,
+          "context": [
+            "TestExpertValidationWithHypotheses",
+            "test_expert_validation_with_multiple_hypotheses"
+          ]
+        },
+        {
           "instantiator": "test_single_investigation_step_execution",
           "file": "tests/test_thinkdeep_workflow.py",
           "line": 59,
@@ -4001,7 +4239,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 86
+      "instantiation_count": 104
     },
     {
       "name": "ModelProvider",
@@ -5145,6 +5383,141 @@
           ]
         },
         {
+          "instantiator": "test_expert_validation_enabled_with_expert_provider",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 57,
+          "context": [
+            "TestExpertProviderIntegration",
+            "test_expert_validation_enabled_with_expert_provider"
+          ]
+        },
+        {
+          "instantiator": "test_expert_validation_disabled_without_expert_provider",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 73,
+          "context": [
+            "TestExpertProviderIntegration",
+            "test_expert_validation_disabled_without_expert_provider"
+          ]
+        },
+        {
+          "instantiator": "test_expert_validation_explicit_disable_via_config",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 88,
+          "context": [
+            "TestExpertProviderIntegration",
+            "test_expert_validation_explicit_disable_via_config"
+          ]
+        },
+        {
+          "instantiator": "test_expert_validation_explicit_enable_via_config",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 105,
+          "context": [
+            "TestExpertProviderIntegration",
+            "test_expert_validation_explicit_enable_via_config"
+          ]
+        },
+        {
+          "instantiator": "test_expert_validation_triggered_at_medium_confidence",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 161,
+          "context": [
+            "TestExpertValidationTriggering",
+            "test_expert_validation_triggered_at_medium_confidence"
+          ]
+        },
+        {
+          "instantiator": "test_expert_validation_not_triggered_at_exploring_confidence",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 202,
+          "context": [
+            "TestExpertValidationTriggering",
+            "test_expert_validation_not_triggered_at_exploring_confidence"
+          ]
+        },
+        {
+          "instantiator": "test_expert_validation_triggered_at_high_confidence",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 248,
+          "context": [
+            "TestExpertValidationTriggering",
+            "test_expert_validation_triggered_at_high_confidence"
+          ]
+        },
+        {
+          "instantiator": "test_expert_validation_not_triggered_when_disabled",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 289,
+          "context": [
+            "TestExpertValidationTriggering",
+            "test_expert_validation_not_triggered_when_disabled"
+          ]
+        },
+        {
+          "instantiator": "test_expert_validation_result_included_in_metadata",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 359,
+          "context": [
+            "TestExpertValidationResultHandling",
+            "test_expert_validation_result_included_in_metadata"
+          ]
+        },
+        {
+          "instantiator": "test_expert_validation_conversation_history_updated",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 403,
+          "context": [
+            "TestExpertValidationResultHandling",
+            "test_expert_validation_conversation_history_updated"
+          ]
+        },
+        {
+          "instantiator": "test_expert_validation_failure_does_not_crash_investigation",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 469,
+          "context": [
+            "TestExpertValidationErrorHandling",
+            "test_expert_validation_failure_does_not_crash_investigation"
+          ]
+        },
+        {
+          "instantiator": "test_expert_validation_timeout_handling",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 512,
+          "context": [
+            "TestExpertValidationErrorHandling",
+            "test_expert_validation_timeout_handling"
+          ]
+        },
+        {
+          "instantiator": "test_expert_validation_with_empty_response",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 557,
+          "context": [
+            "TestExpertValidationErrorHandling",
+            "test_expert_validation_with_empty_response"
+          ]
+        },
+        {
+          "instantiator": "test_expert_validation_validates_hypothesis",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 624,
+          "context": [
+            "TestExpertValidationWithHypotheses",
+            "test_expert_validation_validates_hypothesis"
+          ]
+        },
+        {
+          "instantiator": "test_expert_validation_with_multiple_hypotheses",
+          "file": "tests/test_thinkdeep_expert_validation.py",
+          "line": 678,
+          "context": [
+            "TestExpertValidationWithHypotheses",
+            "test_expert_validation_with_multiple_hypotheses"
+          ]
+        },
+        {
           "instantiator": "test_single_investigation_step_execution",
           "file": "tests/test_thinkdeep_workflow.py",
           "line": 67,
@@ -5470,7 +5843,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 49
+      "instantiation_count": 64
     },
     {
       "name": "TestMultiProviderChat",
@@ -6071,6 +6444,111 @@
         "conversation_memory",
         "test_long_investigation_with_hypothesis_pivots",
         "test_investigation_with_multiple_evidence_types"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestExpertProviderIntegration",
+      "file": "tests/test_thinkdeep_expert_validation.py",
+      "line": 27,
+      "language": "python",
+      "docstring": "Test suite for expert provider integration in ThinkDeepWorkflow.",
+      "bases": [],
+      "methods": [
+        "mock_provider",
+        "mock_expert_provider",
+        "conversation_memory",
+        "test_expert_validation_enabled_with_expert_provider",
+        "test_expert_validation_disabled_without_expert_provider",
+        "test_expert_validation_explicit_disable_via_config",
+        "test_expert_validation_explicit_enable_via_config"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestExpertValidationTriggering",
+      "file": "tests/test_thinkdeep_expert_validation.py",
+      "line": 116,
+      "language": "python",
+      "docstring": "Test suite for expert validation triggering logic.",
+      "bases": [],
+      "methods": [
+        "mock_provider",
+        "mock_expert_provider",
+        "conversation_memory",
+        "test_expert_validation_triggered_at_medium_confidence",
+        "test_expert_validation_not_triggered_at_exploring_confidence",
+        "test_expert_validation_triggered_at_high_confidence",
+        "test_expert_validation_not_triggered_when_disabled"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestExpertValidationResultHandling",
+      "file": "tests/test_thinkdeep_expert_validation.py",
+      "line": 314,
+      "language": "python",
+      "docstring": "Test suite for handling expert validation results.",
+      "bases": [],
+      "methods": [
+        "mock_provider",
+        "mock_expert_provider",
+        "conversation_memory",
+        "test_expert_validation_result_included_in_metadata",
+        "test_expert_validation_conversation_history_updated"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestExpertValidationErrorHandling",
+      "file": "tests/test_thinkdeep_expert_validation.py",
+      "line": 428,
+      "language": "python",
+      "docstring": "Test suite for error handling in expert validation.",
+      "bases": [],
+      "methods": [
+        "mock_provider",
+        "mock_expert_provider",
+        "conversation_memory",
+        "test_expert_validation_failure_does_not_crash_investigation",
+        "test_expert_validation_timeout_handling",
+        "test_expert_validation_with_empty_response"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestExpertValidationWithHypotheses",
+      "file": "tests/test_thinkdeep_expert_validation.py",
+      "line": 579,
+      "language": "python",
+      "docstring": "Test suite for expert validation interaction with hypotheses.",
+      "bases": [],
+      "methods": [
+        "mock_provider",
+        "mock_expert_provider",
+        "conversation_memory",
+        "test_expert_validation_validates_hypothesis",
+        "test_expert_validation_with_multiple_hypotheses"
       ],
       "properties": [],
       "is_exported": false,
@@ -10954,6 +11432,21 @@
       "modelchorus.providers.GenerationRequest"
     ],
     "tests/test_thinkdeep_complex.py": [
+      "pytest",
+      "unittest.mock.AsyncMock",
+      "unittest.mock.MagicMock",
+      "unittest.mock.patch",
+      "uuid",
+      "modelchorus.workflows.thinkdeep.ThinkDeepWorkflow",
+      "modelchorus.providers.base_provider.GenerationResponse",
+      "modelchorus.providers.base_provider.GenerationRequest",
+      "modelchorus.core.conversation.ConversationMemory",
+      "modelchorus.core.models.ConfidenceLevel",
+      "modelchorus.core.models.Hypothesis",
+      "modelchorus.core.models.InvestigationStep",
+      "modelchorus.core.models.ThinkDeepState"
+    ],
+    "tests/test_thinkdeep_expert_validation.py": [
       "pytest",
       "unittest.mock.AsyncMock",
       "unittest.mock.MagicMock",

@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 07:47:44
+**Generated:** 2025-11-06 07:51:10
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 42
-- **Total Lines:** 13811
-- **Total Classes:** 69
+- **Total Files:** 43
+- **Total Lines:** 14516
+- **Total Classes:** 74
 - **Total Functions:** 34
 - **Avg Complexity:** 4.62
 - **Max Complexity:** 36
@@ -1120,6 +1120,96 @@ Attributes:
 **Methods:**
 - `test_provider_error_handled()`
 - `test_get_result_returns_last_result()`
+
+---
+
+### `TestExpertProviderIntegration`
+
+**Language:** python
+**Defined in:** `tests/test_thinkdeep_expert_validation.py:27`
+
+**Description:**
+> Test suite for expert provider integration in ThinkDeepWorkflow.
+
+**Methods:**
+- `mock_provider()`
+- `mock_expert_provider()`
+- `conversation_memory()`
+- `test_expert_validation_enabled_with_expert_provider()`
+- `test_expert_validation_disabled_without_expert_provider()`
+- `test_expert_validation_explicit_disable_via_config()`
+- `test_expert_validation_explicit_enable_via_config()`
+
+---
+
+### `TestExpertValidationErrorHandling`
+
+**Language:** python
+**Defined in:** `tests/test_thinkdeep_expert_validation.py:428`
+
+**Description:**
+> Test suite for error handling in expert validation.
+
+**Methods:**
+- `mock_provider()`
+- `mock_expert_provider()`
+- `conversation_memory()`
+- `test_expert_validation_failure_does_not_crash_investigation()`
+- `test_expert_validation_timeout_handling()`
+- `test_expert_validation_with_empty_response()`
+
+---
+
+### `TestExpertValidationResultHandling`
+
+**Language:** python
+**Defined in:** `tests/test_thinkdeep_expert_validation.py:314`
+
+**Description:**
+> Test suite for handling expert validation results.
+
+**Methods:**
+- `mock_provider()`
+- `mock_expert_provider()`
+- `conversation_memory()`
+- `test_expert_validation_result_included_in_metadata()`
+- `test_expert_validation_conversation_history_updated()`
+
+---
+
+### `TestExpertValidationTriggering`
+
+**Language:** python
+**Defined in:** `tests/test_thinkdeep_expert_validation.py:116`
+
+**Description:**
+> Test suite for expert validation triggering logic.
+
+**Methods:**
+- `mock_provider()`
+- `mock_expert_provider()`
+- `conversation_memory()`
+- `test_expert_validation_triggered_at_medium_confidence()`
+- `test_expert_validation_not_triggered_at_exploring_confidence()`
+- `test_expert_validation_triggered_at_high_confidence()`
+- `test_expert_validation_not_triggered_when_disabled()`
+
+---
+
+### `TestExpertValidationWithHypotheses`
+
+**Language:** python
+**Defined in:** `tests/test_thinkdeep_expert_validation.py:579`
+
+**Description:**
+> Test suite for expert validation interaction with hypotheses.
+
+**Methods:**
+- `mock_provider()`
+- `mock_expert_provider()`
+- `conversation_memory()`
+- `test_expert_validation_validates_hypothesis()`
+- `test_expert_validation_with_multiple_hypotheses()`
 
 ---
 
@@ -2618,6 +2708,22 @@ Example:
 - `sys`
 
 ### `tests/test_thinkdeep_complex.py`
+
+- `modelchorus.core.conversation.ConversationMemory`
+- `modelchorus.core.models.ConfidenceLevel`
+- `modelchorus.core.models.Hypothesis`
+- `modelchorus.core.models.InvestigationStep`
+- `modelchorus.core.models.ThinkDeepState`
+- `modelchorus.providers.base_provider.GenerationRequest`
+- `modelchorus.providers.base_provider.GenerationResponse`
+- `modelchorus.workflows.thinkdeep.ThinkDeepWorkflow`
+- `pytest`
+- `unittest.mock.AsyncMock`
+- `unittest.mock.MagicMock`
+- `unittest.mock.patch`
+- `uuid`
+
+### `tests/test_thinkdeep_expert_validation.py`
 
 - `modelchorus.core.conversation.ConversationMemory`
 - `modelchorus.core.models.ConfidenceLevel`
