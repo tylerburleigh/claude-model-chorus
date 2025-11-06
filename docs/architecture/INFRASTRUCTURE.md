@@ -1428,6 +1428,1014 @@ pytest modelchorus/tests/test_clustering.py --cov=modelchorus.core.clustering
 
 ---
 
+## Role-Based Orchestration Framework
+
+### Overview
+
+The Role-Based Orchestration Framework provides infrastructure for coordinating multiple AI models in specific roles, enabling sophisticated multi-model workflows. Each model can be assigned a distinct role (e.g., proponent, critic, analyst) with customized prompts and execution patterns, allowing workflows to leverage diverse perspectives and specialized behaviors.
+
+**Key Capabilities:**
+- **Role Assignment:** Assign specific roles to different models with customized prompts
+- **Stance Configuration:** Define stances (for/against/neutral) for debate-style workflows
+- **Execution Patterns:** Sequential, parallel, or hybrid orchestration
+- **Synthesis Strategies:** Combine role outputs using concatenation, structured formatting, or AI synthesis
+- **Provider Flexibility:** Map any model to any role with per-role parameter overrides
+
+**Supported Workflows:**
+- **ARGUMENT:** Sequential debate with Creator (for), Skeptic (against), and Moderator (synthesis)
+- **IDEATE:** Parallel brainstorming from multiple creative perspectives
+- **RESEARCH:** Multi-angle investigation with specialized research roles (planned)
+
+**Location:** `modelchorus/src/modelchorus/core/role_orchestration.py`
+
+---
+
+### Architecture
+
+#### Core Components
+
+The orchestration framework consists of four primary components:
+
+1. **ModelRole:** Defines a model's role, stance, and prompt customization
+2. **RoleOrchestrator:** Coordinates execution of models in assigned roles
+3. **OrchestrationPattern:** Defines execution strategy (sequential/parallel/hybrid)
+4. **SynthesisStrategy:** Determines how to combine role outputs
+
+#### Data Models
+
+##### ModelRole
+
+Represents a specific role assignment for an AI model in a multi-model workflow.
+
+**Fields:**
+- `role` (str, required): Descriptive name for this role
+  - Examples: "proponent", "critic", "synthesizer", "analyst"
+  - Min length: 1, Max length: 100
+- `model` (str, required): Model identifier to assign to this role
+  - Examples: "gpt-5", "gemini-2.5-pro", "claude-sonnet-4"
+- `stance` (str, optional): Stance for debate-style workflows
+  - Allowed values: "for", "against", "neutral"
+  - Automatically validated and normalized to lowercase
+- `stance_prompt` (str, optional): Additional prompt text to reinforce the stance
+  - Appended to base prompt to guide model behavior
+- `system_prompt` (str, optional): System-level prompt for this role
+  - Sets overall behavior and expertise context
+- `temperature` (float, optional): Temperature override for this role
+  - Range: 0.0 to 1.0
+  - Overrides workflow default for role-specific creativity
+- `max_tokens` (int, optional): Max tokens override for this role
+  - Overrides workflow default for role-specific response length
+- `metadata` (dict, optional): Additional metadata
+  - Common fields: `priority`, `tags`, `constraints`
+
+**Example:**
+```python
+from modelchorus.core.role_orchestration import ModelRole
+
+proponent = ModelRole(
+    role="proponent",
+    model="gpt-5",
+    stance="for",
+    stance_prompt="You are advocating FOR the proposal. Present strong supporting arguments.",
+    system_prompt="You are an expert debater focused on building compelling cases.",
+    temperature=0.8,
+    max_tokens=4000,
+    metadata={
+        "priority": 1,
+        "tags": ["debate", "advocacy"]
+    }
+)
+
+critic = ModelRole(
+    role="critic",
+    model="gemini-2.5-pro",
+    stance="against",
+    stance_prompt="You are critically analyzing AGAINST the proposal. Identify weaknesses and risks.",
+    system_prompt="You are a skeptical analyst who challenges assumptions.",
+    temperature=0.7,
+    max_tokens=3500
+)
+```
+
+##### OrchestrationResult
+
+Result from orchestrating multiple models with assigned roles.
+
+**Fields:**
+- `role_responses` (List[tuple], optional): List of (role_name, response) tuples in execution order
+- `all_responses` (List, optional): List of all GenerationResponse objects
+- `failed_roles` (List[str], optional): List of role names that failed to execute
+- `pattern_used` (OrchestrationPattern, required): Orchestration pattern that was executed
+- `execution_order` (List[str], optional): List of role names in the order they were executed
+- `synthesized_output` (Any, optional): Synthesized/combined output (if synthesis enabled)
+- `synthesis_strategy` (SynthesisStrategy, optional): Strategy used for synthesis
+- `metadata` (dict, optional): Additional execution metadata
+  - Common fields: `total_roles`, `successful_roles`, `failed_roles`, `timing`, `synthesis_metadata`
+
+**Example:**
+```python
+from modelchorus.core.role_orchestration import OrchestrationResult, OrchestrationPattern
+
+result = OrchestrationResult(
+    role_responses=[
+        ("proponent", GenerationResponse(content="Argument FOR...", model="gpt-5")),
+        ("critic", GenerationResponse(content="Argument AGAINST...", model="gemini-2.5-pro")),
+    ],
+    pattern_used=OrchestrationPattern.SEQUENTIAL,
+    execution_order=["proponent", "critic"],
+    synthesized_output="After considering both perspectives...",
+    synthesis_strategy=SynthesisStrategy.AI_SYNTHESIZE,
+    metadata={
+        "total_roles": 2,
+        "successful_roles": 2,
+        "failed_roles": 0
+    }
+)
+```
+
+---
+
+#### Orchestration Patterns
+
+The framework supports three execution patterns, each optimized for different workflow characteristics:
+
+##### Sequential Pattern
+
+**How it works:**
+1. Execute first role
+2. Wait for completion
+3. Execute second role
+4. Repeat until all roles complete
+5. Return results in execution order
+
+**Characteristics:**
+- **Sequential dependency:** Each role can build on previous outputs
+- **Ordered execution:** Deterministic, predictable order
+- **Context building:** Later roles can reference earlier responses
+- **Slower:** Total time = sum of all role execution times
+
+**Best for:**
+- Debate workflows where roles respond to each other
+- Multi-stage analysis (research → analysis → synthesis)
+- When later roles need context from earlier roles
+
+**Example:**
+```python
+from modelchorus.core.role_orchestration import RoleOrchestrator, OrchestrationPattern
+
+# Sequential debate: Creator → Skeptic → Moderator
+orchestrator = RoleOrchestrator(
+    roles=[creator_role, skeptic_role, moderator_role],
+    provider_map=providers,
+    pattern=OrchestrationPattern.SEQUENTIAL
+)
+
+result = await orchestrator.execute("Should we adopt TypeScript?")
+# Creator generates thesis first
+# Skeptic responds to creator's thesis
+# Moderator synthesizes both perspectives
+```
+
+##### Parallel Pattern
+
+**How it works:**
+1. Launch all roles simultaneously using asyncio.gather
+2. Wait for all to complete
+3. Sort results by original role order
+4. Return all responses
+
+**Characteristics:**
+- **Concurrent execution:** All roles execute at once
+- **Independent perspectives:** Roles don't see each other's outputs
+- **Faster:** Total time ≈ slowest role execution time
+- **Unordered internally:** Results sorted by index after completion
+
+**Best for:**
+- Multiple independent perspectives (brainstorming, research)
+- When roles don't need each other's context
+- Maximizing throughput for large workflows
+- Diverse expert opinions
+
+**Example:**
+```python
+# Parallel brainstorming: Multiple perspectives simultaneously
+orchestrator = RoleOrchestrator(
+    roles=[perspective1, perspective2, perspective3],
+    provider_map=providers,
+    pattern=OrchestrationPattern.PARALLEL
+)
+
+result = await orchestrator.execute("Ways to improve developer productivity")
+# All three perspectives generate ideas simultaneously
+# Results combined after all complete
+```
+
+##### Hybrid Pattern (Planned)
+
+**How it works:**
+1. Mix sequential and parallel phases
+2. Example: Parallel research → Sequential debate → Parallel voting
+
+**Status:** Not yet implemented
+
+**Characteristics:**
+- **Flexible orchestration:** Combine sequential and parallel benefits
+- **Complex workflows:** Multi-phase workflows with different patterns per phase
+- **Performance optimization:** Parallel where possible, sequential where needed
+
+**Planned for:** Future releases
+
+---
+
+#### Synthesis Strategies
+
+After roles execute, their outputs can be synthesized using different strategies:
+
+##### NONE
+
+**Description:** No synthesis - return raw responses as-is
+
+**Use when:**
+- You want to process each response individually
+- Custom synthesis logic needed
+- Displaying responses separately
+
+**Output:** Original `role_responses` list unchanged
+
+**Example:**
+```python
+result = await orchestrator.execute(
+    prompt="Should we adopt TypeScript?",
+)
+# No synthesis performed - default
+for role_name, response in result.role_responses:
+    print(f"{role_name}: {response.content}")
+```
+
+##### CONCATENATE
+
+**Description:** Simple concatenation with role labels and separators
+
+**Use when:**
+- You want a readable combined text
+- Clear attribution to each role needed
+- Simple text output sufficient
+
+**Output:** Single string with role-labeled sections
+
+**Format:**
+```
+## PROPONENT
+
+[Proponent's full response]
+
+---
+
+## CRITIC
+
+[Critic's full response]
+```
+
+**Example:**
+```python
+result = await orchestrator.execute(
+    prompt="Should we adopt TypeScript?",
+)
+synthesized = await orchestrator.synthesize(result, SynthesisStrategy.CONCATENATE)
+print(synthesized.synthesized_output)
+```
+
+##### STRUCTURED
+
+**Description:** Combine into structured dictionary with role keys
+
+**Use when:**
+- Programmatic access to individual responses needed
+- Preserving response metadata (model, usage)
+- Building APIs or data pipelines
+
+**Output:** Dictionary with role names as keys
+
+**Format:**
+```python
+{
+    "proponent": {
+        "content": "TypeScript provides...",
+        "model": "gpt-5",
+        "usage": {...}
+    },
+    "critic": {
+        "content": "TypeScript adds complexity...",
+        "model": "gemini-2.5-pro",
+        "usage": {...}
+    }
+}
+```
+
+**Example:**
+```python
+synthesized = await orchestrator.synthesize(result, SynthesisStrategy.STRUCTURED)
+proponent_content = synthesized.synthesized_output["proponent"]["content"]
+```
+
+##### AI_SYNTHESIZE
+
+**Description:** Use AI model to intelligently combine responses
+
+**Use when:**
+- You want a coherent synthesis that resolves conflicts
+- Integrating multiple perspectives into unified recommendation
+- Producing publication-quality output
+
+**Output:** AI-generated synthesis incorporating all perspectives
+
+**Process:**
+1. Build synthesis prompt with all role responses
+2. Send to synthesis provider (default: first role's provider)
+3. AI model integrates perspectives, identifies agreements/disagreements
+4. Returns coherent, balanced final response
+
+**Example:**
+```python
+synthesized = await orchestrator.synthesize(
+    result,
+    strategy=SynthesisStrategy.AI_SYNTHESIZE,
+    synthesis_provider=claude_provider,  # Optional: specify synthesis model
+    synthesis_prompt="Custom synthesis instructions..."  # Optional: override default
+)
+print(synthesized.synthesized_output)
+# "After considering both perspectives, TypeScript offers strong benefits..."
+```
+
+---
+
+### Usage Examples
+
+#### Basic Sequential Debate (ARGUMENT)
+
+**Two-role debate:**
+```python
+from modelchorus.core.role_orchestration import RoleOrchestrator, ModelRole, OrchestrationPattern
+from modelchorus.providers import ClaudeProvider, GeminiProvider
+
+# Define roles
+proponent = ModelRole(
+    role="proponent",
+    model="claude",
+    stance="for",
+    stance_prompt="You are advocating FOR the proposal. Present strong supporting arguments.",
+    temperature=0.8
+)
+
+critic = ModelRole(
+    role="critic",
+    model="gemini",
+    stance="against",
+    stance_prompt="You are critically analyzing AGAINST the proposal. Identify weaknesses and risks.",
+    temperature=0.7
+)
+
+# Create provider map
+providers = {
+    "claude": ClaudeProvider(),
+    "gemini": GeminiProvider()
+}
+
+# Create orchestrator
+orchestrator = RoleOrchestrator(
+    roles=[proponent, critic],
+    provider_map=providers,
+    pattern=OrchestrationPattern.SEQUENTIAL
+)
+
+# Execute debate
+result = await orchestrator.execute("Should we adopt TypeScript for our project?")
+
+# Display responses
+for role_name, response in result.role_responses:
+    print(f"\n## {role_name.upper()}")
+    print(response.content)
+```
+
+#### Three-Role Sequential Analysis
+
+**Analysis → Critique → Synthesis pattern:**
+```python
+# Define three roles
+analyst = ModelRole(
+    role="analyst",
+    model="gpt-5",
+    stance="neutral",
+    stance_prompt="Analyze objectively, present facts and data.",
+    temperature=0.5
+)
+
+skeptic = ModelRole(
+    role="skeptic",
+    model="gemini-2.5-pro",
+    stance="against",
+    stance_prompt="Challenge assumptions, identify risks and weaknesses.",
+    temperature=0.6
+)
+
+synthesizer = ModelRole(
+    role="synthesizer",
+    model="claude-sonnet-4",
+    stance="neutral",
+    stance_prompt="Integrate both perspectives into balanced recommendation.",
+    temperature=0.7
+)
+
+orchestrator = RoleOrchestrator(
+    roles=[analyst, skeptic, synthesizer],
+    provider_map=providers,
+    pattern=OrchestrationPattern.SEQUENTIAL
+)
+
+# Execute with AI synthesis
+result = await orchestrator.execute("Evaluate moving to microservices architecture")
+synthesized = await orchestrator.synthesize(result, SynthesisStrategy.AI_SYNTHESIZE)
+
+print(synthesized.synthesized_output)
+```
+
+#### Parallel Brainstorming (IDEATE)
+
+**Multiple independent perspectives:**
+```python
+# Define multiple perspective roles
+perspectives = [
+    ModelRole(
+        role="efficiency_expert",
+        model="gpt-5",
+        stance="neutral",
+        stance_prompt="Focus on efficiency and optimization opportunities.",
+        temperature=0.8
+    ),
+    ModelRole(
+        role="ux_designer",
+        model="gemini-2.5-pro",
+        stance="neutral",
+        stance_prompt="Focus on user experience and usability improvements.",
+        temperature=0.9
+    ),
+    ModelRole(
+        role="technical_architect",
+        model="claude-sonnet-4",
+        stance="neutral",
+        stance_prompt="Focus on technical feasibility and architecture.",
+        temperature=0.7
+    )
+]
+
+# Parallel execution for speed
+orchestrator = RoleOrchestrator(
+    roles=perspectives,
+    provider_map=providers,
+    pattern=OrchestrationPattern.PARALLEL
+)
+
+result = await orchestrator.execute("Brainstorm ways to improve developer productivity")
+
+# Structured output for programmatic access
+synthesized = await orchestrator.synthesize(result, SynthesisStrategy.STRUCTURED)
+
+for role_name, data in synthesized.synthesized_output.items():
+    print(f"\n{role_name}: {data['content'][:200]}...")
+```
+
+#### ARGUMENT Workflow Integration
+
+**How ARGUMENT uses RoleOrchestrator:**
+```python
+from modelchorus.workflows import ArgumentWorkflow
+from modelchorus.providers import ClaudeProvider
+
+# ArgumentWorkflow internally creates three roles:
+# 1. Creator (stance: "for") - Generates thesis
+# 2. Skeptic (stance: "against") - Provides rebuttal
+# 3. Moderator (stance: "neutral") - Synthesizes perspectives
+
+workflow = ArgumentWorkflow(provider=ClaudeProvider())
+
+result = await workflow.run(
+    prompt="TypeScript should replace JavaScript for all new projects",
+    temperature=0.7
+)
+
+# Workflow uses RoleOrchestrator internally:
+# - Sequential pattern (roles build on each other)
+# - Custom stance prompts per role
+# - Final synthesis via Moderator role
+
+print(result.synthesis)  # Balanced dialectical analysis
+```
+
+#### Custom Role Configuration
+
+**Advanced role customization:**
+```python
+custom_role = ModelRole(
+    role="devil's_advocate",
+    model="gpt-5",
+    stance="against",
+    stance_prompt=(
+        "You are playing devil's advocate. Your goal is to find flaws, "
+        "challenge assumptions, and present worst-case scenarios. Be relentlessly "
+        "critical and skeptical."
+    ),
+    system_prompt="You are a contrarian thinker who questions conventional wisdom.",
+    temperature=0.9,  # Higher creativity for diverse criticism
+    max_tokens=5000,  # Allow detailed critiques
+    metadata={
+        "priority": "high",
+        "tags": ["critical_thinking", "risk_analysis"],
+        "constraints": ["focus_on_risks", "identify_blind_spots"]
+    }
+)
+
+# Role can access full prompt via get_full_prompt()
+base_prompt = "Evaluate this proposal: ..."
+full_prompt = custom_role.get_full_prompt(base_prompt)
+
+# Output combines: system_prompt + stance_prompt + base_prompt
+print(full_prompt)
+```
+
+---
+
+### API Reference
+
+#### ModelRole.__init__()
+
+Create a new role assignment for an AI model.
+
+```python
+def __init__(
+    role: str,
+    model: str,
+    stance: Optional[str] = None,
+    stance_prompt: Optional[str] = None,
+    system_prompt: Optional[str] = None,
+    temperature: Optional[float] = None,
+    max_tokens: Optional[int] = None,
+    metadata: Dict[str, Any] = {}
+)
+```
+
+**Parameters:**
+- `role` (str): Descriptive name for this role (1-100 chars)
+- `model` (str): Model identifier ("gpt-5", "gemini-2.5-pro", etc.)
+- `stance` (str, optional): "for", "against", or "neutral"
+- `stance_prompt` (str, optional): Additional prompt to reinforce stance
+- `system_prompt` (str, optional): System-level behavior prompt
+- `temperature` (float, optional): Temperature override (0.0-1.0)
+- `max_tokens` (int, optional): Max tokens override
+- `metadata` (dict, optional): Additional metadata
+
+**Raises:**
+- `ValueError`: If stance not in {"for", "against", "neutral"}
+- `ValueError`: If temperature outside [0.0, 1.0]
+
+---
+
+#### ModelRole.get_full_prompt()
+
+Construct full prompt by combining base prompt with role customizations.
+
+```python
+def get_full_prompt(base_prompt: str) -> str
+```
+
+**Parameters:**
+- `base_prompt` (str): The base prompt from the workflow
+
+**Returns:**
+- `str`: Complete prompt with system_prompt + stance_prompt + base_prompt
+
+**Example:**
+```python
+full = role.get_full_prompt("Analyze this proposal")
+# Returns: "{system_prompt}\n\n{stance_prompt}\n\n{base_prompt}"
+```
+
+---
+
+#### RoleOrchestrator.__init__()
+
+Initialize the role orchestrator.
+
+```python
+def __init__(
+    roles: List[ModelRole],
+    provider_map: Dict[str, Any],
+    pattern: OrchestrationPattern = OrchestrationPattern.SEQUENTIAL,
+    default_timeout: float = 120.0
+)
+```
+
+**Parameters:**
+- `roles` (List[ModelRole]): List of ModelRole instances defining the workflow
+- `provider_map` (Dict[str, Any]): Mapping from model identifiers to provider instances
+- `pattern` (OrchestrationPattern): Execution pattern (default: SEQUENTIAL)
+- `default_timeout` (float): Default timeout per model in seconds (default: 120.0)
+
+**Raises:**
+- `ValueError`: If roles list is empty
+- `ValueError`: If pattern is HYBRID (not yet implemented)
+
+---
+
+#### RoleOrchestrator.execute()
+
+Execute the orchestrated workflow with all roles.
+
+```python
+async def execute(
+    base_prompt: str,
+    context: Optional[str] = None
+) -> OrchestrationResult
+```
+
+**Parameters:**
+- `base_prompt` (str): The base prompt to send to all models
+- `context` (Optional[str]): Additional context to include (e.g., from previous execution)
+
+**Returns:**
+- `OrchestrationResult`: Structured result with all responses and metadata
+
+**Execution behavior:**
+- Sequential: Executes roles one at a time in order
+- Parallel: Executes all roles concurrently with asyncio.gather
+
+**Example:**
+```python
+result = await orchestrator.execute(
+    base_prompt="Should we adopt microservices?",
+    context="Previous discussion established our current monolith has scaling issues."
+)
+```
+
+---
+
+#### RoleOrchestrator.synthesize()
+
+Synthesize multiple role outputs into a unified result.
+
+```python
+async def synthesize(
+    result: OrchestrationResult,
+    strategy: SynthesisStrategy = SynthesisStrategy.CONCATENATE,
+    synthesis_provider: Optional[Any] = None,
+    synthesis_prompt: Optional[str] = None
+) -> OrchestrationResult
+```
+
+**Parameters:**
+- `result` (OrchestrationResult): Result from execute()
+- `strategy` (SynthesisStrategy): How to combine outputs
+- `synthesis_provider` (Optional[Any]): Provider for AI synthesis (defaults to first role's provider)
+- `synthesis_prompt` (Optional[str]): Custom synthesis prompt (overrides default)
+
+**Returns:**
+- `OrchestrationResult`: Updated result with synthesized_output field populated
+
+**Synthesis behaviors:**
+- NONE: Returns original result unchanged
+- CONCATENATE: Simple text concatenation with role labels
+- STRUCTURED: Dictionary with role keys
+- AI_SYNTHESIZE: AI-generated integration (falls back to CONCATENATE on error)
+
+---
+
+### Design Decisions
+
+#### Why Role-Based Abstraction?
+
+**Benefits:**
+- **Flexibility:** Any model can play any role
+- **Clarity:** Role names communicate purpose (proponent vs critic)
+- **Customization:** Per-role prompts, temperatures, and constraints
+- **Reusability:** Same roles work across different workflows
+
+**Alternatives considered:**
+- Hard-coded model assignments: Less flexible, tight coupling
+- Workflow-specific implementations: Code duplication across workflows
+- Simple multi-model calls: No role semantics, harder to understand
+
+#### Why Sequential and Parallel Patterns?
+
+**Sequential pattern enables:**
+- Context building (later roles reference earlier outputs)
+- Dialectical reasoning (thesis → antithesis → synthesis)
+- Multi-stage analysis (research → analysis → recommendation)
+
+**Parallel pattern enables:**
+- Independent diverse perspectives
+- Faster execution (concurrent API calls)
+- Brainstorming and ideation workflows
+
+**Hybrid pattern (future) enables:**
+- Best of both: parallel where possible, sequential where needed
+- Complex multi-phase workflows
+- Performance optimization
+
+#### Synthesis Strategy Flexibility
+
+Different workflows need different synthesis approaches:
+- **ARGUMENT:** AI synthesis for balanced dialectical conclusion
+- **IDEATE:** Structured output for programmatic idea processing
+- **RESEARCH:** Concatenation for comprehensive evidence review
+
+Providing multiple strategies allows workflows to choose the best approach for their use case.
+
+#### Provider Map Design
+
+**Why explicit provider map?**
+- **Flexibility:** Multiple models from same provider (gpt-5-mini, gpt-5-pro)
+- **Testing:** Easy to mock providers for testing
+- **Configuration:** Centralized provider management
+- **Fallbacks:** Can implement fallback logic in provider map
+
+**Alternative considered:**
+- Auto-resolve providers from model names: Less explicit, harder to test
+
+---
+
+### Best Practices
+
+#### Choosing Orchestration Pattern
+
+**Use Sequential when:**
+- Roles need to respond to each other
+- Building context across multiple stages
+- Debate or dialectical workflows
+- Order matters for workflow logic
+
+**Use Parallel when:**
+- Roles are independent
+- Speed is important
+- Brainstorming or diverse perspectives
+- Order doesn't matter for workflow logic
+
+**Example decision:**
+```python
+# Debate: Use sequential (Skeptic needs to respond to Proponent)
+pattern = OrchestrationPattern.SEQUENTIAL
+
+# Brainstorming: Use parallel (all perspectives independent)
+pattern = OrchestrationPattern.PARALLEL
+```
+
+#### Crafting Effective Role Prompts
+
+**Good stance prompts:**
+- Clear role definition
+- Specific behavioral guidance
+- Examples of desired output
+- Appropriate tone/style
+
+**Example:**
+```python
+# ✅ Good: Clear, specific, actionable
+stance_prompt = (
+    "You are a critical security analyst. Review the proposal for security "
+    "vulnerabilities, threat vectors, and compliance risks. For each risk identified, "
+    "assess severity (critical/high/medium/low) and provide concrete mitigation strategies."
+)
+
+# ❌ Bad: Vague, generic
+stance_prompt = "You are a critic. Find problems."
+```
+
+#### Temperature Tuning by Role
+
+Different roles benefit from different creativity levels:
+
+**Conservative (0.3-0.5):**
+- Analyst roles requiring factual accuracy
+- Technical evaluation
+- Compliance reviews
+
+**Balanced (0.6-0.8):**
+- General debate and discussion
+- Balanced analysis
+- Standard workflows (default)
+
+**Creative (0.8-1.0):**
+- Brainstorming and ideation
+- Creative problem solving
+- Exploring unconventional approaches
+
+**Example:**
+```python
+roles = [
+    ModelRole(role="analyst", model="gpt-5", temperature=0.4),      # Factual
+    ModelRole(role="creative", model="gemini", temperature=0.9),    # Innovative
+    ModelRole(role="synthesizer", model="claude", temperature=0.7)  # Balanced
+]
+```
+
+#### Error Handling
+
+**Orchestrator continues on role failures:**
+```python
+result = await orchestrator.execute("Analyze proposal")
+
+# Check for failures
+if result.failed_roles:
+    print(f"Failed roles: {', '.join(result.failed_roles)}")
+    print(f"Successful: {len(result.role_responses)}/{len(orchestrator.roles)}")
+
+# Access successful responses
+for role_name, response in result.role_responses:
+    # Only successful roles appear here
+    print(f"{role_name}: {response.content}")
+```
+
+#### Provider Resolution
+
+**Map variations automatically:**
+```python
+provider_map = {
+    "gpt5": openai_provider,
+    "gpt-5": openai_provider,    # Handles both formats
+    "gemini": gemini_provider,
+    "gemini-2.5-pro": gemini_provider
+}
+
+# These all resolve to the same provider
+ModelRole(role="role1", model="gpt5")
+ModelRole(role="role2", model="gpt-5")
+ModelRole(role="role3", model="gpt_5")  # Underscores also handled
+```
+
+---
+
+### Use Cases
+
+#### Structured Debate (ARGUMENT)
+
+**Problem:** Need balanced analysis of controversial proposal
+
+**Solution:**
+```python
+# Three-role debate
+orchestrator = RoleOrchestrator(
+    roles=[
+        ModelRole(role="proponent", model="gpt-5", stance="for"),
+        ModelRole(role="critic", model="gemini", stance="against"),
+        ModelRole(role="moderator", model="claude", stance="neutral")
+    ],
+    provider_map=providers,
+    pattern=OrchestrationPattern.SEQUENTIAL
+)
+
+result = await orchestrator.execute("Should we adopt microservices?")
+synthesized = await orchestrator.synthesize(result, SynthesisStrategy.AI_SYNTHESIZE)
+```
+
+**Output:** Balanced dialectical analysis considering both perspectives
+
+**Benefit:** Structured reasoning prevents confirmation bias
+
+---
+
+#### Multi-Perspective Brainstorming (IDEATE)
+
+**Problem:** Need diverse ideas from different viewpoints
+
+**Solution:**
+```python
+# Parallel perspectives
+orchestrator = RoleOrchestrator(
+    roles=[
+        ModelRole(role="technical", model="gpt-5", temperature=0.8),
+        ModelRole(role="business", model="gemini", temperature=0.9),
+        ModelRole(role="user_experience", model="claude", temperature=0.85)
+    ],
+    provider_map=providers,
+    pattern=OrchestrationPattern.PARALLEL
+)
+
+result = await orchestrator.execute("Ways to improve app performance")
+```
+
+**Output:** Diverse ideas from technical, business, and UX perspectives simultaneously
+
+**Benefit:** Faster execution, diverse perspectives, no anchoring bias
+
+---
+
+#### Multi-Stage Analysis
+
+**Problem:** Need comprehensive analysis with multiple stages
+
+**Solution:**
+```python
+# Research → Analysis → Recommendation
+orchestrator = RoleOrchestrator(
+    roles=[
+        ModelRole(role="researcher", model="gpt-5", temperature=0.5),
+        ModelRole(role="analyst", model="gemini", temperature=0.6),
+        ModelRole(role="strategist", model="claude", temperature=0.7)
+    ],
+    provider_map=providers,
+    pattern=OrchestrationPattern.SEQUENTIAL
+)
+
+result = await orchestrator.execute("Evaluate cloud migration options")
+```
+
+**Output:** Research findings → Analysis of findings → Strategic recommendation
+
+**Benefit:** Structured, multi-stage reasoning with context building
+
+---
+
+### Testing
+
+#### Test Coverage
+
+Comprehensive tests in `modelchorus/tests/test_role_orchestration.py`:
+
+**ModelRole Tests:**
+- Role creation with all fields
+- Stance validation (for/against/neutral)
+- Temperature validation (0.0-1.0)
+- Prompt construction via get_full_prompt()
+- Metadata handling
+
+**RoleOrchestrator Tests:**
+- Sequential execution
+- Parallel execution
+- Provider resolution with variations
+- Error handling and partial failures
+- Execution order preservation
+
+**Synthesis Tests:**
+- NONE strategy
+- CONCATENATE strategy
+- STRUCTURED strategy
+- AI_SYNTHESIZE strategy
+- Fallback behavior on AI synthesis failure
+
+**Integration Tests:**
+- ARGUMENT workflow integration
+- IDEATE workflow integration
+- End-to-end orchestration with real providers
+
+#### Running Tests
+
+```bash
+# Run all orchestration tests
+pytest modelchorus/tests/test_role_orchestration.py -v
+
+# Run specific test
+pytest modelchorus/tests/test_role_orchestration.py::TestRoleOrchestrator::test_sequential_execution -v
+
+# Run with coverage
+pytest modelchorus/tests/test_role_orchestration.py --cov=modelchorus.core.role_orchestration
+```
+
+---
+
+### Future Enhancements
+
+**Planned improvements:**
+
+1. **Hybrid Pattern Implementation:**
+   - Mix sequential and parallel phases
+   - Example: Parallel research → Sequential debate → Parallel voting
+   - Performance optimization for complex workflows
+
+2. **Dynamic Role Assignment:**
+   - Assign roles based on model capabilities
+   - Auto-select best model for each role
+   - Capability-based routing
+
+3. **Role Dependencies:**
+   - Explicit dependencies between roles (DAG)
+   - Conditional execution based on previous results
+   - Branching logic
+
+4. **Enhanced Synthesis:**
+   - Multiple synthesis models for comparison
+   - Synthesis quality scoring
+   - Consensus detection across roles
+
+5. **Execution Monitoring:**
+   - Real-time progress updates
+   - Per-role timing and metrics
+   - Execution visualization
+
+6. **Role Templates:**
+   - Pre-configured roles for common use cases
+   - Role libraries (analyst, critic, synthesizer, etc.)
+   - Easy workflow composition
+
+---
+
 ### Best Practices
 
 #### When to Add Citations
