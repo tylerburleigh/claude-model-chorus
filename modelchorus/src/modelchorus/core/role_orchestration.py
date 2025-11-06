@@ -13,6 +13,7 @@ Public API:
     - RoleOrchestrator: Coordinator for executing models in assigned roles
     - OrchestrationPattern: Enum for execution patterns (sequential/parallel/hybrid)
     - OrchestrationResult: Result data structure from orchestrated execution
+    - SynthesisStrategy: Enum for strategies to combine role outputs
 """
 
 import asyncio
@@ -45,6 +46,49 @@ class OrchestrationPattern(str, Enum):
     SEQUENTIAL = "sequential"
     PARALLEL = "parallel"
     HYBRID = "hybrid"
+
+
+class SynthesisStrategy(str, Enum):
+    """
+    Strategies for combining multiple role outputs into a unified result.
+
+    After roles execute (sequentially or in parallel), their outputs can be
+    synthesized using different strategies depending on workflow needs.
+
+    Values:
+        NONE: No synthesis - return raw responses as-is
+             Use when: You want to process each response individually
+
+        CONCATENATE: Simple concatenation with role labels
+                    Use when: You want a readable combined text with clear attribution
+
+        AI_SYNTHESIZE: Use AI model to intelligently combine responses
+                      Use when: You want a coherent synthesis that resolves conflicts
+                               and integrates multiple perspectives
+
+        STRUCTURED: Combine into structured format (dict with role keys)
+                   Use when: You need programmatic access to individual responses
+                            while keeping them organized
+
+    Example:
+        >>> # Get raw responses
+        >>> result = await orchestrator.execute(prompt, synthesis=SynthesisStrategy.NONE)
+        >>>
+        >>> # Get simple concatenation
+        >>> result = await orchestrator.execute(prompt, synthesis=SynthesisStrategy.CONCATENATE)
+        >>>
+        >>> # Get AI-synthesized output
+        >>> result = await orchestrator.execute(
+        ...     prompt,
+        ...     synthesis=SynthesisStrategy.AI_SYNTHESIZE,
+        ...     synthesis_provider=synthesis_model
+        ... )
+    """
+
+    NONE = "none"
+    CONCATENATE = "concatenate"
+    AI_SYNTHESIZE = "ai_synthesize"
+    STRUCTURED = "structured"
 
 
 class ModelRole(BaseModel):
@@ -256,9 +300,9 @@ class OrchestrationResult:
     """
     Result from orchestrating multiple models with assigned roles.
 
-    Contains responses from all models, execution metadata, and error information.
-    Used by RoleOrchestrator to return structured results after executing
-    a multi-model workflow.
+    Contains responses from all models, execution metadata, synthesis output,
+    and error information. Used by RoleOrchestrator to return structured results
+    after executing a multi-model workflow.
 
     Attributes:
         role_responses: List of (role_name, response) tuples in execution order
@@ -266,7 +310,9 @@ class OrchestrationResult:
         failed_roles: List of role names that failed to execute
         pattern_used: Orchestration pattern that was executed
         execution_order: List of role names in the order they were executed
-        metadata: Additional execution metadata (timing, context, etc.)
+        synthesized_output: Optional synthesized/combined output (if synthesis enabled)
+        synthesis_strategy: Strategy used for synthesis (if any)
+        metadata: Additional execution metadata (timing, context, synthesis_metadata, etc.)
 
     Example:
         >>> result = OrchestrationResult(
@@ -275,7 +321,9 @@ class OrchestrationResult:
         ...         ("critic", GenerationResponse(content="Argument AGAINST...", model="gemini-2.5-pro")),
         ...     ],
         ...     pattern_used=OrchestrationPattern.SEQUENTIAL,
-        ...     execution_order=["proponent", "critic"]
+        ...     execution_order=["proponent", "critic"],
+        ...     synthesized_output="After considering both perspectives...",
+        ...     synthesis_strategy=SynthesisStrategy.AI_SYNTHESIZE
         ... )
     """
 
@@ -284,6 +332,8 @@ class OrchestrationResult:
     failed_roles: List[str] = field(default_factory=list)
     pattern_used: OrchestrationPattern = OrchestrationPattern.SEQUENTIAL
     execution_order: List[str] = field(default_factory=list)
+    synthesized_output: Optional[Any] = None
+    synthesis_strategy: Optional[SynthesisStrategy] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
@@ -671,3 +721,154 @@ class RoleOrchestrator:
         )
 
         return result
+
+    async def synthesize(
+        self,
+        result: OrchestrationResult,
+        strategy: SynthesisStrategy = SynthesisStrategy.CONCATENATE,
+        synthesis_provider: Optional[Any] = None,
+        synthesis_prompt: Optional[str] = None,
+    ) -> OrchestrationResult:
+        """
+        Synthesize multiple role outputs into a unified result.
+
+        Takes the raw role responses and combines them according to the specified
+        strategy. Can be called manually after execute() or automatically via
+        execute(synthesis_strategy=...).
+
+        Args:
+            result: OrchestrationResult from execute()
+            strategy: How to combine the outputs (CONCATENATE, AI_SYNTHESIZE, STRUCTURED, NONE)
+            synthesis_provider: Optional provider for AI synthesis (uses first role's provider if None)
+            synthesis_prompt: Optional custom prompt for AI synthesis
+
+        Returns:
+            Updated OrchestrationResult with synthesized_output field populated
+
+        Example:
+            >>> result = await orchestrator.execute("Should we adopt TypeScript?")
+            >>> synthesized = await orchestrator.synthesize(result, SynthesisStrategy.AI_SYNTHESIZE)
+            >>> print(synthesized.synthesized_output)
+        """
+        if strategy == SynthesisStrategy.NONE:
+            # No synthesis - return original result
+            result.synthesis_strategy = strategy
+            return result
+
+        elif strategy == SynthesisStrategy.CONCATENATE:
+            # Simple concatenation with role labels
+            logger.info("Synthesizing with CONCATENATE strategy")
+
+            parts = []
+            for role_name, response in result.role_responses:
+                parts.append(f"## {role_name.upper()}\n\n{response.content}")
+
+            synthesized = "\n\n---\n\n".join(parts)
+            result.synthesized_output = synthesized
+            result.synthesis_strategy = strategy
+            result.metadata["synthesis_method"] = "concatenate"
+
+            logger.info(f"Concatenated {len(result.role_responses)} responses ({len(synthesized)} chars)")
+
+            return result
+
+        elif strategy == SynthesisStrategy.STRUCTURED:
+            # Build structured dict with role keys
+            logger.info("Synthesizing with STRUCTURED strategy")
+
+            structured = {}
+            for role_name, response in result.role_responses:
+                structured[role_name] = {
+                    "content": response.content,
+                    "model": response.model,
+                    "usage": response.usage,
+                }
+
+            result.synthesized_output = structured
+            result.synthesis_strategy = strategy
+            result.metadata["synthesis_method"] = "structured"
+
+            logger.info(f"Structured synthesis created with {len(structured)} roles")
+
+            return result
+
+        elif strategy == SynthesisStrategy.AI_SYNTHESIZE:
+            # Use AI to synthesize responses
+            logger.info("Synthesizing with AI_SYNTHESIZE strategy")
+
+            # Determine which provider to use
+            if synthesis_provider is None:
+                if not result.role_responses:
+                    raise ValueError("No role responses to synthesize")
+                # Use first role's provider as default
+                first_role = self.roles[0]
+                synthesis_provider = self._resolve_provider(first_role.model)
+                logger.debug(f"Using {first_role.model} provider for synthesis")
+
+            # Build synthesis prompt
+            if synthesis_prompt is None:
+                synthesis_prompt = self._build_synthesis_prompt(result)
+
+            try:
+                # Import here to avoid circular dependency
+                from ..providers import GenerationRequest
+
+                # Create request for synthesis
+                request = GenerationRequest(
+                    prompt=synthesis_prompt,
+                    system_prompt="You are an expert at synthesizing multiple perspectives into coherent, balanced analysis.",
+                    temperature=0.7,
+                )
+
+                # Execute synthesis
+                synthesis_response = await synthesis_provider.generate(request)
+
+                result.synthesized_output = synthesis_response.content
+                result.synthesis_strategy = strategy
+                result.metadata["synthesis_method"] = "ai"
+                result.metadata["synthesis_model"] = synthesis_response.model
+                result.metadata["synthesis_usage"] = synthesis_response.usage
+
+                logger.info(f"AI synthesis completed ({len(synthesis_response.content)} chars)")
+
+                return result
+
+            except Exception as e:
+                logger.error(f"AI synthesis failed: {e}", exc_info=True)
+                logger.warning("Falling back to CONCATENATE strategy")
+
+                # Fallback to concatenation
+                return await self.synthesize(result, SynthesisStrategy.CONCATENATE)
+
+        else:
+            raise ValueError(f"Unknown synthesis strategy: {strategy}")
+
+    def _build_synthesis_prompt(self, result: OrchestrationResult) -> str:
+        """
+        Build a prompt for AI-powered synthesis of role responses.
+
+        Args:
+            result: OrchestrationResult containing role responses
+
+        Returns:
+            Synthesis prompt string
+        """
+        prompt_parts = [
+            "You have received multiple perspectives on a question from different roles.",
+            "Please synthesize these perspectives into a coherent, balanced response that:",
+            "1. Integrates key insights from each perspective",
+            "2. Identifies areas of agreement and disagreement",
+            "3. Provides a nuanced final recommendation or conclusion",
+            "",
+            "Here are the perspectives:",
+            "",
+        ]
+
+        for role_name, response in result.role_responses:
+            prompt_parts.append(f"**{role_name.upper()}:**")
+            prompt_parts.append(response.content)
+            prompt_parts.append("")
+
+        prompt_parts.append("Please synthesize these perspectives:")
+
+        return "\n".join(prompt_parts)
