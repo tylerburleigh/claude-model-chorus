@@ -1075,3 +1075,177 @@ class Claim(BaseModel):
             'Test'
         """
         return cls(**data)
+
+
+class Evidence(BaseModel):
+    """
+    Represents supporting or refuting evidence for claims and hypotheses.
+
+    Evidence is a fundamental building block in investigation, research, and
+    argument workflows. Each piece of evidence captures specific information
+    from a source along with its type, strength, and relevance.
+
+    Used in workflows like:
+    - THINKDEEP: Tracking evidence that supports or refutes hypotheses
+    - ARGUMENT: Recording factual evidence for debate claims
+    - RESEARCH: Documenting findings from multiple sources
+
+    Attributes:
+        content: The actual evidence text (the observation or fact)
+        source_id: Identifier for the source (file path, model ID, document ID, etc.)
+        location: Optional location within source (line number, section, page, etc.)
+        evidence_type: Type of evidence (supporting, refuting, neutral, contextual)
+        strength: Strength/weight of this evidence (0.0 = weak, 1.0 = strong)
+        timestamp: Optional ISO timestamp when evidence was collected
+        metadata: Additional evidence metadata (tags, categories, analysis, etc.)
+
+    Example:
+        >>> evidence = Evidence(
+        ...     content="Found async def pattern in auth.py line 45",
+        ...     source_id="src/services/auth.py",
+        ...     location="line 45",
+        ...     evidence_type="supporting",
+        ...     strength=0.9
+        ... )
+        >>> print(evidence)
+        [src/services/auth.py@line 45] (supporting, 0.90): Found async def pattern in auth.py line 45
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "content": "Found async def pattern in auth.py line 45",
+                "source_id": "src/services/auth.py",
+                "location": "line 45",
+                "evidence_type": "supporting",
+                "strength": 0.9,
+                "timestamp": "2025-11-06T12:00:00Z",
+                "metadata": {
+                    "tags": ["async", "authentication"],
+                    "category": "code_analysis",
+                    "verified": True,
+                },
+            }
+        }
+    )
+
+    content: str = Field(
+        ...,
+        description="The actual evidence text (the observation or fact)",
+        min_length=1,
+    )
+
+    source_id: str = Field(
+        ...,
+        description="Identifier for the source (file path, model ID, document ID, etc.)",
+        min_length=1,
+    )
+
+    location: Optional[str] = Field(
+        default=None,
+        description="Optional location within source (line number, section, page, etc.)",
+    )
+
+    evidence_type: Literal["supporting", "refuting", "neutral", "contextual"] = Field(
+        default="supporting",
+        description="Type of evidence: supporting, refuting, neutral, or contextual",
+    )
+
+    strength: float = Field(
+        default=1.0,
+        description="Strength/weight of this evidence (0.0 = weak, 1.0 = strong)",
+        ge=0.0,
+        le=1.0,
+    )
+
+    timestamp: Optional[str] = Field(
+        default=None,
+        description="Optional ISO timestamp when evidence was collected",
+    )
+
+    metadata: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Additional evidence metadata (tags, categories, analysis, etc.)",
+    )
+
+    def __str__(self) -> str:
+        """
+        Return human-readable string representation of the evidence.
+
+        Format: [source_id@location] (evidence_type, strength): content
+        If location is not specified, format is: [source_id] (evidence_type, strength): content
+
+        Returns:
+            Human-readable evidence string
+
+        Example:
+            >>> evidence = Evidence(
+            ...     content="Test finding",
+            ...     source_id="test.py",
+            ...     evidence_type="supporting",
+            ...     strength=0.8
+            ... )
+            >>> str(evidence)
+            '[test.py] (supporting, 0.80): Test finding'
+        """
+        location_str = f"@{self.location}" if self.location else ""
+        return f"[{self.source_id}{location_str}] ({self.evidence_type}, {self.strength:.2f}): {self.content}"
+
+    def to_dict(self) -> Dict[str, Any]:
+        """
+        Convert evidence to dictionary for serialization.
+
+        Returns:
+            Dictionary representation of the evidence
+
+        Example:
+            >>> evidence = Evidence(
+            ...     content="Test",
+            ...     source_id="test",
+            ...     evidence_type="supporting",
+            ...     strength=0.5
+            ... )
+            >>> evidence.to_dict()
+            {
+                'content': 'Test',
+                'source_id': 'test',
+                'location': None,
+                'evidence_type': 'supporting',
+                'strength': 0.5,
+                'timestamp': None,
+                'metadata': {}
+            }
+        """
+        return {
+            "content": self.content,
+            "source_id": self.source_id,
+            "location": self.location,
+            "evidence_type": self.evidence_type,
+            "strength": self.strength,
+            "timestamp": self.timestamp,
+            "metadata": self.metadata,
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "Evidence":
+        """
+        Create an Evidence from a dictionary.
+
+        Args:
+            data: Dictionary containing evidence fields
+
+        Returns:
+            New Evidence instance
+
+        Example:
+            >>> data = {
+            ...     'content': 'Test',
+            ...     'source_id': 'test',
+            ...     'evidence_type': 'supporting',
+            ...     'strength': 0.5
+            ... }
+            >>> evidence = Evidence.from_dict(data)
+            >>> evidence.content
+            'Test'
+        """
+        return cls(**data)

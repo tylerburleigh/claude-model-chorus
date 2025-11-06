@@ -1,7 +1,7 @@
 {
   "spec_id": "general-purpose-workflows-2025-11-06-001",
   "generated": "2025-11-06T12:45:00Z",
-  "last_updated": "2025-11-06T18:01:20.474307Z",
+  "last_updated": "2025-11-06T18:05:28.224482Z",
   "metadata": {
     "title": "General-Purpose Workflows (ARGUMENT, IDEATE, RESEARCH)",
     "description": "Implement foundation infrastructure and three general-purpose workflows for ModelChorus: ARGUMENT (structured debate), IDEATE (creative ideation), and RESEARCH (evidence-based research with citations)",
@@ -24,7 +24,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-06T16:35:09.389143Z",
-    "progress_percentage": 21,
+    "progress_percentage": 22,
     "current_phase": "phase-1"
   },
   "hierarchy": {
@@ -42,7 +42,7 @@
         "phase-6"
       ],
       "total_tasks": 71,
-      "completed_tasks": 15,
+      "completed_tasks": 16,
       "metadata": {},
       "dependencies": {
         "blocks": [],
@@ -60,7 +60,7 @@
         "phase-1-verify"
       ],
       "total_tasks": 23,
-      "completed_tasks": 15,
+      "completed_tasks": 16,
       "metadata": {
         "purpose": "Build shared infrastructure components for citations, clustering, and role-based orchestration",
         "risk_level": "high",
@@ -90,7 +90,7 @@
         "task-1-8"
       ],
       "total_tasks": 19,
-      "completed_tasks": 15,
+      "completed_tasks": 16,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -510,7 +510,7 @@
     "task-1-5": {
       "type": "task",
       "title": "modelchorus/src/modelchorus/core/models.py",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-1-files",
       "children": [
         "task-1-5-1",
@@ -526,7 +526,7 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "file_path": "modelchorus/src/modelchorus/core/models.py",
         "task_category": "implementation",
@@ -558,7 +558,7 @@
     "task-1-5-2": {
       "type": "subtask",
       "title": "Add Evidence and Hypothesis dataclasses",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-1-5",
       "children": [],
       "dependencies": {
@@ -567,8 +567,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
-      "metadata": {}
+      "completed_tasks": 1,
+      "metadata": {
+        "started_at": "2025-11-06T18:04:11.968427Z",
+        "completed_at": "2025-11-06T18:05:28.207044Z",
+        "needs_journaling": false,
+        "actual_hours": 0.021,
+        "journaled_at": "2025-11-06T18:05:28.218559Z"
+      }
     },
     "task-1-6": {
       "type": "task",
@@ -2261,6 +2267,15 @@
       "content": "Successfully added Claim dataclass to models.py. The implementation includes:\n\n1. Claim class using Pydantic BaseModel for validation\n2. Four core fields: content (str), source_id (str), location (Optional[str]), confidence (float 0.0-1.0)\n3. Field validators ensuring confidence stays in [0.0, 1.0] range\n4. Human-readable __str__ method with format: [source_id@location] (confidence): content\n5. to_dict() and from_dict() methods for serialization/deserialization\n6. Comprehensive docstrings with usage examples\n7. model_config with JSON schema example\n\nTesting performed:\n- Creation with all fields - passed\n- String representation - format correct: \"[proponent@para 2] (0.80): TypeScript reduces errors\"\n- Dictionary serialization - passed: {'content': '...', 'source_id': '...', 'location': '...', 'confidence': 0.8}\n- Dictionary deserialization - passed\n- Confidence validation - correctly rejects values outside [0.0, 1.0]\n\nThe Claim dataclass is ready for use in ARGUMENT, RESEARCH, and IDEATE workflows for structured claim extraction and analysis.",
       "metadata": {},
       "task_id": "task-1-5-1"
+    },
+    {
+      "timestamp": "2025-11-06T18:05:28.218542Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add Evidence and Hypothesis dataclasses",
+      "author": "claude-code",
+      "content": "Successfully added Evidence dataclass to core/models.py with all required fields (content, source_id, location, evidence_type, strength, timestamp, metadata). Hypothesis dataclass already existed. Verified both Evidence and Hypothesis import successfully and Evidence methods (__str__, to_dict, from_dict) work correctly.",
+      "metadata": {},
+      "task_id": "task-1-5-2"
     }
   ]
 }
