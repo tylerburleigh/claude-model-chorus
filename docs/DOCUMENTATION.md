@@ -1,17 +1,17 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 11:57:49
+**Generated:** 2025-11-06 12:10:22
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 50
-- **Total Lines:** 17065
-- **Total Classes:** 88
-- **Total Functions:** 52
-- **Avg Complexity:** 4.48
+- **Total Lines:** 17635
+- **Total Classes:** 93
+- **Total Functions:** 56
+- **Avg Complexity:** 4.46
 - **Max Complexity:** 36
 - **High Complexity Functions:**
   - thinkdeep (36)
@@ -28,7 +28,7 @@
 
 **Language:** python
 **Inherits from:** `ABC`
-**Defined in:** `src/modelchorus/core/base_workflow.py:50`
+**Defined in:** `modelchorus/src/modelchorus/core/base_workflow.py:50`
 
 **Description:**
 > Abstract base class for all ModelChorus workflows.
@@ -59,7 +59,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `ModelProvider`
-**Defined in:** `src/modelchorus/providers/cli_provider.py:24`
+**Defined in:** `modelchorus/src/modelchorus/providers/cli_provider.py:24`
 
 **Description:**
 > Base class for CLI-based model providers.
@@ -96,7 +96,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseWorkflow`
-**Defined in:** `src/modelchorus/workflows/chat.py:21`
+**Defined in:** `modelchorus/src/modelchorus/workflows/chat.py:21`
 
 **Description:**
 > Simple single-model chat workflow with conversation continuity.
@@ -163,7 +163,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `src/modelchorus/core/models.py:823`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:823`
 
 **Description:**
 > Citation model for tracking sources in ARGUMENT workflow.
@@ -184,7 +184,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `src/modelchorus/core/models.py:883`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:883`
 
 **Description:**
 > Maps claims to their supporting citations for evidence tracking.
@@ -206,7 +206,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `str`, `Enum`
-**Defined in:** `src/modelchorus/utils/citation_formatter.py:15`
+**Defined in:** `modelchorus/src/modelchorus/utils/citation_formatter.py:15`
 
 **Description:**
 > Supported citation formatting styles.
@@ -217,7 +217,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `CLIProvider`
-**Defined in:** `src/modelchorus/providers/claude_provider.py:22`
+**Defined in:** `modelchorus/src/modelchorus/providers/claude_provider.py:22`
 
 **Description:**
 > Provider for Anthropic's Claude models via the `claude` CLI tool.
@@ -256,7 +256,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `CLIProvider`
-**Defined in:** `src/modelchorus/providers/codex_provider.py:22`
+**Defined in:** `modelchorus/src/modelchorus/providers/codex_provider.py:22`
 
 **Description:**
 > Provider for OpenAI's Codex models via the `codex` CLI tool.
@@ -295,7 +295,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `str`, `Enum`
-**Defined in:** `src/modelchorus/core/models.py:16`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:16`
 
 **Description:**
 > Confidence level enum for investigation workflows.
@@ -319,7 +319,7 @@ Values:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `src/modelchorus/core/models.py:334`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:334`
 
 **Description:**
 > Configuration for consensus-building workflows.
@@ -340,7 +340,7 @@ Attributes:
 ### `ConsensusResult`
 
 **Language:** python
-**Defined in:** `src/modelchorus/workflows/consensus.py:45`
+**Defined in:** `modelchorus/src/modelchorus/workflows/consensus.py:45`
 
 **Description:**
 > Result from a consensus workflow execution.
@@ -351,7 +351,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `Enum`
-**Defined in:** `src/modelchorus/workflows/consensus.py:24`
+**Defined in:** `modelchorus/src/modelchorus/workflows/consensus.py:24`
 
 **Description:**
 > Strategy for reaching consensus among multiple model responses.
@@ -361,7 +361,7 @@ Attributes:
 ### `ConsensusWorkflow`
 
 **Language:** python
-**Defined in:** `src/modelchorus/workflows/consensus.py:56`
+**Defined in:** `modelchorus/src/modelchorus/workflows/consensus.py:56`
 
 **Description:**
 > Workflow for coordinating multiple AI models to reach consensus.
@@ -412,7 +412,7 @@ Example:
 ### `ConversationMemory`
 
 **Language:** python
-**Defined in:** `src/modelchorus/core/conversation.py:36`
+**Defined in:** `modelchorus/src/modelchorus/core/conversation.py:36`
 
 **Description:**
 > Manages conversation threads with file-based persistence.
@@ -453,7 +453,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `src/modelchorus/core/models.py:407`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:407`
 
 **Description:**
 > Single message in a conversation thread.
@@ -477,7 +477,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `src/modelchorus/core/models.py:763`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:763`
 
 **Description:**
 > Generic state container for workflow-specific conversation data.
@@ -499,7 +499,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `src/modelchorus/core/models.py:479`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:479`
 
 **Description:**
 > Complete conversation context for a thread.
@@ -529,7 +529,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `CLIProvider`
-**Defined in:** `src/modelchorus/providers/cursor_agent_provider.py:22`
+**Defined in:** `modelchorus/src/modelchorus/providers/cursor_agent_provider.py:22`
 
 **Description:**
 > Provider for Cursor's AI agent via the `cursor-agent` CLI tool.
@@ -570,7 +570,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `ModelProvider`
-**Defined in:** `examples/provider_integration.py:18`
+**Defined in:** `modelchorus/examples/provider_integration.py:18`
 
 **Description:**
 > Example provider implementation.
@@ -590,7 +590,7 @@ with an actual AI provider's API.
 
 **Language:** python
 **Inherits from:** `BaseWorkflow`
-**Defined in:** `examples/basic_workflow.py:14`
+**Defined in:** `modelchorus/examples/basic_workflow.py:14`
 
 **Description:**
 > Example workflow that demonstrates basic workflow structure.
@@ -607,7 +607,7 @@ needed to create a working workflow.
 
 **Language:** python
 **Inherits from:** `CLIProvider`
-**Defined in:** `src/modelchorus/providers/gemini_provider.py:22`
+**Defined in:** `modelchorus/src/modelchorus/providers/gemini_provider.py:22`
 
 **Description:**
 > Provider for Google's Gemini models via the `gemini` CLI tool.
@@ -646,7 +646,7 @@ Example:
 ### `GenerationRequest`
 
 **Language:** python
-**Defined in:** `src/modelchorus/providers/base_provider.py:37`
+**Defined in:** `modelchorus/src/modelchorus/providers/base_provider.py:37`
 
 **Description:**
 > Request for text generation.
@@ -656,7 +656,7 @@ Example:
 ### `GenerationResponse`
 
 **Language:** python
-**Defined in:** `src/modelchorus/providers/base_provider.py:51`
+**Defined in:** `modelchorus/src/modelchorus/providers/base_provider.py:51`
 
 **Description:**
 > Response from text generation.
@@ -667,7 +667,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `src/modelchorus/core/models.py:589`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:589`
 
 **Description:**
 > Model for tracking hypotheses in investigation workflows.
@@ -687,7 +687,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `src/modelchorus/core/models.py:634`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:634`
 
 **Description:**
 > Model for a single investigation step in Thinkdeep workflow.
@@ -708,7 +708,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `Enum`
-**Defined in:** `src/modelchorus/providers/base_provider.py:15`
+**Defined in:** `modelchorus/src/modelchorus/providers/base_provider.py:15`
 
 **Description:**
 > Enumeration of model capabilities.
@@ -718,7 +718,7 @@ Attributes:
 ### `ModelConfig`
 
 **Language:** python
-**Defined in:** `src/modelchorus/providers/base_provider.py:26`
+**Defined in:** `modelchorus/src/modelchorus/providers/base_provider.py:26`
 
 **Description:**
 > Configuration for a model.
@@ -729,7 +729,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `ABC`
-**Defined in:** `src/modelchorus/providers/base_provider.py:61`
+**Defined in:** `modelchorus/src/modelchorus/providers/base_provider.py:61`
 
 **Description:**
 > Abstract base class for all model providers.
@@ -758,7 +758,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `src/modelchorus/core/models.py:286`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:286`
 
 **Description:**
 > Model for a response from a single model.
@@ -778,7 +778,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `src/modelchorus/core/models.py:184`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:184`
 
 **Description:**
 > Model for specifying model selection criteria.
@@ -796,7 +796,7 @@ Attributes:
 ### `ProviderConfig`
 
 **Language:** python
-**Defined in:** `src/modelchorus/workflows/consensus.py:35`
+**Defined in:** `modelchorus/src/modelchorus/workflows/consensus.py:35`
 
 **Description:**
 > Configuration for a provider in the consensus workflow.
@@ -806,7 +806,7 @@ Attributes:
 ### `StateManager`
 
 **Language:** python
-**Defined in:** `src/modelchorus/core/state.py:32`
+**Defined in:** `modelchorus/src/modelchorus/core/state.py:32`
 
 **Description:**
 > Thread-safe state persistence manager for workflows.
@@ -850,7 +850,7 @@ Attributes:
 ### `TestArchitecturalDecisionScenarios`
 
 **Language:** python
-**Defined in:** `test_thinkdeep_complex.py:26`
+**Defined in:** `tests/test_thinkdeep_complex.py:26`
 
 **Description:**
 > Test suite for architectural decision making scenarios.
@@ -866,7 +866,7 @@ Attributes:
 ### `TestBatchSimilarity`
 
 **Language:** python
-**Defined in:** `tests/test_semantic_similarity.py:248`
+**Defined in:** `modelchorus/tests/test_semantic_similarity.py:252`
 
 **Description:**
 > Test batch similarity computation.
@@ -882,7 +882,7 @@ Attributes:
 ### `TestBugInvestigationScenarios`
 
 **Language:** python
-**Defined in:** `test_thinkdeep_complex.py:250`
+**Defined in:** `tests/test_thinkdeep_complex.py:250`
 
 **Description:**
 > Test suite for systematic bug investigation scenarios.
@@ -898,7 +898,7 @@ Attributes:
 ### `TestCLIProvidersImplementInterface`
 
 **Language:** python
-**Defined in:** `test_cli_interface.py:27`
+**Defined in:** `tests/test_providers/test_cli_interface.py:27`
 
 **Description:**
 > Test that all CLI providers implement the ModelProvider interface.
@@ -924,7 +924,7 @@ Attributes:
 ### `TestChatErrorHandling`
 
 **Language:** python
-**Defined in:** `tests/test_chat_integration.py:180`
+**Defined in:** `modelchorus/tests/test_chat_integration.py:180`
 
 **Description:**
 > Test error handling in chat workflow.
@@ -939,7 +939,7 @@ Attributes:
 ### `TestChatThreadManagement`
 
 **Language:** python
-**Defined in:** `tests/test_chat_integration.py:234`
+**Defined in:** `modelchorus/tests/test_chat_integration.py:234`
 
 **Description:**
 > Test conversation thread management.
@@ -953,7 +953,7 @@ Attributes:
 ### `TestChatWorkflowInitialization`
 
 **Language:** python
-**Defined in:** `tests/test_chat_workflow.py:52`
+**Defined in:** `modelchorus/tests/test_chat_workflow.py:52`
 
 **Description:**
 > Test ChatWorkflow initialization.
@@ -970,7 +970,7 @@ Attributes:
 ### `TestCitationIntegration`
 
 **Language:** python
-**Defined in:** `tests/test_semantic_similarity.py:304`
+**Defined in:** `modelchorus/tests/test_semantic_similarity.py:308`
 
 **Description:**
 > Test integration with Citation model.
@@ -985,7 +985,7 @@ Attributes:
 ### `TestClaimSimilarity`
 
 **Language:** python
-**Defined in:** `tests/test_semantic_similarity.py:119`
+**Defined in:** `modelchorus/tests/test_semantic_similarity.py:123`
 
 **Description:**
 > Test claim-to-claim similarity computation.
@@ -1001,7 +1001,7 @@ Attributes:
 ### `TestClaudeProvider`
 
 **Language:** python
-**Defined in:** `tests/test_claude_provider.py:13`
+**Defined in:** `modelchorus/tests/test_claude_provider.py:13`
 
 **Description:**
 > Test suite for ClaudeProvider.
@@ -1022,10 +1022,54 @@ Attributes:
 
 ---
 
+### `TestClusterRepresentative`
+
+**Language:** python
+**Defined in:** `modelchorus/tests/test_semantic_similarity.py:665`
+
+**Description:**
+> Test cluster representative selection.
+
+**Methods:**
+- `test_get_cluster_representative_basic()`
+- `test_get_cluster_representative_single_item()`
+- `test_get_cluster_representative_empty_cluster()`
+
+---
+
+### `TestClusterStatistics`
+
+**Language:** python
+**Defined in:** `modelchorus/tests/test_semantic_similarity.py:717`
+
+**Description:**
+> Test cluster statistics computation.
+
+**Methods:**
+- `test_compute_cluster_statistics_basic()`
+- `test_compute_cluster_statistics_empty()`
+- `test_compute_cluster_statistics_single_item_clusters()`
+
+---
+
+### `TestClusteringIntegration`
+
+**Language:** python
+**Defined in:** `modelchorus/tests/test_semantic_similarity.py:768`
+
+**Description:**
+> Test end-to-end clustering workflows.
+
+**Methods:**
+- `test_kmeans_to_statistics_pipeline()`
+- `test_hierarchical_to_statistics_pipeline()`
+
+---
+
 ### `TestCodexProvider`
 
 **Language:** python
-**Defined in:** `tests/test_codex_provider.py:13`
+**Defined in:** `modelchorus/tests/test_codex_provider.py:13`
 
 **Description:**
 > Test suite for CodexProvider.
@@ -1050,7 +1094,7 @@ Attributes:
 ### `TestComplexMultiStepReasoning`
 
 **Language:** python
-**Defined in:** `test_thinkdeep_complex.py:597`
+**Defined in:** `tests/test_thinkdeep_complex.py:597`
 
 **Description:**
 > Test suite for complex multi-step reasoning scenarios.
@@ -1066,7 +1110,7 @@ Attributes:
 ### `TestConcurrentConversationHandling`
 
 **Language:** python
-**Defined in:** `test_concurrent_conversations.py:26`
+**Defined in:** `tests/test_concurrent_conversations.py:26`
 
 **Description:**
 > Test suite for concurrent conversation handling.
@@ -1087,7 +1131,7 @@ scenarios with proper thread isolation and performance.
 ### `TestConfidenceLevel`
 
 **Language:** python
-**Defined in:** `tests/test_thinkdeep_models.py:25`
+**Defined in:** `modelchorus/tests/test_thinkdeep_models.py:25`
 
 **Description:**
 > Test suite for ConfidenceLevel enum.
@@ -1103,7 +1147,7 @@ scenarios with proper thread isolation and performance.
 ### `TestConfidenceProgression`
 
 **Language:** python
-**Defined in:** `test_thinkdeep_workflow.py:1135`
+**Defined in:** `tests/test_thinkdeep_workflow.py:1135`
 
 **Description:**
 > Test suite for confidence level progression in ThinkDeepWorkflow.
@@ -1128,7 +1172,7 @@ scenarios with proper thread isolation and performance.
 ### `TestConsensusThinkDeepChatChaining`
 
 **Language:** python
-**Defined in:** `test_workflow_integration_chaining.py:22`
+**Defined in:** `tests/test_workflow_integration_chaining.py:22`
 
 **Description:**
 > Test suite for consensus → thinkdeep → chat workflow integration.
@@ -1151,7 +1195,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestConsensusWorkflow`
 
 **Language:** python
-**Defined in:** `tests/test_consensus_workflow.py:12`
+**Defined in:** `modelchorus/tests/test_consensus_workflow.py:12`
 
 **Description:**
 > Test suite for ConsensusWorkflow.
@@ -1170,7 +1214,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestConversationContinuation`
 
 **Language:** python
-**Defined in:** `tests/test_chat_workflow.py:140`
+**Defined in:** `modelchorus/tests/test_chat_workflow.py:140`
 
 **Description:**
 > Test conversation continuation functionality.
@@ -1186,7 +1230,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestConversationInitiation`
 
 **Language:** python
-**Defined in:** `tests/test_chat_workflow.py:88`
+**Defined in:** `modelchorus/tests/test_chat_workflow.py:88`
 
 **Description:**
 > Test conversation creation and initiation.
@@ -1202,7 +1246,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestConversationMemory`
 
 **Language:** python
-**Defined in:** `tests/test_conversation.py:22`
+**Defined in:** `modelchorus/tests/test_conversation.py:22`
 
 **Description:**
 > Test suite for ConversationMemory class.
@@ -1226,7 +1270,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestConversationTracking`
 
 **Language:** python
-**Defined in:** `tests/test_chat_workflow.py:303`
+**Defined in:** `modelchorus/tests/test_chat_workflow.py:303`
 
 **Description:**
 > Test conversation history and tracking.
@@ -1242,7 +1286,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestCosineSimilarity`
 
 **Language:** python
-**Defined in:** `tests/test_semantic_similarity.py:77`
+**Defined in:** `modelchorus/tests/test_semantic_similarity.py:81`
 
 **Description:**
 > Test cosine similarity computation.
@@ -1258,7 +1302,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestDuplicateDetection`
 
 **Language:** python
-**Defined in:** `tests/test_semantic_similarity.py:354`
+**Defined in:** `modelchorus/tests/test_semantic_similarity.py:358`
 
 **Description:**
 > Test duplicate claim detection.
@@ -1275,7 +1319,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestEdgeCases`
 
 **Language:** python
-**Defined in:** `tests/test_semantic_similarity.py:465`
+**Defined in:** `modelchorus/tests/test_semantic_similarity.py:469`
 
 **Description:**
 > Test edge cases and error handling.
@@ -1291,7 +1335,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestEmbeddingComputation`
 
 **Language:** python
-**Defined in:** `tests/test_semantic_similarity.py:23`
+**Defined in:** `modelchorus/tests/test_semantic_similarity.py:27`
 
 **Description:**
 > Test embedding computation and caching.
@@ -1308,7 +1352,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestEndToEndIntegration`
 
 **Language:** python
-**Defined in:** `test_thinkdeep_workflow.py:1613`
+**Defined in:** `tests/test_thinkdeep_workflow.py:1613`
 
 **Description:**
 > End-to-end integration tests for complete investigation scenarios.
@@ -1324,7 +1368,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestErrorHandling`
 
 **Language:** python
-**Defined in:** `tests/test_chat_workflow.py:348`
+**Defined in:** `modelchorus/tests/test_chat_workflow.py:348`
 
 **Description:**
 > Test error handling in ChatWorkflow.
@@ -1338,7 +1382,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestExpertProviderIntegration`
 
 **Language:** python
-**Defined in:** `test_thinkdeep_expert_validation.py:27`
+**Defined in:** `tests/test_thinkdeep_expert_validation.py:27`
 
 **Description:**
 > Test suite for expert provider integration in ThinkDeepWorkflow.
@@ -1357,7 +1401,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestExpertValidationErrorHandling`
 
 **Language:** python
-**Defined in:** `test_thinkdeep_expert_validation.py:428`
+**Defined in:** `tests/test_thinkdeep_expert_validation.py:428`
 
 **Description:**
 > Test suite for error handling in expert validation.
@@ -1375,7 +1419,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestExpertValidationResultHandling`
 
 **Language:** python
-**Defined in:** `test_thinkdeep_expert_validation.py:314`
+**Defined in:** `tests/test_thinkdeep_expert_validation.py:314`
 
 **Description:**
 > Test suite for handling expert validation results.
@@ -1392,7 +1436,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestExpertValidationTriggering`
 
 **Language:** python
-**Defined in:** `test_thinkdeep_expert_validation.py:116`
+**Defined in:** `tests/test_thinkdeep_expert_validation.py:116`
 
 **Description:**
 > Test suite for expert validation triggering logic.
@@ -1411,7 +1455,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestExpertValidationWithHypotheses`
 
 **Language:** python
-**Defined in:** `test_thinkdeep_expert_validation.py:579`
+**Defined in:** `tests/test_thinkdeep_expert_validation.py:579`
 
 **Description:**
 > Test suite for expert validation interaction with hypotheses.
@@ -1428,7 +1472,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestFileContext`
 
 **Language:** python
-**Defined in:** `tests/test_chat_workflow.py:222`
+**Defined in:** `modelchorus/tests/test_chat_workflow.py:222`
 
 **Description:**
 > Test file context handling.
@@ -1444,7 +1488,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestFindSimilarClaims`
 
 **Language:** python
-**Defined in:** `tests/test_semantic_similarity.py:159`
+**Defined in:** `modelchorus/tests/test_semantic_similarity.py:163`
 
 **Description:**
 > Test finding similar claims in citation maps.
@@ -1462,7 +1506,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestGeminiIntegration`
 
 **Language:** python
-**Defined in:** `tests/test_gemini_integration.py:13`
+**Defined in:** `modelchorus/tests/test_gemini_integration.py:13`
 
 **Description:**
 > Integration tests for Gemini provider.
@@ -1481,10 +1525,27 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 
 ---
 
+### `TestHierarchicalClustering`
+
+**Language:** python
+**Defined in:** `modelchorus/tests/test_semantic_similarity.py:597`
+
+**Description:**
+> Test hierarchical clustering functionality.
+
+**Methods:**
+- `sample_maps()`
+- `test_cluster_claims_hierarchical_basic()`
+- `test_cluster_claims_hierarchical_empty_list()`
+- `test_cluster_claims_hierarchical_linkage_methods()`
+- `test_cluster_claims_hierarchical_too_many_clusters()`
+
+---
+
 ### `TestHypothesis`
 
 **Language:** python
-**Defined in:** `tests/test_thinkdeep_models.py:69`
+**Defined in:** `modelchorus/tests/test_thinkdeep_models.py:69`
 
 **Description:**
 > Test suite for Hypothesis model.
@@ -1505,7 +1566,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestHypothesisEvolution`
 
 **Language:** python
-**Defined in:** `test_thinkdeep_workflow.py:598`
+**Defined in:** `tests/test_thinkdeep_workflow.py:598`
 
 **Description:**
 > Test suite for hypothesis evolution in ThinkDeepWorkflow.
@@ -1530,7 +1591,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestIntegration`
 
 **Language:** python
-**Defined in:** `tests/test_integration.py:17`
+**Defined in:** `modelchorus/tests/test_integration.py:17`
 
 **Description:**
 > Integration test suite.
@@ -1547,7 +1608,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestInvestigationStep`
 
 **Language:** python
-**Defined in:** `tests/test_thinkdeep_models.py:180`
+**Defined in:** `modelchorus/tests/test_thinkdeep_models.py:180`
 
 **Description:**
 > Test suite for InvestigationStep model.
@@ -1567,7 +1628,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestInvestigationStepExecution`
 
 **Language:** python
-**Defined in:** `test_thinkdeep_workflow.py:29`
+**Defined in:** `tests/test_thinkdeep_workflow.py:29`
 
 **Description:**
 > Test suite for investigation step execution in ThinkDeepWorkflow.
@@ -1591,10 +1652,28 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 
 ---
 
+### `TestKMeansClustering`
+
+**Language:** python
+**Defined in:** `modelchorus/tests/test_semantic_similarity.py:500`
+
+**Description:**
+> Test K-means clustering functionality.
+
+**Methods:**
+- `diverse_citation_maps()`
+- `test_cluster_claims_kmeans_basic()`
+- `test_cluster_claims_kmeans_empty_list()`
+- `test_cluster_claims_kmeans_single_cluster()`
+- `test_cluster_claims_kmeans_too_many_clusters()`
+- `test_cluster_claims_kmeans_reproducibility()`
+
+---
+
 ### `TestLongConversations`
 
 **Language:** python
-**Defined in:** `tests/test_chat_integration.py:288`
+**Defined in:** `modelchorus/tests/test_chat_integration.py:288`
 
 **Description:**
 > Test handling of long multi-turn conversations (20+ turns).
@@ -1611,7 +1690,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestMemoryManagement`
 
 **Language:** python
-**Defined in:** `test_memory_management.py:23`
+**Defined in:** `tests/test_memory_management.py:23`
 
 **Description:**
 > Test suite for memory management with long conversations.
@@ -1632,7 +1711,7 @@ with long-running conversations with many messages.
 ### `TestModelIntegration`
 
 **Language:** python
-**Defined in:** `tests/test_thinkdeep_models.py:592`
+**Defined in:** `modelchorus/tests/test_thinkdeep_models.py:592`
 
 **Description:**
 > Test integration scenarios using multiple models together.
@@ -1647,7 +1726,7 @@ with long-running conversations with many messages.
 ### `TestMultiProviderChat`
 
 **Language:** python
-**Defined in:** `tests/test_chat_integration.py:71`
+**Defined in:** `modelchorus/tests/test_chat_integration.py:71`
 
 **Description:**
 > Test chat functionality across multiple providers.
@@ -1663,7 +1742,7 @@ with long-running conversations with many messages.
 ### `TestStateManager`
 
 **Language:** python
-**Defined in:** `tests/test_state.py:23`
+**Defined in:** `modelchorus/tests/test_state.py:23`
 
 **Description:**
 > Test suite for StateManager class.
@@ -1704,7 +1783,7 @@ with long-running conversations with many messages.
 ### `TestStateManagerExportImportRoundtrip`
 
 **Language:** python
-**Defined in:** `tests/test_state.py:609`
+**Defined in:** `modelchorus/tests/test_state.py:609`
 
 **Description:**
 > Test complete export/import workflow.
@@ -1717,7 +1796,7 @@ with long-running conversations with many messages.
 ### `TestStateManagerFileRecovery`
 
 **Language:** python
-**Defined in:** `tests/test_state.py:647`
+**Defined in:** `modelchorus/tests/test_state.py:647`
 
 **Description:**
 > Test state recovery after simulated process restart.
@@ -1730,7 +1809,7 @@ with long-running conversations with many messages.
 ### `TestThinkDeepState`
 
 **Language:** python
-**Defined in:** `tests/test_thinkdeep_models.py:314`
+**Defined in:** `modelchorus/tests/test_thinkdeep_models.py:314`
 
 **Description:**
 > Test suite for ThinkDeepState model.
@@ -1752,7 +1831,7 @@ with long-running conversations with many messages.
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `src/modelchorus/core/models.py:688`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:688`
 
 **Description:**
 > State model for Thinkdeep workflow multi-turn conversations.
@@ -1773,7 +1852,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseWorkflow`
-**Defined in:** `src/modelchorus/workflows/thinkdeep.py:27`
+**Defined in:** `modelchorus/src/modelchorus/workflows/thinkdeep.py:27`
 
 **Description:**
 > Extended reasoning workflow with systematic investigation and hypothesis tracking.
@@ -1858,7 +1937,7 @@ Example:
 ### `WorkflowRegistry`
 
 **Language:** python
-**Defined in:** `src/modelchorus/core/registry.py:13`
+**Defined in:** `modelchorus/src/modelchorus/core/registry.py:13`
 
 **Description:**
 > Registry for workflow implementations.
@@ -1895,7 +1974,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `src/modelchorus/core/models.py:43`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:43`
 
 **Description:**
 > Request model for workflow execution.
@@ -1919,7 +1998,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `src/modelchorus/core/models.py:117`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:117`
 
 **Description:**
 > Response model for workflow execution.
@@ -1941,7 +2020,7 @@ Attributes:
 ### `WorkflowResult`
 
 **Language:** python
-**Defined in:** `src/modelchorus/core/base_workflow.py:29`
+**Defined in:** `modelchorus/src/modelchorus/core/base_workflow.py:29`
 
 **Description:**
 > Result of a workflow execution.
@@ -1954,7 +2033,7 @@ Attributes:
 ### `WorkflowStep`
 
 **Language:** python
-**Defined in:** `src/modelchorus/core/base_workflow.py:18`
+**Defined in:** `modelchorus/src/modelchorus/core/base_workflow.py:18`
 
 **Description:**
 > Represents a single step in a workflow execution.
@@ -1965,7 +2044,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `src/modelchorus/core/models.py:224`
+**Defined in:** `modelchorus/src/modelchorus/core/models.py:224`
 
 **Description:**
 > Model for a single workflow execution step.
@@ -1989,7 +2068,7 @@ Attributes:
 ### `_compute_embedding_cached(text_hash, text, model_name) -> np.ndarray`
 
 **Language:** python
-**Defined in:** `src/modelchorus/workflows/argument/semantic.py:57`
+**Defined in:** `modelchorus/src/modelchorus/workflows/argument/semantic.py:57`
 **Complexity:** 1
 
 **Decorators:** `@lru_cache(maxsize=1000)`
@@ -2018,7 +2097,7 @@ Returns:
 ### `_format_apa(citation) -> str`
 
 **Language:** python
-**Defined in:** `src/modelchorus/utils/citation_formatter.py:58`
+**Defined in:** `modelchorus/src/modelchorus/utils/citation_formatter.py:58`
 **Complexity:** 6
 
 **Description:**
@@ -2040,7 +2119,7 @@ Returns:
 ### `_format_chicago(citation) -> str`
 
 **Language:** python
-**Defined in:** `src/modelchorus/utils/citation_formatter.py:138`
+**Defined in:** `modelchorus/src/modelchorus/utils/citation_formatter.py:138`
 **Complexity:** 6
 
 **Description:**
@@ -2062,7 +2141,7 @@ Returns:
 ### `_format_mla(citation) -> str`
 
 **Language:** python
-**Defined in:** `src/modelchorus/utils/citation_formatter.py:98`
+**Defined in:** `modelchorus/src/modelchorus/utils/citation_formatter.py:98`
 **Complexity:** 6
 
 **Description:**
@@ -2084,7 +2163,7 @@ Returns:
 ### `_get_model(model_name) -> SentenceTransformer`
 
 **Language:** python
-**Defined in:** `src/modelchorus/workflows/argument/semantic.py:24`
+**Defined in:** `modelchorus/src/modelchorus/workflows/argument/semantic.py:24`
 **Complexity:** 2
 
 **Description:**
@@ -2107,7 +2186,7 @@ Returns:
 ### `_normalize_text(text) -> str`
 
 **Language:** python
-**Defined in:** `src/modelchorus/workflows/argument/semantic.py:43`
+**Defined in:** `modelchorus/src/modelchorus/workflows/argument/semantic.py:43`
 **Complexity:** 1
 
 **Description:**
@@ -2127,7 +2206,7 @@ Returns:
 ### `add_similarity_to_citation(citation, reference_claim, model_name) -> Citation`
 
 **Language:** python
-**Defined in:** `src/modelchorus/workflows/argument/semantic.py:278`
+**Defined in:** `modelchorus/src/modelchorus/workflows/argument/semantic.py:278`
 **Complexity:** 2
 
 **Description:**
@@ -2167,7 +2246,7 @@ Example:
 ### `async basic_chat_example() -> None`
 
 **Language:** python
-**Defined in:** `examples/chat_example.py:19`
+**Defined in:** `modelchorus/examples/chat_example.py:19`
 **Complexity:** 2
 
 **Description:**
@@ -2178,7 +2257,7 @@ Example:
 ### `async basic_investigation_example() -> None`
 
 **Language:** python
-**Defined in:** `examples/thinkdeep_example.py:27`
+**Defined in:** `modelchorus/examples/thinkdeep_example.py:27`
 **Complexity:** 2
 
 **Description:**
@@ -2189,7 +2268,7 @@ Example:
 ### `calculate_citation_confidence(citation) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/modelchorus/utils/citation_formatter.py:279`
+**Defined in:** `modelchorus/src/modelchorus/utils/citation_formatter.py:279`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -2226,7 +2305,7 @@ Example:
 ### `calculate_citation_map_confidence(citation_map) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/modelchorus/utils/citation_formatter.py:367`
+**Defined in:** `modelchorus/src/modelchorus/utils/citation_formatter.py:367`
 **Complexity:** 2
 
 **Description:**
@@ -2260,7 +2339,7 @@ Example:
 ### `chat(prompt, provider, continuation_id, files, system, temperature, max_tokens, output, verbose) -> None`
 
 **Language:** python
-**Defined in:** `src/modelchorus/cli/main.py:55`
+**Defined in:** `modelchorus/src/modelchorus/cli/main.py:55`
 ⚠️ **Complexity:** 19 (High)
 
 **Decorators:** `@app.command()`
@@ -2294,7 +2373,7 @@ Example:
 ### `async chat_with_file_context_example() -> None`
 
 **Language:** python
-**Defined in:** `examples/chat_example.py:106`
+**Defined in:** `modelchorus/examples/chat_example.py:106`
 **Complexity:** 2
 
 **Description:**
@@ -2305,7 +2384,7 @@ Example:
 ### `chat_workflow(provider, conversation_memory) -> None`
 
 **Language:** python
-**Defined in:** `tests/test_chat_integration.py:62`
+**Defined in:** `modelchorus/tests/test_chat_integration.py:62`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -2322,7 +2401,7 @@ Example:
 ### `chat_workflow(mock_provider, conversation_memory) -> None`
 
 **Language:** python
-**Defined in:** `tests/test_chat_workflow.py:44`
+**Defined in:** `modelchorus/tests/test_chat_workflow.py:44`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -2336,10 +2415,94 @@ Example:
 
 ---
 
+### `cluster_claims_hierarchical(citation_maps, n_clusters, model_name, linkage_method) -> List[List[CitationMap]]`
+
+**Language:** python
+**Defined in:** `modelchorus/src/modelchorus/workflows/argument/semantic.py:458`
+**Complexity:** 4
+
+**Description:**
+> Cluster claims using hierarchical clustering on semantic embeddings.
+
+Uses agglomerative hierarchical clustering to group claims,
+building a tree-based hierarchy and cutting at specified level.
+
+Args:
+    citation_maps: List of CitationMap objects to cluster
+    n_clusters: Number of clusters to create (default: 3)
+    model_name: Sentence transformer model to use
+    linkage_method: Linkage method ('ward', 'complete', 'average', 'single')
+
+Returns:
+    List of clusters, where each cluster is a list of CitationMaps
+
+Raises:
+    ValueError: If n_clusters > len(citation_maps)
+
+Example:
+    >>> maps = [cm1, cm2, cm3, cm4, cm5]
+    >>> clusters = cluster_claims_hierarchical(
+    ...     maps,
+    ...     n_clusters=2,
+    ...     linkage_method="ward"
+    ... )
+    >>> print(f"Found {len(clusters)} clusters")
+    Found 2 clusters
+
+**Parameters:**
+- `citation_maps`: List[CitationMap]
+- `n_clusters`: int
+- `model_name`: str
+- `linkage_method`: str
+
+---
+
+### `cluster_claims_kmeans(citation_maps, n_clusters, model_name, random_state) -> List[List[CitationMap]]`
+
+**Language:** python
+**Defined in:** `modelchorus/src/modelchorus/workflows/argument/semantic.py:397`
+**Complexity:** 4
+
+**Description:**
+> Cluster claims using K-means algorithm on semantic embeddings.
+
+Groups claims into k clusters based on semantic similarity,
+useful for organizing large collections of claims by topic.
+
+Args:
+    citation_maps: List of CitationMap objects to cluster
+    n_clusters: Number of clusters to create (default: 3)
+    model_name: Sentence transformer model to use
+    random_state: Random seed for reproducibility
+
+Returns:
+    List of clusters, where each cluster is a list of CitationMaps
+
+Raises:
+    ValueError: If n_clusters > len(citation_maps)
+
+Example:
+    >>> maps = [cm1, cm2, cm3, cm4, cm5]
+    >>> clusters = cluster_claims_kmeans(maps, n_clusters=2)
+    >>> print(f"Found {len(clusters)} clusters")
+    Found 2 clusters
+    >>> for i, cluster in enumerate(clusters):
+    ...     print(f"Cluster {i}: {len(cluster)} claims")
+    Cluster 0: 3 claims
+    Cluster 1: 2 claims
+
+**Parameters:**
+- `citation_maps`: List[CitationMap]
+- `n_clusters`: int
+- `model_name`: str
+- `random_state`: int
+
+---
+
 ### `compute_claim_similarity(claim1, claim2, model_name) -> float`
 
 **Language:** python
-**Defined in:** `src/modelchorus/workflows/argument/semantic.py:142`
+**Defined in:** `modelchorus/src/modelchorus/workflows/argument/semantic.py:142`
 **Complexity:** 1
 
 **Description:**
@@ -2375,7 +2538,7 @@ Example:
 ### `compute_claim_similarity_batch(claims, model_name) -> np.ndarray`
 
 **Language:** python
-**Defined in:** `src/modelchorus/workflows/argument/semantic.py:235`
+**Defined in:** `modelchorus/src/modelchorus/workflows/argument/semantic.py:235`
 **Complexity:** 1
 
 **Description:**
@@ -2409,10 +2572,46 @@ Example:
 
 ---
 
+### `compute_cluster_statistics(clusters, model_name) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `modelchorus/src/modelchorus/workflows/argument/semantic.py:565`
+**Complexity:** 6
+
+**Description:**
+> Compute statistics and quality metrics for clusters.
+
+Provides insights into cluster quality, including size distribution,
+intra-cluster similarity, and representative claims.
+
+Args:
+    clusters: List of clusters (each cluster is a list of CitationMaps)
+    model_name: Sentence transformer model to use
+
+Returns:
+    Dictionary with cluster statistics:
+    - num_clusters: Number of clusters
+    - cluster_sizes: List of cluster sizes
+    - avg_cluster_size: Average cluster size
+    - representatives: List of representative claims (one per cluster)
+    - intra_cluster_similarities: Average similarity within each cluster
+
+Example:
+    >>> stats = compute_cluster_statistics(clusters)
+    >>> print(f"Number of clusters: {stats['num_clusters']}")
+    >>> print(f"Average cluster size: {stats['avg_cluster_size']:.1f}")
+    >>> print(f"Representatives: {stats['representatives']}")
+
+**Parameters:**
+- `clusters`: List[List[CitationMap]]
+- `model_name`: str
+
+---
+
 ### `compute_embedding(text, model_name, normalize) -> np.ndarray`
 
 **Language:** python
-**Defined in:** `src/modelchorus/workflows/argument/semantic.py:77`
+**Defined in:** `modelchorus/src/modelchorus/workflows/argument/semantic.py:77`
 **Complexity:** 2
 
 **Description:**
@@ -2447,7 +2646,7 @@ Example:
 ### `async confidence_progression_example() -> None`
 
 **Language:** python
-**Defined in:** `examples/thinkdeep_example.py:365`
+**Defined in:** `modelchorus/examples/thinkdeep_example.py:365`
 **Complexity:** 5
 
 **Description:**
@@ -2461,7 +2660,7 @@ and hypotheses are validated.
 ### `consensus(prompt, providers, strategy, system, temperature, max_tokens, timeout, output, verbose) -> None`
 
 **Language:** python
-**Defined in:** `src/modelchorus/cli/main.py:232`
+**Defined in:** `modelchorus/src/modelchorus/cli/main.py:232`
 ⚠️ **Complexity:** 16 (High)
 
 **Decorators:** `@app.command()`
@@ -2488,7 +2687,7 @@ Example:
 ### `conversation_memory() -> None`
 
 **Language:** python
-**Defined in:** `tests/test_chat_integration.py:35`
+**Defined in:** `modelchorus/tests/test_chat_integration.py:35`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -2501,7 +2700,7 @@ Example:
 ### `conversation_memory() -> None`
 
 **Language:** python
-**Defined in:** `tests/test_chat_workflow.py:38`
+**Defined in:** `modelchorus/tests/test_chat_workflow.py:38`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -2514,7 +2713,7 @@ Example:
 ### `async conversation_tracking_example() -> None`
 
 **Language:** python
-**Defined in:** `examples/chat_example.py:152`
+**Defined in:** `modelchorus/examples/chat_example.py:152`
 **Complexity:** 5
 
 **Description:**
@@ -2525,7 +2724,7 @@ Example:
 ### `cosine_similarity(embedding1, embedding2) -> float`
 
 **Language:** python
-**Defined in:** `src/modelchorus/workflows/argument/semantic.py:113`
+**Defined in:** `modelchorus/src/modelchorus/workflows/argument/semantic.py:113`
 **Complexity:** 1
 
 **Description:**
@@ -2559,7 +2758,7 @@ Example:
 ### `find_duplicate_claims(citation_maps, threshold, model_name) -> List[List[CitationMap]]`
 
 **Language:** python
-**Defined in:** `src/modelchorus/workflows/argument/semantic.py:329`
+**Defined in:** `modelchorus/src/modelchorus/workflows/argument/semantic.py:329`
 **Complexity:** 8
 
 **Description:**
@@ -2597,7 +2796,7 @@ Example:
 ### `find_similar_claims(query_claim, citation_maps, threshold, top_k, model_name) -> List[Tuple[CitationMap, float]]`
 
 **Language:** python
-**Defined in:** `src/modelchorus/workflows/argument/semantic.py:175`
+**Defined in:** `modelchorus/src/modelchorus/workflows/argument/semantic.py:175`
 **Complexity:** 4
 
 **Description:**
@@ -2644,7 +2843,7 @@ Example:
 ### `format_citation(citation, style) -> str`
 
 **Language:** python
-**Defined in:** `src/modelchorus/utils/citation_formatter.py:23`
+**Defined in:** `modelchorus/src/modelchorus/utils/citation_formatter.py:23`
 **Complexity:** 4
 
 **Description:**
@@ -2677,7 +2876,7 @@ Example:
 ### `format_citation_map(citation_map, style, include_claim) -> str`
 
 **Language:** python
-**Defined in:** `src/modelchorus/utils/citation_formatter.py:180`
+**Defined in:** `modelchorus/src/modelchorus/utils/citation_formatter.py:180`
 **Complexity:** 4
 
 **Description:**
@@ -2707,10 +2906,40 @@ Example:
 
 ---
 
+### `get_cluster_representative(cluster, model_name) -> CitationMap`
+
+**Language:** python
+**Defined in:** `modelchorus/src/modelchorus/workflows/argument/semantic.py:522`
+**Complexity:** 3
+
+**Description:**
+> Find the most representative claim in a cluster (centroid).
+
+Computes the claim closest to the cluster centroid in embedding space,
+useful for summarizing or labeling clusters.
+
+Args:
+    cluster: List of CitationMaps in the cluster
+    model_name: Sentence transformer model to use
+
+Returns:
+    CitationMap closest to cluster centroid
+
+Example:
+    >>> cluster = [cm1, cm2, cm3]
+    >>> representative = get_cluster_representative(cluster)
+    >>> print(f"Representative claim: {representative.claim_text}")
+
+**Parameters:**
+- `cluster`: List[CitationMap]
+- `model_name`: str
+
+---
+
 ### `get_default_state_manager() -> StateManager`
 
 **Language:** python
-**Defined in:** `src/modelchorus/core/state.py:517`
+**Defined in:** `modelchorus/src/modelchorus/core/state.py:517`
 **Complexity:** 2
 
 **Description:**
@@ -2729,7 +2958,7 @@ Example:
 ### `get_provider_by_name(name) -> None`
 
 **Language:** python
-**Defined in:** `src/modelchorus/cli/main.py:36`
+**Defined in:** `modelchorus/src/modelchorus/cli/main.py:36`
 **Complexity:** 2
 
 **Description:**
@@ -2743,7 +2972,7 @@ Example:
 ### `async hypothesis_management_example() -> None`
 
 **Language:** python
-**Defined in:** `examples/thinkdeep_example.py:275`
+**Defined in:** `modelchorus/examples/thinkdeep_example.py:275`
 **Complexity:** 6
 
 **Description:**
@@ -2757,7 +2986,7 @@ during an investigation.
 ### `async investigation_with_expert_validation() -> None`
 
 **Language:** python
-**Defined in:** `examples/thinkdeep_example.py:195`
+**Defined in:** `modelchorus/examples/thinkdeep_example.py:195`
 **Complexity:** 4
 
 **Description:**
@@ -2771,7 +3000,7 @@ and additional insights when confidence hasn't reached "certain" level.
 ### `is_provider_available(provider_class) -> None`
 
 **Language:** python
-**Defined in:** `tests/test_chat_integration.py:18`
+**Defined in:** `modelchorus/tests/test_chat_integration.py:18`
 **Complexity:** 2
 
 **Description:**
@@ -2785,7 +3014,7 @@ and additional insights when confidence hasn't reached "certain" level.
 ### `list_providers() -> None`
 
 **Language:** python
-**Defined in:** `src/modelchorus/cli/main.py:789`
+**Defined in:** `modelchorus/src/modelchorus/cli/main.py:789`
 **Complexity:** 3
 
 **Decorators:** `@app.command()`
@@ -2798,7 +3027,7 @@ and additional insights when confidence hasn't reached "certain" level.
 ### `async main() -> None`
 
 **Language:** python
-**Defined in:** `examples/basic_workflow.py:56`
+**Defined in:** `modelchorus/examples/basic_workflow.py:56`
 **Complexity:** 2
 
 **Description:**
@@ -2809,7 +3038,7 @@ and additional insights when confidence hasn't reached "certain" level.
 ### `async main() -> None`
 
 **Language:** python
-**Defined in:** `examples/chat_example.py:196`
+**Defined in:** `modelchorus/examples/chat_example.py:196`
 **Complexity:** 1
 
 **Description:**
@@ -2820,7 +3049,7 @@ and additional insights when confidence hasn't reached "certain" level.
 ### `async main() -> None`
 
 **Language:** python
-**Defined in:** `examples/provider_integration.py:101`
+**Defined in:** `modelchorus/examples/provider_integration.py:101`
 **Complexity:** 2
 
 **Description:**
@@ -2831,7 +3060,7 @@ and additional insights when confidence hasn't reached "certain" level.
 ### `async main() -> None`
 
 **Language:** python
-**Defined in:** `examples/thinkdeep_example.py:431`
+**Defined in:** `modelchorus/examples/thinkdeep_example.py:431`
 **Complexity:** 1
 
 **Description:**
@@ -2842,7 +3071,7 @@ and additional insights when confidence hasn't reached "certain" level.
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `src/modelchorus/cli/main.py:827`
+**Defined in:** `modelchorus/src/modelchorus/cli/main.py:827`
 **Complexity:** 1
 
 **Description:**
@@ -2853,7 +3082,7 @@ and additional insights when confidence hasn't reached "certain" level.
 ### `mock_claude_response() -> None`
 
 **Language:** python
-**Defined in:** `tests/conftest.py:10`
+**Defined in:** `modelchorus/tests/conftest.py:10`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -2866,7 +3095,7 @@ and additional insights when confidence hasn't reached "certain" level.
 ### `mock_codex_response() -> None`
 
 **Language:** python
-**Defined in:** `tests/conftest.py:35`
+**Defined in:** `modelchorus/tests/conftest.py:35`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -2879,7 +3108,7 @@ and additional insights when confidence hasn't reached "certain" level.
 ### `mock_provider() -> None`
 
 **Language:** python
-**Defined in:** `tests/test_chat_workflow.py:18`
+**Defined in:** `modelchorus/tests/test_chat_workflow.py:18`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -2892,7 +3121,7 @@ and additional insights when confidence hasn't reached "certain" level.
 ### `mock_subprocess_run() -> None`
 
 **Language:** python
-**Defined in:** `tests/conftest.py:45`
+**Defined in:** `modelchorus/tests/conftest.py:45`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -2905,7 +3134,7 @@ and additional insights when confidence hasn't reached "certain" level.
 ### `async multi_step_investigation_example() -> None`
 
 **Language:** python
-**Defined in:** `examples/thinkdeep_example.py:63`
+**Defined in:** `modelchorus/examples/thinkdeep_example.py:63`
 **Complexity:** 10
 
 **Description:**
@@ -2919,7 +3148,7 @@ showing how hypotheses are formed, tested, and confidence evolves across steps.
 ### `async multi_turn_conversation_example() -> None`
 
 **Language:** python
-**Defined in:** `examples/chat_example.py:48`
+**Defined in:** `modelchorus/examples/chat_example.py:48`
 **Complexity:** 4
 
 **Description:**
@@ -2930,7 +3159,7 @@ showing how hypotheses are formed, tested, and confidence evolves across steps.
 ### `provider(provider_name) -> None`
 
 **Language:** python
-**Defined in:** `tests/test_chat_integration.py:51`
+**Defined in:** `modelchorus/tests/test_chat_integration.py:51`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -2946,7 +3175,7 @@ showing how hypotheses are formed, tested, and confidence evolves across steps.
 ### `provider_name(request) -> None`
 
 **Language:** python
-**Defined in:** `tests/test_chat_integration.py:45`
+**Defined in:** `modelchorus/tests/test_chat_integration.py:45`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture(params=[pytest.param('claude', marks=pytest.mark.skipif(not CLAUDE_AVAILABLE, reason='Claude API not configured')), pytest.param('gemini', marks=pytest.mark.skipif(not GEMINI_AVAILABLE, reason='Gemini API not configured')), pytest.param('codex', marks=pytest.mark.skipif(not CODEX_AVAILABLE, reason='Codex API not configured'))])`
@@ -2962,7 +3191,7 @@ showing how hypotheses are formed, tested, and confidence evolves across steps.
 ### `sample_generation_request() -> None`
 
 **Language:** python
-**Defined in:** `tests/conftest.py:55`
+**Defined in:** `modelchorus/tests/conftest.py:55`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -2975,7 +3204,7 @@ showing how hypotheses are formed, tested, and confidence evolves across steps.
 ### `thinkdeep(prompt, provider, expert_provider, continuation_id, files, system, temperature, max_tokens, disable_expert, output, verbose) -> None`
 
 **Language:** python
-**Defined in:** `src/modelchorus/cli/main.py:417`
+**Defined in:** `modelchorus/src/modelchorus/cli/main.py:417`
 ⚠️ **Complexity:** 36 (High)
 
 **Decorators:** `@app.command()`
@@ -3014,7 +3243,7 @@ Example:
 ### `thinkdeep_status(thread_id, show_steps, show_files, verbose) -> None`
 
 **Language:** python
-**Defined in:** `src/modelchorus/cli/main.py:664`
+**Defined in:** `modelchorus/src/modelchorus/cli/main.py:664`
 ⚠️ **Complexity:** 18 (High)
 
 **Decorators:** `@app.command(name='thinkdeep-status')`
@@ -3046,7 +3275,7 @@ Example:
 ### `validate_citation(citation) -> Tuple[bool, List[str]]`
 
 **Language:** python
-**Defined in:** `src/modelchorus/utils/citation_formatter.py:227`
+**Defined in:** `modelchorus/src/modelchorus/utils/citation_formatter.py:227`
 ⚠️ **Complexity:** 14 (High)
 
 **Description:**
@@ -3073,7 +3302,7 @@ Example:
 ### `version() -> None`
 
 **Language:** python
-**Defined in:** `src/modelchorus/cli/main.py:816`
+**Defined in:** `modelchorus/src/modelchorus/cli/main.py:816`
 **Complexity:** 1
 
 **Decorators:** `@app.command()`
@@ -3086,7 +3315,7 @@ Example:
 
 ## 📦 Dependencies
 
-### `examples/basic_workflow.py`
+### `modelchorus/examples/basic_workflow.py`
 
 - `asyncio`
 - `modelchorus.core.BaseWorkflow`
@@ -3094,7 +3323,7 @@ Example:
 - `modelchorus.core.WorkflowRequest`
 - `modelchorus.core.WorkflowResult`
 
-### `examples/chat_example.py`
+### `modelchorus/examples/chat_example.py`
 
 - `asyncio`
 - `modelchorus.core.conversation.ConversationMemory`
@@ -3102,7 +3331,7 @@ Example:
 - `modelchorus.workflows.ChatWorkflow`
 - `pathlib.Path`
 
-### `examples/provider_integration.py`
+### `modelchorus/examples/provider_integration.py`
 
 - `asyncio`
 - `modelchorus.providers.GenerationRequest`
@@ -3111,7 +3340,7 @@ Example:
 - `modelchorus.providers.ModelConfig`
 - `modelchorus.providers.ModelProvider`
 
-### `examples/thinkdeep_example.py`
+### `modelchorus/examples/thinkdeep_example.py`
 
 - `asyncio`
 - `modelchorus.core.conversation.ConversationMemory`
@@ -3124,12 +3353,12 @@ Example:
 - `modelchorus.workflows.ThinkDeepWorkflow`
 - `pathlib.Path`
 
-### `src/modelchorus/cli/__init__.py`
+### `modelchorus/src/modelchorus/cli/__init__.py`
 
 - `main.app`
 - `main.main`
 
-### `src/modelchorus/cli/main.py`
+### `modelchorus/src/modelchorus/cli/main.py`
 
 - `asyncio`
 - `core.conversation.ConversationMemory`
@@ -3152,7 +3381,7 @@ Example:
 - `workflows.ConsensusWorkflow`
 - `workflows.ThinkDeepWorkflow`
 
-### `src/modelchorus/core/__init__.py`
+### `modelchorus/src/modelchorus/core/__init__.py`
 
 - `base_workflow.BaseWorkflow`
 - `base_workflow.WorkflowResult`
@@ -3173,7 +3402,7 @@ Example:
 - `models.WorkflowStep`
 - `registry.WorkflowRegistry`
 
-### `src/modelchorus/core/base_workflow.py`
+### `modelchorus/src/modelchorus/core/base_workflow.py`
 
 - `abc.ABC`
 - `abc.abstractmethod`
@@ -3188,7 +3417,7 @@ Example:
 - `typing.List`
 - `typing.Optional`
 
-### `src/modelchorus/core/conversation.py`
+### `modelchorus/src/modelchorus/core/conversation.py`
 
 - `datetime.datetime`
 - `datetime.timedelta`
@@ -3207,7 +3436,7 @@ Example:
 - `typing.Tuple`
 - `uuid`
 
-### `src/modelchorus/core/models.py`
+### `modelchorus/src/modelchorus/core/models.py`
 
 - `enum.Enum`
 - `pydantic.BaseModel`
@@ -3219,7 +3448,7 @@ Example:
 - `typing.Literal`
 - `typing.Optional`
 
-### `src/modelchorus/core/registry.py`
+### `modelchorus/src/modelchorus/core/registry.py`
 
 - `base_workflow.BaseWorkflow`
 - `inspect`
@@ -3228,7 +3457,7 @@ Example:
 - `typing.Optional`
 - `typing.Type`
 
-### `src/modelchorus/core/state.py`
+### `modelchorus/src/modelchorus/core/state.py`
 
 - `datetime.datetime`
 - `datetime.timezone`
@@ -3241,7 +3470,7 @@ Example:
 - `typing.Dict`
 - `typing.Optional`
 
-### `src/modelchorus/providers/__init__.py`
+### `modelchorus/src/modelchorus/providers/__init__.py`
 
 - `base_provider.GenerationRequest`
 - `base_provider.GenerationResponse`
@@ -3254,7 +3483,7 @@ Example:
 - `cursor_agent_provider.CursorAgentProvider`
 - `gemini_provider.GeminiProvider`
 
-### `src/modelchorus/providers/base_provider.py`
+### `modelchorus/src/modelchorus/providers/base_provider.py`
 
 - `abc.ABC`
 - `abc.abstractmethod`
@@ -3266,7 +3495,7 @@ Example:
 - `typing.List`
 - `typing.Optional`
 
-### `src/modelchorus/providers/claude_provider.py`
+### `modelchorus/src/modelchorus/providers/claude_provider.py`
 
 - `base_provider.GenerationRequest`
 - `base_provider.GenerationResponse`
@@ -3280,7 +3509,7 @@ Example:
 - `typing.List`
 - `typing.Optional`
 
-### `src/modelchorus/providers/cli_provider.py`
+### `modelchorus/src/modelchorus/providers/cli_provider.py`
 
 - `abc.abstractmethod`
 - `asyncio`
@@ -3295,7 +3524,7 @@ Example:
 - `typing.List`
 - `typing.Optional`
 
-### `src/modelchorus/providers/codex_provider.py`
+### `modelchorus/src/modelchorus/providers/codex_provider.py`
 
 - `base_provider.GenerationRequest`
 - `base_provider.GenerationResponse`
@@ -3309,7 +3538,7 @@ Example:
 - `typing.List`
 - `typing.Optional`
 
-### `src/modelchorus/providers/cursor_agent_provider.py`
+### `modelchorus/src/modelchorus/providers/cursor_agent_provider.py`
 
 - `base_provider.GenerationRequest`
 - `base_provider.GenerationResponse`
@@ -3323,7 +3552,7 @@ Example:
 - `typing.List`
 - `typing.Optional`
 
-### `src/modelchorus/providers/gemini_provider.py`
+### `modelchorus/src/modelchorus/providers/gemini_provider.py`
 
 - `base_provider.GenerationRequest`
 - `base_provider.GenerationResponse`
@@ -3337,7 +3566,7 @@ Example:
 - `typing.List`
 - `typing.Optional`
 
-### `src/modelchorus/utils/__init__.py`
+### `modelchorus/src/modelchorus/utils/__init__.py`
 
 - `modelchorus.utils.citation_formatter.CitationStyle`
 - `modelchorus.utils.citation_formatter.calculate_citation_confidence`
@@ -3346,7 +3575,7 @@ Example:
 - `modelchorus.utils.citation_formatter.format_citation_map`
 - `modelchorus.utils.citation_formatter.validate_citation`
 
-### `src/modelchorus/utils/citation_formatter.py`
+### `modelchorus/src/modelchorus/utils/citation_formatter.py`
 
 - `enum.Enum`
 - `typing.Any`
@@ -3355,7 +3584,7 @@ Example:
 - `typing.Optional`
 - `typing.Tuple`
 
-### `src/modelchorus/workflows/__init__.py`
+### `modelchorus/src/modelchorus/workflows/__init__.py`
 
 - `chat.ChatWorkflow`
 - `consensus.ConsensusResult`
@@ -3368,14 +3597,18 @@ Example:
 - `core.models.ThinkDeepState`
 - `thinkdeep.ThinkDeepWorkflow`
 
-### `src/modelchorus/workflows/argument/__init__.py`
+### `modelchorus/src/modelchorus/workflows/argument/__init__.py`
 
+- `modelchorus.workflows.argument.semantic.cluster_claims_hierarchical`
+- `modelchorus.workflows.argument.semantic.cluster_claims_kmeans`
 - `modelchorus.workflows.argument.semantic.compute_claim_similarity`
+- `modelchorus.workflows.argument.semantic.compute_cluster_statistics`
 - `modelchorus.workflows.argument.semantic.compute_embedding`
 - `modelchorus.workflows.argument.semantic.cosine_similarity`
 - `modelchorus.workflows.argument.semantic.find_similar_claims`
+- `modelchorus.workflows.argument.semantic.get_cluster_representative`
 
-### `src/modelchorus/workflows/argument/semantic.py`
+### `modelchorus/src/modelchorus/workflows/argument/semantic.py`
 
 - `functools.lru_cache`
 - `hashlib`
@@ -3383,12 +3616,13 @@ Example:
 - `modelchorus.core.models.CitationMap`
 - `numpy`
 - `sentence_transformers.SentenceTransformer`
+- `typing.Any`
 - `typing.Dict`
 - `typing.List`
 - `typing.Optional`
 - `typing.Tuple`
 
-### `src/modelchorus/workflows/chat.py`
+### `modelchorus/src/modelchorus/workflows/chat.py`
 
 - `core.base_workflow.BaseWorkflow`
 - `core.base_workflow.WorkflowResult`
@@ -3405,7 +3639,7 @@ Example:
 - `typing.Optional`
 - `uuid`
 
-### `src/modelchorus/workflows/consensus.py`
+### `modelchorus/src/modelchorus/workflows/consensus.py`
 
 - `asyncio`
 - `dataclasses.dataclass`
@@ -3420,7 +3654,7 @@ Example:
 - `typing.List`
 - `typing.Optional`
 
-### `src/modelchorus/workflows/thinkdeep.py`
+### `modelchorus/src/modelchorus/workflows/thinkdeep.py`
 
 - `core.base_workflow.BaseWorkflow`
 - `core.base_workflow.WorkflowResult`
@@ -3441,20 +3675,136 @@ Example:
 - `typing.Optional`
 - `uuid`
 
-### `test_cli_interface.py`
+### `modelchorus/tests/conftest.py`
 
-- `modelchorus.providers.CLIProvider`
+- `pytest`
+- `unittest.mock.AsyncMock`
+- `unittest.mock.MagicMock`
+
+### `modelchorus/tests/test_chat_integration.py`
+
+- `modelchorus.core.conversation.ConversationMemory`
 - `modelchorus.providers.ClaudeProvider`
 - `modelchorus.providers.CodexProvider`
-- `modelchorus.providers.CursorAgentProvider`
 - `modelchorus.providers.GeminiProvider`
-- `modelchorus.providers.GenerationRequest`
-- `modelchorus.providers.ModelProvider`
+- `modelchorus.workflows.ChatWorkflow`
+- `os`
 - `pathlib.Path`
 - `pytest`
-- `sys`
 
-### `test_concurrent_conversations.py`
+### `modelchorus/tests/test_chat_workflow.py`
+
+- `modelchorus.core.conversation.ConversationMemory`
+- `modelchorus.providers.base_provider.GenerationRequest`
+- `modelchorus.providers.base_provider.GenerationResponse`
+- `modelchorus.workflows.ChatWorkflow`
+- `pathlib.Path`
+- `pytest`
+- `unittest.mock.AsyncMock`
+- `unittest.mock.MagicMock`
+- `unittest.mock.patch`
+- `uuid`
+
+### `modelchorus/tests/test_claude_provider.py`
+
+- `json`
+- `modelchorus.providers.base_provider.GenerationRequest`
+- `modelchorus.providers.claude_provider.ClaudeProvider`
+- `pytest`
+- `unittest.mock.AsyncMock`
+- `unittest.mock.patch`
+
+### `modelchorus/tests/test_codex_provider.py`
+
+- `json`
+- `modelchorus.providers.base_provider.GenerationRequest`
+- `modelchorus.providers.codex_provider.CodexProvider`
+- `pytest`
+- `unittest.mock.AsyncMock`
+- `unittest.mock.patch`
+
+### `modelchorus/tests/test_consensus_workflow.py`
+
+- `modelchorus.providers.base_provider.GenerationRequest`
+- `modelchorus.providers.base_provider.GenerationResponse`
+- `modelchorus.workflows.consensus.ConsensusStrategy`
+- `modelchorus.workflows.consensus.ConsensusWorkflow`
+- `pytest`
+- `unittest.mock.AsyncMock`
+
+### `modelchorus/tests/test_conversation.py`
+
+- `datetime.datetime`
+- `datetime.timezone`
+- `json`
+- `modelchorus.core.conversation.ConversationMemory`
+- `modelchorus.core.models.ConversationMessage`
+- `modelchorus.core.models.ConversationThread`
+- `pathlib.Path`
+- `pytest`
+- `uuid`
+
+### `modelchorus/tests/test_gemini_integration.py`
+
+- `modelchorus.providers.base_provider.GenerationRequest`
+- `modelchorus.providers.gemini_provider.GeminiProvider`
+- `pytest`
+- `subprocess`
+
+### `modelchorus/tests/test_integration.py`
+
+- `modelchorus.providers.base_provider.GenerationRequest`
+- `modelchorus.providers.base_provider.GenerationResponse`
+- `modelchorus.providers.claude_provider.ClaudeProvider`
+- `modelchorus.providers.codex_provider.CodexProvider`
+- `modelchorus.workflows.consensus.ConsensusStrategy`
+- `modelchorus.workflows.consensus.ConsensusWorkflow`
+- `pytest`
+- `unittest.mock.AsyncMock`
+- `unittest.mock.patch`
+
+### `modelchorus/tests/test_semantic_similarity.py`
+
+- `modelchorus.core.models.Citation`
+- `modelchorus.core.models.CitationMap`
+- `modelchorus.workflows.argument.semantic.add_similarity_to_citation`
+- `modelchorus.workflows.argument.semantic.cluster_claims_hierarchical`
+- `modelchorus.workflows.argument.semantic.cluster_claims_kmeans`
+- `modelchorus.workflows.argument.semantic.compute_claim_similarity`
+- `modelchorus.workflows.argument.semantic.compute_claim_similarity_batch`
+- `modelchorus.workflows.argument.semantic.compute_cluster_statistics`
+- `modelchorus.workflows.argument.semantic.compute_embedding`
+- `modelchorus.workflows.argument.semantic.cosine_similarity`
+- `modelchorus.workflows.argument.semantic.find_duplicate_claims`
+- `modelchorus.workflows.argument.semantic.find_similar_claims`
+- `modelchorus.workflows.argument.semantic.get_cluster_representative`
+- `numpy`
+- `pytest`
+
+### `modelchorus/tests/test_state.py`
+
+- `datetime.datetime`
+- `datetime.timezone`
+- `json`
+- `modelchorus.core.models.ConversationState`
+- `modelchorus.core.state.StateManager`
+- `modelchorus.core.state.get_default_state_manager`
+- `pathlib.Path`
+- `pytest`
+- `threading`
+- `time`
+
+### `modelchorus/tests/test_thinkdeep_models.py`
+
+- `json`
+- `modelchorus.core.models.ConfidenceLevel`
+- `modelchorus.core.models.Hypothesis`
+- `modelchorus.core.models.InvestigationStep`
+- `modelchorus.core.models.ThinkDeepState`
+- `pydantic.ValidationError`
+- `pytest`
+
+### `tests/test_concurrent_conversations.py`
 
 - `asyncio`
 - `concurrent.futures.ThreadPoolExecutor`
@@ -3470,7 +3820,7 @@ Example:
 - `unittest.mock.AsyncMock`
 - `uuid`
 
-### `test_memory_management.py`
+### `tests/test_memory_management.py`
 
 - `asyncio`
 - `modelchorus.core.conversation.ConversationMemory`
@@ -3482,7 +3832,20 @@ Example:
 - `unittest.mock.AsyncMock`
 - `uuid`
 
-### `test_thinkdeep_complex.py`
+### `tests/test_providers/test_cli_interface.py`
+
+- `modelchorus.providers.CLIProvider`
+- `modelchorus.providers.ClaudeProvider`
+- `modelchorus.providers.CodexProvider`
+- `modelchorus.providers.CursorAgentProvider`
+- `modelchorus.providers.GeminiProvider`
+- `modelchorus.providers.GenerationRequest`
+- `modelchorus.providers.ModelProvider`
+- `pathlib.Path`
+- `pytest`
+- `sys`
+
+### `tests/test_thinkdeep_complex.py`
 
 - `modelchorus.core.conversation.ConversationMemory`
 - `modelchorus.core.models.ConfidenceLevel`
@@ -3498,7 +3861,7 @@ Example:
 - `unittest.mock.patch`
 - `uuid`
 
-### `test_thinkdeep_expert_validation.py`
+### `tests/test_thinkdeep_expert_validation.py`
 
 - `modelchorus.core.conversation.ConversationMemory`
 - `modelchorus.core.models.ConfidenceLevel`
@@ -3514,7 +3877,7 @@ Example:
 - `unittest.mock.patch`
 - `uuid`
 
-### `test_thinkdeep_workflow.py`
+### `tests/test_thinkdeep_workflow.py`
 
 - `modelchorus.core.conversation.ConversationMemory`
 - `modelchorus.core.models.ConfidenceLevel`
@@ -3530,7 +3893,7 @@ Example:
 - `unittest.mock.patch`
 - `uuid`
 
-### `test_workflow_integration_chaining.py`
+### `tests/test_workflow_integration_chaining.py`
 
 - `modelchorus.core.conversation.ConversationMemory`
 - `modelchorus.providers.base_provider.GenerationRequest`
@@ -3543,128 +3906,3 @@ Example:
 - `unittest.mock.AsyncMock`
 - `unittest.mock.patch`
 - `uuid`
-
-### `tests/conftest.py`
-
-- `pytest`
-- `unittest.mock.AsyncMock`
-- `unittest.mock.MagicMock`
-
-### `tests/test_chat_integration.py`
-
-- `modelchorus.core.conversation.ConversationMemory`
-- `modelchorus.providers.ClaudeProvider`
-- `modelchorus.providers.CodexProvider`
-- `modelchorus.providers.GeminiProvider`
-- `modelchorus.workflows.ChatWorkflow`
-- `os`
-- `pathlib.Path`
-- `pytest`
-
-### `tests/test_chat_workflow.py`
-
-- `modelchorus.core.conversation.ConversationMemory`
-- `modelchorus.providers.base_provider.GenerationRequest`
-- `modelchorus.providers.base_provider.GenerationResponse`
-- `modelchorus.workflows.ChatWorkflow`
-- `pathlib.Path`
-- `pytest`
-- `unittest.mock.AsyncMock`
-- `unittest.mock.MagicMock`
-- `unittest.mock.patch`
-- `uuid`
-
-### `tests/test_claude_provider.py`
-
-- `json`
-- `modelchorus.providers.base_provider.GenerationRequest`
-- `modelchorus.providers.claude_provider.ClaudeProvider`
-- `pytest`
-- `unittest.mock.AsyncMock`
-- `unittest.mock.patch`
-
-### `tests/test_codex_provider.py`
-
-- `json`
-- `modelchorus.providers.base_provider.GenerationRequest`
-- `modelchorus.providers.codex_provider.CodexProvider`
-- `pytest`
-- `unittest.mock.AsyncMock`
-- `unittest.mock.patch`
-
-### `tests/test_consensus_workflow.py`
-
-- `modelchorus.providers.base_provider.GenerationRequest`
-- `modelchorus.providers.base_provider.GenerationResponse`
-- `modelchorus.workflows.consensus.ConsensusStrategy`
-- `modelchorus.workflows.consensus.ConsensusWorkflow`
-- `pytest`
-- `unittest.mock.AsyncMock`
-
-### `tests/test_conversation.py`
-
-- `datetime.datetime`
-- `datetime.timezone`
-- `json`
-- `modelchorus.core.conversation.ConversationMemory`
-- `modelchorus.core.models.ConversationMessage`
-- `modelchorus.core.models.ConversationThread`
-- `pathlib.Path`
-- `pytest`
-- `uuid`
-
-### `tests/test_gemini_integration.py`
-
-- `modelchorus.providers.base_provider.GenerationRequest`
-- `modelchorus.providers.gemini_provider.GeminiProvider`
-- `pytest`
-- `subprocess`
-
-### `tests/test_integration.py`
-
-- `modelchorus.providers.base_provider.GenerationRequest`
-- `modelchorus.providers.base_provider.GenerationResponse`
-- `modelchorus.providers.claude_provider.ClaudeProvider`
-- `modelchorus.providers.codex_provider.CodexProvider`
-- `modelchorus.workflows.consensus.ConsensusStrategy`
-- `modelchorus.workflows.consensus.ConsensusWorkflow`
-- `pytest`
-- `unittest.mock.AsyncMock`
-- `unittest.mock.patch`
-
-### `tests/test_semantic_similarity.py`
-
-- `modelchorus.core.models.Citation`
-- `modelchorus.core.models.CitationMap`
-- `modelchorus.workflows.argument.semantic.add_similarity_to_citation`
-- `modelchorus.workflows.argument.semantic.compute_claim_similarity`
-- `modelchorus.workflows.argument.semantic.compute_claim_similarity_batch`
-- `modelchorus.workflows.argument.semantic.compute_embedding`
-- `modelchorus.workflows.argument.semantic.cosine_similarity`
-- `modelchorus.workflows.argument.semantic.find_duplicate_claims`
-- `modelchorus.workflows.argument.semantic.find_similar_claims`
-- `numpy`
-- `pytest`
-
-### `tests/test_state.py`
-
-- `datetime.datetime`
-- `datetime.timezone`
-- `json`
-- `modelchorus.core.models.ConversationState`
-- `modelchorus.core.state.StateManager`
-- `modelchorus.core.state.get_default_state_manager`
-- `pathlib.Path`
-- `pytest`
-- `threading`
-- `time`
-
-### `tests/test_thinkdeep_models.py`
-
-- `json`
-- `modelchorus.core.models.ConfidenceLevel`
-- `modelchorus.core.models.Hypothesis`
-- `modelchorus.core.models.InvestigationStep`
-- `modelchorus.core.models.ThinkDeepState`
-- `pydantic.ValidationError`
-- `pytest`

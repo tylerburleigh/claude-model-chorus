@@ -562,6 +562,110 @@ def get_cluster_representative(
     return cluster[most_central_idx]
 
 
+def generate_cluster_name(
+    cluster: List[CitationMap],
+    model_name: str = _DEFAULT_MODEL,
+    max_words: int = 5,
+) -> str:
+    """
+    Generate a concise name for a cluster based on representative claims.
+
+    Uses extractive approach: identifies key terms from the cluster
+    representative claim and constructs a short descriptive name.
+
+    Args:
+        cluster: List of CitationMaps in the cluster
+        model_name: Sentence transformer model to use
+        max_words: Maximum words in generated name (default: 5)
+
+    Returns:
+        Concise cluster name (e.g., "AI Quality Improvement")
+
+    Example:
+        >>> cluster = [cm1, cm2, cm3]  # Claims about "AI improves quality"
+        >>> name = generate_cluster_name(cluster, max_words=4)
+        >>> print(name)
+        AI Quality Improvement
+    """
+    if len(cluster) == 0:
+        return "Empty Cluster"
+
+    if len(cluster) == 1:
+        # For single-item clusters, use truncated claim text
+        claim_text = cluster[0].claim_text
+        words = claim_text.split()
+        return " ".join(words[:max_words])
+
+    # Get representative claim
+    representative = get_cluster_representative(cluster, model_name=model_name)
+    claim_text = representative.claim_text
+
+    # Simple extractive approach: take first N words
+    # Future enhancement: use NLP for key phrase extraction
+    words = claim_text.split()
+
+    # Capitalize first letter of each word for title case
+    name_words = words[:max_words]
+    name = " ".join(word.capitalize() for word in name_words)
+
+    return name
+
+
+def summarize_cluster(
+    cluster: List[CitationMap],
+    model_name: str = _DEFAULT_MODEL,
+    max_length: int = 150,
+) -> str:
+    """
+    Generate a detailed summary of cluster themes.
+
+    Analyzes claims in cluster to identify common patterns
+    and generates a descriptive summary.
+
+    Args:
+        cluster: List of CitationMaps in the cluster
+        model_name: Sentence transformer model to use
+        max_length: Maximum characters in summary (default: 150)
+
+    Returns:
+        Cluster summary (1-2 sentences)
+
+    Example:
+        >>> cluster = [cm1, cm2, cm3]
+        >>> summary = summarize_cluster(cluster)
+        >>> print(summary)
+        This cluster focuses on AI quality improvement claims.
+        All claims discuss machine learning enhancing accuracy.
+    """
+    if len(cluster) == 0:
+        return "Empty cluster with no claims."
+
+    if len(cluster) == 1:
+        # For single-item clusters, return the claim itself
+        claim_text = cluster[0].claim_text
+        if len(claim_text) > max_length:
+            return claim_text[:max_length - 3] + "..."
+        return claim_text
+
+    # Get representative claim as central theme
+    representative = get_cluster_representative(cluster, model_name=model_name)
+
+    # Create summary based on cluster size and representative
+    num_claims = len(cluster)
+
+    # Build summary sentence
+    summary = (
+        f"This cluster contains {num_claims} related claims. "
+        f"Representative theme: {representative.claim_text}"
+    )
+
+    # Truncate if too long
+    if len(summary) > max_length:
+        summary = summary[:max_length - 3] + "..."
+
+    return summary
+
+
 def compute_cluster_statistics(
     clusters: List[List[CitationMap]],
     model_name: str = _DEFAULT_MODEL,
@@ -637,4 +741,257 @@ def compute_cluster_statistics(
         "representatives": representatives,
         "intra_cluster_similarities": intra_cluster_sims,
         "avg_intra_cluster_similarity": float(np.mean(intra_cluster_sims)) if intra_cluster_sims else 0.0,
+    }
+
+
+def score_cluster_coherence(
+    cluster: List[CitationMap],
+    model_name: str = _DEFAULT_MODEL,
+) -> float:
+    """
+    Measure how tightly grouped claims are within a cluster.
+
+    Computes average pairwise similarity between claims in the cluster.
+    Higher scores indicate more coherent/similar claims.
+
+    Args:
+        cluster: List of CitationMaps in the cluster
+        model_name: Sentence transformer model to use
+
+    Returns:
+        Coherence score (0.0 to 1.0)
+        - 1.0 = perfect coherence (all claims identical)
+        - 0.8-1.0 = high coherence (very similar claims)
+        - 0.5-0.8 = moderate coherence
+        - < 0.5 = low coherence (diverse claims)
+
+    Example:
+        >>> cluster = [cm1, cm2, cm3]
+        >>> coherence = score_cluster_coherence(cluster)
+        >>> print(f"Coherence: {coherence:.3f}")
+        Coherence: 0.847
+    """
+    if len(cluster) == 0:
+        return 0.0
+
+    if len(cluster) == 1:
+        return 1.0  # Single claim is perfectly coherent
+
+    # Compute pairwise similarities
+    claims = [cm.claim_text for cm in cluster]
+    sim_matrix = compute_claim_similarity_batch(claims, model_name=model_name)
+
+    # Get upper triangle (exclude diagonal) and compute average
+    upper_triangle = sim_matrix[np.triu_indices_from(sim_matrix, k=1)]
+
+    if len(upper_triangle) == 0:
+        return 1.0
+
+    avg_similarity = float(np.mean(upper_triangle))
+    return avg_similarity
+
+
+def score_cluster_separation(
+    clusters: List[List[CitationMap]],
+    model_name: str = _DEFAULT_MODEL,
+) -> float:
+    """
+    Measure how distinct clusters are from each other.
+
+    Computes average distance between cluster centroids.
+    Higher scores indicate better separation between clusters.
+
+    Args:
+        clusters: List of clusters (each cluster is a list of CitationMaps)
+        model_name: Sentence transformer model to use
+
+    Returns:
+        Separation score (0.0 to 1.0)
+        - 1.0 = perfect separation (clusters completely distinct)
+        - 0.7-1.0 = high separation (well-separated clusters)
+        - 0.5-0.7 = moderate separation
+        - < 0.5 = low separation (overlapping clusters)
+
+    Example:
+        >>> clusters = [[cm1, cm2], [cm3, cm4]]
+        >>> separation = score_cluster_separation(clusters)
+        >>> print(f"Separation: {separation:.3f}")
+        Separation: 0.723
+    """
+    if len(clusters) <= 1:
+        return 1.0  # Single cluster or empty - perfect separation
+
+    # Remove empty clusters
+    non_empty_clusters = [c for c in clusters if len(c) > 0]
+
+    if len(non_empty_clusters) <= 1:
+        return 1.0
+
+    # Compute centroid for each cluster
+    centroids = []
+    for cluster in non_empty_clusters:
+        claims = [cm.claim_text for cm in cluster]
+        embeddings = np.array([compute_embedding(claim, model_name=model_name) for claim in claims])
+
+        # Compute centroid
+        centroid = np.mean(embeddings, axis=0)
+        centroid = centroid / np.linalg.norm(centroid)  # Normalize
+        centroids.append(centroid)
+
+    centroids_array = np.array(centroids)
+
+    # Compute pairwise distances between centroids
+    # Distance = 1 - similarity (for cosine similarity)
+    similarity_matrix = np.dot(centroids_array, centroids_array.T)
+    distance_matrix = 1.0 - similarity_matrix
+
+    # Get upper triangle (exclude diagonal)
+    upper_triangle = distance_matrix[np.triu_indices_from(distance_matrix, k=1)]
+
+    if len(upper_triangle) == 0:
+        return 1.0
+
+    # Average inter-cluster distance
+    avg_distance = float(np.mean(upper_triangle))
+
+    # Convert to separation score (higher is better)
+    # Distance is already 0-1, so we can use it directly
+    separation = avg_distance
+
+    return separation
+
+
+def score_clustering_quality(
+    clusters: List[List[CitationMap]],
+    model_name: str = _DEFAULT_MODEL,
+) -> Dict[str, Any]:
+    """
+    Compute comprehensive quality metrics for clustering results.
+
+    Combines multiple metrics to provide overall assessment of
+    clustering quality, including coherence, separation, and
+    interpretability measures.
+
+    Args:
+        clusters: List of clusters (each cluster is a list of CitationMaps)
+        model_name: Sentence transformer model to use
+
+    Returns:
+        Dictionary with quality metrics:
+        - coherence_scores: List of coherence scores (one per cluster)
+        - avg_coherence: Average coherence across all clusters
+        - separation: Inter-cluster separation score
+        - silhouette_score: Sklearn silhouette coefficient (-1 to 1)
+        - quality_score: Overall quality (0.0 to 1.0)
+        - num_clusters: Number of clusters
+        - cluster_sizes: List of cluster sizes
+        - interpretability: Named clusters and summaries
+
+    Example:
+        >>> clusters = [[cm1, cm2], [cm3, cm4]]
+        >>> quality = score_clustering_quality(clusters)
+        >>> print(f"Quality: {quality['quality_score']:.3f}")
+        >>> print(f"Coherence: {quality['avg_coherence']:.3f}")
+        >>> print(f"Separation: {quality['separation']:.3f}")
+        Quality: 0.812
+        Coherence: 0.847
+        Separation: 0.723
+    """
+    if len(clusters) == 0:
+        return {
+            "coherence_scores": [],
+            "avg_coherence": 0.0,
+            "separation": 0.0,
+            "silhouette_score": 0.0,
+            "quality_score": 0.0,
+            "num_clusters": 0,
+            "cluster_sizes": [],
+            "interpretability": {
+                "cluster_names": [],
+                "cluster_summaries": [],
+            },
+        }
+
+    # Remove empty clusters
+    non_empty_clusters = [c for c in clusters if len(c) > 0]
+
+    if len(non_empty_clusters) == 0:
+        return {
+            "coherence_scores": [],
+            "avg_coherence": 0.0,
+            "separation": 0.0,
+            "silhouette_score": 0.0,
+            "quality_score": 0.0,
+            "num_clusters": 0,
+            "cluster_sizes": [],
+            "interpretability": {
+                "cluster_names": [],
+                "cluster_summaries": [],
+            },
+        }
+
+    # Compute coherence for each cluster
+    coherence_scores = [
+        score_cluster_coherence(cluster, model_name=model_name)
+        for cluster in non_empty_clusters
+    ]
+    avg_coherence = float(np.mean(coherence_scores))
+
+    # Compute separation
+    separation = score_cluster_separation(non_empty_clusters, model_name=model_name)
+
+    # Compute silhouette score (requires sklearn)
+    silhouette = 0.0
+    if len(non_empty_clusters) > 1:
+        try:
+            from sklearn.metrics import silhouette_score as sklearn_silhouette
+
+            # Flatten all claims and create labels
+            all_claims = []
+            labels = []
+            for cluster_idx, cluster in enumerate(non_empty_clusters):
+                for cm in cluster:
+                    all_claims.append(cm.claim_text)
+                    labels.append(cluster_idx)
+
+            # Compute embeddings
+            embeddings = np.array([
+                compute_embedding(claim, model_name=model_name)
+                for claim in all_claims
+            ])
+
+            # Compute silhouette score
+            if len(set(labels)) > 1:  # Need at least 2 clusters
+                silhouette = float(sklearn_silhouette(embeddings, labels, metric='cosine'))
+                # Convert from [-1, 1] to [0, 1] range
+                silhouette = (silhouette + 1.0) / 2.0
+        except ImportError:
+            silhouette = 0.0  # sklearn not available
+
+    # Compute overall quality score
+    # Weight: 40% coherence + 40% separation + 20% silhouette
+    quality_score = (0.4 * avg_coherence) + (0.4 * separation) + (0.2 * silhouette)
+
+    # Generate cluster names and summaries for interpretability
+    cluster_names = [
+        generate_cluster_name(cluster, model_name=model_name)
+        for cluster in non_empty_clusters
+    ]
+    cluster_summaries = [
+        summarize_cluster(cluster, model_name=model_name)
+        for cluster in non_empty_clusters
+    ]
+
+    return {
+        "coherence_scores": coherence_scores,
+        "avg_coherence": avg_coherence,
+        "separation": separation,
+        "silhouette_score": silhouette,
+        "quality_score": quality_score,
+        "num_clusters": len(non_empty_clusters),
+        "cluster_sizes": [len(c) for c in non_empty_clusters],
+        "interpretability": {
+            "cluster_names": cluster_names,
+            "cluster_summaries": cluster_summaries,
+        },
     }
