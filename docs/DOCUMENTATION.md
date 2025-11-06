@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 07:33:37
+**Generated:** 2025-11-06 07:35:34
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 41
-- **Total Lines:** 12762
-- **Total Classes:** 65
+- **Total Lines:** 12967
+- **Total Classes:** 66
 - **Total Functions:** 34
 - **Avg Complexity:** 4.62
 - **Max Complexity:** 36
@@ -1220,6 +1220,23 @@ Attributes:
 - `test_investigation_step_metadata_completeness()`
 - `test_investigation_step_error_handling()`
 - `test_investigation_without_conversation_memory()`
+
+---
+
+### `TestLongConversations`
+
+**Language:** python
+**Defined in:** `tests/test_chat_integration.py:288`
+
+**Description:**
+> Test handling of long multi-turn conversations (20+ turns).
+
+**Methods:**
+- `test_20_turn_conversation()`
+- `test_25_turn_conversation_with_context_retention()`
+- `test_conversation_length_tracking()`
+- `test_long_conversation_with_file_references()`
+- `test_conversation_stability_under_load()`
 
 ---
 

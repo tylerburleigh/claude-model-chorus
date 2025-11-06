@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T12:33:37.137239Z",
+    "generated_at": "2025-11-06T12:35:34.806654Z",
     "languages": [
       "python"
     ],
@@ -10,8 +10,8 @@
   },
   "statistics": {
     "total_files": 41,
-    "total_lines": 12762,
-    "total_classes": 65,
+    "total_lines": 12967,
+    "total_classes": 66,
     "total_functions": 34,
     "avg_complexity": 4.62,
     "max_complexity": 36,
@@ -24,8 +24,8 @@
     "by_language": {
       "python": {
         "files": 41,
-        "lines": 12762,
-        "classes": 65,
+        "lines": 12967,
+        "classes": 66,
         "functions": 34,
         "avg_complexity": 4.62
       }
@@ -698,7 +698,8 @@
       "classes": [
         "TestMultiProviderChat",
         "TestChatErrorHandling",
-        "TestChatThreadManagement"
+        "TestChatThreadManagement",
+        "TestLongConversations"
       ],
       "functions": [
         "is_provider_available",
@@ -718,7 +719,7 @@
         "modelchorus.core.conversation.ConversationMemory"
       ],
       "exports": [],
-      "lines": 284
+      "lines": 489
     },
     {
       "name": "test_chat_workflow",
@@ -5201,6 +5202,26 @@
       "methods": [
         "test_multiple_concurrent_threads",
         "test_thread_retrieval"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestLongConversations",
+      "file": "tests/test_chat_integration.py",
+      "line": 288,
+      "language": "python",
+      "docstring": "Test handling of long multi-turn conversations (20+ turns).",
+      "bases": [],
+      "methods": [
+        "test_20_turn_conversation",
+        "test_25_turn_conversation_with_context_retention",
+        "test_conversation_length_tracking",
+        "test_long_conversation_with_file_references",
+        "test_conversation_stability_under_load"
       ],
       "properties": [],
       "is_exported": false,
