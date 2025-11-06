@@ -22,7 +22,8 @@ from ..providers import (
     CursorAgentProvider,
     GenerationRequest,
 )
-from ..workflows import ConsensusWorkflow, ConsensusStrategy
+from ..workflows import ChatWorkflow, ConsensusWorkflow, ConsensusStrategy, ThinkDeepWorkflow
+from ..core.conversation import ConversationMemory
 
 app = typer.Typer(
     name="modelchorus",
@@ -48,6 +49,183 @@ def get_provider_by_name(name: str):
         raise typer.Exit(1)
 
     return provider_class()
+
+
+@app.command()
+def chat(
+    prompt: str = typer.Argument(..., help="Message to send to the AI model"),
+    provider: str = typer.Option(
+        "claude",
+        "--provider",
+        "-p",
+        help="Provider to use (claude, gemini, codex, cursor-agent)",
+    ),
+    continuation_id: Optional[str] = typer.Option(
+        None,
+        "--continue",
+        "-c",
+        help="Thread ID to continue an existing conversation",
+    ),
+    files: Optional[List[str]] = typer.Option(
+        None,
+        "--file",
+        "-f",
+        help="File paths to include in conversation context (can specify multiple times)",
+    ),
+    system: Optional[str] = typer.Option(
+        None,
+        "--system",
+        help="System prompt for context",
+    ),
+    temperature: float = typer.Option(
+        0.7,
+        "--temperature",
+        "-t",
+        help="Temperature for generation (0.0-1.0)",
+    ),
+    max_tokens: Optional[int] = typer.Option(
+        None,
+        "--max-tokens",
+        help="Maximum tokens to generate",
+    ),
+    output: Optional[Path] = typer.Option(
+        None,
+        "--output",
+        "-o",
+        help="Output file for result (JSON format)",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Show detailed execution information",
+    ),
+):
+    """
+    Chat with a single AI model with conversation continuity.
+
+    Example:
+        # Start new conversation
+        modelchorus chat "What is quantum computing?" -p claude
+
+        # Continue conversation
+        modelchorus chat "Give me an example" --continue thread-id-123
+
+        # Include files
+        modelchorus chat "Review this code" -f src/main.py -f tests/test_main.py
+    """
+    try:
+        # Create provider instance
+        if verbose:
+            console.print(f"[cyan]Initializing provider: {provider}[/cyan]")
+
+        try:
+            provider_instance = get_provider_by_name(provider)
+            if verbose:
+                console.print(f"[green]✓ {provider} initialized[/green]")
+        except Exception as e:
+            console.print(f"[red]Failed to initialize {provider}: {e}[/red]")
+            raise typer.Exit(1)
+
+        # Create conversation memory (in-memory for now)
+        memory = ConversationMemory()
+
+        # Create workflow
+        workflow = ChatWorkflow(
+            provider=provider_instance,
+            conversation_memory=memory,
+        )
+
+        if verbose:
+            console.print(f"[cyan]Workflow: {workflow}[/cyan]")
+
+        # Validate files exist
+        if files:
+            for file_path in files:
+                if not Path(file_path).exists():
+                    console.print(f"[red]Error: File not found: {file_path}[/red]")
+                    raise typer.Exit(1)
+
+        # Display conversation info
+        console.print(f"\n[bold cyan]{'Continuing' if continuation_id else 'Starting new'} chat conversation...[/bold cyan]")
+        console.print(f"Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
+        console.print(f"Provider: {provider}")
+        if continuation_id:
+            console.print(f"Thread ID: {continuation_id}")
+        if files:
+            console.print(f"Files: {', '.join(files)}")
+        console.print()
+
+        # Run async workflow
+        result = asyncio.run(
+            workflow.run(
+                prompt=prompt,
+                continuation_id=continuation_id,
+                files=files,
+                system_prompt=system,
+                temperature=temperature,
+                max_tokens=max_tokens,
+            )
+        )
+
+        # Display results
+        if result.success:
+            console.print(f"[bold green]✓ Chat completed[/bold green]\n")
+
+            # Show thread info
+            thread_id = result.metadata.get('thread_id')
+            is_continuation = result.metadata.get('is_continuation', False)
+            conv_length = result.metadata.get('conversation_length', 0)
+
+            console.print(f"[cyan]Thread ID:[/cyan] {thread_id}")
+            if not is_continuation:
+                console.print("[cyan]Status:[/cyan] New conversation started")
+            else:
+                console.print(f"[cyan]Status:[/cyan] Continued ({conv_length} messages in thread)")
+            console.print()
+
+            # Show response
+            console.print("[bold]Response:[/bold]\n")
+            console.print(result.synthesis)
+
+            # Show usage info if available
+            usage = result.metadata.get('usage', {})
+            if usage and verbose:
+                console.print(f"\n[dim]Tokens: {usage.get('total_tokens', 'N/A')}[/dim]")
+
+            # Save to file if requested
+            if output:
+                output_data = {
+                    "prompt": prompt,
+                    "provider": provider,
+                    "thread_id": thread_id,
+                    "is_continuation": is_continuation,
+                    "response": result.synthesis,
+                    "model": result.metadata.get('model'),
+                    "usage": usage,
+                    "conversation_length": conv_length,
+                }
+                if files:
+                    output_data["files"] = files
+
+                output.write_text(json.dumps(output_data, indent=2))
+                console.print(f"\n[green]✓ Result saved to {output}[/green]")
+
+            console.print(f"\n[dim]To continue this conversation, use: --continue {thread_id}[/dim]")
+
+        else:
+            console.print(f"[red]✗ Chat failed: {result.error}[/red]")
+            raise typer.Exit(1)
+
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Interrupted by user[/yellow]")
+        raise typer.Exit(130)
+    except Exception as e:
+        console.print(f"\n[red]Error: {e}[/red]")
+        if verbose:
+            import traceback
+            console.print(f"\n[red]{traceback.format_exc()}[/red]")
+        raise typer.Exit(1)
 
 
 @app.command()
@@ -223,6 +401,378 @@ def consensus(
             if len(result.all_responses) == 0:
                 console.print("[red]Error: All providers failed[/red]")
                 raise typer.Exit(1)
+
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Interrupted by user[/yellow]")
+        raise typer.Exit(130)
+    except Exception as e:
+        console.print(f"\n[red]Error: {e}[/red]")
+        if verbose:
+            import traceback
+            console.print(f"\n[red]{traceback.format_exc()}[/red]")
+        raise typer.Exit(1)
+
+
+@app.command()
+def thinkdeep(
+    prompt: str = typer.Argument(..., help="Investigation problem statement or query"),
+    provider: str = typer.Option(
+        "claude",
+        "--provider",
+        "-p",
+        help="Provider to use for investigation (claude, gemini, codex, cursor-agent)",
+    ),
+    expert_provider: Optional[str] = typer.Option(
+        None,
+        "--expert",
+        "-e",
+        help="Expert provider for validation (optional, uses different model for validation)",
+    ),
+    continuation_id: Optional[str] = typer.Option(
+        None,
+        "--continue",
+        "-c",
+        help="Thread ID to continue an existing investigation",
+    ),
+    files: Optional[List[str]] = typer.Option(
+        None,
+        "--file",
+        "-f",
+        help="File paths to examine during investigation (can specify multiple times)",
+    ),
+    system: Optional[str] = typer.Option(
+        None,
+        "--system",
+        help="System prompt for context",
+    ),
+    temperature: float = typer.Option(
+        0.7,
+        "--temperature",
+        "-t",
+        help="Temperature for generation (0.0-1.0)",
+    ),
+    max_tokens: Optional[int] = typer.Option(
+        None,
+        "--max-tokens",
+        help="Maximum tokens to generate",
+    ),
+    disable_expert: bool = typer.Option(
+        False,
+        "--disable-expert",
+        help="Disable expert validation even if expert provider is specified",
+    ),
+    output: Optional[Path] = typer.Option(
+        None,
+        "--output",
+        "-o",
+        help="Output file for result (JSON format)",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Show detailed execution information",
+    ),
+):
+    """
+    Start a ThinkDeep investigation for systematic problem analysis.
+
+    ThinkDeep provides extended reasoning with hypothesis tracking, confidence
+    progression, and optional expert validation.
+
+    Example:
+        # Start new investigation
+        modelchorus thinkdeep "Why is authentication failing?" -p claude
+
+        # Continue investigation
+        modelchorus thinkdeep "Check async patterns" --continue thread-id-123
+
+        # Include files and expert validation
+        modelchorus thinkdeep "Analyze bug" -f src/auth.py -e gemini
+    """
+    try:
+        # Create primary provider instance
+        if verbose:
+            console.print(f"[cyan]Initializing primary provider: {provider}[/cyan]")
+
+        try:
+            provider_instance = get_provider_by_name(provider)
+            if verbose:
+                console.print(f"[green]✓ {provider} initialized[/green]")
+        except Exception as e:
+            console.print(f"[red]Failed to initialize {provider}: {e}[/red]")
+            raise typer.Exit(1)
+
+        # Create expert provider if specified
+        expert_instance = None
+        if expert_provider:
+            if verbose:
+                console.print(f"[cyan]Initializing expert provider: {expert_provider}[/cyan]")
+            try:
+                expert_instance = get_provider_by_name(expert_provider)
+                if verbose:
+                    console.print(f"[green]✓ {expert_provider} initialized as expert[/green]")
+            except Exception as e:
+                console.print(f"[yellow]Warning: Failed to initialize expert provider: {e}[/yellow]")
+                console.print("[yellow]Continuing without expert validation[/yellow]")
+
+        # Create conversation memory
+        memory = ConversationMemory()
+
+        # Create workflow config
+        config = {}
+        if disable_expert:
+            config['enable_expert_validation'] = False
+
+        # Create workflow
+        workflow = ThinkDeepWorkflow(
+            provider=provider_instance,
+            expert_provider=expert_instance,
+            conversation_memory=memory,
+            config=config if config else None,
+        )
+
+        if verbose:
+            console.print(f"[cyan]Workflow: {workflow}[/cyan]")
+
+        # Validate files exist
+        if files:
+            for file_path in files:
+                if not Path(file_path).exists():
+                    console.print(f"[red]Error: File not found: {file_path}[/red]")
+                    raise typer.Exit(1)
+
+        # Display investigation info
+        console.print(f"\n[bold cyan]{'Continuing' if continuation_id else 'Starting new'} ThinkDeep investigation...[/bold cyan]")
+        console.print(f"Problem: {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
+        console.print(f"Primary Provider: {provider}")
+        if expert_instance:
+            expert_status = "disabled" if disable_expert else "enabled"
+            console.print(f"Expert Provider: {expert_provider} ({expert_status})")
+        if continuation_id:
+            console.print(f"Thread ID: {continuation_id}")
+        if files:
+            console.print(f"Files: {', '.join(files)}")
+        console.print()
+
+        # Run async workflow
+        result = asyncio.run(
+            workflow.run(
+                prompt=prompt,
+                continuation_id=continuation_id,
+                files=files,
+                system_prompt=system,
+                temperature=temperature,
+                max_tokens=max_tokens,
+            )
+        )
+
+        # Display results
+        if result.success:
+            console.print(f"[bold green]✓ Investigation step completed[/bold green]\n")
+
+            # Show thread info
+            thread_id = result.metadata.get('thread_id')
+            is_continuation = result.metadata.get('is_continuation', False)
+            step_number = result.metadata.get('investigation_step', 1)
+            confidence = result.metadata.get('confidence', 'exploring')
+            hypotheses_count = result.metadata.get('hypotheses_count', 0)
+            expert_performed = result.metadata.get('expert_validation_performed', False)
+            files_examined = result.metadata.get('files_examined', 0)
+
+            console.print(f"[cyan]Thread ID:[/cyan] {thread_id}")
+            console.print(f"[cyan]Investigation Step:[/cyan] {step_number}")
+            console.print(f"[cyan]Confidence Level:[/cyan] {confidence}")
+            console.print(f"[cyan]Hypotheses:[/cyan] {hypotheses_count}")
+            console.print(f"[cyan]Files Examined:[/cyan] {files_examined}")
+            if expert_performed:
+                console.print(f"[cyan]Expert Validation:[/cyan] ✓ Performed")
+
+            # Show hypothesis details if continuing investigation
+            if is_continuation and hypotheses_count > 0:
+                console.print("\n[bold]Current Hypotheses:[/bold]")
+                # Get investigation state to show hypotheses
+                state = workflow.get_investigation_state(thread_id)
+                if state and state.hypotheses:
+                    for i, hyp in enumerate(state.hypotheses, 1):
+                        status_color = {
+                            'active': 'yellow',
+                            'validated': 'green',
+                            'disproven': 'red'
+                        }.get(hyp.status, 'white')
+                        console.print(f"  {i}. [{status_color}]{hyp.status.upper()}[/{status_color}] {hyp.hypothesis}")
+                        if hyp.evidence and verbose:
+                            console.print(f"     Evidence: {', '.join(hyp.evidence[:3])}")
+            console.print()
+
+            # Show response
+            console.print("[bold]Investigation Findings:[/bold]\n")
+            console.print(result.synthesis)
+
+            # Show expert validation if present
+            if expert_performed and len(result.steps) > 1:
+                console.print("\n[bold]Expert Validation:[/bold]\n")
+                console.print(result.steps[-1].content)
+
+            # Show usage info if available
+            usage = result.metadata.get('usage', {})
+            if usage and verbose:
+                console.print(f"\n[dim]Tokens: {usage.get('total_tokens', 'N/A')}[/dim]")
+
+            # Save to file if requested
+            if output:
+                output_data = {
+                    "prompt": prompt,
+                    "provider": provider,
+                    "expert_provider": expert_provider,
+                    "thread_id": thread_id,
+                    "is_continuation": is_continuation,
+                    "investigation_step": step_number,
+                    "confidence": confidence,
+                    "hypotheses_count": hypotheses_count,
+                    "expert_validation_performed": expert_performed,
+                    "response": result.synthesis,
+                    "model": result.metadata.get('model'),
+                    "usage": usage,
+                }
+                if files:
+                    output_data["files"] = files
+                if expert_performed and len(result.steps) > 1:
+                    output_data["expert_validation"] = result.steps[-1].content
+
+                output.write_text(json.dumps(output_data, indent=2))
+                console.print(f"\n[green]✓ Result saved to {output}[/green]")
+
+            console.print(f"\n[dim]To continue this investigation, use: --continue {thread_id}[/dim]")
+
+        else:
+            console.print(f"[red]✗ Investigation failed: {result.error}[/red]")
+            raise typer.Exit(1)
+
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Interrupted by user[/yellow]")
+        raise typer.Exit(130)
+    except Exception as e:
+        console.print(f"\n[red]Error: {e}[/red]")
+        if verbose:
+            import traceback
+            console.print(f"\n[red]{traceback.format_exc()}[/red]")
+        raise typer.Exit(1)
+
+
+@app.command(name="thinkdeep-status")
+def thinkdeep_status(
+    thread_id: str = typer.Argument(..., help="Thread ID of the investigation to inspect"),
+    show_steps: bool = typer.Option(
+        False,
+        "--steps",
+        help="Show all investigation steps",
+    ),
+    show_files: bool = typer.Option(
+        False,
+        "--files",
+        help="Show all examined files",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Show detailed information including evidence",
+    ),
+):
+    """
+    Inspect the state of an ongoing ThinkDeep investigation.
+
+    Shows current hypotheses, confidence level, investigation progress,
+    and optionally all steps and examined files.
+
+    Example:
+        # View basic status
+        modelchorus thinkdeep-status thread-id-123
+
+        # View with all steps
+        modelchorus thinkdeep-status thread-id-123 --steps
+
+        # View with files
+        modelchorus thinkdeep-status thread-id-123 --files --verbose
+    """
+    try:
+        # Create conversation memory to access thread
+        memory = ConversationMemory()
+
+        # Create a dummy workflow to access state
+        # (We need a provider but won't use it for inspection)
+        dummy_provider = ClaudeProvider()
+        workflow = ThinkDeepWorkflow(
+            provider=dummy_provider,
+            conversation_memory=memory,
+        )
+
+        # Get investigation state
+        state = workflow.get_investigation_state(thread_id)
+
+        if not state:
+            console.print(f"[red]Error: Investigation thread not found: {thread_id}[/red]")
+            console.print("[yellow]Make sure you're using the correct thread ID from a previous investigation.[/yellow]")
+            raise typer.Exit(1)
+
+        # Get investigation summary
+        summary = workflow.get_investigation_summary(thread_id)
+
+        # Display header
+        console.print(f"\n[bold cyan]Investigation Status[/bold cyan]")
+        console.print(f"[cyan]Thread ID:[/cyan] {thread_id}\n")
+
+        # Display summary metrics
+        console.print(f"[cyan]Confidence Level:[/cyan] {state.current_confidence}")
+        console.print(f"[cyan]Total Steps:[/cyan] {len(state.steps)}")
+        console.print(f"[cyan]Total Hypotheses:[/cyan] {len(state.hypotheses)}")
+        console.print(f"[cyan]Files Examined:[/cyan] {len(state.relevant_files)}")
+
+        if summary:
+            console.print(f"[cyan]Active Hypotheses:[/cyan] {summary['active_hypotheses']}")
+            console.print(f"[cyan]Validated Hypotheses:[/cyan] {summary['validated_hypotheses']}")
+            console.print(f"[cyan]Disproven Hypotheses:[/cyan] {summary['disproven_hypotheses']}")
+            console.print(f"[cyan]Complete:[/cyan] {'Yes' if summary['is_complete'] else 'No'}")
+
+        # Display hypotheses
+        if state.hypotheses:
+            console.print("\n[bold]Hypotheses:[/bold]")
+            for i, hyp in enumerate(state.hypotheses, 1):
+                status_color = {
+                    'active': 'yellow',
+                    'validated': 'green',
+                    'disproven': 'red'
+                }.get(hyp.status, 'white')
+                console.print(f"  {i}. [{status_color}]{hyp.status.upper()}[/{status_color}] {hyp.hypothesis}")
+                if hyp.evidence and verbose:
+                    console.print(f"     [dim]Evidence ({len(hyp.evidence)}):[/dim]")
+                    for evidence in hyp.evidence:
+                        console.print(f"       • {evidence}")
+        else:
+            console.print("\n[yellow]No hypotheses yet.[/yellow]")
+
+        # Display investigation steps if requested
+        if show_steps and state.steps:
+            console.print("\n[bold]Investigation Steps:[/bold]")
+            for i, step in enumerate(state.steps, 1):
+                console.print(f"\n  [cyan]Step {step.step_number}:[/cyan]")
+                console.print(f"  Confidence: {step.confidence}")
+                console.print(f"  Files checked: {len(step.files_checked)}")
+                if verbose:
+                    console.print(f"  Findings: {step.findings}")
+                else:
+                    # Truncate findings if not verbose
+                    findings_preview = step.findings[:150] + "..." if len(step.findings) > 150 else step.findings
+                    console.print(f"  Findings: {findings_preview}")
+
+        # Display examined files if requested
+        if show_files and state.relevant_files:
+            console.print("\n[bold]Examined Files:[/bold]")
+            for file in state.relevant_files:
+                console.print(f"  • {file}")
+
+        console.print()
 
     except KeyboardInterrupt:
         console.print("\n[yellow]Interrupted by user[/yellow]")

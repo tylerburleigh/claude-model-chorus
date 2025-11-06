@@ -69,6 +69,58 @@ print(f"Result: {result.synthesis}")
 
 ## Supported Workflows
 
+- **Chat**: Simple single-model peer consultation with conversation threading
+- **ThinkDeep**: Multi-step analytical reasoning with progressive refinement
+- **Consensus**: Multi-model consensus building through structured debate or voting
+
+### Chat Workflow
+
+The Chat workflow provides straightforward peer consultation with a single AI model, supporting conversation threading for multi-turn interactions. Unlike multi-model workflows, Chat focuses on simplicity and conversational flow.
+
+**Key Features:**
+- Single-model interactions (no multi-model overhead)
+- Conversation threading via continuation_id
+- Automatic conversation history management
+- Simple request/response pattern
+- Ideal for quick consultations and iterative conversations
+
+**Use Cases:**
+- Quick second opinions from an AI model
+- Iterative brainstorming and idea refinement
+- Simple consultations without orchestration complexity
+- Building conversational applications
+
+**Example:**
+
+```python
+from modelchorus.providers import ClaudeProvider
+from modelchorus.workflows import ChatWorkflow
+from modelchorus.core.conversation import ConversationMemory
+
+# Setup
+provider = ClaudeProvider()
+memory = ConversationMemory()
+workflow = ChatWorkflow(provider, conversation_memory=memory)
+
+# First message (creates new conversation)
+result1 = await workflow.run("What is quantum computing?")
+thread_id = result1.metadata.get('thread_id')
+print(result1.synthesis)
+
+# Follow-up message (continues conversation)
+result2 = await workflow.run(
+    "How does it differ from classical computing?",
+    continuation_id=thread_id
+)
+print(result2.synthesis)
+
+# Check conversation history
+thread = workflow.get_thread(thread_id)
+print(f"Total messages: {len(thread.messages)}")
+```
+
+### Other Workflows
+
 - **ThinkDeep**: Multi-step analytical reasoning with progressive refinement
 - **Debug**: Systematic debugging with hypothesis testing and root cause analysis
 - **Consensus**: Multi-model consensus building through structured debate or voting
@@ -81,6 +133,28 @@ print(f"Result: {result.synthesis}")
 - **Anthropic** (Claude 3 Opus, Sonnet, Haiku)
 - **OpenAI** (GPT-4, GPT-3.5)
 - **Google** (Gemini Pro, Gemini Flash)
+
+### CLI Provider Compatibility
+
+ModelChorus supports integration with AI model CLIs. Each CLI has different argument support:
+
+| Provider | CLI Command | Temperature | Max Tokens | System Prompt | Output Format | Notes |
+|----------|-------------|-------------|------------|---------------|---------------|-------|
+| **Claude** | `claude` | ❌ | ❌ | ✅ | ✅ `--output-format json` | Uses config for model params |
+| **Gemini** | `gemini` | ❌ | ❌ | ❌ | ✅ `-o json` | Positional prompt, limited CLI options |
+| **Codex** | `codex` | ❌ | ❌ | ✅ | ✅ `--json` | Uses config for model params |
+| **Cursor Agent** | `cursor-agent` | ⚠️ | ⚠️ | ⚠️ | ⚠️ | Untested (CLI not available) |
+
+**Legend:**
+- ✅ Supported via CLI arguments
+- ❌ Not supported via CLI (may use config files)
+- ⚠️ Unknown/untested
+
+**Important Notes:**
+- **Gemini CLI** uses positional arguments for prompts, not `--prompt` flag
+- **Gemini CLI** doesn't support temperature, max_tokens, system_prompt, or images via CLI
+- **Claude CLI** and **Codex CLI** use configuration files for model parameters
+- All providers support JSON output for structured parsing
 
 ## Configuration
 

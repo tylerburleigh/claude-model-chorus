@@ -3,10 +3,41 @@ Pydantic models for ModelChorus workflow requests and responses.
 
 This module defines the data models used for workflow communication,
 providing validation and serialization for workflow inputs and outputs.
+
+Additionally defines conversation infrastructure models for multi-turn
+conversations with continuation support, adapted from Zen MCP patterns.
 """
 
-from typing import Any, Dict, List, Optional
+from enum import Enum
+from typing import Any, Dict, List, Optional, Literal
 from pydantic import BaseModel, Field, ConfigDict
+
+
+class ConfidenceLevel(str, Enum):
+    """
+    Confidence level enum for investigation workflows.
+
+    Used in Thinkdeep workflow to track the investigator's confidence
+    in their hypothesis as evidence accumulates. Levels progress from
+    initial exploration through to complete certainty.
+
+    Values:
+        EXPLORING: Just starting investigation, no clear hypothesis yet
+        LOW: Early investigation with initial hypothesis forming
+        MEDIUM: Some supporting evidence found
+        HIGH: Strong evidence supporting hypothesis
+        VERY_HIGH: Very strong evidence, high confidence
+        ALMOST_CERTAIN: Near complete confidence, comprehensive evidence
+        CERTAIN: 100% confidence, hypothesis validated beyond reasonable doubt
+    """
+
+    EXPLORING = "exploring"
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    VERY_HIGH = "very_high"
+    ALMOST_CERTAIN = "almost_certain"
+    CERTAIN = "certain"
 
 
 class WorkflowRequest(BaseModel):
@@ -364,4 +395,426 @@ class ConsensusConfig(BaseModel):
         ge=1,
         le=10,
         description="Maximum number of consensus rounds",
+    )
+
+
+# ============================================================================
+# Conversation Infrastructure Models
+# ============================================================================
+# Based on Zen MCP patterns, adapted for CLI-based orchestration
+
+
+class ConversationMessage(BaseModel):
+    """
+    Single message in a conversation thread.
+
+    Based on Zen MCP's ConversationTurn but adapted for CLI-based architecture.
+    Tracks who said what, when, and with what context (files, models, workflow).
+
+    Attributes:
+        role: Message role - 'user' or 'assistant'
+        content: The actual message text/content
+        timestamp: ISO format timestamp of when message was created
+        files: Optional list of file paths referenced in this message
+        workflow_name: Optional workflow that generated this message (for assistant messages)
+        model_provider: Optional provider type used (cli, api, mcp)
+        model_name: Optional specific model identifier (e.g., claude-3-opus, gpt-5)
+        metadata: Additional message metadata (tokens, latency, cost, etc.)
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "role": "user",
+                "content": "Analyze this code for potential security issues",
+                "timestamp": "2025-11-05T12:00:00Z",
+                "files": ["src/auth.py", "src/crypto.py"],
+                "metadata": {"user_id": "dev-123", "session_id": "abc-456"},
+            }
+        }
+    )
+
+    role: Literal["user", "assistant"] = Field(
+        ...,
+        description="Message role: 'user' or 'assistant'",
+    )
+
+    content: str = Field(
+        ...,
+        description="The message content/text",
+        min_length=1,
+    )
+
+    timestamp: str = Field(
+        ...,
+        description="ISO format timestamp of message creation",
+    )
+
+    files: Optional[List[str]] = Field(
+        default=None,
+        description="Files referenced in this message",
+    )
+
+    workflow_name: Optional[str] = Field(
+        default=None,
+        description="Workflow that generated this message (if assistant)",
+    )
+
+    model_provider: Optional[str] = Field(
+        default=None,
+        description="Provider type: cli, api, or mcp",
+    )
+
+    model_name: Optional[str] = Field(
+        default=None,
+        description="Specific model used (e.g., claude-3-opus, gpt-5, gemini-2.5-pro)",
+    )
+
+    metadata: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Additional message metadata (tokens, latency, cost, etc.)",
+    )
+
+
+class ConversationThread(BaseModel):
+    """
+    Complete conversation context for a thread.
+
+    Adapted from Zen MCP's ThreadContext with enhancements for CLI orchestration:
+    - Provider-agnostic design supporting multiple CLI providers
+    - Explicit lifecycle management (status field)
+    - Support for conversation branching (future enhancement)
+    - Workflow-specific state persistence
+
+    Attributes:
+        thread_id: UUID identifying this conversation thread
+        parent_thread_id: Optional parent thread ID for conversation chains
+        created_at: ISO timestamp of thread creation
+        last_updated_at: ISO timestamp of last update
+        workflow_name: Workflow that created this thread
+        messages: All messages in chronological order
+        state: Workflow-specific state data (persisted across turns)
+        initial_context: Original request parameters
+        status: Thread lifecycle status (active, completed, archived)
+        branch_point: Optional message ID where branch occurred
+        sibling_threads: Other thread IDs branched from same point
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "thread_id": "550e8400-e29b-41d4-a716-446655440000",
+                "parent_thread_id": None,
+                "created_at": "2025-11-05T12:00:00Z",
+                "last_updated_at": "2025-11-05T12:15:30Z",
+                "workflow_name": "consensus",
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "Analyze this code",
+                        "timestamp": "2025-11-05T12:00:00Z",
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "Found 3 issues...",
+                        "timestamp": "2025-11-05T12:01:00Z",
+                        "model_provider": "cli",
+                        "model_name": "claude-3-opus",
+                    },
+                ],
+                "state": {"models_consulted": ["claude", "gpt-5", "gemini"]},
+                "initial_context": {"prompt": "Analyze this code", "models": ["claude", "gpt-5"]},
+                "status": "active",
+            }
+        }
+    )
+
+    thread_id: str = Field(
+        ...,
+        description="UUID identifying this conversation thread",
+    )
+
+    parent_thread_id: Optional[str] = Field(
+        default=None,
+        description="Parent thread ID for conversation chains",
+    )
+
+    created_at: str = Field(
+        ...,
+        description="ISO timestamp of thread creation",
+    )
+
+    last_updated_at: str = Field(
+        ...,
+        description="ISO timestamp of last update",
+    )
+
+    workflow_name: str = Field(
+        ...,
+        description="Workflow that created this thread",
+        min_length=1,
+    )
+
+    messages: List[ConversationMessage] = Field(
+        default_factory=list,
+        description="All messages in chronological order",
+    )
+
+    state: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Workflow-specific state data (persisted across turns)",
+    )
+
+    initial_context: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Original request parameters",
+    )
+
+    status: Literal["active", "completed", "archived"] = Field(
+        default="active",
+        description="Thread lifecycle status",
+    )
+
+    branch_point: Optional[str] = Field(
+        default=None,
+        description="Message ID where branch occurred (if branched)",
+    )
+
+    sibling_threads: List[str] = Field(
+        default_factory=list,
+        description="Other thread IDs branched from same point",
+    )
+
+
+class Hypothesis(BaseModel):
+    """
+    Model for tracking hypotheses in investigation workflows.
+
+    Used in Thinkdeep workflow to track hypothesis evolution during
+    systematic investigation, including the hypothesis text, supporting
+    evidence, and current validation status.
+
+    Attributes:
+        hypothesis: The hypothesis text/statement being investigated
+        evidence: List of evidence items supporting or refuting this hypothesis
+        status: Current validation status (active, disproven, validated)
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "hypothesis": "API uses async/await pattern instead of callbacks",
+                "evidence": [
+                    "Found async def in auth.py line 45",
+                    "Tests use asyncio.run() in test_auth.py",
+                    "No callback patterns found in service layer"
+                ],
+                "status": "validated"
+            }
+        }
+    )
+
+    hypothesis: str = Field(
+        ...,
+        description="The hypothesis text/statement being investigated",
+        min_length=1,
+    )
+
+    evidence: List[str] = Field(
+        default_factory=list,
+        description="List of evidence items supporting or refuting this hypothesis",
+    )
+
+    status: Literal["active", "disproven", "validated"] = Field(
+        default="active",
+        description="Current validation status of the hypothesis",
+    )
+
+
+class InvestigationStep(BaseModel):
+    """
+    Model for a single investigation step in Thinkdeep workflow.
+
+    Captures the details of one step in a systematic investigation,
+    including what was found, which files were examined, and the
+    current confidence level in the hypothesis.
+
+    Attributes:
+        step_number: Sequential step number (1-indexed)
+        findings: Key findings and insights discovered in this step
+        files_checked: List of files examined during this step
+        confidence: Current confidence level after this step
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "step_number": 1,
+                "findings": "Found async/await pattern in auth service. No callbacks detected in user-facing API.",
+                "files_checked": [
+                    "src/services/auth.py",
+                    "src/api/users.py",
+                    "tests/test_auth.py"
+                ],
+                "confidence": "high"
+            }
+        }
+    )
+
+    step_number: int = Field(
+        ...,
+        ge=1,
+        description="Sequential step number in the investigation",
+    )
+
+    findings: str = Field(
+        ...,
+        description="Key findings and insights discovered in this step",
+        min_length=1,
+    )
+
+    files_checked: List[str] = Field(
+        default_factory=list,
+        description="List of files examined during this step",
+    )
+
+    confidence: str = Field(
+        ...,
+        description="Current confidence level after this step (ConfidenceLevel value)",
+        min_length=1,
+    )
+
+
+class ThinkDeepState(BaseModel):
+    """
+    State model for Thinkdeep workflow multi-turn conversations.
+
+    Maintains the complete investigation state across conversation turns,
+    tracking hypothesis evolution, investigation steps, confidence progression,
+    and files examined.
+
+    Attributes:
+        hypotheses: List of all hypotheses tracked during investigation
+        steps: List of all investigation steps completed
+        current_confidence: Current overall confidence level
+        relevant_files: All files identified as relevant to the investigation
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "hypotheses": [
+                    {
+                        "hypothesis": "API uses async/await pattern",
+                        "evidence": ["Found async def in auth.py", "Tests use asyncio"],
+                        "status": "validated"
+                    },
+                    {
+                        "hypothesis": "Error handling uses custom exceptions",
+                        "evidence": ["Found CustomError class", "Used in auth service"],
+                        "status": "active"
+                    }
+                ],
+                "steps": [
+                    {
+                        "step_number": 1,
+                        "findings": "Examined auth service implementation",
+                        "files_checked": ["src/auth.py"],
+                        "confidence": "medium"
+                    },
+                    {
+                        "step_number": 2,
+                        "findings": "Validated hypothesis with tests",
+                        "files_checked": ["tests/test_auth.py"],
+                        "confidence": "high"
+                    }
+                ],
+                "current_confidence": "high",
+                "relevant_files": [
+                    "src/services/auth.py",
+                    "src/api/users.py",
+                    "tests/test_auth.py"
+                ]
+            }
+        }
+    )
+
+    hypotheses: List[Hypothesis] = Field(
+        default_factory=list,
+        description="List of all hypotheses tracked during investigation",
+    )
+
+    steps: List[InvestigationStep] = Field(
+        default_factory=list,
+        description="List of all investigation steps completed",
+    )
+
+    current_confidence: str = Field(
+        default="exploring",
+        description="Current overall confidence level (ConfidenceLevel value)",
+    )
+
+    relevant_files: List[str] = Field(
+        default_factory=list,
+        description="All files identified as relevant to the investigation",
+    )
+
+
+class ConversationState(BaseModel):
+    """
+    Generic state container for workflow-specific conversation data.
+
+    Provides type-safe structure for storing arbitrary workflow state
+    while maintaining serializability for file-based persistence.
+    Includes versioning to support schema evolution.
+
+    Attributes:
+        workflow_name: Workflow this state belongs to
+        data: Arbitrary workflow-specific state data
+        schema_version: State schema version for compatibility
+        created_at: ISO timestamp of state creation
+        updated_at: ISO timestamp of last state update
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "workflow_name": "consensus",
+                "data": {
+                    "current_model_index": 2,
+                    "models_consulted": ["gpt-5", "claude", "gemini"],
+                    "consensus_reached": False,
+                    "confidence_level": "medium",
+                },
+                "schema_version": "1.0",
+                "created_at": "2025-11-05T12:00:00Z",
+                "updated_at": "2025-11-05T12:15:00Z",
+            }
+        }
+    )
+
+    workflow_name: str = Field(
+        ...,
+        description="Workflow this state belongs to",
+        min_length=1,
+    )
+
+    data: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Arbitrary workflow-specific state data",
+    )
+
+    schema_version: str = Field(
+        default="1.0",
+        description="State schema version for compatibility",
+    )
+
+    created_at: str = Field(
+        ...,
+        description="ISO timestamp of state creation",
+    )
+
+    updated_at: str = Field(
+        ...,
+        description="ISO timestamp of last state update",
     )

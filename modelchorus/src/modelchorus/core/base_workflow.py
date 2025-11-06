@@ -10,6 +10,9 @@ from typing import Any, Dict, List, Optional
 from dataclasses import dataclass, field
 from datetime import datetime
 
+from .conversation import ConversationMemory
+from .models import ConversationThread, ConversationMessage
+
 
 @dataclass
 class WorkflowStep:
@@ -55,9 +58,16 @@ class BaseWorkflow(ABC):
         name: Human-readable name of the workflow
         description: Brief description of what this workflow does
         config: Configuration dictionary for the workflow
+        conversation_memory: Optional ConversationMemory instance for multi-turn conversations
     """
 
-    def __init__(self, name: str, description: str, config: Optional[Dict[str, Any]] = None):
+    def __init__(
+        self,
+        name: str,
+        description: str,
+        config: Optional[Dict[str, Any]] = None,
+        conversation_memory: Optional[ConversationMemory] = None
+    ):
         """
         Initialize the base workflow.
 
@@ -65,10 +75,12 @@ class BaseWorkflow(ABC):
             name: Human-readable workflow name
             description: Brief description of the workflow
             config: Optional configuration dictionary
+            conversation_memory: Optional ConversationMemory for multi-turn conversations
         """
         self.name = name
         self.description = description
         self.config = config or {}
+        self.conversation_memory = conversation_memory
         self._result: Optional[WorkflowResult] = None
 
     @abstractmethod
@@ -136,6 +148,96 @@ class BaseWorkflow(ABC):
             True if configuration is valid, False otherwise
         """
         return True
+
+    # ========================================================================
+    # Conversation Support Methods (task-1-5-2)
+    # ========================================================================
+
+    def get_thread(self, thread_id: str) -> Optional[ConversationThread]:
+        """
+        Retrieve conversation thread by ID.
+
+        Convenience wrapper for conversation_memory.get_thread().
+        Returns None if conversation_memory not available or thread not found.
+
+        Args:
+            thread_id: Thread ID to retrieve
+
+        Returns:
+            ConversationThread if found, None otherwise
+
+        Example:
+            >>> thread = workflow.get_thread(continuation_id)
+            >>> if thread:
+            ...     print(f"Found thread with {len(thread.messages)} messages")
+        """
+        if not self.conversation_memory:
+            return None
+        return self.conversation_memory.get_thread(thread_id)
+
+    def add_message(
+        self,
+        thread_id: str,
+        role: str,
+        content: str,
+        **kwargs
+    ) -> bool:
+        """
+        Add message to conversation thread.
+
+        Convenience wrapper for conversation_memory.add_message().
+        Returns False if conversation_memory not available or operation fails.
+
+        Args:
+            thread_id: Thread to add message to
+            role: Message role ('user' or 'assistant')
+            content: Message content
+            **kwargs: Additional arguments passed to ConversationMemory.add_message()
+                     (files, workflow_name, model_provider, model_name, metadata)
+
+        Returns:
+            True if successful, False otherwise
+
+        Example:
+            >>> success = workflow.add_message(
+            ...     thread_id,
+            ...     "assistant",
+            ...     "Analysis complete",
+            ...     model_name="gpt-5"
+            ... )
+        """
+        if not self.conversation_memory:
+            return False
+        return self.conversation_memory.add_message(thread_id, role, content, **kwargs)
+
+    def resume_conversation(self, thread_id: str) -> Optional[List[ConversationMessage]]:
+        """
+        Resume conversation from existing thread.
+
+        Retrieves thread and returns messages for context. This is a convenience
+        method combining get_thread() and message extraction.
+
+        Args:
+            thread_id: Thread ID to resume from
+
+        Returns:
+            List of messages if thread found, None otherwise
+
+        Example:
+            >>> messages = workflow.resume_conversation(continuation_id)
+            >>> if messages:
+            ...     print(f"Resuming with {len(messages)} messages of context")
+            ...     for msg in messages[-5:]:  # Last 5 messages
+            ...         print(f"{msg.role}: {msg.content[:50]}...")
+        """
+        if not self.conversation_memory:
+            return None
+
+        thread = self.conversation_memory.get_thread(thread_id)
+        if not thread:
+            return None
+
+        return thread.messages
 
     def __repr__(self) -> str:
         """String representation of the workflow."""

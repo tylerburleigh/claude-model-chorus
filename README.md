@@ -7,11 +7,162 @@ Multi-model AI consensus building for Claude Code. Orchestrate responses from mu
 ModelChorus is both a **Python package** for multi-model AI orchestration and a **Claude Code plugin** for seamless consensus building within your development workflow.
 
 **Key Features:**
+- **Multiple Workflows** - CHAT, THINKDEEP, and CONSENSUS for different use cases
 - **Multi-Provider Support** - Coordinate Claude, Gemini, OpenAI Codex, and Cursor Agent
-- **Flexible Consensus Strategies** - Choose from 5 strategies: all_responses, first_valid, majority, weighted, synthesize
+- **Conversation Continuity** - Multi-turn conversations with state persistence
+- **Systematic Investigation** - Hypothesis tracking and confidence progression
 - **CLI & Python API** - Use via command-line or programmatically
 - **Async Execution** - Parallel provider calls for speed
 - **Rich Output** - Beautiful terminal output with detailed results
+
+---
+
+## Core Workflows
+
+ModelChorus provides three powerful workflows for different scenarios:
+
+### CHAT - Simple Conversation
+
+**Single-model conversation with continuity**
+
+Quick consultations, iterative refinement, and building on previous responses.
+
+**CLI Example:**
+```bash
+# Start conversation
+modelchorus chat "What is quantum computing?" -p claude
+# Returns: Thread ID: abc-123
+
+# Continue conversation
+modelchorus chat "Give me an example" --continue abc-123
+```
+
+**Python Example:**
+```python
+from modelchorus.workflows import ChatWorkflow
+from modelchorus.providers import ClaudeProvider
+from modelchorus.core.conversation import ConversationMemory
+
+provider = ClaudeProvider()
+memory = ConversationMemory()
+workflow = ChatWorkflow(provider, conversation_memory=memory)
+
+# First message
+result1 = await workflow.run("What is quantum computing?")
+thread_id = result1.metadata.get('thread_id')
+
+# Follow-up
+result2 = await workflow.run(
+    "How does it differ from classical?",
+    continuation_id=thread_id
+)
+```
+
+**When to use:** Quick Q&A, iterative design, code reviews, learning conversations
+
+---
+
+### THINKDEEP - Systematic Investigation
+
+**Extended reasoning with hypothesis tracking and confidence progression**
+
+Complex debugging, security analysis, and problems requiring methodical investigation.
+
+**CLI Example:**
+```bash
+# Start investigation
+modelchorus thinkdeep "Why is authentication failing?" \
+  -f src/auth.py -p claude -e gemini
+# Returns: Thread ID: def-456
+
+# Continue investigation
+modelchorus thinkdeep "Check async patterns" --continue def-456
+
+# Check progress
+modelchorus thinkdeep-status def-456 --steps
+```
+
+**Python Example:**
+```python
+from modelchorus.workflows import ThinkDeepWorkflow
+from modelchorus.providers import ClaudeProvider, GeminiProvider
+from modelchorus.core.conversation import ConversationMemory
+
+provider = ClaudeProvider()
+expert = GeminiProvider()  # Optional
+memory = ConversationMemory()
+workflow = ThinkDeepWorkflow(
+    provider,
+    expert_provider=expert,
+    conversation_memory=memory
+)
+
+# Start investigation
+result1 = await workflow.run(
+    "Authentication failing intermittently",
+    files=["src/auth.py", "tests/test_auth.py"]
+)
+thread_id = result1.metadata.get('thread_id')
+
+# Continue with new findings
+result2 = await workflow.run(
+    "Found race condition in token validation",
+    continuation_id=thread_id
+)
+
+# Check investigation state
+state = workflow.get_investigation_state(thread_id)
+print(f"Confidence: {state.current_confidence}")
+print(f"Hypotheses: {len(state.hypotheses)}")
+```
+
+**Key Features:**
+- Hypothesis tracking and evolution
+- Confidence progression (exploring → certain)
+- Optional expert validation from second model
+- File examination tracking
+- State persistence across sessions
+
+**When to use:** Complex bugs, security analysis, performance issues, systematic problem-solving
+
+---
+
+### CONSENSUS - Multi-Model Perspectives
+
+**Coordinate multiple AI models for robust answers**
+
+Architecture decisions, technology evaluations, and reducing single-model bias.
+
+**CLI Example:**
+```bash
+# Get multiple perspectives
+modelchorus consensus "REST vs GraphQL for our API?" \
+  -p claude -p gemini -p codex -s synthesize
+```
+
+**Python Example:**
+```python
+from modelchorus.workflows import ConsensusWorkflow, ConsensusStrategy
+from modelchorus.providers import ClaudeProvider, GeminiProvider
+
+providers = [ClaudeProvider(), GeminiProvider()]
+workflow = ConsensusWorkflow(
+    providers=providers,
+    strategy=ConsensusStrategy.SYNTHESIZE
+)
+
+request = GenerationRequest(
+    prompt="Explain trade-offs between REST and GraphQL",
+    temperature=0.7
+)
+
+result = await workflow.execute(request)
+print(f"Consensus: {result.consensus_response}")
+```
+
+**When to use:** Important decisions, multiple expert perspectives, comparing approaches
+
+**See [docs/WORKFLOWS.md](docs/WORKFLOWS.md) for detailed workflow guides and decision trees.**
 
 ## Installation
 
@@ -54,68 +205,91 @@ pip install -e ".[dev]"
 
 ### Via CLI
 
+**CHAT - Simple conversation:**
 ```bash
-# Basic consensus with 2 providers
-modelchorus consensus "Explain quantum computing" \
-  --provider claude \
-  --provider gemini
+modelchorus chat "Explain quantum computing" -p claude
+# Returns: Thread ID: abc-123
 
-# With synthesis strategy
-modelchorus consensus "What's the best caching strategy?" \
-  -p claude -p gemini -p codex \
-  -s synthesize \
-  --verbose
+modelchorus chat "Give me an example" --continue abc-123
+```
 
-# Save results to JSON
-modelchorus consensus "Design a microservices architecture" \
-  -p claude -p gemini \
-  -s synthesize \
-  --output results.json
+**THINKDEEP - Systematic investigation:**
+```bash
+modelchorus thinkdeep "Debug authentication issue" \
+  -f src/auth.py -p claude -e gemini
+
+modelchorus thinkdeep-status thread-id-here --steps
+```
+
+**CONSENSUS - Multi-model perspectives:**
+```bash
+modelchorus consensus "REST vs GraphQL?" \
+  -p claude -p gemini -s synthesize
 ```
 
 ### Via Python API
 
+**CHAT workflow:**
 ```python
-import asyncio
+from modelchorus.workflows import ChatWorkflow
+from modelchorus.providers import ClaudeProvider
+from modelchorus.core.conversation import ConversationMemory
+
+provider = ClaudeProvider()
+memory = ConversationMemory()
+workflow = ChatWorkflow(provider, conversation_memory=memory)
+
+result = await workflow.run("Explain quantum computing")
+thread_id = result.metadata.get('thread_id')
+
+# Continue conversation
+result2 = await workflow.run(
+    "Give me an example",
+    continuation_id=thread_id
+)
+```
+
+**THINKDEEP workflow:**
+```python
+from modelchorus.workflows import ThinkDeepWorkflow
+from modelchorus.providers import ClaudeProvider, GeminiProvider
+from modelchorus.core.conversation import ConversationMemory
+
+provider = ClaudeProvider()
+expert = GeminiProvider()
+memory = ConversationMemory()
+workflow = ThinkDeepWorkflow(provider, expert_provider=expert, conversation_memory=memory)
+
+result = await workflow.run(
+    "Debug authentication issue",
+    files=["src/auth.py"]
+)
+state = workflow.get_investigation_state(result.metadata['thread_id'])
+```
+
+**CONSENSUS workflow:**
+```python
 from modelchorus.workflows import ConsensusWorkflow, ConsensusStrategy
 from modelchorus.providers import ClaudeProvider, GeminiProvider, GenerationRequest
 
-async def main():
-    # Create providers
-    providers = [ClaudeProvider(), GeminiProvider()]
+providers = [ClaudeProvider(), GeminiProvider()]
+workflow = ConsensusWorkflow(providers=providers, strategy=ConsensusStrategy.SYNTHESIZE)
 
-    # Create workflow
-    workflow = ConsensusWorkflow(
-        providers=providers,
-        strategy=ConsensusStrategy.SYNTHESIZE,
-        default_timeout=120.0
-    )
-
-    # Create request
-    request = GenerationRequest(
-        prompt="Explain the trade-offs between REST and GraphQL",
-        system_prompt="You are a senior software architect",
-        temperature=0.7
-    )
-
-    # Execute
-    result = await workflow.execute(request, strategy=ConsensusStrategy.SYNTHESIZE)
-
-    print(f"Consensus: {result.consensus_response}")
-    print(f"Responses from {len(result.provider_results)} providers")
-
-asyncio.run(main())
+request = GenerationRequest(prompt="REST vs GraphQL trade-offs", temperature=0.7)
+result = await workflow.execute(request)
 ```
 
 ### Via Claude Code Skill
 
-```
-Use Skill(model-chorus:consensus) by running:
+```bash
+# CHAT workflow
+modelchorus chat "How do I implement JWT auth?" -p claude
 
-modelchorus consensus "Should we use TypeScript or JavaScript?" \
-  --provider claude \
-  --provider gemini \
-  --strategy synthesize
+# THINKDEEP workflow
+modelchorus thinkdeep "Investigate memory leak" -f src/cache.py -p claude -e gemini
+
+# CONSENSUS workflow
+modelchorus consensus "TypeScript vs JavaScript?" -p claude -p gemini -s synthesize
 ```
 
 ## Consensus Strategies
@@ -172,7 +346,14 @@ export OPENAI_API_KEY="your-key"
 ## CLI Commands
 
 ```bash
-# Run consensus
+# CHAT workflow
+modelchorus chat "prompt" [options]
+
+# THINKDEEP workflow
+modelchorus thinkdeep "prompt" [options]
+modelchorus thinkdeep-status THREAD_ID [options]
+
+# CONSENSUS workflow
 modelchorus consensus "prompt" [options]
 
 # List available providers and models
@@ -183,11 +364,62 @@ modelchorus version
 
 # Help
 modelchorus --help
+modelchorus chat --help
+modelchorus thinkdeep --help
 modelchorus consensus --help
 ```
 
 ## CLI Options
 
+### CHAT Command
+```
+modelchorus chat [PROMPT]
+
+Arguments:
+  PROMPT                    Your question or message [required]
+
+Options:
+  -p, --provider TEXT       Provider to use [default: claude]
+  --continue TEXT          Thread ID to continue conversation
+  -f, --files TEXT         Files to include (repeatable)
+  --system TEXT            System prompt for context
+  -t, --temperature FLOAT   Temperature (0.0-1.0) [default: 0.7]
+  --max-tokens INTEGER      Maximum tokens to generate
+  -o, --output PATH        Save results to JSON file
+  -v, --verbose            Show detailed execution info
+```
+
+### THINKDEEP Command
+```
+modelchorus thinkdeep [PROMPT]
+
+Arguments:
+  PROMPT                    Investigation question or task [required]
+
+Options:
+  -p, --provider TEXT       Primary provider [default: claude]
+  -e, --expert TEXT         Expert provider for validation (optional)
+  --continue TEXT          Thread ID to continue investigation
+  -f, --files TEXT         Files to examine (repeatable)
+  --system TEXT            System prompt for context
+  -t, --temperature FLOAT   Temperature (0.0-1.0) [default: 0.7]
+  --max-tokens INTEGER      Maximum tokens to generate
+  --disable-expert         Disable expert validation
+  -o, --output PATH        Save results to JSON file
+  -v, --verbose            Show detailed execution info
+
+modelchorus thinkdeep-status [THREAD_ID]
+
+Arguments:
+  THREAD_ID                Investigation thread to inspect [required]
+
+Options:
+  --steps                  Show all investigation steps
+  --files                  Show examined files
+  -v, --verbose            Show detailed information
+```
+
+### CONSENSUS Command
 ```
 modelchorus consensus [PROMPT]
 
@@ -203,46 +435,54 @@ Options:
   --timeout FLOAT          Timeout per provider (seconds) [default: 120.0]
   -o, --output PATH        Save results to JSON file
   -v, --verbose            Show detailed execution info
-  --help                   Show help message
 ```
 
 ## Examples
 
-### Example 1: Technical Decision
+### Example 1: Iterative Code Review (CHAT)
+
+```bash
+# Start code review
+modelchorus chat "Review this authentication function" \
+  -f src/auth.py -p claude
+# Returns: Thread ID: abc-123
+
+# Follow-up questions
+modelchorus chat "How would you refactor the token validation?" --continue abc-123
+modelchorus chat "Add error handling examples" --continue abc-123
+```
+
+**Result:** Multi-turn conversation with full context of previous messages.
+
+### Example 2: Complex Bug Investigation (THINKDEEP)
+
+```bash
+# Start investigation
+modelchorus thinkdeep "Users report intermittent 500 errors" \
+  -f src/api/users.py -f logs/error.log \
+  -p claude -e gemini
+# Returns: Thread ID: def-456
+
+# Continue with findings
+modelchorus thinkdeep "Found race condition in async handler" --continue def-456
+
+# Check investigation progress
+modelchorus thinkdeep-status def-456 --steps --files
+```
+
+**Result:** Systematic investigation with hypothesis tracking and confidence progression.
+
+### Example 3: Architecture Decision (CONSENSUS)
 
 ```bash
 modelchorus consensus \
   "Should we use REST or GraphQL for our API?" \
   -p claude -p gemini -p codex \
-  -s all_responses \
+  -s synthesize \
   --output decision.json
 ```
 
-Result: See all three perspectives, save for team review.
-
-### Example 2: Architecture Design
-
-```bash
-modelchorus consensus \
-  "Design a caching strategy for 100k concurrent users" \
-  -p claude -p gemini \
-  -s synthesize \
-  --system "You are a senior distributed systems architect" \
-  --verbose
-```
-
-Result: Synthesized design incorporating both models' expertise.
-
-### Example 3: Quick Answer
-
-```bash
-modelchorus consensus \
-  "How do I reverse a list in Python?" \
-  -p claude -p codex \
-  -s first_valid
-```
-
-Result: Fast answer from whichever provider responds first.
+**Result:** Synthesized recommendation from multiple AI perspectives.
 
 ## Output Format
 

@@ -29,7 +29,9 @@
   },
   "components": {
     "skills": [
-      "consensus"
+      "consensus",
+      "chat",
+      "thinkdeep"
     ]
   }
 }

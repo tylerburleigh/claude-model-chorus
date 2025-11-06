@@ -9,6 +9,7 @@ import asyncio
 import json
 import logging
 from abc import abstractmethod
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from .base_provider import (
@@ -66,6 +67,38 @@ class CLIProvider(ModelProvider):
         self.timeout = timeout
         self.retry_limit = retry_limit
 
+    def _load_conversation_context(self, continuation_id: str) -> Optional[Dict[str, Any]]:
+        """
+        Load conversation context from continuation_id.
+
+        Reads the conversation thread file and serializes it for CLI invocation.
+        Returns None if the thread file doesn't exist or can't be loaded.
+
+        Args:
+            continuation_id: Thread ID to load conversation context for
+
+        Returns:
+            Dictionary with conversation context or None if not found
+        """
+        try:
+            # Default conversations directory
+            conversations_dir = Path.home() / ".modelchorus" / "conversations"
+            thread_file = conversations_dir / f"{continuation_id}.json"
+
+            if not thread_file.exists():
+                logger.warning(f"Conversation thread not found: {continuation_id}")
+                return None
+
+            with open(thread_file, "r") as f:
+                thread_data = json.load(f)
+
+            logger.debug(f"Loaded conversation context for {continuation_id}")
+            return thread_data
+
+        except Exception as e:
+            logger.error(f"Error loading conversation context: {e}")
+            return None
+
     @abstractmethod
     def build_command(self, request: GenerationRequest) -> List[str]:
         """
@@ -73,6 +106,10 @@ class CLIProvider(ModelProvider):
 
         Subclasses must implement this to construct the appropriate command
         for their specific CLI tool.
+
+        If request.continuation_id is present, subclasses can use
+        self._load_conversation_context(continuation_id) to retrieve
+        conversation history for multi-turn conversations.
 
         Args:
             request: GenerationRequest containing prompt and parameters

@@ -1,0 +1,1900 @@
+{
+  "spec_id": "document-workflows-2025-11-06-001",
+  "generated": "2025-11-06T13:00:00Z",
+  "last_updated": "2025-11-06T13:01:52.552000Z",
+  "metadata": {
+    "title": "Document Processing Workflows (DIGEST, SYNTHESIZE, REVIEW)",
+    "description": "Implement document infrastructure and three document-focused workflows for ModelChorus: DIGEST (single-document summarization), SYNTHESIZE (multi-document analysis), and REVIEW (committee-based critical analysis)",
+    "estimated_effort_hours": 152,
+    "complexity": "high",
+    "dependencies": [
+      "Requires general-purpose-workflows-2025-11-06-001 to be completed (citation engine, role framework)"
+    ],
+    "objectives": [
+      "Build document ingestion and parsing infrastructure",
+      "Implement DIGEST workflow for structured single-document summaries",
+      "Implement SYNTHESIZE workflow for multi-document synthesis with citations",
+      "Implement REVIEW workflow for multi-perspective critical analysis",
+      "Expose workflows via CLI",
+      "Comprehensive testing and documentation"
+    ],
+    "success_criteria": [
+      "All 3 document workflows operational with CLI commands",
+      "Document parser handles PDF, DOCX, TXT, MD formats",
+      "SYNTHESIZE maintains 95%+ citation accuracy",
+      "All tests pass with >80% coverage",
+      "User documentation complete for each workflow"
+    ]
+  },
+  "hierarchy": {
+    "spec-root": {
+      "type": "spec",
+      "title": "Document Processing Workflows (DIGEST, SYNTHESIZE, REVIEW)",
+      "status": "pending",
+      "parent": null,
+      "children": [
+        "phase-1",
+        "phase-2",
+        "phase-3",
+        "phase-4",
+        "phase-5",
+        "phase-6"
+      ],
+      "total_tasks": 64,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "phase-1": {
+      "type": "phase",
+      "title": "Document Infrastructure",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-1-files",
+        "phase-1-verify"
+      ],
+      "total_tasks": 18,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Build document ingestion pipeline and parsing infrastructure for all document workflows",
+        "risk_level": "high",
+        "estimated_hours": 48
+      },
+      "dependencies": {
+        "blocks": [
+          "phase-2",
+          "phase-3",
+          "phase-4"
+        ]
+      }
+    },
+    "phase-1-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "task-1-1",
+        "task-1-2",
+        "task-1-3",
+        "task-1-4",
+        "task-1-5"
+      ],
+      "total_tasks": 15,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-1-verify"
+        ]
+      }
+    },
+    "task-1-1": {
+      "type": "task",
+      "title": "modelchorus/src/modelchorus/core/document_parser.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-1-1",
+        "task-1-1-2",
+        "task-1-1-3",
+        "task-1-1-4"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-1-2",
+          "task-2-1",
+          "task-3-1",
+          "task-4-1",
+          "task-1-5"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/core/document_parser.py",
+        "task_category": "implementation",
+        "estimated_hours": 12,
+        "description": "Document parser for multiple formats (PDF, DOCX, TXT, MD)"
+      }
+    },
+    "task-1-1-1": {
+      "type": "subtask",
+      "title": "Create DocumentParser base class with format detection",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-1-2": {
+      "type": "subtask",
+      "title": "Implement PDF parser (using PyPDF2 or pdfplumber)",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-1-3": {
+      "type": "subtask",
+      "title": "Implement DOCX parser (using python-docx)",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-1-4": {
+      "type": "subtask",
+      "title": "Implement TXT/MD parsers with encoding detection",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-2": {
+      "type": "task",
+      "title": "modelchorus/src/modelchorus/core/document_chunker.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-2-1",
+        "task-1-2-2",
+        "task-1-2-3"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-3-1"
+        ],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/core/document_chunker.py",
+        "task_category": "implementation",
+        "estimated_hours": 8,
+        "description": "Intelligent document chunking for processing large documents"
+      }
+    },
+    "task-1-2-1": {
+      "type": "subtask",
+      "title": "Create DocumentChunker with semantic chunking strategy",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-2-2": {
+      "type": "subtask",
+      "title": "Implement chunk size optimization and overlap handling",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-2-3": {
+      "type": "subtask",
+      "title": "Add metadata preservation across chunks",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-3": {
+      "type": "task",
+      "title": "modelchorus/src/modelchorus/core/document_models.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-3-1",
+        "task-1-3-2",
+        "task-1-3-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/core/document_models.py",
+        "task_category": "implementation",
+        "estimated_hours": 6,
+        "description": "Data models for documents, sections, chunks, and metadata"
+      }
+    },
+    "task-1-3-1": {
+      "type": "subtask",
+      "title": "Create Document dataclass with metadata and sections",
+      "status": "pending",
+      "parent": "task-1-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-3-2": {
+      "type": "subtask",
+      "title": "Create Section and Chunk dataclasses",
+      "status": "pending",
+      "parent": "task-1-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-3-3": {
+      "type": "subtask",
+      "title": "Create DocumentMetadata with author, date, source tracking",
+      "status": "pending",
+      "parent": "task-1-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-4": {
+      "type": "task",
+      "title": "modelchorus/src/modelchorus/core/section_detector.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-4-1",
+        "task-1-4-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/core/section_detector.py",
+        "task_category": "implementation",
+        "estimated_hours": 6,
+        "description": "Automatic section detection using headings and structure"
+      }
+    },
+    "task-1-4-1": {
+      "type": "subtask",
+      "title": "Implement heading-based section detection",
+      "status": "pending",
+      "parent": "task-1-4",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-4-2": {
+      "type": "subtask",
+      "title": "Add semantic section boundary detection for unstructured text",
+      "status": "pending",
+      "parent": "task-1-4",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-5": {
+      "type": "task",
+      "title": "tests/test_document_infrastructure.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-5-1",
+        "task-1-5-2",
+        "task-1-5-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "tests/test_document_infrastructure.py",
+        "task_category": "implementation",
+        "estimated_hours": 8,
+        "description": "Comprehensive tests for document infrastructure"
+      }
+    },
+    "task-1-5-1": {
+      "type": "subtask",
+      "title": "Test parser for all supported formats",
+      "status": "pending",
+      "parent": "task-1-5",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-5-2": {
+      "type": "subtask",
+      "title": "Test chunking strategies and metadata preservation",
+      "status": "pending",
+      "parent": "task-1-5",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-5-3": {
+      "type": "subtask",
+      "title": "Test section detection accuracy",
+      "status": "pending",
+      "parent": "task-1-5",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "phase-1-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "verify-1-1",
+        "verify-1-2",
+        "verify-1-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-1-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-1-1": {
+      "type": "verify",
+      "title": "Document parser handles all formats correctly",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest tests/test_document_infrastructure.py::test_parser -v",
+        "expected": "PDF, DOCX, TXT, MD files parsed correctly with metadata"
+      }
+    },
+    "verify-1-2": {
+      "type": "verify",
+      "title": "Chunking preserves context and metadata",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest tests/test_document_infrastructure.py::test_chunker -v",
+        "expected": "Chunks maintain semantic coherence and metadata links"
+      }
+    },
+    "verify-1-3": {
+      "type": "verify",
+      "title": "Section detection identifies document structure",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest tests/test_document_infrastructure.py::test_section_detector -v",
+        "expected": "Sections correctly identified in structured and unstructured documents"
+      }
+    },
+    "phase-2": {
+      "type": "phase",
+      "title": "DIGEST Workflow Implementation",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-2-files",
+        "phase-2-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-5"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 9,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Implement DIGEST workflow for structured single-document summarization",
+        "risk_level": "medium",
+        "estimated_hours": 20
+      }
+    },
+    "phase-2-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "task-2-1",
+        "task-2-2",
+        "task-2-3",
+        "task-2-4"
+      ],
+      "total_tasks": 7,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-2-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-2-1": {
+      "type": "task",
+      "title": "modelchorus/src/modelchorus/workflows/digest.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-1-1",
+        "task-2-1-2",
+        "task-2-1-3",
+        "task-2-1-4"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-2-3",
+          "task-2-4"
+        ],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/workflows/digest.py",
+        "task_category": "implementation",
+        "estimated_hours": 10,
+        "description": "DIGEST workflow with extractive highlighting and abstractive summarization"
+      }
+    },
+    "task-2-1-1": {
+      "type": "subtask",
+      "title": "Create DigestWorkflow class extending BaseWorkflow",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-1-2": {
+      "type": "subtask",
+      "title": "Implement extractive highlight selection with fast model",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-1-3": {
+      "type": "subtask",
+      "title": "Implement abstractive summary generation",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-1-4": {
+      "type": "subtask",
+      "title": "Add optional enhancements (action items, key quotes, questions)",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-2": {
+      "type": "task",
+      "title": "modelchorus/src/modelchorus/core/models.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-2-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/core/models.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "description": "Add DigestState and Summary data models"
+      }
+    },
+    "task-2-2-1": {
+      "type": "subtask",
+      "title": "Add DigestState, Summary, Highlight, ActionItem dataclasses",
+      "status": "pending",
+      "parent": "task-2-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-3": {
+      "type": "task",
+      "title": "tests/test_digest_workflow.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "tests/test_digest_workflow.py",
+        "task_category": "implementation",
+        "estimated_hours": 5,
+        "description": "Unit and integration tests for DIGEST workflow"
+      }
+    },
+    "task-2-4": {
+      "type": "task",
+      "title": "modelchorus/src/modelchorus/workflows/__init__.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/workflows/__init__.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "description": "Export DigestWorkflow"
+      }
+    },
+    "phase-2-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "verify-2-1",
+        "verify-2-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-2-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-2-1": {
+      "type": "verify",
+      "title": "DIGEST workflow produces structured summaries",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest tests/test_digest_workflow.py -v",
+        "expected": "Extractive highlights and abstractive summaries generated correctly"
+      }
+    },
+    "verify-2-2": {
+      "type": "verify",
+      "title": "Action items and key quotes extracted accurately",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "",
+        "expected": "Action items are actionable, quotes are relevant and accurate"
+      }
+    },
+    "phase-3": {
+      "type": "phase",
+      "title": "SYNTHESIZE Workflow Implementation",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-3-files",
+        "phase-3-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-5"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
+        "depends": [
+          "general-purpose-workflows-2025-11-06-001:phase-1"
+        ]
+      },
+      "total_tasks": 12,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Implement SYNTHESIZE workflow for multi-document analysis with citations",
+        "risk_level": "high",
+        "estimated_hours": 40,
+        "notes": "Requires citation engine from general-purpose-workflows spec"
+      }
+    },
+    "phase-3-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "task-3-1",
+        "task-3-2",
+        "task-3-3",
+        "task-3-4"
+      ],
+      "total_tasks": 9,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-3-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-3-1": {
+      "type": "task",
+      "title": "modelchorus/src/modelchorus/workflows/synthesize.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-1-1",
+        "task-3-1-2",
+        "task-3-1-3",
+        "task-3-1-4",
+        "task-3-1-5",
+        "task-3-1-6"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-3-3",
+          "task-3-4"
+        ],
+        "blocked_by": [
+          "task-1-1",
+          "task-1-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/workflows/synthesize.py",
+        "task_category": "implementation",
+        "estimated_hours": 20,
+        "description": "SYNTHESIZE workflow for multi-document analysis with theme extraction and citations"
+      }
+    },
+    "task-3-1-1": {
+      "type": "subtask",
+      "title": "Create SynthesizeWorkflow class extending BaseWorkflow",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-1-2": {
+      "type": "subtask",
+      "title": "Implement parallel document extraction with citation tracking",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-1-3": {
+      "type": "subtask",
+      "title": "Implement theme clustering across documents",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-1-4": {
+      "type": "subtask",
+      "title": "Implement contradiction detection across sources",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-1-5": {
+      "type": "subtask",
+      "title": "Implement knowledge gap analysis",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-1-6": {
+      "type": "subtask",
+      "title": "Generate synthesis report with embedded citations",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-2": {
+      "type": "task",
+      "title": "modelchorus/src/modelchorus/core/models.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-2-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/core/models.py",
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "description": "Add SynthesisState, Theme, KnowledgeGap data models"
+      }
+    },
+    "task-3-2-1": {
+      "type": "subtask",
+      "title": "Add SynthesisState, Theme, KnowledgeGap, SynthesisReport dataclasses",
+      "status": "pending",
+      "parent": "task-3-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-3": {
+      "type": "task",
+      "title": "tests/test_synthesize_workflow.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-3-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "tests/test_synthesize_workflow.py",
+        "task_category": "implementation",
+        "estimated_hours": 10,
+        "description": "Unit and integration tests for SYNTHESIZE workflow"
+      }
+    },
+    "task-3-4": {
+      "type": "task",
+      "title": "modelchorus/src/modelchorus/workflows/__init__.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-3-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/workflows/__init__.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "description": "Export SynthesizeWorkflow"
+      }
+    },
+    "phase-3-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "verify-3-1",
+        "verify-3-2",
+        "verify-3-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-3-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-3-1": {
+      "type": "verify",
+      "title": "SYNTHESIZE workflow extracts themes across documents",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest tests/test_synthesize_workflow.py -v",
+        "expected": "Themes clustered, contradictions detected, gaps identified"
+      }
+    },
+    "verify-3-2": {
+      "type": "verify",
+      "title": "Citation accuracy meets 95%+ threshold",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "",
+        "expected": "Spot check 30+ citations across multiple documents, verify 95%+ accuracy"
+      }
+    },
+    "verify-3-3": {
+      "type": "verify",
+      "title": "Synthesis report is coherent and well-structured",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "",
+        "expected": "Report flows logically, themes are clear, contradictions explained"
+      }
+    },
+    "phase-4": {
+      "type": "phase",
+      "title": "REVIEW Workflow Implementation",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-4-files",
+        "phase-4-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-5"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
+        "depends": [
+          "general-purpose-workflows-2025-11-06-001:phase-1"
+        ]
+      },
+      "total_tasks": 9,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Implement REVIEW workflow for multi-perspective critical document analysis",
+        "risk_level": "medium",
+        "estimated_hours": 24,
+        "notes": "Requires role orchestration from general-purpose-workflows spec"
+      }
+    },
+    "phase-4-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "task-4-1",
+        "task-4-2",
+        "task-4-3",
+        "task-4-4"
+      ],
+      "total_tasks": 7,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-4-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-4-1": {
+      "type": "task",
+      "title": "modelchorus/src/modelchorus/workflows/review.py",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-1-1",
+        "task-4-1-2",
+        "task-4-1-3",
+        "task-4-1-4"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-4-3",
+          "task-4-4"
+        ],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/workflows/review.py",
+        "task_category": "implementation",
+        "estimated_hours": 12,
+        "description": "REVIEW workflow with parallel committee analysis (Summarizer, Critic, Amplifier)"
+      }
+    },
+    "task-4-1-1": {
+      "type": "subtask",
+      "title": "Create ReviewWorkflow class extending BaseWorkflow",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-4-1-2": {
+      "type": "subtask",
+      "title": "Implement parallel committee analysis (Summarizer, Critic, Amplifier)",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-4-1-3": {
+      "type": "subtask",
+      "title": "Implement consolidation using consensus synthesis",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-4-1-4": {
+      "type": "subtask",
+      "title": "Generate multi-faceted review with confidence scores",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-4-2": {
+      "type": "task",
+      "title": "modelchorus/src/modelchorus/core/models.py",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-2-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/core/models.py",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "description": "Add ReviewState, CriticalAnalysis, OpportunityAnalysis data models"
+      }
+    },
+    "task-4-2-1": {
+      "type": "subtask",
+      "title": "Add ReviewState, CriticalAnalysis, OpportunityAnalysis, IntegratedReview dataclasses",
+      "status": "pending",
+      "parent": "task-4-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-4-3": {
+      "type": "task",
+      "title": "tests/test_review_workflow.py",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-4-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "tests/test_review_workflow.py",
+        "task_category": "implementation",
+        "estimated_hours": 6,
+        "description": "Unit and integration tests for REVIEW workflow"
+      }
+    },
+    "task-4-4": {
+      "type": "task",
+      "title": "modelchorus/src/modelchorus/workflows/__init__.py",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-4-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/workflows/__init__.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "description": "Export ReviewWorkflow"
+      }
+    },
+    "phase-4-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "verify-4-1",
+        "verify-4-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-4-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-4-1": {
+      "type": "verify",
+      "title": "REVIEW workflow provides multi-perspective analysis",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest tests/test_review_workflow.py -v",
+        "expected": "Summarizer, Critic, Amplifier perspectives generated and synthesized"
+      }
+    },
+    "verify-4-2": {
+      "type": "verify",
+      "title": "Review provides balanced assessment with actionable insights",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "",
+        "expected": "Review identifies strengths, weaknesses, and provides clear recommendations"
+      }
+    },
+    "phase-5": {
+      "type": "phase",
+      "title": "CLI Integration",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-5-files",
+        "phase-5-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-6"
+        ],
+        "blocked_by": [
+          "phase-2",
+          "phase-3",
+          "phase-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 7,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Expose DIGEST, SYNTHESIZE, REVIEW workflows via CLI commands",
+        "risk_level": "low",
+        "estimated_hours": 16
+      }
+    },
+    "phase-5-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "task-5-1",
+        "task-5-2",
+        "task-5-3"
+      ],
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-5-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-5-1": {
+      "type": "task",
+      "title": "modelchorus/src/modelchorus/cli/main.py",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [
+        "task-5-1-1",
+        "task-5-1-2",
+        "task-5-1-3"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-5-2",
+          "task-5-3"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "modelchorus/src/modelchorus/cli/main.py",
+        "task_category": "implementation",
+        "estimated_hours": 8,
+        "description": "Add CLI commands for DIGEST, SYNTHESIZE, REVIEW"
+      }
+    },
+    "task-5-1-1": {
+      "type": "subtask",
+      "title": "Add 'digest' CLI command with format and extraction options",
+      "status": "pending",
+      "parent": "task-5-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-5-1-2": {
+      "type": "subtask",
+      "title": "Add 'synthesize' CLI command with multi-document and citation options",
+      "status": "pending",
+      "parent": "task-5-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-5-1-3": {
+      "type": "subtask",
+      "title": "Add 'review' CLI command with committee role parameters",
+      "status": "pending",
+      "parent": "task-5-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-5-2": {
+      "type": "task",
+      "title": "tests/test_cli_document_workflows.py",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-5-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "tests/test_cli_document_workflows.py",
+        "task_category": "implementation",
+        "estimated_hours": 6,
+        "description": "Integration tests for document workflow CLI commands"
+      }
+    },
+    "task-5-3": {
+      "type": "task",
+      "title": "examples/document_workflow_examples.py",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-5-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "examples/document_workflow_examples.py",
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "description": "Example scripts for document workflows"
+      }
+    },
+    "phase-5-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "verify-5-1",
+        "verify-5-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-5-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-5-1": {
+      "type": "verify",
+      "title": "All document workflow CLI commands execute successfully",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest tests/test_cli_document_workflows.py -v",
+        "expected": "DIGEST, SYNTHESIZE, REVIEW commands work with file inputs"
+      }
+    },
+    "verify-5-2": {
+      "type": "verify",
+      "title": "Example scripts demonstrate document workflows",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "python examples/document_workflow_examples.py",
+        "expected": "Examples process real documents and produce expected outputs"
+      }
+    },
+    "phase-6": {
+      "type": "phase",
+      "title": "Documentation & Polish",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-6-files",
+        "phase-6-verify"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-5"
+        ],
+        "depends": []
+      },
+      "total_tasks": 9,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Create comprehensive documentation for document workflows and infrastructure",
+        "risk_level": "low",
+        "estimated_hours": 16
+      }
+    },
+    "phase-6-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-6",
+      "children": [
+        "task-6-1",
+        "task-6-2",
+        "task-6-3",
+        "task-6-4",
+        "task-6-5",
+        "task-6-6"
+      ],
+      "total_tasks": 7,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-6-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-6-1": {
+      "type": "task",
+      "title": "docs/workflows/DIGEST.md",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/workflows/DIGEST.md",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "description": "User guide for DIGEST workflow"
+      }
+    },
+    "task-6-2": {
+      "type": "task",
+      "title": "docs/workflows/SYNTHESIZE.md",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/workflows/SYNTHESIZE.md",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "description": "User guide for SYNTHESIZE workflow"
+      }
+    },
+    "task-6-3": {
+      "type": "task",
+      "title": "docs/workflows/REVIEW.md",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/workflows/REVIEW.md",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "description": "User guide for REVIEW workflow"
+      }
+    },
+    "task-6-4": {
+      "type": "task",
+      "title": "docs/architecture/DOCUMENT_INFRASTRUCTURE.md",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [
+        "task-6-4-1",
+        "task-6-4-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/architecture/DOCUMENT_INFRASTRUCTURE.md",
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "description": "Architecture documentation for document infrastructure"
+      }
+    },
+    "task-6-4-1": {
+      "type": "subtask",
+      "title": "Document parser architecture and format support",
+      "status": "pending",
+      "parent": "task-6-4",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-6-4-2": {
+      "type": "subtask",
+      "title": "Document chunking strategies and section detection",
+      "status": "pending",
+      "parent": "task-6-4",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-6-5": {
+      "type": "task",
+      "title": "README.md",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "README.md",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "description": "Update README with document workflows"
+      }
+    },
+    "task-6-6": {
+      "type": "task",
+      "title": "CHANGELOG.md",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "CHANGELOG.md",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "description": "Add changelog entries for document workflows"
+      }
+    },
+    "phase-6-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-6",
+      "children": [
+        "verify-6-1",
+        "verify-6-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-6-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-6-1": {
+      "type": "verify",
+      "title": "Documentation is complete and accurate",
+      "status": "pending",
+      "parent": "phase-6-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "",
+        "expected": "All workflows documented, architecture guide covers infrastructure"
+      }
+    },
+    "verify-6-2": {
+      "type": "verify",
+      "title": "Examples in documentation work correctly",
+      "status": "pending",
+      "parent": "phase-6-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "",
+        "expected": "Documentation examples process documents and produce valid outputs"
+      }
+    }
+  }
+}
