@@ -1,7 +1,7 @@
 {
   "spec_id": "general-purpose-workflows-2025-11-06-001",
   "generated": "2025-11-06T12:45:00Z",
-  "last_updated": "2025-11-06T20:53:58.686772Z",
+  "last_updated": "2025-11-06T21:32:38.622487Z",
   "metadata": {
     "title": "General-Purpose Workflows (ARGUMENT, IDEATE, RESEARCH)",
     "description": "Implement foundation infrastructure and three general-purpose workflows for ModelChorus: ARGUMENT (structured debate), IDEATE (creative ideation), and RESEARCH (evidence-based research with citations)",
@@ -24,7 +24,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-06T16:35:09.389143Z",
-    "progress_percentage": 67,
+    "progress_percentage": 69,
     "current_phase": "phase-4"
   },
   "hierarchy": {
@@ -42,7 +42,7 @@
         "phase-6"
       ],
       "total_tasks": 71,
-      "completed_tasks": 48,
+      "completed_tasks": 49,
       "metadata": {},
       "dependencies": {
         "blocks": [],
@@ -1525,7 +1525,7 @@
         "depends": []
       },
       "total_tasks": 11,
-      "completed_tasks": 5,
+      "completed_tasks": 6,
       "metadata": {
         "purpose": "Implement RESEARCH workflow for evidence-based research with citations and validation",
         "risk_level": "high",
@@ -1544,7 +1544,7 @@
         "task-4-4"
       ],
       "total_tasks": 9,
-      "completed_tasks": 5,
+      "completed_tasks": 6,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1557,7 +1557,7 @@
     "task-4-1": {
       "type": "task",
       "title": "modelchorus/src/modelchorus/workflows/research.py",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-4-files",
       "children": [
         "task-4-1-1",
@@ -1579,7 +1579,7 @@
         "depends": []
       },
       "total_tasks": 6,
-      "completed_tasks": 5,
+      "completed_tasks": 6,
       "metadata": {
         "file_path": "modelchorus/src/modelchorus/workflows/research.py",
         "task_category": "implementation",
@@ -1695,7 +1695,7 @@
     "task-4-1-6": {
       "type": "subtask",
       "title": "Generate research dossier with citations and evidence tables",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-4-1",
       "children": [],
       "dependencies": {
@@ -1704,8 +1704,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
-      "metadata": {}
+      "completed_tasks": 1,
+      "metadata": {
+        "started_at": "2025-11-06T21:29:45.480089Z",
+        "completed_at": "2025-11-06T21:32:38.606097Z",
+        "needs_journaling": false,
+        "actual_hours": 0.048,
+        "journaled_at": "2025-11-06T21:32:38.618195Z"
+      }
     },
     "task-4-2": {
       "type": "task",
@@ -2859,6 +2865,15 @@
       "content": "Successfully implemented gap analysis functionality for the ARGUMENT workflow. Created comprehensive gap_analysis.py module with models and detection logic for identifying missing evidence, logical gaps, and unsupported claims. Implemented severity assessment, gap recommendations, and batch detection capabilities. Added 34 comprehensive tests covering all gap types (evidence, logical, support, assumption) with realistic scenarios. All tests pass. Exported gap analysis and contradiction detection APIs through core/__init__.py for easy access. Both contradiction detection (pre-existing) and gap analysis (newly implemented) are now fully functional and tested.",
       "metadata": {},
       "task_id": "task-4-1-5"
+    },
+    {
+      "timestamp": "2025-11-06T21:32:38.618183Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Generate research dossier with citations and evidence tables",
+      "author": "claude-code",
+      "content": "Successfully implemented comprehensive research dossier generation functionality for the ResearchWorkflow class. Added the following methods to research_workflow.py:\n\n1. generate_dossier() - Main method that compiles research findings into formatted markdown dossier with executive summary, citations, evidence tables, contradiction analysis, and validation metrics\n\n2. _create_executive_summary() - Generates executive summary section with evidence counts, source counts, categories, validation statistics, and contradiction counts\n\n3. _format_citations() - Formats source citations section supporting three styles (informal, academic, technical) with proper formatting and credibility indicators\n\n4. _format_single_citation() - Formats individual citations based on selected style\n\n5. _create_evidence_table() - Creates formatted evidence tables organized by category with validation results\n\n6. _create_evidence_category_table() - Generates markdown tables for evidence within each category showing content, source, confidence, relevance, and validation status\n\n7. _format_contradictions() - Formats contradiction analysis section showing evidence with conflicts, supporting/refuting evidence relationships\n\n8. _create_validation_metrics() - Generates validation metrics summary with overall statistics, confidence distribution, and average confidence scores\n\nThe implementation provides flexible dossier generation with options to include/exclude specific sections, supports three citation styles, and creates well-formatted markdown output. Tested successfully with sample data showing proper formatting of all sections including executive summary, citations, categorized evidence tables, contradictions, and validation metrics.\n\nAll methods follow the existing code patterns, include proper error handling, use logging for observability, and integrate seamlessly with the existing ResearchWorkflow architecture including evidence extraction, validation, and contradiction detection features implemented in previous subtasks.",
+      "metadata": {},
+      "task_id": "task-4-1-6"
     }
   ]
 }
