@@ -1490,6 +1490,383 @@ Use the requested format exactly."""
         logger.info("Complete ideation workflow finished successfully")
         return result
 
+    def run_interactive_selection(
+        self,
+        convergent_result: WorkflowResult,
+        max_selections: Optional[int] = None
+    ) -> WorkflowResult:
+        """
+        Run interactive CLI selection of idea clusters.
+
+        Presents scored clusters to the user and allows interactive selection
+        of which clusters to pursue. This is the third step in the complete
+        IDEATE workflow pattern.
+
+        Args:
+            convergent_result: WorkflowResult from run_convergent_analysis()
+            max_selections: Maximum number of clusters user can select (default: unlimited)
+
+        Returns:
+            WorkflowResult containing:
+                - synthesis: Summary of selected clusters
+                - steps: Original convergent steps + selection step
+                - metadata: Selected cluster IDs and selection metadata
+
+        Raises:
+            ValueError: If convergent_result is invalid
+            IOError: If running in non-interactive environment
+
+        Example:
+            >>> # After running convergent analysis
+            >>> convergent_result = await workflow.run_convergent_analysis(brainstorming_result)
+            >>>
+            >>> # Interactively select clusters
+            >>> selection_result = workflow.run_interactive_selection(convergent_result)
+            >>>
+            >>> # Access selected clusters
+            >>> selected = selection_result.metadata['selected_clusters']
+            >>> print(f"Selected {len(selected)} clusters for implementation")
+        """
+        if not convergent_result or not convergent_result.steps:
+            raise ValueError("Convergent result must have steps")
+
+        # Get scored clusters from convergent analysis
+        scoring_step = None
+        for step in convergent_result.steps:
+            if step.metadata.get('title') == 'Idea Scoring':
+                scoring_step = step
+                break
+
+        if not scoring_step:
+            raise ValueError("No scoring step found in convergent result")
+
+        scored_clusters = scoring_step.metadata.get('scored_clusters', [])
+
+        if not scored_clusters:
+            raise ValueError("No scored clusters found")
+
+        logger.info(f"Starting interactive selection for {len(scored_clusters)} clusters")
+
+        # Display clusters and get user selection
+        selected_cluster_ids = self._display_and_select_clusters(
+            scored_clusters,
+            max_selections=max_selections
+        )
+
+        # Get full cluster details for selected IDs
+        clustering_step = None
+        for step in convergent_result.steps:
+            if step.metadata.get('title') == 'Idea Clustering':
+                clustering_step = step
+                break
+
+        all_clusters = clustering_step.metadata.get('clusters', []) if clustering_step else []
+
+        # Extract selected clusters with full details
+        selected_clusters = []
+        for cluster_id in selected_cluster_ids:
+            # Find scored cluster
+            scored = next(
+                (sc for sc in scored_clusters if sc['cluster_id'] == cluster_id),
+                None
+            )
+            # Find full cluster details
+            cluster = next(
+                (c for c in all_clusters if c['id'] == cluster_id),
+                {}
+            )
+
+            if scored:
+                selected_clusters.append({
+                    'cluster_id': cluster_id,
+                    'theme': scored.get('theme', ''),
+                    'overall_score': scored.get('overall_score', 0),
+                    'recommendation': scored.get('recommendation', ''),
+                    'scores': scored.get('scores', {}),
+                    'ideas': cluster.get('ideas', [])
+                })
+
+        # Create synthesis
+        synthesis = self._synthesize_selection(selected_clusters, scored_clusters)
+
+        # Create selection step
+        selection_step = WorkflowStep(
+            step_number=len(convergent_result.steps) + 1,
+            content=synthesis,
+            metadata={
+                'title': 'Interactive Selection',
+                'num_selected': len(selected_clusters),
+                'num_available': len(scored_clusters),
+                'selected_cluster_ids': selected_cluster_ids,
+                'selected_clusters': selected_clusters
+            }
+        )
+
+        # Create result combining convergent steps + selection
+        result = WorkflowResult(
+            success=True,
+            synthesis=synthesis,
+            steps=convergent_result.steps + [selection_step],
+            metadata={
+                'workflow': 'ideate-selection',
+                'selected_cluster_ids': selected_cluster_ids,
+                'selected_clusters': selected_clusters,
+                'convergent_metadata': convergent_result.metadata
+            }
+        )
+
+        logger.info(f"Interactive selection completed. Selected {len(selected_clusters)} clusters")
+        return result
+
+    def _display_and_select_clusters(
+        self,
+        scored_clusters: List[Dict[str, Any]],
+        max_selections: Optional[int] = None
+    ) -> List[str]:
+        """
+        Display scored clusters and prompt user for selection.
+
+        Args:
+            scored_clusters: List of scored cluster dictionaries
+            max_selections: Maximum selections allowed (None = unlimited)
+
+        Returns:
+            List of selected cluster IDs
+        """
+        # Sort by score (descending)
+        sorted_clusters = sorted(
+            scored_clusters,
+            key=lambda x: x.get('overall_score', 0),
+            reverse=True
+        )
+
+        print("\n" + "=" * 80)
+        print("IDEATE: CLUSTER SELECTION")
+        print("=" * 80 + "\n")
+
+        print(f"Found {len(sorted_clusters)} idea clusters from brainstorming session.\n")
+
+        # Display clusters with numbers
+        for i, cluster in enumerate(sorted_clusters, 1):
+            cluster_id = cluster.get('cluster_id', '')
+            theme = cluster.get('theme', 'Untitled')
+            score = cluster.get('overall_score', 0)
+            rec = cluster.get('recommendation', 'Unknown')
+
+            # Color-code by priority
+            priority_marker = "🔴" if score >= 4.0 else "🟡" if score >= 3.0 else "🟢"
+
+            print(f"{i}. {priority_marker} {theme}")
+            print(f"   Score: {score:.1f}/5.0 ({rec})")
+
+            # Show top scoring criteria
+            scores = cluster.get('scores', {})
+            top_scores = sorted(
+                scores.items(),
+                key=lambda x: x[1].get('score', 0),
+                reverse=True
+            )[:2]
+
+            if top_scores:
+                criteria_str = ", ".join([
+                    f"{crit.title()}: {data.get('score', 0)}/5"
+                    for crit, data in top_scores
+                ])
+                print(f"   Strengths: {criteria_str}")
+
+            print()
+
+        # Prompt for selection
+        print("-" * 80)
+        print("Select clusters to pursue (enter numbers separated by commas)")
+        print("Examples: '1,3,5' or '1-3' or 'all' or 'none'")
+
+        if max_selections:
+            print(f"(Maximum {max_selections} selections allowed)")
+
+        print("-" * 80 + "\n")
+
+        # Get user input
+        while True:
+            try:
+                user_input = input("Your selection: ").strip()
+
+                if not user_input:
+                    print("⚠️  Please enter a selection\n")
+                    continue
+
+                # Parse selection
+                selected_indices = self._parse_selection_input(
+                    user_input,
+                    total_count=len(sorted_clusters),
+                    max_selections=max_selections
+                )
+
+                if selected_indices is None:
+                    continue  # Invalid input, prompt again
+
+                # Convert indices to cluster IDs
+                selected_ids = [
+                    sorted_clusters[idx - 1].get('cluster_id', '')
+                    for idx in selected_indices
+                ]
+
+                print(f"\n✅ Selected {len(selected_ids)} cluster(s)\n")
+                return selected_ids
+
+            except (EOFError, KeyboardInterrupt):
+                print("\n\n⚠️  Selection cancelled by user")
+                return []
+
+    def _parse_selection_input(
+        self,
+        user_input: str,
+        total_count: int,
+        max_selections: Optional[int] = None
+    ) -> Optional[List[int]]:
+        """
+        Parse user selection input.
+
+        Supports formats: "1,3,5", "1-3", "all", "none"
+
+        Args:
+            user_input: Raw user input string
+            total_count: Total number of items available
+            max_selections: Maximum selections allowed
+
+        Returns:
+            List of selected indices (1-based), or None if invalid
+        """
+        user_input = user_input.strip().lower()
+
+        # Handle special cases
+        if user_input == 'none':
+            return []
+
+        if user_input == 'all':
+            selections = list(range(1, total_count + 1))
+            if max_selections and len(selections) > max_selections:
+                print(f"⚠️  'all' exceeds maximum of {max_selections} selections\n")
+                return None
+            return selections
+
+        # Parse comma-separated or range selections
+        selections = set()
+
+        try:
+            parts = user_input.split(',')
+
+            for part in parts:
+                part = part.strip()
+
+                # Range format: "1-3"
+                if '-' in part:
+                    range_parts = part.split('-')
+                    if len(range_parts) != 2:
+                        print(f"⚠️  Invalid range format: '{part}'\n")
+                        return None
+
+                    start = int(range_parts[0].strip())
+                    end = int(range_parts[1].strip())
+
+                    if start < 1 or end > total_count or start > end:
+                        print(f"⚠️  Invalid range: {start}-{end} (valid: 1-{total_count})\n")
+                        return None
+
+                    selections.update(range(start, end + 1))
+
+                # Single number
+                else:
+                    num = int(part)
+
+                    if num < 1 or num > total_count:
+                        print(f"⚠️  Invalid selection: {num} (valid: 1-{total_count})\n")
+                        return None
+
+                    selections.add(num)
+
+        except ValueError as e:
+            print(f"⚠️  Invalid input format: {user_input}\n")
+            print("   Use numbers (1,2,3), ranges (1-3), 'all', or 'none'\n")
+            return None
+
+        # Check max selections
+        if max_selections and len(selections) > max_selections:
+            print(f"⚠️  Too many selections: {len(selections)} (maximum: {max_selections})\n")
+            return None
+
+        return sorted(list(selections))
+
+    def _synthesize_selection(
+        self,
+        selected_clusters: List[Dict[str, Any]],
+        all_clusters: List[Dict[str, Any]]
+    ) -> str:
+        """
+        Synthesize selection results into summary.
+
+        Args:
+            selected_clusters: Clusters selected by user
+            all_clusters: All available clusters
+
+        Returns:
+            Formatted synthesis text
+        """
+        if not selected_clusters:
+            return "# Selection Summary\n\nNo clusters selected for implementation."
+
+        synthesis_parts = [
+            "# Selected Ideas for Implementation\n",
+            f"\nSelected {len(selected_clusters)} of {len(all_clusters)} clusters:\n\n"
+        ]
+
+        # Sort by score
+        sorted_selected = sorted(
+            selected_clusters,
+            key=lambda x: x.get('overall_score', 0),
+            reverse=True
+        )
+
+        for cluster in sorted_selected:
+            theme = cluster.get('theme', 'Untitled')
+            score = cluster.get('overall_score', 0)
+            rec = cluster.get('recommendation', '')
+
+            synthesis_parts.append(f"## {theme}\n\n")
+            synthesis_parts.append(f"**Score**: {score:.1f}/5.0 ({rec})\n\n")
+
+            # Add scores
+            scores = cluster.get('scores', {})
+            if scores:
+                synthesis_parts.append("**Evaluation**:\n")
+                for criterion, data in scores.items():
+                    val = data.get('score', 0)
+                    explanation = data.get('explanation', '')
+                    synthesis_parts.append(f"- {criterion.title()}: {val}/5 - {explanation}\n")
+                synthesis_parts.append("\n")
+
+            # Add ideas
+            ideas = cluster.get('ideas', [])
+            if ideas:
+                synthesis_parts.append(f"**Ideas** ({len(ideas)}):\n")
+                for idea_ref in ideas[:3]:  # Show top 3
+                    idea_id = idea_ref.get('idea_id', '')
+                    reason = idea_ref.get('reason', '')
+                    synthesis_parts.append(f"- {idea_id}: {reason}\n")
+
+                if len(ideas) > 3:
+                    synthesis_parts.append(f"  ... and {len(ideas) - 3} more\n")
+
+                synthesis_parts.append("\n")
+
+        synthesis_parts.append("---\n\n## Next Steps\n\n")
+        synthesis_parts.append("1. Develop detailed implementation plans for selected clusters\n")
+        synthesis_parts.append("2. Prioritize ideas within each cluster\n")
+        synthesis_parts.append("3. Estimate resources and timelines\n")
+        synthesis_parts.append("4. Begin prototyping highest-priority ideas\n")
+
+        return "".join(synthesis_parts)
+
     def validate_config(self, config: Dict[str, Any]) -> bool:
         """
         Validate ideation workflow configuration.
