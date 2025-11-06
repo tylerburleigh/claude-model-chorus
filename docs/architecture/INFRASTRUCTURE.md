@@ -573,6 +573,861 @@ This approach allows workflows to use citations in workflow-specific ways while 
 
 ---
 
+## Semantic Clustering Engine
+
+### Overview
+
+The Semantic Clustering Engine provides theme-based organization of textual content through machine learning-powered semantic similarity analysis. It groups similar ideas, claims, or findings into coherent clusters, enabling workflows to organize large collections of information automatically.
+
+**Key Capabilities:**
+- **Semantic Similarity:** Compute meaning-based similarity using sentence transformers
+- **Multiple Algorithms:** K-means and hierarchical clustering methods
+- **Automatic Naming:** Generate descriptive labels for clusters
+- **Quality Scoring:** Assess cluster coherence and quality
+- **Flexible Integration:** Works with any text-based content
+
+**Supported Workflows:**
+- **IDEATE:** Organize brainstormed ideas into thematic groups for convergent analysis
+- **ARGUMENT:** Cluster claims by topic for better organization
+- **RESEARCH:** Group findings by theme (future enhancement)
+
+**Location:** `modelchorus/src/modelchorus/core/clustering.py`
+
+---
+
+### Architecture
+
+#### Core Components
+
+The clustering engine consists of three primary components:
+
+1. **Embedding Computation:** Converts text into semantic vectors using sentence transformers
+2. **Clustering Algorithms:** Groups embeddings using K-means or hierarchical methods
+3. **Post-Processing:** Names, summarizes, and scores clusters
+
+#### Data Models
+
+##### ClusterResult
+
+Represents the result of a clustering operation with all metadata.
+
+**Fields:**
+- `cluster_id` (int, required): Unique identifier for this cluster
+- `items` (List[int], required): List of item indices belonging to this cluster
+- `centroid` (np.ndarray, required): Cluster centroid in embedding space
+- `name` (str, optional): Human-readable cluster name/label
+- `summary` (str, optional): Brief summary of cluster theme
+- `quality_score` (float, optional): Cluster coherence score (0.0-1.0)
+- `metadata` (dict, optional): Additional cluster information
+  - `size` (int): Number of items in cluster
+  - `method` (str): Clustering method used ("kmeans" or "hierarchical")
+
+**Example:**
+```python
+from modelchorus.core.clustering import ClusterResult
+import numpy as np
+
+cluster = ClusterResult(
+    cluster_id=0,
+    items=[0, 2, 5],
+    centroid=np.array([0.1, 0.2, ..., 0.9]),
+    name="Python programming ideas",
+    summary="Ideas related to Python development, best practices, and tooling",
+    quality_score=0.85,
+    metadata={
+        "size": 3,
+        "method": "kmeans"
+    }
+)
+```
+
+---
+
+#### Semantic Similarity
+
+The clustering engine uses **sentence transformers** to compute semantic embeddings. By default, it uses the `all-MiniLM-L6-v2` model, which balances speed and accuracy.
+
+##### How It Works
+
+1. **Text → Embeddings:** Each text is converted to a 384-dimensional vector that captures its semantic meaning
+2. **Similarity Computation:** Vectors are compared using cosine similarity (angle between vectors)
+3. **Similar texts** have embeddings that point in similar directions, resulting in high similarity scores
+
+##### Supported Similarity Metrics
+
+**Cosine Similarity (Default):**
+- Measures angle between vectors
+- Range: -1.0 to 1.0 (typically 0.0 to 1.0 for normalized vectors)
+- Best for: Text similarity, semantic meaning
+- Formula: `cos(θ) = (A · B) / (||A|| × ||B||)`
+
+**Euclidean Distance:**
+- Measures geometric distance between vectors
+- Converted to similarity: `1 / (1 + distance)`
+- Best for: Spatial clustering
+
+**Dot Product:**
+- Simple vector multiplication
+- Best for: Raw embedding comparisons
+
+**Example:**
+```python
+from modelchorus.core.clustering import SemanticClustering
+
+clustering = SemanticClustering()
+
+texts = [
+    "Python is great for data science",
+    "I love Python for machine learning",
+    "Java is verbose but powerful"
+]
+
+# Compute embeddings
+embeddings = clustering.compute_embeddings(texts)
+print(embeddings.shape)  # (3, 384)
+
+# Compute similarity matrix
+similarity = clustering.compute_similarity(embeddings, metric="cosine")
+print(similarity.shape)  # (3, 3)
+
+# Check similarity between first two texts (both about Python)
+print(f"Python texts similarity: {similarity[0, 1]:.3f}")  # High score
+
+# Check similarity between Python and Java texts
+print(f"Python vs Java similarity: {similarity[0, 2]:.3f}")  # Lower score
+```
+
+---
+
+#### Clustering Algorithms
+
+The engine supports two clustering algorithms, each with different characteristics:
+
+##### K-Means Clustering
+
+**How it works:**
+1. Randomly initialize K cluster centers
+2. Assign each item to nearest center
+3. Update centers to mean of assigned items
+4. Repeat until convergence
+
+**Characteristics:**
+- **Fast:** O(n × k × i) where n=items, k=clusters, i=iterations
+- **Deterministic:** Same random seed produces same results
+- **Assumes spherical clusters:** Works best when clusters are roughly equal size
+- **Requires K:** Must specify number of clusters in advance
+
+**Best for:**
+- Large datasets (>100 items)
+- When you know the approximate number of themes
+- When speed is important
+
+**Example:**
+```python
+clustering = SemanticClustering()
+
+texts = ["Python is great", "I love Python", "Java is verbose", "C++ is fast"]
+clusters = clustering.cluster(texts, n_clusters=2, method="kmeans", random_state=42)
+
+for cluster in clusters:
+    print(f"Cluster {cluster.cluster_id}: {cluster.name}")
+    print(f"  Items: {cluster.items}")
+    print(f"  Quality: {cluster.quality_score:.2f}")
+```
+
+##### Hierarchical Clustering
+
+**How it works:**
+1. Start with each item as its own cluster
+2. Merge the two most similar clusters
+3. Repeat until K clusters remain
+
+**Characteristics:**
+- **Slower:** O(n³) complexity
+- **Deterministic:** No random initialization
+- **Flexible shapes:** Can handle irregular cluster shapes
+- **Creates hierarchy:** Can visualize as dendrogram
+
+**Linkage methods:**
+- **ward** (default): Minimizes within-cluster variance
+- **complete**: Maximum distance between clusters
+- **average**: Average distance between all pairs
+- **single**: Minimum distance between clusters
+
+**Best for:**
+- Smaller datasets (<100 items)
+- When cluster hierarchy is meaningful
+- When you want dendrogram visualization
+
+**Example:**
+```python
+clustering = SemanticClustering()
+
+texts = ["Python is great", "I love Python", "Java is verbose", "C++ is fast"]
+clusters = clustering.cluster(texts, n_clusters=2, method="hierarchical")
+
+for cluster in clusters:
+    print(f"Cluster {cluster.cluster_id}: {cluster.name}")
+```
+
+---
+
+#### Cluster Naming and Summarization
+
+The engine automatically generates names and summaries for clusters:
+
+##### Cluster Naming
+
+**Current implementation:**
+- Uses the shortest text in the cluster as the name
+- Truncates to 50 characters if needed
+- Simple but effective for most cases
+
+**Future enhancement:**
+- Use LLM to generate thematic names based on cluster content
+- Example: "Python Development" instead of "Python is great"
+
+**Example:**
+```python
+texts = [
+    "Python is great for data science",
+    "Python programming",
+    "I love Python for machine learning"
+]
+
+# Cluster name would be "Python programming" (shortest)
+name = clustering.name_cluster(texts)
+```
+
+##### Cluster Summarization
+
+**Current implementation:**
+- Concatenates all texts with semicolons
+- Truncates to 200 characters if needed
+- Provides quick overview of cluster content
+
+**Future enhancement:**
+- Use LLM to generate coherent summaries
+- Example: "This cluster focuses on Python's strengths in data science and machine learning applications."
+
+---
+
+#### Quality Scoring
+
+Each cluster receives a quality score measuring its coherence:
+
+**Scoring Formula:**
+```
+Quality = Average cosine similarity of items to centroid
+```
+
+**Score Interpretation:**
+- **0.8-1.0:** Excellent coherence (highly similar items)
+- **0.6-0.8:** Good coherence (related items)
+- **0.4-0.6:** Moderate coherence (somewhat related)
+- **0.0-0.4:** Poor coherence (diverse or unrelated items)
+
+**Why it matters:**
+- High-quality clusters indicate clear thematic groupings
+- Low-quality clusters may indicate:
+  - Too many clusters (over-segmentation)
+  - Items don't naturally group
+  - Need to adjust clustering parameters
+
+**Example:**
+```python
+embeddings = clustering.compute_embeddings(cluster_texts)
+centroid = embeddings.mean(axis=0)
+quality = clustering.score_cluster(embeddings, centroid)
+
+if quality > 0.8:
+    print("Excellent cluster coherence!")
+elif quality > 0.6:
+    print("Good cluster coherence")
+else:
+    print("Consider adjusting number of clusters")
+```
+
+---
+
+### Usage Examples
+
+#### Basic Clustering
+
+**Simple text clustering:**
+```python
+from modelchorus.core.clustering import SemanticClustering
+
+# Initialize engine
+clustering = SemanticClustering(
+    model_name="all-MiniLM-L6-v2",  # Default model
+    cache_embeddings=True  # Cache for faster repeated calls
+)
+
+# Cluster texts
+texts = [
+    "Python is great for data science",
+    "I love Python for ML",
+    "Java is verbose but powerful",
+    "C++ offers fine-grained control",
+    "JavaScript is ubiquitous on the web"
+]
+
+clusters = clustering.cluster(
+    texts=texts,
+    n_clusters=3,
+    method="kmeans",
+    random_state=42
+)
+
+# Inspect results
+for cluster in clusters:
+    print(f"\n{cluster.name}")
+    print(f"Quality: {cluster.quality_score:.2f}")
+    print(f"Items ({len(cluster.items)}):")
+    for idx in cluster.items:
+        print(f"  - {texts[idx]}")
+```
+
+#### IDEATE Workflow Integration
+
+**Organize brainstormed ideas:**
+```python
+from modelchorus.workflows import IdeateWorkflow
+from modelchorus.providers import ClaudeProvider
+from modelchorus.core.conversation import ConversationMemory
+
+provider = ClaudeProvider()
+memory = ConversationMemory()
+workflow = IdeateWorkflow(provider=provider, conversation_memory=memory)
+
+# Brainstorm ideas
+brainstorm_result = await workflow.brainstorm(
+    prompt="Ways to improve developer productivity",
+    perspectives=["efficiency", "tooling", "collaboration"],
+    ideas_per_perspective=5
+)
+
+# Convergent analysis with clustering
+analysis_result = await workflow.convergent_analysis(
+    brainstorming_result=brainstorm_result,
+    num_clusters=4,  # Group into 4 themes
+    scoring_criteria=["feasibility", "impact", "effort"]
+)
+
+# The clustering engine automatically groups similar ideas
+print(analysis_result.synthesis)
+```
+
+**How it works:**
+1. Extract ideas from brainstorming result (15 ideas from 3 perspectives)
+2. Cluster similar ideas using semantic clustering (4 themes)
+3. Score each cluster based on feasibility, impact, effort
+4. Synthesize analysis with clusters and recommendations
+
+#### ARGUMENT Workflow Integration
+
+**Cluster argument claims by topic:**
+```python
+from modelchorus.workflows.argument.semantic import cluster_claims_kmeans
+from modelchorus.core.models import CitationMap, Citation
+
+# Create claims about TypeScript
+claims = [
+    CitationMap(
+        claim_id="claim-1",
+        claim_text="TypeScript reduces runtime errors by 15%",
+        citations=[Citation(source="study.com", confidence=0.9)],
+        strength=0.9
+    ),
+    CitationMap(
+        claim_id="claim-2",
+        claim_text="TypeScript improves developer productivity",
+        citations=[Citation(source="blog.com", confidence=0.7)],
+        strength=0.7
+    ),
+    CitationMap(
+        claim_id="claim-3",
+        claim_text="Learning TypeScript adds overhead for new developers",
+        citations=[Citation(source="survey.com", confidence=0.8)],
+        strength=0.8
+    ),
+]
+
+# Cluster by topic
+clusters = cluster_claims_kmeans(
+    citation_maps=claims,
+    n_clusters=2,
+    random_state=42
+)
+
+for i, cluster in enumerate(clusters):
+    print(f"\nCluster {i}:")
+    for claim_map in cluster:
+        print(f"  - {claim_map.claim_text}")
+```
+
+**Result:**
+- **Cluster 0:** Benefits claims (errors, productivity)
+- **Cluster 1:** Challenges claims (learning curve)
+
+#### Advanced: Embedding Cache
+
+**Speed up repeated clustering:**
+```python
+clustering = SemanticClustering(cache_embeddings=True)
+
+texts = ["Python is great", "I love Python"]
+
+# First call: computes embeddings
+clusters1 = clustering.cluster(texts, n_clusters=2)  # Slower
+
+# Second call: uses cached embeddings
+clusters2 = clustering.cluster(texts, n_clusters=2)  # Much faster
+
+# Cache persists across calls with same texts
+print(f"Cache size: {len(clustering._embedding_cache)}")  # 2
+```
+
+#### Custom Similarity Metrics
+
+**Try different metrics:**
+```python
+clustering = SemanticClustering()
+
+texts = ["Python is great", "I love Python", "Java is verbose"]
+embeddings = clustering.compute_embeddings(texts)
+
+# Cosine similarity (default)
+cosine_sim = clustering.compute_similarity(embeddings, metric="cosine")
+print(f"Cosine similarity (Python texts): {cosine_sim[0, 1]:.3f}")
+
+# Euclidean distance
+euclidean_sim = clustering.compute_similarity(embeddings, metric="euclidean")
+print(f"Euclidean similarity (Python texts): {euclidean_sim[0, 1]:.3f}")
+
+# Dot product
+dot_sim = clustering.compute_similarity(embeddings, metric="dot")
+print(f"Dot product (Python texts): {dot_sim[0, 1]:.3f}")
+```
+
+---
+
+### API Reference
+
+#### SemanticClustering.__init__()
+
+Initialize the semantic clustering engine.
+
+```python
+def __init__(
+    model_name: str = "all-MiniLM-L6-v2",
+    cache_embeddings: bool = True
+)
+```
+
+**Parameters:**
+- `model_name` (str): Name of sentence transformer model to use
+  - Default: `"all-MiniLM-L6-v2"` (384-dim, balanced speed/quality)
+  - Alternatives: `"all-mpnet-base-v2"` (768-dim, higher quality, slower)
+- `cache_embeddings` (bool): Whether to cache computed embeddings for faster repeated calls
+
+---
+
+#### compute_embeddings()
+
+Convert texts to semantic vector embeddings.
+
+```python
+def compute_embeddings(texts: List[str]) -> np.ndarray
+```
+
+**Parameters:**
+- `texts` (List[str]): List of text strings to embed
+
+**Returns:**
+- `np.ndarray`: Array of shape (n_texts, embedding_dim) with embeddings
+
+**Example:**
+```python
+embeddings = clustering.compute_embeddings(["Hello", "World"])
+print(embeddings.shape)  # (2, 384)
+```
+
+---
+
+#### compute_similarity()
+
+Compute pairwise similarity matrix between embeddings.
+
+```python
+def compute_similarity(
+    embeddings: np.ndarray,
+    metric: str = "cosine"
+) -> np.ndarray
+```
+
+**Parameters:**
+- `embeddings` (np.ndarray): Array of shape (n_items, embedding_dim)
+- `metric` (str): Similarity metric - "cosine", "euclidean", or "dot"
+
+**Returns:**
+- `np.ndarray`: Similarity matrix of shape (n_items, n_items)
+
+---
+
+#### cluster()
+
+Main entry point: cluster texts into semantic groups.
+
+```python
+def cluster(
+    texts: List[str],
+    n_clusters: int,
+    method: str = "kmeans",
+    random_state: Optional[int] = None
+) -> List[ClusterResult]
+```
+
+**Parameters:**
+- `texts` (List[str]): List of texts to cluster
+- `n_clusters` (int): Number of clusters to create
+- `method` (str): Clustering method - "kmeans" or "hierarchical"
+- `random_state` (int, optional): Random seed for reproducibility (kmeans only)
+
+**Returns:**
+- `List[ClusterResult]`: List of ClusterResult objects with names, summaries, and scores
+
+**Example:**
+```python
+clusters = clustering.cluster(
+    texts=["Python rocks", "I love Python", "Java is verbose"],
+    n_clusters=2,
+    method="kmeans",
+    random_state=42
+)
+```
+
+---
+
+#### cluster_kmeans()
+
+Cluster embeddings using K-means algorithm (internal method).
+
+```python
+def cluster_kmeans(
+    embeddings: np.ndarray,
+    n_clusters: int,
+    random_state: Optional[int] = None
+) -> Tuple[np.ndarray, np.ndarray]
+```
+
+**Returns:**
+- `Tuple[np.ndarray, np.ndarray]`: (cluster_labels, centroids)
+
+---
+
+#### cluster_hierarchical()
+
+Cluster embeddings using hierarchical clustering (internal method).
+
+```python
+def cluster_hierarchical(
+    embeddings: np.ndarray,
+    n_clusters: int,
+    linkage: str = "ward"
+) -> np.ndarray
+```
+
+**Returns:**
+- `np.ndarray`: Cluster labels
+
+---
+
+#### score_cluster()
+
+Compute quality score for a cluster based on cohesion.
+
+```python
+def score_cluster(
+    embeddings: np.ndarray,
+    centroid: np.ndarray
+) -> float
+```
+
+**Returns:**
+- `float`: Quality score between 0.0 and 1.0
+
+---
+
+### Design Decisions
+
+#### Why Sentence Transformers?
+
+**Advantages:**
+- **Pre-trained:** No training required, works out-of-box
+- **Fast:** Efficient inference on CPU
+- **Accurate:** State-of-the-art semantic similarity
+- **Flexible:** Multiple models for different speed/quality trade-offs
+
+**Alternatives considered:**
+- Word2Vec: Less accurate for semantic meaning
+- BERT embeddings: Slower, requires more resources
+- OpenAI embeddings: API cost, network latency
+
+#### Why K-Means as Default?
+
+K-means balances speed, simplicity, and effectiveness:
+- **Speed:** Handles 1000+ items efficiently
+- **Predictable:** Clear spherical clusters
+- **Deterministic:** Reproducible with random seed
+
+Hierarchical clustering offered as alternative for:
+- Smaller datasets where speed less critical
+- When dendrogram visualization desired
+- Irregular cluster shapes
+
+#### Embedding Caching Strategy
+
+Caching embeddings improves performance for repeated clustering:
+- **Speed improvement:** 10-100x faster for repeated texts
+- **Memory trade-off:** ~1.5KB per cached text (384 dims × 4 bytes)
+- **Use case:** Re-clustering with different K values
+
+Cache disabled by default in memory-constrained environments.
+
+#### Quality Scoring Rationale
+
+Using average cosine similarity to centroid because:
+- **Simple:** Easy to understand and interpret
+- **Effective:** Correlates well with human perception of coherence
+- **Fast:** O(n) computation
+- **Standard:** Used in scikit-learn and research literature
+
+---
+
+### Best Practices
+
+#### Choosing Number of Clusters
+
+**Start with sqrt(n/2):**
+```python
+import math
+
+n_items = len(texts)
+n_clusters = max(2, math.floor(math.sqrt(n_items / 2)))
+```
+
+**Experiment with different values:**
+```python
+# Try multiple cluster counts
+for k in range(2, 6):
+    clusters = clustering.cluster(texts, n_clusters=k)
+    avg_quality = sum(c.quality_score for c in clusters) / len(clusters)
+    print(f"K={k}: Average quality = {avg_quality:.2f}")
+```
+
+**Guidelines by dataset size:**
+- **5-10 items:** 2-3 clusters
+- **10-20 items:** 3-5 clusters
+- **20-50 items:** 4-8 clusters
+- **50+ items:** sqrt(n/2) or quality-based selection
+
+#### When to Use Which Method
+
+**Use K-means when:**
+- Dataset has >50 items
+- Clusters are roughly equal size
+- Speed is important
+- You have a target number of themes
+
+**Use hierarchical when:**
+- Dataset has <50 items
+- Cluster sizes vary significantly
+- You want to explore different cluster counts
+- Dendrogram visualization would be useful
+
+#### Improving Cluster Quality
+
+**Low quality scores? Try:**
+1. **Adjust K:** Increase/decrease number of clusters
+2. **Filter noise:** Remove very dissimilar items first
+3. **Use better model:** Switch to "all-mpnet-base-v2" for higher quality
+4. **Hierarchical method:** May handle irregular shapes better
+
+**Example:**
+```python
+# Try different K values and pick best
+best_k = None
+best_quality = 0.0
+
+for k in range(2, 8):
+    clusters = clustering.cluster(texts, n_clusters=k)
+    avg_quality = sum(c.quality_score for c in clusters) / len(clusters)
+
+    if avg_quality > best_quality:
+        best_quality = avg_quality
+        best_k = k
+
+print(f"Best K: {best_k} with quality {best_quality:.2f}")
+```
+
+#### Memory Management
+
+**For large datasets:**
+```python
+# Disable caching if memory is limited
+clustering = SemanticClustering(cache_embeddings=False)
+
+# Process in batches
+batch_size = 100
+for i in range(0, len(texts), batch_size):
+    batch = texts[i:i+batch_size]
+    clusters = clustering.cluster(batch, n_clusters=k)
+```
+
+---
+
+### Use Cases
+
+#### Organizing Brainstormed Ideas (IDEATE)
+
+**Problem:** 15 ideas from 3 perspectives, need thematic grouping
+
+**Solution:**
+```python
+# After brainstorming, cluster ideas
+analysis = await workflow.convergent_analysis(
+    brainstorming_result=result,
+    num_clusters=4
+)
+```
+
+**Output:** 4 themed clusters (e.g., "Automation", "Collaboration", "Tooling", "Process")
+
+**Benefit:** Easier to evaluate ideas when organized by theme
+
+---
+
+#### Organizing Argument Claims (ARGUMENT)
+
+**Problem:** Complex debates have many claims, hard to track themes
+
+**Solution:**
+```python
+# Cluster claims by topic
+clusters = cluster_claims_kmeans(claims, n_clusters=3)
+
+# Pro/Con clusters automatically separate
+for cluster in clusters:
+    print(f"Theme: {cluster[0].claim_text[:50]}")
+```
+
+**Output:** Claims grouped by topic (benefits, challenges, performance)
+
+**Benefit:** See debate structure at a glance, identify which topics have most evidence
+
+---
+
+#### Research Finding Organization (Future)
+
+**Problem:** RESEARCH workflow generates 5-10 findings, need thematic synthesis
+
+**Solution:**
+```python
+# Cluster findings by theme
+finding_texts = [step.content for step in result.steps]
+clusters = clustering.cluster(finding_texts, n_clusters=3)
+
+# Generate themed dossier
+for cluster in clusters:
+    print(f"\n## {cluster.name}")
+    for idx in cluster.items:
+        print(f"- Finding {idx+1}: {finding_texts[idx][:100]}...")
+```
+
+**Output:** Research dossier organized by theme
+
+**Benefit:** More coherent synthesis, easier to understand overall picture
+
+---
+
+### Testing
+
+#### Test Coverage
+
+Comprehensive tests in `modelchorus/tests/test_clustering.py`:
+
+**Core Functionality Tests:**
+- Embedding computation with various model sizes
+- Similarity computation (cosine, euclidean, dot)
+- K-means clustering with different K values
+- Hierarchical clustering with different linkage methods
+- Cluster naming and summarization
+- Quality scoring
+
+**Edge Cases:**
+- Empty input lists
+- Single item clustering
+- K > number of items
+- Identical texts
+- Cache behavior
+
+**Integration Tests:**
+- IDEATE workflow clustering integration
+- ARGUMENT workflow clustering integration
+- End-to-end clustering pipeline
+
+#### Running Tests
+
+```bash
+# Run all clustering tests
+pytest modelchorus/tests/test_clustering.py -v
+
+# Run specific test
+pytest modelchorus/tests/test_clustering.py::TestSemanticClustering::test_cluster_kmeans -v
+
+# Run with coverage
+pytest modelchorus/tests/test_clustering.py --cov=modelchorus.core.clustering
+```
+
+---
+
+### Future Enhancements
+
+**Planned improvements:**
+
+1. **LLM-Based Naming:**
+   - Use provider LLMs to generate meaningful cluster names
+   - Example: "Machine Learning Applications" vs "Python is great"
+
+2. **Dynamic K Selection:**
+   - Automatically determine optimal number of clusters
+   - Use silhouette score or elbow method
+   - Reduce need for manual K tuning
+
+3. **Multi-Language Support:**
+   - Use multilingual sentence transformers
+   - Enable clustering across languages
+   - Useful for international workflows
+
+4. **Incremental Clustering:**
+   - Add new items to existing clusters without re-clustering
+   - Useful for streaming workflows
+   - Maintain cluster stability
+
+5. **Hierarchical Dendrogram Visualization:**
+   - Generate visual dendrograms for hierarchical clustering
+   - Export to PNG/SVG
+   - Interactive exploration of cluster hierarchy
+
+6. **Cluster Comparison:**
+   - Compare clustering results with different K or methods
+   - Measure cluster stability across runs
+   - Help users choose best clustering
+
+---
+
 ### Best Practices
 
 #### When to Add Citations
