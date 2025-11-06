@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 12:19:00
+**Generated:** 2025-11-06 12:22:33
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 50
-- **Total Lines:** 17992
-- **Total Classes:** 93
+- **Total Files:** 51
+- **Total Lines:** 18180
+- **Total Classes:** 95
 - **Total Functions:** 61
 - **Avg Complexity:** 4.51
 - **Max Complexity:** 36
@@ -406,6 +406,62 @@ Example:
 - `get_providers()`
 - `set_strategy()`
 - `__repr__()`
+
+---
+
+### `Contradiction`
+
+**Language:** python
+**Inherits from:** `BaseModel`
+**Defined in:** `modelchorus/src/modelchorus/core/contradiction.py:41`
+
+**Description:**
+> Model for tracking contradictions between claims in ARGUMENT workflow.
+
+Represents a detected contradiction between two claims, including
+severity assessment, confidence in detection, and resolution suggestions.
+Used to identify conflicts in evidence and maintain argument coherence.
+
+Attributes:
+    contradiction_id: Unique identifier for this contradiction
+    claim_1_id: Identifier of the first conflicting claim
+    claim_2_id: Identifier of the second conflicting claim
+    claim_1_text: Full text of the first claim
+    claim_2_text: Full text of the second claim
+    severity: Severity level of the contradiction
+    confidence: Confidence in contradiction detection (0.0-1.0)
+    explanation: Detailed explanation of why claims contradict
+    resolution_suggestion: Optional suggestion for resolving the contradiction
+    metadata: Additional metadata (detection_method, timestamp, etc.)
+
+**Methods:**
+- `validate_confidence()`
+- `validate_different_claims()`
+
+---
+
+### `ContradictionSeverity`
+
+**Language:** python
+**Inherits from:** `str`, `Enum`
+**Defined in:** `modelchorus/src/modelchorus/core/contradiction.py:16`
+
+**Description:**
+> Severity levels for contradictions between claims.
+
+Classifies contradictions by their importance and impact on
+argument validity. Higher severity indicates more significant
+conflicts requiring immediate attention.
+
+Values:
+    MINOR: Slight inconsistency, may be due to different perspectives
+           or temporal differences. Low impact on argument validity.
+    MODERATE: Notable contradiction that should be investigated.
+             May indicate measurement differences or scope variations.
+    MAJOR: Significant contradiction that undermines argument coherence.
+          Requires careful analysis and resolution.
+    CRITICAL: Direct, irreconcilable contradiction that invalidates
+             one or both claims. Immediate attention required.
 
 ---
 
@@ -3596,6 +3652,17 @@ Example:
 - `typing.Any`
 - `typing.Dict`
 - `typing.List`
+- `typing.Optional`
+
+### `modelchorus/src/modelchorus/core/contradiction.py`
+
+- `enum.Enum`
+- `pydantic.BaseModel`
+- `pydantic.ConfigDict`
+- `pydantic.Field`
+- `pydantic.field_validator`
+- `typing.Any`
+- `typing.Dict`
 - `typing.Optional`
 
 ### `modelchorus/src/modelchorus/core/conversation.py`

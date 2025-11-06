@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T17:19:00.050681Z",
+    "generated_at": "2025-11-06T17:22:33.710166Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 50,
-    "total_lines": 17992,
-    "total_classes": 93,
+    "total_files": 51,
+    "total_lines": 18180,
+    "total_classes": 95,
     "total_functions": 61,
     "avg_complexity": 4.51,
     "max_complexity": 36,
@@ -24,9 +24,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 50,
-        "lines": 17992,
-        "classes": 93,
+        "files": 51,
+        "lines": 18180,
+        "classes": 95,
         "functions": 61,
         "avg_complexity": 4.51
       }
@@ -251,6 +251,29 @@
       ],
       "exports": [],
       "lines": 244
+    },
+    {
+      "name": "contradiction",
+      "file": "modelchorus/src/modelchorus/core/contradiction.py",
+      "language": "python",
+      "docstring": "Contradiction detection models for ARGUMENT workflow.\n\nProvides data models for tracking contradictions between claims across\nsources, with severity classification and resolution tracking.\n\nUsed in ARGUMENT workflow to identify and analyze conflicting claims,\nassess contradiction severity, and suggest resolutions.",
+      "classes": [
+        "ContradictionSeverity",
+        "Contradiction"
+      ],
+      "functions": [],
+      "imports": [
+        "enum.Enum",
+        "typing.Any",
+        "typing.Dict",
+        "typing.Optional",
+        "pydantic.BaseModel",
+        "pydantic.Field",
+        "pydantic.ConfigDict",
+        "pydantic.field_validator"
+      ],
+      "exports": [],
+      "lines": 188
     },
     {
       "name": "conversation",
@@ -1422,6 +1445,42 @@
         "add_message",
         "resume_conversation",
         "__repr__"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "ContradictionSeverity",
+      "file": "modelchorus/src/modelchorus/core/contradiction.py",
+      "line": 16,
+      "language": "python",
+      "docstring": "Severity levels for contradictions between claims.\n\nClassifies contradictions by their importance and impact on\nargument validity. Higher severity indicates more significant\nconflicts requiring immediate attention.\n\nValues:\n    MINOR: Slight inconsistency, may be due to different perspectives\n           or temporal differences. Low impact on argument validity.\n    MODERATE: Notable contradiction that should be investigated.\n             May indicate measurement differences or scope variations.\n    MAJOR: Significant contradiction that undermines argument coherence.\n          Requires careful analysis and resolution.\n    CRITICAL: Direct, irreconcilable contradiction that invalidates\n             one or both claims. Immediate attention required.",
+      "bases": [
+        "str",
+        "Enum"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "Contradiction",
+      "file": "modelchorus/src/modelchorus/core/contradiction.py",
+      "line": 41,
+      "language": "python",
+      "docstring": "Model for tracking contradictions between claims in ARGUMENT workflow.\n\nRepresents a detected contradiction between two claims, including\nseverity assessment, confidence in detection, and resolution suggestions.\nUsed to identify conflicts in evidence and maintain argument coherence.\n\nAttributes:\n    contradiction_id: Unique identifier for this contradiction\n    claim_1_id: Identifier of the first conflicting claim\n    claim_2_id: Identifier of the second conflicting claim\n    claim_1_text: Full text of the first claim\n    claim_2_text: Full text of the second claim\n    severity: Severity level of the contradiction\n    confidence: Confidence in contradiction detection (0.0-1.0)\n    explanation: Detailed explanation of why claims contradict\n    resolution_suggestion: Optional suggestion for resolving the contradiction\n    metadata: Additional metadata (detection_method, timestamp, etc.)",
+      "bases": [
+        "BaseModel"
+      ],
+      "methods": [
+        "validate_confidence",
+        "validate_different_claims"
       ],
       "properties": [],
       "is_exported": false,
@@ -15300,6 +15359,16 @@
       "conversation.ConversationMemory",
       "models.ConversationThread",
       "models.ConversationMessage"
+    ],
+    "modelchorus/src/modelchorus/core/contradiction.py": [
+      "enum.Enum",
+      "typing.Any",
+      "typing.Dict",
+      "typing.Optional",
+      "pydantic.BaseModel",
+      "pydantic.Field",
+      "pydantic.ConfigDict",
+      "pydantic.field_validator"
     ],
     "modelchorus/src/modelchorus/core/conversation.py": [
       "json",
