@@ -13,6 +13,12 @@ from typing import Optional, Dict, Any, List
 from ...core.base_workflow import BaseWorkflow, WorkflowResult, WorkflowStep
 from ...core.conversation import ConversationMemory
 from ...core.registry import WorkflowRegistry
+from ...core.role_orchestration import (
+    RoleOrchestrator,
+    ModelRole,
+    OrchestrationPattern,
+    OrchestrationResult,
+)
 from ...providers import ModelProvider, GenerationRequest, GenerationResponse
 from ...core.models import ConversationMessage
 
@@ -22,16 +28,27 @@ logger = logging.getLogger(__name__)
 @WorkflowRegistry.register("argument")
 class ArgumentWorkflow(BaseWorkflow):
     """
-    Structured argument analysis workflow for dialectical reasoning.
+    Role-based dialectical reasoning workflow using RoleOrchestrator.
 
-    This workflow provides systematic analysis of claims and arguments through
-    a multi-step process that examines supporting evidence, counter-arguments,
-    and overall argument strength. It's designed for critical thinking, debate
-    preparation, and decision-making scenarios.
+    This workflow implements structured argument analysis through role-based
+    orchestration, where different AI roles (Creator, Skeptic, Moderator) examine
+    an argument from multiple perspectives to produce balanced dialectical analysis.
 
-    Key features:
-    - Single provider (focused analysis from one perspective)
-    - Multi-step analysis: claim analysis, evidence, counter-arguments, assessment
+    Architecture:
+    - Uses RoleOrchestrator for sequential role execution
+    - Creator role: Generates strong thesis advocating FOR the position (Step 1)
+    - Skeptic role: Provides critical rebuttal AGAINST the position (Step 2 - future)
+    - Moderator role: Synthesizes perspectives into balanced analysis (Step 3 - future)
+
+    Current Implementation Status:
+    - Step 1 (Creator): ✓ Implemented - Generates thesis with supporting arguments
+    - Step 2 (Skeptic): ⏳ Pending - Will provide counter-arguments
+    - Step 3 (Moderator): ⏳ Pending - Will synthesize final analysis
+
+    Key Features:
+    - Role-based orchestration using RoleOrchestrator
+    - Sequential execution pattern (roles build on each other's outputs)
+    - Stance-driven prompts (for/against/neutral)
     - Conversation threading via continuation_id
     - Inherits conversation support from BaseWorkflow
     - Structured dialectical reasoning
@@ -40,14 +57,13 @@ class ArgumentWorkflow(BaseWorkflow):
     - Analyzing the strength of arguments and claims
     - Debate preparation and research
     - Critical thinking and decision-making support
-    - Examining multiple perspectives on a topic
-    - Identifying weaknesses in reasoning
+    - Examining multiple perspectives systematically
+    - Identifying both strengths and weaknesses in reasoning
 
-    Workflow Steps:
-    1. **Claim Analysis**: Understand and clarify the core argument
-    2. **Supporting Evidence**: Identify evidence and reasons supporting the claim
-    3. **Counter-Arguments**: Identify objections and opposing viewpoints
-    4. **Strength Assessment**: Evaluate overall argument quality and validity
+    Workflow Steps (when complete):
+    1. **Creator Role (Thesis Generation)**: Build strong case FOR the position
+    2. **Skeptic Role (Critical Rebuttal)**: Challenge with counter-arguments
+    3. **Moderator Role (Synthesis)**: Integrate perspectives into balanced assessment
 
     Example:
         >>> from modelchorus.providers import ClaudeProvider
@@ -61,11 +77,12 @@ class ArgumentWorkflow(BaseWorkflow):
         >>> # Create workflow
         >>> workflow = ArgumentWorkflow(provider, conversation_memory=memory)
         >>>
-        >>> # Analyze an argument
+        >>> # Analyze an argument (currently only Creator role executes)
         >>> result = await workflow.run(
-        ...     "Universal basic income would reduce poverty and inequality"
+        ...     "Universal basic income would reduce poverty"
         ... )
-        >>> print(result.synthesis)
+        >>> print(result.steps[0].content)  # Creator's thesis
+        >>> print(result.metadata['roles_executed'])  # ['creator']
         >>>
         >>> # Continue analysis with follow-up
         >>> result2 = await workflow.run(
@@ -105,6 +122,48 @@ class ArgumentWorkflow(BaseWorkflow):
 
         logger.info(f"ArgumentWorkflow initialized with provider: {provider.provider_name}")
 
+    def _create_creator_role(self) -> ModelRole:
+        """
+        Create Creator role for thesis generation (Step 1 of ARGUMENT workflow).
+
+        The Creator role is responsible for generating a strong initial thesis
+        with supporting arguments. This role advocates FOR the position, establishing
+        the foundation for the Skeptic's counter-arguments.
+
+        Returns:
+            ModelRole configured for Creator with "for" stance
+
+        Example:
+            >>> creator = workflow._create_creator_role()
+            >>> print(creator.role, creator.stance)
+            creator for
+        """
+        return ModelRole(
+            role="creator",
+            model=self.provider.provider_name,
+            stance="for",
+            stance_prompt=(
+                "You are a thoughtful argument creator. Your role is to construct a STRONG, "
+                "well-reasoned thesis that supports the given position. Present compelling "
+                "evidence, logical reasoning, and anticipate potential objections. Be persuasive "
+                "and thorough in building your case."
+            ),
+            system_prompt=(
+                "You are an expert at constructing compelling arguments. Focus on:\n"
+                "1. Clearly stating the core thesis\n"
+                "2. Providing strong supporting evidence and reasoning\n"
+                "3. Identifying key assumptions underlying the argument\n"
+                "4. Anticipating and addressing potential counter-arguments\n"
+                "5. Maintaining intellectual rigor while being persuasive"
+            ),
+            temperature=0.7,  # Balanced creativity and coherence
+            metadata={
+                "step": 1,
+                "step_name": "Thesis Generation",
+                "role_type": "advocate",
+            },
+        )
+
     async def run(
         self,
         prompt: str,
@@ -113,43 +172,49 @@ class ArgumentWorkflow(BaseWorkflow):
         **kwargs
     ) -> WorkflowResult:
         """
-        Execute argument analysis workflow with optional conversation continuation.
+        Execute argument analysis workflow using role-based orchestration.
 
-        This method performs a structured analysis of the argument or claim provided
-        in the prompt. If a continuation_id is provided and conversation_memory is
-        available, the conversation history will be loaded and included in the context.
+        This method performs structured dialectical analysis using the Creator role
+        to generate a strong initial thesis. This is Step 1 of the complete ARGUMENT
+        workflow (Creator → Skeptic → Moderator).
+
+        The workflow uses RoleOrchestrator to coordinate role-based execution:
+        - Creator role: Generates thesis advocating FOR the position
+        - Skeptic role: (future task) Provides critical rebuttal AGAINST the position
+        - Moderator role: (future task) Synthesizes perspectives into balanced analysis
 
         Args:
             prompt: The argument, claim, or question to analyze
             continuation_id: Optional thread ID to continue an existing conversation
             files: Optional list of file paths to include in conversation context
-            **kwargs: Additional parameters passed to provider.generate()
-                     (e.g., temperature, max_tokens, system_prompt)
+            **kwargs: Additional parameters passed to RoleOrchestrator
+                     (e.g., temperature, max_tokens)
 
         Returns:
             WorkflowResult containing:
                 - success: True if analysis succeeded
-                - synthesis: Combined analysis from all steps
-                - steps: Four steps (claim analysis, evidence, counter-arguments, assessment)
-                - metadata: thread_id, model info, and analysis details
+                - synthesis: Combined analysis from all role perspectives
+                - steps: One step per role (currently only Creator)
+                - metadata: thread_id, model info, role execution details
 
         Raises:
-            Exception: If provider.generate() fails
+            Exception: If role orchestration fails
 
         Example:
             >>> # Fresh analysis
             >>> result = await workflow.run(
-            ...     "Remote work increases productivity"
+            ...     "Universal basic income would reduce poverty"
             ... )
+            >>> print(result.steps[0].content)  # Creator's thesis
             >>>
             >>> # Continuation
             >>> result2 = await workflow.run(
-            ...     "How does this vary by industry?",
+            ...     "What about work incentives?",
             ...     continuation_id=result.metadata['thread_id']
             ... )
         """
         logger.info(
-            f"Starting argument workflow - prompt length: {len(prompt)}, "
+            f"Starting ARGUMENT workflow - prompt length: {len(prompt)}, "
             f"continuation: {continuation_id is not None}, "
             f"files: {len(files) if files else 0}"
         )
@@ -173,52 +238,45 @@ class ArgumentWorkflow(BaseWorkflow):
             # Build the full prompt with conversation history and file context if available
             full_prompt = self._build_prompt_with_history(prompt, thread_id, files)
 
-            # Step 1: Claim Analysis
-            claim_analysis = await self._analyze_claim(full_prompt, thread_id, **kwargs)
-            result.add_step(
-                step_number=1,
-                content=claim_analysis.content,
-                model=claim_analysis.model,
-                step_name="Claim Analysis"
+            # Create Creator role for Step 1: Thesis generation
+            creator_role = self._create_creator_role()
+
+            # Set up provider map for orchestrator
+            provider_map = {
+                self.provider.provider_name: self.provider
+            }
+
+            # Create orchestrator with Creator role (SEQUENTIAL pattern for future expansion)
+            orchestrator = RoleOrchestrator(
+                roles=[creator_role],  # Will add Skeptic and Moderator in future tasks
+                provider_map=provider_map,
+                pattern=OrchestrationPattern.SEQUENTIAL,
             )
 
-            # Step 2: Supporting Evidence
-            supporting_evidence = await self._gather_supporting_evidence(
-                full_prompt, claim_analysis.content, thread_id, **kwargs
-            )
-            result.add_step(
-                step_number=2,
-                content=supporting_evidence.content,
-                model=supporting_evidence.model,
-                step_name="Supporting Evidence"
+            logger.info("Executing Creator role for thesis generation...")
+
+            # Execute orchestration (Creator role generates thesis)
+            orchestration_result: OrchestrationResult = await orchestrator.execute(
+                base_prompt=full_prompt,
+                context=None,  # No prior context for first step
             )
 
-            # Step 3: Counter-Arguments
-            counter_arguments = await self._gather_counter_arguments(
-                full_prompt, claim_analysis.content, thread_id, **kwargs
-            )
-            result.add_step(
-                step_number=3,
-                content=counter_arguments.content,
-                model=counter_arguments.model,
-                step_name="Counter-Arguments"
-            )
+            # Extract Creator's thesis from orchestration result
+            if orchestration_result.role_responses:
+                creator_response = orchestration_result.role_responses[0]
 
-            # Step 4: Strength Assessment
-            strength_assessment = await self._assess_argument_strength(
-                full_prompt,
-                claim_analysis.content,
-                supporting_evidence.content,
-                counter_arguments.content,
-                thread_id,
-                **kwargs
-            )
-            result.add_step(
-                step_number=4,
-                content=strength_assessment.content,
-                model=strength_assessment.model,
-                step_name="Strength Assessment"
-            )
+                # Add Creator's thesis as Step 1
+                result.add_step(
+                    step_number=1,
+                    content=creator_response.content,
+                    model=creator_response.model,
+                    role="creator",
+                    step_name="Thesis Generation (Creator)"
+                )
+
+                logger.info(f"Creator role generated thesis: {len(creator_response.content)} chars")
+            else:
+                raise ValueError("No response from Creator role orchestration")
 
             # Add user message to conversation history
             if self.conversation_memory:
@@ -231,8 +289,10 @@ class ArgumentWorkflow(BaseWorkflow):
                     model_provider=self.provider.provider_name
                 )
 
-            # Add synthesis as assistant response to conversation history
+            # Generate synthesis from role outputs
             synthesis = self.synthesize(result.steps)
+
+            # Add synthesis as assistant response to conversation history
             if self.conversation_memory:
                 self.add_message(
                     thread_id,
@@ -240,7 +300,7 @@ class ArgumentWorkflow(BaseWorkflow):
                     synthesis,
                     workflow_name=self.name,
                     model_provider=self.provider.provider_name,
-                    model_name=claim_analysis.model
+                    model_name=creator_response.model
                 )
 
             # Build successful result
@@ -251,13 +311,17 @@ class ArgumentWorkflow(BaseWorkflow):
             result.metadata.update({
                 'thread_id': thread_id,
                 'provider': self.provider.provider_name,
-                'model': claim_analysis.model,
+                'model': creator_response.model,
                 'is_continuation': continuation_id is not None,
                 'conversation_length': self._get_conversation_length(thread_id),
-                'steps_completed': 4
+                'workflow_pattern': 'role_orchestration',
+                'orchestration_pattern': OrchestrationPattern.SEQUENTIAL.value,
+                'roles_executed': ['creator'],  # Will expand with Skeptic and Moderator
+                'steps_completed': 1,  # Currently only Creator step
             })
 
-            logger.info(f"Argument workflow completed successfully for thread: {thread_id}")
+            logger.info(f"ARGUMENT workflow completed successfully for thread: {thread_id}")
+            logger.info(f"Creator role executed - thesis generated ({len(creator_response.content)} chars)")
 
         except Exception as e:
             logger.error(f"Argument workflow failed: {e}", exc_info=True)
@@ -268,172 +332,6 @@ class ArgumentWorkflow(BaseWorkflow):
         # Store result
         self._result = result
         return result
-
-    async def _analyze_claim(
-        self,
-        prompt: str,
-        thread_id: str,
-        **kwargs
-    ) -> GenerationResponse:
-        """
-        Step 1: Analyze and clarify the core claim or argument.
-
-        Args:
-            prompt: The argument or claim to analyze
-            thread_id: Thread ID for context
-            **kwargs: Additional generation parameters
-
-        Returns:
-            GenerationResponse with claim analysis
-        """
-        analysis_prompt = f"""Analyze the following argument or claim:
-
-{prompt}
-
-Please:
-1. Identify the core claim being made
-2. Clarify any ambiguous terms or concepts
-3. Identify key assumptions underlying the argument
-4. Restate the argument in clear, precise terms
-
-Provide a structured analysis of the claim."""
-
-        request = GenerationRequest(
-            prompt=analysis_prompt,
-            continuation_id=thread_id,
-            **kwargs
-        )
-
-        return await self.provider.generate(request)
-
-    async def _gather_supporting_evidence(
-        self,
-        original_prompt: str,
-        claim_analysis: str,
-        thread_id: str,
-        **kwargs
-    ) -> GenerationResponse:
-        """
-        Step 2: Identify evidence and reasoning supporting the claim.
-
-        Args:
-            original_prompt: Original user prompt
-            claim_analysis: Results from claim analysis step
-            thread_id: Thread ID for context
-            **kwargs: Additional generation parameters
-
-        Returns:
-            GenerationResponse with supporting evidence
-        """
-        evidence_prompt = f"""Based on this claim analysis:
-
-{claim_analysis}
-
-Please identify and explain:
-1. Main arguments and evidence supporting this claim
-2. Logical reasoning that supports the conclusion
-3. Real-world examples or data that back up the claim
-4. Theoretical frameworks that support this position
-
-Provide a comprehensive analysis of the supporting side."""
-
-        request = GenerationRequest(
-            prompt=evidence_prompt,
-            continuation_id=thread_id,
-            **kwargs
-        )
-
-        return await self.provider.generate(request)
-
-    async def _gather_counter_arguments(
-        self,
-        original_prompt: str,
-        claim_analysis: str,
-        thread_id: str,
-        **kwargs
-    ) -> GenerationResponse:
-        """
-        Step 3: Identify objections and counter-arguments to the claim.
-
-        Args:
-            original_prompt: Original user prompt
-            claim_analysis: Results from claim analysis step
-            thread_id: Thread ID for context
-            **kwargs: Additional generation parameters
-
-        Returns:
-            GenerationResponse with counter-arguments
-        """
-        counter_prompt = f"""Based on this claim analysis:
-
-{claim_analysis}
-
-Please identify and explain:
-1. Main objections and counter-arguments to this claim
-2. Weaknesses in the reasoning or evidence
-3. Alternative explanations or perspectives
-4. Potential flaws in the underlying assumptions
-
-Provide a comprehensive analysis of the opposing side."""
-
-        request = GenerationRequest(
-            prompt=counter_prompt,
-            continuation_id=thread_id,
-            **kwargs
-        )
-
-        return await self.provider.generate(request)
-
-    async def _assess_argument_strength(
-        self,
-        original_prompt: str,
-        claim_analysis: str,
-        supporting_evidence: str,
-        counter_arguments: str,
-        thread_id: str,
-        **kwargs
-    ) -> GenerationResponse:
-        """
-        Step 4: Assess overall argument strength and validity.
-
-        Args:
-            original_prompt: Original user prompt
-            claim_analysis: Results from claim analysis step
-            supporting_evidence: Results from supporting evidence step
-            counter_arguments: Results from counter-arguments step
-            thread_id: Thread ID for context
-            **kwargs: Additional generation parameters
-
-        Returns:
-            GenerationResponse with strength assessment
-        """
-        assessment_prompt = f"""Based on the complete argument analysis:
-
-CLAIM ANALYSIS:
-{claim_analysis}
-
-SUPPORTING EVIDENCE:
-{supporting_evidence}
-
-COUNTER-ARGUMENTS:
-{counter_arguments}
-
-Please provide:
-1. Overall assessment of argument strength (strong, moderate, weak)
-2. Key strengths of the argument
-3. Key weaknesses or vulnerabilities
-4. Conditions under which the argument is most/least valid
-5. Final judgment on the argument's persuasiveness
-
-Provide a balanced, critical assessment."""
-
-        request = GenerationRequest(
-            prompt=assessment_prompt,
-            continuation_id=thread_id,
-            **kwargs
-        )
-
-        return await self.provider.generate(request)
 
     def _build_prompt_with_history(
         self,
