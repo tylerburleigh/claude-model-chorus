@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T17:10:22.061781Z",
+    "generated_at": "2025-11-06T17:19:00.050681Z",
     "languages": [
       "python"
     ],
@@ -10,10 +10,10 @@
   },
   "statistics": {
     "total_files": 50,
-    "total_lines": 17635,
+    "total_lines": 17992,
     "total_classes": 93,
-    "total_functions": 56,
-    "avg_complexity": 4.46,
+    "total_functions": 61,
+    "avg_complexity": 4.51,
     "max_complexity": 36,
     "high_complexity_functions": [
       "thinkdeep (36)",
@@ -25,10 +25,10 @@
     "by_language": {
       "python": {
         "files": 50,
-        "lines": 17635,
+        "lines": 17992,
         "classes": 93,
-        "functions": 56,
-        "avg_complexity": 4.46
+        "functions": 61,
+        "avg_complexity": 4.51
       }
     }
   },
@@ -649,7 +649,12 @@
         "cluster_claims_kmeans",
         "cluster_claims_hierarchical",
         "get_cluster_representative",
-        "compute_cluster_statistics"
+        "generate_cluster_name",
+        "summarize_cluster",
+        "compute_cluster_statistics",
+        "score_cluster_coherence",
+        "score_cluster_separation",
+        "score_clustering_quality"
       ],
       "imports": [
         "hashlib",
@@ -665,7 +670,7 @@
         "modelchorus.core.models.CitationMap"
       ],
       "exports": [],
-      "lines": 640
+      "lines": 997
     },
     {
       "name": "chat",
@@ -13074,6 +13079,18 @@
           "call_type": "function_call"
         },
         {
+          "name": "score_cluster_separation",
+          "file": "modelchorus/src/modelchorus/workflows/argument/semantic.py",
+          "line": 834,
+          "call_type": "function_call"
+        },
+        {
+          "name": "score_clustering_quality",
+          "file": "modelchorus/src/modelchorus/workflows/argument/semantic.py",
+          "line": 959,
+          "call_type": "function_call"
+        },
+        {
           "name": "test_compute_embedding_returns_array",
           "file": "modelchorus/tests/test_semantic_similarity.py",
           "line": 33,
@@ -13214,7 +13231,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 26
+      "call_count": 28
     },
     {
       "name": "cosine_similarity",
@@ -13540,7 +13557,13 @@
         {
           "name": "compute_cluster_statistics",
           "file": "modelchorus/src/modelchorus/workflows/argument/semantic.py",
-          "line": 623,
+          "line": 727,
+          "call_type": "function_call"
+        },
+        {
+          "name": "score_cluster_coherence",
+          "file": "modelchorus/src/modelchorus/workflows/argument/semantic.py",
+          "line": 782,
           "call_type": "function_call"
         },
         {
@@ -13594,7 +13617,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 6
+      "call_count": 7
     },
     {
       "name": "add_similarity_to_citation",
@@ -14060,9 +14083,21 @@
       "is_public": true,
       "callers": [
         {
+          "name": "generate_cluster_name",
+          "file": "modelchorus/src/modelchorus/workflows/argument/semantic.py",
+          "line": 600,
+          "call_type": "function_call"
+        },
+        {
+          "name": "summarize_cluster",
+          "file": "modelchorus/src/modelchorus/workflows/argument/semantic.py",
+          "line": 651,
+          "call_type": "function_call"
+        },
+        {
           "name": "compute_cluster_statistics",
           "file": "modelchorus/src/modelchorus/workflows/argument/semantic.py",
-          "line": 609,
+          "line": 713,
           "call_type": "function_call"
         },
         {
@@ -14140,12 +14175,178 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 5
+      "call_count": 7
+    },
+    {
+      "name": "generate_cluster_name",
+      "file": "modelchorus/src/modelchorus/workflows/argument/semantic.py",
+      "line": 565,
+      "language": "python",
+      "docstring": "Generate a concise name for a cluster based on representative claims.\n\nUses extractive approach: identifies key terms from the cluster\nrepresentative claim and constructs a short descriptive name.\n\nArgs:\n    cluster: List of CitationMaps in the cluster\n    model_name: Sentence transformer model to use\n    max_words: Maximum words in generated name (default: 5)\n\nReturns:\n    Concise cluster name (e.g., \"AI Quality Improvement\")\n\nExample:\n    >>> cluster = [cm1, cm2, cm3]  # Claims about \"AI improves quality\"\n    >>> name = generate_cluster_name(cluster, max_words=4)\n    >>> print(name)\n    AI Quality Improvement",
+      "parameters": [
+        {
+          "name": "cluster",
+          "type": "List[CitationMap]",
+          "default": null
+        },
+        {
+          "name": "model_name",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "max_words",
+          "type": "int",
+          "default": null
+        }
+      ],
+      "return_type": "str",
+      "complexity": 3,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "score_clustering_quality",
+          "file": "modelchorus/src/modelchorus/workflows/argument/semantic.py",
+          "line": 977,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 590,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 593,
+          "call_type": "function_call"
+        },
+        {
+          "name": "split",
+          "file": "unknown",
+          "line": 596,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 597,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get_cluster_representative",
+          "file": "unknown",
+          "line": 600,
+          "call_type": "function_call"
+        },
+        {
+          "name": "split",
+          "file": "unknown",
+          "line": 605,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 609,
+          "call_type": "method_call"
+        },
+        {
+          "name": "capitalize",
+          "file": "unknown",
+          "line": 609,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "summarize_cluster",
+      "file": "modelchorus/src/modelchorus/workflows/argument/semantic.py",
+      "line": 614,
+      "language": "python",
+      "docstring": "Generate a detailed summary of cluster themes.\n\nAnalyzes claims in cluster to identify common patterns\nand generates a descriptive summary.\n\nArgs:\n    cluster: List of CitationMaps in the cluster\n    model_name: Sentence transformer model to use\n    max_length: Maximum characters in summary (default: 150)\n\nReturns:\n    Cluster summary (1-2 sentences)\n\nExample:\n    >>> cluster = [cm1, cm2, cm3]\n    >>> summary = summarize_cluster(cluster)\n    >>> print(summary)\n    This cluster focuses on AI quality improvement claims.\n    All claims discuss machine learning enhancing accuracy.",
+      "parameters": [
+        {
+          "name": "cluster",
+          "type": "List[CitationMap]",
+          "default": null
+        },
+        {
+          "name": "model_name",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "max_length",
+          "type": "int",
+          "default": null
+        }
+      ],
+      "return_type": "str",
+      "complexity": 5,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "score_clustering_quality",
+          "file": "modelchorus/src/modelchorus/workflows/argument/semantic.py",
+          "line": 981,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 640,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 643,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 646,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get_cluster_representative",
+          "file": "unknown",
+          "line": 651,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 654,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 663,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 1
     },
     {
       "name": "compute_cluster_statistics",
       "file": "modelchorus/src/modelchorus/workflows/argument/semantic.py",
-      "line": 565,
+      "line": 669,
       "language": "python",
       "docstring": "Compute statistics and quality metrics for clusters.\n\nProvides insights into cluster quality, including size distribution,\nintra-cluster similarity, and representative claims.\n\nArgs:\n    clusters: List of clusters (each cluster is a list of CitationMaps)\n    model_name: Sentence transformer model to use\n\nReturns:\n    Dictionary with cluster statistics:\n    - num_clusters: Number of clusters\n    - cluster_sizes: List of cluster sizes\n    - avg_cluster_size: Average cluster size\n    - representatives: List of representative claims (one per cluster)\n    - intra_cluster_similarities: Average similarity within each cluster\n\nExample:\n    >>> stats = compute_cluster_statistics(clusters)\n    >>> print(f\"Number of clusters: {stats['num_clusters']}\")\n    >>> print(f\"Average cluster size: {stats['avg_cluster_size']:.1f}\")\n    >>> print(f\"Representatives: {stats['representatives']}\")",
       "parameters": [
@@ -14196,131 +14397,483 @@
         {
           "name": "len",
           "file": "unknown",
-          "line": 593,
+          "line": 697,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 603,
+          "line": 707,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 608,
+          "line": 712,
           "call_type": "function_call"
         },
         {
           "name": "get_cluster_representative",
           "file": "unknown",
-          "line": 609,
+          "line": 713,
           "call_type": "function_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 610,
+          "line": 714,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 612,
+          "line": 716,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 617,
+          "line": 721,
           "call_type": "function_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 618,
+          "line": 722,
           "call_type": "method_call"
         },
         {
           "name": "compute_claim_similarity_batch",
           "file": "unknown",
-          "line": 623,
+          "line": 727,
           "call_type": "function_call"
         },
         {
           "name": "triu_indices_from",
           "file": "unknown",
-          "line": 626,
+          "line": 730,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 627,
+          "line": 731,
           "call_type": "function_call"
         },
         {
           "name": "float",
           "file": "unknown",
-          "line": 627,
+          "line": 731,
           "call_type": "function_call"
         },
         {
           "name": "mean",
           "file": "unknown",
-          "line": 627,
+          "line": 731,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 629,
+          "line": 733,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 632,
+          "line": 736,
           "call_type": "function_call"
         },
         {
           "name": "float",
           "file": "unknown",
-          "line": 634,
+          "line": 738,
           "call_type": "function_call"
         },
         {
           "name": "mean",
           "file": "unknown",
-          "line": 634,
+          "line": 738,
           "call_type": "method_call"
         },
         {
           "name": "min",
           "file": "unknown",
-          "line": 635,
+          "line": 739,
           "call_type": "function_call"
         },
         {
           "name": "max",
           "file": "unknown",
-          "line": 636,
+          "line": 740,
           "call_type": "function_call"
         },
         {
           "name": "float",
           "file": "unknown",
-          "line": 639,
+          "line": 743,
           "call_type": "function_call"
         },
         {
           "name": "mean",
           "file": "unknown",
-          "line": 639,
+          "line": 743,
           "call_type": "method_call"
         }
       ],
       "call_count": 4
+    },
+    {
+      "name": "score_cluster_coherence",
+      "file": "modelchorus/src/modelchorus/workflows/argument/semantic.py",
+      "line": 747,
+      "language": "python",
+      "docstring": "Measure how tightly grouped claims are within a cluster.\n\nComputes average pairwise similarity between claims in the cluster.\nHigher scores indicate more coherent/similar claims.\n\nArgs:\n    cluster: List of CitationMaps in the cluster\n    model_name: Sentence transformer model to use\n\nReturns:\n    Coherence score (0.0 to 1.0)\n    - 1.0 = perfect coherence (all claims identical)\n    - 0.8-1.0 = high coherence (very similar claims)\n    - 0.5-0.8 = moderate coherence\n    - < 0.5 = low coherence (diverse claims)\n\nExample:\n    >>> cluster = [cm1, cm2, cm3]\n    >>> coherence = score_cluster_coherence(cluster)\n    >>> print(f\"Coherence: {coherence:.3f}\")\n    Coherence: 0.847",
+      "parameters": [
+        {
+          "name": "cluster",
+          "type": "List[CitationMap]",
+          "default": null
+        },
+        {
+          "name": "model_name",
+          "type": "str",
+          "default": null
+        }
+      ],
+      "return_type": "float",
+      "complexity": 4,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "score_clustering_quality",
+          "file": "modelchorus/src/modelchorus/workflows/argument/semantic.py",
+          "line": 935,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 774,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 777,
+          "call_type": "function_call"
+        },
+        {
+          "name": "compute_claim_similarity_batch",
+          "file": "unknown",
+          "line": 782,
+          "call_type": "function_call"
+        },
+        {
+          "name": "triu_indices_from",
+          "file": "unknown",
+          "line": 785,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 787,
+          "call_type": "function_call"
+        },
+        {
+          "name": "float",
+          "file": "unknown",
+          "line": 790,
+          "call_type": "function_call"
+        },
+        {
+          "name": "mean",
+          "file": "unknown",
+          "line": 790,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "score_cluster_separation",
+      "file": "modelchorus/src/modelchorus/workflows/argument/semantic.py",
+      "line": 794,
+      "language": "python",
+      "docstring": "Measure how distinct clusters are from each other.\n\nComputes average distance between cluster centroids.\nHigher scores indicate better separation between clusters.\n\nArgs:\n    clusters: List of clusters (each cluster is a list of CitationMaps)\n    model_name: Sentence transformer model to use\n\nReturns:\n    Separation score (0.0 to 1.0)\n    - 1.0 = perfect separation (clusters completely distinct)\n    - 0.7-1.0 = high separation (well-separated clusters)\n    - 0.5-0.7 = moderate separation\n    - < 0.5 = low separation (overlapping clusters)\n\nExample:\n    >>> clusters = [[cm1, cm2], [cm3, cm4]]\n    >>> separation = score_cluster_separation(clusters)\n    >>> print(f\"Separation: {separation:.3f}\")\n    Separation: 0.723",
+      "parameters": [
+        {
+          "name": "clusters",
+          "type": "List[List[CitationMap]]",
+          "default": null
+        },
+        {
+          "name": "model_name",
+          "type": "str",
+          "default": null
+        }
+      ],
+      "return_type": "float",
+      "complexity": 5,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "score_clustering_quality",
+          "file": "modelchorus/src/modelchorus/workflows/argument/semantic.py",
+          "line": 941,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 821,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 825,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 827,
+          "call_type": "function_call"
+        },
+        {
+          "name": "array",
+          "file": "unknown",
+          "line": 834,
+          "call_type": "method_call"
+        },
+        {
+          "name": "compute_embedding",
+          "file": "unknown",
+          "line": 834,
+          "call_type": "function_call"
+        },
+        {
+          "name": "mean",
+          "file": "unknown",
+          "line": 837,
+          "call_type": "method_call"
+        },
+        {
+          "name": "norm",
+          "file": "unknown",
+          "line": 838,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 839,
+          "call_type": "method_call"
+        },
+        {
+          "name": "array",
+          "file": "unknown",
+          "line": 841,
+          "call_type": "method_call"
+        },
+        {
+          "name": "dot",
+          "file": "unknown",
+          "line": 845,
+          "call_type": "method_call"
+        },
+        {
+          "name": "triu_indices_from",
+          "file": "unknown",
+          "line": 849,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 851,
+          "call_type": "function_call"
+        },
+        {
+          "name": "float",
+          "file": "unknown",
+          "line": 855,
+          "call_type": "function_call"
+        },
+        {
+          "name": "mean",
+          "file": "unknown",
+          "line": 855,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "score_clustering_quality",
+      "file": "modelchorus/src/modelchorus/workflows/argument/semantic.py",
+      "line": 864,
+      "language": "python",
+      "docstring": "Compute comprehensive quality metrics for clustering results.\n\nCombines multiple metrics to provide overall assessment of\nclustering quality, including coherence, separation, and\ninterpretability measures.\n\nArgs:\n    clusters: List of clusters (each cluster is a list of CitationMaps)\n    model_name: Sentence transformer model to use\n\nReturns:\n    Dictionary with quality metrics:\n    - coherence_scores: List of coherence scores (one per cluster)\n    - avg_coherence: Average coherence across all clusters\n    - separation: Inter-cluster separation score\n    - silhouette_score: Sklearn silhouette coefficient (-1 to 1)\n    - quality_score: Overall quality (0.0 to 1.0)\n    - num_clusters: Number of clusters\n    - cluster_sizes: List of cluster sizes\n    - interpretability: Named clusters and summaries\n\nExample:\n    >>> clusters = [[cm1, cm2], [cm3, cm4]]\n    >>> quality = score_clustering_quality(clusters)\n    >>> print(f\"Quality: {quality['quality_score']:.3f}\")\n    >>> print(f\"Coherence: {quality['avg_coherence']:.3f}\")\n    >>> print(f\"Separation: {quality['separation']:.3f}\")\n    Quality: 0.812\n    Coherence: 0.847\n    Separation: 0.723",
+      "parameters": [
+        {
+          "name": "clusters",
+          "type": "List[List[CitationMap]]",
+          "default": null
+        },
+        {
+          "name": "model_name",
+          "type": "str",
+          "default": null
+        }
+      ],
+      "return_type": "Dict[str, Any]",
+      "complexity": 8,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 900,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 916,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 918,
+          "call_type": "function_call"
+        },
+        {
+          "name": "score_cluster_coherence",
+          "file": "unknown",
+          "line": 935,
+          "call_type": "function_call"
+        },
+        {
+          "name": "float",
+          "file": "unknown",
+          "line": 938,
+          "call_type": "function_call"
+        },
+        {
+          "name": "mean",
+          "file": "unknown",
+          "line": 938,
+          "call_type": "method_call"
+        },
+        {
+          "name": "score_cluster_separation",
+          "file": "unknown",
+          "line": 941,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 945,
+          "call_type": "function_call"
+        },
+        {
+          "name": "enumerate",
+          "file": "unknown",
+          "line": 952,
+          "call_type": "function_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 954,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 955,
+          "call_type": "method_call"
+        },
+        {
+          "name": "array",
+          "file": "unknown",
+          "line": 958,
+          "call_type": "method_call"
+        },
+        {
+          "name": "compute_embedding",
+          "file": "unknown",
+          "line": 959,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 964,
+          "call_type": "function_call"
+        },
+        {
+          "name": "set",
+          "file": "unknown",
+          "line": 964,
+          "call_type": "function_call"
+        },
+        {
+          "name": "float",
+          "file": "unknown",
+          "line": 965,
+          "call_type": "function_call"
+        },
+        {
+          "name": "sklearn_silhouette",
+          "file": "unknown",
+          "line": 965,
+          "call_type": "function_call"
+        },
+        {
+          "name": "generate_cluster_name",
+          "file": "unknown",
+          "line": 977,
+          "call_type": "function_call"
+        },
+        {
+          "name": "summarize_cluster",
+          "file": "unknown",
+          "line": 981,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 991,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 992,
+          "call_type": "function_call"
+        }
+      ]
     },
     {
       "name": "mock_claude_response",

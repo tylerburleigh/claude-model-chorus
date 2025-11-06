@@ -1,17 +1,17 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 12:10:22
+**Generated:** 2025-11-06 12:19:00
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 50
-- **Total Lines:** 17635
+- **Total Lines:** 17992
 - **Total Classes:** 93
-- **Total Functions:** 56
-- **Avg Complexity:** 4.46
+- **Total Functions:** 61
+- **Avg Complexity:** 4.51
 - **Max Complexity:** 36
 - **High Complexity Functions:**
   - thinkdeep (36)
@@ -2575,7 +2575,7 @@ Example:
 ### `compute_cluster_statistics(clusters, model_name) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `modelchorus/src/modelchorus/workflows/argument/semantic.py:565`
+**Defined in:** `modelchorus/src/modelchorus/workflows/argument/semantic.py:669`
 **Complexity:** 6
 
 **Description:**
@@ -2906,6 +2906,39 @@ Example:
 
 ---
 
+### `generate_cluster_name(cluster, model_name, max_words) -> str`
+
+**Language:** python
+**Defined in:** `modelchorus/src/modelchorus/workflows/argument/semantic.py:565`
+**Complexity:** 3
+
+**Description:**
+> Generate a concise name for a cluster based on representative claims.
+
+Uses extractive approach: identifies key terms from the cluster
+representative claim and constructs a short descriptive name.
+
+Args:
+    cluster: List of CitationMaps in the cluster
+    model_name: Sentence transformer model to use
+    max_words: Maximum words in generated name (default: 5)
+
+Returns:
+    Concise cluster name (e.g., "AI Quality Improvement")
+
+Example:
+    >>> cluster = [cm1, cm2, cm3]  # Claims about "AI improves quality"
+    >>> name = generate_cluster_name(cluster, max_words=4)
+    >>> print(name)
+    AI Quality Improvement
+
+**Parameters:**
+- `cluster`: List[CitationMap]
+- `model_name`: str
+- `max_words`: int
+
+---
+
 ### `get_cluster_representative(cluster, model_name) -> CitationMap`
 
 **Language:** python
@@ -3198,6 +3231,154 @@ showing how hypotheses are formed, tested, and confidence evolves across steps.
 
 **Description:**
 > Sample GenerationRequest for testing.
+
+---
+
+### `score_cluster_coherence(cluster, model_name) -> float`
+
+**Language:** python
+**Defined in:** `modelchorus/src/modelchorus/workflows/argument/semantic.py:747`
+**Complexity:** 4
+
+**Description:**
+> Measure how tightly grouped claims are within a cluster.
+
+Computes average pairwise similarity between claims in the cluster.
+Higher scores indicate more coherent/similar claims.
+
+Args:
+    cluster: List of CitationMaps in the cluster
+    model_name: Sentence transformer model to use
+
+Returns:
+    Coherence score (0.0 to 1.0)
+    - 1.0 = perfect coherence (all claims identical)
+    - 0.8-1.0 = high coherence (very similar claims)
+    - 0.5-0.8 = moderate coherence
+    - < 0.5 = low coherence (diverse claims)
+
+Example:
+    >>> cluster = [cm1, cm2, cm3]
+    >>> coherence = score_cluster_coherence(cluster)
+    >>> print(f"Coherence: {coherence:.3f}")
+    Coherence: 0.847
+
+**Parameters:**
+- `cluster`: List[CitationMap]
+- `model_name`: str
+
+---
+
+### `score_cluster_separation(clusters, model_name) -> float`
+
+**Language:** python
+**Defined in:** `modelchorus/src/modelchorus/workflows/argument/semantic.py:794`
+**Complexity:** 5
+
+**Description:**
+> Measure how distinct clusters are from each other.
+
+Computes average distance between cluster centroids.
+Higher scores indicate better separation between clusters.
+
+Args:
+    clusters: List of clusters (each cluster is a list of CitationMaps)
+    model_name: Sentence transformer model to use
+
+Returns:
+    Separation score (0.0 to 1.0)
+    - 1.0 = perfect separation (clusters completely distinct)
+    - 0.7-1.0 = high separation (well-separated clusters)
+    - 0.5-0.7 = moderate separation
+    - < 0.5 = low separation (overlapping clusters)
+
+Example:
+    >>> clusters = [[cm1, cm2], [cm3, cm4]]
+    >>> separation = score_cluster_separation(clusters)
+    >>> print(f"Separation: {separation:.3f}")
+    Separation: 0.723
+
+**Parameters:**
+- `clusters`: List[List[CitationMap]]
+- `model_name`: str
+
+---
+
+### `score_clustering_quality(clusters, model_name) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `modelchorus/src/modelchorus/workflows/argument/semantic.py:864`
+**Complexity:** 8
+
+**Description:**
+> Compute comprehensive quality metrics for clustering results.
+
+Combines multiple metrics to provide overall assessment of
+clustering quality, including coherence, separation, and
+interpretability measures.
+
+Args:
+    clusters: List of clusters (each cluster is a list of CitationMaps)
+    model_name: Sentence transformer model to use
+
+Returns:
+    Dictionary with quality metrics:
+    - coherence_scores: List of coherence scores (one per cluster)
+    - avg_coherence: Average coherence across all clusters
+    - separation: Inter-cluster separation score
+    - silhouette_score: Sklearn silhouette coefficient (-1 to 1)
+    - quality_score: Overall quality (0.0 to 1.0)
+    - num_clusters: Number of clusters
+    - cluster_sizes: List of cluster sizes
+    - interpretability: Named clusters and summaries
+
+Example:
+    >>> clusters = [[cm1, cm2], [cm3, cm4]]
+    >>> quality = score_clustering_quality(clusters)
+    >>> print(f"Quality: {quality['quality_score']:.3f}")
+    >>> print(f"Coherence: {quality['avg_coherence']:.3f}")
+    >>> print(f"Separation: {quality['separation']:.3f}")
+    Quality: 0.812
+    Coherence: 0.847
+    Separation: 0.723
+
+**Parameters:**
+- `clusters`: List[List[CitationMap]]
+- `model_name`: str
+
+---
+
+### `summarize_cluster(cluster, model_name, max_length) -> str`
+
+**Language:** python
+**Defined in:** `modelchorus/src/modelchorus/workflows/argument/semantic.py:614`
+**Complexity:** 5
+
+**Description:**
+> Generate a detailed summary of cluster themes.
+
+Analyzes claims in cluster to identify common patterns
+and generates a descriptive summary.
+
+Args:
+    cluster: List of CitationMaps in the cluster
+    model_name: Sentence transformer model to use
+    max_length: Maximum characters in summary (default: 150)
+
+Returns:
+    Cluster summary (1-2 sentences)
+
+Example:
+    >>> cluster = [cm1, cm2, cm3]
+    >>> summary = summarize_cluster(cluster)
+    >>> print(summary)
+    This cluster focuses on AI quality improvement claims.
+    All claims discuss machine learning enhancing accuracy.
+
+**Parameters:**
+- `cluster`: List[CitationMap]
+- `model_name`: str
+- `max_length`: int
 
 ---
 
