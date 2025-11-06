@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T00:23:57.334388Z",
+    "generated_at": "2025-11-06T00:28:22.174215Z",
     "languages": [
       "python"
     ],
@@ -10,8 +10,8 @@
   },
   "statistics": {
     "total_files": 40,
-    "total_lines": 11719,
-    "total_classes": 60,
+    "total_lines": 12197,
+    "total_classes": 61,
     "total_functions": 29,
     "avg_complexity": 5.21,
     "max_complexity": 36,
@@ -24,8 +24,8 @@
     "by_language": {
       "python": {
         "files": 40,
-        "lines": 11719,
-        "classes": 60,
+        "lines": 12197,
+        "classes": 61,
         "functions": 29,
         "avg_complexity": 5.21
       }
@@ -951,7 +951,8 @@
       "docstring": "Integration tests for ThinkDeep workflow.\n\nTests verify ThinkDeepWorkflow functionality including:\n- Investigation step execution and tracking\n- Multi-step investigation with state management\n- Conversation threading and continuation\n- Hypothesis management through workflow\n- Confidence progression tracking\n- File examination tracking\n- Expert validation integration",
       "classes": [
         "TestInvestigationStepExecution",
-        "TestHypothesisEvolution"
+        "TestHypothesisEvolution",
+        "TestConfidenceProgression"
       ],
       "functions": [],
       "imports": [
@@ -970,7 +971,7 @@
         "modelchorus.core.models.ThinkDeepState"
       ],
       "exports": [],
-      "lines": 1132
+      "lines": 1610
     }
   ],
   "classes": [
@@ -1383,10 +1384,19 @@
             "TestHypothesisEvolution",
             "conversation_memory"
           ]
+        },
+        {
+          "instantiator": "conversation_memory",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1149,
+          "context": [
+            "TestConfidenceProgression",
+            "conversation_memory"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 28
+      "instantiation_count": 29
     },
     {
       "name": "ConfidenceLevel",
@@ -3460,10 +3470,154 @@
             "TestHypothesisEvolution",
             "test_hypothesis_metadata_tracking"
           ]
+        },
+        {
+          "instantiator": "test_initial_confidence_level",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1157,
+          "context": [
+            "TestConfidenceProgression",
+            "test_initial_confidence_level"
+          ]
+        },
+        {
+          "instantiator": "test_update_confidence_level",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1187,
+          "context": [
+            "TestConfidenceProgression",
+            "test_update_confidence_level"
+          ]
+        },
+        {
+          "instantiator": "test_get_confidence_level",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1225,
+          "context": [
+            "TestConfidenceProgression",
+            "test_get_confidence_level"
+          ]
+        },
+        {
+          "instantiator": "test_confidence_progression_across_steps",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1261,
+          "context": [
+            "TestConfidenceProgression",
+            "test_confidence_progression_across_steps"
+          ]
+        },
+        {
+          "instantiator": "test_confidence_progression_across_steps",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1278,
+          "context": [
+            "TestConfidenceProgression",
+            "test_confidence_progression_across_steps"
+          ]
+        },
+        {
+          "instantiator": "test_confidence_progression_across_steps",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1296,
+          "context": [
+            "TestConfidenceProgression",
+            "test_confidence_progression_across_steps"
+          ]
+        },
+        {
+          "instantiator": "test_confidence_progression_across_steps",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1314,
+          "context": [
+            "TestConfidenceProgression",
+            "test_confidence_progression_across_steps"
+          ]
+        },
+        {
+          "instantiator": "test_confidence_tracked_in_metadata",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1342,
+          "context": [
+            "TestConfidenceProgression",
+            "test_confidence_tracked_in_metadata"
+          ]
+        },
+        {
+          "instantiator": "test_invalid_confidence_level_rejected",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1373,
+          "context": [
+            "TestConfidenceProgression",
+            "test_invalid_confidence_level_rejected"
+          ]
+        },
+        {
+          "instantiator": "test_confidence_complete_progression",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1402,
+          "context": [
+            "TestConfidenceProgression",
+            "test_confidence_complete_progression"
+          ]
+        },
+        {
+          "instantiator": "test_investigation_completion_criteria",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1450,
+          "context": [
+            "TestConfidenceProgression",
+            "test_investigation_completion_criteria"
+          ]
+        },
+        {
+          "instantiator": "test_investigation_summary_includes_confidence",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1494,
+          "context": [
+            "TestConfidenceProgression",
+            "test_investigation_summary_includes_confidence"
+          ]
+        },
+        {
+          "instantiator": "test_confidence_cannot_decrease",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1530,
+          "context": [
+            "TestConfidenceProgression",
+            "test_confidence_cannot_decrease"
+          ]
+        },
+        {
+          "instantiator": "test_confidence_persistence_across_turns",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1569,
+          "context": [
+            "TestConfidenceProgression",
+            "test_confidence_persistence_across_turns"
+          ]
+        },
+        {
+          "instantiator": "test_confidence_persistence_across_turns",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1582,
+          "context": [
+            "TestConfidenceProgression",
+            "test_confidence_persistence_across_turns"
+          ]
+        },
+        {
+          "instantiator": "test_confidence_persistence_across_turns",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1594,
+          "context": [
+            "TestConfidenceProgression",
+            "test_confidence_persistence_across_turns"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 39
+      "instantiation_count": 55
     },
     {
       "name": "ModelProvider",
@@ -4741,10 +4895,109 @@
             "TestHypothesisEvolution",
             "test_hypothesis_metadata_tracking"
           ]
+        },
+        {
+          "instantiator": "test_initial_confidence_level",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1165,
+          "context": [
+            "TestConfidenceProgression",
+            "test_initial_confidence_level"
+          ]
+        },
+        {
+          "instantiator": "test_update_confidence_level",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1194,
+          "context": [
+            "TestConfidenceProgression",
+            "test_update_confidence_level"
+          ]
+        },
+        {
+          "instantiator": "test_get_confidence_level",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1232,
+          "context": [
+            "TestConfidenceProgression",
+            "test_get_confidence_level"
+          ]
+        },
+        {
+          "instantiator": "test_confidence_progression_across_steps",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1255,
+          "context": [
+            "TestConfidenceProgression",
+            "test_confidence_progression_across_steps"
+          ]
+        },
+        {
+          "instantiator": "test_confidence_tracked_in_metadata",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1349,
+          "context": [
+            "TestConfidenceProgression",
+            "test_confidence_tracked_in_metadata"
+          ]
+        },
+        {
+          "instantiator": "test_invalid_confidence_level_rejected",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1380,
+          "context": [
+            "TestConfidenceProgression",
+            "test_invalid_confidence_level_rejected"
+          ]
+        },
+        {
+          "instantiator": "test_confidence_complete_progression",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1409,
+          "context": [
+            "TestConfidenceProgression",
+            "test_confidence_complete_progression"
+          ]
+        },
+        {
+          "instantiator": "test_investigation_completion_criteria",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1457,
+          "context": [
+            "TestConfidenceProgression",
+            "test_investigation_completion_criteria"
+          ]
+        },
+        {
+          "instantiator": "test_investigation_summary_includes_confidence",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1501,
+          "context": [
+            "TestConfidenceProgression",
+            "test_investigation_summary_includes_confidence"
+          ]
+        },
+        {
+          "instantiator": "test_confidence_cannot_decrease",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1537,
+          "context": [
+            "TestConfidenceProgression",
+            "test_confidence_cannot_decrease"
+          ]
+        },
+        {
+          "instantiator": "test_confidence_persistence_across_turns",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1563,
+          "context": [
+            "TestConfidenceProgression",
+            "test_confidence_persistence_across_turns"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 30
+      "instantiation_count": 41
     },
     {
       "name": "TestChatWorkflowInitialization",
@@ -5272,6 +5525,34 @@
         "test_hypothesis_update_with_status_change",
         "test_hypothesis_not_found_handling",
         "test_hypothesis_metadata_tracking"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestConfidenceProgression",
+      "file": "tests/test_thinkdeep_workflow.py",
+      "line": 1135,
+      "language": "python",
+      "docstring": "Test suite for confidence level progression in ThinkDeepWorkflow.",
+      "bases": [],
+      "methods": [
+        "mock_provider",
+        "conversation_memory",
+        "test_initial_confidence_level",
+        "test_update_confidence_level",
+        "test_get_confidence_level",
+        "test_confidence_progression_across_steps",
+        "test_confidence_tracked_in_metadata",
+        "test_invalid_confidence_level_rejected",
+        "test_confidence_complete_progression",
+        "test_investigation_completion_criteria",
+        "test_investigation_summary_includes_confidence",
+        "test_confidence_cannot_decrease",
+        "test_confidence_persistence_across_turns"
       ],
       "properties": [],
       "is_exported": false,

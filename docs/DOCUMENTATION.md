@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 19:23:57
+**Generated:** 2025-11-05 19:28:22
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 40
-- **Total Lines:** 11719
-- **Total Classes:** 60
+- **Total Lines:** 12197
+- **Total Classes:** 61
 - **Total Functions:** 29
 - **Avg Complexity:** 5.21
 - **Max Complexity:** 36
@@ -897,6 +897,31 @@ Attributes:
 - `test_confidence_level_count()`
 - `test_confidence_level_progression()`
 - `test_confidence_level_string_representation()`
+
+---
+
+### `TestConfidenceProgression`
+
+**Language:** python
+**Defined in:** `tests/test_thinkdeep_workflow.py:1135`
+
+**Description:**
+> Test suite for confidence level progression in ThinkDeepWorkflow.
+
+**Methods:**
+- `mock_provider()`
+- `conversation_memory()`
+- `test_initial_confidence_level()`
+- `test_update_confidence_level()`
+- `test_get_confidence_level()`
+- `test_confidence_progression_across_steps()`
+- `test_confidence_tracked_in_metadata()`
+- `test_invalid_confidence_level_rejected()`
+- `test_confidence_complete_progression()`
+- `test_investigation_completion_criteria()`
+- `test_investigation_summary_includes_confidence()`
+- `test_confidence_cannot_decrease()`
+- `test_confidence_persistence_across_turns()`
 
 ---
 

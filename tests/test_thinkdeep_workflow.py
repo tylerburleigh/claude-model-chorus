@@ -1608,3 +1608,284 @@ class TestConfidenceProgression:
         assert result1.metadata["confidence"] == ConfidenceLevel.EXPLORING.value
         assert result2.metadata["confidence"] == ConfidenceLevel.MEDIUM.value
         assert result3.metadata["confidence"] == ConfidenceLevel.HIGH.value
+
+
+class TestEndToEndIntegration:
+    """End-to-end integration tests for complete investigation scenarios."""
+
+    @pytest.fixture
+    def mock_provider(self):
+        """Create a mock provider for testing."""
+        provider = AsyncMock()
+        provider.provider_name = "test_provider"
+        provider.validate_api_key.return_value = True
+        return provider
+
+    @pytest.fixture
+    def conversation_memory(self):
+        """Create conversation memory for testing."""
+        return ConversationMemory()
+
+    @pytest.mark.asyncio
+    async def test_five_step_investigation_with_hypothesis_evolution(
+        self, mock_provider, conversation_memory
+    ):
+        """
+        Verify that multi-step investigation (5+ steps) works end-to-end.
+
+        This test simulates a complete investigation scenario with:
+        - 5+ investigation steps
+        - Multiple hypotheses with status changes
+        - Confidence progression from exploring to high
+        - Evidence accumulation
+        - File tracking across steps
+        """
+        # Create workflow
+        workflow = ThinkDeepWorkflow(
+            provider=mock_provider,
+            conversation_memory=conversation_memory
+        )
+
+        # Step 1: Initial exploration
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Initial exploration: System shows intermittent timeout errors during peak load.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        result1 = await workflow.run(
+            prompt="Investigate why application has intermittent timeout errors",
+            files=["app.py"]
+        )
+
+        assert result1.success is True
+        thread_id = result1.metadata["thread_id"]
+        assert result1.metadata["confidence"] == ConfidenceLevel.EXPLORING.value
+
+        # Add first hypothesis
+        workflow.add_hypothesis(
+            thread_id,
+            "Database connection pool is undersized for peak load",
+            evidence=["Timeout errors correlate with peak traffic"]
+        )
+
+        # Step 2: Test first hypothesis
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Database configuration shows pool size of 5. Peak load analysis suggests 20+ concurrent connections needed.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        result2 = await workflow.run(
+            prompt="Check database connection pool configuration",
+            continuation_id=thread_id,
+            files=["config/database.py"]
+        )
+
+        assert result2.success is True
+
+        # Add evidence and update confidence
+        workflow.update_hypothesis(
+            thread_id,
+            "Database connection pool is undersized for peak load",
+            new_evidence=["Pool size: 5", "Peak concurrent connections: 20+"]
+        )
+        workflow.update_confidence(thread_id, ConfidenceLevel.MEDIUM.value)
+
+        # Add second hypothesis
+        workflow.add_hypothesis(
+            thread_id,
+            "Network latency causes timeouts",
+            evidence=["Geographic distance to database server"]
+        )
+
+        # Step 3: Test second hypothesis
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Network metrics show consistent low latency. Average: 2ms, p99: 5ms. No correlation with timeout events.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        result3 = await workflow.run(
+            prompt="Analyze network latency metrics",
+            continuation_id=thread_id,
+            files=["logs/network_metrics.log"]
+        )
+
+        assert result3.success is True
+
+        # Disprove second hypothesis
+        workflow.update_hypothesis(
+            thread_id,
+            "Network latency causes timeouts",
+            new_evidence=["Network latency consistently low (2ms avg, 5ms p99)"],
+            new_status="disproven"
+        )
+
+        # Step 4: Gather more evidence for first hypothesis
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Load testing confirms: timeout rate increases linearly with connection pool exhaustion. Clear correlation.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        result4 = await workflow.run(
+            prompt="Run load tests to confirm pool exhaustion hypothesis",
+            continuation_id=thread_id,
+            files=["tests/load_test_results.log"]
+        )
+
+        assert result4.success is True
+
+        # Validate first hypothesis and increase confidence
+        workflow.update_hypothesis(
+            thread_id,
+            "Database connection pool is undersized for peak load",
+            new_evidence=["Load tests confirm correlation", "Timeout rate linear with pool exhaustion"],
+            new_status="validated"
+        )
+        workflow.update_confidence(thread_id, ConfidenceLevel.HIGH.value)
+
+        # Step 5: Verify solution approach
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Solution validated: Increasing pool size to 25 eliminates timeouts under peak load in staging environment.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        result5 = await workflow.run(
+            prompt="Test proposed solution: increase pool size to 25",
+            continuation_id=thread_id,
+            files=["staging/validation_results.log"]
+        )
+
+        assert result5.success is True
+        workflow.update_confidence(thread_id, ConfidenceLevel.VERY_HIGH.value)
+
+        # Step 6: Final conclusion
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Root cause confirmed: Database connection pool size insufficient. Solution verified in staging.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        result6 = await workflow.run(
+            prompt="Summarize findings and confidence in root cause identification",
+            continuation_id=thread_id
+        )
+
+        assert result6.success is True
+
+        # Verify final state
+        state = workflow.get_investigation_state(thread_id)
+
+        # Verify 6 steps completed
+        assert len(state.steps) == 6
+
+        # Verify confidence progression
+        assert state.steps[0].confidence == ConfidenceLevel.EXPLORING.value
+        assert state.steps[1].confidence == ConfidenceLevel.EXPLORING.value  # Not updated yet
+        assert state.current_confidence == ConfidenceLevel.VERY_HIGH.value
+
+        # Verify hypotheses
+        assert len(state.hypotheses) == 2
+
+        # Find hypotheses by status
+        validated_hyps = [h for h in state.hypotheses if h.status == "validated"]
+        disproven_hyps = [h for h in state.hypotheses if h.status == "disproven"]
+
+        assert len(validated_hyps) == 1
+        assert len(disproven_hyps) == 1
+
+        # Verify validated hypothesis has evidence
+        validated_hyp = validated_hyps[0]
+        assert "Database connection pool" in validated_hyp.hypothesis
+        assert len(validated_hyp.evidence) >= 4  # Initial + 3 updates
+
+        # Verify files tracked
+        assert len(state.relevant_files) == 5  # 5 different files examined
+
+        # Verify investigation completion criteria
+        summary = workflow.get_investigation_summary(thread_id)
+        assert summary is not None
+        assert summary["total_steps"] == 6
+        assert summary["validated_hypotheses"] == 1
+        assert summary["disproven_hypotheses"] == 1
+        assert summary["confidence"] == ConfidenceLevel.VERY_HIGH.value
+        assert summary["files_examined"] == 5
+
+        print("\n✅ End-to-End Verification Complete:")
+        print(f"   - Investigation Steps: {summary['total_steps']}")
+        print(f"   - Hypotheses: {summary['total_hypotheses']} (1 validated, 1 disproven)")
+        print(f"   - Final Confidence: {summary['confidence']}")
+        print(f"   - Files Examined: {summary['files_examined']}")
+        print(f"   - Investigation Complete: {summary['is_complete']}")
+
+    @pytest.mark.asyncio
+    async def test_complete_investigation_workflow(
+        self, mock_provider, conversation_memory
+    ):
+        """
+        Test complete investigation workflow from start to completion.
+
+        Verifies:
+        - Investigation can be started
+        - Hypotheses can be added and evolved
+        - Confidence can progress to completion
+        - Investigation completion criteria work correctly
+        """
+        # Create workflow
+        workflow = ThinkDeepWorkflow(
+            provider=mock_provider,
+            conversation_memory=conversation_memory
+        )
+
+        # Start investigation
+        mock_provider.generate.return_value = GenerationResponse(
+            content="Starting systematic investigation.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        result = await workflow.run(prompt="Investigate the issue")
+        thread_id = result.metadata["thread_id"]
+
+        # Add hypothesis
+        workflow.add_hypothesis(thread_id, "Root cause identified", evidence=["Strong evidence"])
+
+        # Progress through investigation
+        for step in range(2, 6):
+            mock_provider.generate.return_value = GenerationResponse(
+                content=f"Investigation step {step} findings.",
+                model="test-model",
+                usage={},
+                stop_reason="end_turn"
+            )
+
+            result = await workflow.run(
+                prompt=f"Step {step} investigation",
+                continuation_id=thread_id
+            )
+
+            assert result.success is True
+
+        # Validate hypothesis and reach completion
+        workflow.validate_hypothesis(thread_id, "Root cause identified")
+        workflow.update_confidence(thread_id, ConfidenceLevel.CERTAIN.value)
+
+        # Verify investigation complete
+        assert workflow.is_investigation_complete(thread_id) is True
+
+        # Verify summary
+        summary = workflow.get_investigation_summary(thread_id)
+        assert summary["is_complete"] is True
+        assert summary["confidence"] == ConfidenceLevel.CERTAIN.value
+        assert summary["total_steps"] == 5
+        assert summary["validated_hypotheses"] == 1
