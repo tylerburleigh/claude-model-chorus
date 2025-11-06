@@ -1,7 +1,7 @@
 {
   "spec_id": "general-purpose-workflows-2025-11-06-001",
   "generated": "2025-11-06T12:45:00Z",
-  "last_updated": "2025-11-06T20:37:33.913046Z",
+  "last_updated": "2025-11-06T20:39:38.386579Z",
   "metadata": {
     "title": "General-Purpose Workflows (ARGUMENT, IDEATE, RESEARCH)",
     "description": "Implement foundation infrastructure and three general-purpose workflows for ModelChorus: ARGUMENT (structured debate), IDEATE (creative ideation), and RESEARCH (evidence-based research with citations)",
@@ -24,7 +24,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-06T16:35:09.389143Z",
-    "progress_percentage": 63,
+    "progress_percentage": 64,
     "current_phase": "phase-4"
   },
   "hierarchy": {
@@ -42,7 +42,7 @@
         "phase-6"
       ],
       "total_tasks": 71,
-      "completed_tasks": 45,
+      "completed_tasks": 46,
       "metadata": {},
       "dependencies": {
         "blocks": [],
@@ -1525,7 +1525,7 @@
         "depends": []
       },
       "total_tasks": 11,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "purpose": "Implement RESEARCH workflow for evidence-based research with citations and validation",
         "risk_level": "high",
@@ -1544,7 +1544,7 @@
         "task-4-4"
       ],
       "total_tasks": 9,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1579,7 +1579,7 @@
         "depends": []
       },
       "total_tasks": 6,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "file_path": "modelchorus/src/modelchorus/workflows/research.py",
         "task_category": "implementation",
@@ -1632,7 +1632,7 @@
     "task-4-1-3": {
       "type": "subtask",
       "title": "Implement parallel evidence extraction from sources",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-4-1",
       "children": [],
       "dependencies": {
@@ -1641,9 +1641,13 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "started_at": "2025-11-06T20:37:33.912681Z"
+        "started_at": "2025-11-06T20:37:33.912681Z",
+        "completed_at": "2025-11-06T20:39:38.368014Z",
+        "needs_journaling": false,
+        "actual_hours": 0.035,
+        "journaled_at": "2025-11-06T20:39:38.381209Z"
       }
     },
     "task-4-1-4": {
@@ -2816,6 +2820,15 @@
       "content": "Successfully implemented source ingestion and registry management for ResearchWorkflow. Added source_registry instance variable (List[Dict]) to __init__. Implemented 7 methods: ingest_source() with auto-validation support, _validate_source() with credibility scoring (high/medium/low based on URL and source type), get_sources_by_tag(), get_sources_by_type(), get_sources_by_credibility(), get_source_summary() with detailed statistics, and clear_source_registry(). Validation logic assigns scores based on URL presence (+2 points) and credible source types like paper/book/academic/official (+3 points). All tests pass: source ingestion with metadata, filtering by tag/type/credibility, summary statistics, registry clearing, and validation scoring (high=5 points, medium=2 points, low=0 points).",
       "metadata": {},
       "task_id": "task-4-1-2"
+    },
+    {
+      "timestamp": "2025-11-06T20:39:38.381189Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Implement parallel evidence extraction from sources",
+      "author": "claude-code",
+      "content": "Successfully implemented parallel evidence extraction from sources for the RESEARCH workflow. Added Evidence and ExtractionResult dataclasses, implemented extract_evidence_from_sources() method with asyncio-based parallel processing, semaphore-based concurrency control (max 5 concurrent), per-source timeout handling (60s default), comprehensive error handling, and evidence parsing. Verified imports work correctly. Implementation allows extracting evidence from multiple research sources concurrently while respecting rate limits.",
+      "metadata": {},
+      "task_id": "task-4-1-3"
     }
   ]
 }
