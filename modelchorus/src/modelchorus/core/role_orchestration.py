@@ -12,11 +12,16 @@ Public API:
     - ModelRole: Data class defining a model's role, stance, and prompt customization
     - RoleOrchestrator: Coordinator for executing models in assigned roles
     - OrchestrationPattern: Enum for execution patterns (sequential/parallel/hybrid)
+    - OrchestrationResult: Result data structure from orchestrated execution
 """
 
+import logging
 from enum import Enum
 from typing import Any, Dict, Optional, List
+from dataclasses import dataclass, field
 from pydantic import BaseModel, Field, ConfigDict, field_validator
+
+logger = logging.getLogger(__name__)
 
 
 class OrchestrationPattern(str, Enum):
@@ -243,3 +248,269 @@ class ModelRole(BaseModel):
         prompt_parts.append(base_prompt)
 
         return "\n\n".join(prompt_parts)
+
+
+@dataclass
+class OrchestrationResult:
+    """
+    Result from orchestrating multiple models with assigned roles.
+
+    Contains responses from all models, execution metadata, and error information.
+    Used by RoleOrchestrator to return structured results after executing
+    a multi-model workflow.
+
+    Attributes:
+        role_responses: List of (role_name, response) tuples in execution order
+        all_responses: List of all GenerationResponse objects
+        failed_roles: List of role names that failed to execute
+        pattern_used: Orchestration pattern that was executed
+        execution_order: List of role names in the order they were executed
+        metadata: Additional execution metadata (timing, context, etc.)
+
+    Example:
+        >>> result = OrchestrationResult(
+        ...     role_responses=[
+        ...         ("proponent", GenerationResponse(content="Argument FOR...", model="gpt-5")),
+        ...         ("critic", GenerationResponse(content="Argument AGAINST...", model="gemini-2.5-pro")),
+        ...     ],
+        ...     pattern_used=OrchestrationPattern.SEQUENTIAL,
+        ...     execution_order=["proponent", "critic"]
+        ... )
+    """
+
+    role_responses: List[tuple[str, Any]] = field(default_factory=list)
+    all_responses: List[Any] = field(default_factory=list)
+    failed_roles: List[str] = field(default_factory=list)
+    pattern_used: OrchestrationPattern = OrchestrationPattern.SEQUENTIAL
+    execution_order: List[str] = field(default_factory=list)
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+
+class RoleOrchestrator:
+    """
+    Coordinator for executing multiple models with assigned roles in sequential order.
+
+    Manages the execution of multi-model workflows where each model has a specific
+    role (e.g., proponent, critic, synthesizer) and executes in a defined sequence.
+    Handles provider resolution, prompt customization, and result aggregation.
+
+    This orchestrator enables workflows like:
+    - ARGUMENT: Sequential debate with roles taking turns
+    - IDEATE: Multiple creative perspectives built sequentially
+    - RESEARCH: Step-by-step investigation with specialized roles
+
+    Attributes:
+        roles: List of ModelRole instances defining the workflow
+        provider_map: Mapping from model identifiers to provider instances
+        pattern: Orchestration pattern (currently only SEQUENTIAL supported)
+        default_timeout: Default timeout for each model execution (seconds)
+
+    Example:
+        >>> from modelchorus.core.role_orchestration import ModelRole, RoleOrchestrator
+        >>> from modelchorus.providers import ClaudeProvider, GeminiProvider
+        >>>
+        >>> # Define roles
+        >>> roles = [
+        ...     ModelRole(role="proponent", model="claude", stance="for"),
+        ...     ModelRole(role="critic", model="gemini", stance="against"),
+        ... ]
+        >>>
+        >>> # Create provider map
+        >>> providers = {
+        ...     "claude": ClaudeProvider(),
+        ...     "gemini": GeminiProvider(),
+        ... }
+        >>>
+        >>> # Create orchestrator
+        >>> orchestrator = RoleOrchestrator(roles, providers)
+        >>>
+        >>> # Execute workflow
+        >>> result = await orchestrator.execute("Should we adopt this proposal?")
+        >>> for role_name, response in result.role_responses:
+        ...     print(f"{role_name}: {response.content}")
+    """
+
+    def __init__(
+        self,
+        roles: List[ModelRole],
+        provider_map: Dict[str, Any],
+        pattern: OrchestrationPattern = OrchestrationPattern.SEQUENTIAL,
+        default_timeout: float = 120.0,
+    ):
+        """
+        Initialize the role orchestrator.
+
+        Args:
+            roles: List of ModelRole instances defining the workflow
+            provider_map: Mapping from model identifiers to provider instances
+                         (e.g., {"gpt-5": openai_provider, "gemini-2.5-pro": gemini_provider})
+            pattern: Orchestration pattern to use (default: SEQUENTIAL)
+            default_timeout: Default timeout for each model execution in seconds (default: 120.0)
+
+        Raises:
+            ValueError: If roles list is empty
+            ValueError: If pattern is not SEQUENTIAL (only sequential supported currently)
+        """
+        if not roles:
+            raise ValueError("At least one role is required")
+
+        if pattern != OrchestrationPattern.SEQUENTIAL:
+            raise ValueError(
+                f"Only SEQUENTIAL pattern is currently supported, got {pattern}"
+            )
+
+        self.roles = roles
+        self.provider_map = provider_map
+        self.pattern = pattern
+        self.default_timeout = default_timeout
+
+        logger.info(
+            f"Initialized RoleOrchestrator with {len(roles)} roles, pattern={pattern}"
+        )
+
+    def _resolve_provider(self, model_id: str) -> Any:
+        """
+        Resolve a model identifier to a provider instance.
+
+        Looks up the provider for the given model identifier in the provider map.
+        Handles common variations (e.g., "gpt5" vs "gpt-5") by checking multiple
+        formats.
+
+        Args:
+            model_id: Model identifier from ModelRole.model
+
+        Returns:
+            Provider instance for the model
+
+        Raises:
+            ValueError: If no provider is found for the model identifier
+        """
+        # Try exact match first
+        if model_id in self.provider_map:
+            return self.provider_map[model_id]
+
+        # Try common variations
+        variations = [
+            model_id.lower(),
+            model_id.replace("-", ""),
+            model_id.replace("_", ""),
+        ]
+
+        for variation in variations:
+            if variation in self.provider_map:
+                logger.debug(
+                    f"Resolved model '{model_id}' to provider via variation '{variation}'"
+                )
+                return self.provider_map[variation]
+
+        # No provider found
+        available = ", ".join(self.provider_map.keys())
+        raise ValueError(
+            f"No provider found for model '{model_id}'. Available providers: {available}"
+        )
+
+    async def execute(
+        self,
+        base_prompt: str,
+        context: Optional[str] = None,
+    ) -> OrchestrationResult:
+        """
+        Execute the orchestrated workflow with all roles in sequential order.
+
+        Executes each role in sequence, using the base prompt customized for each
+        role's stance and configuration. Collects all responses and returns a
+        structured result.
+
+        Args:
+            base_prompt: The base prompt to send to all models
+            context: Optional additional context to include (e.g., from previous execution)
+
+        Returns:
+            OrchestrationResult containing all responses and execution metadata
+
+        Example:
+            >>> result = await orchestrator.execute(
+            ...     "Should we adopt TypeScript for the new microservice?"
+            ... )
+            >>> print(f"Executed {len(result.role_responses)} roles")
+            >>> for role_name, response in result.role_responses:
+            ...     print(f"\n{role_name}:\n{response.content[:200]}...")
+        """
+        # Import here to avoid circular dependency
+        from ..providers import GenerationRequest
+
+        logger.info(
+            f"Starting sequential execution of {len(self.roles)} roles"
+        )
+
+        role_responses = []
+        all_responses = []
+        failed_roles = []
+        execution_order = []
+
+        # Build context-enhanced prompt if context provided
+        full_base_prompt = base_prompt
+        if context:
+            full_base_prompt = f"{context}\n\n{base_prompt}"
+
+        # Execute each role sequentially
+        for idx, role in enumerate(self.roles):
+            execution_order.append(role.role)
+
+            try:
+                logger.info(
+                    f"Executing role {idx + 1}/{len(self.roles)}: {role.role} (model: {role.model})"
+                )
+
+                # Resolve provider for this role
+                provider = self._resolve_provider(role.model)
+
+                # Construct full prompt with role customizations
+                full_prompt = role.get_full_prompt(full_base_prompt)
+
+                # Create generation request with role-specific overrides
+                request = GenerationRequest(
+                    prompt=full_prompt,
+                    system_prompt=role.system_prompt,
+                    temperature=role.temperature,
+                    max_tokens=role.max_tokens,
+                )
+
+                # Execute via provider
+                response = await provider.generate(request)
+
+                # Store results
+                role_responses.append((role.role, response))
+                all_responses.append(response)
+
+                logger.info(
+                    f"Role '{role.role}' completed successfully ({len(response.content)} chars)"
+                )
+
+            except Exception as e:
+                logger.error(
+                    f"Role '{role.role}' failed: {e}",
+                    exc_info=True
+                )
+                failed_roles.append(role.role)
+                # Continue with remaining roles even if one fails
+
+        # Build result
+        result = OrchestrationResult(
+            role_responses=role_responses,
+            all_responses=all_responses,
+            failed_roles=failed_roles,
+            pattern_used=self.pattern,
+            execution_order=execution_order,
+            metadata={
+                "total_roles": len(self.roles),
+                "successful_roles": len(role_responses),
+                "failed_roles": len(failed_roles),
+            },
+        )
+
+        logger.info(
+            f"Orchestration complete: {len(role_responses)}/{len(self.roles)} roles succeeded"
+        )
+
+        return result
