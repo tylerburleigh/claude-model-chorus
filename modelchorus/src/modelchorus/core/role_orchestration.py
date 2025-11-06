@@ -15,6 +15,7 @@ Public API:
     - OrchestrationResult: Result data structure from orchestrated execution
 """
 
+import asyncio
 import logging
 from enum import Enum
 from typing import Any, Dict, Optional, List
@@ -288,21 +289,29 @@ class OrchestrationResult:
 
 class RoleOrchestrator:
     """
-    Coordinator for executing multiple models with assigned roles in sequential order.
+    Coordinator for executing multiple models with assigned roles.
 
     Manages the execution of multi-model workflows where each model has a specific
-    role (e.g., proponent, critic, synthesizer) and executes in a defined sequence.
-    Handles provider resolution, prompt customization, and result aggregation.
+    role (e.g., proponent, critic, synthesizer). Supports both sequential and parallel
+    execution patterns. Handles provider resolution, prompt customization, and result
+    aggregation.
+
+    Execution Patterns:
+        SEQUENTIAL: Roles execute one at a time in defined order
+                   (e.g., analyst → critic → synthesizer)
+        PARALLEL: All roles execute concurrently for independent perspectives
+                 (e.g., multiple experts providing simultaneous input)
+        HYBRID: Not yet implemented (future work)
 
     This orchestrator enables workflows like:
-    - ARGUMENT: Sequential debate with roles taking turns
-    - IDEATE: Multiple creative perspectives built sequentially
-    - RESEARCH: Step-by-step investigation with specialized roles
+    - ARGUMENT: Sequential debate (roles take turns) or parallel perspectives
+    - IDEATE: Multiple creative perspectives (parallel for diversity)
+    - RESEARCH: Multi-angle investigation (parallel for breadth)
 
     Attributes:
         roles: List of ModelRole instances defining the workflow
         provider_map: Mapping from model identifiers to provider instances
-        pattern: Orchestration pattern (currently only SEQUENTIAL supported)
+        pattern: Orchestration pattern (SEQUENTIAL or PARALLEL)
         default_timeout: Default timeout for each model execution (seconds)
 
     Example:
@@ -354,9 +363,10 @@ class RoleOrchestrator:
         if not roles:
             raise ValueError("At least one role is required")
 
-        if pattern != OrchestrationPattern.SEQUENTIAL:
+        if pattern not in (OrchestrationPattern.SEQUENTIAL, OrchestrationPattern.PARALLEL):
             raise ValueError(
-                f"Only SEQUENTIAL pattern is currently supported, got {pattern}"
+                f"Only SEQUENTIAL and PARALLEL patterns are supported, got {pattern}. "
+                f"HYBRID pattern is not yet implemented."
             )
 
         self.roles = roles
@@ -415,11 +425,14 @@ class RoleOrchestrator:
         context: Optional[str] = None,
     ) -> OrchestrationResult:
         """
-        Execute the orchestrated workflow with all roles in sequential order.
+        Execute the orchestrated workflow with all roles.
 
-        Executes each role in sequence, using the base prompt customized for each
-        role's stance and configuration. Collects all responses and returns a
-        structured result.
+        Executes each role according to the configured pattern (sequential or parallel),
+        using the base prompt customized for each role's stance and configuration.
+        Collects all responses and returns a structured result.
+
+        Sequential pattern: Executes roles one at a time in order
+        Parallel pattern: Executes all roles concurrently
 
         Args:
             base_prompt: The base prompt to send to all models
@@ -428,13 +441,41 @@ class RoleOrchestrator:
         Returns:
             OrchestrationResult containing all responses and execution metadata
 
-        Example:
-            >>> result = await orchestrator.execute(
-            ...     "Should we adopt TypeScript for the new microservice?"
-            ... )
-            >>> print(f"Executed {len(result.role_responses)} roles")
-            >>> for role_name, response in result.role_responses:
-            ...     print(f"\n{role_name}:\n{response.content[:200]}...")
+        Example (Sequential):
+            >>> orchestrator = RoleOrchestrator(roles, providers, pattern=OrchestrationPattern.SEQUENTIAL)
+            >>> result = await orchestrator.execute("Should we adopt TypeScript?")
+            >>> # Roles execute one after another
+
+        Example (Parallel):
+            >>> orchestrator = RoleOrchestrator(roles, providers, pattern=OrchestrationPattern.PARALLEL)
+            >>> result = await orchestrator.execute("Should we adopt TypeScript?")
+            >>> # All roles execute simultaneously
+        """
+        # Route to appropriate execution method based on pattern
+        if self.pattern == OrchestrationPattern.SEQUENTIAL:
+            return await self._execute_sequential(base_prompt, context)
+        elif self.pattern == OrchestrationPattern.PARALLEL:
+            return await self._execute_parallel(base_prompt, context)
+        else:
+            raise ValueError(f"Unsupported pattern: {self.pattern}")
+
+    async def _execute_sequential(
+        self,
+        base_prompt: str,
+        context: Optional[str] = None,
+    ) -> OrchestrationResult:
+        """
+        Execute all roles sequentially in order.
+
+        Internal method for sequential execution pattern. Roles are executed
+        one at a time in the order they appear in self.roles.
+
+        Args:
+            base_prompt: The base prompt to send to all models
+            context: Optional additional context to include
+
+        Returns:
+            OrchestrationResult with sequential execution metadata
         """
         # Import here to avoid circular dependency
         from ..providers import GenerationRequest
@@ -510,7 +551,123 @@ class RoleOrchestrator:
         )
 
         logger.info(
-            f"Orchestration complete: {len(role_responses)}/{len(self.roles)} roles succeeded"
+            f"Sequential orchestration complete: {len(role_responses)}/{len(self.roles)} roles succeeded"
+        )
+
+        return result
+
+    async def _execute_parallel(
+        self,
+        base_prompt: str,
+        context: Optional[str] = None,
+    ) -> OrchestrationResult:
+        """
+        Execute all roles in parallel (concurrently).
+
+        Internal method for parallel execution pattern. All roles are executed
+        simultaneously using asyncio.gather, which improves performance when roles
+        are independent.
+
+        Args:
+            base_prompt: The base prompt to send to all models
+            context: Optional additional context to include
+
+        Returns:
+            OrchestrationResult with parallel execution metadata
+        """
+        # Import here to avoid circular dependency
+        from ..providers import GenerationRequest
+
+        logger.info(
+            f"Starting parallel execution of {len(self.roles)} roles"
+        )
+
+        # Build context-enhanced prompt if context provided
+        full_base_prompt = base_prompt
+        if context:
+            full_base_prompt = f"{context}\n\n{base_prompt}"
+
+        # Create tasks for all roles
+        async def execute_role(role: ModelRole, index: int) -> tuple[int, Optional[str], Optional[Any], Optional[str]]:
+            """
+            Execute a single role and return (index, role_name, response, error).
+
+            Args:
+                role: The ModelRole to execute
+                index: Position in execution order
+
+            Returns:
+                Tuple of (index, role_name, response or None, error_message or None)
+            """
+            try:
+                logger.info(f"Executing role {index + 1}/{len(self.roles)}: {role.role} (model: {role.model})")
+
+                # Resolve provider for this role
+                provider = self._resolve_provider(role.model)
+
+                # Construct full prompt with role customizations
+                full_prompt = role.get_full_prompt(full_base_prompt)
+
+                # Create generation request with role-specific overrides
+                request = GenerationRequest(
+                    prompt=full_prompt,
+                    system_prompt=role.system_prompt,
+                    temperature=role.temperature,
+                    max_tokens=role.max_tokens,
+                )
+
+                # Execute via provider
+                response = await provider.generate(request)
+
+                logger.info(f"Role '{role.role}' completed successfully ({len(response.content)} chars)")
+
+                return (index, role.role, response, None)
+
+            except Exception as e:
+                error_msg = str(e)
+                logger.error(f"Role '{role.role}' failed: {error_msg}", exc_info=True)
+                return (index, role.role, None, error_msg)
+
+        # Execute all roles in parallel
+        tasks = [execute_role(role, idx) for idx, role in enumerate(self.roles)]
+        results = await asyncio.gather(*tasks)
+
+        # Process results and maintain execution order
+        role_responses = []
+        all_responses = []
+        failed_roles = []
+        execution_order = []
+
+        # Sort by index to maintain execution order
+        sorted_results = sorted(results, key=lambda x: x[0])
+
+        for index, role_name, response, error in sorted_results:
+            execution_order.append(role_name)
+
+            if error is None:
+                # Success
+                role_responses.append((role_name, response))
+                all_responses.append(response)
+            else:
+                # Failure
+                failed_roles.append(role_name)
+
+        # Build result
+        result = OrchestrationResult(
+            role_responses=role_responses,
+            all_responses=all_responses,
+            failed_roles=failed_roles,
+            pattern_used=self.pattern,
+            execution_order=execution_order,
+            metadata={
+                "total_roles": len(self.roles),
+                "successful_roles": len(role_responses),
+                "failed_roles": len(failed_roles),
+            },
+        )
+
+        logger.info(
+            f"Parallel orchestration complete: {len(role_responses)}/{len(self.roles)} roles succeeded"
         )
 
         return result
