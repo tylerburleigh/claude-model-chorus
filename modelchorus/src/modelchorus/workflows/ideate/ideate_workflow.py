@@ -184,10 +184,10 @@ class IdeateWorkflow(BaseWorkflow):
             # Create workflow step
             step = WorkflowStep(
                 step_number=len(history) // 2 + 1,
-                title="Ideation Round",
                 content=response.content,
+                model=self.provider.provider_name,
                 metadata={
-                    "model": self.provider.provider_name,
+                    "title": "Ideation Round",
                     "temperature": temperature,
                     "tokens_used": response.usage.total_tokens if response.usage else 0
                 }
@@ -389,8 +389,7 @@ Generate diverse, innovative ideas. Think broadly and explore multiple approache
         # Execute parallel brainstorming
         try:
             orchestration_result: OrchestrationResult = await orchestrator.execute(
-                prompt=prompt,
-                conversation_history=[]
+                base_prompt=prompt
             )
 
             # Convert orchestration steps to workflow steps
@@ -399,12 +398,12 @@ Generate diverse, innovative ideas. Think broadly and explore multiple approache
                 perspective = perspectives[i] if i < len(perspectives) else "general"
                 step = WorkflowStep(
                     step_number=i + 1,
-                    title=f"Brainstorming ({perspective})",
                     content=response.content,
+                    model=roles[i].model,
                     metadata={
+                        "title": f"Brainstorming ({perspective})",
                         "perspective": perspective,
                         "role": role_name,
-                        "model": roles[i].model,
                         "tokens": response.usage.total_tokens if response.usage else 0
                     }
                 )
@@ -465,6 +464,1031 @@ Generate diverse, innovative ideas. Think broadly and explore multiple approache
         )
 
         return "\n".join(synthesis_parts)
+
+    async def run_convergent_analysis(
+        self,
+        brainstorming_result: WorkflowResult,
+        scoring_criteria: Optional[List[str]] = None,
+        num_clusters: Optional[int] = None,
+        **kwargs
+    ) -> WorkflowResult:
+        """
+        Execute convergent analysis on parallel brainstorming results.
+
+        This method takes diverse ideas from parallel brainstorming and performs:
+        1. Idea extraction from perspective-based outputs
+        2. Clustering of similar ideas into themes
+        3. Multi-criteria scoring and ranking
+
+        Args:
+            brainstorming_result: WorkflowResult from run_parallel_brainstorming()
+            scoring_criteria: List of criteria to score on (default: ['feasibility', 'impact', 'novelty'])
+            num_clusters: Target number of clusters (default: auto-determine 3-7)
+            **kwargs: Additional parameters (temperature, max_tokens, etc.)
+
+        Returns:
+            WorkflowResult containing:
+                - synthesis: Formatted analysis with clusters, scores, and recommendations
+                - steps: [extraction, clustering, scoring]
+                - metadata: Analysis parameters and summary statistics
+
+        Raises:
+            ValueError: If brainstorming_result is None or has no steps
+            Exception: If analysis fails
+        """
+        if brainstorming_result is None or not brainstorming_result.steps:
+            raise ValueError("Brainstorming result must have steps to analyze")
+
+        # Default scoring criteria
+        if scoring_criteria is None:
+            scoring_criteria = ['feasibility', 'impact', 'novelty']
+
+        logger.info(
+            f"Starting convergent analysis on {len(brainstorming_result.steps)} brainstorming outputs"
+        )
+
+        # Step 1: Extract ideas from brainstorming results
+        extraction_result = await self._extract_ideas(brainstorming_result)
+
+        # Step 2: Cluster similar ideas
+        clustering_result = await self._cluster_ideas(
+            extraction_result,
+            num_clusters=num_clusters,
+            **kwargs
+        )
+
+        # Step 3: Score ideas/clusters
+        scoring_result = await self._score_ideas(
+            clustering_result,
+            scoring_criteria=scoring_criteria,
+            **kwargs
+        )
+
+        # Create synthesis of analysis
+        synthesis = self._synthesize_convergent_analysis(
+            extraction_result,
+            clustering_result,
+            scoring_result,
+            scoring_criteria
+        )
+
+        # Combine all steps
+        steps = [
+            extraction_result,
+            clustering_result,
+            scoring_result
+        ]
+
+        # Create workflow result
+        result = WorkflowResult(
+            synthesis=synthesis,
+            steps=steps,
+            metadata={
+                'workflow': 'ideate-convergent',
+                'num_ideas_extracted': extraction_result.metadata.get('num_ideas', 0),
+                'num_clusters': clustering_result.metadata.get('num_clusters', 0),
+                'scoring_criteria': scoring_criteria,
+                'source_perspectives': brainstorming_result.metadata.get('perspectives', [])
+            }
+        )
+
+        logger.info("Convergent analysis completed successfully")
+        return result
+
+    async def _extract_ideas(
+        self,
+        brainstorming_result: WorkflowResult,
+        **kwargs
+    ) -> WorkflowStep:
+        """
+        Extract individual ideas from brainstorming results.
+
+        Parses the narrative outputs from each perspective and extracts
+        discrete ideas with source metadata.
+
+        Args:
+            brainstorming_result: WorkflowResult from parallel brainstorming
+            **kwargs: Additional parameters for provider
+
+        Returns:
+            WorkflowStep containing extracted ideas with metadata
+        """
+        logger.info("Extracting ideas from brainstorming results")
+
+        # Compile all brainstorming content
+        perspectives_content = []
+        for step in brainstorming_result.steps:
+            perspective = step.metadata.get('perspective', 'unknown')
+            perspectives_content.append({
+                'perspective': perspective,
+                'content': step.content,
+                'model': step.metadata.get('model', 'unknown')
+            })
+
+        # Create extraction prompt
+        extraction_prompt = self._create_extraction_prompt(perspectives_content)
+
+        # Set low temperature for structured extraction
+        temperature = kwargs.get('temperature', 0.3)
+
+        # Create generation request
+        request = GenerationRequest(
+            messages=[ConversationMessage(role="user", content=extraction_prompt)],
+            system_prompt=self._get_extraction_system_prompt(),
+            temperature=temperature,
+            max_tokens=kwargs.get('max_tokens', 3000)
+        )
+
+        try:
+            # Execute extraction
+            response: GenerationResponse = await self.provider.generate(request)
+
+            # Parse extracted ideas from response
+            ideas = self._parse_extracted_ideas(response.content, perspectives_content)
+
+            # Create workflow step
+            step = WorkflowStep(
+                step_number=1,
+                content=response.content,
+                model=self.provider.provider_name,
+                metadata={
+                    'title': 'Idea Extraction',
+                    'num_ideas': len(ideas),
+                    'perspectives_analyzed': len(perspectives_content),
+                    'extracted_ideas': ideas,
+                    'temperature': temperature
+                }
+            )
+
+            logger.info(f"Extracted {len(ideas)} ideas from brainstorming results")
+            return step
+
+        except Exception as e:
+            logger.error(f"Idea extraction failed: {e}")
+            raise
+
+    def _create_extraction_prompt(
+        self,
+        perspectives_content: List[Dict[str, str]]
+    ) -> str:
+        """
+        Create prompt for extracting individual ideas.
+
+        Args:
+            perspectives_content: List of perspective outputs
+
+        Returns:
+            Formatted extraction prompt
+        """
+        prompt_parts = [
+            "You are analyzing brainstorming results from multiple perspectives. "
+            "Extract individual, discrete ideas from the following outputs.\n\n"
+            "For each idea:\n"
+            "1. State it clearly and concisely (1-2 sentences)\n"
+            "2. Note which perspective(s) it came from\n"
+            "3. Give it a brief descriptive label\n\n"
+            "Brainstorming Results:\n\n"
+        ]
+
+        for i, pc in enumerate(perspectives_content, 1):
+            prompt_parts.append(f"--- Perspective {i}: {pc['perspective'].title()} ---\n")
+            prompt_parts.append(f"{pc['content']}\n\n")
+
+        prompt_parts.append(
+            "---\n\n"
+            "Now extract all discrete ideas. Format each as:\n\n"
+            "**[IDEA-{number}] {Brief Label}** (from {perspective})\n"
+            "{1-2 sentence description}\n\n"
+            "Extract all unique ideas, combining duplicates where appropriate."
+        )
+
+        return "".join(prompt_parts)
+
+    def _get_extraction_system_prompt(self) -> str:
+        """
+        Get system prompt for idea extraction.
+
+        Returns:
+            System prompt for extraction task
+        """
+        return """You are an expert at analyzing brainstorming sessions and extracting discrete ideas.
+
+Your task is to:
+1. Read through all perspectives carefully
+2. Identify each unique idea mentioned
+3. Extract ideas clearly and concisely
+4. Combine duplicate ideas from different perspectives
+5. Preserve the source perspective for each idea
+
+Be thorough but focused. Extract concrete ideas, not vague statements.
+Use the requested format exactly."""
+
+    def _parse_extracted_ideas(
+        self,
+        extraction_content: str,
+        perspectives_content: List[Dict[str, str]]
+    ) -> List[Dict[str, Any]]:
+        """
+        Parse extracted ideas from LLM response.
+
+        Args:
+            extraction_content: LLM response with extracted ideas
+            perspectives_content: Original perspective outputs
+
+        Returns:
+            List of idea dictionaries with metadata
+        """
+        ideas = []
+
+        # Split by idea markers
+        lines = extraction_content.split('\n')
+        current_idea = None
+
+        for line in lines:
+            line = line.strip()
+
+            # Check for idea header like "**[IDEA-1] Label** (from perspective)"
+            if line.startswith('**[IDEA-') and ']' in line:
+                # Save previous idea if exists
+                if current_idea and current_idea.get('description'):
+                    ideas.append(current_idea)
+
+                # Parse new idea header
+                try:
+                    # Extract components
+                    idea_num = line.split('[IDEA-')[1].split(']')[0]
+
+                    # Extract label (between ] and **)
+                    label_part = line.split(']')[1].split('**')[0].strip()
+
+                    # Extract perspective (between parentheses)
+                    perspective = 'unknown'
+                    if '(' in line and ')' in line:
+                        perspective = line.split('(from ')[-1].split(')')[0].strip()
+
+                    current_idea = {
+                        'id': f"idea-{idea_num}",
+                        'label': label_part,
+                        'perspective': perspective,
+                        'description': ''
+                    }
+                except Exception as e:
+                    logger.warning(f"Failed to parse idea header: {line} - {e}")
+                    continue
+
+            elif current_idea is not None and line and not line.startswith('**[IDEA-'):
+                # Accumulate description lines
+                if current_idea['description']:
+                    current_idea['description'] += ' ' + line
+                else:
+                    current_idea['description'] = line
+
+        # Don't forget the last idea
+        if current_idea and current_idea.get('description'):
+            ideas.append(current_idea)
+
+        logger.info(f"Parsed {len(ideas)} ideas from extraction content")
+        return ideas
+
+    async def _cluster_ideas(
+        self,
+        extraction_step: WorkflowStep,
+        num_clusters: Optional[int] = None,
+        **kwargs
+    ) -> WorkflowStep:
+        """
+        Cluster similar ideas into thematic groups.
+
+        Uses LLM to identify common themes and group related ideas.
+
+        Args:
+            extraction_step: WorkflowStep from idea extraction
+            num_clusters: Target number of clusters (None = auto-determine)
+            **kwargs: Additional parameters for provider
+
+        Returns:
+            WorkflowStep containing clustered ideas with metadata
+        """
+        logger.info("Clustering ideas into thematic groups")
+
+        # Get extracted ideas from metadata
+        ideas = extraction_step.metadata.get('extracted_ideas', [])
+
+        if not ideas:
+            raise ValueError("No ideas found in extraction step")
+
+        # Create clustering prompt
+        clustering_prompt = self._create_clustering_prompt(ideas, num_clusters)
+
+        # Set moderate temperature for creative but structured clustering
+        temperature = kwargs.get('temperature', 0.5)
+
+        # Create generation request
+        request = GenerationRequest(
+            messages=[ConversationMessage(role="user", content=clustering_prompt)],
+            system_prompt=self._get_clustering_system_prompt(),
+            temperature=temperature,
+            max_tokens=kwargs.get('max_tokens', 3000)
+        )
+
+        try:
+            # Execute clustering
+            response: GenerationResponse = await self.provider.generate(request)
+
+            # Parse clusters from response
+            clusters = self._parse_clusters(response.content, ideas)
+
+            # Create workflow step
+            step = WorkflowStep(
+                step_number=2,
+                content=response.content,
+                model=self.provider.provider_name,
+                metadata={
+                    'title': 'Idea Clustering',
+                    'num_clusters': len(clusters),
+                    'num_ideas': len(ideas),
+                    'clusters': clusters,
+                    'temperature': temperature
+                }
+            )
+
+            logger.info(f"Clustered {len(ideas)} ideas into {len(clusters)} themes")
+            return step
+
+        except Exception as e:
+            logger.error(f"Idea clustering failed: {e}")
+            raise
+
+    def _create_clustering_prompt(
+        self,
+        ideas: List[Dict[str, Any]],
+        num_clusters: Optional[int]
+    ) -> str:
+        """
+        Create prompt for clustering ideas.
+
+        Args:
+            ideas: List of extracted ideas
+            num_clusters: Target number of clusters (None = auto)
+
+        Returns:
+            Formatted clustering prompt
+        """
+        cluster_guidance = (
+            f"Organize these into exactly {num_clusters} thematic clusters."
+            if num_clusters
+            else "Organize these into 3-7 thematic clusters (choose the number that makes most sense)."
+        )
+
+        prompt_parts = [
+            f"You are clustering brainstormed ideas into themes. {cluster_guidance}\n\n"
+            "Ideas to cluster:\n\n"
+        ]
+
+        for idea in ideas:
+            prompt_parts.append(
+                f"**{idea['id'].upper()}**: {idea['label']}\n"
+                f"{idea['description']}\n"
+                f"(from {idea['perspective']})\n\n"
+            )
+
+        prompt_parts.append(
+            "---\n\n"
+            "Now create thematic clusters. For each cluster:\n\n"
+            "**[CLUSTER-{number}] {Theme Name}**\n"
+            "{Brief description of this theme}\n\n"
+            "Ideas in this cluster:\n"
+            "- {IDEA-ID}: {Brief note on why it fits}\n"
+            "- {IDEA-ID}: {Brief note on why it fits}\n\n"
+            "Focus on meaningful themes. Ideas can fit multiple themes - assign to best fit."
+        )
+
+        return "".join(prompt_parts)
+
+    def _get_clustering_system_prompt(self) -> str:
+        """
+        Get system prompt for idea clustering.
+
+        Returns:
+            System prompt for clustering task
+        """
+        return """You are an expert at thematic analysis and clustering ideas.
+
+Your task is to:
+1. Identify common themes across the ideas
+2. Group related ideas into coherent clusters
+3. Name each cluster with a clear, descriptive theme
+4. Explain why ideas belong in each cluster
+
+Guidelines:
+- Create 3-7 clusters (fewer is better if ideas are very related)
+- Each cluster should have a clear, distinct theme
+- Assign each idea to exactly one cluster (best fit)
+- Provide meaningful cluster names
+- Explain the grouping logic
+
+Use the requested format exactly."""
+
+    def _parse_clusters(
+        self,
+        clustering_content: str,
+        ideas: List[Dict[str, Any]]
+    ) -> List[Dict[str, Any]]:
+        """
+        Parse clusters from LLM response.
+
+        Args:
+            clustering_content: LLM response with clusters
+            ideas: Original list of ideas
+
+        Returns:
+            List of cluster dictionaries
+        """
+        clusters = []
+
+        lines = clustering_content.split('\n')
+        current_cluster = None
+
+        for line in lines:
+            line = line.strip()
+
+            # Check for cluster header like "**[CLUSTER-1] Theme Name**"
+            if line.startswith('**[CLUSTER-') and ']' in line:
+                # Save previous cluster if exists
+                if current_cluster and current_cluster.get('ideas'):
+                    clusters.append(current_cluster)
+
+                # Parse new cluster header
+                try:
+                    cluster_num = line.split('[CLUSTER-')[1].split(']')[0]
+                    theme_name = line.split(']')[1].split('**')[0].strip()
+
+                    current_cluster = {
+                        'id': f"cluster-{cluster_num}",
+                        'theme': theme_name,
+                        'description': '',
+                        'ideas': []
+                    }
+                except Exception as e:
+                    logger.warning(f"Failed to parse cluster header: {line} - {e}")
+                    continue
+
+            elif current_cluster is not None:
+                # Check for idea assignment like "- IDEA-1: reason"
+                if line.startswith('- ') and 'IDEA-' in line.upper():
+                    try:
+                        # Extract idea ID (case-insensitive)
+                        idea_part = line[2:].split(':')[0].strip().lower()
+
+                        # Extract reason
+                        reason = ':'.join(line[2:].split(':')[1:]).strip() if ':' in line else ''
+
+                        current_cluster['ideas'].append({
+                            'idea_id': idea_part,
+                            'reason': reason
+                        })
+                    except Exception as e:
+                        logger.warning(f"Failed to parse idea assignment: {line} - {e}")
+
+                # Accumulate description (lines before "Ideas in this cluster:")
+                elif (
+                    'ideas in this cluster' not in line.lower()
+                    and not line.startswith('**[CLUSTER-')
+                    and line
+                    and not current_cluster.get('ideas')
+                ):
+                    if current_cluster['description']:
+                        current_cluster['description'] += ' ' + line
+                    else:
+                        current_cluster['description'] = line
+
+        # Don't forget the last cluster
+        if current_cluster and current_cluster.get('ideas'):
+            clusters.append(current_cluster)
+
+        logger.info(f"Parsed {len(clusters)} clusters from clustering content")
+        return clusters
+
+    async def _score_ideas(
+        self,
+        clustering_step: WorkflowStep,
+        scoring_criteria: List[str],
+        **kwargs
+    ) -> WorkflowStep:
+        """
+        Score ideas/clusters based on multiple criteria.
+
+        Uses LLM to evaluate each cluster against criteria and assign scores.
+
+        Args:
+            clustering_step: WorkflowStep from idea clustering
+            scoring_criteria: List of criteria to score on
+            **kwargs: Additional parameters for provider
+
+        Returns:
+            WorkflowStep containing scored clusters with metadata
+        """
+        logger.info(f"Scoring clusters on criteria: {scoring_criteria}")
+
+        # Get clusters from metadata
+        clusters = clustering_step.metadata.get('clusters', [])
+
+        if not clusters:
+            raise ValueError("No clusters found in clustering step")
+
+        # Create scoring prompt
+        scoring_prompt = self._create_scoring_prompt(clusters, scoring_criteria)
+
+        # Set low temperature for consistent scoring
+        temperature = kwargs.get('temperature', 0.3)
+
+        # Create generation request
+        request = GenerationRequest(
+            messages=[ConversationMessage(role="user", content=scoring_prompt)],
+            system_prompt=self._get_scoring_system_prompt(),
+            temperature=temperature,
+            max_tokens=kwargs.get('max_tokens', 3000)
+        )
+
+        try:
+            # Execute scoring
+            response: GenerationResponse = await self.provider.generate(request)
+
+            # Parse scores from response
+            scored_clusters = self._parse_scores(response.content, clusters, scoring_criteria)
+
+            # Create workflow step
+            step = WorkflowStep(
+                step_number=3,
+                content=response.content,
+                model=self.provider.provider_name,
+                metadata={
+                    'title': 'Idea Scoring',
+                    'num_clusters': len(scored_clusters),
+                    'scoring_criteria': scoring_criteria,
+                    'scored_clusters': scored_clusters,
+                    'temperature': temperature
+                }
+            )
+
+            logger.info(f"Scored {len(scored_clusters)} clusters on {len(scoring_criteria)} criteria")
+            return step
+
+        except Exception as e:
+            logger.error(f"Idea scoring failed: {e}")
+            raise
+
+    def _create_scoring_prompt(
+        self,
+        clusters: List[Dict[str, Any]],
+        scoring_criteria: List[str]
+    ) -> str:
+        """
+        Create prompt for scoring clusters.
+
+        Args:
+            clusters: List of clusters with ideas
+            scoring_criteria: List of criteria names
+
+        Returns:
+            Formatted scoring prompt
+        """
+        # Define scoring rubric
+        criteria_descriptions = {
+            'feasibility': 'How practical and achievable is this? (1=very difficult, 5=very easy)',
+            'impact': 'How much value/improvement would this create? (1=minimal, 5=transformative)',
+            'novelty': 'How innovative and unique is this? (1=common, 5=groundbreaking)',
+            'effort': 'How much work would this require? (1=extensive, 5=minimal)',
+            'risk': 'How risky is this to implement? (1=very risky, 5=very safe)',
+            'user_value': 'How much would users benefit? (1=minimal, 5=huge benefit)'
+        }
+
+        prompt_parts = [
+            f"You are evaluating idea clusters on {len(scoring_criteria)} criteria. "
+            f"Score each cluster on a scale of 1-5 for each criterion.\n\n"
+            "Scoring Criteria:\n"
+        ]
+
+        for criterion in scoring_criteria:
+            description = criteria_descriptions.get(
+                criterion,
+                f"Evaluate {criterion} (1=low, 5=high)"
+            )
+            prompt_parts.append(f"- **{criterion.title()}**: {description}\n")
+
+        prompt_parts.append("\n\nClusters to Score:\n\n")
+
+        for cluster in clusters:
+            prompt_parts.append(f"**{cluster['id'].upper()}**: {cluster['theme']}\n")
+            prompt_parts.append(f"{cluster['description']}\n")
+            prompt_parts.append(f"Ideas: {len(cluster.get('ideas', []))}\n\n")
+
+        prompt_parts.append(
+            "---\n\n"
+            "Now score each cluster. Format:\n\n"
+            "**[SCORE-{cluster-id}] {Theme Name}**\n\n"
+            "Scores:\n"
+        )
+
+        for criterion in scoring_criteria:
+            prompt_parts.append(f"- {criterion.title()}: {'{score}'}/5 - {'{brief explanation}'}\n")
+
+        prompt_parts.append(
+            "\n"
+            "Overall Score: {average}/5\n"
+            "Recommendation: {High Priority|Medium Priority|Low Priority}\n\n"
+        )
+
+        return "".join(prompt_parts)
+
+    def _get_scoring_system_prompt(self) -> str:
+        """
+        Get system prompt for idea scoring.
+
+        Returns:
+            System prompt for scoring task
+        """
+        return """You are an expert at evaluating and prioritizing ideas.
+
+Your task is to:
+1. Score each cluster on the given criteria (1-5 scale)
+2. Provide brief justification for each score
+3. Calculate overall score (average of criteria)
+4. Recommend priority level based on scores
+
+Guidelines:
+- Be objective and consistent in scoring
+- Consider trade-offs between criteria
+- Provide specific reasoning for scores
+- Use the full 1-5 range appropriately
+- High Priority: Overall score >= 4.0
+- Medium Priority: Overall score 3.0-3.9
+- Low Priority: Overall score < 3.0
+
+Use the requested format exactly."""
+
+    def _parse_scores(
+        self,
+        scoring_content: str,
+        clusters: List[Dict[str, Any]],
+        scoring_criteria: List[str]
+    ) -> List[Dict[str, Any]]:
+        """
+        Parse scores from LLM response.
+
+        Args:
+            scoring_content: LLM response with scores
+            clusters: Original list of clusters
+            scoring_criteria: List of criteria names
+
+        Returns:
+            List of scored cluster dictionaries
+        """
+        scored_clusters = []
+
+        lines = scoring_content.split('\n')
+        current_score = None
+
+        for line in lines:
+            line = line.strip()
+
+            # Check for score header like "**[SCORE-cluster-1] Theme Name**"
+            if line.startswith('**[SCORE-') and ']' in line:
+                # Save previous scored cluster if exists
+                if current_score and current_score.get('scores'):
+                    scored_clusters.append(current_score)
+
+                # Parse new score header
+                try:
+                    cluster_id = line.split('[SCORE-')[1].split(']')[0]
+                    theme_name = line.split(']')[1].split('**')[0].strip()
+
+                    current_score = {
+                        'cluster_id': cluster_id,
+                        'theme': theme_name,
+                        'scores': {},
+                        'overall_score': 0.0,
+                        'recommendation': 'Unknown'
+                    }
+                except Exception as e:
+                    logger.warning(f"Failed to parse score header: {line} - {e}")
+                    continue
+
+            elif current_score is not None:
+                # Parse individual criterion scores like "- Feasibility: 4/5 - explanation"
+                if line.startswith('- ') and ':' in line and '/5' in line:
+                    try:
+                        criterion_part = line[2:].split(':')[0].strip().lower()
+                        score_part = line.split(':')[1].strip()
+
+                        # Extract numeric score
+                        score_str = score_part.split('/')[0].strip()
+                        score_value = float(score_str)
+
+                        # Extract explanation (after the score)
+                        explanation = score_part.split('-', 1)[1].strip() if '-' in score_part else ''
+
+                        current_score['scores'][criterion_part] = {
+                            'score': score_value,
+                            'explanation': explanation
+                        }
+                    except Exception as e:
+                        logger.warning(f"Failed to parse criterion score: {line} - {e}")
+
+                # Parse overall score like "Overall Score: 4.2/5"
+                elif 'overall score:' in line.lower():
+                    try:
+                        score_part = line.split(':')[1].strip()
+                        overall_str = score_part.split('/')[0].strip()
+                        current_score['overall_score'] = float(overall_str)
+                    except Exception as e:
+                        logger.warning(f"Failed to parse overall score: {line} - {e}")
+
+                # Parse recommendation like "Recommendation: High Priority"
+                elif 'recommendation:' in line.lower():
+                    try:
+                        rec_part = line.split(':')[1].strip()
+                        current_score['recommendation'] = rec_part
+                    except Exception as e:
+                        logger.warning(f"Failed to parse recommendation: {line} - {e}")
+
+        # Don't forget the last scored cluster
+        if current_score and current_score.get('scores'):
+            scored_clusters.append(current_score)
+
+        logger.info(f"Parsed scores for {len(scored_clusters)} clusters")
+        return scored_clusters
+
+    def _synthesize_convergent_analysis(
+        self,
+        extraction_step: WorkflowStep,
+        clustering_step: WorkflowStep,
+        scoring_step: WorkflowStep,
+        scoring_criteria: List[str]
+    ) -> str:
+        """
+        Synthesize convergent analysis results into formatted output.
+
+        Args:
+            extraction_step: WorkflowStep from idea extraction
+            clustering_step: WorkflowStep from clustering
+            scoring_step: WorkflowStep from scoring
+            scoring_criteria: List of scoring criteria used
+
+        Returns:
+            Formatted synthesis with clusters, scores, and recommendations
+        """
+        ideas = extraction_step.metadata.get('extracted_ideas', [])
+        clusters = clustering_step.metadata.get('clusters', [])
+        scored_clusters = scoring_step.metadata.get('scored_clusters', [])
+
+        # Create lookup for scores by cluster_id
+        score_lookup = {sc['cluster_id']: sc for sc in scored_clusters}
+
+        # Sort clusters by overall score (descending)
+        sorted_scored = sorted(
+            scored_clusters,
+            key=lambda x: x.get('overall_score', 0),
+            reverse=True
+        )
+
+        synthesis_parts = [
+            "# Convergent Idea Analysis\n",
+            f"\nAnalyzed {len(ideas)} ideas from brainstorming session\n",
+            f"Organized into {len(clusters)} thematic clusters\n",
+            f"Scored on {len(scoring_criteria)} criteria: {', '.join(scoring_criteria)}\n",
+            "\n---\n\n"
+        ]
+
+        # High Priority Clusters
+        high_priority = [sc for sc in sorted_scored if sc.get('overall_score', 0) >= 4.0]
+        if high_priority:
+            synthesis_parts.append("## High Priority Clusters\n\n")
+            for sc in high_priority:
+                synthesis_parts.append(self._format_scored_cluster(sc, clusters, ideas))
+
+        # Medium Priority Clusters
+        medium_priority = [
+            sc for sc in sorted_scored
+            if 3.0 <= sc.get('overall_score', 0) < 4.0
+        ]
+        if medium_priority:
+            synthesis_parts.append("\n## Medium Priority Clusters\n\n")
+            for sc in medium_priority:
+                synthesis_parts.append(self._format_scored_cluster(sc, clusters, ideas))
+
+        # Low Priority Clusters
+        low_priority = [sc for sc in sorted_scored if sc.get('overall_score', 0) < 3.0]
+        if low_priority:
+            synthesis_parts.append("\n## Low Priority Clusters\n\n")
+            for sc in low_priority:
+                synthesis_parts.append(self._format_scored_cluster(sc, clusters, ideas))
+
+        # Add recommendations
+        synthesis_parts.append("\n---\n\n## Recommended Next Steps\n\n")
+
+        if high_priority:
+            synthesis_parts.append(
+                f"1. **Prioritize High-Scoring Themes**: Focus on the {len(high_priority)} "
+                f"high-priority cluster(s) for immediate action\n\n"
+            )
+
+        synthesis_parts.append(
+            "2. **Develop Detailed Plans**: For top-ranked ideas, create implementation plans\n\n"
+        )
+
+        synthesis_parts.append(
+            "3. **Prototype and Test**: Start with feasible, high-impact ideas for quick wins\n\n"
+        )
+
+        if medium_priority:
+            synthesis_parts.append(
+                f"4. **Consider Medium Priority**: Evaluate the {len(medium_priority)} medium-priority "
+                f"cluster(s) for longer-term planning\n\n"
+            )
+
+        return "".join(synthesis_parts)
+
+    def _format_scored_cluster(
+        self,
+        scored_cluster: Dict[str, Any],
+        all_clusters: List[Dict[str, Any]],
+        all_ideas: List[Dict[str, Any]]
+    ) -> str:
+        """
+        Format a single scored cluster for display.
+
+        Args:
+            scored_cluster: Scored cluster dictionary
+            all_clusters: All clusters (for looking up details)
+            all_ideas: All ideas (for looking up details)
+
+        Returns:
+            Formatted cluster section
+        """
+        cluster_id = scored_cluster['cluster_id']
+        theme = scored_cluster['theme']
+        overall_score = scored_cluster.get('overall_score', 0)
+        recommendation = scored_cluster.get('recommendation', 'Unknown')
+
+        # Find full cluster details
+        cluster_details = next(
+            (c for c in all_clusters if c['id'] == cluster_id),
+            {}
+        )
+
+        parts = [
+            f"### {theme}\n\n",
+            f"**Overall Score**: {overall_score:.1f}/5.0 ({recommendation})\n\n"
+        ]
+
+        # Add individual scores
+        parts.append("**Scores**:\n")
+        for criterion, score_data in scored_cluster.get('scores', {}).items():
+            score_val = score_data.get('score', 0)
+            explanation = score_data.get('explanation', '')
+            parts.append(f"- {criterion.title()}: {score_val}/5 - {explanation}\n")
+
+        parts.append("\n")
+
+        # Add cluster description
+        if cluster_details.get('description'):
+            parts.append(f"**Description**: {cluster_details['description']}\n\n")
+
+        # Add ideas in cluster
+        cluster_ideas = cluster_details.get('ideas', [])
+        if cluster_ideas:
+            parts.append(f"**Ideas in this cluster** ({len(cluster_ideas)}):\n")
+            for ci in cluster_ideas[:5]:  # Limit to first 5 for brevity
+                idea_id = ci.get('idea_id', '')
+                reason = ci.get('reason', '')
+
+                # Find idea details
+                idea = next(
+                    (i for i in all_ideas if i['id'] == idea_id),
+                    {}
+                )
+
+                if idea:
+                    parts.append(f"- **{idea.get('label', idea_id)}**: {reason}\n")
+
+            if len(cluster_ideas) > 5:
+                parts.append(f"  ... and {len(cluster_ideas) - 5} more\n")
+
+        parts.append("\n")
+
+        return "".join(parts)
+
+    async def run_complete_ideation(
+        self,
+        prompt: str,
+        provider_map: Dict[str, ModelProvider],
+        perspectives: Optional[List[str]] = None,
+        scoring_criteria: Optional[List[str]] = None,
+        num_clusters: Optional[int] = None,
+        **kwargs
+    ) -> WorkflowResult:
+        """
+        Execute complete two-step ideation workflow.
+
+        Combines divergent brainstorming with convergent analysis for
+        comprehensive ideation from multiple perspectives with scoring.
+
+        This is a convenience method that runs:
+        1. Divergent Step: Parallel brainstorming from multiple perspectives
+        2. Convergent Step: Extraction, clustering, and scoring of ideas
+
+        Args:
+            prompt: The topic or problem to ideate on
+            provider_map: Dictionary mapping model names to provider instances
+            perspectives: List of perspectives for brainstorming (default: ['practical', 'innovative', 'user-focused'])
+            scoring_criteria: Criteria for scoring ideas (default: ['feasibility', 'impact', 'novelty'])
+            num_clusters: Target number of clusters (default: auto-determine 3-7)
+            **kwargs: Additional parameters passed to both steps
+
+        Returns:
+            WorkflowResult containing:
+                - synthesis: Final convergent analysis with prioritized clusters
+                - steps: All steps from both divergent and convergent phases
+                - metadata: Combined metadata from both workflow phases
+
+        Raises:
+            ValueError: If prompt is empty or provider_map is empty
+            Exception: If either workflow phase fails
+
+        Example:
+            >>> from modelchorus.providers import ClaudeProvider, GeminiProvider
+            >>> from modelchorus.workflows import IdeateWorkflow
+            >>>
+            >>> # Create providers
+            >>> claude = ClaudeProvider()
+            >>> gemini = GeminiProvider()
+            >>> provider_map = {"claude": claude, "gemini": gemini}
+            >>>
+            >>> # Create workflow
+            >>> workflow = IdeateWorkflow(claude)  # One provider for convergent phase
+            >>>
+            >>> # Run complete ideation
+            >>> result = await workflow.run_complete_ideation(
+            ...     prompt="How can we improve our API documentation?",
+            ...     provider_map=provider_map,
+            ...     perspectives=['practical', 'innovative', 'user-focused'],
+            ...     scoring_criteria=['feasibility', 'impact', 'user_value']
+            ... )
+            >>>
+            >>> # Access prioritized results
+            >>> print(result.synthesis)  # Shows high/medium/low priority clusters
+            >>> for step in result.steps:
+            ...     print(f"{step.title}: {step.metadata}")
+        """
+        if not prompt or not prompt.strip():
+            raise ValueError("Prompt cannot be empty")
+
+        if not provider_map:
+            raise ValueError("Provider map cannot be empty")
+
+        logger.info("Starting complete ideation workflow (divergent + convergent)")
+
+        # Step 1: Divergent brainstorming with multiple perspectives
+        logger.info("Phase 1: Divergent brainstorming")
+        brainstorming_result = await self.run_parallel_brainstorming(
+            prompt=prompt,
+            provider_map=provider_map,
+            perspectives=perspectives,
+            **kwargs
+        )
+
+        # Step 2: Convergent analysis
+        logger.info("Phase 2: Convergent analysis")
+        convergent_result = await self.run_convergent_analysis(
+            brainstorming_result=brainstorming_result,
+            scoring_criteria=scoring_criteria,
+            num_clusters=num_clusters,
+            **kwargs
+        )
+
+        # Combine steps from both phases
+        all_steps = brainstorming_result.steps + convergent_result.steps
+
+        # Create combined metadata
+        combined_metadata = {
+            'workflow': 'ideate-complete',
+            'divergent_phase': brainstorming_result.metadata,
+            'convergent_phase': convergent_result.metadata,
+            'total_steps': len(all_steps),
+            'perspectives': perspectives or ['practical', 'innovative', 'user-focused'],
+            'scoring_criteria': scoring_criteria or ['feasibility', 'impact', 'novelty']
+        }
+
+        # Create final result with convergent analysis as synthesis
+        result = WorkflowResult(
+            synthesis=convergent_result.synthesis,
+            steps=all_steps,
+            metadata=combined_metadata
+        )
+
+        logger.info("Complete ideation workflow finished successfully")
+        return result
 
     def validate_config(self, config: Dict[str, Any]) -> bool:
         """
