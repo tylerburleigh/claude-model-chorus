@@ -16,7 +16,6 @@ from ...core.base_workflow import BaseWorkflow, WorkflowResult, WorkflowStep
 from ...core.conversation import ConversationMemory
 from ...core.registry import WorkflowRegistry
 from ...providers import ModelProvider, GenerationRequest, GenerationResponse
-from ...core.models import ConversationMessage
 
 logger = logging.getLogger(__name__)
 
@@ -268,7 +267,23 @@ class ResearchWorkflow(BaseWorkflow):
         logger.info(f"Starting research workflow: {prompt[:100]}...")
 
         # Create or get conversation thread
-        thread_id = continuation_id or str(uuid.uuid4())
+        if continuation_id:
+            thread_id = continuation_id
+            # If continuing, check if thread exists, create if it doesn't
+            if self.conversation_memory and self.conversation_memory.get_thread(thread_id) is None:
+                # Thread doesn't exist, create it with the given ID
+                # Since create_thread generates its own ID, we'll just use the continuation_id directly
+                # and let add_message handle thread creation if needed
+                pass
+        else:
+            # Create new thread via conversation memory
+            if self.conversation_memory:
+                thread_id = self.conversation_memory.create_thread(
+                    workflow_name=self.name,
+                    initial_context={'research_topic': prompt}
+                )
+            else:
+                thread_id = str(uuid.uuid4())
 
         # Merge kwargs with default config
         config = {**self.default_config, **kwargs}
@@ -286,6 +301,7 @@ class ResearchWorkflow(BaseWorkflow):
 
         # Create workflow result
         result = WorkflowResult(
+            success=True,
             steps=steps,
             synthesis=questions_step.content,  # Placeholder - will be updated
             metadata={
@@ -339,22 +355,19 @@ class ResearchWorkflow(BaseWorkflow):
 
             # Add to conversation memory if available
             if self.conversation_memory:
-                self.conversation_memory.add_message(
-                    thread_id=thread_id,
-                    message=ConversationMessage(
-                        role="user",
-                        content=prompt,
-                        timestamp=datetime.now(timezone.utc)
-                    )
+                self.add_message(
+                    thread_id,
+                    "user",
+                    prompt,
+                    workflow_name=self.name,
+                    model_provider=self.provider.provider_name
                 )
-                self.conversation_memory.add_message(
-                    thread_id=thread_id,
-                    message=ConversationMessage(
-                        role="assistant",
-                        content=response.content,
-                        timestamp=datetime.now(timezone.utc),
-                        model=self.provider.provider_name
-                    )
+                self.add_message(
+                    thread_id,
+                    "assistant",
+                    response.content,
+                    workflow_name=self.name,
+                    model_provider=self.provider.provider_name
                 )
 
             # Create workflow step

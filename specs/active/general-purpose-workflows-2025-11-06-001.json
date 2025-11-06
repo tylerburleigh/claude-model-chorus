@@ -1,7 +1,7 @@
 {
   "spec_id": "general-purpose-workflows-2025-11-06-001",
   "generated": "2025-11-06T12:45:00Z",
-  "last_updated": "2025-11-06T21:34:56.898382Z",
+  "last_updated": "2025-11-06T21:46:46.441263Z",
   "metadata": {
     "title": "General-Purpose Workflows (ARGUMENT, IDEATE, RESEARCH)",
     "description": "Implement foundation infrastructure and three general-purpose workflows for ModelChorus: ARGUMENT (structured debate), IDEATE (creative ideation), and RESEARCH (evidence-based research with citations)",
@@ -24,7 +24,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-06T16:35:09.389143Z",
-    "progress_percentage": 70,
+    "progress_percentage": 71,
     "current_phase": "phase-4"
   },
   "hierarchy": {
@@ -42,7 +42,7 @@
         "phase-6"
       ],
       "total_tasks": 71,
-      "completed_tasks": 50,
+      "completed_tasks": 51,
       "metadata": {},
       "dependencies": {
         "blocks": [],
@@ -1525,7 +1525,7 @@
         "depends": []
       },
       "total_tasks": 11,
-      "completed_tasks": 7,
+      "completed_tasks": 8,
       "metadata": {
         "purpose": "Implement RESEARCH workflow for evidence-based research with citations and validation",
         "risk_level": "high",
@@ -1544,7 +1544,7 @@
         "task-4-4"
       ],
       "total_tasks": 9,
-      "completed_tasks": 7,
+      "completed_tasks": 8,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1759,7 +1759,7 @@
     "task-4-3": {
       "type": "task",
       "title": "tests/test_research_workflow.py",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-4-files",
       "children": [],
       "dependencies": {
@@ -1771,12 +1771,17 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "tests/test_research_workflow.py",
         "task_category": "implementation",
         "estimated_hours": 8,
-        "description": "Unit and integration tests for RESEARCH workflow"
+        "description": "Unit and integration tests for RESEARCH workflow",
+        "started_at": "2025-11-06T21:41:09.688110Z",
+        "completed_at": "2025-11-06T21:46:46.419492Z",
+        "needs_journaling": false,
+        "actual_hours": 0.094,
+        "journaled_at": "2025-11-06T21:46:46.434214Z"
       }
     },
     "task-4-4": {
@@ -2889,6 +2894,15 @@
       "content": "Successfully added ResearchState, Source, and ResearchDossier dataclasses to modelchorus/src/modelchorus/core/models.py.\n\nAdded five comprehensive Pydantic models for the RESEARCH workflow:\n\n1. **Source** - Represents research sources with metadata and validation, including source_id, title, URL, source_type, credibility assessment (high/medium/low/unassessed), tags, validation status, validation score, validation notes, ingested timestamp, and metadata\n\n2. **ResearchEvidence** - Evidence items extracted from research sources with evidence_id, source_id, content, relevance_score (0.0-1.0), confidence level (low/medium/high), category, supporting_quote, extracted timestamp, and metadata\n\n3. **ResearchValidation** - Validation results for research evidence including evidence_id, is_valid status, confidence_score (0.0-1.0), validation_notes list, contradictions list, supporting_evidence IDs, refuting_evidence IDs, validated timestamp, and metadata\n\n4. **ResearchDossier** - Comprehensive research dossier containing title, topic, generated timestamp, sources list, evidence_items list, validation_results list, executive_summary, contradictions_found count, citation_style (informal/academic/technical), and metadata. Includes helper methods: get_source_count(), get_evidence_count(), get_validated_count(), get_average_confidence(), and to_markdown() for converting dossier to markdown format\n\n5. **ResearchState** - State model for RESEARCH workflow multi-turn conversations tracking session_id, topic, research_depth (shallow/moderate/thorough/comprehensive), sources list, evidence_items list, validation_results list, research_questions list, current_phase (questions/sources/analysis/synthesis), optional dossier, metadata, created_at and updated_at timestamps. Includes helper methods: add_source(), add_evidence(), add_validation(), get_source_count(), get_evidence_count(), and get_validated_count()\n\nAll models follow Pydantic BaseModel patterns with proper Field definitions, validation constraints, ConfigDict with examples, comprehensive docstrings, and type hints. Models integrate seamlessly with the existing RESEARCH workflow implementation in research_workflow.py and provide structured data models for source tracking, evidence extraction, validation, dossier generation, and conversation state management.\n\nVerified implementation with syntax checking and import testing - all models compile correctly and can be imported successfully.",
       "metadata": {},
       "task_id": "task-4-2-1"
+    },
+    {
+      "timestamp": "2025-11-06T21:46:46.434197Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: tests/test_research_workflow.py",
+      "author": "claude-code",
+      "content": "Successfully implemented comprehensive test suite for RESEARCH workflow (tests/test_research_workflow.py). Created 49 unit and integration tests covering:\n\n- Workflow initialization and configuration validation\n- Research execution with threading and continuation\n- Question formulation with depth-appropriate guidance\n- Source management (ingestion, validation, filtering, registry)\n- Parallel evidence extraction with concurrency control and timeout handling\n- Evidence validation with fact-checking and contradiction detection\n- Research dossier generation with citations, evidence tables, and metrics\n\nFixed research_workflow.py to use BaseWorkflow's add_message helper and WorkflowResult's required success parameter. All 49 tests passing. Test file: 970 lines, comprehensive coverage of all workflow features including error handling and edge cases.",
+      "metadata": {},
+      "task_id": "task-4-3"
     }
   ]
 }
