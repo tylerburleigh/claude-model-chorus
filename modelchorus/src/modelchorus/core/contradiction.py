@@ -6,6 +6,16 @@ sources, with severity classification and resolution tracking.
 
 Used in ARGUMENT workflow to identify and analyze conflicting claims,
 assess contradiction severity, and suggest resolutions.
+
+Public API:
+    - Contradiction: Pydantic model for contradiction representation
+    - ContradictionSeverity: Enum for severity levels (MINOR/MODERATE/MAJOR/CRITICAL)
+    - detect_contradiction: Main entry point for detecting contradictions between two claims
+    - detect_contradictions_batch: Detect contradictions across multiple claims efficiently
+    - generate_contradiction_explanation: Generate human-readable explanation for contradictions
+    - generate_reconciliation_suggestion: Generate suggestions for resolving contradictions
+    - assess_contradiction_severity: Assess severity based on semantic and polarity analysis
+    - detect_polarity_opposition: Detect opposing polarity between claims
 """
 
 from enum import Enum
@@ -363,6 +373,103 @@ def assess_contradiction_severity(
         return ContradictionSeverity.MINOR
 
 
+def generate_contradiction_explanation(
+    severity: ContradictionSeverity,
+    semantic_similarity: float,
+    has_polarity_opposition: bool,
+    polarity_confidence: float,
+) -> str:
+    """
+    Generate human-readable explanation for a detected contradiction.
+
+    Creates a detailed explanation describing why two claims contradict,
+    including semantic similarity scores and polarity analysis.
+
+    Args:
+        severity: Assessed severity level of the contradiction
+        semantic_similarity: Cosine similarity between claims (0.0-1.0)
+        has_polarity_opposition: Whether claims have opposing polarity
+        polarity_confidence: Confidence in polarity detection (0.0-1.0)
+
+    Returns:
+        Formatted explanation string describing the contradiction
+
+    Example:
+        >>> explanation = generate_contradiction_explanation(
+        ...     severity=ContradictionSeverity.CRITICAL,
+        ...     semantic_similarity=0.85,
+        ...     has_polarity_opposition=True,
+        ...     polarity_confidence=0.8
+        ... )
+        >>> print(explanation)
+        Claims have opposing polarity (confidence: 0.80). Semantic similarity: 0.85. Claims are highly related but present contradictory assertions
+    """
+    explanation_parts = []
+
+    if has_polarity_opposition:
+        explanation_parts.append(
+            f"Claims have opposing polarity (confidence: {polarity_confidence:.2f})"
+        )
+
+    explanation_parts.append(
+        f"Semantic similarity: {semantic_similarity:.2f}"
+    )
+
+    if severity in [ContradictionSeverity.CRITICAL, ContradictionSeverity.MAJOR]:
+        explanation_parts.append(
+            "Claims are highly related but present contradictory assertions"
+        )
+    elif severity == ContradictionSeverity.MODERATE:
+        explanation_parts.append(
+            "Claims show notable inconsistency requiring investigation"
+        )
+    else:
+        explanation_parts.append(
+            "Claims show minor inconsistency, may be due to different contexts"
+        )
+
+    return ". ".join(explanation_parts)
+
+
+def generate_reconciliation_suggestion(
+    severity: ContradictionSeverity,
+) -> Optional[str]:
+    """
+    Generate reconciliation suggestion based on contradiction severity.
+
+    Provides actionable guidance for investigating and resolving contradictions.
+    Higher severity contradictions receive more urgent recommendations.
+
+    Args:
+        severity: Severity level of the contradiction
+
+    Returns:
+        Suggestion string for CRITICAL/MAJOR/MODERATE, None for MINOR
+
+    Example:
+        >>> suggestion = generate_reconciliation_suggestion(ContradictionSeverity.CRITICAL)
+        >>> print(suggestion)
+        Investigate source reliability and experimental conditions. One or both claims may be incorrect.
+    """
+    if severity == ContradictionSeverity.CRITICAL:
+        return (
+            "Investigate source reliability and experimental conditions. "
+            "One or both claims may be incorrect."
+        )
+    elif severity == ContradictionSeverity.MAJOR:
+        return (
+            "Review source contexts and methodologies. "
+            "Claims may apply to different domains or conditions."
+        )
+    elif severity == ContradictionSeverity.MODERATE:
+        return (
+            "Check for temporal differences or scope variations between sources."
+        )
+
+    # No suggestion for MINOR severity
+    return None
+
+
 def detect_contradiction(
     claim_1_id: str,
     claim_1_text: str,
@@ -433,49 +540,16 @@ def detect_contradiction(
     # Weighted average: 60% semantic similarity, 40% polarity confidence
     confidence = (0.6 * similarity) + (0.4 * polarity_conf)
 
-    # Generate explanation
-    explanation_parts = []
-
-    if has_polarity:
-        explanation_parts.append(
-            f"Claims have opposing polarity (confidence: {polarity_conf:.2f})"
-        )
-
-    explanation_parts.append(
-        f"Semantic similarity: {similarity:.2f}"
+    # Generate explanation using dedicated function
+    explanation = generate_contradiction_explanation(
+        severity=severity,
+        semantic_similarity=similarity,
+        has_polarity_opposition=has_polarity,
+        polarity_confidence=polarity_conf,
     )
 
-    if severity in [ContradictionSeverity.CRITICAL, ContradictionSeverity.MAJOR]:
-        explanation_parts.append(
-            "Claims are highly related but present contradictory assertions"
-        )
-    elif severity == ContradictionSeverity.MODERATE:
-        explanation_parts.append(
-            "Claims show notable inconsistency requiring investigation"
-        )
-    else:
-        explanation_parts.append(
-            "Claims show minor inconsistency, may be due to different contexts"
-        )
-
-    explanation = ". ".join(explanation_parts)
-
-    # Generate resolution suggestion based on severity
-    resolution_suggestion = None
-    if severity == ContradictionSeverity.CRITICAL:
-        resolution_suggestion = (
-            "Investigate source reliability and experimental conditions. "
-            "One or both claims may be incorrect."
-        )
-    elif severity == ContradictionSeverity.MAJOR:
-        resolution_suggestion = (
-            "Review source contexts and methodologies. "
-            "Claims may apply to different domains or conditions."
-        )
-    elif severity == ContradictionSeverity.MODERATE:
-        resolution_suggestion = (
-            "Check for temporal differences or scope variations between sources."
-        )
+    # Generate resolution suggestion using dedicated function
+    resolution_suggestion = generate_reconciliation_suggestion(severity)
 
     # Create contradiction object
     contradiction = Contradiction(

@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T17:22:33.710166Z",
+    "generated_at": "2025-11-06T17:26:35.915620Z",
     "languages": [
       "python"
     ],
@@ -10,10 +10,10 @@
   },
   "statistics": {
     "total_files": 51,
-    "total_lines": 18180,
+    "total_lines": 18542,
     "total_classes": 95,
-    "total_functions": 61,
-    "avg_complexity": 4.51,
+    "total_functions": 67,
+    "avg_complexity": 4.61,
     "max_complexity": 36,
     "high_complexity_functions": [
       "thinkdeep (36)",
@@ -25,10 +25,10 @@
     "by_language": {
       "python": {
         "files": 51,
-        "lines": 18180,
+        "lines": 18542,
         "classes": 95,
-        "functions": 61,
-        "avg_complexity": 4.51
+        "functions": 67,
+        "avg_complexity": 4.61
       }
     }
   },
@@ -256,24 +256,34 @@
       "name": "contradiction",
       "file": "modelchorus/src/modelchorus/core/contradiction.py",
       "language": "python",
-      "docstring": "Contradiction detection models for ARGUMENT workflow.\n\nProvides data models for tracking contradictions between claims across\nsources, with severity classification and resolution tracking.\n\nUsed in ARGUMENT workflow to identify and analyze conflicting claims,\nassess contradiction severity, and suggest resolutions.",
+      "docstring": "Contradiction detection models and logic for ARGUMENT workflow.\n\nProvides data models for tracking contradictions between claims across\nsources, with severity classification and resolution tracking.\n\nUsed in ARGUMENT workflow to identify and analyze conflicting claims,\nassess contradiction severity, and suggest resolutions.",
       "classes": [
         "ContradictionSeverity",
         "Contradiction"
       ],
-      "functions": [],
+      "functions": [
+        "_import_semantic_functions",
+        "_import_citation_map",
+        "detect_polarity_opposition",
+        "assess_contradiction_severity",
+        "detect_contradiction",
+        "detect_contradictions_batch"
+      ],
       "imports": [
         "enum.Enum",
         "typing.Any",
         "typing.Dict",
         "typing.Optional",
+        "typing.List",
+        "typing.Tuple",
         "pydantic.BaseModel",
         "pydantic.Field",
         "pydantic.ConfigDict",
-        "pydantic.field_validator"
+        "pydantic.field_validator",
+        "re"
       ],
       "exports": [],
-      "lines": 188
+      "lines": 550
     },
     {
       "name": "conversation",
@@ -1455,7 +1465,7 @@
     {
       "name": "ContradictionSeverity",
       "file": "modelchorus/src/modelchorus/core/contradiction.py",
-      "line": 16,
+      "line": 17,
       "language": "python",
       "docstring": "Severity levels for contradictions between claims.\n\nClassifies contradictions by their importance and impact on\nargument validity. Higher severity indicates more significant\nconflicts requiring immediate attention.\n\nValues:\n    MINOR: Slight inconsistency, may be due to different perspectives\n           or temporal differences. Low impact on argument validity.\n    MODERATE: Notable contradiction that should be investigated.\n             May indicate measurement differences or scope variations.\n    MAJOR: Significant contradiction that undermines argument coherence.\n          Requires careful analysis and resolution.\n    CRITICAL: Direct, irreconcilable contradiction that invalidates\n             one or both claims. Immediate attention required.",
       "bases": [
@@ -1472,7 +1482,7 @@
     {
       "name": "Contradiction",
       "file": "modelchorus/src/modelchorus/core/contradiction.py",
-      "line": 41,
+      "line": 42,
       "language": "python",
       "docstring": "Model for tracking contradictions between claims in ARGUMENT workflow.\n\nRepresents a detected contradiction between two claims, including\nseverity assessment, confidence in detection, and resolution suggestions.\nUsed to identify conflicts in evidence and maintain argument coherence.\n\nAttributes:\n    contradiction_id: Unique identifier for this contradiction\n    claim_1_id: Identifier of the first conflicting claim\n    claim_2_id: Identifier of the second conflicting claim\n    claim_1_text: Full text of the first claim\n    claim_2_text: Full text of the second claim\n    severity: Severity level of the contradiction\n    confidence: Confidence in contradiction detection (0.0-1.0)\n    explanation: Detailed explanation of why claims contradict\n    resolution_suggestion: Optional suggestion for resolving the contradiction\n    metadata: Additional metadata (detection_method, timestamp, etc.)",
       "bases": [
@@ -1485,8 +1495,18 @@
       "properties": [],
       "is_exported": false,
       "is_public": true,
-      "instantiated_by": [],
-      "imported_by": []
+      "instantiated_by": [
+        {
+          "instantiator": "detect_contradiction",
+          "file": "modelchorus/src/modelchorus/core/contradiction.py",
+          "line": 481,
+          "context": [
+            "detect_contradiction"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 1
     },
     {
       "name": "ConversationMemory",
@@ -12057,6 +12077,391 @@
       "call_count": 5
     },
     {
+      "name": "_import_semantic_functions",
+      "file": "modelchorus/src/modelchorus/core/contradiction.py",
+      "line": 197,
+      "language": "python",
+      "docstring": "Import semantic similarity functions from workflows.argument.semantic.",
+      "parameters": [],
+      "return_type": null,
+      "complexity": 2,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [
+        {
+          "name": "detect_contradiction",
+          "file": "modelchorus/src/modelchorus/core/contradiction.py",
+          "line": 412,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [],
+      "call_count": 1
+    },
+    {
+      "name": "_import_citation_map",
+      "file": "modelchorus/src/modelchorus/core/contradiction.py",
+      "line": 212,
+      "language": "python",
+      "docstring": "Import CitationMap model.",
+      "parameters": [],
+      "return_type": null,
+      "complexity": 2,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [],
+      "calls": []
+    },
+    {
+      "name": "detect_polarity_opposition",
+      "file": "modelchorus/src/modelchorus/core/contradiction.py",
+      "line": 238,
+      "language": "python",
+      "docstring": "Detect if two claims have opposing polarity (positive vs negative).\n\nUses keyword-based analysis to identify claims that make opposite\nassertions about the same topic.\n\nArgs:\n    claim_text_1: First claim text\n    claim_text_2: Second claim text\n\nReturns:\n    Tuple of (has_opposition, confidence)\n    - has_opposition: True if claims have opposing polarity\n    - confidence: Confidence in polarity detection (0.0-1.0)\n\nExample:\n    >>> has_opp, conf = detect_polarity_opposition(\n    ...     \"AI improves accuracy by 23%\",\n    ...     \"AI reduces accuracy by 15%\"\n    ... )\n    >>> print(f\"Opposition: {has_opp}, Confidence: {conf:.2f}\")\n    Opposition: True, Confidence: 0.80",
+      "parameters": [
+        {
+          "name": "claim_text_1",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "claim_text_2",
+          "type": "str",
+          "default": null
+        }
+      ],
+      "return_type": "Tuple[bool, float]",
+      "complexity": 10,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "detect_contradiction",
+          "file": "modelchorus/src/modelchorus/core/contradiction.py",
+          "line": 422,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "lower",
+          "file": "unknown",
+          "line": 265,
+          "call_type": "method_call"
+        },
+        {
+          "name": "lower",
+          "file": "unknown",
+          "line": 266,
+          "call_type": "method_call"
+        },
+        {
+          "name": "any",
+          "file": "unknown",
+          "line": 269,
+          "call_type": "function_call"
+        },
+        {
+          "name": "any",
+          "file": "unknown",
+          "line": 270,
+          "call_type": "function_call"
+        },
+        {
+          "name": "any",
+          "file": "unknown",
+          "line": 271,
+          "call_type": "function_call"
+        },
+        {
+          "name": "any",
+          "file": "unknown",
+          "line": 274,
+          "call_type": "function_call"
+        },
+        {
+          "name": "any",
+          "file": "unknown",
+          "line": 275,
+          "call_type": "function_call"
+        },
+        {
+          "name": "any",
+          "file": "unknown",
+          "line": 276,
+          "call_type": "function_call"
+        },
+        {
+          "name": "min",
+          "file": "unknown",
+          "line": 295,
+          "call_type": "function_call"
+        },
+        {
+          "name": "findall",
+          "file": "unknown",
+          "line": 300,
+          "call_type": "method_call"
+        },
+        {
+          "name": "findall",
+          "file": "unknown",
+          "line": 301,
+          "call_type": "method_call"
+        },
+        {
+          "name": "min",
+          "file": "unknown",
+          "line": 305,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "assess_contradiction_severity",
+      "file": "modelchorus/src/modelchorus/core/contradiction.py",
+      "line": 310,
+      "language": "python",
+      "docstring": "Assess the severity of a contradiction based on multiple factors.\n\nCombines semantic similarity and polarity opposition to classify\ncontradiction severity.\n\nArgs:\n    semantic_similarity: Cosine similarity between claims (0.0-1.0)\n    has_polarity_opposition: Whether claims have opposing polarity\n    polarity_confidence: Confidence in polarity detection (0.0-1.0)\n\nReturns:\n    ContradictionSeverity enum value\n\nSeverity Rules:\n    - High similarity (>0.7) + strong polarity opposition = CRITICAL\n    - High similarity (>0.7) + weak polarity opposition = MAJOR\n    - Moderate similarity (0.5-0.7) + polarity opposition = MODERATE\n    - Low similarity (<0.5) + polarity opposition = MINOR\n\nExample:\n    >>> severity = assess_contradiction_severity(\n    ...     semantic_similarity=0.85,\n    ...     has_polarity_opposition=True,\n    ...     polarity_confidence=0.8\n    ... )\n    >>> print(severity)\n    ContradictionSeverity.CRITICAL",
+      "parameters": [
+        {
+          "name": "semantic_similarity",
+          "type": "float",
+          "default": null
+        },
+        {
+          "name": "has_polarity_opposition",
+          "type": "bool",
+          "default": null
+        },
+        {
+          "name": "polarity_confidence",
+          "type": "float",
+          "default": null
+        }
+      ],
+      "return_type": "ContradictionSeverity",
+      "complexity": 7,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "detect_contradiction",
+          "file": "modelchorus/src/modelchorus/core/contradiction.py",
+          "line": 430,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [],
+      "call_count": 1
+    },
+    {
+      "name": "detect_contradiction",
+      "file": "modelchorus/src/modelchorus/core/contradiction.py",
+      "line": 366,
+      "language": "python",
+      "docstring": "Detect contradiction between two claims.\n\nMain entry point for contradiction detection. Analyzes semantic\nsimilarity and polarity opposition to determine if claims contradict.\n\nArgs:\n    claim_1_id: Identifier for first claim\n    claim_1_text: Text of first claim\n    claim_2_id: Identifier for second claim\n    claim_2_text: Text of second claim\n    similarity_threshold: Minimum similarity to consider (default: 0.3)\n    model_name: Sentence transformer model to use\n\nReturns:\n    Contradiction object if contradiction detected, None otherwise\n\nDetection Logic:\n    1. Compute semantic similarity\n    2. If similarity < threshold: likely unrelated, return None\n    3. Detect polarity opposition\n    4. If no polarity opposition and low similarity: return None\n    5. Assess severity\n    6. Generate explanation\n    7. Return Contradiction object\n\nExample:\n    >>> contra = detect_contradiction(\n    ...     \"claim-1\", \"AI improves accuracy by 23%\",\n    ...     \"claim-2\", \"AI reduces accuracy by 15%\"\n    ... )\n    >>> if contra:\n    ...     print(f\"Severity: {contra.severity}\")\n    ...     print(f\"Confidence: {contra.confidence}\")\n    Severity: ContradictionSeverity.CRITICAL\n    Confidence: 0.87",
+      "parameters": [
+        {
+          "name": "claim_1_id",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "claim_1_text",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "claim_2_id",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "claim_2_text",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "similarity_threshold",
+          "type": "float",
+          "default": null
+        },
+        {
+          "name": "model_name",
+          "type": "str",
+          "default": null
+        }
+      ],
+      "return_type": "Optional[Contradiction]",
+      "complexity": 9,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "detect_contradictions_batch",
+          "file": "modelchorus/src/modelchorus/core/contradiction.py",
+          "line": 540,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "_import_semantic_functions",
+          "file": "unknown",
+          "line": 412,
+          "call_type": "function_call"
+        },
+        {
+          "name": "compute_claim_similarity",
+          "file": "unknown",
+          "line": 415,
+          "call_type": "function_call"
+        },
+        {
+          "name": "detect_polarity_opposition",
+          "file": "unknown",
+          "line": 422,
+          "call_type": "function_call"
+        },
+        {
+          "name": "assess_contradiction_severity",
+          "file": "unknown",
+          "line": 430,
+          "call_type": "function_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 440,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 444,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 449,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 453,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 457,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 461,
+          "call_type": "method_call"
+        },
+        {
+          "name": "round",
+          "file": "unknown",
+          "line": 492,
+          "call_type": "function_call"
+        },
+        {
+          "name": "round",
+          "file": "unknown",
+          "line": 494,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "detect_contradictions_batch",
+      "file": "modelchorus/src/modelchorus/core/contradiction.py",
+      "line": 503,
+      "language": "python",
+      "docstring": "Detect contradictions in a batch of claims.\n\nEfficiently compares all pairs of claims to find contradictions.\nUseful for analyzing collections of claims from multiple sources.\n\nArgs:\n    claims: List of (claim_id, claim_text) tuples\n    similarity_threshold: Minimum similarity to consider (default: 0.3)\n    model_name: Sentence transformer model to use\n\nReturns:\n    List of detected Contradiction objects\n\nExample:\n    >>> claims = [\n    ...     (\"claim-1\", \"AI improves accuracy\"),\n    ...     (\"claim-2\", \"AI reduces accuracy\"),\n    ...     (\"claim-3\", \"Weather is sunny\"),\n    ... ]\n    >>> contradictions = detect_contradictions_batch(claims)\n    >>> print(f\"Found {len(contradictions)} contradictions\")\n    Found 1 contradictions",
+      "parameters": [
+        {
+          "name": "claims",
+          "type": "List[Tuple[str, str]]",
+          "default": null
+        },
+        {
+          "name": "similarity_threshold",
+          "type": "float",
+          "default": null
+        },
+        {
+          "name": "model_name",
+          "type": "str",
+          "default": null
+        }
+      ],
+      "return_type": "List[Contradiction]",
+      "complexity": 4,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "range",
+          "file": "unknown",
+          "line": 535,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 535,
+          "call_type": "function_call"
+        },
+        {
+          "name": "range",
+          "file": "unknown",
+          "line": 536,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 536,
+          "call_type": "function_call"
+        },
+        {
+          "name": "detect_contradiction",
+          "file": "unknown",
+          "line": 540,
+          "call_type": "function_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 548,
+          "call_type": "method_call"
+        }
+      ]
+    },
+    {
       "name": "get_default_state_manager",
       "file": "modelchorus/src/modelchorus/core/state.py",
       "line": 517,
@@ -13413,6 +13818,12 @@
       "is_public": true,
       "callers": [
         {
+          "name": "detect_contradiction",
+          "file": "modelchorus/src/modelchorus/core/contradiction.py",
+          "line": 415,
+          "call_type": "function_call"
+        },
+        {
           "name": "add_similarity_to_citation",
           "file": "modelchorus/src/modelchorus/workflows/argument/semantic.py",
           "line": 317,
@@ -13469,7 +13880,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 6
+      "call_count": 7
     },
     {
       "name": "find_similar_claims",
@@ -15365,10 +15776,13 @@
       "typing.Any",
       "typing.Dict",
       "typing.Optional",
+      "typing.List",
+      "typing.Tuple",
       "pydantic.BaseModel",
       "pydantic.Field",
       "pydantic.ConfigDict",
-      "pydantic.field_validator"
+      "pydantic.field_validator",
+      "re"
     ],
     "modelchorus/src/modelchorus/core/conversation.py": [
       "json",

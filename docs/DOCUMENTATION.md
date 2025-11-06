@@ -1,17 +1,17 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 12:22:33
+**Generated:** 2025-11-06 12:26:35
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 51
-- **Total Lines:** 18180
+- **Total Lines:** 18542
 - **Total Classes:** 95
-- **Total Functions:** 61
-- **Avg Complexity:** 4.51
+- **Total Functions:** 67
+- **Avg Complexity:** 4.61
 - **Max Complexity:** 36
 - **High Complexity Functions:**
   - thinkdeep (36)
@@ -413,7 +413,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `modelchorus/src/modelchorus/core/contradiction.py:41`
+**Defined in:** `modelchorus/src/modelchorus/core/contradiction.py:42`
 
 **Description:**
 > Model for tracking contradictions between claims in ARGUMENT workflow.
@@ -444,7 +444,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `str`, `Enum`
-**Defined in:** `modelchorus/src/modelchorus/core/contradiction.py:16`
+**Defined in:** `modelchorus/src/modelchorus/core/contradiction.py:17`
 
 **Description:**
 > Severity levels for contradictions between claims.
@@ -2239,6 +2239,28 @@ Returns:
 
 ---
 
+### `_import_citation_map() -> None`
+
+**Language:** python
+**Defined in:** `modelchorus/src/modelchorus/core/contradiction.py:212`
+**Complexity:** 2
+
+**Description:**
+> Import CitationMap model.
+
+---
+
+### `_import_semantic_functions() -> None`
+
+**Language:** python
+**Defined in:** `modelchorus/src/modelchorus/core/contradiction.py:197`
+**Complexity:** 2
+
+**Description:**
+> Import semantic similarity functions from workflows.argument.semantic.
+
+---
+
 ### `_normalize_text(text) -> str`
 
 **Language:** python
@@ -2296,6 +2318,48 @@ Example:
 - `citation`: Citation
 - `reference_claim`: str
 - `model_name`: str
+
+---
+
+### `assess_contradiction_severity(semantic_similarity, has_polarity_opposition, polarity_confidence) -> ContradictionSeverity`
+
+**Language:** python
+**Defined in:** `modelchorus/src/modelchorus/core/contradiction.py:310`
+**Complexity:** 7
+
+**Description:**
+> Assess the severity of a contradiction based on multiple factors.
+
+Combines semantic similarity and polarity opposition to classify
+contradiction severity.
+
+Args:
+    semantic_similarity: Cosine similarity between claims (0.0-1.0)
+    has_polarity_opposition: Whether claims have opposing polarity
+    polarity_confidence: Confidence in polarity detection (0.0-1.0)
+
+Returns:
+    ContradictionSeverity enum value
+
+Severity Rules:
+    - High similarity (>0.7) + strong polarity opposition = CRITICAL
+    - High similarity (>0.7) + weak polarity opposition = MAJOR
+    - Moderate similarity (0.5-0.7) + polarity opposition = MODERATE
+    - Low similarity (<0.5) + polarity opposition = MINOR
+
+Example:
+    >>> severity = assess_contradiction_severity(
+    ...     semantic_similarity=0.85,
+    ...     has_polarity_opposition=True,
+    ...     polarity_confidence=0.8
+    ... )
+    >>> print(severity)
+    ContradictionSeverity.CRITICAL
+
+**Parameters:**
+- `semantic_similarity`: float
+- `has_polarity_opposition`: bool
+- `polarity_confidence`: float
 
 ---
 
@@ -2808,6 +2872,131 @@ Example:
 **Parameters:**
 - `embedding1`: np.ndarray
 - `embedding2`: np.ndarray
+
+---
+
+### `detect_contradiction(claim_1_id, claim_1_text, claim_2_id, claim_2_text, similarity_threshold, model_name) -> Optional[Contradiction]`
+
+**Language:** python
+**Defined in:** `modelchorus/src/modelchorus/core/contradiction.py:366`
+**Complexity:** 9
+
+**Description:**
+> Detect contradiction between two claims.
+
+Main entry point for contradiction detection. Analyzes semantic
+similarity and polarity opposition to determine if claims contradict.
+
+Args:
+    claim_1_id: Identifier for first claim
+    claim_1_text: Text of first claim
+    claim_2_id: Identifier for second claim
+    claim_2_text: Text of second claim
+    similarity_threshold: Minimum similarity to consider (default: 0.3)
+    model_name: Sentence transformer model to use
+
+Returns:
+    Contradiction object if contradiction detected, None otherwise
+
+Detection Logic:
+    1. Compute semantic similarity
+    2. If similarity < threshold: likely unrelated, return None
+    3. Detect polarity opposition
+    4. If no polarity opposition and low similarity: return None
+    5. Assess severity
+    6. Generate explanation
+    7. Return Contradiction object
+
+Example:
+    >>> contra = detect_contradiction(
+    ...     "claim-1", "AI improves accuracy by 23%",
+    ...     "claim-2", "AI reduces accuracy by 15%"
+    ... )
+    >>> if contra:
+    ...     print(f"Severity: {contra.severity}")
+    ...     print(f"Confidence: {contra.confidence}")
+    Severity: ContradictionSeverity.CRITICAL
+    Confidence: 0.87
+
+**Parameters:**
+- `claim_1_id`: str
+- `claim_1_text`: str
+- `claim_2_id`: str
+- `claim_2_text`: str
+- `similarity_threshold`: float
+- `model_name`: str
+
+---
+
+### `detect_contradictions_batch(claims, similarity_threshold, model_name) -> List[Contradiction]`
+
+**Language:** python
+**Defined in:** `modelchorus/src/modelchorus/core/contradiction.py:503`
+**Complexity:** 4
+
+**Description:**
+> Detect contradictions in a batch of claims.
+
+Efficiently compares all pairs of claims to find contradictions.
+Useful for analyzing collections of claims from multiple sources.
+
+Args:
+    claims: List of (claim_id, claim_text) tuples
+    similarity_threshold: Minimum similarity to consider (default: 0.3)
+    model_name: Sentence transformer model to use
+
+Returns:
+    List of detected Contradiction objects
+
+Example:
+    >>> claims = [
+    ...     ("claim-1", "AI improves accuracy"),
+    ...     ("claim-2", "AI reduces accuracy"),
+    ...     ("claim-3", "Weather is sunny"),
+    ... ]
+    >>> contradictions = detect_contradictions_batch(claims)
+    >>> print(f"Found {len(contradictions)} contradictions")
+    Found 1 contradictions
+
+**Parameters:**
+- `claims`: List[Tuple[str, str]]
+- `similarity_threshold`: float
+- `model_name`: str
+
+---
+
+### `detect_polarity_opposition(claim_text_1, claim_text_2) -> Tuple[bool, float]`
+
+**Language:** python
+**Defined in:** `modelchorus/src/modelchorus/core/contradiction.py:238`
+**Complexity:** 10
+
+**Description:**
+> Detect if two claims have opposing polarity (positive vs negative).
+
+Uses keyword-based analysis to identify claims that make opposite
+assertions about the same topic.
+
+Args:
+    claim_text_1: First claim text
+    claim_text_2: Second claim text
+
+Returns:
+    Tuple of (has_opposition, confidence)
+    - has_opposition: True if claims have opposing polarity
+    - confidence: Confidence in polarity detection (0.0-1.0)
+
+Example:
+    >>> has_opp, conf = detect_polarity_opposition(
+    ...     "AI improves accuracy by 23%",
+    ...     "AI reduces accuracy by 15%"
+    ... )
+    >>> print(f"Opposition: {has_opp}, Confidence: {conf:.2f}")
+    Opposition: True, Confidence: 0.80
+
+**Parameters:**
+- `claim_text_1`: str
+- `claim_text_2`: str
 
 ---
 
@@ -3661,9 +3850,12 @@ Example:
 - `pydantic.ConfigDict`
 - `pydantic.Field`
 - `pydantic.field_validator`
+- `re`
 - `typing.Any`
 - `typing.Dict`
+- `typing.List`
 - `typing.Optional`
+- `typing.Tuple`
 
 ### `modelchorus/src/modelchorus/core/conversation.py`
 
