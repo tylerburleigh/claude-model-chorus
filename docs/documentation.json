@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T12:59:28.217363Z",
+    "generated_at": "2025-11-06T13:04:37.039909Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 44,
-    "total_lines": 14857,
-    "total_classes": 75,
+    "total_files": 45,
+    "total_lines": 15229,
+    "total_classes": 76,
     "total_functions": 34,
     "avg_complexity": 4.62,
     "max_complexity": 36,
@@ -23,9 +23,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 44,
-        "lines": 14857,
-        "classes": 75,
+        "files": 45,
+        "lines": 15229,
+        "classes": 76,
         "functions": 34,
         "avg_complexity": 4.62
       }
@@ -941,6 +941,33 @@
       "lines": 1
     },
     {
+      "name": "test_concurrent_conversations",
+      "file": "tests/test_concurrent_conversations.py",
+      "language": "python",
+      "docstring": "Concurrency and performance tests for ConversationMemory.\n\nTests verify that ConversationMemory can handle:\n- 100+ concurrent conversation threads\n- Thread-safe operations under parallel access\n- Memory management under high load\n- Thread isolation (no cross-contamination between conversations)",
+      "classes": [
+        "TestConcurrentConversationHandling"
+      ],
+      "functions": [],
+      "imports": [
+        "pytest",
+        "asyncio",
+        "unittest.mock.AsyncMock",
+        "uuid",
+        "concurrent.futures.ThreadPoolExecutor",
+        "time",
+        "datetime.datetime",
+        "datetime.timezone",
+        "modelchorus.workflows.chat.ChatWorkflow",
+        "modelchorus.workflows.thinkdeep.ThinkDeepWorkflow",
+        "modelchorus.providers.base_provider.GenerationResponse",
+        "modelchorus.core.conversation.ConversationMemory",
+        "modelchorus.core.models.ConversationMessage"
+      ],
+      "exports": [],
+      "lines": 372
+    },
+    {
       "name": "__init__",
       "file": "tests/test_providers/__init__.py",
       "language": "python",
@@ -1494,6 +1521,15 @@
         },
         {
           "instantiator": "conversation_memory",
+          "file": "tests/test_concurrent_conversations.py",
+          "line": 45,
+          "context": [
+            "TestConcurrentConversationHandling",
+            "conversation_memory"
+          ]
+        },
+        {
+          "instantiator": "conversation_memory",
           "file": "tests/test_thinkdeep_complex.py",
           "line": 40,
           "context": [
@@ -1611,7 +1647,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 40
+      "instantiation_count": 41
     },
     {
       "name": "ConfidenceLevel",
@@ -3444,6 +3480,44 @@
           ]
         },
         {
+          "instantiator": "generate_response",
+          "file": "tests/test_concurrent_conversations.py",
+          "line": 64,
+          "context": [
+            "TestConcurrentConversationHandling",
+            "test_100_concurrent_chat_conversations",
+            "generate_response"
+          ]
+        },
+        {
+          "instantiator": "generate_response",
+          "file": "tests/test_concurrent_conversations.py",
+          "line": 168,
+          "context": [
+            "TestConcurrentConversationHandling",
+            "test_concurrent_multi_turn_conversations",
+            "generate_response"
+          ]
+        },
+        {
+          "instantiator": "test_mixed_workflow_concurrent_execution",
+          "file": "tests/test_concurrent_conversations.py",
+          "line": 252,
+          "context": [
+            "TestConcurrentConversationHandling",
+            "test_mixed_workflow_concurrent_execution"
+          ]
+        },
+        {
+          "instantiator": "test_performance_scalability",
+          "file": "tests/test_concurrent_conversations.py",
+          "line": 331,
+          "context": [
+            "TestConcurrentConversationHandling",
+            "test_performance_scalability"
+          ]
+        },
+        {
           "instantiator": "test_architectural_decision_rest_vs_graphql",
           "file": "tests/test_thinkdeep_complex.py",
           "line": 62,
@@ -4354,7 +4428,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 111
+      "instantiation_count": 115
     },
     {
       "name": "ModelProvider",
@@ -5130,6 +5204,42 @@
           ]
         },
         {
+          "instantiator": "test_100_concurrent_chat_conversations",
+          "file": "tests/test_concurrent_conversations.py",
+          "line": 74,
+          "context": [
+            "TestConcurrentConversationHandling",
+            "test_100_concurrent_chat_conversations"
+          ]
+        },
+        {
+          "instantiator": "test_concurrent_multi_turn_conversations",
+          "file": "tests/test_concurrent_conversations.py",
+          "line": 178,
+          "context": [
+            "TestConcurrentConversationHandling",
+            "test_concurrent_multi_turn_conversations"
+          ]
+        },
+        {
+          "instantiator": "test_mixed_workflow_concurrent_execution",
+          "file": "tests/test_concurrent_conversations.py",
+          "line": 260,
+          "context": [
+            "TestConcurrentConversationHandling",
+            "test_mixed_workflow_concurrent_execution"
+          ]
+        },
+        {
+          "instantiator": "test_performance_scalability",
+          "file": "tests/test_concurrent_conversations.py",
+          "line": 338,
+          "context": [
+            "TestConcurrentConversationHandling",
+            "test_performance_scalability"
+          ]
+        },
+        {
           "instantiator": "test_consensus_to_thinkdeep_to_chat_workflow",
           "file": "tests/test_workflow_integration_chaining.py",
           "line": 169,
@@ -5149,7 +5259,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 16
+      "instantiation_count": 20
     },
     {
       "name": "ConsensusStrategy",
@@ -5477,6 +5587,15 @@
           "line": 706,
           "context": [
             "thinkdeep_status"
+          ]
+        },
+        {
+          "instantiator": "test_mixed_workflow_concurrent_execution",
+          "file": "tests/test_concurrent_conversations.py",
+          "line": 265,
+          "context": [
+            "TestConcurrentConversationHandling",
+            "test_mixed_workflow_concurrent_execution"
           ]
         },
         {
@@ -6021,7 +6140,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 67
+      "instantiation_count": 68
     },
     {
       "name": "TestMultiProviderChat",
@@ -6536,6 +6655,27 @@
         "test_hypothesis_lifecycle",
         "test_investigation_progression",
         "test_multiple_hypothesis_tracking"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestConcurrentConversationHandling",
+      "file": "tests/test_concurrent_conversations.py",
+      "line": 26,
+      "language": "python",
+      "docstring": "Test suite for concurrent conversation handling.\n\nValidates that ConversationMemory and workflows can handle high concurrency\nscenarios with proper thread isolation and performance.",
+      "bases": [],
+      "methods": [
+        "mock_provider",
+        "conversation_memory",
+        "test_100_concurrent_chat_conversations",
+        "test_concurrent_multi_turn_conversations",
+        "test_mixed_workflow_concurrent_execution",
+        "test_performance_scalability"
       ],
       "properties": [],
       "is_exported": false,
@@ -11617,6 +11757,21 @@
       "modelchorus.core.models.Hypothesis",
       "modelchorus.core.models.InvestigationStep",
       "modelchorus.core.models.ThinkDeepState"
+    ],
+    "tests/test_concurrent_conversations.py": [
+      "pytest",
+      "asyncio",
+      "unittest.mock.AsyncMock",
+      "uuid",
+      "concurrent.futures.ThreadPoolExecutor",
+      "time",
+      "datetime.datetime",
+      "datetime.timezone",
+      "modelchorus.workflows.chat.ChatWorkflow",
+      "modelchorus.workflows.thinkdeep.ThinkDeepWorkflow",
+      "modelchorus.providers.base_provider.GenerationResponse",
+      "modelchorus.core.conversation.ConversationMemory",
+      "modelchorus.core.models.ConversationMessage"
     ],
     "tests/test_providers/test_cli_interface.py": [
       "sys",

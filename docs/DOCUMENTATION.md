@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 07:59:28
+**Generated:** 2025-11-06 08:04:37
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 44
-- **Total Lines:** 14857
-- **Total Classes:** 75
+- **Total Files:** 45
+- **Total Lines:** 15229
+- **Total Classes:** 76
 - **Total Functions:** 34
 - **Avg Complexity:** 4.62
 - **Max Complexity:** 36
@@ -958,6 +958,27 @@ Attributes:
 - `conversation_memory()`
 - `test_long_investigation_with_hypothesis_pivots()`
 - `test_investigation_with_multiple_evidence_types()`
+
+---
+
+### `TestConcurrentConversationHandling`
+
+**Language:** python
+**Defined in:** `tests/test_concurrent_conversations.py:26`
+
+**Description:**
+> Test suite for concurrent conversation handling.
+
+Validates that ConversationMemory and workflows can handle high concurrency
+scenarios with proper thread isolation and performance.
+
+**Methods:**
+- `mock_provider()`
+- `conversation_memory()`
+- `test_100_concurrent_chat_conversations()`
+- `test_concurrent_multi_turn_conversations()`
+- `test_mixed_workflow_concurrent_execution()`
+- `test_performance_scalability()`
 
 ---
 
@@ -2716,6 +2737,22 @@ Example:
 - `modelchorus.core.models.ThinkDeepState`
 - `pydantic.ValidationError`
 - `pytest`
+
+### `tests/test_concurrent_conversations.py`
+
+- `asyncio`
+- `concurrent.futures.ThreadPoolExecutor`
+- `datetime.datetime`
+- `datetime.timezone`
+- `modelchorus.core.conversation.ConversationMemory`
+- `modelchorus.core.models.ConversationMessage`
+- `modelchorus.providers.base_provider.GenerationResponse`
+- `modelchorus.workflows.chat.ChatWorkflow`
+- `modelchorus.workflows.thinkdeep.ThinkDeepWorkflow`
+- `pytest`
+- `time`
+- `unittest.mock.AsyncMock`
+- `uuid`
 
 ### `tests/test_providers/test_cli_interface.py`
 
