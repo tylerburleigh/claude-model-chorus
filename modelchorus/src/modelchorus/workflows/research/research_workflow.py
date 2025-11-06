@@ -5,8 +5,10 @@ This module implements the ResearchWorkflow which provides systematic research
 through structured question formulation, source gathering, and synthesis.
 """
 
+import asyncio
 import logging
 import uuid
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Optional, Dict, Any, List
 
@@ -17,6 +19,53 @@ from ...providers import ModelProvider, GenerationRequest, GenerationResponse
 from ...core.models import ConversationMessage
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class Evidence:
+    """
+    Represents a piece of evidence extracted from a source.
+
+    Attributes:
+        evidence_id: Unique identifier for this evidence
+        source_id: ID of the source this evidence came from
+        content: The extracted evidence content
+        relevance_score: Relevance score (0.0-1.0)
+        confidence: Confidence in the extraction (low, medium, high)
+        category: Category or theme of the evidence
+        supporting_quote: Optional direct quote from source
+        metadata: Additional metadata
+    """
+    evidence_id: str
+    source_id: str
+    content: str
+    relevance_score: float = 0.0
+    confidence: str = 'medium'
+    category: Optional[str] = None
+    supporting_quote: Optional[str] = None
+    metadata: Dict[str, Any] = field(default_factory=dict)
+    extracted_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+
+@dataclass
+class ExtractionResult:
+    """
+    Result from parallel evidence extraction.
+
+    Attributes:
+        source_id: ID of the source processed
+        evidence: List of extracted evidence items
+        success: Whether extraction succeeded
+        error: Optional error message if extraction failed
+        duration: Time taken for extraction in seconds
+        metadata: Additional metadata
+    """
+    source_id: str
+    evidence: List[Evidence] = field(default_factory=list)
+    success: bool = True
+    error: Optional[str] = None
+    duration: float = 0.0
+    metadata: Dict[str, Any] = field(default_factory=dict)
 
 
 @WorkflowRegistry.register("research")
@@ -531,3 +580,386 @@ Organize your questions by theme or category, and indicate priority (High/Medium
         """Clear all sources from the registry."""
         self.source_registry = []
         logger.info("Source registry cleared")
+
+    async def extract_evidence_from_sources(
+        self,
+        source_ids: Optional[List[str]] = None,
+        questions: Optional[List[str]] = None,
+        max_concurrent: int = 5,
+        timeout_per_source: float = 60.0
+    ) -> List[ExtractionResult]:
+        """
+        Extract evidence from multiple sources in parallel.
+
+        This method processes multiple sources concurrently to extract relevant
+        evidence based on the research questions. It uses asyncio for parallel
+        execution while respecting concurrency limits.
+
+        Args:
+            source_ids: Optional list of specific source IDs to process.
+                       If None, processes all sources in registry.
+            questions: Optional list of research questions to guide extraction.
+                      If None, uses general extraction approach.
+            max_concurrent: Maximum number of concurrent source extractions.
+                           Default is 5 to avoid overwhelming the model.
+            timeout_per_source: Timeout in seconds for each source extraction.
+                               Default is 60.0 seconds.
+
+        Returns:
+            List of ExtractionResult objects, one per source processed.
+            Results include both successful and failed extractions.
+
+        Raises:
+            ValueError: If source_ids contains invalid IDs not in registry
+
+        Example:
+            >>> # Extract from all sources
+            >>> results = await workflow.extract_evidence_from_sources()
+            >>>
+            >>> # Extract from specific sources with questions
+            >>> questions = ["What are the key benefits?", "What are the risks?"]
+            >>> results = await workflow.extract_evidence_from_sources(
+            ...     source_ids=['src1', 'src2'],
+            ...     questions=questions
+            ... )
+        """
+        # Determine which sources to process
+        if source_ids is None:
+            sources_to_process = self.source_registry
+        else:
+            # Validate source IDs
+            valid_ids = {s['source_id'] for s in self.source_registry}
+            invalid_ids = [sid for sid in source_ids if sid not in valid_ids]
+            if invalid_ids:
+                raise ValueError(f"Invalid source IDs: {invalid_ids}")
+
+            sources_to_process = [
+                s for s in self.source_registry
+                if s['source_id'] in source_ids
+            ]
+
+        if not sources_to_process:
+            logger.warning("No sources to process for evidence extraction")
+            return []
+
+        logger.info(f"Starting parallel evidence extraction from {len(sources_to_process)} sources "
+                   f"(max concurrent: {max_concurrent})")
+
+        # Create semaphore for controlling concurrency
+        semaphore = asyncio.Semaphore(max_concurrent)
+
+        # Create extraction tasks
+        tasks = [
+            self._extract_evidence_from_source(
+                source=source,
+                questions=questions,
+                semaphore=semaphore,
+                timeout=timeout_per_source
+            )
+            for source in sources_to_process
+        ]
+
+        # Execute all tasks in parallel
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+
+        # Process results and handle exceptions
+        extraction_results: List[ExtractionResult] = []
+        for i, result in enumerate(results):
+            if isinstance(result, Exception):
+                source_id = sources_to_process[i]['source_id']
+                logger.error(f"Extraction failed for source {source_id}: {result}")
+                extraction_results.append(ExtractionResult(
+                    source_id=source_id,
+                    success=False,
+                    error=str(result)
+                ))
+            else:
+                extraction_results.append(result)
+
+        # Log summary statistics
+        successful = sum(1 for r in extraction_results if r.success)
+        failed = len(extraction_results) - successful
+        total_evidence = sum(len(r.evidence) for r in extraction_results if r.success)
+
+        logger.info(f"Evidence extraction complete: {successful} successful, {failed} failed, "
+                   f"{total_evidence} evidence items extracted")
+
+        return extraction_results
+
+    async def _extract_evidence_from_source(
+        self,
+        source: Dict[str, Any],
+        questions: Optional[List[str]],
+        semaphore: asyncio.Semaphore,
+        timeout: float
+    ) -> ExtractionResult:
+        """
+        Extract evidence from a single source.
+
+        This is an internal method called by extract_evidence_from_sources
+        for each source. It uses a semaphore to control concurrency.
+
+        Args:
+            source: Source dictionary to extract evidence from
+            questions: Optional research questions to guide extraction
+            semaphore: Asyncio semaphore for controlling concurrency
+            timeout: Timeout in seconds for this extraction
+
+        Returns:
+            ExtractionResult with extracted evidence or error information
+        """
+        source_id = source['source_id']
+        start_time = asyncio.get_event_loop().time()
+
+        async with semaphore:
+            try:
+                # Create extraction prompt
+                extraction_prompt = self._create_extraction_prompt(source, questions)
+
+                # Create generation request
+                request = GenerationRequest(
+                    prompt=extraction_prompt,
+                    system_prompt=self._get_evidence_extraction_system_prompt(),
+                    temperature=0.3,  # Lower temperature for more focused extraction
+                    max_tokens=2000
+                )
+
+                # Execute with timeout
+                response = await asyncio.wait_for(
+                    self.provider.generate(request),
+                    timeout=timeout
+                )
+
+                # Parse evidence from response
+                evidence_items = self._parse_evidence_from_response(
+                    response.content,
+                    source_id
+                )
+
+                duration = asyncio.get_event_loop().time() - start_time
+
+                logger.info(f"Extracted {len(evidence_items)} evidence items from source {source_id} "
+                           f"in {duration:.2f}s")
+
+                return ExtractionResult(
+                    source_id=source_id,
+                    evidence=evidence_items,
+                    success=True,
+                    duration=duration,
+                    metadata={
+                        'source_title': source.get('title'),
+                        'source_type': source.get('type'),
+                        'credibility': source.get('credibility')
+                    }
+                )
+
+            except asyncio.TimeoutError:
+                duration = asyncio.get_event_loop().time() - start_time
+                logger.warning(f"Evidence extraction timed out for source {source_id} "
+                             f"after {timeout}s")
+                return ExtractionResult(
+                    source_id=source_id,
+                    success=False,
+                    error=f"Extraction timed out after {timeout}s",
+                    duration=duration
+                )
+
+            except Exception as e:
+                duration = asyncio.get_event_loop().time() - start_time
+                logger.error(f"Evidence extraction failed for source {source_id}: {e}")
+                return ExtractionResult(
+                    source_id=source_id,
+                    success=False,
+                    error=str(e),
+                    duration=duration
+                )
+
+    def _create_extraction_prompt(
+        self,
+        source: Dict[str, Any],
+        questions: Optional[List[str]]
+    ) -> str:
+        """
+        Create prompt for evidence extraction from a source.
+
+        Args:
+            source: Source dictionary
+            questions: Optional research questions
+
+        Returns:
+            Formatted extraction prompt
+        """
+        prompt_parts = [
+            f"Source: {source.get('title')}",
+            f"Type: {source.get('type')}",
+        ]
+
+        if source.get('url'):
+            prompt_parts.append(f"URL: {source['url']}")
+
+        if source.get('metadata'):
+            prompt_parts.append(f"Metadata: {source['metadata']}")
+
+        prompt_parts.append("\n")
+
+        if questions:
+            prompt_parts.append("Research Questions:")
+            for i, q in enumerate(questions, 1):
+                prompt_parts.append(f"{i}. {q}")
+            prompt_parts.append("\n")
+            prompt_parts.append(
+                "Extract key evidence from this source that addresses these research questions."
+            )
+        else:
+            prompt_parts.append(
+                "Extract key evidence and insights from this source."
+            )
+
+        prompt_parts.append("\n")
+        prompt_parts.append(
+            "For each piece of evidence, provide:\n"
+            "1. The evidence content\n"
+            "2. Relevance score (0.0-1.0)\n"
+            "3. Confidence level (low/medium/high)\n"
+            "4. Category or theme\n"
+            "5. Supporting quote (if applicable)\n\n"
+            "Format each piece of evidence clearly with these components."
+        )
+
+        return "\n".join(prompt_parts)
+
+    def _get_evidence_extraction_system_prompt(self) -> str:
+        """
+        Get system prompt for evidence extraction.
+
+        Returns:
+            System prompt for evidence extraction task
+        """
+        return """You are an expert research analyst specializing in evidence extraction and synthesis.
+
+Your task is to extract relevant, high-quality evidence from research sources.
+
+Guidelines:
+- Focus on factual, verifiable evidence
+- Assign accurate relevance scores based on importance to research questions
+- Be conservative with confidence levels - only use 'high' for well-supported claims
+- Categorize evidence by theme or topic for easier synthesis
+- Include direct quotes when they strengthen the evidence
+- Distinguish between primary evidence and interpretations
+- Note any potential biases or limitations in the source
+
+Your extractions should be precise, well-organized, and ready for synthesis."""
+
+    def _parse_evidence_from_response(
+        self,
+        response_content: str,
+        source_id: str
+    ) -> List[Evidence]:
+        """
+        Parse evidence items from model response.
+
+        This method attempts to extract structured evidence from the model's
+        response text. It looks for evidence markers and extracts components.
+
+        Args:
+            response_content: The model's response text
+            source_id: ID of the source this evidence came from
+
+        Returns:
+            List of Evidence objects parsed from the response
+
+        Note:
+            This is a simplified parser. In production, you might want to use
+            more sophisticated parsing or request structured JSON output.
+        """
+        evidence_items: List[Evidence] = []
+
+        # Simple parsing approach: split by numbered items or blank lines
+        # This is a basic implementation - could be enhanced with JSON output
+        lines = response_content.strip().split('\n')
+
+        current_evidence = {}
+        evidence_content = []
+
+        for line in lines:
+            line = line.strip()
+            if not line:
+                # Blank line might indicate end of evidence item
+                if current_evidence and evidence_content:
+                    evidence_items.append(self._create_evidence_from_parsed(
+                        evidence_content,
+                        source_id,
+                        current_evidence
+                    ))
+                    current_evidence = {}
+                    evidence_content = []
+                continue
+
+            # Look for component markers
+            if line.lower().startswith(('relevance:', 'score:')):
+                try:
+                    score_str = line.split(':', 1)[1].strip()
+                    current_evidence['relevance_score'] = float(score_str)
+                except (ValueError, IndexError):
+                    pass
+            elif line.lower().startswith('confidence:'):
+                confidence = line.split(':', 1)[1].strip().lower()
+                if confidence in ['low', 'medium', 'high']:
+                    current_evidence['confidence'] = confidence
+            elif line.lower().startswith('category:'):
+                current_evidence['category'] = line.split(':', 1)[1].strip()
+            elif line.lower().startswith(('quote:', 'supporting quote:')):
+                current_evidence['supporting_quote'] = line.split(':', 1)[1].strip()
+            else:
+                # Assume it's content
+                evidence_content.append(line)
+
+        # Don't forget the last evidence item
+        if current_evidence and evidence_content:
+            evidence_items.append(self._create_evidence_from_parsed(
+                evidence_content,
+                source_id,
+                current_evidence
+            ))
+
+        # If no evidence parsed (might be unstructured response), create single evidence
+        if not evidence_items and response_content.strip():
+            logger.warning(f"Could not parse structured evidence from source {source_id}, "
+                         f"using full response as single evidence item")
+            evidence_items.append(Evidence(
+                evidence_id=str(uuid.uuid4())[:8],
+                source_id=source_id,
+                content=response_content.strip(),
+                relevance_score=0.5,
+                confidence='medium'
+            ))
+
+        return evidence_items
+
+    def _create_evidence_from_parsed(
+        self,
+        content_lines: List[str],
+        source_id: str,
+        metadata: Dict[str, Any]
+    ) -> Evidence:
+        """
+        Create an Evidence object from parsed components.
+
+        Args:
+            content_lines: Lines of evidence content
+            source_id: Source ID
+            metadata: Parsed metadata (relevance, confidence, etc.)
+
+        Returns:
+            Evidence object
+        """
+        return Evidence(
+            evidence_id=str(uuid.uuid4())[:8],
+            source_id=source_id,
+            content=' '.join(content_lines).strip(),
+            relevance_score=metadata.get('relevance_score', 0.5),
+            confidence=metadata.get('confidence', 'medium'),
+            category=metadata.get('category'),
+            supporting_quote=metadata.get('supporting_quote'),
+            metadata=metadata
+        )
