@@ -22,7 +22,7 @@ from ..providers import (
     CursorAgentProvider,
     GenerationRequest,
 )
-from ..workflows import ChatWorkflow, ConsensusWorkflow, ConsensusStrategy, ThinkDeepWorkflow
+from ..workflows import ArgumentWorkflow, ChatWorkflow, ConsensusWorkflow, ConsensusStrategy, ThinkDeepWorkflow
 from ..core.conversation import ConversationMemory
 
 app = typer.Typer(
@@ -216,6 +216,180 @@ def chat(
         else:
             console.print(f"[red]✗ Chat failed: {result.error}[/red]")
             raise typer.Exit(1)
+
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Interrupted by user[/yellow]")
+        raise typer.Exit(130)
+    except Exception as e:
+        console.print(f"\n[red]Error: {e}[/red]")
+        if verbose:
+            import traceback
+            console.print(f"\n[red]{traceback.format_exc()}[/red]")
+        raise typer.Exit(1)
+
+
+@app.command()
+def argument(
+    prompt: str = typer.Argument(..., help="Argument, claim, or question to analyze"),
+    provider: str = typer.Option(
+        "claude",
+        "--provider",
+        "-p",
+        help="Provider to use (claude, gemini, codex, cursor-agent)",
+    ),
+    continuation_id: Optional[str] = typer.Option(
+        None,
+        "--continue",
+        "-c",
+        help="Thread ID to continue an existing conversation",
+    ),
+    files: Optional[List[str]] = typer.Option(
+        None,
+        "--file",
+        "-f",
+        help="File paths to include in conversation context (can specify multiple times)",
+    ),
+    system: Optional[str] = typer.Option(
+        None,
+        "--system",
+        help="System prompt for context",
+    ),
+    temperature: float = typer.Option(
+        0.7,
+        "--temperature",
+        "-t",
+        help="Temperature for generation (0.0-1.0)",
+    ),
+    max_tokens: Optional[int] = typer.Option(
+        None,
+        "--max-tokens",
+        help="Maximum tokens to generate",
+    ),
+    output: Optional[Path] = typer.Option(
+        None,
+        "--output",
+        "-o",
+        help="Output file for result (JSON format)",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Show detailed execution information",
+    ),
+):
+    """
+    Analyze arguments through structured dialectical reasoning.
+
+    The argument workflow uses role-based orchestration to examine claims from
+    multiple perspectives: Creator (thesis), Skeptic (critique), and Moderator (synthesis).
+
+    Example:
+        # Analyze an argument
+        modelchorus argument "Universal basic income would reduce poverty"
+
+        # Continue analysis
+        modelchorus argument "What about inflation?" --continue thread-id-123
+
+        # Include supporting files
+        modelchorus argument "Review this proposal" -f proposal.md -f data.csv
+    """
+    try:
+        # Create provider instance
+        if verbose:
+            console.print(f"[cyan]Initializing provider: {provider}[/cyan]")
+
+        try:
+            provider_instance = get_provider_by_name(provider)
+            if verbose:
+                console.print(f"[green]✓ {provider} initialized[/green]")
+        except Exception as e:
+            console.print(f"[red]Failed to initialize {provider}: {e}[/red]")
+            raise typer.Exit(1)
+
+        # Create conversation memory
+        memory = ConversationMemory()
+
+        # Create workflow
+        workflow = ArgumentWorkflow(
+            provider=provider_instance,
+            conversation_memory=memory,
+        )
+
+        if verbose:
+            console.print(f"[cyan]Workflow: {workflow}[/cyan]")
+
+        # Validate files exist
+        if files:
+            for file_path in files:
+                if not Path(file_path).exists():
+                    console.print(f"[red]Error: File not found: {file_path}[/red]")
+                    raise typer.Exit(1)
+
+        # Display analysis info
+        console.print(f"\n[bold cyan]Analyzing argument through dialectical reasoning...[/bold cyan]")
+        console.print(f"[dim]Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}[/dim]\n")
+
+        # Build config
+        config = {}
+        if system:
+            config['system_prompt'] = system
+        if temperature is not None:
+            config['temperature'] = temperature
+        if max_tokens is not None:
+            config['max_tokens'] = max_tokens
+
+        # Execute workflow
+        result = asyncio.run(
+            workflow.run(
+                prompt=prompt,
+                continuation_id=continuation_id,
+                files=files,
+                **config
+            )
+        )
+
+        # Display results
+        console.print("\n[bold green]Analysis Complete[/bold green]")
+        console.print(f"\n[bold]Dialectical Analysis:[/bold]")
+
+        # Show each role's perspective
+        if result.steps:
+            for i, step in enumerate(result.steps, 1):
+                role_name = step.name if hasattr(step, 'name') else f"Step {i}"
+                console.print(f"\n[bold cyan]{role_name}:[/bold cyan]")
+                console.print(step.content)
+
+        # Show synthesis
+        if result.synthesis:
+            console.print(f"\n[bold magenta]Final Synthesis:[/bold magenta]")
+            console.print(result.synthesis)
+
+        # Show metadata
+        if verbose and result.metadata:
+            console.print(f"\n[dim]Thread ID: {result.metadata.get('thread_id', 'N/A')}[/dim]")
+            console.print(f"[dim]Model: {result.metadata.get('model', 'N/A')}[/dim]")
+
+        # Save output if requested
+        if output:
+            output_data = {
+                'success': result.success,
+                'synthesis': result.synthesis,
+                'steps': [
+                    {
+                        'name': step.name if hasattr(step, 'name') else f'Step {i}',
+                        'content': step.content,
+                        'metadata': step.metadata if hasattr(step, 'metadata') else {}
+                    }
+                    for i, step in enumerate(result.steps, 1)
+                ],
+                'metadata': result.metadata,
+            }
+
+            with open(output, 'w') as f:
+                json.dump(output_data, f, indent=2)
+
+            console.print(f"\n[green]Results saved to: {output}[/green]")
 
     except KeyboardInterrupt:
         console.print("\n[yellow]Interrupted by user[/yellow]")
