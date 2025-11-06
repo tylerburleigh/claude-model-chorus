@@ -12,6 +12,12 @@ from typing import Optional, Dict, Any, List
 from ...core.base_workflow import BaseWorkflow, WorkflowResult, WorkflowStep
 from ...core.conversation import ConversationMemory
 from ...core.registry import WorkflowRegistry
+from ...core.role_orchestration import (
+    RoleOrchestrator,
+    ModelRole,
+    OrchestrationPattern,
+    OrchestrationResult,
+)
 from ...providers import ModelProvider, GenerationRequest, GenerationResponse
 from ...core.models import ConversationMessage
 
@@ -262,6 +268,203 @@ Build on our previous ideas and explore new directions."""
 {prompt}
 
 Generate diverse, innovative ideas. Think broadly and explore multiple approaches."""
+
+    def _create_brainstormer_role(self, model_name: str, perspective: str) -> ModelRole:
+        """
+        Create a brainstormer role for parallel ideation.
+
+        Args:
+            model_name: Name of the model to use
+            perspective: The perspective this brainstormer should take
+                        (e.g., 'practical', 'innovative', 'user-focused')
+
+        Returns:
+            ModelRole configured for creative brainstorming
+        """
+        perspective_prompts = {
+            'practical': (
+                "Focus on pragmatic, implementable ideas that can be executed "
+                "with existing resources. Emphasize feasibility and near-term value."
+            ),
+            'innovative': (
+                "Think boldly and push boundaries. Explore cutting-edge approaches, "
+                "emerging technologies, and unconventional solutions."
+            ),
+            'user-focused': (
+                "Prioritize user experience and user needs. Generate ideas that "
+                "directly improve user satisfaction, engagement, and value."
+            ),
+            'technical': (
+                "Consider technical architecture and implementation details. "
+                "Focus on scalability, performance, and technical excellence."
+            ),
+            'business': (
+                "Think about business impact, ROI, and strategic alignment. "
+                "Emphasize ideas that drive revenue, reduce costs, or create competitive advantage."
+            ),
+        }
+
+        stance_prompt = perspective_prompts.get(
+            perspective,
+            "Generate diverse, creative ideas from your unique perspective."
+        )
+
+        return ModelRole(
+            role=f"brainstormer-{perspective}",
+            model=model_name,
+            stance="neutral",  # No for/against in ideation
+            stance_prompt=stance_prompt,
+            system_prompt=self._get_ideation_system_prompt(),
+            temperature=0.9,  # High temperature for creativity
+            metadata={
+                "perspective": perspective,
+                "role_type": "ideator",
+            },
+        )
+
+    async def run_parallel_brainstorming(
+        self,
+        prompt: str,
+        provider_map: Dict[str, ModelProvider],
+        perspectives: Optional[List[str]] = None,
+        **kwargs
+    ) -> WorkflowResult:
+        """
+        Execute parallel divergent brainstorming with multiple models.
+
+        This method uses RoleOrchestrator to run multiple models in parallel,
+        each bringing a different perspective to the brainstorming session.
+        This creates diverse, creative output by combining different viewpoints.
+
+        Args:
+            prompt: The topic or problem to ideate on
+            provider_map: Dictionary mapping model names to provider instances
+                         (e.g., {"claude": claude_provider, "gemini": gemini_provider})
+            perspectives: List of perspectives to use (default: ['practical', 'innovative', 'user-focused'])
+            **kwargs: Additional parameters (temperature, max_tokens, etc.)
+
+        Returns:
+            WorkflowResult containing:
+                - synthesis: Combined ideas from all perspectives
+                - steps: Individual brainstorming outputs from each model
+                - metadata: Thread ID, models used, perspectives
+
+        Raises:
+            ValueError: If prompt is empty or provider_map is empty
+            Exception: If orchestration fails
+        """
+        if not prompt or not prompt.strip():
+            raise ValueError("Prompt cannot be empty")
+
+        if not provider_map:
+            raise ValueError("Provider map cannot be empty")
+
+        # Default perspectives
+        if perspectives is None:
+            perspectives = ['practical', 'innovative', 'user-focused']
+
+        # Ensure we don't have more perspectives than providers
+        if len(perspectives) > len(provider_map):
+            perspectives = perspectives[:len(provider_map)]
+
+        # Create roles for each perspective
+        roles = []
+        model_names = list(provider_map.keys())
+        for i, perspective in enumerate(perspectives):
+            model_name = model_names[i % len(model_names)]
+            role = self._create_brainstormer_role(model_name, perspective)
+            roles.append(role)
+
+        logger.info(
+            f"Starting parallel brainstorming with {len(roles)} perspectives: {perspectives}"
+        )
+
+        # Create orchestrator with PARALLEL pattern
+        orchestrator = RoleOrchestrator(
+            roles=roles,
+            provider_map=provider_map,
+            pattern=OrchestrationPattern.PARALLEL
+        )
+
+        # Execute parallel brainstorming
+        try:
+            orchestration_result: OrchestrationResult = await orchestrator.execute(
+                prompt=prompt,
+                conversation_history=[]
+            )
+
+            # Convert orchestration steps to workflow steps
+            steps = []
+            for i, (role_name, response) in enumerate(orchestration_result.role_responses):
+                perspective = perspectives[i] if i < len(perspectives) else "general"
+                step = WorkflowStep(
+                    step_number=i + 1,
+                    title=f"Brainstorming ({perspective})",
+                    content=response.content,
+                    metadata={
+                        "perspective": perspective,
+                        "role": role_name,
+                        "model": roles[i].model,
+                        "tokens": response.usage.total_tokens if response.usage else 0
+                    }
+                )
+                steps.append(step)
+
+            # Create synthesis of all perspectives
+            synthesis = self._synthesize_brainstorming_results(steps, perspectives)
+
+            # Create workflow result
+            result = WorkflowResult(
+                synthesis=synthesis,
+                steps=steps,
+                metadata={
+                    'workflow': 'ideate-parallel',
+                    'perspectives': perspectives,
+                    'models_used': [role.model for role in roles],
+                    'pattern': 'parallel',
+                    'total_ideas': len(steps)
+                }
+            )
+
+            logger.info(f"Parallel brainstorming completed with {len(steps)} perspectives")
+            return result
+
+        except Exception as e:
+            logger.error(f"Parallel brainstorming failed: {e}")
+            raise
+
+    def _synthesize_brainstorming_results(
+        self,
+        steps: List[WorkflowStep],
+        perspectives: List[str]
+    ) -> str:
+        """
+        Synthesize parallel brainstorming results into a cohesive summary.
+
+        Args:
+            steps: List of brainstorming steps from different perspectives
+            perspectives: List of perspective names
+
+        Returns:
+            Synthesized summary combining all perspectives
+        """
+        synthesis_parts = [
+            "# Parallel Brainstorming Results\n",
+            f"\nGenerated {len(steps)} sets of ideas from different perspectives:\n"
+        ]
+
+        for i, step in enumerate(steps):
+            perspective = perspectives[i] if i < len(perspectives) else "general"
+            synthesis_parts.append(f"\n## {perspective.title()} Perspective\n")
+            synthesis_parts.append(step.content)
+
+        synthesis_parts.append(
+            "\n\n---\n\n"
+            "**Next Steps**: Review the ideas above from each perspective. "
+            "Identify common themes, unique innovations, and ideas worth developing further."
+        )
+
+        return "\n".join(synthesis_parts)
 
     def validate_config(self, config: Dict[str, Any]) -> bool:
         """
