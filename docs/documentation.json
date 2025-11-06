@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T13:04:37.039909Z",
+    "generated_at": "2025-11-06T14:06:00.376834Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 45,
-    "total_lines": 15229,
-    "total_classes": 76,
+    "total_files": 46,
+    "total_lines": 15568,
+    "total_classes": 77,
     "total_functions": 34,
     "avg_complexity": 4.62,
     "max_complexity": 36,
@@ -23,9 +23,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 45,
-        "lines": 15229,
-        "classes": 76,
+        "files": 46,
+        "lines": 15568,
+        "classes": 77,
         "functions": 34,
         "avg_complexity": 4.62
       }
@@ -968,6 +968,29 @@
       "lines": 372
     },
     {
+      "name": "test_memory_management",
+      "file": "tests/test_memory_management.py",
+      "language": "python",
+      "docstring": "Memory management tests for ConversationMemory with long conversations.\n\nTests verify that:\n- Memory usage doesn't grow unbounded with long conversations\n- Context window limits are respected\n- Old conversation cleanup works properly\n- No memory leaks from conversation storage",
+      "classes": [
+        "TestMemoryManagement"
+      ],
+      "functions": [],
+      "imports": [
+        "pytest",
+        "asyncio",
+        "unittest.mock.AsyncMock",
+        "uuid",
+        "sys",
+        "modelchorus.workflows.chat.ChatWorkflow",
+        "modelchorus.workflows.thinkdeep.ThinkDeepWorkflow",
+        "modelchorus.providers.base_provider.GenerationResponse",
+        "modelchorus.core.conversation.ConversationMemory"
+      ],
+      "exports": [],
+      "lines": 339
+    },
+    {
       "name": "__init__",
       "file": "tests/test_providers/__init__.py",
       "language": "python",
@@ -1530,6 +1553,15 @@
         },
         {
           "instantiator": "conversation_memory",
+          "file": "tests/test_memory_management.py",
+          "line": 42,
+          "context": [
+            "TestMemoryManagement",
+            "conversation_memory"
+          ]
+        },
+        {
+          "instantiator": "conversation_memory",
           "file": "tests/test_thinkdeep_complex.py",
           "line": 40,
           "context": [
@@ -1647,7 +1679,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 41
+      "instantiation_count": 42
     },
     {
       "name": "ConfidenceLevel",
@@ -3518,6 +3550,44 @@
           ]
         },
         {
+          "instantiator": "generate_response",
+          "file": "tests/test_memory_management.py",
+          "line": 67,
+          "context": [
+            "TestMemoryManagement",
+            "test_long_conversation_memory_stability",
+            "generate_response"
+          ]
+        },
+        {
+          "instantiator": "test_multiple_long_conversations_memory_isolation",
+          "file": "tests/test_memory_management.py",
+          "line": 158,
+          "context": [
+            "TestMemoryManagement",
+            "test_multiple_long_conversations_memory_isolation"
+          ]
+        },
+        {
+          "instantiator": "generate_large_response",
+          "file": "tests/test_memory_management.py",
+          "line": 225,
+          "context": [
+            "TestMemoryManagement",
+            "test_memory_efficiency_with_large_messages",
+            "generate_large_response"
+          ]
+        },
+        {
+          "instantiator": "test_concurrent_long_conversations_memory",
+          "file": "tests/test_memory_management.py",
+          "line": 283,
+          "context": [
+            "TestMemoryManagement",
+            "test_concurrent_long_conversations_memory"
+          ]
+        },
+        {
           "instantiator": "test_architectural_decision_rest_vs_graphql",
           "file": "tests/test_thinkdeep_complex.py",
           "line": 62,
@@ -4428,7 +4498,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 115
+      "instantiation_count": 119
     },
     {
       "name": "ModelProvider",
@@ -5240,6 +5310,42 @@
           ]
         },
         {
+          "instantiator": "test_long_conversation_memory_stability",
+          "file": "tests/test_memory_management.py",
+          "line": 77,
+          "context": [
+            "TestMemoryManagement",
+            "test_long_conversation_memory_stability"
+          ]
+        },
+        {
+          "instantiator": "test_multiple_long_conversations_memory_isolation",
+          "file": "tests/test_memory_management.py",
+          "line": 166,
+          "context": [
+            "TestMemoryManagement",
+            "test_multiple_long_conversations_memory_isolation"
+          ]
+        },
+        {
+          "instantiator": "test_memory_efficiency_with_large_messages",
+          "file": "tests/test_memory_management.py",
+          "line": 235,
+          "context": [
+            "TestMemoryManagement",
+            "test_memory_efficiency_with_large_messages"
+          ]
+        },
+        {
+          "instantiator": "test_concurrent_long_conversations_memory",
+          "file": "tests/test_memory_management.py",
+          "line": 291,
+          "context": [
+            "TestMemoryManagement",
+            "test_concurrent_long_conversations_memory"
+          ]
+        },
+        {
           "instantiator": "test_consensus_to_thinkdeep_to_chat_workflow",
           "file": "tests/test_workflow_integration_chaining.py",
           "line": 169,
@@ -5259,7 +5365,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 20
+      "instantiation_count": 24
     },
     {
       "name": "ConsensusStrategy",
@@ -6676,6 +6782,27 @@
         "test_concurrent_multi_turn_conversations",
         "test_mixed_workflow_concurrent_execution",
         "test_performance_scalability"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestMemoryManagement",
+      "file": "tests/test_memory_management.py",
+      "line": 23,
+      "language": "python",
+      "docstring": "Test suite for memory management with long conversations.\n\nValidates that ConversationMemory properly manages memory when dealing\nwith long-running conversations with many messages.",
+      "bases": [],
+      "methods": [
+        "mock_provider",
+        "conversation_memory",
+        "test_long_conversation_memory_stability",
+        "test_multiple_long_conversations_memory_isolation",
+        "test_memory_efficiency_with_large_messages",
+        "test_concurrent_long_conversations_memory"
       ],
       "properties": [],
       "is_exported": false,
@@ -11772,6 +11899,17 @@
       "modelchorus.providers.base_provider.GenerationResponse",
       "modelchorus.core.conversation.ConversationMemory",
       "modelchorus.core.models.ConversationMessage"
+    ],
+    "tests/test_memory_management.py": [
+      "pytest",
+      "asyncio",
+      "unittest.mock.AsyncMock",
+      "uuid",
+      "sys",
+      "modelchorus.workflows.chat.ChatWorkflow",
+      "modelchorus.workflows.thinkdeep.ThinkDeepWorkflow",
+      "modelchorus.providers.base_provider.GenerationResponse",
+      "modelchorus.core.conversation.ConversationMemory"
     ],
     "tests/test_providers/test_cli_interface.py": [
       "sys",

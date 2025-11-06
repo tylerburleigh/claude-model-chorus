@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 08:04:37
+**Generated:** 2025-11-06 09:06:00
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 45
-- **Total Lines:** 15229
-- **Total Classes:** 76
+- **Total Files:** 46
+- **Total Lines:** 15568
+- **Total Classes:** 77
 - **Total Functions:** 34
 - **Avg Complexity:** 4.62
 - **Max Complexity:** 36
@@ -1422,6 +1422,27 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 
 ---
 
+### `TestMemoryManagement`
+
+**Language:** python
+**Defined in:** `tests/test_memory_management.py:23`
+
+**Description:**
+> Test suite for memory management with long conversations.
+
+Validates that ConversationMemory properly manages memory when dealing
+with long-running conversations with many messages.
+
+**Methods:**
+- `mock_provider()`
+- `conversation_memory()`
+- `test_long_conversation_memory_stability()`
+- `test_multiple_long_conversations_memory_isolation()`
+- `test_memory_efficiency_with_large_messages()`
+- `test_concurrent_long_conversations_memory()`
+
+---
+
 ### `TestModelIntegration`
 
 **Language:** python
@@ -2751,6 +2772,18 @@ Example:
 - `modelchorus.workflows.thinkdeep.ThinkDeepWorkflow`
 - `pytest`
 - `time`
+- `unittest.mock.AsyncMock`
+- `uuid`
+
+### `tests/test_memory_management.py`
+
+- `asyncio`
+- `modelchorus.core.conversation.ConversationMemory`
+- `modelchorus.providers.base_provider.GenerationResponse`
+- `modelchorus.workflows.chat.ChatWorkflow`
+- `modelchorus.workflows.thinkdeep.ThinkDeepWorkflow`
+- `pytest`
+- `sys`
 - `unittest.mock.AsyncMock`
 - `uuid`
 
