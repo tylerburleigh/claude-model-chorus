@@ -1,7 +1,7 @@
 {
   "spec_id": "general-purpose-workflows-2025-11-06-001",
   "generated": "2025-11-06T12:45:00Z",
-  "last_updated": "2025-11-06T21:51:54.445052Z",
+  "last_updated": "2025-11-06T21:52:56.088289Z",
   "metadata": {
     "title": "General-Purpose Workflows (ARGUMENT, IDEATE, RESEARCH)",
     "description": "Implement foundation infrastructure and three general-purpose workflows for ModelChorus: ARGUMENT (structured debate), IDEATE (creative ideation), and RESEARCH (evidence-based research with citations)",
@@ -24,7 +24,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-06T16:35:09.389143Z",
-    "progress_percentage": 73,
+    "progress_percentage": 74,
     "current_phase": "phase-4"
   },
   "hierarchy": {
@@ -42,7 +42,7 @@
         "phase-6"
       ],
       "total_tasks": 71,
-      "completed_tasks": 52,
+      "completed_tasks": 53,
       "metadata": {},
       "dependencies": {
         "blocks": [],
@@ -1525,7 +1525,7 @@
         "depends": []
       },
       "total_tasks": 11,
-      "completed_tasks": 9,
+      "completed_tasks": 10,
       "metadata": {
         "purpose": "Implement RESEARCH workflow for evidence-based research with citations and validation",
         "risk_level": "high",
@@ -1818,7 +1818,7 @@
     "phase-4-verify": {
       "type": "group",
       "title": "Verification",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-4",
       "children": [
         "verify-4-1",
@@ -1832,13 +1832,13 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {}
     },
     "verify-4-1": {
       "type": "verify",
       "title": "RESEARCH workflow extracts and validates claims with citations",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-4-verify",
       "children": [],
       "dependencies": {
@@ -1847,11 +1847,16 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "auto",
         "command": "pytest tests/test_research_workflow.py -v",
-        "expected": "Evidence extraction, validation, citations work correctly"
+        "expected": "Evidence extraction, validation, citations work correctly",
+        "started_at": "2025-11-06T21:52:43.112427Z",
+        "completed_at": "2025-11-06T21:52:56.071596Z",
+        "needs_journaling": false,
+        "actual_hours": 0.004,
+        "journaled_at": "2025-11-06T21:52:56.083932Z"
       }
     },
     "verify-4-2": {
@@ -2930,6 +2935,15 @@
       "content": "All child tasks in group phase-4-files have been completed.",
       "metadata": {},
       "task_id": "phase-4-files"
+    },
+    {
+      "timestamp": "2025-11-06T21:52:56.083917Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: RESEARCH workflow extracts and validates claims with citations",
+      "author": "claude-code",
+      "content": "All 49 tests passed successfully for the RESEARCH workflow. Verified evidence extraction from multiple sources, validation with cross-referencing and contradiction detection, and dossier generation with multiple citation formats (APA, MLA, Chicago). All workflow components functioning correctly.",
+      "metadata": {},
+      "task_id": "verify-4-1"
     }
   ]
 }
