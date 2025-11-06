@@ -439,10 +439,11 @@ class ArgumentWorkflow(BaseWorkflow):
             )
 
             # Extract role responses from orchestration result
+            # role_responses is a list of (role_name, response) tuples
             if len(orchestration_result.role_responses) >= 3:
-                creator_response = orchestration_result.role_responses[0]
-                skeptic_response = orchestration_result.role_responses[1]
-                moderator_response = orchestration_result.role_responses[2]
+                _, creator_response = orchestration_result.role_responses[0]
+                _, skeptic_response = orchestration_result.role_responses[1]
+                _, moderator_response = orchestration_result.role_responses[2]
 
                 # Add Creator's thesis as Step 1
                 result.add_step(
