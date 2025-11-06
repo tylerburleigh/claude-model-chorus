@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 07:51:10
+**Generated:** 2025-11-06 07:59:28
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 43
-- **Total Lines:** 14516
-- **Total Classes:** 74
+- **Total Files:** 44
+- **Total Lines:** 14857
+- **Total Classes:** 75
 - **Total Functions:** 34
 - **Avg Complexity:** 4.62
 - **Max Complexity:** 36
@@ -999,6 +999,29 @@ Attributes:
 - `test_investigation_summary_includes_confidence()`
 - `test_confidence_cannot_decrease()`
 - `test_confidence_persistence_across_turns()`
+
+---
+
+### `TestConsensusThinkDeepChatChaining`
+
+**Language:** python
+**Defined in:** `tests/test_workflow_integration_chaining.py:22`
+
+**Description:**
+> Test suite for consensus → thinkdeep → chat workflow integration.
+
+This pattern demonstrates using multiple orchestration strategies in sequence:
+1. Consensus: Gather multi-model opinions on a decision
+2. ThinkDeep: Investigate specific concerns raised
+3. Chat: Refine understanding and get practical recommendations
+
+**Methods:**
+- `mock_provider()`
+- `mock_provider_2()`
+- `conversation_memory()`
+- `test_consensus_to_thinkdeep_to_chat_workflow()`
+- `test_workflow_chain_context_isolation()`
+- `test_consensus_without_continuation_support()`
 
 ---
 
@@ -2752,5 +2775,19 @@ Example:
 - `pytest`
 - `unittest.mock.AsyncMock`
 - `unittest.mock.MagicMock`
+- `unittest.mock.patch`
+- `uuid`
+
+### `tests/test_workflow_integration_chaining.py`
+
+- `modelchorus.core.conversation.ConversationMemory`
+- `modelchorus.providers.base_provider.GenerationRequest`
+- `modelchorus.providers.base_provider.GenerationResponse`
+- `modelchorus.workflows.chat.ChatWorkflow`
+- `modelchorus.workflows.consensus.ConsensusStrategy`
+- `modelchorus.workflows.consensus.ConsensusWorkflow`
+- `modelchorus.workflows.thinkdeep.ThinkDeepWorkflow`
+- `pytest`
+- `unittest.mock.AsyncMock`
 - `unittest.mock.patch`
 - `uuid`

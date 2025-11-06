@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T12:51:10.283777Z",
+    "generated_at": "2025-11-06T12:59:28.217363Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 43,
-    "total_lines": 14516,
-    "total_classes": 74,
+    "total_files": 44,
+    "total_lines": 14857,
+    "total_classes": 75,
     "total_functions": 34,
     "avg_complexity": 4.62,
     "max_complexity": 36,
@@ -23,9 +23,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 43,
-        "lines": 14516,
-        "classes": 74,
+        "files": 44,
+        "lines": 14857,
+        "classes": 75,
         "functions": 34,
         "avg_complexity": 4.62
       }
@@ -1064,6 +1064,31 @@
       ],
       "exports": [],
       "lines": 1891
+    },
+    {
+      "name": "test_workflow_integration_chaining",
+      "file": "tests/test_workflow_integration_chaining.py",
+      "language": "python",
+      "docstring": "Integration tests for workflow chaining patterns.\n\nTests verify that different workflows can be chained together effectively,\ndemonstrating ModelChorus's orchestration capabilities:\n- Consensus \u2192 ThinkDeep \u2192 Chat workflow integration\n- Context preservation across workflow boundaries\n- Continuation ID management across workflow types",
+      "classes": [
+        "TestConsensusThinkDeepChatChaining"
+      ],
+      "functions": [],
+      "imports": [
+        "pytest",
+        "unittest.mock.AsyncMock",
+        "unittest.mock.patch",
+        "uuid",
+        "modelchorus.workflows.consensus.ConsensusWorkflow",
+        "modelchorus.workflows.consensus.ConsensusStrategy",
+        "modelchorus.workflows.thinkdeep.ThinkDeepWorkflow",
+        "modelchorus.workflows.chat.ChatWorkflow",
+        "modelchorus.providers.base_provider.GenerationResponse",
+        "modelchorus.providers.base_provider.GenerationRequest",
+        "modelchorus.core.conversation.ConversationMemory"
+      ],
+      "exports": [],
+      "lines": 341
     }
   ],
   "classes": [
@@ -1574,10 +1599,19 @@
             "TestEndToEndIntegration",
             "conversation_memory"
           ]
+        },
+        {
+          "instantiator": "conversation_memory",
+          "file": "tests/test_workflow_integration_chaining.py",
+          "line": 51,
+          "context": [
+            "TestConsensusThinkDeepChatChaining",
+            "conversation_memory"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 39
+      "instantiation_count": 40
     },
     {
       "name": "ConfidenceLevel",
@@ -3284,10 +3318,28 @@
             "TestCLIProvidersImplementInterface",
             "test_build_command_includes_cli_command"
           ]
+        },
+        {
+          "instantiator": "test_consensus_to_thinkdeep_to_chat_workflow",
+          "file": "tests/test_workflow_integration_chaining.py",
+          "line": 98,
+          "context": [
+            "TestConsensusThinkDeepChatChaining",
+            "test_consensus_to_thinkdeep_to_chat_workflow"
+          ]
+        },
+        {
+          "instantiator": "test_consensus_without_continuation_support",
+          "file": "tests/test_workflow_integration_chaining.py",
+          "line": 325,
+          "context": [
+            "TestConsensusThinkDeepChatChaining",
+            "test_consensus_without_continuation_support"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 29
+      "instantiation_count": 31
     },
     {
       "name": "GenerationResponse",
@@ -4236,10 +4288,73 @@
             "TestEndToEndIntegration",
             "test_complete_investigation_workflow"
           ]
+        },
+        {
+          "instantiator": "test_consensus_to_thinkdeep_to_chat_workflow",
+          "file": "tests/test_workflow_integration_chaining.py",
+          "line": 72,
+          "context": [
+            "TestConsensusThinkDeepChatChaining",
+            "test_consensus_to_thinkdeep_to_chat_workflow"
+          ]
+        },
+        {
+          "instantiator": "test_consensus_to_thinkdeep_to_chat_workflow",
+          "file": "tests/test_workflow_integration_chaining.py",
+          "line": 82,
+          "context": [
+            "TestConsensusThinkDeepChatChaining",
+            "test_consensus_to_thinkdeep_to_chat_workflow"
+          ]
+        },
+        {
+          "instantiator": "test_consensus_to_thinkdeep_to_chat_workflow",
+          "file": "tests/test_workflow_integration_chaining.py",
+          "line": 118,
+          "context": [
+            "TestConsensusThinkDeepChatChaining",
+            "test_consensus_to_thinkdeep_to_chat_workflow"
+          ]
+        },
+        {
+          "instantiator": "test_consensus_to_thinkdeep_to_chat_workflow",
+          "file": "tests/test_workflow_integration_chaining.py",
+          "line": 157,
+          "context": [
+            "TestConsensusThinkDeepChatChaining",
+            "test_consensus_to_thinkdeep_to_chat_workflow"
+          ]
+        },
+        {
+          "instantiator": "test_workflow_chain_context_isolation",
+          "file": "tests/test_workflow_integration_chaining.py",
+          "line": 226,
+          "context": [
+            "TestConsensusThinkDeepChatChaining",
+            "test_workflow_chain_context_isolation"
+          ]
+        },
+        {
+          "instantiator": "test_consensus_without_continuation_support",
+          "file": "tests/test_workflow_integration_chaining.py",
+          "line": 303,
+          "context": [
+            "TestConsensusThinkDeepChatChaining",
+            "test_consensus_without_continuation_support"
+          ]
+        },
+        {
+          "instantiator": "test_consensus_without_continuation_support",
+          "file": "tests/test_workflow_integration_chaining.py",
+          "line": 310,
+          "context": [
+            "TestConsensusThinkDeepChatChaining",
+            "test_consensus_without_continuation_support"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 104
+      "instantiation_count": 111
     },
     {
       "name": "ModelProvider",
@@ -5013,10 +5128,28 @@
             "TestErrorHandling",
             "test_provider_error_handled"
           ]
+        },
+        {
+          "instantiator": "test_consensus_to_thinkdeep_to_chat_workflow",
+          "file": "tests/test_workflow_integration_chaining.py",
+          "line": 169,
+          "context": [
+            "TestConsensusThinkDeepChatChaining",
+            "test_consensus_to_thinkdeep_to_chat_workflow"
+          ]
+        },
+        {
+          "instantiator": "test_workflow_chain_context_isolation",
+          "file": "tests/test_workflow_integration_chaining.py",
+          "line": 269,
+          "context": [
+            "TestConsensusThinkDeepChatChaining",
+            "test_workflow_chain_context_isolation"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 14
+      "instantiation_count": 16
     },
     {
       "name": "ConsensusStrategy",
@@ -5230,10 +5363,28 @@
             "TestIntegration",
             "test_concurrent_provider_execution"
           ]
+        },
+        {
+          "instantiator": "test_consensus_to_thinkdeep_to_chat_workflow",
+          "file": "tests/test_workflow_integration_chaining.py",
+          "line": 93,
+          "context": [
+            "TestConsensusThinkDeepChatChaining",
+            "test_consensus_to_thinkdeep_to_chat_workflow"
+          ]
+        },
+        {
+          "instantiator": "test_consensus_without_continuation_support",
+          "file": "tests/test_workflow_integration_chaining.py",
+          "line": 318,
+          "context": [
+            "TestConsensusThinkDeepChatChaining",
+            "test_consensus_without_continuation_support"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 13
+      "instantiation_count": 15
     },
     {
       "name": "ThinkDeepWorkflow",
@@ -5840,10 +5991,37 @@
             "TestEndToEndIntegration",
             "test_complete_investigation_workflow"
           ]
+        },
+        {
+          "instantiator": "test_consensus_to_thinkdeep_to_chat_workflow",
+          "file": "tests/test_workflow_integration_chaining.py",
+          "line": 130,
+          "context": [
+            "TestConsensusThinkDeepChatChaining",
+            "test_consensus_to_thinkdeep_to_chat_workflow"
+          ]
+        },
+        {
+          "instantiator": "test_workflow_chain_context_isolation",
+          "file": "tests/test_workflow_integration_chaining.py",
+          "line": 234,
+          "context": [
+            "TestConsensusThinkDeepChatChaining",
+            "test_workflow_chain_context_isolation"
+          ]
+        },
+        {
+          "instantiator": "test_workflow_chain_context_isolation",
+          "file": "tests/test_workflow_integration_chaining.py",
+          "line": 239,
+          "context": [
+            "TestConsensusThinkDeepChatChaining",
+            "test_workflow_chain_context_isolation"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 64
+      "instantiation_count": 67
     },
     {
       "name": "TestMultiProviderChat",
@@ -6654,6 +6832,27 @@
         "conversation_memory",
         "test_five_step_investigation_with_hypothesis_evolution",
         "test_complete_investigation_workflow"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestConsensusThinkDeepChatChaining",
+      "file": "tests/test_workflow_integration_chaining.py",
+      "line": 22,
+      "language": "python",
+      "docstring": "Test suite for consensus \u2192 thinkdeep \u2192 chat workflow integration.\n\nThis pattern demonstrates using multiple orchestration strategies in sequence:\n1. Consensus: Gather multi-model opinions on a decision\n2. ThinkDeep: Investigate specific concerns raised\n3. Chat: Refine understanding and get practical recommendations",
+      "bases": [],
+      "methods": [
+        "mock_provider",
+        "mock_provider_2",
+        "conversation_memory",
+        "test_consensus_to_thinkdeep_to_chat_workflow",
+        "test_workflow_chain_context_isolation",
+        "test_consensus_without_continuation_support"
       ],
       "properties": [],
       "is_exported": false,
@@ -11475,6 +11674,19 @@
       "modelchorus.core.models.Hypothesis",
       "modelchorus.core.models.InvestigationStep",
       "modelchorus.core.models.ThinkDeepState"
+    ],
+    "tests/test_workflow_integration_chaining.py": [
+      "pytest",
+      "unittest.mock.AsyncMock",
+      "unittest.mock.patch",
+      "uuid",
+      "modelchorus.workflows.consensus.ConsensusWorkflow",
+      "modelchorus.workflows.consensus.ConsensusStrategy",
+      "modelchorus.workflows.thinkdeep.ThinkDeepWorkflow",
+      "modelchorus.workflows.chat.ChatWorkflow",
+      "modelchorus.providers.base_provider.GenerationResponse",
+      "modelchorus.providers.base_provider.GenerationRequest",
+      "modelchorus.core.conversation.ConversationMemory"
     ]
   }
 }
