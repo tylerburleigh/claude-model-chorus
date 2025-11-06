@@ -953,3 +953,125 @@ class CitationMap(BaseModel):
         default_factory=dict,
         description="Additional mapping metadata (argument_type, verification_status, etc.)",
     )
+
+
+class Claim(BaseModel):
+    """
+    Represents a factual or arguable statement extracted from model output.
+
+    Claims are fundamental units in argument analysis and research workflows.
+    Each claim captures a specific assertion along with metadata about its source,
+    location, and confidence level.
+
+    Used in workflows like:
+    - ARGUMENT: Extracting claims from debate responses for contradiction detection
+    - RESEARCH: Identifying factual claims across multiple sources
+    - IDEATE: Capturing key assertions from diverse perspectives
+
+    Attributes:
+        content: The actual claim text (the statement being made)
+        source_id: Identifier for the source (role name, document ID, model ID, etc.)
+        location: Optional location within source (line number, section, paragraph, etc.)
+        confidence: Confidence score for this claim (0.0 = low, 1.0 = high)
+
+    Example:
+        >>> claim = Claim(
+        ...     content="TypeScript reduces runtime errors by 15%",
+        ...     source_id="proponent",
+        ...     location="paragraph 2",
+        ...     confidence=0.8
+        ... )
+        >>> print(claim)
+        [proponent@paragraph 2] (0.80): TypeScript reduces runtime errors by 15%
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "content": "TypeScript reduces runtime errors by 15%",
+                "source_id": "proponent",
+                "location": "paragraph 2",
+                "confidence": 0.8,
+            }
+        }
+    )
+
+    content: str = Field(
+        ...,
+        description="The actual claim text (the statement being made)",
+        min_length=1,
+    )
+
+    source_id: str = Field(
+        ...,
+        description="Identifier for the source (role name, document ID, model ID, etc.)",
+        min_length=1,
+    )
+
+    location: Optional[str] = Field(
+        default=None,
+        description="Optional location within source (line number, section, paragraph, etc.)",
+    )
+
+    confidence: float = Field(
+        default=1.0,
+        description="Confidence score for this claim (0.0 = low confidence, 1.0 = high confidence)",
+        ge=0.0,
+        le=1.0,
+    )
+
+    def __str__(self) -> str:
+        """
+        Return human-readable string representation of the claim.
+
+        Format: [source_id@location] (confidence): content
+        If location is not specified, format is: [source_id] (confidence): content
+
+        Returns:
+            Human-readable claim string
+
+        Example:
+            >>> claim = Claim(content="Test claim", source_id="analyst", confidence=0.9)
+            >>> str(claim)
+            '[analyst] (0.90): Test claim'
+        """
+        location_str = f"@{self.location}" if self.location else ""
+        return f"[{self.source_id}{location_str}] ({self.confidence:.2f}): {self.content}"
+
+    def to_dict(self) -> Dict[str, Any]:
+        """
+        Convert claim to dictionary for serialization.
+
+        Returns:
+            Dictionary representation of the claim
+
+        Example:
+            >>> claim = Claim(content="Test", source_id="test", confidence=0.5)
+            >>> claim.to_dict()
+            {'content': 'Test', 'source_id': 'test', 'location': None, 'confidence': 0.5}
+        """
+        return {
+            "content": self.content,
+            "source_id": self.source_id,
+            "location": self.location,
+            "confidence": self.confidence,
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "Claim":
+        """
+        Create a Claim from a dictionary.
+
+        Args:
+            data: Dictionary containing claim fields
+
+        Returns:
+            New Claim instance
+
+        Example:
+            >>> data = {'content': 'Test', 'source_id': 'test', 'confidence': 0.5}
+            >>> claim = Claim.from_dict(data)
+            >>> claim.content
+            'Test'
+        """
+        return cls(**data)
