@@ -1,7 +1,7 @@
 {
   "spec_id": "general-purpose-workflows-2025-11-06-001",
   "generated": "2025-11-06T12:45:00Z",
-  "last_updated": "2025-11-06T21:46:46.441263Z",
+  "last_updated": "2025-11-06T21:51:54.445052Z",
   "metadata": {
     "title": "General-Purpose Workflows (ARGUMENT, IDEATE, RESEARCH)",
     "description": "Implement foundation infrastructure and three general-purpose workflows for ModelChorus: ARGUMENT (structured debate), IDEATE (creative ideation), and RESEARCH (evidence-based research with citations)",
@@ -24,7 +24,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-06T16:35:09.389143Z",
-    "progress_percentage": 71,
+    "progress_percentage": 73,
     "current_phase": "phase-4"
   },
   "hierarchy": {
@@ -42,7 +42,7 @@
         "phase-6"
       ],
       "total_tasks": 71,
-      "completed_tasks": 51,
+      "completed_tasks": 52,
       "metadata": {},
       "dependencies": {
         "blocks": [],
@@ -1525,7 +1525,7 @@
         "depends": []
       },
       "total_tasks": 11,
-      "completed_tasks": 8,
+      "completed_tasks": 9,
       "metadata": {
         "purpose": "Implement RESEARCH workflow for evidence-based research with citations and validation",
         "risk_level": "high",
@@ -1535,7 +1535,7 @@
     "phase-4-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-4",
       "children": [
         "task-4-1",
@@ -1544,8 +1544,12 @@
         "task-4-4"
       ],
       "total_tasks": 9,
-      "completed_tasks": 8,
-      "metadata": {},
+      "completed_tasks": 9,
+      "metadata": {
+        "needs_journaling": false,
+        "completed_at": "2025-11-06T21:51:54.423333Z",
+        "journaled_at": "2025-11-06T21:51:54.444978Z"
+      },
       "dependencies": {
         "blocks": [
           "phase-4-verify"
@@ -1787,7 +1791,7 @@
     "task-4-4": {
       "type": "task",
       "title": "modelchorus/src/modelchorus/workflows/__init__.py",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-4-files",
       "children": [],
       "dependencies": {
@@ -1798,12 +1802,17 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "modelchorus/src/modelchorus/workflows/__init__.py",
         "task_category": "implementation",
         "estimated_hours": 1,
-        "description": "Export ResearchWorkflow"
+        "description": "Export ResearchWorkflow",
+        "started_at": "2025-11-06T21:50:45.628319Z",
+        "completed_at": "2025-11-06T21:51:54.423127Z",
+        "needs_journaling": false,
+        "actual_hours": 0.019,
+        "journaled_at": "2025-11-06T21:51:54.434788Z"
       }
     },
     "phase-4-verify": {
@@ -2903,6 +2912,24 @@
       "content": "Successfully implemented comprehensive test suite for RESEARCH workflow (tests/test_research_workflow.py). Created 49 unit and integration tests covering:\n\n- Workflow initialization and configuration validation\n- Research execution with threading and continuation\n- Question formulation with depth-appropriate guidance\n- Source management (ingestion, validation, filtering, registry)\n- Parallel evidence extraction with concurrency control and timeout handling\n- Evidence validation with fact-checking and contradiction detection\n- Research dossier generation with citations, evidence tables, and metrics\n\nFixed research_workflow.py to use BaseWorkflow's add_message helper and WorkflowResult's required success parameter. All 49 tests passing. Test file: 970 lines, comprehensive coverage of all workflow features including error handling and edge cases.",
       "metadata": {},
       "task_id": "task-4-3"
+    },
+    {
+      "timestamp": "2025-11-06T21:51:54.434774Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: modelchorus/src/modelchorus/workflows/__init__.py",
+      "author": "claude-code",
+      "content": "Successfully exported ResearchWorkflow from workflows/__init__.py following the established pattern. Added import statement and updated __all__ list. Verified imports work correctly with no errors.",
+      "metadata": {},
+      "task_id": "task-4-4"
+    },
+    {
+      "timestamp": "2025-11-06T21:51:54.444963Z",
+      "entry_type": "status_change",
+      "title": "Group Completed: File Modifications",
+      "author": "claude-code",
+      "content": "All child tasks in group phase-4-files have been completed.",
+      "metadata": {},
+      "task_id": "phase-4-files"
     }
   ]
 }

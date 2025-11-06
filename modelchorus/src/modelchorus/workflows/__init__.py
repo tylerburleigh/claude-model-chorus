@@ -14,6 +14,7 @@ from .consensus import (
     ProviderConfig,
 )
 from .ideate import IdeateWorkflow
+from .research import ResearchWorkflow
 from .thinkdeep import ThinkDeepWorkflow
 from ..core.models import (
     ConfidenceLevel,
@@ -30,6 +31,7 @@ __all__ = [
     "ConsensusResult",
     "ProviderConfig",
     "IdeateWorkflow",
+    "ResearchWorkflow",
     "ThinkDeepWorkflow",
     "ConfidenceLevel",
     "Hypothesis",
