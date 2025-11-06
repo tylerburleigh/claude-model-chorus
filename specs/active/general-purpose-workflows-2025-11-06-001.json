@@ -1,7 +1,7 @@
 {
   "spec_id": "general-purpose-workflows-2025-11-06-001",
   "generated": "2025-11-06T12:45:00Z",
-  "last_updated": "2025-11-06T23:10:03.127252Z",
+  "last_updated": "2025-11-06T23:18:11.002637Z",
   "metadata": {
     "title": "General-Purpose Workflows (ARGUMENT, IDEATE, RESEARCH)",
     "description": "Implement foundation infrastructure and three general-purpose workflows for ModelChorus: ARGUMENT (structured debate), IDEATE (creative ideation), and RESEARCH (evidence-based research with citations)",
@@ -24,7 +24,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-06T16:35:09.389143Z",
-    "progress_percentage": 90,
+    "progress_percentage": 91,
     "current_phase": "phase-6"
   },
   "hierarchy": {
@@ -42,7 +42,7 @@
         "phase-6"
       ],
       "total_tasks": 71,
-      "completed_tasks": 64,
+      "completed_tasks": 65,
       "metadata": {},
       "dependencies": {
         "blocks": [],
@@ -2179,7 +2179,7 @@
         "depends": []
       },
       "total_tasks": 10,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {
         "purpose": "Create comprehensive documentation for workflows and infrastructure",
         "risk_level": "low",
@@ -2200,7 +2200,7 @@
         "task-6-6"
       ],
       "total_tasks": 8,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -2288,7 +2288,7 @@
     "task-6-4": {
       "type": "task",
       "title": "docs/architecture/INFRASTRUCTURE.md",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-6-files",
       "children": [
         "task-6-4-1",
@@ -2301,7 +2301,7 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "docs/architecture/INFRASTRUCTURE.md",
         "task_category": "implementation",
@@ -2312,7 +2312,7 @@
     "task-6-4-1": {
       "type": "subtask",
       "title": "Document citation engine design and usage",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-6-4",
       "children": [],
       "dependencies": {
@@ -2321,8 +2321,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
-      "metadata": {}
+      "completed_tasks": 1,
+      "metadata": {
+        "started_at": "2025-11-06T23:15:45.439441Z",
+        "completed_at": "2025-11-06T23:18:10.987327Z",
+        "needs_journaling": false,
+        "actual_hours": 0.04,
+        "journaled_at": "2025-11-06T23:18:10.998091Z"
+      }
     },
     "task-6-4-2": {
       "type": "subtask",
@@ -3164,6 +3170,15 @@
       "content": "Successfully created comprehensive RESEARCH workflow documentation at docs/workflows/RESEARCH.md (31KB, 3,537 words). The documentation includes:\n\n\u2705 Complete workflow overview with quick reference table\n\u2705 Detailed explanation of systematic research with structured findings, source management, and citations\n\u2705 Use cases for technical investigation, literature review, technology evaluation, policy research\n\u2705 Complete CLI usage examples (research depth, citation styles, provider selection, source files)\n\u2705 Comprehensive Python API usage with all features and patterns\n\u2705 Advanced features: source ingestion/management, research depth strategies, citation styles, iterative deep dives\n\u2705 Configuration options with comprehensive parameter reference and depth/citation guidelines\n\u2705 Best practices for depth matching, source provision, citation styles, iteration, temperature tuning\n\u2705 Common use patterns: technology comparison, best practices research, compliance research\n\u2705 Troubleshooting guide for common issues (shallow findings, missing citations, lost context)\n\u2705 Workflow comparison section (CHAT, ARGUMENT, THINKDEEP)\n\u2705 Real-world examples for technology comparison, best practices, compliance research\n\u2705 Cross-references to all related documentation\n\nAll referenced files exist and links are properly formatted. Documentation follows established patterns and provides comprehensive guidance for systematic research workflows with proper citations and evidence.",
       "metadata": {},
       "task_id": "task-6-3"
+    },
+    {
+      "timestamp": "2025-11-06T23:18:10.998075Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Document citation engine design and usage",
+      "author": "claude-code",
+      "content": "Successfully created comprehensive citation engine documentation in docs/architecture/INFRASTRUCTURE.md (793 lines, 24KB). The documentation includes:\n\n- Complete architecture overview with data models (Citation and CitationMap)\n- Three citation formatting styles (APA, MLA, Chicago) with examples\n- Validation and confidence scoring systems\n- Usage examples for RESEARCH and ARGUMENT workflows\n- Complete API reference for all functions\n- Design decisions and rationale\n- Best practices for citation quality\n- Test coverage information\n- Future enhancement roadmap\n\nAll referenced files verified to exist. Cross-references to RESEARCH and ARGUMENT workflow docs included.",
+      "metadata": {},
+      "task_id": "task-6-4-1"
     }
   ]
 }
