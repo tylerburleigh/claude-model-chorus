@@ -23,6 +23,27 @@ from .models import (
     ThinkDeepState,
 )
 from .conversation import ConversationMemory
+from .gap_analysis import (
+    Gap,
+    GapType,
+    GapSeverity,
+    detect_gaps,
+    detect_missing_evidence,
+    detect_logical_gaps,
+    detect_unsupported_claims,
+    assess_gap_severity,
+    generate_gap_recommendation,
+)
+from .contradiction import (
+    Contradiction,
+    ContradictionSeverity,
+    detect_contradiction,
+    detect_contradictions_batch,
+    detect_polarity_opposition,
+    assess_contradiction_severity,
+    generate_contradiction_explanation,
+    generate_reconciliation_suggestion,
+)
 
 __all__ = [
     "BaseWorkflow",
@@ -43,4 +64,23 @@ __all__ = [
     "Hypothesis",
     "InvestigationStep",
     "ThinkDeepState",
+    # Gap Analysis
+    "Gap",
+    "GapType",
+    "GapSeverity",
+    "detect_gaps",
+    "detect_missing_evidence",
+    "detect_logical_gaps",
+    "detect_unsupported_claims",
+    "assess_gap_severity",
+    "generate_gap_recommendation",
+    # Contradiction Detection
+    "Contradiction",
+    "ContradictionSeverity",
+    "detect_contradiction",
+    "detect_contradictions_batch",
+    "detect_polarity_opposition",
+    "assess_contradiction_severity",
+    "generate_contradiction_explanation",
+    "generate_reconciliation_suggestion",
 ]
