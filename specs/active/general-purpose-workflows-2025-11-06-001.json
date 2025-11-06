@@ -1,7 +1,7 @@
 {
   "spec_id": "general-purpose-workflows-2025-11-06-001",
   "generated": "2025-11-06T12:45:00Z",
-  "last_updated": "2025-11-06T18:05:28.224482Z",
+  "last_updated": "2025-11-06T18:08:26.326264Z",
   "metadata": {
     "title": "General-Purpose Workflows (ARGUMENT, IDEATE, RESEARCH)",
     "description": "Implement foundation infrastructure and three general-purpose workflows for ModelChorus: ARGUMENT (structured debate), IDEATE (creative ideation), and RESEARCH (evidence-based research with citations)",
@@ -24,7 +24,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-06T16:35:09.389143Z",
-    "progress_percentage": 22,
+    "progress_percentage": 23,
     "current_phase": "phase-1"
   },
   "hierarchy": {
@@ -42,7 +42,7 @@
         "phase-6"
       ],
       "total_tasks": 71,
-      "completed_tasks": 16,
+      "completed_tasks": 17,
       "metadata": {},
       "dependencies": {
         "blocks": [],
@@ -60,7 +60,7 @@
         "phase-1-verify"
       ],
       "total_tasks": 23,
-      "completed_tasks": 16,
+      "completed_tasks": 17,
       "metadata": {
         "purpose": "Build shared infrastructure components for citations, clustering, and role-based orchestration",
         "risk_level": "high",
@@ -90,7 +90,7 @@
         "task-1-8"
       ],
       "total_tasks": 19,
-      "completed_tasks": 16,
+      "completed_tasks": 17,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -579,7 +579,7 @@
     "task-1-6": {
       "type": "task",
       "title": "tests/test_citation.py",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-1-files",
       "children": [],
       "dependencies": {
@@ -590,12 +590,17 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "tests/test_citation.py",
         "task_category": "implementation",
         "estimated_hours": 4,
-        "description": "Unit tests for citation engine"
+        "description": "Unit tests for citation engine",
+        "started_at": "2025-11-06T18:06:04.187269Z",
+        "completed_at": "2025-11-06T18:08:26.300169Z",
+        "needs_journaling": false,
+        "actual_hours": 0.039,
+        "journaled_at": "2025-11-06T18:08:26.317662Z"
       }
     },
     "task-1-7": {
@@ -2276,6 +2281,15 @@
       "content": "Successfully added Evidence dataclass to core/models.py with all required fields (content, source_id, location, evidence_type, strength, timestamp, metadata). Hypothesis dataclass already existed. Verified both Evidence and Hypothesis import successfully and Evidence methods (__str__, to_dict, from_dict) work correctly.",
       "metadata": {},
       "task_id": "task-1-5-2"
+    },
+    {
+      "timestamp": "2025-11-06T18:08:26.317633Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: tests/test_citation.py",
+      "author": "claude-code",
+      "content": "Successfully created comprehensive unit tests for Citation and CitationMap models in tests/test_citation.py. Created 28 tests covering: Citation model creation/validation/serialization, CitationMap claim-to-citation mapping, confidence and strength bounds validation, nested validation, JSON roundtrips, and integration scenarios for ARGUMENT workflow. All tests pass (28/28).",
+      "metadata": {},
+      "task_id": "task-1-6"
     }
   ]
 }
