@@ -878,3 +878,78 @@ class Citation(BaseModel):
         default_factory=dict,
         description="Additional citation metadata (author, date, context, etc.)",
     )
+
+
+class CitationMap(BaseModel):
+    """
+    Maps claims to their supporting citations for evidence tracking.
+
+    Used in ARGUMENT workflow to maintain bidirectional mapping between
+    claims/arguments and their source citations, enabling verification
+    and citation analysis.
+
+    Attributes:
+        claim_id: Unique identifier for the claim being supported
+        claim_text: The actual claim or argument text
+        citations: List of Citation objects supporting this claim
+        strength: Overall strength of citation support (0.0-1.0)
+        metadata: Additional mapping metadata (argument_type, verification_status, etc.)
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "claim_id": "claim-001",
+                "claim_text": "Machine learning models improve accuracy by 23%",
+                "citations": [
+                    {
+                        "source": "https://arxiv.org/abs/2401.12345",
+                        "location": "Section 3.2",
+                        "confidence": 0.95,
+                        "snippet": "Our experiments show a 23% improvement...",
+                    },
+                    {
+                        "source": "paper2.pdf",
+                        "location": "Figure 4",
+                        "confidence": 0.85,
+                        "snippet": "Results demonstrate significant gains...",
+                    },
+                ],
+                "strength": 0.9,
+                "metadata": {
+                    "argument_type": "empirical",
+                    "verification_status": "verified",
+                    "citation_count": 2,
+                },
+            }
+        }
+    )
+
+    claim_id: str = Field(
+        ...,
+        description="Unique identifier for the claim being supported",
+        min_length=1,
+    )
+
+    claim_text: str = Field(
+        ...,
+        description="The actual claim or argument text",
+        min_length=1,
+    )
+
+    citations: List[Citation] = Field(
+        default_factory=list,
+        description="List of Citation objects supporting this claim",
+    )
+
+    strength: float = Field(
+        ...,
+        ge=0.0,
+        le=1.0,
+        description="Overall strength of citation support (0.0-1.0)",
+    )
+
+    metadata: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Additional mapping metadata (argument_type, verification_status, etc.)",
+    )
