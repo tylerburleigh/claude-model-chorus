@@ -120,7 +120,11 @@ class GeminiProvider(CLIProvider):
         Build the CLI command for a Gemini generation request.
 
         Constructs a command like:
+<<<<<<< HEAD
             gemini "prompt text" --model pro -o json
+=======
+            gemini "..." --model pro --output-format json
+>>>>>>> 397c12f (Add chat and thinkdeep skills with comprehensive documentation)
 
         Args:
             request: GenerationRequest containing prompt and parameters
@@ -130,10 +134,23 @@ class GeminiProvider(CLIProvider):
         """
         command = [self.cli_command]
 
+<<<<<<< HEAD
         # Add model from metadata if specified (must come before prompt)
+=======
+        # Build full prompt (system + user prompt)
+        full_prompt = request.prompt
+        if request.system_prompt:
+            full_prompt = f"{request.system_prompt}\n\n{request.prompt}"
+
+        # Add prompt as positional argument
+        command.append(full_prompt)
+
+        # Add model from metadata if specified
+>>>>>>> 397c12f (Add chat and thinkdeep skills with comprehensive documentation)
         if "model" in request.metadata:
             command.extend(["-m", request.metadata["model"]])
 
+<<<<<<< HEAD
         # Note: Gemini CLI doesn't support --temperature or --max-tokens via CLI flags
         # These parameters are controlled through the Gemini CLI settings/config
 
@@ -142,6 +159,10 @@ class GeminiProvider(CLIProvider):
 
         # Add JSON output format for easier parsing
         command.extend(["-o", "json"])
+=======
+        # Add JSON output format for easier parsing
+        command.extend(["--output-format", "json"])
+>>>>>>> 397c12f (Add chat and thinkdeep skills with comprehensive documentation)
 
         logger.debug(f"Built Gemini command: {' '.join(command)}")
         logger.warning(
@@ -190,7 +211,10 @@ class GeminiProvider(CLIProvider):
         try:
             data = json.loads(stdout)
 
-            # Extract model name from stats if available
+            # Extract content from Gemini CLI response format
+            content = data.get("response", data.get("content", ""))
+
+            # Extract model info from stats if available
             model_name = "unknown"
             usage = {}
             if "stats" in data and "models" in data["stats"]:
@@ -209,7 +233,7 @@ class GeminiProvider(CLIProvider):
                         }
 
             response = GenerationResponse(
-                content=data.get("response", ""),
+                content=content,
                 model=model_name,
                 usage=usage,
                 stop_reason=None,  # Gemini CLI doesn't provide finish_reason
