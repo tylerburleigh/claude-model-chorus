@@ -1,7 +1,7 @@
 {
   "spec_id": "general-purpose-workflows-2025-11-06-001",
   "generated": "2025-11-06T12:45:00Z",
-  "last_updated": "2025-11-06T20:25:13.649036Z",
+  "last_updated": "2025-11-06T20:34:05.480199Z",
   "metadata": {
     "title": "General-Purpose Workflows (ARGUMENT, IDEATE, RESEARCH)",
     "description": "Implement foundation infrastructure and three general-purpose workflows for ModelChorus: ARGUMENT (structured debate), IDEATE (creative ideation), and RESEARCH (evidence-based research with citations)",
@@ -24,7 +24,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-06T16:35:09.389143Z",
-    "progress_percentage": 61,
+    "progress_percentage": 63,
     "current_phase": "phase-4"
   },
   "hierarchy": {
@@ -42,7 +42,7 @@
         "phase-6"
       ],
       "total_tasks": 71,
-      "completed_tasks": 44,
+      "completed_tasks": 45,
       "metadata": {},
       "dependencies": {
         "blocks": [],
@@ -1525,7 +1525,7 @@
         "depends": []
       },
       "total_tasks": 11,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "purpose": "Implement RESEARCH workflow for evidence-based research with citations and validation",
         "risk_level": "high",
@@ -1544,7 +1544,7 @@
         "task-4-4"
       ],
       "total_tasks": 9,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1579,7 +1579,7 @@
         "depends": []
       },
       "total_tasks": 6,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "file_path": "modelchorus/src/modelchorus/workflows/research.py",
         "task_category": "implementation",
@@ -1611,7 +1611,7 @@
     "task-4-1-2": {
       "type": "subtask",
       "title": "Implement source ingestion and registry management",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-4-1",
       "children": [],
       "dependencies": {
@@ -1620,8 +1620,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
-      "metadata": {}
+      "completed_tasks": 1,
+      "metadata": {
+        "started_at": "2025-11-06T20:32:02.434511Z",
+        "completed_at": "2025-11-06T20:34:05.462219Z",
+        "needs_journaling": false,
+        "actual_hours": 0.034,
+        "journaled_at": "2025-11-06T20:34:05.475369Z"
+      }
     },
     "task-4-1-3": {
       "type": "subtask",
@@ -2799,6 +2805,15 @@
       "content": "Successfully created ResearchWorkflow class extending BaseWorkflow. Created research_workflow.py (347 lines) with complete implementation including __init__, validate_config, get_provider, run methods, and question formulation logic. Created __init__.py to export the class. All verification tests passed: imports successfully, initializes correctly with provider, extends BaseWorkflow, registered in WorkflowRegistry as 'research', has all required methods (validate_config, get_provider, run, _formulate_questions). Default configuration includes temperature (0.5), max_tokens (4000), research_depth (thorough), source_validation (True), citation_style (informal). Follows established workflow patterns from IDEATE workflow.",
       "metadata": {},
       "task_id": "task-4-1-1"
+    },
+    {
+      "timestamp": "2025-11-06T20:34:05.475352Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Implement source ingestion and registry management",
+      "author": "claude-code",
+      "content": "Successfully implemented source ingestion and registry management for ResearchWorkflow. Added source_registry instance variable (List[Dict]) to __init__. Implemented 7 methods: ingest_source() with auto-validation support, _validate_source() with credibility scoring (high/medium/low based on URL and source type), get_sources_by_tag(), get_sources_by_type(), get_sources_by_credibility(), get_source_summary() with detailed statistics, and clear_source_registry(). Validation logic assigns scores based on URL presence (+2 points) and credible source types like paper/book/academic/official (+3 points). All tests pass: source ingestion with metadata, filtering by tag/type/credibility, summary statistics, registry clearing, and validation scoring (high=5 points, medium=2 points, low=0 points).",
+      "metadata": {},
+      "task_id": "task-4-1-2"
     }
   ]
 }

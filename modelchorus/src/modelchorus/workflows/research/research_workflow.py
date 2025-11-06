@@ -109,6 +109,9 @@ class ResearchWorkflow(BaseWorkflow):
         self.provider = provider
         self.conversation_memory = conversation_memory
 
+        # Initialize source registry for tracking research sources
+        self.source_registry: List[Dict[str, Any]] = []
+
         # Research-specific default configuration
         self.default_config = {
             'temperature': 0.5,  # Balanced between creativity and accuracy
@@ -355,3 +358,176 @@ Please formulate research questions for this topic. Your questions should:
 4. Consider multiple perspectives and dimensions
 
 Organize your questions by theme or category, and indicate priority (High/Medium/Low) for each."""
+
+    def ingest_source(
+        self,
+        title: str,
+        url: Optional[str] = None,
+        source_type: str = 'article',
+        credibility: Optional[str] = None,
+        tags: Optional[List[str]] = None,
+        metadata: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
+        """
+        Ingest a new research source into the registry.
+
+        Args:
+            title: Title or description of the source
+            url: Optional URL or reference to the source
+            source_type: Type of source (article, paper, book, website, etc.)
+            credibility: Optional credibility assessment (high, medium, low)
+            tags: Optional list of tags for categorization
+            metadata: Optional additional metadata
+
+        Returns:
+            Source dictionary with assigned ID
+        """
+        source_id = str(uuid.uuid4())[:8]
+
+        source = {
+            'source_id': source_id,
+            'title': title,
+            'url': url,
+            'type': source_type,
+            'credibility': credibility or 'unassessed',
+            'tags': tags or [],
+            'metadata': metadata or {},
+            'ingested_at': datetime.now(timezone.utc).isoformat(),
+            'validated': False
+        }
+
+        # Auto-validate if source_validation is enabled
+        if self.default_config.get('source_validation', True):
+            source = self._validate_source(source)
+
+        self.source_registry.append(source)
+        logger.info(f"Ingested source: {source_id} - {title}")
+
+        return source
+
+    def _validate_source(self, source: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Validate source credibility and metadata.
+
+        Args:
+            source: Source dictionary to validate
+
+        Returns:
+            Updated source dictionary with validation results
+        """
+        # Basic validation checks
+        validation_score = 0
+        validation_notes = []
+
+        # Check if URL is provided
+        if source.get('url'):
+            validation_score += 2
+            validation_notes.append("URL provided")
+        else:
+            validation_notes.append("No URL - manual source")
+
+        # Check source type
+        credible_types = ['paper', 'book', 'academic', 'official']
+        if source.get('type') in credible_types:
+            validation_score += 3
+            validation_notes.append(f"Credible type: {source['type']}")
+
+        # Determine credibility level
+        if validation_score >= 4:
+            source['credibility'] = 'high'
+        elif validation_score >= 2:
+            source['credibility'] = 'medium'
+        else:
+            source['credibility'] = 'low'
+
+        source['validated'] = True
+        source['validation_score'] = validation_score
+        source['validation_notes'] = validation_notes
+
+        logger.info(f"Validated source {source['source_id']}: {source['credibility']} credibility")
+
+        return source
+
+    def get_sources_by_tag(self, tag: str) -> List[Dict[str, Any]]:
+        """
+        Retrieve sources by tag.
+
+        Args:
+            tag: Tag to filter by
+
+        Returns:
+            List of sources with the specified tag
+        """
+        return [
+            source for source in self.source_registry
+            if tag in source.get('tags', [])
+        ]
+
+    def get_sources_by_type(self, source_type: str) -> List[Dict[str, Any]]:
+        """
+        Retrieve sources by type.
+
+        Args:
+            source_type: Source type to filter by
+
+        Returns:
+            List of sources of the specified type
+        """
+        return [
+            source for source in self.source_registry
+            if source.get('type') == source_type
+        ]
+
+    def get_sources_by_credibility(self, credibility: str) -> List[Dict[str, Any]]:
+        """
+        Retrieve sources by credibility level.
+
+        Args:
+            credibility: Credibility level (high, medium, low)
+
+        Returns:
+            List of sources with the specified credibility
+        """
+        return [
+            source for source in self.source_registry
+            if source.get('credibility') == credibility
+        ]
+
+    def get_source_summary(self) -> Dict[str, Any]:
+        """
+        Get summary statistics of the source registry.
+
+        Returns:
+            Dictionary with registry statistics
+        """
+        total = len(self.source_registry)
+
+        by_type = {}
+        by_credibility = {}
+        by_tags = {}
+
+        for source in self.source_registry:
+            # Count by type
+            source_type = source.get('type', 'unknown')
+            by_type[source_type] = by_type.get(source_type, 0) + 1
+
+            # Count by credibility
+            cred = source.get('credibility', 'unassessed')
+            by_credibility[cred] = by_credibility.get(cred, 0) + 1
+
+            # Count by tags
+            for tag in source.get('tags', []):
+                by_tags[tag] = by_tags.get(tag, 0) + 1
+
+        return {
+            'total_sources': total,
+            'by_type': by_type,
+            'by_credibility': by_credibility,
+            'by_tags': by_tags,
+            'validated_count': sum(1 for s in self.source_registry if s.get('validated', False))
+        }
+
+    def clear_source_registry(self) -> None:
+        """Clear all sources from the registry."""
+        self.source_registry = []
+        logger.info("Source registry cleared")
