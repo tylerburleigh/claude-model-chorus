@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 11:39:15
+**Generated:** 2025-11-06 11:40:36
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 45
-- **Total Lines:** 15373
-- **Total Classes:** 77
+- **Total Lines:** 15448
+- **Total Classes:** 78
 - **Total Functions:** 34
 - **Avg Complexity:** 4.62
 - **Max Complexity:** 36
@@ -176,6 +176,28 @@ Attributes:
     confidence: Confidence level in the citation accuracy (0.0-1.0)
     snippet: Optional text snippet from the source
     metadata: Additional citation metadata (author, date, context, etc.)
+
+---
+
+### `CitationMap`
+
+**Language:** python
+**Inherits from:** `BaseModel`
+**Defined in:** `src/modelchorus/core/models.py:883`
+
+**Description:**
+> Maps claims to their supporting citations for evidence tracking.
+
+Used in ARGUMENT workflow to maintain bidirectional mapping between
+claims/arguments and their source citations, enabling verification
+and citation analysis.
+
+Attributes:
+    claim_id: Unique identifier for the claim being supported
+    claim_text: The actual claim or argument text
+    citations: List of Citation objects supporting this claim
+    strength: Overall strength of citation support (0.0-1.0)
+    metadata: Additional mapping metadata (argument_type, verification_status, etc.)
 
 ---
 

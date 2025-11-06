@@ -1,7 +1,7 @@
 {
   "spec_id": "general-purpose-workflows-2025-11-06-001",
   "generated": "2025-11-06T12:45:00Z",
-  "last_updated": "2025-11-06T16:40:15.610226Z",
+  "last_updated": "2025-11-06T16:42:08.612047Z",
   "metadata": {
     "title": "General-Purpose Workflows (ARGUMENT, IDEATE, RESEARCH)",
     "description": "Implement foundation infrastructure and three general-purpose workflows for ModelChorus: ARGUMENT (structured debate), IDEATE (creative ideation), and RESEARCH (evidence-based research with citations)",
@@ -24,7 +24,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-06T16:35:09.389143Z",
-    "progress_percentage": 2,
+    "progress_percentage": 4,
     "current_phase": "phase-1"
   },
   "hierarchy": {
@@ -42,7 +42,7 @@
         "phase-6"
       ],
       "total_tasks": 71,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {},
       "dependencies": {
         "blocks": [],
@@ -60,7 +60,7 @@
         "phase-1-verify"
       ],
       "total_tasks": 23,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "purpose": "Build shared infrastructure components for citations, clustering, and role-based orchestration",
         "risk_level": "high",
@@ -90,7 +90,7 @@
         "task-1-8"
       ],
       "total_tasks": 19,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -121,7 +121,7 @@
         "depends": []
       },
       "total_tasks": 4,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "file_path": "modelchorus/src/modelchorus/core/citation.py",
         "task_category": "implementation",
@@ -174,7 +174,7 @@
     "task-1-1-3": {
       "type": "subtask",
       "title": "Implement citation formatting (APA, MLA, Chicago styles)",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-1-1",
       "children": [],
       "dependencies": {
@@ -183,8 +183,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
-      "metadata": {}
+      "completed_tasks": 1,
+      "metadata": {
+        "started_at": "2025-11-06T16:40:41.562332Z",
+        "completed_at": "2025-11-06T16:42:08.597216Z",
+        "needs_journaling": false,
+        "actual_hours": 0.024,
+        "journaled_at": "2025-11-06T16:42:08.607726Z"
+      }
     },
     "task-1-1-4": {
       "type": "subtask",
@@ -2066,6 +2072,15 @@
       "content": "Successfully created the CitationMap data model in modelchorus/src/modelchorus/core/models.py for claim-to-source mapping with the following features:\n\n1. Claim tracking - Required claim_id and claim_text fields for identifying claims\n2. Citation list - List[Citation] field that integrates with the Citation model from task-1-1-1\n3. Strength assessment - Required float field (0.0-1.0) for overall citation support strength\n4. Metadata dict - Additional mapping metadata (argument_type, verification_status, citation_count)\n\nThe model follows established patterns:\n- Uses Pydantic BaseModel with proper validation\n- Comprehensive docstrings and example in model_config\n- Nested Citation objects for structured source tracking\n- Proper field validation (min_length, ge/le constraints)\n- Follows same style as other models in the file\n\nTesting confirmed:\n\u2705 Model imports successfully\n\u2705 Citation objects nest correctly within CitationMap\n\u2705 Multiple citations can be tracked per claim\n\u2705 Validation works (strength 0.0-1.0, required fields enforced)\n\u2705 JSON serialization works with nested Citation objects\n\u2705 Bidirectional claim-to-citation mapping functional\n\nThe CitationMap model enables evidence-based argumentation by maintaining structured mappings between claims and their supporting sources, ready for use in the ARGUMENT workflow.",
       "metadata": {},
       "task_id": "task-1-1-2"
+    },
+    {
+      "timestamp": "2025-11-06T16:42:08.607708Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Implement citation formatting (APA, MLA, Chicago styles)",
+      "author": "claude-code",
+      "content": "Successfully implemented citation formatting for APA, MLA, and Chicago styles in modelchorus/src/modelchorus/utils/citation_formatter.py with the following features:\n\n1. CitationStyle enum - Supports APA, MLA, and Chicago format styles\n2. format_citation() function - Formats individual Citation objects according to specified style\n3. format_citation_map() function - Formats CitationMap objects with all citations\n4. Style-specific formatters:\n   - _format_apa(): APA 7th edition style (Author. (Year). Title. Retrieved from Source)\n   - _format_mla(): MLA 9th edition style (Author. \"Title.\" Source, Year. Location.)\n   - _format_chicago(): Chicago 17th edition style (Author. \"Title.\" Source (Year): Location.)\n\nImplementation details:\n- Extracts author, year, title from Citation.metadata\n- Includes source URL and location information\n- Handles missing metadata gracefully (falls back to source only)\n- Supports full-date extraction (extracts year from YYYY-MM-DD format)\n- Proper formatting with quotes, parentheses, and punctuation per style guide\n- Export functions via utils/__init__.py for easy importing\n\nTesting confirmed:\nAll three citation styles format correctly\nMetadata extraction works (author, year, title)\nLocation information included appropriately per style\nCitationMap formatting produces numbered citation lists\nMissing metadata handled gracefully\nFunctions can be imported from modelchorus.utils\n\nFiles created/modified:\n- modelchorus/src/modelchorus/utils/citation_formatter.py (new, 224 lines)\n- modelchorus/src/modelchorus/utils/__init__.py (updated exports)\n\nThe citation formatting utilities are ready for use in the ARGUMENT workflow, providing professional academic citation formatting for research and evidence-based argumentation.",
+      "metadata": {},
+      "task_id": "task-1-1-3"
     }
   ]
 }

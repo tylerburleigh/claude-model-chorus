@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T16:39:15.143292Z",
+    "generated_at": "2025-11-06T16:40:36.470711Z",
     "languages": [
       "python"
     ],
@@ -10,8 +10,8 @@
   },
   "statistics": {
     "total_files": 45,
-    "total_lines": 15373,
-    "total_classes": 77,
+    "total_lines": 15448,
+    "total_classes": 78,
     "total_functions": 34,
     "avg_complexity": 4.62,
     "max_complexity": 36,
@@ -24,8 +24,8 @@
     "by_language": {
       "python": {
         "files": 45,
-        "lines": 15373,
-        "classes": 77,
+        "lines": 15448,
+        "classes": 78,
         "functions": 34,
         "avg_complexity": 4.62
       }
@@ -300,7 +300,8 @@
         "InvestigationStep",
         "ThinkDeepState",
         "ConversationState",
-        "Citation"
+        "Citation",
+        "CitationMap"
       ],
       "functions": [],
       "imports": [
@@ -315,7 +316,7 @@
         "pydantic.ConfigDict"
       ],
       "exports": [],
-      "lines": 880
+      "lines": 955
     },
     {
       "name": "registry",
@@ -2589,6 +2590,22 @@
       "line": 823,
       "language": "python",
       "docstring": "Citation model for tracking sources in ARGUMENT workflow.\n\nTracks the source of information, its location, and confidence level\nfor evidence-based argumentation and research workflows.\n\nAttributes:\n    source: The source identifier (URL, file path, document ID, etc.)\n    location: Specific location within source (page, line, section, timestamp)\n    confidence: Confidence level in the citation accuracy (0.0-1.0)\n    snippet: Optional text snippet from the source\n    metadata: Additional citation metadata (author, date, context, etc.)",
+      "bases": [
+        "BaseModel"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "CitationMap",
+      "file": "src/modelchorus/core/models.py",
+      "line": 883,
+      "language": "python",
+      "docstring": "Maps claims to their supporting citations for evidence tracking.\n\nUsed in ARGUMENT workflow to maintain bidirectional mapping between\nclaims/arguments and their source citations, enabling verification\nand citation analysis.\n\nAttributes:\n    claim_id: Unique identifier for the claim being supported\n    claim_text: The actual claim or argument text\n    citations: List of Citation objects supporting this claim\n    strength: Overall strength of citation support (0.0-1.0)\n    metadata: Additional mapping metadata (argument_type, verification_status, etc.)",
       "bases": [
         "BaseModel"
       ],
