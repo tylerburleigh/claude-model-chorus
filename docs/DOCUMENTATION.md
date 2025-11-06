@@ -21,6 +21,232 @@
 
 
 
+## 🌊 Workflows
+
+### CHAT Workflow
+
+**Simple single-model conversation with continuity**
+
+The CHAT workflow provides straightforward peer consultation with a single AI model, supporting conversation threading for multi-turn interactions.
+
+**When to use:**
+- Quick second opinions from an AI model
+- Iterative conversations and refinement
+- Simple consultations without orchestration overhead
+
+**Key features:**
+- Single provider (not multi-model)
+- Conversation threading via continuation_id
+- Automatic conversation history management
+- Simple request/response pattern
+
+**Example:**
+```python
+from modelchorus.providers import ClaudeProvider
+from modelchorus.workflows import ChatWorkflow
+from modelchorus.core.conversation import ConversationMemory
+
+# Create provider and conversation memory
+provider = ClaudeProvider()
+memory = ConversationMemory()
+
+# Create workflow
+workflow = ChatWorkflow(provider, conversation_memory=memory)
+
+# First message (creates new conversation)
+result1 = await workflow.run("What is quantum computing?")
+thread_id = result1.metadata.get('thread_id')
+
+# Follow-up message (continues conversation)
+result2 = await workflow.run(
+    "How does it differ from classical computing?",
+    continuation_id=thread_id
+)
+```
+
+**CLI Usage:**
+```bash
+# Start new conversation
+modelchorus chat "What is quantum computing?" -p claude
+
+# Continue conversation
+modelchorus chat "Give me an example" --continue thread-id-123
+
+# Include files
+modelchorus chat "Review this code" -f src/main.py
+```
+
+---
+
+### THINKDEEP Workflow
+
+**Extended reasoning with systematic investigation and hypothesis tracking**
+
+The THINKDEEP workflow provides multi-step investigation capabilities where hypotheses are formed, tested, and refined across conversation turns. It maintains state including hypothesis evolution, investigation steps, confidence levels, and relevant files examined.
+
+**When to use:**
+- Complex problem analysis requiring systematic investigation
+- Debugging scenarios with hypothesis testing
+- Architecture decisions with evidence-based reasoning
+- Security analysis with confidence tracking
+- Any task requiring methodical, step-by-step investigation
+
+**Key features:**
+- Single provider with extended reasoning
+- Hypothesis tracking and evolution
+- Investigation step progression with findings capture
+- Confidence level tracking (exploring → low → medium → high → very_high → almost_certain → certain)
+- File examination history
+- State persistence across turns via conversation threading
+- Optional expert validation from second model
+
+**Hypothesis Evolution:**
+- **Add hypotheses** during investigation
+- **Update with evidence** as findings accumulate
+- **Validate** when evidence confirms hypothesis
+- **Disprove** when evidence contradicts hypothesis
+- Track multiple hypotheses simultaneously
+
+**Confidence Progression:**
+The workflow tracks confidence level throughout the investigation:
+- `exploring` - Just starting, no clear hypothesis
+- `low` - Early investigation with initial hypothesis
+- `medium` - Some supporting evidence found
+- `high` - Strong evidence supporting hypothesis
+- `very_high` - Very strong evidence, high confidence
+- `almost_certain` - Near complete confidence
+- `certain` - 100% confidence, hypothesis validated
+
+**Expert Validation:**
+When confidence hasn't reached "certain" level, ThinkDeep can optionally consult a second model (expert provider) for validation and additional insights.
+
+**Example:**
+```python
+from modelchorus.providers import ClaudeProvider, GeminiProvider
+from modelchorus.workflows import ThinkDeepWorkflow
+from modelchorus.core.conversation import ConversationMemory
+
+# Create provider and conversation memory
+provider = ClaudeProvider()
+expert_provider = GeminiProvider()  # Optional second model for validation
+memory = ConversationMemory()
+
+# Create workflow
+workflow = ThinkDeepWorkflow(
+    provider,
+    expert_provider=expert_provider,  # Optional
+    conversation_memory=memory
+)
+
+# First investigation step (creates new investigation)
+result1 = await workflow.run(
+    "Why is authentication failing intermittently?",
+    files=["src/auth.py", "tests/test_auth.py"]
+)
+thread_id = result1.metadata.get('thread_id')
+
+# Follow-up investigation (continues thread with state)
+result2 = await workflow.run(
+    "Check if it's related to async/await patterns",
+    continuation_id=thread_id,
+    files=["src/services/user.py"]
+)
+
+# Check investigation state
+state = workflow.get_investigation_state(thread_id)
+print(f"Hypotheses: {len(state.hypotheses)}")
+print(f"Confidence: {state.current_confidence}")
+print(f"Steps completed: {len(state.steps)}")
+```
+
+**Manual Hypothesis Management:**
+```python
+# Add hypothesis during investigation
+workflow.add_hypothesis(
+    thread_id,
+    "Race condition in async user creation causes auth failures"
+)
+
+# Update hypothesis with evidence
+workflow.update_hypothesis(
+    thread_id,
+    "Race condition in async user creation",
+    evidence="Found concurrent DB writes in logs without proper locking"
+)
+
+# Validate hypothesis when confirmed
+workflow.validate_hypothesis(thread_id, "Race condition in async user creation")
+
+# Get active hypotheses
+active = workflow.get_active_hypotheses(thread_id)
+```
+
+**CLI Usage:**
+```bash
+# Start new investigation
+modelchorus thinkdeep "Why is authentication failing?" -p claude
+
+# Continue investigation
+modelchorus thinkdeep "Check async patterns" --continue thread-id-123
+
+# Include files and expert validation
+modelchorus thinkdeep "Analyze bug" -f src/auth.py -e gemini
+
+# Disable expert validation
+modelchorus thinkdeep "Quick investigation" -p claude --disable-expert
+
+# Check investigation status
+modelchorus thinkdeep-status thread-id-123
+modelchorus thinkdeep-status thread-id-123 --steps --files
+```
+
+**Use Cases:**
+
+1. **Debugging Complex Issues:**
+   ```bash
+   modelchorus thinkdeep "Users report intermittent 500 errors" \
+     -f src/api/users.py -f logs/error.log \
+     -p claude -e gemini
+   ```
+
+2. **Architecture Analysis:**
+   ```bash
+   modelchorus thinkdeep "Evaluate microservices vs monolith for our scale" \
+     -p claude --system "You are a senior architect"
+   ```
+
+3. **Security Investigation:**
+   ```bash
+   modelchorus thinkdeep "Analyze potential SQL injection vectors" \
+     -f src/db/queries.py -f src/api/handlers.py \
+     -p claude -e gemini
+   ```
+
+4. **Performance Analysis:**
+   ```bash
+   modelchorus thinkdeep "Why is response time degrading under load?" \
+     -f src/cache/redis.py -f monitoring/metrics.json \
+     -p claude
+   ```
+
+**Investigation State:**
+The workflow maintains comprehensive state across conversation turns:
+- All hypotheses with status (active, validated, disproven)
+- Investigation steps with findings and files examined
+- Current confidence level
+- Relevant files identified
+- Evidence accumulation
+
+**Benefits:**
+- **Systematic approach** prevents jumping to conclusions
+- **Hypothesis tracking** maintains focus and progress
+- **Confidence progression** signals investigation maturity
+- **Expert validation** provides second opinion when needed
+- **File tracking** keeps context of what's been examined
+- **State persistence** enables resuming complex investigations
+
+---
+
 ## 🏛️ Classes
 
 ### `BaseWorkflow`
