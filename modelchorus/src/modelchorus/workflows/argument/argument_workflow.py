@@ -37,12 +37,12 @@ class ArgumentWorkflow(BaseWorkflow):
     Architecture:
     - Uses RoleOrchestrator for sequential role execution
     - Creator role: Generates strong thesis advocating FOR the position (Step 1)
-    - Skeptic role: Provides critical rebuttal AGAINST the position (Step 2 - future)
+    - Skeptic role: Provides critical rebuttal AGAINST the position (Step 2)
     - Moderator role: Synthesizes perspectives into balanced analysis (Step 3 - future)
 
     Current Implementation Status:
     - Step 1 (Creator): ✓ Implemented - Generates thesis with supporting arguments
-    - Step 2 (Skeptic): ⏳ Pending - Will provide counter-arguments
+    - Step 2 (Skeptic): ✓ Implemented - Provides critical rebuttal and counter-arguments
     - Step 3 (Moderator): ⏳ Pending - Will synthesize final analysis
 
     Key Features:
@@ -164,6 +164,48 @@ class ArgumentWorkflow(BaseWorkflow):
             },
         )
 
+    def _create_skeptic_role(self) -> ModelRole:
+        """
+        Create Skeptic role for critical rebuttal (Step 2 of ARGUMENT workflow).
+
+        The Skeptic role is responsible for providing critical analysis and
+        counter-arguments to the Creator's thesis. This role advocates AGAINST
+        the position, identifying weaknesses, flaws, and alternative perspectives.
+
+        Returns:
+            ModelRole configured for Skeptic with "against" stance
+
+        Example:
+            >>> skeptic = workflow._create_skeptic_role()
+            >>> print(skeptic.role, skeptic.stance)
+            skeptic against
+        """
+        return ModelRole(
+            role="skeptic",
+            model=self.provider.provider_name,
+            stance="against",
+            stance_prompt=(
+                "You are a critical skeptic. Your role is to provide a STRONG rebuttal "
+                "to the thesis presented. Challenge assumptions, identify logical flaws, "
+                "present counter-evidence, and articulate the strongest possible case AGAINST "
+                "the position. Be rigorous and thorough in your critique."
+            ),
+            system_prompt=(
+                "You are an expert at critical analysis and identifying argument weaknesses. Focus on:\n"
+                "1. Challenging the core thesis and its underlying assumptions\n"
+                "2. Identifying logical fallacies or gaps in reasoning\n"
+                "3. Presenting counter-evidence and alternative explanations\n"
+                "4. Highlighting potential negative consequences or risks\n"
+                "5. Articulating the strongest counter-arguments with intellectual rigor"
+            ),
+            temperature=0.7,  # Balanced creativity and coherence
+            metadata={
+                "step": 2,
+                "step_name": "Critical Rebuttal",
+                "role_type": "critic",
+            },
+        )
+
     async def run(
         self,
         prompt: str,
@@ -238,32 +280,34 @@ class ArgumentWorkflow(BaseWorkflow):
             # Build the full prompt with conversation history and file context if available
             full_prompt = self._build_prompt_with_history(prompt, thread_id, files)
 
-            # Create Creator role for Step 1: Thesis generation
-            creator_role = self._create_creator_role()
+            # Create roles for ARGUMENT workflow
+            creator_role = self._create_creator_role()  # Step 1: Thesis generation
+            skeptic_role = self._create_skeptic_role()  # Step 2: Critical rebuttal
 
             # Set up provider map for orchestrator
             provider_map = {
                 self.provider.provider_name: self.provider
             }
 
-            # Create orchestrator with Creator role (SEQUENTIAL pattern for future expansion)
+            # Create orchestrator with Creator and Skeptic roles (SEQUENTIAL pattern)
             orchestrator = RoleOrchestrator(
-                roles=[creator_role],  # Will add Skeptic and Moderator in future tasks
+                roles=[creator_role, skeptic_role],  # Will add Moderator in future task
                 provider_map=provider_map,
                 pattern=OrchestrationPattern.SEQUENTIAL,
             )
 
-            logger.info("Executing Creator role for thesis generation...")
+            logger.info("Executing ARGUMENT workflow with Creator → Skeptic roles...")
 
-            # Execute orchestration (Creator role generates thesis)
+            # Execute orchestration (Creator generates thesis, then Skeptic provides rebuttal)
             orchestration_result: OrchestrationResult = await orchestrator.execute(
                 base_prompt=full_prompt,
                 context=None,  # No prior context for first step
             )
 
-            # Extract Creator's thesis from orchestration result
-            if orchestration_result.role_responses:
+            # Extract role responses from orchestration result
+            if len(orchestration_result.role_responses) >= 2:
                 creator_response = orchestration_result.role_responses[0]
+                skeptic_response = orchestration_result.role_responses[1]
 
                 # Add Creator's thesis as Step 1
                 result.add_step(
@@ -275,8 +319,21 @@ class ArgumentWorkflow(BaseWorkflow):
                 )
 
                 logger.info(f"Creator role generated thesis: {len(creator_response.content)} chars")
+
+                # Add Skeptic's rebuttal as Step 2
+                result.add_step(
+                    step_number=2,
+                    content=skeptic_response.content,
+                    model=skeptic_response.model,
+                    role="skeptic",
+                    step_name="Critical Rebuttal (Skeptic)"
+                )
+
+                logger.info(f"Skeptic role generated rebuttal: {len(skeptic_response.content)} chars")
             else:
-                raise ValueError("No response from Creator role orchestration")
+                raise ValueError(
+                    f"Expected 2 role responses, got {len(orchestration_result.role_responses)}"
+                )
 
             # Add user message to conversation history
             if self.conversation_memory:
@@ -316,12 +373,13 @@ class ArgumentWorkflow(BaseWorkflow):
                 'conversation_length': self._get_conversation_length(thread_id),
                 'workflow_pattern': 'role_orchestration',
                 'orchestration_pattern': OrchestrationPattern.SEQUENTIAL.value,
-                'roles_executed': ['creator'],  # Will expand with Skeptic and Moderator
-                'steps_completed': 1,  # Currently only Creator step
+                'roles_executed': ['creator', 'skeptic'],  # Will add Moderator in future task
+                'steps_completed': 2,  # Creator + Skeptic
             })
 
             logger.info(f"ARGUMENT workflow completed successfully for thread: {thread_id}")
-            logger.info(f"Creator role executed - thesis generated ({len(creator_response.content)} chars)")
+            logger.info(f"Creator role: {len(creator_response.content)} chars thesis")
+            logger.info(f"Skeptic role: {len(skeptic_response.content)} chars rebuttal")
 
         except Exception as e:
             logger.error(f"Argument workflow failed: {e}", exc_info=True)
