@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 19:28:22
+**Generated:** 2025-11-05 19:34:05
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 40
-- **Total Lines:** 12197
-- **Total Classes:** 61
+- **Total Lines:** 12478
+- **Total Classes:** 62
 - **Total Functions:** 29
 - **Avg Complexity:** 5.21
 - **Max Complexity:** 36
@@ -1013,6 +1013,22 @@ Attributes:
 - `test_get_thread_returns_none_for_invalid_id()`
 - `test_get_thread_without_memory_returns_none()`
 - `test_get_message_count()`
+
+---
+
+### `TestEndToEndIntegration`
+
+**Language:** python
+**Defined in:** `tests/test_thinkdeep_workflow.py:1613`
+
+**Description:**
+> End-to-end integration tests for complete investigation scenarios.
+
+**Methods:**
+- `mock_provider()`
+- `conversation_memory()`
+- `test_five_step_investigation_with_hypothesis_evolution()`
+- `test_complete_investigation_workflow()`
 
 ---
 

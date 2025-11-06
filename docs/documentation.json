@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T00:28:22.174215Z",
+    "generated_at": "2025-11-06T00:34:05.880816Z",
     "languages": [
       "python"
     ],
@@ -10,8 +10,8 @@
   },
   "statistics": {
     "total_files": 40,
-    "total_lines": 12197,
-    "total_classes": 61,
+    "total_lines": 12478,
+    "total_classes": 62,
     "total_functions": 29,
     "avg_complexity": 5.21,
     "max_complexity": 36,
@@ -24,8 +24,8 @@
     "by_language": {
       "python": {
         "files": 40,
-        "lines": 12197,
-        "classes": 61,
+        "lines": 12478,
+        "classes": 62,
         "functions": 29,
         "avg_complexity": 5.21
       }
@@ -952,7 +952,8 @@
       "classes": [
         "TestInvestigationStepExecution",
         "TestHypothesisEvolution",
-        "TestConfidenceProgression"
+        "TestConfidenceProgression",
+        "TestEndToEndIntegration"
       ],
       "functions": [],
       "imports": [
@@ -971,7 +972,7 @@
         "modelchorus.core.models.ThinkDeepState"
       ],
       "exports": [],
-      "lines": 1610
+      "lines": 1891
     }
   ],
   "classes": [
@@ -1393,10 +1394,19 @@
             "TestConfidenceProgression",
             "conversation_memory"
           ]
+        },
+        {
+          "instantiator": "conversation_memory",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1627,
+          "context": [
+            "TestEndToEndIntegration",
+            "conversation_memory"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 29
+      "instantiation_count": 30
     },
     {
       "name": "ConfidenceLevel",
@@ -3614,10 +3624,82 @@
             "TestConfidenceProgression",
             "test_confidence_persistence_across_turns"
           ]
+        },
+        {
+          "instantiator": "test_five_step_investigation_with_hypothesis_evolution",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1650,
+          "context": [
+            "TestEndToEndIntegration",
+            "test_five_step_investigation_with_hypothesis_evolution"
+          ]
+        },
+        {
+          "instantiator": "test_five_step_investigation_with_hypothesis_evolution",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1674,
+          "context": [
+            "TestEndToEndIntegration",
+            "test_five_step_investigation_with_hypothesis_evolution"
+          ]
+        },
+        {
+          "instantiator": "test_five_step_investigation_with_hypothesis_evolution",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1705,
+          "context": [
+            "TestEndToEndIntegration",
+            "test_five_step_investigation_with_hypothesis_evolution"
+          ]
+        },
+        {
+          "instantiator": "test_five_step_investigation_with_hypothesis_evolution",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1729,
+          "context": [
+            "TestEndToEndIntegration",
+            "test_five_step_investigation_with_hypothesis_evolution"
+          ]
+        },
+        {
+          "instantiator": "test_five_step_investigation_with_hypothesis_evolution",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1754,
+          "context": [
+            "TestEndToEndIntegration",
+            "test_five_step_investigation_with_hypothesis_evolution"
+          ]
+        },
+        {
+          "instantiator": "test_five_step_investigation_with_hypothesis_evolution",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1771,
+          "context": [
+            "TestEndToEndIntegration",
+            "test_five_step_investigation_with_hypothesis_evolution"
+          ]
+        },
+        {
+          "instantiator": "test_complete_investigation_workflow",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1850,
+          "context": [
+            "TestEndToEndIntegration",
+            "test_complete_investigation_workflow"
+          ]
+        },
+        {
+          "instantiator": "test_complete_investigation_workflow",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1865,
+          "context": [
+            "TestEndToEndIntegration",
+            "test_complete_investigation_workflow"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 55
+      "instantiation_count": 63
     },
     {
       "name": "ModelProvider",
@@ -4994,10 +5076,28 @@
             "TestConfidenceProgression",
             "test_confidence_persistence_across_turns"
           ]
+        },
+        {
+          "instantiator": "test_five_step_investigation_with_hypothesis_evolution",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1644,
+          "context": [
+            "TestEndToEndIntegration",
+            "test_five_step_investigation_with_hypothesis_evolution"
+          ]
+        },
+        {
+          "instantiator": "test_complete_investigation_workflow",
+          "file": "tests/test_thinkdeep_workflow.py",
+          "line": 1844,
+          "context": [
+            "TestEndToEndIntegration",
+            "test_complete_investigation_workflow"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 41
+      "instantiation_count": 43
     },
     {
       "name": "TestChatWorkflowInitialization",
@@ -5553,6 +5653,25 @@
         "test_investigation_summary_includes_confidence",
         "test_confidence_cannot_decrease",
         "test_confidence_persistence_across_turns"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestEndToEndIntegration",
+      "file": "tests/test_thinkdeep_workflow.py",
+      "line": 1613,
+      "language": "python",
+      "docstring": "End-to-end integration tests for complete investigation scenarios.",
+      "bases": [],
+      "methods": [
+        "mock_provider",
+        "conversation_memory",
+        "test_five_step_investigation_with_hypothesis_evolution",
+        "test_complete_investigation_workflow"
       ],
       "properties": [],
       "is_exported": false,
