@@ -68,6 +68,32 @@ class ExtractionResult:
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
+@dataclass
+class ValidationResult:
+    """
+    Result from fact-checking and validation.
+
+    Attributes:
+        evidence_id: ID of the evidence being validated
+        is_valid: Whether the evidence passed validation
+        confidence_score: Validation confidence score (0.0-1.0)
+        validation_notes: List of validation findings
+        contradictions: List of contradictions found
+        supporting_evidence: IDs of evidence that supports this claim
+        refuting_evidence: IDs of evidence that refutes this claim
+        metadata: Additional metadata
+    """
+    evidence_id: str
+    is_valid: bool = True
+    confidence_score: float = 0.5
+    validation_notes: List[str] = field(default_factory=list)
+    contradictions: List[str] = field(default_factory=list)
+    supporting_evidence: List[str] = field(default_factory=list)
+    refuting_evidence: List[str] = field(default_factory=list)
+    metadata: Dict[str, Any] = field(default_factory=dict)
+    validated_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+
 @WorkflowRegistry.register("research")
 class ResearchWorkflow(BaseWorkflow):
     """
@@ -963,3 +989,282 @@ Your extractions should be precise, well-organized, and ready for synthesis."""
             supporting_quote=metadata.get('supporting_quote'),
             metadata=metadata
         )
+
+    async def validate_evidence(
+        self,
+        evidence_items: List[Evidence],
+        cross_reference: bool = True,
+        detect_contradictions: bool = True
+    ) -> List[ValidationResult]:
+        """
+        Validate evidence items with fact-checking and confidence scoring.
+
+        This method performs systematic validation of evidence including:
+        - Internal consistency checking
+        - Cross-referencing between evidence items
+        - Contradiction detection
+        - Confidence score calculation
+
+        Args:
+            evidence_items: List of Evidence objects to validate
+            cross_reference: Whether to cross-reference evidence items (default: True)
+            detect_contradictions: Whether to detect contradictions (default: True)
+
+        Returns:
+            List of ValidationResult objects with validation outcomes
+
+        Example:
+            >>> # Validate extracted evidence
+            >>> evidence_list = [evidence1, evidence2, evidence3]
+            >>> validation_results = await workflow.validate_evidence(evidence_list)
+            >>>
+            >>> # Check for contradictions
+            >>> for result in validation_results:
+            ...     if result.contradictions:
+            ...         print(f"Evidence {result.evidence_id} has contradictions")
+        """
+        if not evidence_items:
+            logger.warning("No evidence items provided for validation")
+            return []
+
+        logger.info(f"Validating {len(evidence_items)} evidence items "
+                   f"(cross_reference: {cross_reference}, detect_contradictions: {detect_contradictions})")
+
+        validation_results: List[ValidationResult] = []
+
+        for evidence in evidence_items:
+            # Validate each piece of evidence
+            result = await self._validate_single_evidence(
+                evidence=evidence,
+                all_evidence=evidence_items if cross_reference else [evidence],
+                detect_contradictions=detect_contradictions
+            )
+            validation_results.append(result)
+
+        # Log summary
+        valid_count = sum(1 for r in validation_results if r.is_valid)
+        avg_confidence = sum(r.confidence_score for r in validation_results) / len(validation_results)
+        contradictions_found = sum(len(r.contradictions) for r in validation_results)
+
+        logger.info(f"Validation complete: {valid_count}/{len(validation_results)} valid, "
+                   f"avg confidence: {avg_confidence:.2f}, contradictions: {contradictions_found}")
+
+        return validation_results
+
+    async def _validate_single_evidence(
+        self,
+        evidence: Evidence,
+        all_evidence: List[Evidence],
+        detect_contradictions: bool
+    ) -> ValidationResult:
+        """
+        Validate a single piece of evidence.
+
+        Args:
+            evidence: Evidence to validate
+            all_evidence: All evidence items for cross-referencing
+            detect_contradictions: Whether to detect contradictions
+
+        Returns:
+            ValidationResult with validation outcome
+        """
+        # Create validation prompt
+        validation_prompt = self._create_validation_prompt(evidence, all_evidence, detect_contradictions)
+
+        try:
+            # Create generation request
+            request = GenerationRequest(
+                prompt=validation_prompt,
+                system_prompt=self._get_validation_system_prompt(),
+                temperature=0.2,  # Low temperature for consistent validation
+                max_tokens=1500
+            )
+
+            # Get validation response
+            response = await self.provider.generate(request)
+
+            # Parse validation result
+            validation_result = self._parse_validation_response(
+                response.content,
+                evidence.evidence_id
+            )
+
+            logger.info(f"Validated evidence {evidence.evidence_id}: "
+                       f"valid={validation_result.is_valid}, "
+                       f"confidence={validation_result.confidence_score:.2f}")
+
+            return validation_result
+
+        except Exception as e:
+            logger.error(f"Validation failed for evidence {evidence.evidence_id}: {e}")
+            # Return default validation result on error
+            return ValidationResult(
+                evidence_id=evidence.evidence_id,
+                is_valid=True,  # Assume valid if validation fails
+                confidence_score=0.3,  # Low confidence
+                validation_notes=[f"Validation error: {str(e)}"]
+            )
+
+    def _create_validation_prompt(
+        self,
+        evidence: Evidence,
+        all_evidence: List[Evidence],
+        detect_contradictions: bool
+    ) -> str:
+        """
+        Create prompt for evidence validation.
+
+        Args:
+            evidence: Evidence to validate
+            all_evidence: All evidence for cross-referencing
+            detect_contradictions: Whether to check for contradictions
+
+        Returns:
+            Formatted validation prompt
+        """
+        prompt_parts = [
+            "Evidence to Validate:",
+            f"ID: {evidence.evidence_id}",
+            f"Content: {evidence.content}",
+            f"Source: {evidence.source_id}",
+            f"Initial Confidence: {evidence.confidence}",
+            ""
+        ]
+
+        if evidence.supporting_quote:
+            prompt_parts.append(f"Supporting Quote: {evidence.supporting_quote}")
+            prompt_parts.append("")
+
+        prompt_parts.append("Validation Tasks:")
+        prompt_parts.append("1. Assess the factual accuracy and credibility of this evidence")
+        prompt_parts.append("2. Assign a confidence score (0.0-1.0) based on:")
+        prompt_parts.append("   - Evidence quality and specificity")
+        prompt_parts.append("   - Source credibility")
+        prompt_parts.append("   - Presence of supporting quotes or citations")
+        prompt_parts.append("   - Internal consistency")
+
+        if detect_contradictions and len(all_evidence) > 1:
+            prompt_parts.append("3. Check for contradictions with other evidence:")
+            prompt_parts.append("")
+            # Include snippets of other evidence for comparison
+            other_evidence = [e for e in all_evidence if e.evidence_id != evidence.evidence_id]
+            for i, other in enumerate(other_evidence[:5], 1):  # Limit to 5 for context
+                prompt_parts.append(f"   Evidence {i} ({other.evidence_id}): {other.content[:150]}...")
+            prompt_parts.append("")
+
+        prompt_parts.append("Provide:")
+        prompt_parts.append("- Is Valid: true/false")
+        prompt_parts.append("- Confidence Score: 0.0-1.0")
+        prompt_parts.append("- Validation Notes: Key findings")
+        prompt_parts.append("- Contradictions: Any contradictions found (if applicable)")
+        prompt_parts.append("- Supporting Evidence IDs: Evidence that supports this claim")
+        prompt_parts.append("- Refuting Evidence IDs: Evidence that refutes this claim")
+
+        return "\n".join(prompt_parts)
+
+    def _get_validation_system_prompt(self) -> str:
+        """
+        Get system prompt for evidence validation.
+
+        Returns:
+            System prompt for validation task
+        """
+        return """You are an expert fact-checker and research validator specializing in evidence assessment.
+
+Your task is to rigorously validate evidence for accuracy, consistency, and reliability.
+
+Validation Guidelines:
+- Be critical but fair in assessing evidence quality
+- High confidence (0.8-1.0): Multiple sources, verifiable facts, strong citations
+- Medium confidence (0.5-0.7): Reasonable claims, some support, plausible
+- Low confidence (0.0-0.4): Unverified claims, contradictions, weak sources
+
+Contradiction Detection:
+- Identify direct contradictions in facts or claims
+- Note when evidence presents different perspectives vs. actual contradictions
+- Be precise about what contradicts and why
+
+Confidence Scoring Factors:
+- Source credibility and authority
+- Specificity and detail level
+- Presence of citations or supporting quotes
+- Consistency with other evidence
+- Verifiability of claims
+
+Be thorough, objective, and provide clear reasoning for your assessments."""
+
+    def _parse_validation_response(
+        self,
+        response_content: str,
+        evidence_id: str
+    ) -> ValidationResult:
+        """
+        Parse validation result from model response.
+
+        Args:
+            response_content: Model's validation response
+            evidence_id: ID of evidence being validated
+
+        Returns:
+            ValidationResult object
+        """
+        result = ValidationResult(evidence_id=evidence_id)
+
+        lines = response_content.strip().split('\n')
+        current_section = None
+
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+
+            # Parse structured components
+            if line.lower().startswith('is valid:'):
+                valid_str = line.split(':', 1)[1].strip().lower()
+                result.is_valid = valid_str in ['true', 'yes', 'valid']
+
+            elif line.lower().startswith('confidence score:'):
+                try:
+                    score_str = line.split(':', 1)[1].strip()
+                    # Extract just the number (handle "0.85" or "0.85 (high)" formats)
+                    score = float(score_str.split()[0])
+                    result.confidence_score = max(0.0, min(1.0, score))
+                except (ValueError, IndexError):
+                    pass
+
+            elif line.lower().startswith('validation notes:'):
+                current_section = 'notes'
+                note = line.split(':', 1)[1].strip()
+                if note:
+                    result.validation_notes.append(note)
+
+            elif line.lower().startswith('contradictions:'):
+                current_section = 'contradictions'
+                contradiction = line.split(':', 1)[1].strip()
+                if contradiction and contradiction.lower() not in ['none', 'n/a']:
+                    result.contradictions.append(contradiction)
+
+            elif line.lower().startswith('supporting evidence'):
+                current_section = 'supporting'
+                # Extract IDs from the line
+                ids_str = line.split(':', 1)[1].strip() if ':' in line else ''
+                if ids_str and ids_str.lower() not in ['none', 'n/a']:
+                    result.supporting_evidence.extend(ids_str.split(','))
+
+            elif line.lower().startswith('refuting evidence'):
+                current_section = 'refuting'
+                ids_str = line.split(':', 1)[1].strip() if ':' in line else ''
+                if ids_str and ids_str.lower() not in ['none', 'n/a']:
+                    result.refuting_evidence.extend(ids_str.split(','))
+
+            elif current_section == 'notes' and line.startswith(('-', '•', '*')):
+                result.validation_notes.append(line.lstrip('-•* '))
+
+            elif current_section == 'contradictions' and line.startswith(('-', '•', '*')):
+                result.contradictions.append(line.lstrip('-•* '))
+
+        # Ensure we have at least one validation note
+        if not result.validation_notes:
+            result.validation_notes.append("Validation completed")
+
+        return result

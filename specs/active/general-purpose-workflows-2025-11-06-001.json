@@ -1,7 +1,7 @@
 {
   "spec_id": "general-purpose-workflows-2025-11-06-001",
   "generated": "2025-11-06T12:45:00Z",
-  "last_updated": "2025-11-06T20:39:38.386579Z",
+  "last_updated": "2025-11-06T20:40:20.505491Z",
   "metadata": {
     "title": "General-Purpose Workflows (ARGUMENT, IDEATE, RESEARCH)",
     "description": "Implement foundation infrastructure and three general-purpose workflows for ModelChorus: ARGUMENT (structured debate), IDEATE (creative ideation), and RESEARCH (evidence-based research with citations)",
@@ -1663,7 +1663,9 @@
       },
       "total_tasks": 1,
       "completed_tasks": 0,
-      "metadata": {}
+      "metadata": {
+        "started_at": "2025-11-06T20:40:20.505076Z"
+      }
     },
     "task-4-1-5": {
       "type": "subtask",
