@@ -1465,3 +1465,465 @@ class ArgumentMap(BaseModel):
             synthesis=data["synthesis"],
             metadata=data.get("metadata", {})
         )
+
+
+# ============================================================================
+# IDEATE Workflow Models
+# ============================================================================
+
+
+class Idea(BaseModel):
+    """
+    Represents a single idea extracted from brainstorming.
+
+    Used in the IDEATE workflow to track individual creative ideas
+    that are extracted from multiple perspective-based brainstorming sessions.
+
+    Attributes:
+        id: Unique identifier for the idea (e.g., "idea-1")
+        label: Brief descriptive label for the idea (1-2 words)
+        description: Full description of the idea (1-2 sentences)
+        perspective: The perspective this idea originated from (practical, innovative, etc.)
+        source_model: Model that generated this idea
+        metadata: Additional metadata about the idea
+
+    Example:
+        >>> idea = Idea(
+        ...     id="idea-1",
+        ...     label="Gamification System",
+        ...     description="Add game mechanics like points and badges to improve engagement",
+        ...     perspective="innovative",
+        ...     source_model="claude"
+        ... )
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "id": "idea-1",
+                "label": "AI-Powered Search",
+                "description": "Implement semantic search using AI embeddings for better discovery",
+                "perspective": "technical",
+                "source_model": "gpt-4",
+                "metadata": {"tokens": 150, "temperature": 0.9}
+            }
+        }
+    )
+
+    id: str = Field(
+        ...,
+        description="Unique identifier for the idea (e.g., 'idea-1')",
+        pattern=r"^idea-\d+$"
+    )
+
+    label: str = Field(
+        ...,
+        description="Brief descriptive label (1-5 words)",
+        min_length=1,
+        max_length=100
+    )
+
+    description: str = Field(
+        ...,
+        description="Full description of the idea (1-3 sentences)",
+        min_length=1
+    )
+
+    perspective: str = Field(
+        ...,
+        description="Perspective this idea originated from (practical, innovative, user-focused, etc.)"
+    )
+
+    source_model: Optional[str] = Field(
+        default=None,
+        description="Model that generated this idea"
+    )
+
+    metadata: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Additional metadata about the idea"
+    )
+
+
+class IdeaCluster(BaseModel):
+    """
+    Represents a themed cluster of related ideas.
+
+    Used in the IDEATE workflow to group similar ideas into coherent
+    themes after convergent analysis. Each cluster represents a distinct
+    approach or solution category.
+
+    Attributes:
+        id: Unique identifier for the cluster (e.g., "cluster-1")
+        theme: Theme name that describes this cluster
+        description: Detailed description of the cluster theme
+        idea_ids: List of idea IDs belonging to this cluster
+        ideas: Optional list of full Idea objects in this cluster
+        scores: Evaluation scores for this cluster (feasibility, impact, etc.)
+        overall_score: Average score across all criteria (0.0-5.0)
+        recommendation: Priority recommendation (High/Medium/Low Priority)
+        metadata: Additional metadata about the cluster
+
+    Example:
+        >>> cluster = IdeaCluster(
+        ...     id="cluster-1",
+        ...     theme="User Experience Improvements",
+        ...     description="Ideas focused on enhancing user interface and usability",
+        ...     idea_ids=["idea-1", "idea-3", "idea-5"],
+        ...     scores={"feasibility": 4.5, "impact": 4.0, "novelty": 3.5},
+        ...     overall_score=4.0,
+        ...     recommendation="High Priority"
+        ... )
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "id": "cluster-1",
+                "theme": "AI-Enhanced Features",
+                "description": "Ideas leveraging AI to improve core functionality",
+                "idea_ids": ["idea-1", "idea-2", "idea-4"],
+                "scores": {"feasibility": 4.0, "impact": 4.5, "novelty": 4.0},
+                "overall_score": 4.17,
+                "recommendation": "High Priority",
+                "metadata": {"num_ideas": 3}
+            }
+        }
+    )
+
+    id: str = Field(
+        ...,
+        description="Unique identifier for the cluster (e.g., 'cluster-1')",
+        pattern=r"^cluster-\d+$"
+    )
+
+    theme: str = Field(
+        ...,
+        description="Theme name describing this cluster",
+        min_length=1,
+        max_length=200
+    )
+
+    description: str = Field(
+        default="",
+        description="Detailed description of the cluster theme"
+    )
+
+    idea_ids: List[str] = Field(
+        default_factory=list,
+        description="List of idea IDs in this cluster"
+    )
+
+    ideas: Optional[List[Idea]] = Field(
+        default=None,
+        description="Optional full Idea objects in this cluster"
+    )
+
+    scores: Dict[str, float] = Field(
+        default_factory=dict,
+        description="Evaluation scores (e.g., feasibility: 4.5, impact: 4.0)"
+    )
+
+    overall_score: float = Field(
+        default=0.0,
+        ge=0.0,
+        le=5.0,
+        description="Average score across all criteria (0.0-5.0)"
+    )
+
+    recommendation: str = Field(
+        default="Medium Priority",
+        description="Priority recommendation (High/Medium/Low Priority)"
+    )
+
+    metadata: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Additional metadata about the cluster"
+    )
+
+    def add_idea(self, idea: Idea) -> None:
+        """
+        Add an idea to this cluster.
+
+        Args:
+            idea: Idea object to add
+
+        Example:
+            >>> cluster.add_idea(idea_obj)
+        """
+        if idea.id not in self.idea_ids:
+            self.idea_ids.append(idea.id)
+
+        if self.ideas is None:
+            self.ideas = []
+
+        if idea not in self.ideas:
+            self.ideas.append(idea)
+
+    def get_idea_count(self) -> int:
+        """
+        Get number of ideas in this cluster.
+
+        Returns:
+            Number of ideas
+
+        Example:
+            >>> count = cluster.get_idea_count()
+        """
+        return len(self.idea_ids)
+
+
+class IdeationState(BaseModel):
+    """
+    Represents the complete state of an ideation workflow session.
+
+    Tracks the full lifecycle of an IDEATE workflow execution, from initial
+    brainstorming through convergent analysis, selection, and elaboration.
+
+    Attributes:
+        session_id: Unique identifier for this ideation session
+        topic: The topic or problem being ideated on
+        perspectives: List of perspectives used in brainstorming
+        ideas: All extracted ideas from brainstorming
+        clusters: Thematic clusters of related ideas
+        selected_cluster_ids: IDs of clusters selected for elaboration
+        elaborations: Detailed outlines for selected clusters
+        scoring_criteria: Criteria used for evaluation (feasibility, impact, etc.)
+        workflow_metadata: Metadata about workflow execution
+        created_at: Timestamp when ideation session started
+        updated_at: Timestamp of last update
+
+    Example:
+        >>> state = IdeationState(
+        ...     session_id="ideation-2024-01-15-001",
+        ...     topic="How can we improve our API documentation?",
+        ...     perspectives=["practical", "innovative", "user-focused"],
+        ...     ideas=[idea1, idea2, idea3],
+        ...     clusters=[cluster1, cluster2],
+        ...     selected_cluster_ids=["cluster-1"],
+        ...     scoring_criteria=["feasibility", "impact", "user_value"]
+        ... )
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "session_id": "ideation-2024-01-15-001",
+                "topic": "Improve user onboarding flow",
+                "perspectives": ["practical", "innovative", "user-focused"],
+                "ideas": [],
+                "clusters": [],
+                "selected_cluster_ids": [],
+                "elaborations": {},
+                "scoring_criteria": ["feasibility", "impact", "novelty"],
+                "workflow_metadata": {"models_used": ["claude", "gpt-4"]},
+                "created_at": "2024-01-15T10:30:00Z",
+                "updated_at": "2024-01-15T11:45:00Z"
+            }
+        }
+    )
+
+    session_id: str = Field(
+        ...,
+        description="Unique identifier for this ideation session",
+        min_length=1
+    )
+
+    topic: str = Field(
+        ...,
+        description="The topic or problem being ideated on",
+        min_length=1
+    )
+
+    perspectives: List[str] = Field(
+        default_factory=list,
+        description="Perspectives used in brainstorming (practical, innovative, etc.)"
+    )
+
+    ideas: List[Idea] = Field(
+        default_factory=list,
+        description="All extracted ideas from brainstorming"
+    )
+
+    clusters: List[IdeaCluster] = Field(
+        default_factory=list,
+        description="Thematic clusters of related ideas"
+    )
+
+    selected_cluster_ids: List[str] = Field(
+        default_factory=list,
+        description="IDs of clusters selected for elaboration"
+    )
+
+    elaborations: Dict[str, str] = Field(
+        default_factory=dict,
+        description="Detailed outlines for selected clusters (cluster_id -> outline)"
+    )
+
+    scoring_criteria: List[str] = Field(
+        default_factory=list,
+        description="Criteria used for evaluation (feasibility, impact, etc.)"
+    )
+
+    workflow_metadata: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Metadata about workflow execution"
+    )
+
+    created_at: Optional[str] = Field(
+        default=None,
+        description="ISO timestamp when ideation session started"
+    )
+
+    updated_at: Optional[str] = Field(
+        default=None,
+        description="ISO timestamp of last update"
+    )
+
+    def add_idea(self, idea: Idea) -> None:
+        """
+        Add an idea to the ideation state.
+
+        Args:
+            idea: Idea object to add
+
+        Example:
+            >>> state.add_idea(new_idea)
+        """
+        if idea not in self.ideas:
+            self.ideas.append(idea)
+
+    def add_cluster(self, cluster: IdeaCluster) -> None:
+        """
+        Add a cluster to the ideation state.
+
+        Args:
+            cluster: IdeaCluster object to add
+
+        Example:
+            >>> state.add_cluster(new_cluster)
+        """
+        if cluster not in self.clusters:
+            self.clusters.append(cluster)
+
+    def get_cluster_by_id(self, cluster_id: str) -> Optional[IdeaCluster]:
+        """
+        Get a cluster by its ID.
+
+        Args:
+            cluster_id: Cluster ID to look up
+
+        Returns:
+            IdeaCluster if found, None otherwise
+
+        Example:
+            >>> cluster = state.get_cluster_by_id("cluster-1")
+        """
+        for cluster in self.clusters:
+            if cluster.id == cluster_id:
+                return cluster
+        return None
+
+    def get_selected_clusters(self) -> List[IdeaCluster]:
+        """
+        Get all selected clusters.
+
+        Returns:
+            List of IdeaCluster objects that were selected
+
+        Example:
+            >>> selected = state.get_selected_clusters()
+            >>> print(f"Selected {len(selected)} clusters")
+        """
+        return [
+            cluster for cluster in self.clusters
+            if cluster.id in self.selected_cluster_ids
+        ]
+
+    def get_idea_count(self) -> int:
+        """
+        Get total number of ideas.
+
+        Returns:
+            Total number of ideas
+
+        Example:
+            >>> count = state.get_idea_count()
+        """
+        return len(self.ideas)
+
+    def get_cluster_count(self) -> int:
+        """
+        Get total number of clusters.
+
+        Returns:
+            Total number of clusters
+
+        Example:
+            >>> count = state.get_cluster_count()
+        """
+        return len(self.clusters)
+
+    def to_dict(self) -> Dict[str, Any]:
+        """
+        Convert IdeationState to dictionary for serialization.
+
+        Returns:
+            Dictionary representation of the ideation state
+
+        Example:
+            >>> state_dict = state.to_dict()
+        """
+        return {
+            "session_id": self.session_id,
+            "topic": self.topic,
+            "perspectives": self.perspectives,
+            "ideas": [idea.model_dump() for idea in self.ideas],
+            "clusters": [cluster.model_dump() for cluster in self.clusters],
+            "selected_cluster_ids": self.selected_cluster_ids,
+            "elaborations": self.elaborations,
+            "scoring_criteria": self.scoring_criteria,
+            "workflow_metadata": self.workflow_metadata,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "IdeationState":
+        """
+        Create an IdeationState from a dictionary.
+
+        Args:
+            data: Dictionary containing ideation state fields
+
+        Returns:
+            New IdeationState instance
+
+        Example:
+            >>> state = IdeationState.from_dict(state_data)
+        """
+        # Convert idea dicts to Idea objects
+        ideas = [
+            Idea(**i) if isinstance(i, dict) else i
+            for i in data.get("ideas", [])
+        ]
+
+        # Convert cluster dicts to IdeaCluster objects
+        clusters = [
+            IdeaCluster(**c) if isinstance(c, dict) else c
+            for c in data.get("clusters", [])
+        ]
+
+        return cls(
+            session_id=data["session_id"],
+            topic=data["topic"],
+            perspectives=data.get("perspectives", []),
+            ideas=ideas,
+            clusters=clusters,
+            selected_cluster_ids=data.get("selected_cluster_ids", []),
+            elaborations=data.get("elaborations", {}),
+            scoring_criteria=data.get("scoring_criteria", []),
+            workflow_metadata=data.get("workflow_metadata", {}),
+            created_at=data.get("created_at"),
+            updated_at=data.get("updated_at")
+        )
