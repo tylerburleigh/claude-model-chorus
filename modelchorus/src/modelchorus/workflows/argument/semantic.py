@@ -7,7 +7,7 @@ across citation maps.
 """
 
 import hashlib
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict, Tuple, Optional, Any
 from functools import lru_cache
 
 import numpy as np
@@ -387,3 +387,254 @@ def find_duplicate_claims(
             duplicate_groups.append(group)
 
     return duplicate_groups
+
+
+# ============================================================================
+# Clustering Algorithms
+# ============================================================================
+
+
+def cluster_claims_kmeans(
+    citation_maps: List[CitationMap],
+    n_clusters: int = 3,
+    model_name: str = _DEFAULT_MODEL,
+    random_state: int = 42,
+) -> List[List[CitationMap]]:
+    """
+    Cluster claims using K-means algorithm on semantic embeddings.
+
+    Groups claims into k clusters based on semantic similarity,
+    useful for organizing large collections of claims by topic.
+
+    Args:
+        citation_maps: List of CitationMap objects to cluster
+        n_clusters: Number of clusters to create (default: 3)
+        model_name: Sentence transformer model to use
+        random_state: Random seed for reproducibility
+
+    Returns:
+        List of clusters, where each cluster is a list of CitationMaps
+
+    Raises:
+        ValueError: If n_clusters > len(citation_maps)
+
+    Example:
+        >>> maps = [cm1, cm2, cm3, cm4, cm5]
+        >>> clusters = cluster_claims_kmeans(maps, n_clusters=2)
+        >>> print(f"Found {len(clusters)} clusters")
+        Found 2 clusters
+        >>> for i, cluster in enumerate(clusters):
+        ...     print(f"Cluster {i}: {len(cluster)} claims")
+        Cluster 0: 3 claims
+        Cluster 1: 2 claims
+    """
+    from sklearn.cluster import KMeans
+
+    if len(citation_maps) == 0:
+        return []
+
+    if n_clusters > len(citation_maps):
+        raise ValueError(
+            f"n_clusters ({n_clusters}) cannot be greater than "
+            f"number of citation maps ({len(citation_maps)})"
+        )
+
+    # Compute embeddings for all claims
+    claims = [cm.claim_text for cm in citation_maps]
+    embeddings = np.array([compute_embedding(claim, model_name=model_name) for claim in claims])
+
+    # Run K-means clustering
+    kmeans = KMeans(n_clusters=n_clusters, random_state=random_state, n_init=10)
+    labels = kmeans.fit_predict(embeddings)
+
+    # Group citation maps by cluster
+    clusters: List[List[CitationMap]] = [[] for _ in range(n_clusters)]
+    for idx, label in enumerate(labels):
+        clusters[label].append(citation_maps[idx])
+
+    return clusters
+
+
+def cluster_claims_hierarchical(
+    citation_maps: List[CitationMap],
+    n_clusters: int = 3,
+    model_name: str = _DEFAULT_MODEL,
+    linkage_method: str = "ward",
+) -> List[List[CitationMap]]:
+    """
+    Cluster claims using hierarchical clustering on semantic embeddings.
+
+    Uses agglomerative hierarchical clustering to group claims,
+    building a tree-based hierarchy and cutting at specified level.
+
+    Args:
+        citation_maps: List of CitationMap objects to cluster
+        n_clusters: Number of clusters to create (default: 3)
+        model_name: Sentence transformer model to use
+        linkage_method: Linkage method ('ward', 'complete', 'average', 'single')
+
+    Returns:
+        List of clusters, where each cluster is a list of CitationMaps
+
+    Raises:
+        ValueError: If n_clusters > len(citation_maps)
+
+    Example:
+        >>> maps = [cm1, cm2, cm3, cm4, cm5]
+        >>> clusters = cluster_claims_hierarchical(
+        ...     maps,
+        ...     n_clusters=2,
+        ...     linkage_method="ward"
+        ... )
+        >>> print(f"Found {len(clusters)} clusters")
+        Found 2 clusters
+    """
+    from sklearn.cluster import AgglomerativeClustering
+
+    if len(citation_maps) == 0:
+        return []
+
+    if n_clusters > len(citation_maps):
+        raise ValueError(
+            f"n_clusters ({n_clusters}) cannot be greater than "
+            f"number of citation maps ({len(citation_maps)})"
+        )
+
+    # Compute embeddings for all claims
+    claims = [cm.claim_text for cm in citation_maps]
+    embeddings = np.array([compute_embedding(claim, model_name=model_name) for claim in claims])
+
+    # Run hierarchical clustering
+    hierarchical = AgglomerativeClustering(
+        n_clusters=n_clusters,
+        linkage=linkage_method,
+    )
+    labels = hierarchical.fit_predict(embeddings)
+
+    # Group citation maps by cluster
+    clusters: List[List[CitationMap]] = [[] for _ in range(n_clusters)]
+    for idx, label in enumerate(labels):
+        clusters[label].append(citation_maps[idx])
+
+    return clusters
+
+
+def get_cluster_representative(
+    cluster: List[CitationMap],
+    model_name: str = _DEFAULT_MODEL,
+) -> CitationMap:
+    """
+    Find the most representative claim in a cluster (centroid).
+
+    Computes the claim closest to the cluster centroid in embedding space,
+    useful for summarizing or labeling clusters.
+
+    Args:
+        cluster: List of CitationMaps in the cluster
+        model_name: Sentence transformer model to use
+
+    Returns:
+        CitationMap closest to cluster centroid
+
+    Example:
+        >>> cluster = [cm1, cm2, cm3]
+        >>> representative = get_cluster_representative(cluster)
+        >>> print(f"Representative claim: {representative.claim_text}")
+    """
+    if len(cluster) == 0:
+        raise ValueError("Cluster cannot be empty")
+
+    if len(cluster) == 1:
+        return cluster[0]
+
+    # Compute embeddings for all claims in cluster
+    claims = [cm.claim_text for cm in cluster]
+    embeddings = np.array([compute_embedding(claim, model_name=model_name) for claim in claims])
+
+    # Compute centroid
+    centroid = np.mean(embeddings, axis=0)
+    centroid = centroid / np.linalg.norm(centroid)  # Normalize
+
+    # Find claim closest to centroid
+    similarities = [cosine_similarity(emb, centroid) for emb in embeddings]
+    most_central_idx = np.argmax(similarities)
+
+    return cluster[most_central_idx]
+
+
+def compute_cluster_statistics(
+    clusters: List[List[CitationMap]],
+    model_name: str = _DEFAULT_MODEL,
+) -> Dict[str, Any]:
+    """
+    Compute statistics and quality metrics for clusters.
+
+    Provides insights into cluster quality, including size distribution,
+    intra-cluster similarity, and representative claims.
+
+    Args:
+        clusters: List of clusters (each cluster is a list of CitationMaps)
+        model_name: Sentence transformer model to use
+
+    Returns:
+        Dictionary with cluster statistics:
+        - num_clusters: Number of clusters
+        - cluster_sizes: List of cluster sizes
+        - avg_cluster_size: Average cluster size
+        - representatives: List of representative claims (one per cluster)
+        - intra_cluster_similarities: Average similarity within each cluster
+
+    Example:
+        >>> stats = compute_cluster_statistics(clusters)
+        >>> print(f"Number of clusters: {stats['num_clusters']}")
+        >>> print(f"Average cluster size: {stats['avg_cluster_size']:.1f}")
+        >>> print(f"Representatives: {stats['representatives']}")
+    """
+    if len(clusters) == 0:
+        return {
+            "num_clusters": 0,
+            "cluster_sizes": [],
+            "avg_cluster_size": 0.0,
+            "representatives": [],
+            "intra_cluster_similarities": [],
+        }
+
+    # Cluster sizes
+    cluster_sizes = [len(cluster) for cluster in clusters]
+
+    # Representative claims
+    representatives = []
+    for cluster in clusters:
+        if len(cluster) > 0:
+            rep = get_cluster_representative(cluster, model_name=model_name)
+            representatives.append(rep.claim_text)
+        else:
+            representatives.append(None)
+
+    # Intra-cluster similarities
+    intra_cluster_sims = []
+    for cluster in clusters:
+        if len(cluster) <= 1:
+            intra_cluster_sims.append(1.0)  # Perfect similarity for single-item clusters
+            continue
+
+        # Compute pairwise similarities within cluster
+        claims = [cm.claim_text for cm in cluster]
+        sim_matrix = compute_claim_similarity_batch(claims, model_name=model_name)
+
+        # Get upper triangle (exclude diagonal) and compute average
+        upper_triangle = sim_matrix[np.triu_indices_from(sim_matrix, k=1)]
+        avg_sim = float(np.mean(upper_triangle)) if len(upper_triangle) > 0 else 1.0
+
+        intra_cluster_sims.append(avg_sim)
+
+    return {
+        "num_clusters": len(clusters),
+        "cluster_sizes": cluster_sizes,
+        "avg_cluster_size": float(np.mean(cluster_sizes)) if cluster_sizes else 0.0,
+        "min_cluster_size": min(cluster_sizes) if cluster_sizes else 0,
+        "max_cluster_size": max(cluster_sizes) if cluster_sizes else 0,
+        "representatives": representatives,
+        "intra_cluster_similarities": intra_cluster_sims,
+        "avg_intra_cluster_similarity": float(np.mean(intra_cluster_sims)) if intra_cluster_sims else 0.0,
+    }

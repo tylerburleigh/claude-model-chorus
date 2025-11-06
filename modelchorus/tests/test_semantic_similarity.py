@@ -17,6 +17,10 @@ from modelchorus.workflows.argument.semantic import (
     compute_claim_similarity_batch,
     add_similarity_to_citation,
     find_duplicate_claims,
+    cluster_claims_kmeans,
+    cluster_claims_hierarchical,
+    get_cluster_representative,
+    compute_cluster_statistics,
 )
 
 
@@ -491,3 +495,310 @@ class TestEdgeCases:
 
         embedding = compute_embedding(claim)
         assert isinstance(embedding, np.ndarray)
+
+
+class TestKMeansClustering:
+    """Test K-means clustering functionality."""
+
+    @pytest.fixture
+    def diverse_citation_maps(self):
+        """Create citation maps with diverse topics for clustering."""
+        return [
+            # ML/AI cluster
+            CitationMap(
+                claim_id="ml-1",
+                claim_text="Machine learning improves accuracy",
+                citations=[],
+                strength=0.9,
+            ),
+            CitationMap(
+                claim_id="ml-2",
+                claim_text="AI enhances prediction quality",
+                citations=[],
+                strength=0.85,
+            ),
+            CitationMap(
+                claim_id="ml-3",
+                claim_text="Neural networks achieve better results",
+                citations=[],
+                strength=0.88,
+            ),
+            # Weather cluster
+            CitationMap(
+                claim_id="weather-1",
+                claim_text="Weather forecasting uses numerical models",
+                citations=[],
+                strength=0.8,
+            ),
+            CitationMap(
+                claim_id="weather-2",
+                claim_text="Climate patterns affect temperature",
+                citations=[],
+                strength=0.82,
+            ),
+            # Database cluster
+            CitationMap(
+                claim_id="db-1",
+                claim_text="Database optimization improves query speed",
+                citations=[],
+                strength=0.87,
+            ),
+            CitationMap(
+                claim_id="db-2",
+                claim_text="Indexing enhances database performance",
+                citations=[],
+                strength=0.86,
+            ),
+        ]
+
+    def test_cluster_claims_kmeans_basic(self, diverse_citation_maps):
+        """Test basic K-means clustering."""
+        clusters = cluster_claims_kmeans(diverse_citation_maps, n_clusters=3)
+
+        assert len(clusters) == 3
+        assert all(isinstance(cluster, list) for cluster in clusters)
+        # All citation maps should be assigned to exactly one cluster
+        total_assigned = sum(len(cluster) for cluster in clusters)
+        assert total_assigned == len(diverse_citation_maps)
+
+    def test_cluster_claims_kmeans_empty_list(self):
+        """Test K-means with empty list."""
+        clusters = cluster_claims_kmeans([])
+
+        assert clusters == []
+
+    def test_cluster_claims_kmeans_single_cluster(self, diverse_citation_maps):
+        """Test K-means with n_clusters=1."""
+        clusters = cluster_claims_kmeans(diverse_citation_maps, n_clusters=1)
+
+        assert len(clusters) == 1
+        assert len(clusters[0]) == len(diverse_citation_maps)
+
+    def test_cluster_claims_kmeans_too_many_clusters(self):
+        """Test error when n_clusters > number of items."""
+        maps = [
+            CitationMap(claim_id="1", claim_text="Test", citations=[], strength=0.9),
+            CitationMap(claim_id="2", claim_text="Test2", citations=[], strength=0.9),
+        ]
+
+        with pytest.raises(ValueError, match="n_clusters .* cannot be greater"):
+            cluster_claims_kmeans(maps, n_clusters=5)
+
+    def test_cluster_claims_kmeans_reproducibility(self, diverse_citation_maps):
+        """Test that clustering is reproducible with same random_state."""
+        clusters1 = cluster_claims_kmeans(diverse_citation_maps, n_clusters=3, random_state=42)
+        clusters2 = cluster_claims_kmeans(diverse_citation_maps, n_clusters=3, random_state=42)
+
+        # Should produce same clusters
+        for c1, c2 in zip(clusters1, clusters2):
+            assert len(c1) == len(c2)
+
+
+class TestHierarchicalClustering:
+    """Test hierarchical clustering functionality."""
+
+    @pytest.fixture
+    def sample_maps(self):
+        """Create sample citation maps."""
+        return [
+            CitationMap(
+                claim_id="1",
+                claim_text="Machine learning models",
+                citations=[],
+                strength=0.9,
+            ),
+            CitationMap(
+                claim_id="2",
+                claim_text="AI algorithms",
+                citations=[],
+                strength=0.85,
+            ),
+            CitationMap(
+                claim_id="3",
+                claim_text="Weather forecasting",
+                citations=[],
+                strength=0.8,
+            ),
+            CitationMap(
+                claim_id="4",
+                claim_text="Climate prediction",
+                citations=[],
+                strength=0.82,
+            ),
+        ]
+
+    def test_cluster_claims_hierarchical_basic(self, sample_maps):
+        """Test basic hierarchical clustering."""
+        clusters = cluster_claims_hierarchical(sample_maps, n_clusters=2)
+
+        assert len(clusters) == 2
+        total_assigned = sum(len(cluster) for cluster in clusters)
+        assert total_assigned == len(sample_maps)
+
+    def test_cluster_claims_hierarchical_empty_list(self):
+        """Test hierarchical clustering with empty list."""
+        clusters = cluster_claims_hierarchical([])
+
+        assert clusters == []
+
+    def test_cluster_claims_hierarchical_linkage_methods(self, sample_maps):
+        """Test different linkage methods."""
+        for linkage in ["ward", "complete", "average", "single"]:
+            clusters = cluster_claims_hierarchical(
+                sample_maps,
+                n_clusters=2,
+                linkage_method=linkage
+            )
+
+            assert len(clusters) == 2
+
+    def test_cluster_claims_hierarchical_too_many_clusters(self):
+        """Test error when n_clusters > number of items."""
+        maps = [
+            CitationMap(claim_id="1", claim_text="Test", citations=[], strength=0.9),
+        ]
+
+        with pytest.raises(ValueError, match="n_clusters .* cannot be greater"):
+            cluster_claims_hierarchical(maps, n_clusters=2)
+
+
+class TestClusterRepresentative:
+    """Test cluster representative selection."""
+
+    def test_get_cluster_representative_basic(self):
+        """Test getting representative from cluster."""
+        cluster = [
+            CitationMap(
+                claim_id="1",
+                claim_text="Machine learning models",
+                citations=[],
+                strength=0.9,
+            ),
+            CitationMap(
+                claim_id="2",
+                claim_text="ML algorithms and techniques",
+                citations=[],
+                strength=0.85,
+            ),
+            CitationMap(
+                claim_id="3",
+                claim_text="Deep learning networks",
+                citations=[],
+                strength=0.88,
+            ),
+        ]
+
+        representative = get_cluster_representative(cluster)
+
+        assert representative in cluster
+        assert isinstance(representative, CitationMap)
+
+    def test_get_cluster_representative_single_item(self):
+        """Test representative when cluster has single item."""
+        cluster = [
+            CitationMap(
+                claim_id="1",
+                claim_text="Single claim",
+                citations=[],
+                strength=0.9,
+            ),
+        ]
+
+        representative = get_cluster_representative(cluster)
+
+        assert representative == cluster[0]
+
+    def test_get_cluster_representative_empty_cluster(self):
+        """Test error when cluster is empty."""
+        with pytest.raises(ValueError, match="Cluster cannot be empty"):
+            get_cluster_representative([])
+
+
+class TestClusterStatistics:
+    """Test cluster statistics computation."""
+
+    def test_compute_cluster_statistics_basic(self):
+        """Test basic statistics computation."""
+        clusters = [
+            # Cluster 1: 3 similar claims
+            [
+                CitationMap(claim_id="1", claim_text="AI models", citations=[], strength=0.9),
+                CitationMap(claim_id="2", claim_text="ML algorithms", citations=[], strength=0.85),
+                CitationMap(claim_id="3", claim_text="Deep learning", citations=[], strength=0.88),
+            ],
+            # Cluster 2: 2 similar claims
+            [
+                CitationMap(claim_id="4", claim_text="Weather forecast", citations=[], strength=0.8),
+                CitationMap(claim_id="5", claim_text="Climate prediction", citations=[], strength=0.82),
+            ],
+        ]
+
+        stats = compute_cluster_statistics(clusters)
+
+        assert stats["num_clusters"] == 2
+        assert stats["cluster_sizes"] == [3, 2]
+        assert stats["avg_cluster_size"] == 2.5
+        assert stats["min_cluster_size"] == 2
+        assert stats["max_cluster_size"] == 3
+        assert len(stats["representatives"]) == 2
+        assert len(stats["intra_cluster_similarities"]) == 2
+        assert 0.0 <= stats["avg_intra_cluster_similarity"] <= 1.0
+
+    def test_compute_cluster_statistics_empty(self):
+        """Test statistics for empty cluster list."""
+        stats = compute_cluster_statistics([])
+
+        assert stats["num_clusters"] == 0
+        assert stats["cluster_sizes"] == []
+        assert stats["avg_cluster_size"] == 0.0
+
+    def test_compute_cluster_statistics_single_item_clusters(self):
+        """Test statistics when clusters have single items."""
+        clusters = [
+            [CitationMap(claim_id="1", claim_text="Test 1", citations=[], strength=0.9)],
+            [CitationMap(claim_id="2", claim_text="Test 2", citations=[], strength=0.8)],
+        ]
+
+        stats = compute_cluster_statistics(clusters)
+
+        # Single-item clusters should have similarity of 1.0
+        assert all(sim == 1.0 for sim in stats["intra_cluster_similarities"])
+
+
+class TestClusteringIntegration:
+    """Test end-to-end clustering workflows."""
+
+    def test_kmeans_to_statistics_pipeline(self):
+        """Test complete pipeline: cluster -> compute statistics."""
+        maps = [
+            CitationMap(claim_id=str(i), claim_text=f"Claim about topic {i % 3}", citations=[], strength=0.9)
+            for i in range(9)
+        ]
+
+        # Cluster
+        clusters = cluster_claims_kmeans(maps, n_clusters=3)
+
+        # Compute statistics
+        stats = compute_cluster_statistics(clusters)
+
+        assert stats["num_clusters"] == 3
+        assert sum(stats["cluster_sizes"]) == 9
+        assert len(stats["representatives"]) == 3
+
+    def test_hierarchical_to_statistics_pipeline(self):
+        """Test complete pipeline with hierarchical clustering."""
+        maps = [
+            CitationMap(claim_id="ml-1", claim_text="Machine learning", citations=[], strength=0.9),
+            CitationMap(claim_id="ml-2", claim_text="AI algorithms", citations=[], strength=0.85),
+            CitationMap(claim_id="db-1", claim_text="Database optimization", citations=[], strength=0.8),
+            CitationMap(claim_id="db-2", claim_text="Query performance", citations=[], strength=0.82),
+        ]
+
+        # Cluster
+        clusters = cluster_claims_hierarchical(maps, n_clusters=2)
+
+        # Get representatives
+        representatives = [get_cluster_representative(cluster) for cluster in clusters]
+
+        assert len(representatives) == 2
+        assert all(rep in maps for rep in representatives)
