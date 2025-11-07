@@ -44,3 +44,114 @@ Avoid the CHAT workflow when:
 | You need systematic investigation with hypothesis tracking | **THINKDEEP** - Extended reasoning with confidence progression |
 | You need creative brainstorming with many ideas | **IDEATE** - Structured idea generation workflow |
 | You need comprehensive research with citations | **RESEARCH** - Systematic information gathering with source management |
+
+## Basic Usage
+
+### Simple Example
+
+```bash
+modelchorus chat "What is quantum computing?"
+```
+
+**Expected Output:**
+The command returns a conversational response from the default provider (Claude) explaining the topic. The response includes a thread ID for conversation continuation.
+
+### Common Options
+
+| Option | Short | Default | Description |
+|--------|-------|---------|-------------|
+| `--provider` | `-p` | `claude` | AI provider to use (`claude`, `gemini`, `codex`, `cursor-agent`) |
+| `--continue` | `-c` | None | Thread ID to continue conversation |
+| `--file` | `-f` | None | File paths for context (repeatable) |
+| `--system` | | None | Additional system prompt |
+| `--temperature` | `-t` | `0.7` | Creativity level (0.0-1.0) |
+| `--max-tokens` | | None | Maximum response length |
+| `--output` | `-o` | None | Save result to JSON file |
+| `--verbose` | `-v` | False | Show detailed execution info |
+
+## Advanced Usage
+
+### With Provider Selection
+
+```bash
+# Use specific provider
+modelchorus chat "Explain neural networks" -p gemini
+
+# Use Codex for code-focused questions
+modelchorus chat "How does this algorithm work?" -p codex
+```
+
+**Provider Selection Tips:**
+- `claude`: Best for general conversation, reasoning, and nuanced responses
+- `gemini`: Strong for factual queries and technical explanations
+- `codex`: Optimized for code-related questions and programming tasks
+- `cursor-agent`: Ideal for development-focused consultations
+
+### With File Context
+
+```bash
+# Include single file for discussion
+modelchorus chat "Explain this code" -f src/main.py
+
+# Include multiple files for broader context
+modelchorus chat "Review these implementations" -f api.py -f models.py -f tests.py
+```
+
+**File Handling:**
+- All file paths must exist before execution
+- Files are read and included as context for the conversation
+- Multiple `-f` flags can be used to include multiple files
+- Large files may be truncated based on provider token limits
+
+### With Conversation Threading
+
+```bash
+# Start new conversation
+modelchorus chat "What is quantum computing?"
+# Output includes: Thread ID: thread-abc-123-def-456
+
+# Continue conversation with follow-up
+modelchorus chat "How does it differ from classical computing?" --continue thread-abc-123-def-456
+
+# Further continuation in same thread
+modelchorus chat "Give me a practical example" -c thread-abc-123-def-456
+```
+
+**Threading Notes:**
+- Thread IDs persist across sessions
+- Conversation history is maintained and automatically included
+- Each message builds on the full conversation context
+- Thread IDs follow format: `thread-{uuid}`
+- Use short flag `-c` or long flag `--continue`
+
+### Adjusting Creativity
+
+```bash
+# Lower temperature for factual/precise output
+modelchorus chat "What are the Python PEP 8 guidelines?" --temperature 0.3
+
+# Higher temperature for creative/exploratory output
+modelchorus chat "Brainstorm app features for a fitness tracker" --temperature 0.9
+
+# Default balanced setting (0.7)
+modelchorus chat "Explain dependency injection" --temperature 0.7
+```
+
+**Temperature Guide:**
+- `0.0-0.3`: Deterministic, factual, precise (documentation, facts, specs)
+- `0.4-0.7`: Balanced creativity and accuracy (general conversation, explanations)
+- `0.8-1.0`: Maximum creativity, exploratory (brainstorming, ideation)
+
+### Saving Results
+
+```bash
+# Save output to JSON file
+modelchorus chat "Analyze this architecture" -f design.md --output analysis.json
+```
+
+**Output file contains:**
+- Original prompt
+- Model response/synthesis
+- Metadata (model name, token usage, timestamp)
+- Thread ID for continuation
+- Provider information
