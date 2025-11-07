@@ -203,7 +203,7 @@ Sources:
 [1] GraphQL Documentation (graphql.org)
 [2] REST vs GraphQL Study (example.com/study)
 
-Thread ID: research-thread-abc123
+Session ID: research-thread-abc123
 ```
 
 ### Common Options
@@ -307,7 +307,7 @@ modelchorus research "Compare GraphQL and REST for our use case" \
 ```bash
 # Initial research
 modelchorus research "Microservices architecture patterns"
-# Output includes: Thread ID: research-thread-xyz789
+# Output includes: Session ID: research-thread-xyz789
 
 # Continue with follow-up research
 modelchorus research "Expand on service mesh patterns" --continue research-thread-xyz789
@@ -361,7 +361,7 @@ modelchorus research "Evaluate GraphQL for our API" \
 
 # Iterative research session with threading
 modelchorus research "Kubernetes deployment strategies" --depth moderate
-# Returns: Thread ID: research-thread-abc123
+# Returns: Session ID: research-thread-abc123
 
 modelchorus research "Focus on blue-green deployment details" \
   --continue research-thread-abc123 \
@@ -447,7 +447,7 @@ modelchorus research "GDPR requirements for user data handling, storage, and del
 ```bash
 # Initial broad research
 modelchorus research "Microservices architecture patterns and best practices" --depth moderate
-# Returns: Thread ID: research-thread-xyz789
+# Returns: Session ID: research-thread-xyz789
 
 # Drill into specific pattern
 modelchorus research "Expand on service mesh patterns: implementation and tradeoffs" \

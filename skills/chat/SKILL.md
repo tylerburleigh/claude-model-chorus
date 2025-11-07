@@ -108,7 +108,7 @@ modelchorus chat "Review these implementations" -f api.py -f models.py -f tests.
 ```bash
 # Start new conversation
 modelchorus chat "What is quantum computing?"
-# Output includes: Thread ID: thread-abc-123-def-456
+# Output includes: Session ID: thread-abc-123-def-456
 
 # Continue conversation with follow-up
 modelchorus chat "How does it differ from classical computing?" --continue thread-abc-123-def-456
@@ -226,7 +226,7 @@ modelchorus chat "Explain how these components work together" -f src/models/user
 
 ### Issue: Thread ID not found
 
-**Symptoms:** Error message "Thread ID not found" or "Invalid continuation_id"
+**Symptoms:** Error message "Thread ID not found" or "Invalid session_id"
 
 **Cause:** The thread ID doesn't exist in conversation memory, either due to typo or expired/cleared memory
 
