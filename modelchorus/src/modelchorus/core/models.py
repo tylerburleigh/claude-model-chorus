@@ -818,3 +818,1719 @@ class ConversationState(BaseModel):
         ...,
         description="ISO timestamp of last state update",
     )
+
+
+class Citation(BaseModel):
+    """
+    Citation model for tracking sources in ARGUMENT workflow.
+
+    Tracks the source of information, its location, and confidence level
+    for evidence-based argumentation and research workflows.
+
+    Attributes:
+        source: The source identifier (URL, file path, document ID, etc.)
+        location: Specific location within source (page, line, section, timestamp)
+        confidence: Confidence level in the citation accuracy (0.0-1.0)
+        snippet: Optional text snippet from the source
+        metadata: Additional citation metadata (author, date, context, etc.)
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "source": "https://arxiv.org/abs/2401.12345",
+                "location": "Section 3.2, Figure 4",
+                "confidence": 0.95,
+                "snippet": "Our experiments show a 23% improvement in accuracy...",
+                "metadata": {
+                    "author": "Smith et al.",
+                    "publication_date": "2024-01-15",
+                    "citation_type": "academic_paper",
+                },
+            }
+        }
+    )
+
+    source: str = Field(
+        ...,
+        description="Source identifier (URL, file path, document ID, etc.)",
+        min_length=1,
+    )
+
+    location: Optional[str] = Field(
+        default=None,
+        description="Specific location within source (page, line, section, timestamp)",
+    )
+
+    confidence: float = Field(
+        ...,
+        ge=0.0,
+        le=1.0,
+        description="Confidence level in citation accuracy (0.0-1.0)",
+    )
+
+    snippet: Optional[str] = Field(
+        default=None,
+        description="Optional text snippet from the source",
+    )
+
+    metadata: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Additional citation metadata (author, date, context, etc.)",
+    )
+
+
+class CitationMap(BaseModel):
+    """
+    Maps claims to their supporting citations for evidence tracking.
+
+    Used in ARGUMENT workflow to maintain bidirectional mapping between
+    claims/arguments and their source citations, enabling verification
+    and citation analysis.
+
+    Attributes:
+        claim_id: Unique identifier for the claim being supported
+        claim_text: The actual claim or argument text
+        citations: List of Citation objects supporting this claim
+        strength: Overall strength of citation support (0.0-1.0)
+        metadata: Additional mapping metadata (argument_type, verification_status, etc.)
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "claim_id": "claim-001",
+                "claim_text": "Machine learning models improve accuracy by 23%",
+                "citations": [
+                    {
+                        "source": "https://arxiv.org/abs/2401.12345",
+                        "location": "Section 3.2",
+                        "confidence": 0.95,
+                        "snippet": "Our experiments show a 23% improvement...",
+                    },
+                    {
+                        "source": "paper2.pdf",
+                        "location": "Figure 4",
+                        "confidence": 0.85,
+                        "snippet": "Results demonstrate significant gains...",
+                    },
+                ],
+                "strength": 0.9,
+                "metadata": {
+                    "argument_type": "empirical",
+                    "verification_status": "verified",
+                    "citation_count": 2,
+                },
+            }
+        }
+    )
+
+    claim_id: str = Field(
+        ...,
+        description="Unique identifier for the claim being supported",
+        min_length=1,
+    )
+
+    claim_text: str = Field(
+        ...,
+        description="The actual claim or argument text",
+        min_length=1,
+    )
+
+    citations: List[Citation] = Field(
+        default_factory=list,
+        description="List of Citation objects supporting this claim",
+    )
+
+    strength: float = Field(
+        ...,
+        ge=0.0,
+        le=1.0,
+        description="Overall strength of citation support (0.0-1.0)",
+    )
+
+    metadata: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Additional mapping metadata (argument_type, verification_status, etc.)",
+    )
+
+
+class Claim(BaseModel):
+    """
+    Represents a factual or arguable statement extracted from model output.
+
+    Claims are fundamental units in argument analysis and research workflows.
+    Each claim captures a specific assertion along with metadata about its source,
+    location, and confidence level.
+
+    Used in workflows like:
+    - ARGUMENT: Extracting claims from debate responses for contradiction detection
+    - RESEARCH: Identifying factual claims across multiple sources
+    - IDEATE: Capturing key assertions from diverse perspectives
+
+    Attributes:
+        content: The actual claim text (the statement being made)
+        source_id: Identifier for the source (role name, document ID, model ID, etc.)
+        location: Optional location within source (line number, section, paragraph, etc.)
+        confidence: Confidence score for this claim (0.0 = low, 1.0 = high)
+
+    Example:
+        >>> claim = Claim(
+        ...     content="TypeScript reduces runtime errors by 15%",
+        ...     source_id="proponent",
+        ...     location="paragraph 2",
+        ...     confidence=0.8
+        ... )
+        >>> print(claim)
+        [proponent@paragraph 2] (0.80): TypeScript reduces runtime errors by 15%
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "content": "TypeScript reduces runtime errors by 15%",
+                "source_id": "proponent",
+                "location": "paragraph 2",
+                "confidence": 0.8,
+            }
+        }
+    )
+
+    content: str = Field(
+        ...,
+        description="The actual claim text (the statement being made)",
+        min_length=1,
+    )
+
+    source_id: str = Field(
+        ...,
+        description="Identifier for the source (role name, document ID, model ID, etc.)",
+        min_length=1,
+    )
+
+    location: Optional[str] = Field(
+        default=None,
+        description="Optional location within source (line number, section, paragraph, etc.)",
+    )
+
+    confidence: float = Field(
+        default=1.0,
+        description="Confidence score for this claim (0.0 = low confidence, 1.0 = high confidence)",
+        ge=0.0,
+        le=1.0,
+    )
+
+    def __str__(self) -> str:
+        """
+        Return human-readable string representation of the claim.
+
+        Format: [source_id@location] (confidence): content
+        If location is not specified, format is: [source_id] (confidence): content
+
+        Returns:
+            Human-readable claim string
+
+        Example:
+            >>> claim = Claim(content="Test claim", source_id="analyst", confidence=0.9)
+            >>> str(claim)
+            '[analyst] (0.90): Test claim'
+        """
+        location_str = f"@{self.location}" if self.location else ""
+        return f"[{self.source_id}{location_str}] ({self.confidence:.2f}): {self.content}"
+
+    def to_dict(self) -> Dict[str, Any]:
+        """
+        Convert claim to dictionary for serialization.
+
+        Returns:
+            Dictionary representation of the claim
+
+        Example:
+            >>> claim = Claim(content="Test", source_id="test", confidence=0.5)
+            >>> claim.to_dict()
+            {'content': 'Test', 'source_id': 'test', 'location': None, 'confidence': 0.5}
+        """
+        return {
+            "content": self.content,
+            "source_id": self.source_id,
+            "location": self.location,
+            "confidence": self.confidence,
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "Claim":
+        """
+        Create a Claim from a dictionary.
+
+        Args:
+            data: Dictionary containing claim fields
+
+        Returns:
+            New Claim instance
+
+        Example:
+            >>> data = {'content': 'Test', 'source_id': 'test', 'confidence': 0.5}
+            >>> claim = Claim.from_dict(data)
+            >>> claim.content
+            'Test'
+        """
+        return cls(**data)
+
+
+class Evidence(BaseModel):
+    """
+    Represents supporting or refuting evidence for claims and hypotheses.
+
+    Evidence is a fundamental building block in investigation, research, and
+    argument workflows. Each piece of evidence captures specific information
+    from a source along with its type, strength, and relevance.
+
+    Used in workflows like:
+    - THINKDEEP: Tracking evidence that supports or refutes hypotheses
+    - ARGUMENT: Recording factual evidence for debate claims
+    - RESEARCH: Documenting findings from multiple sources
+
+    Attributes:
+        content: The actual evidence text (the observation or fact)
+        source_id: Identifier for the source (file path, model ID, document ID, etc.)
+        location: Optional location within source (line number, section, page, etc.)
+        evidence_type: Type of evidence (supporting, refuting, neutral, contextual)
+        strength: Strength/weight of this evidence (0.0 = weak, 1.0 = strong)
+        timestamp: Optional ISO timestamp when evidence was collected
+        metadata: Additional evidence metadata (tags, categories, analysis, etc.)
+
+    Example:
+        >>> evidence = Evidence(
+        ...     content="Found async def pattern in auth.py line 45",
+        ...     source_id="src/services/auth.py",
+        ...     location="line 45",
+        ...     evidence_type="supporting",
+        ...     strength=0.9
+        ... )
+        >>> print(evidence)
+        [src/services/auth.py@line 45] (supporting, 0.90): Found async def pattern in auth.py line 45
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "content": "Found async def pattern in auth.py line 45",
+                "source_id": "src/services/auth.py",
+                "location": "line 45",
+                "evidence_type": "supporting",
+                "strength": 0.9,
+                "timestamp": "2025-11-06T12:00:00Z",
+                "metadata": {
+                    "tags": ["async", "authentication"],
+                    "category": "code_analysis",
+                    "verified": True,
+                },
+            }
+        }
+    )
+
+    content: str = Field(
+        ...,
+        description="The actual evidence text (the observation or fact)",
+        min_length=1,
+    )
+
+    source_id: str = Field(
+        ...,
+        description="Identifier for the source (file path, model ID, document ID, etc.)",
+        min_length=1,
+    )
+
+    location: Optional[str] = Field(
+        default=None,
+        description="Optional location within source (line number, section, page, etc.)",
+    )
+
+    evidence_type: Literal["supporting", "refuting", "neutral", "contextual"] = Field(
+        default="supporting",
+        description="Type of evidence: supporting, refuting, neutral, or contextual",
+    )
+
+    strength: float = Field(
+        default=1.0,
+        description="Strength/weight of this evidence (0.0 = weak, 1.0 = strong)",
+        ge=0.0,
+        le=1.0,
+    )
+
+    timestamp: Optional[str] = Field(
+        default=None,
+        description="Optional ISO timestamp when evidence was collected",
+    )
+
+    metadata: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Additional evidence metadata (tags, categories, analysis, etc.)",
+    )
+
+    def __str__(self) -> str:
+        """
+        Return human-readable string representation of the evidence.
+
+        Format: [source_id@location] (evidence_type, strength): content
+        If location is not specified, format is: [source_id] (evidence_type, strength): content
+
+        Returns:
+            Human-readable evidence string
+
+        Example:
+            >>> evidence = Evidence(
+            ...     content="Test finding",
+            ...     source_id="test.py",
+            ...     evidence_type="supporting",
+            ...     strength=0.8
+            ... )
+            >>> str(evidence)
+            '[test.py] (supporting, 0.80): Test finding'
+        """
+        location_str = f"@{self.location}" if self.location else ""
+        return f"[{self.source_id}{location_str}] ({self.evidence_type}, {self.strength:.2f}): {self.content}"
+
+    def to_dict(self) -> Dict[str, Any]:
+        """
+        Convert evidence to dictionary for serialization.
+
+        Returns:
+            Dictionary representation of the evidence
+
+        Example:
+            >>> evidence = Evidence(
+            ...     content="Test",
+            ...     source_id="test",
+            ...     evidence_type="supporting",
+            ...     strength=0.5
+            ... )
+            >>> evidence.to_dict()
+            {
+                'content': 'Test',
+                'source_id': 'test',
+                'location': None,
+                'evidence_type': 'supporting',
+                'strength': 0.5,
+                'timestamp': None,
+                'metadata': {}
+            }
+        """
+        return {
+            "content": self.content,
+            "source_id": self.source_id,
+            "location": self.location,
+            "evidence_type": self.evidence_type,
+            "strength": self.strength,
+            "timestamp": self.timestamp,
+            "metadata": self.metadata,
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "Evidence":
+        """
+        Create an Evidence from a dictionary.
+
+        Args:
+            data: Dictionary containing evidence fields
+
+        Returns:
+            New Evidence instance
+
+        Example:
+            >>> data = {
+            ...     'content': 'Test',
+            ...     'source_id': 'test',
+            ...     'evidence_type': 'supporting',
+            ...     'strength': 0.5
+            ... }
+            >>> evidence = Evidence.from_dict(data)
+            >>> evidence.content
+            'Test'
+        """
+        return cls(**data)
+
+
+class ArgumentPerspective(BaseModel):
+    """
+    Represents a single perspective in an argument analysis.
+
+    Each perspective captures one role's analysis (Creator, Skeptic, or Moderator)
+    with their stance, reasoning, and key points.
+
+    Attributes:
+        role: The role name (creator, skeptic, moderator)
+        stance: The perspective's stance (for, against, neutral)
+        content: Full response content from this perspective
+        key_points: List of key points or arguments
+        model: Model used for this perspective
+        metadata: Additional perspective metadata
+
+    Example:
+        >>> perspective = ArgumentPerspective(
+        ...     role="creator",
+        ...     stance="for",
+        ...     content="Universal basic income would reduce poverty...",
+        ...     key_points=["Ensures basic needs", "Reduces wealth gap"],
+        ...     model="claude-sonnet-4"
+        ... )
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "role": "creator",
+                "stance": "for",
+                "content": "Universal basic income would reduce poverty...",
+                "key_points": ["Ensures basic needs", "Reduces wealth gap"],
+                "model": "claude-sonnet-4",
+                "metadata": {}
+            }
+        }
+    )
+
+    role: Literal["creator", "skeptic", "moderator"] = Field(
+        ...,
+        description="The role name (creator, skeptic, moderator)"
+    )
+
+    stance: Literal["for", "against", "neutral"] = Field(
+        ...,
+        description="The perspective's stance (for, against, neutral)"
+    )
+
+    content: str = Field(
+        ...,
+        description="Full response content from this perspective",
+        min_length=1
+    )
+
+    key_points: List[str] = Field(
+        default_factory=list,
+        description="List of key points or arguments"
+    )
+
+    model: str = Field(
+        ...,
+        description="Model used for this perspective",
+        min_length=1
+    )
+
+    metadata: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Additional perspective metadata"
+    )
+
+
+class ArgumentMap(BaseModel):
+    """
+    Structured output from ARGUMENT workflow containing all perspectives.
+
+    ArgumentMap provides a comprehensive view of the dialectical analysis,
+    including the thesis (Creator), rebuttal (Skeptic), and synthesis (Moderator).
+    This structured format enables programmatic access to different perspectives
+    and supports downstream analysis, visualization, and decision-making.
+
+    Attributes:
+        topic: The argument topic or claim being analyzed
+        perspectives: List of perspectives (Creator, Skeptic, Moderator)
+        synthesis: Final balanced synthesis from Moderator
+        metadata: Additional workflow metadata (thread_id, model, timestamps, etc.)
+
+    Example:
+        >>> arg_map = ArgumentMap(
+        ...     topic="Universal basic income would reduce poverty",
+        ...     perspectives=[creator_perspective, skeptic_perspective, moderator_perspective],
+        ...     synthesis="After examining both perspectives...",
+        ...     metadata={"thread_id": "abc123", "model": "claude-sonnet-4"}
+        ... )
+        >>> print(arg_map.perspectives[0].role)  # 'creator'
+        >>> print(arg_map.perspectives[1].role)  # 'skeptic'
+        >>> print(arg_map.perspectives[2].role)  # 'moderator'
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "topic": "Universal basic income would reduce poverty",
+                "perspectives": [
+                    {
+                        "role": "creator",
+                        "stance": "for",
+                        "content": "Universal basic income would reduce poverty...",
+                        "key_points": ["Ensures basic needs", "Reduces wealth gap"],
+                        "model": "claude-sonnet-4",
+                        "metadata": {}
+                    }
+                ],
+                "synthesis": "After examining both perspectives...",
+                "metadata": {"thread_id": "abc123"}
+            }
+        }
+    )
+
+    topic: str = Field(
+        ...,
+        description="The argument topic or claim being analyzed",
+        min_length=1
+    )
+
+    perspectives: List[ArgumentPerspective] = Field(
+        ...,
+        description="List of perspectives (Creator, Skeptic, Moderator)",
+        min_length=1
+    )
+
+    synthesis: str = Field(
+        ...,
+        description="Final balanced synthesis from Moderator",
+        min_length=1
+    )
+
+    metadata: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Additional workflow metadata (thread_id, model, timestamps, etc.)"
+    )
+
+    def get_perspective(self, role: str) -> Optional[ArgumentPerspective]:
+        """
+        Get a specific perspective by role name.
+
+        Args:
+            role: Role name (creator, skeptic, or moderator)
+
+        Returns:
+            ArgumentPerspective if found, None otherwise
+
+        Example:
+            >>> creator = arg_map.get_perspective("creator")
+            >>> print(creator.stance)  # 'for'
+        """
+        for perspective in self.perspectives:
+            if perspective.role == role:
+                return perspective
+        return None
+
+    def to_dict(self) -> Dict[str, Any]:
+        """
+        Convert ArgumentMap to dictionary for serialization.
+
+        Returns:
+            Dictionary representation of the argument map
+
+        Example:
+            >>> arg_map.to_dict()
+            {
+                'topic': 'Universal basic income...',
+                'perspectives': [...],
+                'synthesis': '...',
+                'metadata': {...}
+            }
+        """
+        return {
+            "topic": self.topic,
+            "perspectives": [p.model_dump() for p in self.perspectives],
+            "synthesis": self.synthesis,
+            "metadata": self.metadata
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "ArgumentMap":
+        """
+        Create an ArgumentMap from a dictionary.
+
+        Args:
+            data: Dictionary containing argument map fields
+
+        Returns:
+            New ArgumentMap instance
+
+        Example:
+            >>> data = {
+            ...     'topic': 'Test topic',
+            ...     'perspectives': [{'role': 'creator', ...}],
+            ...     'synthesis': 'Test synthesis',
+            ...     'metadata': {}
+            ... }
+            >>> arg_map = ArgumentMap.from_dict(data)
+        """
+        # Convert perspective dicts to ArgumentPerspective objects
+        perspectives = [
+            ArgumentPerspective(**p) if isinstance(p, dict) else p
+            for p in data["perspectives"]
+        ]
+        return cls(
+            topic=data["topic"],
+            perspectives=perspectives,
+            synthesis=data["synthesis"],
+            metadata=data.get("metadata", {})
+        )
+
+
+# ============================================================================
+# IDEATE Workflow Models
+# ============================================================================
+
+
+class Idea(BaseModel):
+    """
+    Represents a single idea extracted from brainstorming.
+
+    Used in the IDEATE workflow to track individual creative ideas
+    that are extracted from multiple perspective-based brainstorming sessions.
+
+    Attributes:
+        id: Unique identifier for the idea (e.g., "idea-1")
+        label: Brief descriptive label for the idea (1-2 words)
+        description: Full description of the idea (1-2 sentences)
+        perspective: The perspective this idea originated from (practical, innovative, etc.)
+        source_model: Model that generated this idea
+        metadata: Additional metadata about the idea
+
+    Example:
+        >>> idea = Idea(
+        ...     id="idea-1",
+        ...     label="Gamification System",
+        ...     description="Add game mechanics like points and badges to improve engagement",
+        ...     perspective="innovative",
+        ...     source_model="claude"
+        ... )
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "id": "idea-1",
+                "label": "AI-Powered Search",
+                "description": "Implement semantic search using AI embeddings for better discovery",
+                "perspective": "technical",
+                "source_model": "gpt-4",
+                "metadata": {"tokens": 150, "temperature": 0.9}
+            }
+        }
+    )
+
+    id: str = Field(
+        ...,
+        description="Unique identifier for the idea (e.g., 'idea-1')",
+        pattern=r"^idea-\d+$"
+    )
+
+    label: str = Field(
+        ...,
+        description="Brief descriptive label (1-5 words)",
+        min_length=1,
+        max_length=100
+    )
+
+    description: str = Field(
+        ...,
+        description="Full description of the idea (1-3 sentences)",
+        min_length=1
+    )
+
+    perspective: str = Field(
+        ...,
+        description="Perspective this idea originated from (practical, innovative, user-focused, etc.)"
+    )
+
+    source_model: Optional[str] = Field(
+        default=None,
+        description="Model that generated this idea"
+    )
+
+    metadata: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Additional metadata about the idea"
+    )
+
+
+class IdeaCluster(BaseModel):
+    """
+    Represents a themed cluster of related ideas.
+
+    Used in the IDEATE workflow to group similar ideas into coherent
+    themes after convergent analysis. Each cluster represents a distinct
+    approach or solution category.
+
+    Attributes:
+        id: Unique identifier for the cluster (e.g., "cluster-1")
+        theme: Theme name that describes this cluster
+        description: Detailed description of the cluster theme
+        idea_ids: List of idea IDs belonging to this cluster
+        ideas: Optional list of full Idea objects in this cluster
+        scores: Evaluation scores for this cluster (feasibility, impact, etc.)
+        overall_score: Average score across all criteria (0.0-5.0)
+        recommendation: Priority recommendation (High/Medium/Low Priority)
+        metadata: Additional metadata about the cluster
+
+    Example:
+        >>> cluster = IdeaCluster(
+        ...     id="cluster-1",
+        ...     theme="User Experience Improvements",
+        ...     description="Ideas focused on enhancing user interface and usability",
+        ...     idea_ids=["idea-1", "idea-3", "idea-5"],
+        ...     scores={"feasibility": 4.5, "impact": 4.0, "novelty": 3.5},
+        ...     overall_score=4.0,
+        ...     recommendation="High Priority"
+        ... )
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "id": "cluster-1",
+                "theme": "AI-Enhanced Features",
+                "description": "Ideas leveraging AI to improve core functionality",
+                "idea_ids": ["idea-1", "idea-2", "idea-4"],
+                "scores": {"feasibility": 4.0, "impact": 4.5, "novelty": 4.0},
+                "overall_score": 4.17,
+                "recommendation": "High Priority",
+                "metadata": {"num_ideas": 3}
+            }
+        }
+    )
+
+    id: str = Field(
+        ...,
+        description="Unique identifier for the cluster (e.g., 'cluster-1')",
+        pattern=r"^cluster-\d+$"
+    )
+
+    theme: str = Field(
+        ...,
+        description="Theme name describing this cluster",
+        min_length=1,
+        max_length=200
+    )
+
+    description: str = Field(
+        default="",
+        description="Detailed description of the cluster theme"
+    )
+
+    idea_ids: List[str] = Field(
+        default_factory=list,
+        description="List of idea IDs in this cluster"
+    )
+
+    ideas: Optional[List[Idea]] = Field(
+        default=None,
+        description="Optional full Idea objects in this cluster"
+    )
+
+    scores: Dict[str, float] = Field(
+        default_factory=dict,
+        description="Evaluation scores (e.g., feasibility: 4.5, impact: 4.0)"
+    )
+
+    overall_score: float = Field(
+        default=0.0,
+        ge=0.0,
+        le=5.0,
+        description="Average score across all criteria (0.0-5.0)"
+    )
+
+    recommendation: str = Field(
+        default="Medium Priority",
+        description="Priority recommendation (High/Medium/Low Priority)"
+    )
+
+    metadata: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Additional metadata about the cluster"
+    )
+
+    def add_idea(self, idea: Idea) -> None:
+        """
+        Add an idea to this cluster.
+
+        Args:
+            idea: Idea object to add
+
+        Example:
+            >>> cluster.add_idea(idea_obj)
+        """
+        if idea.id not in self.idea_ids:
+            self.idea_ids.append(idea.id)
+
+        if self.ideas is None:
+            self.ideas = []
+
+        if idea not in self.ideas:
+            self.ideas.append(idea)
+
+    def get_idea_count(self) -> int:
+        """
+        Get number of ideas in this cluster.
+
+        Returns:
+            Number of ideas
+
+        Example:
+            >>> count = cluster.get_idea_count()
+        """
+        return len(self.idea_ids)
+
+
+class IdeationState(BaseModel):
+    """
+    Represents the complete state of an ideation workflow session.
+
+    Tracks the full lifecycle of an IDEATE workflow execution, from initial
+    brainstorming through convergent analysis, selection, and elaboration.
+
+    Attributes:
+        session_id: Unique identifier for this ideation session
+        topic: The topic or problem being ideated on
+        perspectives: List of perspectives used in brainstorming
+        ideas: All extracted ideas from brainstorming
+        clusters: Thematic clusters of related ideas
+        selected_cluster_ids: IDs of clusters selected for elaboration
+        elaborations: Detailed outlines for selected clusters
+        scoring_criteria: Criteria used for evaluation (feasibility, impact, etc.)
+        workflow_metadata: Metadata about workflow execution
+        created_at: Timestamp when ideation session started
+        updated_at: Timestamp of last update
+
+    Example:
+        >>> state = IdeationState(
+        ...     session_id="ideation-2024-01-15-001",
+        ...     topic="How can we improve our API documentation?",
+        ...     perspectives=["practical", "innovative", "user-focused"],
+        ...     ideas=[idea1, idea2, idea3],
+        ...     clusters=[cluster1, cluster2],
+        ...     selected_cluster_ids=["cluster-1"],
+        ...     scoring_criteria=["feasibility", "impact", "user_value"]
+        ... )
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "session_id": "ideation-2024-01-15-001",
+                "topic": "Improve user onboarding flow",
+                "perspectives": ["practical", "innovative", "user-focused"],
+                "ideas": [],
+                "clusters": [],
+                "selected_cluster_ids": [],
+                "elaborations": {},
+                "scoring_criteria": ["feasibility", "impact", "novelty"],
+                "workflow_metadata": {"models_used": ["claude", "gpt-4"]},
+                "created_at": "2024-01-15T10:30:00Z",
+                "updated_at": "2024-01-15T11:45:00Z"
+            }
+        }
+    )
+
+    session_id: str = Field(
+        ...,
+        description="Unique identifier for this ideation session",
+        min_length=1
+    )
+
+    topic: str = Field(
+        ...,
+        description="The topic or problem being ideated on",
+        min_length=1
+    )
+
+    perspectives: List[str] = Field(
+        default_factory=list,
+        description="Perspectives used in brainstorming (practical, innovative, etc.)"
+    )
+
+    ideas: List[Idea] = Field(
+        default_factory=list,
+        description="All extracted ideas from brainstorming"
+    )
+
+    clusters: List[IdeaCluster] = Field(
+        default_factory=list,
+        description="Thematic clusters of related ideas"
+    )
+
+    selected_cluster_ids: List[str] = Field(
+        default_factory=list,
+        description="IDs of clusters selected for elaboration"
+    )
+
+    elaborations: Dict[str, str] = Field(
+        default_factory=dict,
+        description="Detailed outlines for selected clusters (cluster_id -> outline)"
+    )
+
+    scoring_criteria: List[str] = Field(
+        default_factory=list,
+        description="Criteria used for evaluation (feasibility, impact, etc.)"
+    )
+
+    workflow_metadata: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Metadata about workflow execution"
+    )
+
+    created_at: Optional[str] = Field(
+        default=None,
+        description="ISO timestamp when ideation session started"
+    )
+
+    updated_at: Optional[str] = Field(
+        default=None,
+        description="ISO timestamp of last update"
+    )
+
+    def add_idea(self, idea: Idea) -> None:
+        """
+        Add an idea to the ideation state.
+
+        Args:
+            idea: Idea object to add
+
+        Example:
+            >>> state.add_idea(new_idea)
+        """
+        if idea not in self.ideas:
+            self.ideas.append(idea)
+
+    def add_cluster(self, cluster: IdeaCluster) -> None:
+        """
+        Add a cluster to the ideation state.
+
+        Args:
+            cluster: IdeaCluster object to add
+
+        Example:
+            >>> state.add_cluster(new_cluster)
+        """
+        if cluster not in self.clusters:
+            self.clusters.append(cluster)
+
+    def get_cluster_by_id(self, cluster_id: str) -> Optional[IdeaCluster]:
+        """
+        Get a cluster by its ID.
+
+        Args:
+            cluster_id: Cluster ID to look up
+
+        Returns:
+            IdeaCluster if found, None otherwise
+
+        Example:
+            >>> cluster = state.get_cluster_by_id("cluster-1")
+        """
+        for cluster in self.clusters:
+            if cluster.id == cluster_id:
+                return cluster
+        return None
+
+    def get_selected_clusters(self) -> List[IdeaCluster]:
+        """
+        Get all selected clusters.
+
+        Returns:
+            List of IdeaCluster objects that were selected
+
+        Example:
+            >>> selected = state.get_selected_clusters()
+            >>> print(f"Selected {len(selected)} clusters")
+        """
+        return [
+            cluster for cluster in self.clusters
+            if cluster.id in self.selected_cluster_ids
+        ]
+
+    def get_idea_count(self) -> int:
+        """
+        Get total number of ideas.
+
+        Returns:
+            Total number of ideas
+
+        Example:
+            >>> count = state.get_idea_count()
+        """
+        return len(self.ideas)
+
+    def get_cluster_count(self) -> int:
+        """
+        Get total number of clusters.
+
+        Returns:
+            Total number of clusters
+
+        Example:
+            >>> count = state.get_cluster_count()
+        """
+        return len(self.clusters)
+
+    def to_dict(self) -> Dict[str, Any]:
+        """
+        Convert IdeationState to dictionary for serialization.
+
+        Returns:
+            Dictionary representation of the ideation state
+
+        Example:
+            >>> state_dict = state.to_dict()
+        """
+        return {
+            "session_id": self.session_id,
+            "topic": self.topic,
+            "perspectives": self.perspectives,
+            "ideas": [idea.model_dump() for idea in self.ideas],
+            "clusters": [cluster.model_dump() for cluster in self.clusters],
+            "selected_cluster_ids": self.selected_cluster_ids,
+            "elaborations": self.elaborations,
+            "scoring_criteria": self.scoring_criteria,
+            "workflow_metadata": self.workflow_metadata,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "IdeationState":
+        """
+        Create an IdeationState from a dictionary.
+
+        Args:
+            data: Dictionary containing ideation state fields
+
+        Returns:
+            New IdeationState instance
+
+        Example:
+            >>> state = IdeationState.from_dict(state_data)
+        """
+        # Convert idea dicts to Idea objects
+        ideas = [
+            Idea(**i) if isinstance(i, dict) else i
+            for i in data.get("ideas", [])
+        ]
+
+        # Convert cluster dicts to IdeaCluster objects
+        clusters = [
+            IdeaCluster(**c) if isinstance(c, dict) else c
+            for c in data.get("clusters", [])
+        ]
+
+        return cls(
+            session_id=data["session_id"],
+            topic=data["topic"],
+            perspectives=data.get("perspectives", []),
+            ideas=ideas,
+            clusters=clusters,
+            selected_cluster_ids=data.get("selected_cluster_ids", []),
+            elaborations=data.get("elaborations", {}),
+            scoring_criteria=data.get("scoring_criteria", []),
+            workflow_metadata=data.get("workflow_metadata", {}),
+            created_at=data.get("created_at"),
+            updated_at=data.get("updated_at")
+        )
+
+
+# ============================================================================
+# RESEARCH Workflow Models
+# ============================================================================
+
+
+class Source(BaseModel):
+    """
+    Represents a research source with metadata and validation.
+
+    Used in the RESEARCH workflow to track sources that provide evidence
+    for research findings. Each source includes credibility assessment,
+    type classification, and validation status.
+
+    Attributes:
+        source_id: Unique identifier for this source
+        title: Title or description of the source
+        url: Optional URL or reference to the source
+        source_type: Type of source (article, paper, book, website, etc.)
+        credibility: Credibility assessment (high, medium, low, unassessed)
+        tags: Optional list of tags for categorization
+        validated: Whether source has been validated
+        validation_score: Numeric validation score if validated
+        validation_notes: List of validation findings
+        ingested_at: ISO timestamp when source was added
+        metadata: Additional source metadata
+
+    Example:
+        >>> source = Source(
+        ...     source_id="src-001",
+        ...     title="Machine Learning Best Practices",
+        ...     url="https://example.com/ml-practices",
+        ...     source_type="article",
+        ...     credibility="high",
+        ...     tags=["machine-learning", "best-practices"]
+        ... )
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "source_id": "src-001",
+                "title": "Machine Learning Best Practices",
+                "url": "https://example.com/ml-practices",
+                "source_type": "article",
+                "credibility": "high",
+                "tags": ["machine-learning", "best-practices"],
+                "validated": True,
+                "validation_score": 8,
+                "validation_notes": ["URL provided", "Credible type: article"],
+                "ingested_at": "2025-11-06T12:00:00Z",
+                "metadata": {}
+            }
+        }
+    )
+
+    source_id: str = Field(
+        ...,
+        description="Unique identifier for this source",
+        min_length=1
+    )
+
+    title: str = Field(
+        ...,
+        description="Title or description of the source",
+        min_length=1
+    )
+
+    url: Optional[str] = Field(
+        default=None,
+        description="Optional URL or reference to the source"
+    )
+
+    source_type: str = Field(
+        default="unknown",
+        description="Type of source (article, paper, book, website, etc.)"
+    )
+
+    credibility: Literal["high", "medium", "low", "unassessed"] = Field(
+        default="unassessed",
+        description="Credibility assessment"
+    )
+
+    tags: List[str] = Field(
+        default_factory=list,
+        description="Optional list of tags for categorization"
+    )
+
+    validated: bool = Field(
+        default=False,
+        description="Whether source has been validated"
+    )
+
+    validation_score: int = Field(
+        default=0,
+        ge=0,
+        description="Numeric validation score if validated"
+    )
+
+    validation_notes: List[str] = Field(
+        default_factory=list,
+        description="List of validation findings"
+    )
+
+    ingested_at: str = Field(
+        ...,
+        description="ISO timestamp when source was added"
+    )
+
+    metadata: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Additional source metadata"
+    )
+
+
+class ResearchEvidence(BaseModel):
+    """
+    Evidence item extracted from research sources.
+
+    Similar to the general Evidence model but specifically designed for
+    the RESEARCH workflow with research-specific fields like relevance
+    score, category, and supporting quotes.
+
+    Attributes:
+        evidence_id: Unique identifier for this evidence
+        source_id: ID of the source this evidence came from
+        content: The extracted evidence content
+        relevance_score: Relevance score (0.0-1.0)
+        confidence: Confidence in the extraction (low, medium, high)
+        category: Category or theme of the evidence
+        supporting_quote: Optional direct quote from source
+        extracted_at: ISO timestamp when evidence was extracted
+        metadata: Additional evidence metadata
+
+    Example:
+        >>> evidence = ResearchEvidence(
+        ...     evidence_id="ev-001",
+        ...     source_id="src-001",
+        ...     content="Model accuracy improved by 25%",
+        ...     relevance_score=0.9,
+        ...     confidence="high",
+        ...     category="Performance"
+        ... )
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "evidence_id": "ev-001",
+                "source_id": "src-001",
+                "content": "Model accuracy improved by 25% with new architecture",
+                "relevance_score": 0.9,
+                "confidence": "high",
+                "category": "Performance",
+                "supporting_quote": "Results show 25% improvement in accuracy",
+                "extracted_at": "2025-11-06T12:30:00Z",
+                "metadata": {}
+            }
+        }
+    )
+
+    evidence_id: str = Field(
+        ...,
+        description="Unique identifier for this evidence",
+        min_length=1
+    )
+
+    source_id: str = Field(
+        ...,
+        description="ID of the source this evidence came from",
+        min_length=1
+    )
+
+    content: str = Field(
+        ...,
+        description="The extracted evidence content",
+        min_length=1
+    )
+
+    relevance_score: float = Field(
+        default=0.5,
+        ge=0.0,
+        le=1.0,
+        description="Relevance score (0.0-1.0)"
+    )
+
+    confidence: Literal["low", "medium", "high"] = Field(
+        default="medium",
+        description="Confidence in the extraction"
+    )
+
+    category: Optional[str] = Field(
+        default=None,
+        description="Category or theme of the evidence"
+    )
+
+    supporting_quote: Optional[str] = Field(
+        default=None,
+        description="Optional direct quote from source"
+    )
+
+    extracted_at: str = Field(
+        ...,
+        description="ISO timestamp when evidence was extracted"
+    )
+
+    metadata: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Additional evidence metadata"
+    )
+
+
+class ResearchValidation(BaseModel):
+    """
+    Validation result for research evidence.
+
+    Tracks the validation status of research evidence including confidence
+    scores, validation notes, contradictions, and supporting/refuting evidence.
+
+    Attributes:
+        evidence_id: ID of the evidence being validated
+        is_valid: Whether the evidence passed validation
+        confidence_score: Validation confidence score (0.0-1.0)
+        validation_notes: List of validation findings
+        contradictions: List of contradictions found
+        supporting_evidence: IDs of evidence that supports this claim
+        refuting_evidence: IDs of evidence that refutes this claim
+        validated_at: ISO timestamp when validation occurred
+        metadata: Additional validation metadata
+
+    Example:
+        >>> validation = ResearchValidation(
+        ...     evidence_id="ev-001",
+        ...     is_valid=True,
+        ...     confidence_score=0.92,
+        ...     validation_notes=["Strong empirical support"],
+        ...     contradictions=[]
+        ... )
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "evidence_id": "ev-001",
+                "is_valid": True,
+                "confidence_score": 0.92,
+                "validation_notes": ["Strong empirical support", "Multiple confirming sources"],
+                "contradictions": [],
+                "supporting_evidence": ["ev-002", "ev-005"],
+                "refuting_evidence": [],
+                "validated_at": "2025-11-06T13:00:00Z",
+                "metadata": {}
+            }
+        }
+    )
+
+    evidence_id: str = Field(
+        ...,
+        description="ID of the evidence being validated",
+        min_length=1
+    )
+
+    is_valid: bool = Field(
+        default=True,
+        description="Whether the evidence passed validation"
+    )
+
+    confidence_score: float = Field(
+        default=0.5,
+        ge=0.0,
+        le=1.0,
+        description="Validation confidence score (0.0-1.0)"
+    )
+
+    validation_notes: List[str] = Field(
+        default_factory=list,
+        description="List of validation findings"
+    )
+
+    contradictions: List[str] = Field(
+        default_factory=list,
+        description="List of contradictions found"
+    )
+
+    supporting_evidence: List[str] = Field(
+        default_factory=list,
+        description="IDs of evidence that supports this claim"
+    )
+
+    refuting_evidence: List[str] = Field(
+        default_factory=list,
+        description="IDs of evidence that refutes this claim"
+    )
+
+    validated_at: str = Field(
+        ...,
+        description="ISO timestamp when validation occurred"
+    )
+
+    metadata: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Additional validation metadata"
+    )
+
+
+class ResearchDossier(BaseModel):
+    """
+    Comprehensive research dossier with all findings.
+
+    The final output of the RESEARCH workflow containing executive summary,
+    source citations, evidence tables, contradiction analysis, and validation
+    metrics in a structured format.
+
+    Attributes:
+        title: Title of the research dossier
+        topic: Research topic or question
+        generated_at: ISO timestamp when dossier was generated
+        sources: List of research sources
+        evidence_items: List of all evidence extracted
+        validation_results: List of validation results
+        executive_summary: Summary of key findings
+        contradictions_found: Number of contradictions identified
+        citation_style: Citation style used (informal, academic, technical)
+        metadata: Additional dossier metadata (research depth, models used, etc.)
+
+    Example:
+        >>> dossier = ResearchDossier(
+        ...     title="AI Orchestration Research",
+        ...     topic="Multi-model orchestration best practices",
+        ...     sources=[source1, source2],
+        ...     evidence_items=[ev1, ev2, ev3],
+        ...     executive_summary="Research identified three key findings...",
+        ...     citation_style="academic"
+        ... )
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "title": "AI Orchestration Best Practices",
+                "topic": "Multi-model orchestration patterns and techniques",
+                "generated_at": "2025-11-06T14:00:00Z",
+                "sources": [],
+                "evidence_items": [],
+                "validation_results": [],
+                "executive_summary": "Research identified three key approaches...",
+                "contradictions_found": 2,
+                "citation_style": "academic",
+                "metadata": {
+                    "research_depth": "thorough",
+                    "models_used": ["claude-sonnet-4"],
+                    "total_sources": 5,
+                    "total_evidence": 15
+                }
+            }
+        }
+    )
+
+    title: str = Field(
+        ...,
+        description="Title of the research dossier",
+        min_length=1
+    )
+
+    topic: str = Field(
+        ...,
+        description="Research topic or question",
+        min_length=1
+    )
+
+    generated_at: str = Field(
+        ...,
+        description="ISO timestamp when dossier was generated"
+    )
+
+    sources: List[Source] = Field(
+        default_factory=list,
+        description="List of research sources"
+    )
+
+    evidence_items: List[ResearchEvidence] = Field(
+        default_factory=list,
+        description="List of all evidence extracted"
+    )
+
+    validation_results: List[ResearchValidation] = Field(
+        default_factory=list,
+        description="List of validation results"
+    )
+
+    executive_summary: str = Field(
+        default="",
+        description="Summary of key findings"
+    )
+
+    contradictions_found: int = Field(
+        default=0,
+        ge=0,
+        description="Number of contradictions identified"
+    )
+
+    citation_style: Literal["informal", "academic", "technical"] = Field(
+        default="informal",
+        description="Citation style used"
+    )
+
+    metadata: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Additional dossier metadata (research depth, models used, etc.)"
+    )
+
+    def get_source_count(self) -> int:
+        """Get total number of sources."""
+        return len(self.sources)
+
+    def get_evidence_count(self) -> int:
+        """Get total number of evidence items."""
+        return len(self.evidence_items)
+
+    def get_validated_count(self) -> int:
+        """Get number of validated evidence items."""
+        return len(self.validation_results)
+
+    def get_average_confidence(self) -> float:
+        """Get average validation confidence score."""
+        if not self.validation_results:
+            return 0.0
+        total = sum(v.confidence_score for v in self.validation_results)
+        return total / len(self.validation_results)
+
+    def to_markdown(self) -> str:
+        """
+        Convert dossier to markdown format.
+
+        This is a simplified version - the full implementation would use
+        the generate_dossier method from ResearchWorkflow.
+
+        Returns:
+            Markdown formatted dossier
+        """
+        lines = [
+            f"# {self.title}",
+            "",
+            f"**Topic:** {self.topic}",
+            f"**Generated:** {self.generated_at}",
+            "",
+            "## Executive Summary",
+            "",
+            self.executive_summary,
+            "",
+            f"**Sources:** {self.get_source_count()}",
+            f"**Evidence Items:** {self.get_evidence_count()}",
+            f"**Validated:** {self.get_validated_count()}",
+            f"**Average Confidence:** {self.get_average_confidence():.2f}",
+            "",
+        ]
+
+        if self.contradictions_found > 0:
+            lines.append(f"**Contradictions Found:** {self.contradictions_found}")
+            lines.append("")
+
+        return "\n".join(lines)
+
+
+class ResearchState(BaseModel):
+    """
+    State model for RESEARCH workflow multi-turn conversations.
+
+    Maintains the complete research state across conversation turns,
+    tracking sources, evidence, validations, and research progress.
+
+    Attributes:
+        session_id: Unique identifier for this research session
+        topic: Research topic or question
+        research_depth: Research depth setting (shallow, moderate, thorough, comprehensive)
+        sources: List of ingested sources
+        evidence_items: List of extracted evidence
+        validation_results: List of validation results
+        research_questions: List of formulated research questions
+        current_phase: Current phase of research (questions, sources, analysis, synthesis)
+        dossier: Optional generated research dossier
+        metadata: Additional research metadata
+        created_at: ISO timestamp when research session started
+        updated_at: ISO timestamp of last update
+
+    Example:
+        >>> state = ResearchState(
+        ...     session_id="research-2025-11-06-001",
+        ...     topic="AI orchestration patterns",
+        ...     research_depth="thorough",
+        ...     current_phase="analysis",
+        ...     sources=[source1, source2],
+        ...     evidence_items=[ev1, ev2]
+        ... )
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "session_id": "research-2025-11-06-001",
+                "topic": "Multi-model orchestration best practices",
+                "research_depth": "thorough",
+                "sources": [],
+                "evidence_items": [],
+                "validation_results": [],
+                "research_questions": [
+                    "What are the key benefits of multi-model approaches?",
+                    "What are common challenges in model orchestration?"
+                ],
+                "current_phase": "analysis",
+                "dossier": None,
+                "metadata": {"models_used": ["claude-sonnet-4"]},
+                "created_at": "2025-11-06T12:00:00Z",
+                "updated_at": "2025-11-06T14:30:00Z"
+            }
+        }
+    )
+
+    session_id: str = Field(
+        ...,
+        description="Unique identifier for this research session",
+        min_length=1
+    )
+
+    topic: str = Field(
+        ...,
+        description="Research topic or question",
+        min_length=1
+    )
+
+    research_depth: Literal["shallow", "moderate", "thorough", "comprehensive"] = Field(
+        default="thorough",
+        description="Research depth setting"
+    )
+
+    sources: List[Source] = Field(
+        default_factory=list,
+        description="List of ingested sources"
+    )
+
+    evidence_items: List[ResearchEvidence] = Field(
+        default_factory=list,
+        description="List of extracted evidence"
+    )
+
+    validation_results: List[ResearchValidation] = Field(
+        default_factory=list,
+        description="List of validation results"
+    )
+
+    research_questions: List[str] = Field(
+        default_factory=list,
+        description="List of formulated research questions"
+    )
+
+    current_phase: Literal["questions", "sources", "analysis", "synthesis"] = Field(
+        default="questions",
+        description="Current phase of research"
+    )
+
+    dossier: Optional[ResearchDossier] = Field(
+        default=None,
+        description="Optional generated research dossier"
+    )
+
+    metadata: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Additional research metadata"
+    )
+
+    created_at: str = Field(
+        ...,
+        description="ISO timestamp when research session started"
+    )
+
+    updated_at: str = Field(
+        ...,
+        description="ISO timestamp of last update"
+    )
+
+    def add_source(self, source: Source) -> None:
+        """Add a source to the research state."""
+        if source not in self.sources:
+            self.sources.append(source)
+
+    def add_evidence(self, evidence: ResearchEvidence) -> None:
+        """Add evidence to the research state."""
+        if evidence not in self.evidence_items:
+            self.evidence_items.append(evidence)
+
+    def add_validation(self, validation: ResearchValidation) -> None:
+        """Add validation result to the research state."""
+        if validation not in self.validation_results:
+            self.validation_results.append(validation)
+
+    def get_source_count(self) -> int:
+        """Get total number of sources."""
+        return len(self.sources)
+
+    def get_evidence_count(self) -> int:
+        """Get total number of evidence items."""
+        return len(self.evidence_items)
+
+    def get_validated_count(self) -> int:
+        """Get number of validated evidence items."""
+        return len(self.validation_results)

@@ -7,10 +7,10 @@ Multi-model AI consensus building for Claude Code. Orchestrate responses from mu
 ModelChorus is both a **Python package** for multi-model AI orchestration and a **Claude Code plugin** for seamless consensus building within your development workflow.
 
 **Key Features:**
-- **Multiple Workflows** - CHAT, THINKDEEP, and CONSENSUS for different use cases
+- **Six Powerful Workflows** - CHAT, CONSENSUS, THINKDEEP, ARGUMENT, IDEATE, and RESEARCH for different use cases
 - **Multi-Provider Support** - Coordinate Claude, Gemini, OpenAI Codex, and Cursor Agent
 - **Conversation Continuity** - Multi-turn conversations with state persistence
-- **Systematic Investigation** - Hypothesis tracking and confidence progression
+- **Systematic Investigation** - Hypothesis tracking, confidence progression, and dialectical reasoning
 - **CLI & Python API** - Use via command-line or programmatically
 - **Async Execution** - Parallel provider calls for speed
 - **Rich Output** - Beautiful terminal output with detailed results
@@ -19,7 +19,7 @@ ModelChorus is both a **Python package** for multi-model AI orchestration and a 
 
 ## Core Workflows
 
-ModelChorus provides three powerful workflows for different scenarios:
+ModelChorus provides six powerful workflows for different scenarios:
 
 ### CHAT - Simple Conversation
 
@@ -162,7 +162,120 @@ print(f"Consensus: {result.consensus_response}")
 
 **When to use:** Important decisions, multiple expert perspectives, comparing approaches
 
-**See [docs/WORKFLOWS.md](docs/WORKFLOWS.md) for detailed workflow guides and decision trees.**
+---
+
+### ARGUMENT - Dialectical Reasoning
+
+**Structured multi-perspective debate for analyzing claims and proposals**
+
+Policy debates, technology decisions, and balanced argument analysis.
+
+**CLI Example:**
+```bash
+# Analyze an argument from multiple perspectives
+modelchorus argument "Universal healthcare should be implemented" \
+  -p claude
+```
+
+**Python Example:**
+```python
+from modelchorus.workflows import ArgumentWorkflow
+from modelchorus.providers import ClaudeProvider
+from modelchorus.core.conversation import ConversationMemory
+
+provider = ClaudeProvider()
+memory = ConversationMemory()
+workflow = ArgumentWorkflow(provider, conversation_memory=memory)
+
+# Analyze argument with pro, con, and synthesis perspectives
+result = await workflow.run("Universal healthcare should be implemented")
+thread_id = result.metadata.get('thread_id')
+```
+
+**Key Features:**
+- Three distinct roles: Creator (pro), Skeptic (con), Moderator (synthesis)
+- Balanced analysis avoiding single-perspective bias
+- Identifies trade-offs and common ground
+- Conversation continuity for iterative refinement
+
+**When to use:** Policy analysis, technology evaluations, balanced decision-making, argument critique
+
+---
+
+### IDEATE - Collaborative Brainstorming
+
+**Multi-perspective idea generation and exploration**
+
+Creative problem-solving, feature brainstorming, and solution exploration.
+
+**CLI Example:**
+```bash
+# Generate ideas from multiple perspectives
+modelchorus ideate "Ways to improve user onboarding" \
+  -p claude -p gemini
+```
+
+**Python Example:**
+```python
+from modelchorus.workflows import IdeateWorkflow
+from modelchorus.providers import ClaudeProvider, GeminiProvider
+
+providers = [ClaudeProvider(), GeminiProvider()]
+workflow = IdeateWorkflow(providers=providers)
+
+# Generate and synthesize ideas from multiple models
+result = await workflow.run("Ways to improve user onboarding")
+```
+
+**Key Features:**
+- Multi-model collaborative brainstorming
+- Idea clustering and categorization
+- Synthesis of complementary perspectives
+- Handles model disagreements constructively
+
+**When to use:** Feature brainstorming, creative problem-solving, exploring alternatives, innovation sessions
+
+---
+
+### RESEARCH - Knowledge Synthesis
+
+**Multi-source research with citation and clustering**
+
+Research synthesis, topic exploration, and comprehensive analysis.
+
+**CLI Example:**
+```bash
+# Research a topic across multiple models
+modelchorus research "Quantum computing applications" \
+  -p claude -p gemini -p codex
+```
+
+**Python Example:**
+```python
+from modelchorus.workflows import ResearchWorkflow
+from modelchorus.providers import ClaudeProvider, GeminiProvider, CodexProvider
+
+providers = [ClaudeProvider(), GeminiProvider(), CodexProvider()]
+workflow = ResearchWorkflow(providers=providers)
+
+# Research with automatic citation and clustering
+result = await workflow.run("Quantum computing applications")
+```
+
+**Key Features:**
+- Automatic citation tracking
+- Semantic clustering of related ideas
+- Multi-model knowledge synthesis
+- Handles overlapping and contradictory information
+
+**When to use:** Topic research, literature review, comprehensive analysis, knowledge exploration
+
+---
+
+**See [docs/workflows/](docs/workflows/) for detailed workflow guides:**
+- [ARGUMENT.md](docs/workflows/ARGUMENT.md) - Dialectical reasoning
+- [IDEATE.md](docs/workflows/IDEATE.md) - Collaborative brainstorming
+- [RESEARCH.md](docs/workflows/RESEARCH.md) - Knowledge synthesis
 
 ## Installation
 
@@ -227,6 +340,22 @@ modelchorus consensus "REST vs GraphQL?" \
   -p claude -p gemini -s synthesize
 ```
 
+**ARGUMENT - Dialectical reasoning:**
+```bash
+modelchorus argument "Universal healthcare should be implemented" -p claude
+```
+
+**IDEATE - Collaborative brainstorming:**
+```bash
+modelchorus ideate "Ways to improve user onboarding" -p claude -p gemini
+```
+
+**RESEARCH - Knowledge synthesis:**
+```bash
+modelchorus research "Quantum computing applications" \
+  -p claude -p gemini -p codex
+```
+
 ### Via Python API
 
 **CHAT workflow:**
@@ -279,6 +408,41 @@ request = GenerationRequest(prompt="REST vs GraphQL trade-offs", temperature=0.7
 result = await workflow.execute(request)
 ```
 
+**ARGUMENT workflow:**
+```python
+from modelchorus.workflows import ArgumentWorkflow
+from modelchorus.providers import ClaudeProvider
+from modelchorus.core.conversation import ConversationMemory
+
+provider = ClaudeProvider()
+memory = ConversationMemory()
+workflow = ArgumentWorkflow(provider, conversation_memory=memory)
+
+result = await workflow.run("Universal healthcare should be implemented")
+```
+
+**IDEATE workflow:**
+```python
+from modelchorus.workflows import IdeateWorkflow
+from modelchorus.providers import ClaudeProvider, GeminiProvider
+
+providers = [ClaudeProvider(), GeminiProvider()]
+workflow = IdeateWorkflow(providers=providers)
+
+result = await workflow.run("Ways to improve user onboarding")
+```
+
+**RESEARCH workflow:**
+```python
+from modelchorus.workflows import ResearchWorkflow
+from modelchorus.providers import ClaudeProvider, GeminiProvider, CodexProvider
+
+providers = [ClaudeProvider(), GeminiProvider(), CodexProvider()]
+workflow = ResearchWorkflow(providers=providers)
+
+result = await workflow.run("Quantum computing applications")
+```
+
 ### Via Claude Code Skill
 
 ```bash
@@ -290,6 +454,15 @@ modelchorus thinkdeep "Investigate memory leak" -f src/cache.py -p claude -e gem
 
 # CONSENSUS workflow
 modelchorus consensus "TypeScript vs JavaScript?" -p claude -p gemini -s synthesize
+
+# ARGUMENT workflow
+modelchorus argument "Universal healthcare should be implemented" -p claude
+
+# IDEATE workflow
+modelchorus ideate "Ways to improve user onboarding" -p claude -p gemini
+
+# RESEARCH workflow
+modelchorus research "Quantum computing applications" -p claude -p gemini -p codex
 ```
 
 ## Consensus Strategies
@@ -356,6 +529,15 @@ modelchorus thinkdeep-status THREAD_ID [options]
 # CONSENSUS workflow
 modelchorus consensus "prompt" [options]
 
+# ARGUMENT workflow
+modelchorus argument "prompt" [options]
+
+# IDEATE workflow
+modelchorus ideate "prompt" [options]
+
+# RESEARCH workflow
+modelchorus research "prompt" [options]
+
 # List available providers and models
 modelchorus list-providers
 
@@ -367,6 +549,9 @@ modelchorus --help
 modelchorus chat --help
 modelchorus thinkdeep --help
 modelchorus consensus --help
+modelchorus argument --help
+modelchorus ideate --help
+modelchorus research --help
 ```
 
 ## CLI Options
@@ -429,6 +614,60 @@ Arguments:
 Options:
   -p, --provider TEXT       Provider to use (repeatable) [default: claude, gemini]
   -s, --strategy TEXT       Consensus strategy [default: all_responses]
+  --system TEXT            System prompt for context
+  -t, --temperature FLOAT   Temperature (0.0-1.0) [default: 0.7]
+  --max-tokens INTEGER      Maximum tokens to generate
+  --timeout FLOAT          Timeout per provider (seconds) [default: 120.0]
+  -o, --output PATH        Save results to JSON file
+  -v, --verbose            Show detailed execution info
+```
+
+### ARGUMENT Command
+```
+modelchorus argument [PROMPT]
+
+Arguments:
+  PROMPT                    Claim or argument to analyze [required]
+
+Options:
+  -p, --provider TEXT       Provider to use [default: claude]
+  --continue TEXT          Thread ID to continue conversation
+  -f, --files TEXT         Files to include (repeatable)
+  --system TEXT            System prompt for context
+  -t, --temperature FLOAT   Temperature (0.0-1.0) [default: 0.7]
+  --max-tokens INTEGER      Maximum tokens to generate
+  -o, --output PATH        Save results to JSON file
+  -v, --verbose            Show detailed execution info
+```
+
+### IDEATE Command
+```
+modelchorus ideate [PROMPT]
+
+Arguments:
+  PROMPT                    Topic or problem for brainstorming [required]
+
+Options:
+  -p, --provider TEXT       Provider to use (repeatable) [default: claude, gemini]
+  -f, --files TEXT         Files to include (repeatable)
+  --system TEXT            System prompt for context
+  -t, --temperature FLOAT   Temperature (0.0-1.0) [default: 0.7]
+  --max-tokens INTEGER      Maximum tokens to generate
+  --timeout FLOAT          Timeout per provider (seconds) [default: 120.0]
+  -o, --output PATH        Save results to JSON file
+  -v, --verbose            Show detailed execution info
+```
+
+### RESEARCH Command
+```
+modelchorus research [PROMPT]
+
+Arguments:
+  PROMPT                    Topic to research [required]
+
+Options:
+  -p, --provider TEXT       Provider to use (repeatable) [default: claude, gemini]
+  -f, --files TEXT         Files to include (repeatable)
   --system TEXT            System prompt for context
   -t, --temperature FLOAT   Temperature (0.0-1.0) [default: 0.7]
   --max-tokens INTEGER      Maximum tokens to generate
