@@ -236,12 +236,12 @@ THINKDEEP supports optional expert validation using a secondary AI model:
 
 ## Investigation Continuation
 
-THINKDEEP supports multi-turn investigations where you can pause, resume, and build upon previous work using the continuation_id parameter.
+THINKDEEP supports multi-turn investigations where you can pause, resume, and build upon previous work using the session_id parameter.
 
 ### How Continuation Works
 
-**continuation_id Parameter:**
-- Unique thread identifier linking investigation steps
+**session_id Parameter:**
+- Unique session identifier linking investigation steps
 - Preserves full conversation history and context
 - Maintains hypothesis state, findings, and confidence levels
 - Enables seamless resumption across sessions
@@ -401,12 +401,12 @@ modelchorus thinkdeep --step "Investigate why API latency increased from 100ms t
 - `--findings`: What was discovered in this step
 
 **Optional Parameters:**
-- `--model`: AI model to use (default: auto-selection)
-- `--continuation-id`: Resume previous investigation
+- `--provider`: AI provider to use (claude, gemini, codex, cursor-agent; default: claude)
+- `--session-id`: Resume previous investigation
 - `--hypothesis`: Current working theory
 - `--confidence`: Confidence level (exploring, low, medium, high, very_high, almost_certain, certain)
 - `--files-checked`: List of files examined
-- `--temperature`: Creativity level (0.0-1.0)
+- `--temperature`: Creativity level (0.0-1.0, default: 0.7)
 - `--thinking-mode`: Reasoning depth (minimal, low, medium, high, max)
 
 ## Advanced Usage
