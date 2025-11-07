@@ -69,6 +69,62 @@ The command returns a conversational response from the default provider (Claude)
 | `--output` | `-o` | None | Save result to JSON file |
 | `--verbose` | `-v` | False | Show detailed execution info |
 
+## Technical Contract
+
+### Parameters
+
+**Required:**
+- `prompt` (string): The conversation prompt or question to send to the AI model
+
+**Optional:**
+- `--provider, -p` (string): AI provider to use - Valid values: `claude`, `gemini`, `codex`, `cursor-agent` - Default: `claude`
+- `--continue, -c` (string): Thread ID to continue an existing conversation - Format: `thread-{uuid}` - Maintains full conversation history
+- `--file, -f` (string, repeatable): File paths to include as context - Can be specified multiple times - Files must exist before execution
+- `--system` (string): Additional system prompt to customize model behavior
+- `--temperature, -t` (float): Response creativity level - Range: 0.0-1.0 - Default: 0.7 - Lower values are more deterministic
+- `--max-tokens` (integer): Maximum response length in tokens - Provider-specific limits apply
+- `--output, -o` (string): Path to save JSON output file - Creates or overwrites file at specified path
+- `--verbose, -v` (boolean): Enable detailed execution information - Default: false - Shows provider details and timing
+
+### Return Format
+
+The CHAT workflow returns a JSON object with the following structure:
+
+```json
+{
+  "result": "The model's conversational response text...",
+  "session_id": "thread-abc-123-def-456",
+  "metadata": {
+    "provider": "claude",
+    "model": "claude-3-5-sonnet-20241022",
+    "prompt_tokens": 150,
+    "completion_tokens": 300,
+    "total_tokens": 450,
+    "temperature": 0.7,
+    "timestamp": "2025-11-07T10:30:00Z"
+  }
+}
+```
+
+**Field Descriptions:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `result` | string | The conversational response from the AI model |
+| `session_id` | string | Thread ID for continuing this conversation (format: `thread-{uuid}`) |
+| `metadata.provider` | string | The AI provider that processed the request (`claude`, `gemini`, `codex`, `cursor-agent`) |
+| `metadata.model` | string | Specific model version used by the provider |
+| `metadata.prompt_tokens` | integer | Number of tokens in the input (prompt + context + history) |
+| `metadata.completion_tokens` | integer | Number of tokens in the model's response |
+| `metadata.total_tokens` | integer | Total tokens consumed (prompt_tokens + completion_tokens) |
+| `metadata.temperature` | float | Temperature setting used for this request (0.0-1.0) |
+| `metadata.timestamp` | string | ISO 8601 timestamp of when the request was processed |
+
+**Usage Notes:**
+- Save the `session_id` value to continue conversations using `--continue`
+- Token counts help track usage and costs across providers
+- The `result` field contains the complete response text suitable for display or further processing
+
 ## Advanced Usage
 
 ### With Provider Selection

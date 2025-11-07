@@ -409,6 +409,100 @@ modelchorus thinkdeep --step "Investigate why API latency increased from 100ms t
 - `--temperature`: Creativity level (0.0-1.0, default: 0.7)
 - `--thinking-mode`: Reasoning depth (minimal, low, medium, high, max)
 
+## Technical Contract
+
+### Parameters
+
+**Required:**
+- `--step` (string): Current investigation step description - What you're investigating in this step - Should be clear and focused on specific aspect
+- `--step-number` (integer): Current step index - Starts at 1 - Tracks position in investigation sequence
+- `--total-steps` (integer): Estimated total investigation steps - Can be adjusted as investigation progresses - Helps track overall progress
+- `--next-step-required` (boolean): Whether another step is needed - Set to `true` if investigation continues - Set to `false` when investigation is complete
+- `--findings` (string): Discoveries from this step - Evidence, observations, and insights - Builds investigation knowledge base
+
+**Optional:**
+- `--provider` (string): AI provider to use for investigation - Valid values: `claude`, `gemini`, `codex`, `cursor-agent` - Default: `claude`
+- `--session-id` (string): Session ID to resume previous investigation - Format: `thinkdeep-{uuid}` - Maintains full investigation history
+- `--hypothesis` (string): Current working theory about the problem - Should evolve as evidence accumulates - Can be revised or replaced in subsequent steps
+- `--confidence` (string): Confidence level in current hypothesis - Valid values: `exploring`, `low`, `medium`, `high`, `very_high`, `almost_certain`, `certain` - Default: `exploring` - Should increase as evidence strengthens
+- `--files-checked` (string): Comma-separated list of files examined - Tracks investigation scope - Format: `file1.py,file2.js,file3.go`
+- `--relevant-files` (string): Comma-separated list of files relevant to findings - Files identified as related to the problem - Format: `src/auth.py,tests/test_auth.py`
+- `--relevant-context` (string): Comma-separated list of methods/functions involved - Specific code locations identified - Format: `authenticate,validate_token,check_permissions`
+- `--issues-found` (string): JSON array of issues with severity levels - Format: `[{"severity":"high","description":"..."},...]`
+- `--temperature` (float): Creativity level for investigation reasoning - Range: 0.0-1.0 - Default: 0.7 - Lower values for more focused analysis
+- `--thinking-mode` (string): Reasoning depth for investigation - Valid values: `minimal`, `low`, `medium`, `high`, `max` - Default: `medium` - Higher modes for complex problems
+- `--output` (string): Path to save JSON output file - Creates or overwrites file at specified path
+- `--verbose` (boolean): Enable detailed execution information - Default: false - Shows provider details and timing
+
+### Return Format
+
+The THINKDEEP workflow returns a JSON object with the following structure:
+
+```json
+{
+  "result": "Investigation analysis and next steps from the AI model...",
+  "session_id": "thinkdeep-abc-123-def-456",
+  "metadata": {
+    "provider": "claude",
+    "model": "claude-3-5-sonnet-20241022",
+    "step_number": 2,
+    "total_steps": 4,
+    "next_step_required": true,
+    "confidence": "medium",
+    "hypothesis": "API latency caused by database connection pooling issue",
+    "findings": "Found N+1 query pattern in recent ORM changes",
+    "files_checked": ["src/models/user.py", "src/db/connection.py"],
+    "relevant_files": ["src/db/connection.py", "config/database.yml"],
+    "relevant_context": ["get_connection", "execute_query"],
+    "issues_found": [
+      {
+        "severity": "high",
+        "description": "N+1 query pattern in user listing endpoint"
+      }
+    ],
+    "prompt_tokens": 850,
+    "completion_tokens": 450,
+    "total_tokens": 1300,
+    "temperature": 0.7,
+    "thinking_mode": "high",
+    "timestamp": "2025-11-07T10:30:00Z"
+  }
+}
+```
+
+**Field Descriptions:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `result` | string | Investigation analysis, findings, and guidance for next steps |
+| `session_id` | string | Session ID for continuing this investigation (format: `thinkdeep-{uuid}`) |
+| `metadata.provider` | string | The AI provider used for this investigation step |
+| `metadata.model` | string | Specific model version used by the provider |
+| `metadata.step_number` | integer | Current step number in the investigation sequence |
+| `metadata.total_steps` | integer | Total estimated steps for complete investigation |
+| `metadata.next_step_required` | boolean | Whether the investigation continues (true) or is complete (false) |
+| `metadata.confidence` | string | Confidence level in the current hypothesis (`exploring` through `certain`) |
+| `metadata.hypothesis` | string | Current working theory about the problem being investigated |
+| `metadata.findings` | string | Cumulative findings and evidence from this step |
+| `metadata.files_checked` | array[string] | List of files examined during investigation |
+| `metadata.relevant_files` | array[string] | Files identified as relevant to the problem |
+| `metadata.relevant_context` | array[string] | Methods/functions identified as involved in the issue |
+| `metadata.issues_found` | array[object] | Issues discovered with severity levels and descriptions |
+| `metadata.prompt_tokens` | integer | Number of tokens in the input (includes investigation history) |
+| `metadata.completion_tokens` | integer | Number of tokens in the model's response |
+| `metadata.total_tokens` | integer | Total tokens consumed (prompt_tokens + completion_tokens) |
+| `metadata.temperature` | float | Temperature setting used for this investigation step (0.0-1.0) |
+| `metadata.thinking_mode` | string | Reasoning depth used (`minimal`, `low`, `medium`, `high`, `max`) |
+| `metadata.timestamp` | string | ISO 8601 timestamp of when this step was processed |
+
+**Usage Notes:**
+- Always save the `session_id` to continue multi-step investigations
+- The investigation accumulates context across steps through the session
+- Adjust `total_steps` estimate as the investigation reveals complexity
+- Confidence should generally increase as evidence accumulates
+- Set `next_step_required: false` only when the investigation is truly complete
+- The `result` contains both analysis of findings and guidance for next investigation steps
+
 ## Advanced Usage
 
 ### With Model Selection

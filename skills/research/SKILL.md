@@ -480,6 +480,78 @@ modelchorus research "Evaluate our current API design against REST best practice
 
 **Expected Outcome:** Research that treats provided files as authoritative sources, cross-references them with industry best practices, identifies gaps or improvements, and provides evidence-backed recommendations. Technical citations reference both provided files and external sources.
 
+## Technical Contract
+
+### Parameters
+
+**Required:**
+- `prompt` (string): The research topic or question to investigate with comprehensive evidence gathering
+
+**Optional:**
+- `--provider, -p` (string): AI provider to use for research investigation - Valid values: `claude`, `gemini`, `codex`, `cursor-agent` - Default: `claude`
+- `--depth, -d` (string): Research thoroughness level - Valid values: `shallow`, `moderate`, `thorough`, `comprehensive` - Default: `moderate` - Controls number of focused findings (2-3 for shallow, 4-6 for moderate, 7-9 for thorough, 10+ for comprehensive)
+- `--citation-style` (string): Citation formatting style - Valid values: `informal`, `academic`, `technical` - Default: `informal` - `academic` for formal papers, `technical` for technical docs
+- `--continue, -c` (string): Session ID to continue previous research - Format: `research-thread-{uuid}` - Maintains full research context including sources and findings across iterations
+- `--file, -f` (string, repeatable): File paths to include as authoritative sources - Can be specified multiple times - Files must exist before execution - Treated as primary sources and cross-referenced with external research
+- `--system` (string): Additional system prompt to customize research focus - Useful for specifying constraints, priorities, or specific research angles
+- `--temperature, -t` (float): Response creativity level - Range: 0.0-1.0 - Default: 0.7 - Recommended: 0.3-0.5 for factual research, 0.6-0.8 for trend analysis or exploratory research
+- `--max-tokens` (integer): Maximum response length in tokens - Provider-specific limits apply - Affects detail level of research dossier
+- `--output, -o` (string): Path to save JSON output file - Creates or overwrites file at specified path - Recommended for thorough/comprehensive research to preserve findings
+- `--verbose, -v` (boolean): Enable detailed execution information - Default: false - Shows provider details and timing
+
+### Return Format
+
+The RESEARCH workflow returns a JSON object with the following structure:
+
+```json
+{
+  "result": "=== Finding 1: [Title] ===\n[Evidence and analysis]\nCitations: [sources]\n\n=== Finding 2: [Title] ===\n[Evidence and analysis]\nCitations: [sources]\n\n... [depth-based count] ...\n\n=== Research Dossier ===\n[Synthesis, themes, conclusions]",
+  "session_id": "research-thread-abc-123-def-456",
+  "metadata": {
+    "provider": "claude",
+    "model": "claude-3-5-sonnet-20241022",
+    "depth": "moderate",
+    "citation_style": "informal",
+    "num_findings": 5,
+    "sources_referenced": ["source1", "source2", "source3"],
+    "files_provided": ["api_spec.yaml", "context.md"],
+    "temperature": 0.7,
+    "prompt_tokens": 500,
+    "completion_tokens": 1200,
+    "total_tokens": 1700,
+    "timestamp": "2025-11-07T10:30:00Z"
+  }
+}
+```
+
+**Field Descriptions:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `result` | string | Complete research dossier with numbered findings (each with evidence and citations), followed by synthesis section with themes and conclusions |
+| `session_id` | string | Session ID for continuing this research (format: `research-thread-{uuid}`) |
+| `metadata.provider` | string | The AI provider used for this research |
+| `metadata.model` | string | Specific model version used by the provider |
+| `metadata.depth` | string | Research depth level used (`shallow`, `moderate`, `thorough`, `comprehensive`) |
+| `metadata.citation_style` | string | Citation formatting style used (`informal`, `academic`, `technical`) |
+| `metadata.num_findings` | integer | Number of focused findings generated (varies by depth level) |
+| `metadata.sources_referenced` | array[string] | List of sources cited in the research findings |
+| `metadata.files_provided` | array[string] | List of local files used as authoritative sources (if any) |
+| `metadata.temperature` | float | Temperature setting used for this research (0.0-1.0) |
+| `metadata.prompt_tokens` | integer | Number of tokens in the input (prompt + context + history + files) |
+| `metadata.completion_tokens` | integer | Number of tokens in the research dossier output |
+| `metadata.total_tokens` | integer | Total tokens consumed (prompt_tokens + completion_tokens) |
+| `metadata.timestamp` | string | ISO 8601 timestamp of when the research was completed |
+
+**Usage Notes:**
+- Save the `session_id` to continue research with follow-up questions or deeper investigation
+- The `result` includes both individual findings (with citations) and a synthesized research dossier
+- Token costs scale with `depth` - comprehensive research uses significantly more tokens than shallow
+- Provided files via `--file` are treated as authoritative sources and appear in citations
+- Citation format affects how sources are referenced throughout the findings
+- Lower temperature (0.3-0.5) recommended for factual accuracy in research
+- Use `--output` to save important research results, especially for thorough/comprehensive investigations
+
 ## Troubleshooting
 
 ### Issue: Research depth insufficient

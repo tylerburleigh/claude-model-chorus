@@ -217,6 +217,82 @@ The command executes on default providers (Claude and Gemini) in parallel using 
 
 **Important:** CONSENSUS does NOT support `--continue` (no conversation threading).
 
+## Technical Contract
+
+### Parameters
+
+**Required:**
+- `prompt` (string): The question or statement to send to all selected AI models
+
+**Optional:**
+- `--provider, -p` (string, repeatable): AI providers to query - Valid values: `claude`, `gemini`, `codex`, `cursor-agent` - Default: `["claude", "gemini"]` - Can be specified multiple times to query additional providers
+- `--strategy, -s` (string): Consensus synthesis strategy - Valid values: `all_responses`, `synthesize`, `majority`, `weighted`, `first_valid` - Default: `all_responses`
+- `--file, -f` (string, repeatable): File paths to include as context for all models - Can be specified multiple times - Files must exist before execution
+- `--system` (string): Additional system prompt to customize model behavior across all providers
+- `--temperature, -t` (float): Response creativity level for all models - Range: 0.0-1.0 - Default: 0.7 - Lower values are more deterministic
+- `--max-tokens` (integer): Maximum response length in tokens per provider - Provider-specific limits apply
+- `--timeout` (float): Timeout per provider in seconds - Default: 120.0 - Prevents hanging on slow providers
+- `--output, -o` (string): Path to save JSON output file - Creates or overwrites file at specified path
+- `--verbose, -v` (boolean): Enable detailed execution information - Default: false - Shows per-provider timing and status
+
+### Return Format
+
+The CONSENSUS workflow returns a JSON object with the following structure:
+
+```json
+{
+  "result": "Synthesized response text based on selected strategy...",
+  "session_id": null,
+  "metadata": {
+    "strategy": "all_responses",
+    "providers_queried": ["claude", "gemini"],
+    "providers_succeeded": ["claude", "gemini"],
+    "providers_failed": [],
+    "execution_time_seconds": 3.45,
+    "temperature": 0.7,
+    "timestamp": "2025-11-07T10:30:00Z",
+    "provider_details": {
+      "claude": {
+        "model": "claude-3-5-sonnet-20241022",
+        "prompt_tokens": 150,
+        "completion_tokens": 300,
+        "total_tokens": 450,
+        "response_time_seconds": 2.1
+      },
+      "gemini": {
+        "model": "gemini-2.5-pro-latest",
+        "prompt_tokens": 145,
+        "completion_tokens": 280,
+        "total_tokens": 425,
+        "response_time_seconds": 3.2
+      }
+    }
+  }
+}
+```
+
+**Field Descriptions:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `result` | string | The synthesized or combined response based on the selected strategy |
+| `session_id` | null | Always null for CONSENSUS (no conversation threading support) |
+| `metadata.strategy` | string | The consensus strategy used (`all_responses`, `synthesize`, `majority`, `weighted`, `first_valid`) |
+| `metadata.providers_queried` | array[string] | List of all providers that were queried |
+| `metadata.providers_succeeded` | array[string] | List of providers that returned successful responses |
+| `metadata.providers_failed` | array[string] | List of providers that failed or timed out |
+| `metadata.execution_time_seconds` | float | Total time for parallel execution (not sum of individual times) |
+| `metadata.temperature` | float | Temperature setting used for all providers (0.0-1.0) |
+| `metadata.timestamp` | string | ISO 8601 timestamp of when the request was processed |
+| `metadata.provider_details` | object | Per-provider execution details including model, tokens, and timing |
+
+**Usage Notes:**
+- CONSENSUS executes all providers in parallel for fast results
+- `providers_failed` will list any providers that timed out or returned errors
+- Token counts and response times are tracked per provider for analysis
+- The `result` format varies by strategy (see Consensus Strategies section)
+- CONSENSUS does not support conversation threading - each invocation is independent
+
 ## Advanced Usage
 
 ### With Provider Selection
