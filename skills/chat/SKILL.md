@@ -155,3 +155,134 @@ modelchorus chat "Analyze this architecture" -f design.md --output analysis.json
 - Metadata (model name, token usage, timestamp)
 - Thread ID for continuation
 - Provider information
+
+## Best Practices
+
+1. **Use threading for multi-turn conversations** - Always save and reuse thread IDs when building on previous context. This ensures the model has full conversation history and provides more coherent responses.
+
+2. **Choose appropriate temperature** - Use lower temperatures (0.3-0.5) for factual queries and higher temperatures (0.7-0.9) for creative or exploratory conversations.
+
+3. **Include relevant files as context** - When discussing code, documentation, or specific content, use `-f` flags to include files rather than copying content into prompts.
+
+4. **Keep prompts clear and specific** - Even though CHAT is conversational, specific prompts yield better results than vague questions.
+
+5. **Select the right provider** - Match provider strengths to your task: Claude for reasoning, Gemini for facts, Codex for code.
+
+## Examples
+
+### Example 1: Code Review Conversation
+
+**Scenario:** You want to discuss code quality and get iterative feedback.
+
+**Command:**
+```bash
+# Start conversation with code file
+modelchorus chat "Review this implementation for potential issues" -f src/auth.py
+
+# Follow up with specific question (using thread ID from previous output)
+modelchorus chat "How would you refactor the login method?" -c thread-abc-123
+
+# Continue with implementation details
+modelchorus chat "Show me an example of the improved version" -c thread-abc-123
+```
+
+**Expected Outcome:** Multi-turn conversation where the model builds on previous context to provide detailed, contextual code review and refactoring suggestions.
+
+---
+
+### Example 2: Learning Session with Follow-ups
+
+**Scenario:** You're learning a new concept and want to ask progressively deeper questions.
+
+**Command:**
+```bash
+# Initial query with lower temperature for accuracy
+modelchorus chat "Explain Rust's ownership system" --temperature 0.5
+
+# Follow up (saves thread ID: thread-xyz-789)
+modelchorus chat "How does borrowing work with mutable references?" -c thread-xyz-789 -t 0.5
+
+# Ask for practical example
+modelchorus chat "Show me a common mistake beginners make" -c thread-xyz-789 -t 0.5
+```
+
+**Expected Outcome:** Educational conversation where each response builds on previous explanations, creating a coherent learning path.
+
+---
+
+### Example 3: Multi-file Analysis
+
+**Scenario:** You need to understand how multiple components interact.
+
+**Command:**
+```bash
+# Include multiple related files
+modelchorus chat "Explain how these components work together" \
+  -f src/models/user.py \
+  -f src/services/auth.py \
+  -f src/api/routes.py \
+  --output analysis.json
+```
+
+**Expected Outcome:** Comprehensive analysis of component relationships with results saved to JSON for later reference.
+
+## Troubleshooting
+
+### Issue: Thread ID not found
+
+**Symptoms:** Error message "Thread ID not found" or "Invalid continuation_id"
+
+**Cause:** The thread ID doesn't exist in conversation memory, either due to typo or expired/cleared memory
+
+**Solution:**
+```bash
+# Verify thread ID format (should be thread-{uuid})
+# Start a new conversation if thread is unavailable
+modelchorus chat "Your prompt here"
+```
+
+---
+
+### Issue: File not found error
+
+**Symptoms:** Error message indicating a file path doesn't exist
+
+**Cause:** File path provided to `-f` flag is invalid or file doesn't exist
+
+**Solution:**
+```bash
+# Verify file exists before running command
+ls -l path/to/file.py
+
+# Use correct absolute or relative path
+modelchorus chat "Review this code" -f ./src/main.py
+```
+
+---
+
+### Issue: Provider initialization failed
+
+**Symptoms:** Error about provider not being available or initialization failure
+
+**Cause:** Selected provider is not configured or invalid provider name
+
+**Solution:**
+```bash
+# Check available providers
+modelchorus list-providers
+
+# Use a valid provider name
+modelchorus chat "Your prompt" -p claude
+```
+
+## Related Workflows
+
+- **CONSENSUS** - When you need multiple AI perspectives on the same question instead of a single model's view
+- **THINKDEEP** - When the question requires deep investigation with hypothesis testing rather than conversational exchange
+
+---
+
+**See Also:**
+- ModelChorus Documentation: `/docs/WORKFLOWS.md`
+- Provider Information: `modelchorus list-providers`
+- General CLI Help: `modelchorus --help`
