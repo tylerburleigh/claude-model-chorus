@@ -21,6 +21,24 @@ from .base_provider import (
 logger = logging.getLogger(__name__)
 
 
+class ProviderUnavailableError(Exception):
+    """Provider CLI is not available or cannot be used."""
+
+    def __init__(self, provider_name: str, reason: str, suggestions: Optional[List[str]] = None):
+        """
+        Initialize provider unavailability error.
+
+        Args:
+            provider_name: Name of the provider (e.g., "claude")
+            reason: Reason for unavailability
+            suggestions: List of suggestions for fixing the issue
+        """
+        self.provider_name = provider_name
+        self.reason = reason
+        self.suggestions = suggestions or []
+        super().__init__(f"{provider_name}: {reason}")
+
+
 class CLIProvider(ModelProvider):
     """
     Base class for CLI-based model providers.
@@ -66,6 +84,43 @@ class CLIProvider(ModelProvider):
         self.cli_command = cli_command
         self.timeout = timeout
         self.retry_limit = retry_limit
+
+    async def check_availability(self) -> tuple[bool, Optional[str]]:
+        """
+        Check if this provider's CLI is available and working.
+
+        Returns:
+            Tuple of (is_available, error_message)
+            - is_available: True if CLI is available and working
+            - error_message: None if available, otherwise description of the issue
+        """
+        try:
+            # Try running --version or --help with short timeout
+            process = await asyncio.create_subprocess_exec(
+                self.cli_command,
+                "--version",
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+
+            try:
+                await asyncio.wait_for(process.communicate(), timeout=5.0)
+                return (True, None)
+            except asyncio.TimeoutError:
+                # Kill the process if it times out
+                try:
+                    process.kill()
+                    await process.wait()
+                except:
+                    pass
+                return (False, f"CLI command '{self.cli_command}' timed out during availability check")
+
+        except FileNotFoundError:
+            return (False, f"CLI command '{self.cli_command}' not found in PATH")
+        except PermissionError:
+            return (False, f"Permission denied to execute '{self.cli_command}'")
+        except Exception as e:
+            return (False, f"Error checking availability: {str(e)}")
 
     def _load_conversation_context(self, continuation_id: str) -> Optional[Dict[str, Any]]:
         """
@@ -154,6 +209,7 @@ class CLIProvider(ModelProvider):
             Tuple of (stdout, stderr, returncode)
 
         Raises:
+            ProviderUnavailableError: If CLI is not available or cannot be executed
             asyncio.TimeoutError: If command exceeds timeout
             Exception: For other execution errors
         """
@@ -182,6 +238,31 @@ class CLIProvider(ModelProvider):
 
             return stdout_str, stderr_str, returncode
 
+        except FileNotFoundError:
+            # CLI command not found in PATH
+            error_msg = f"CLI command '{self.cli_command}' not found in PATH"
+            logger.error(error_msg)
+            raise ProviderUnavailableError(
+                self.provider_name,
+                f"CLI command '{self.cli_command}' not installed or not in PATH",
+                suggestions=[
+                    f"Install the {self.provider_name} CLI tool",
+                    f"Ensure '{self.cli_command}' is in your system PATH",
+                    "Or use a different provider with --provider flag",
+                ]
+            )
+        except PermissionError:
+            # No permission to execute CLI command
+            error_msg = f"Permission denied to execute '{self.cli_command}'"
+            logger.error(error_msg)
+            raise ProviderUnavailableError(
+                self.provider_name,
+                f"Permission denied to execute '{self.cli_command}'",
+                suggestions=[
+                    f"Check file permissions for '{self.cli_command}'",
+                    "Or use a different provider with --provider flag",
+                ]
+            )
         except asyncio.TimeoutError:
             logger.error(f"Command timed out after {self.timeout} seconds")
             raise
@@ -189,13 +270,54 @@ class CLIProvider(ModelProvider):
             logger.error(f"Error executing command: {e}")
             raise
 
+    def _is_retryable_error(self, error: Exception) -> bool:
+        """
+        Determine if an error is retryable or permanent.
+
+        Args:
+            error: The exception to check
+
+        Returns:
+            True if the error is transient and should be retried, False otherwise
+        """
+        # Permanent errors that should not be retried
+        permanent_error_types = (
+            ProviderUnavailableError,  # CLI not found, permission denied
+            FileNotFoundError,  # Command not found
+            PermissionError,  # Permission issues
+        )
+
+        if isinstance(error, permanent_error_types):
+            return False
+
+        # Check for specific error messages indicating permanent failures
+        error_str = str(error).lower()
+        permanent_error_patterns = [
+            "command not found",
+            "permission denied",
+            "not found in path",
+            "invalid api key",
+            "unauthorized",
+            "authentication failed",
+            "400",  # Bad request
+            "401",  # Unauthorized
+            "403",  # Forbidden
+        ]
+
+        for pattern in permanent_error_patterns:
+            if pattern in error_str:
+                return False
+
+        # Timeout and network errors are retryable
+        return True
+
     async def generate(self, request: GenerationRequest) -> GenerationResponse:
         """
         Generate text using the CLI tool.
 
         This method orchestrates the generation process:
         1. Build the CLI command
-        2. Execute the command with retries
+        2. Execute the command with retries (only for transient errors)
         3. Parse the response
         4. Return the result
 
@@ -206,6 +328,7 @@ class CLIProvider(ModelProvider):
             GenerationResponse with generated content
 
         Raises:
+            ProviderUnavailableError: If provider CLI is not available
             Exception: If all retry attempts fail
         """
         command = self.build_command(request)
@@ -223,6 +346,12 @@ class CLIProvider(ModelProvider):
 
             except Exception as e:
                 last_exception = e
+
+                # Check if error is retryable
+                if not self._is_retryable_error(e):
+                    logger.error(f"Permanent error encountered, not retrying: {e}")
+                    raise
+
                 logger.warning(
                     f"Attempt {attempt + 1}/{self.retry_limit} failed: {e}"
                 )

@@ -342,7 +342,7 @@ modelchorus research "Future trends in cloud architecture" --temperature 0.7
 
 ```bash
 # Comprehensive formal research with academic citations
-modelchorus research "State of quantum computing 2024" --depth thorough --citation-style academic --provider claude --temperature 0.4 --output quantum_research.json
+modelchorus research "State of quantum computing 2024" --depth thorough --citation-style academic --temperature 0.4 --output quantum_research.json
 
 # Quick technical research with source files
 modelchorus research "Evaluate GraphQL for our API" --depth shallow --citation-style technical --file current_api_spec.yaml --file requirements.md
@@ -394,7 +394,7 @@ modelchorus research "GraphQL vs REST API comparison" --depth thorough --citatio
 
 **Command:**
 ```bash
-modelchorus research "Compare GraphQL and REST APIs: benefits, challenges, and use cases" --depth thorough --citation-style technical --provider claude --output api_comparison.json
+modelchorus research "Compare GraphQL and REST APIs: benefits, challenges, and use cases" --depth thorough --citation-style technical --output api_comparison.json
 ```
 
 **Expected Outcome:** Comprehensive research with 7-9 findings covering benefits of each approach, implementation challenges, performance considerations, use case recommendations, and ecosystem maturity. Technical citations provide specific references for claims. Results saved to JSON for team review.

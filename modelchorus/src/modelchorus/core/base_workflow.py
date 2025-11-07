@@ -5,13 +5,21 @@ This module defines the abstract base class that all workflow implementations
 must inherit from, providing a consistent interface for multi-model orchestration.
 """
 
+import asyncio
+import logging
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, TYPE_CHECKING
 from dataclasses import dataclass, field
 from datetime import datetime
 
 from .conversation import ConversationMemory
 from .models import ConversationThread, ConversationMessage
+
+if TYPE_CHECKING:
+    from ..providers import ModelProvider, GenerationRequest, GenerationResponse
+    from ..providers.cli_provider import ProviderUnavailableError
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -148,6 +156,141 @@ class BaseWorkflow(ABC):
             True if configuration is valid, False otherwise
         """
         return True
+
+    # ========================================================================
+    # Provider Fallback and Availability Methods
+    # ========================================================================
+
+    async def _execute_with_fallback(
+        self,
+        request: "GenerationRequest",
+        primary_provider: "ModelProvider",
+        fallback_providers: Optional[List["ModelProvider"]] = None
+    ) -> tuple["GenerationResponse", str, List[str]]:
+        """
+        Execute generation with automatic fallback to alternative providers.
+
+        Attempts to generate using the primary provider. If that fails, automatically
+        tries each fallback provider in order until one succeeds.
+
+        Args:
+            request: Generation request to execute
+            primary_provider: Primary provider to try first
+            fallback_providers: Optional list of fallback providers to try if primary fails
+
+        Returns:
+            Tuple of (response, successful_provider_name, failed_provider_names)
+
+        Raises:
+            Exception: If all providers fail
+
+        Example:
+            >>> response, used, failed = await self._execute_with_fallback(
+            ...     request, primary_provider, [fallback1, fallback2]
+            ... )
+            >>> if failed:
+            ...     logger.warning(f"Providers failed: {failed}, used: {used}")
+        """
+        from ..providers.cli_provider import ProviderUnavailableError
+
+        fallback_providers = fallback_providers or []
+        all_providers = [primary_provider] + fallback_providers
+        failed_providers = []
+        last_exception = None
+
+        for i, provider in enumerate(all_providers):
+            try:
+                logger.info(
+                    f"Attempting provider {provider.provider_name} "
+                    f"({i+1}/{len(all_providers)})"
+                )
+                response = await provider.generate(request)
+
+                if i > 0:
+                    logger.warning(
+                        f"Primary provider failed, succeeded with fallback: "
+                        f"{provider.provider_name}"
+                    )
+
+                return response, provider.provider_name, failed_providers
+
+            except ProviderUnavailableError as e:
+                # Permanent error - provider CLI not available
+                failed_providers.append(provider.provider_name)
+                logger.error(
+                    f"{provider.provider_name} unavailable: {e.reason}"
+                )
+                last_exception = e
+
+            except Exception as e:
+                # Other error - could be transient or permanent
+                failed_providers.append(provider.provider_name)
+                logger.warning(
+                    f"{provider.provider_name} failed: {str(e)[:100]}"
+                )
+                last_exception = e
+
+        # All providers failed
+        error_msg = (
+            f"All {len(all_providers)} providers failed. "
+            f"Last error: {last_exception}"
+        )
+        logger.error(error_msg)
+        raise Exception(error_msg)
+
+    async def check_provider_availability(
+        self,
+        primary_provider: "ModelProvider",
+        fallback_providers: Optional[List["ModelProvider"]] = None
+    ) -> tuple[bool, List[str], List[tuple[str, str]]]:
+        """
+        Check availability of all providers before starting workflow.
+
+        Tests each provider's CLI availability concurrently. This allows the workflow
+        to fail fast if no providers are available, or to warn the user if some
+        providers are unavailable.
+
+        Args:
+            primary_provider: Primary provider to check
+            fallback_providers: Optional list of fallback providers to check
+
+        Returns:
+            Tuple of (at_least_one_available, available_providers, unavailable_providers)
+            - at_least_one_available: True if at least one provider is available
+            - available_providers: List of available provider names
+            - unavailable_providers: List of (provider_name, error_message) tuples
+
+        Example:
+            >>> has_provider, available, unavailable = await self.check_provider_availability(
+            ...     primary, [fallback1, fallback2]
+            ... )
+            >>> if not has_provider:
+            ...     raise Exception("No providers available")
+            >>> if unavailable:
+            ...     logger.warning(f"Some providers unavailable: {unavailable}")
+        """
+        fallback_providers = fallback_providers or []
+        all_providers = [primary_provider] + fallback_providers
+
+        available = []
+        unavailable = []
+
+        # Check all providers concurrently
+        async def check_one(provider: "ModelProvider"):
+            """Check a single provider's availability."""
+            is_available, error = await provider.check_availability()
+            return provider.provider_name, is_available, error
+
+        tasks = [check_one(p) for p in all_providers]
+        results = await asyncio.gather(*tasks)
+
+        for name, is_available, error in results:
+            if is_available:
+                available.append(name)
+            else:
+                unavailable.append((name, error))
+
+        return len(available) > 0, available, unavailable
 
     # ========================================================================
     # Conversation Support Methods (task-1-5-2)

@@ -223,6 +223,107 @@ generation:
         }
 
 
+def create_tiered_config(
+    project_root: Optional[Path] = None,
+    tier: str = "quick",
+    default_provider: str = "claude",
+    temperature: float = 0.7,
+    max_tokens: Optional[int] = None,
+    timeout: float = 120.0,
+    # Standard tier options
+    consensus_providers: Optional[list] = None,
+    consensus_strategy: str = "all_responses",
+    research_depth: str = "thorough",
+    research_citation_style: str = "academic",
+    thinkdeep_thinking_mode: str = "medium",
+    ideate_providers: Optional[list] = None,
+    # Advanced tier options
+    system_prompt: Optional[str] = None,
+    workflow_overrides: Optional[Dict[str, Dict[str, Any]]] = None
+) -> Dict[str, Any]:
+    """Create tiered .modelchorusrc configuration file.
+
+    Args:
+        project_root: Project root directory (defaults to cwd)
+        tier: Configuration tier (quick, standard, advanced)
+        default_provider: Default AI provider
+        temperature: Default temperature
+        max_tokens: Default max tokens (optional)
+        timeout: Default timeout in seconds
+        consensus_providers: Providers for consensus workflow (standard+)
+        consensus_strategy: Strategy for consensus workflow (standard+)
+        research_depth: Research depth setting (standard+)
+        research_citation_style: Citation style for research (standard+)
+        thinkdeep_thinking_mode: Thinking mode for thinkdeep (standard+)
+        ideate_providers: Providers for ideate workflow (standard+)
+        system_prompt: Global system prompt (advanced)
+        workflow_overrides: Additional workflow overrides (advanced)
+
+    Returns:
+        Dict with creation result
+    """
+    if project_root is None:
+        project_root = Path.cwd()
+
+    config_path = project_root / '.modelchorusrc'
+
+    # Check if file already exists
+    if config_path.exists():
+        return {
+            "success": False,
+            "message": f"Config file already exists: {config_path}",
+            "path": str(config_path)
+        }
+
+    # Build workflows config based on tier
+    workflows = {}
+
+    if tier in ["standard", "advanced"]:
+        # Add consensus workflow
+        if consensus_providers:
+            workflows["consensus"] = {
+                "providers": consensus_providers,
+                "strategy": consensus_strategy
+            }
+
+        # Add research workflow
+        workflows["research"] = {
+            "citation_style": research_citation_style,
+            "depth": research_depth
+        }
+        if consensus_providers:
+            workflows["research"]["providers"] = consensus_providers
+
+        # Add thinkdeep workflow
+        workflows["thinkdeep"] = {
+            "thinking_mode": thinkdeep_thinking_mode
+        }
+
+        # Add ideate workflow
+        if ideate_providers:
+            workflows["ideate"] = {
+                "providers": ideate_providers
+            }
+
+    if tier == "advanced" and workflow_overrides:
+        # Merge in additional workflow overrides
+        for workflow_name, config in workflow_overrides.items():
+            if workflow_name in workflows:
+                workflows[workflow_name].update(config)
+            else:
+                workflows[workflow_name] = config
+
+    # Use the existing create_config_file function with workflows
+    return create_config_file(
+        project_root=project_root,
+        default_provider=default_provider,
+        temperature=temperature,
+        max_tokens=max_tokens,
+        timeout=timeout,
+        workflows=workflows if workflows else None
+    )
+
+
 def validate_config(project_root: Optional[Path] = None) -> Dict[str, Any]:
     """Validate .modelchorusrc configuration file.
 
@@ -306,6 +407,81 @@ def check_permissions(project_root: Optional[Path] = None) -> Dict[str, Any]:
         return {
             "configured": False,
             "error": str(e)
+        }
+
+
+def add_to_gitignore(
+    project_root: Optional[Path] = None
+) -> Dict[str, Any]:
+    """Add .modelchorusrc to project .gitignore.
+
+    Args:
+        project_root: Project root directory (defaults to cwd)
+
+    Returns:
+        Dict with result
+    """
+    if project_root is None:
+        project_root = Path.cwd()
+
+    gitignore_path = project_root / '.gitignore'
+
+    # Entries to add
+    entries_to_add = [
+        '.modelchorusrc',
+        '.modelchorusrc.yaml',
+        '.modelchorusrc.yml',
+        '.modelchorusrc.json'
+    ]
+
+    # Read existing gitignore or create new
+    if gitignore_path.exists():
+        try:
+            with open(gitignore_path, 'r') as f:
+                existing_content = f.read()
+        except Exception as e:
+            return {
+                "success": False,
+                "error": f"Failed to read .gitignore: {e}"
+            }
+    else:
+        existing_content = ""
+
+    # Check which entries are missing
+    existing_lines = set(line.strip() for line in existing_content.split('\n'))
+    entries_needed = [entry for entry in entries_to_add if entry not in existing_lines]
+
+    if not entries_needed:
+        return {
+            "success": True,
+            "message": "All entries already in .gitignore",
+            "added_entries": []
+        }
+
+    # Add entries
+    try:
+        with open(gitignore_path, 'a') as f:
+            # Add section header if file exists and doesn't end with newline
+            if existing_content and not existing_content.endswith('\n'):
+                f.write('\n')
+
+            if existing_content:
+                f.write('\n')
+
+            f.write('# ModelChorus configuration\n')
+            for entry in entries_needed:
+                f.write(f'{entry}\n')
+
+        return {
+            "success": True,
+            "message": f"Added {len(entries_needed)} entries to .gitignore",
+            "added_entries": entries_needed,
+            "path": str(gitignore_path)
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": f"Failed to write .gitignore: {e}"
         }
 
 
@@ -409,6 +585,22 @@ def main():
     create_parser.add_argument('--temperature', type=float, default=0.7, help='Default temperature')
     create_parser.add_argument('--timeout', type=float, default=120.0, help='Default timeout')
 
+    # create-tiered-config command
+    tiered_parser = subparsers.add_parser('create-tiered-config', help='Create tiered config file')
+    tiered_parser.add_argument('--project', default=None, help='Project root directory')
+    tiered_parser.add_argument('--tier', default='quick', choices=['quick', 'standard', 'advanced'], help='Configuration tier')
+    tiered_parser.add_argument('--provider', default='claude', help='Default provider')
+    tiered_parser.add_argument('--temperature', type=float, default=0.7, help='Default temperature')
+    tiered_parser.add_argument('--max-tokens', type=int, default=None, help='Default max tokens')
+    tiered_parser.add_argument('--timeout', type=float, default=120.0, help='Default timeout')
+    # Standard tier options
+    tiered_parser.add_argument('--consensus-providers', nargs='+', help='Providers for consensus workflow')
+    tiered_parser.add_argument('--consensus-strategy', default='all_responses', help='Consensus strategy')
+    tiered_parser.add_argument('--research-depth', default='thorough', help='Research depth')
+    tiered_parser.add_argument('--research-citation', default='academic', help='Research citation style')
+    tiered_parser.add_argument('--thinkdeep-mode', default='medium', help='ThinkDeep thinking mode')
+    tiered_parser.add_argument('--ideate-providers', nargs='+', help='Providers for ideate workflow')
+
     # validate-config command
     validate_parser = subparsers.add_parser('validate-config', help='Validate config file')
     validate_parser.add_argument('--project', default=None, help='Project root directory')
@@ -420,6 +612,10 @@ def main():
     # add-permissions command
     perm_add_parser = subparsers.add_parser('add-permissions', help='Add permissions')
     perm_add_parser.add_argument('--project', default=None, help='Project root directory')
+
+    # add-to-gitignore command
+    gitignore_parser = subparsers.add_parser('add-to-gitignore', help='Add .modelchorusrc to .gitignore')
+    gitignore_parser.add_argument('--project', default=None, help='Project root directory')
 
     args = parser.parse_args()
 
@@ -443,12 +639,29 @@ def main():
             temperature=args.temperature,
             timeout=args.timeout
         )
+    elif args.command == 'create-tiered-config':
+        result = create_tiered_config(
+            project,
+            tier=args.tier,
+            default_provider=args.provider,
+            temperature=args.temperature,
+            max_tokens=args.max_tokens,
+            timeout=args.timeout,
+            consensus_providers=args.consensus_providers,
+            consensus_strategy=args.consensus_strategy,
+            research_depth=args.research_depth,
+            research_citation_style=args.research_citation,
+            thinkdeep_thinking_mode=args.thinkdeep_mode,
+            ideate_providers=args.ideate_providers
+        )
     elif args.command == 'validate-config':
         result = validate_config(project)
     elif args.command == 'check-permissions':
         result = check_permissions(project)
     elif args.command == 'add-permissions':
         result = add_permissions(project)
+    elif args.command == 'add-to-gitignore':
+        result = add_to_gitignore(project)
     else:
         print(json.dumps({"error": "Unknown command"}))
         sys.exit(1)

@@ -71,6 +71,7 @@ class ChatWorkflow(BaseWorkflow):
     def __init__(
         self,
         provider: ModelProvider,
+        fallback_providers: Optional[List[ModelProvider]] = None,
         config: Optional[Dict[str, Any]] = None,
         conversation_memory: Optional[ConversationMemory] = None
     ):
@@ -79,6 +80,7 @@ class ChatWorkflow(BaseWorkflow):
 
         Args:
             provider: ModelProvider instance to use for generation
+            fallback_providers: Optional list of fallback providers to try if primary fails
             config: Optional configuration dictionary
             conversation_memory: Optional ConversationMemory for multi-turn conversations
 
@@ -95,6 +97,7 @@ class ChatWorkflow(BaseWorkflow):
             conversation_memory=conversation_memory
         )
         self.provider = provider
+        self.fallback_providers = fallback_providers or []
 
         logger.info(f"ChatWorkflow initialized with provider: {provider.provider_name}")
 
@@ -103,6 +106,7 @@ class ChatWorkflow(BaseWorkflow):
         prompt: str,
         continuation_id: Optional[str] = None,
         files: Optional[List[str]] = None,
+        skip_provider_check: bool = False,
         **kwargs
     ) -> WorkflowResult:
         """
@@ -116,6 +120,7 @@ class ChatWorkflow(BaseWorkflow):
             prompt: The user's message/query
             continuation_id: Optional thread ID to continue an existing conversation
             files: Optional list of file paths to include in conversation context
+            skip_provider_check: Skip provider availability check (faster startup)
             **kwargs: Additional parameters passed to provider.generate()
                      (e.g., temperature, max_tokens, system_prompt)
 
@@ -151,6 +156,30 @@ class ChatWorkflow(BaseWorkflow):
             f"files: {len(files) if files else 0}"
         )
 
+        # Check provider availability
+        if not skip_provider_check:
+            has_available, available, unavailable = await self.check_provider_availability(
+                self.provider, self.fallback_providers
+            )
+
+            if not has_available:
+                from ..providers.cli_provider import ProviderUnavailableError
+                error_msg = "No providers available for chat:\n"
+                for name, error in unavailable:
+                    error_msg += f"  - {name}: {error}\n"
+                raise ProviderUnavailableError(
+                    "all",
+                    error_msg,
+                    [
+                        "Check installations: modelchorus list-providers --check",
+                        "Install missing providers or update .modelchorusrc"
+                    ]
+                )
+
+            if unavailable and logger.isEnabledFor(logging.WARNING):
+                logger.warning(f"Some providers unavailable: {[n for n, _ in unavailable]}")
+                logger.info(f"Will use available providers: {available}")
+
         # Generate or use thread ID
         if continuation_id:
             thread_id = continuation_id
@@ -179,11 +208,15 @@ class ChatWorkflow(BaseWorkflow):
 
             logger.info(f"Sending request to provider: {self.provider.provider_name}")
 
-            # Generate response from provider
-            response: GenerationResponse = await self.provider.generate(request)
+            # Generate response from provider with fallback
+            response, used_provider, failed = await self._execute_with_fallback(
+                request, self.provider, self.fallback_providers
+            )
+            if failed:
+                logger.warning(f"Providers failed before success: {', '.join(failed)}")
 
             logger.info(
-                f"Received response from {self.provider.provider_name}: "
+                f"Received response from {used_provider}: "
                 f"{len(response.content)} chars"
             )
 

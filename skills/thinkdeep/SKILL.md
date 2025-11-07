@@ -259,18 +259,18 @@ THINKDEEP supports multi-turn investigations where you can pause, resume, and bu
 
 Step 1 - Initial investigation:
 ```bash
-modelchorus thinkdeep --provider claude --step "Investigate authentication failures in production" --step-number 1 --total-steps 3 --next-step-required true --findings "Examining auth service logs..." --confidence exploring
+modelchorus thinkdeep --step "Investigate authentication failures in production" --step-number 1 --total-steps 3 --next-step-required true --findings "Examining auth service logs..." --confidence exploring
 ```
 Returns: `session_id = "auth-inv-abc123"`
 
 Step 2 - Continue with same thread:
 ```bash
-modelchorus thinkdeep --session-id "auth-inv-abc123" --provider claude --step "Check token validation logic based on log findings" --step-number 2 --total-steps 3 --next-step-required true --findings "Found race condition in async token validation" --confidence medium
+modelchorus thinkdeep --session-id "auth-inv-abc123" --step "Check token validation logic based on log findings" --step-number 2 --total-steps 3 --next-step-required true --findings "Found race condition in async token validation" --confidence medium
 ```
 
 Step 3 - Final analysis:
 ```bash
-modelchorus thinkdeep --session-id "auth-inv-abc123" --provider claude --step "Verify race condition hypothesis with code analysis" --step-number 3 --total-steps 3 --next-step-required false --findings "Confirmed: missing await in auth middleware" --confidence high
+modelchorus thinkdeep --session-id "auth-inv-abc123" --step "Verify race condition hypothesis with code analysis" --step-number 3 --total-steps 3 --next-step-required false --findings "Confirmed: missing await in auth middleware" --confidence high
 ```
 
 **Pattern 2: Investigation Branching**
@@ -284,7 +284,7 @@ modelchorus thinkdeep --session-id "original-thread-xyz" --step "Continue origin
 
 New branch (omit continuation-id to start fresh):
 ```bash
-modelchorus thinkdeep --provider claude --step "Explore alternative: network latency causing timeouts" --step-number 1 --total-steps 2 --next-step-required true --findings "Investigating network layer..." --confidence low
+modelchorus thinkdeep --step "Explore alternative: network latency causing timeouts" --step-number 1 --total-steps 2 --next-step-required true --findings "Investigating network layer..." --confidence low
 ```
 
 **Pattern 3: Cross-Session Resume**
@@ -510,7 +510,7 @@ The THINKDEEP workflow returns a JSON object with the following structure:
 Specify which AI model to use for the investigation:
 
 ```bash
-modelchorus thinkdeep --provider claude --step "Analyze security vulnerability in auth flow" --step-number 1 --total-steps 3 --next-step-required true --findings "Reviewing authentication middleware" --confidence exploring
+modelchorus thinkdeep --step "Analyze security vulnerability in auth flow" --step-number 1 --total-steps 3 --next-step-required true --findings "Reviewing authentication middleware" --confidence exploring
 ```
 
 ### With File Context
@@ -654,12 +654,12 @@ modelchorus thinkdeep --session-id "perf-inv-001" --step "Test hypothesis by dis
 Investigation with expert validation:
 
 ```bash
-modelchorus thinkdeep --provider claude --step "Audit authentication flow for bypass vulnerabilities" --step-number 1 --total-steps 2 --next-step-required true --findings "Token validation occurs before permission check. JWT expiry not verified in middleware." --confidence medium --hypothesis "Potential bypass: expired tokens may pass through"
+modelchorus thinkdeep --step "Audit authentication flow for bypass vulnerabilities" --step-number 1 --total-steps 2 --next-step-required true --findings "Token validation occurs before permission check. JWT expiry not verified in middleware." --confidence medium --hypothesis "Potential bypass: expired tokens may pass through"
 ```
 
 Then verify with expert:
 ```bash
-modelchorus thinkdeep --session-id "sec-audit-001" --provider claude --step "Verify vulnerability hypothesis" --step-number 2 --total-steps 2 --next-step-required false --findings "Confirmed: expired tokens accepted if permission check passes. Critical vulnerability." --confidence very_high --use-assistant-model true
+modelchorus thinkdeep --session-id "sec-audit-001" --step "Verify vulnerability hypothesis" --step-number 2 --total-steps 2 --next-step-required false --findings "Confirmed: expired tokens accepted if permission check passes. Critical vulnerability." --confidence very_high --use-assistant-model true
 ```
 
 ## Troubleshooting

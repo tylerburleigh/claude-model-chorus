@@ -9,6 +9,7 @@ ModelChorus is both a **Python package** for multi-model AI orchestration and a 
 **Key Features:**
 - **Six Powerful Workflows** - CHAT, CONSENSUS, THINKDEEP, ARGUMENT, IDEATE, and RESEARCH for different use cases
 - **Multi-Provider Support** - Coordinate Claude, Gemini, OpenAI Codex, and Cursor Agent
+- **Provider Fallback & Resilience** - Automatic fallback to alternative providers when primary fails
 - **Conversation Continuity** - Multi-turn conversations with state persistence
 - **Systematic Investigation** - Hypothesis tracking, confidence progression, and dialectical reasoning
 - **CLI & Python API** - Use via command-line or programmatically
@@ -516,6 +517,57 @@ export OPENAI_API_KEY="your-key"
 # Cursor CLI (usually installed with Cursor IDE)
 ```
 
+### Provider Fallback & Resilience
+
+ModelChorus workflows automatically fallback to alternative providers if the primary fails:
+
+```yaml
+# .modelchorusrc configuration
+workflows:
+  research:
+    provider: claude
+    fallback_providers:  # Tries in order if primary fails
+      - gemini
+      - codex
+      - cursor-agent
+```
+
+**Example**: If Claude is unavailable, the workflow automatically uses Gemini:
+
+```bash
+$ modelchorus research "quantum computing" --verbose
+
+⚠ Some providers unavailable:
+  ✗ claude: CLI command 'claude' not found in PATH
+
+✓ Will use available providers: gemini
+
+[Research completes successfully using gemini]
+```
+
+**Check Provider Availability**:
+```bash
+# Verify all providers are installed and working
+modelchorus list-providers --check
+
+# Output shows status for each provider:
+● claude
+  Status: ✓ Installed and working
+  Provider: Claude
+  CLI Command: claude
+
+● gemini
+  Status: ✗ Not available
+  Issue: CLI command 'gemini' not found in PATH
+  Install: npm install -g @google/gemini-cli
+```
+
+**Skip Provider Check** (faster startup):
+```bash
+# Skip availability check for time-critical operations
+modelchorus research "topic" --skip-provider-check
+```
+
 ## CLI Commands
 
 ```bash
@@ -873,7 +925,6 @@ Contributions welcome! Please:
 - **GitHub**: https://github.com/tylerburleigh/claude-model-chorus
 - **Issues**: https://github.com/tylerburleigh/claude-model-chorus/issues
 - **Python Package Docs**: [`modelchorus/README.md`](modelchorus/README.md)
-- **Skill Documentation**: [`skills/consensus/SKILL.md`](skills/consensus/SKILL.md)
 
 ## License
 

@@ -22,6 +22,7 @@ from ..providers import (
     CursorAgentProvider,
     GenerationRequest,
 )
+from ..providers.cli_provider import ProviderUnavailableError
 from ..workflows import ArgumentWorkflow, ChatWorkflow, ConsensusWorkflow, ConsensusStrategy, IdeateWorkflow, ResearchWorkflow, ThinkDeepWorkflow
 from ..core.conversation import ConversationMemory
 from ..core.config import get_config_loader
@@ -48,6 +49,24 @@ def get_config():
             # If config fails to load, continue with defaults
             pass
     return _config_loader
+
+
+def get_install_command(provider: str) -> str:
+    """Get installation command for a provider CLI.
+
+    Args:
+        provider: Provider name (claude, gemini, codex, cursor-agent)
+
+    Returns:
+        Installation command string
+    """
+    commands = {
+        "claude": "curl -fsSL https://claude.ai/install.sh | bash",
+        "gemini": "npm install -g @google/gemini-cli",
+        "codex": "npm install -g @openai/codex",
+        "cursor-agent": "curl https://cursor.com/install -fsSL | bash",
+    }
+    return commands.get(provider.lower(), "See provider documentation")
 
 
 def get_provider_by_name(name: str):
@@ -117,6 +136,11 @@ def chat(
         "-v",
         help="Show detailed execution information",
     ),
+    skip_provider_check: bool = typer.Option(
+        False,
+        "--skip-provider-check",
+        help="Skip provider availability check (faster startup)",
+    ),
 ):
     """
     Chat with a single AI model with conversation continuity.
@@ -151,9 +175,36 @@ def chat(
             provider_instance = get_provider_by_name(provider)
             if verbose:
                 console.print(f"[green]✓ {provider} initialized[/green]")
+        except ProviderUnavailableError as e:
+            # Provider CLI not available - show helpful error message
+            console.print(f"[red]Error: {e.reason}[/red]\n")
+            if e.suggestions:
+                console.print("[yellow]To fix this:[/yellow]")
+                for suggestion in e.suggestions:
+                    console.print(f"  • {suggestion}")
+            console.print(f"\n[yellow]Installation:[/yellow] {get_install_command(provider)}")
+            console.print(f"\n[dim]Run 'modelchorus list-providers --check' to see which providers are available[/dim]")
+            raise typer.Exit(1)
         except Exception as e:
             console.print(f"[red]Failed to initialize {provider}: {e}[/red]")
             raise typer.Exit(1)
+
+        # Load fallback providers from config
+        fallback_provider_names = config.get_workflow_default('chat', 'fallback_providers', [])
+        fallback_providers = []
+
+        if fallback_provider_names and verbose:
+            console.print(f"[cyan]Initializing fallback providers: {', '.join(fallback_provider_names)}[/cyan]")
+
+        for fallback_name in fallback_provider_names:
+            try:
+                fallback_instance = get_provider_by_name(fallback_name)
+                fallback_providers.append(fallback_instance)
+                if verbose:
+                    console.print(f"[green]✓ {fallback_name} initialized (fallback)[/green]")
+            except Exception as e:
+                if verbose:
+                    console.print(f"[yellow]⚠ Could not initialize fallback {fallback_name}: {e}[/yellow]")
 
         # Create conversation memory (in-memory for now)
         memory = ConversationMemory()
@@ -161,6 +212,7 @@ def chat(
         # Create workflow
         workflow = ChatWorkflow(
             provider=provider_instance,
+            fallback_providers=fallback_providers,
             conversation_memory=memory,
         )
 
@@ -190,6 +242,7 @@ def chat(
                 prompt=prompt,
                 continuation_id=continuation_id,
                 files=files,
+                skip_provider_check=skip_provider_check,
                 system_prompt=system,
                 temperature=temperature,
                 max_tokens=max_tokens,
@@ -305,6 +358,11 @@ def argument(
         "-v",
         help="Show detailed execution information",
     ),
+    skip_provider_check: bool = typer.Option(
+        False,
+        "--skip-provider-check",
+        help="Skip provider availability check (faster startup)",
+    ),
 ):
     """
     Analyze arguments through structured dialectical reasoning.
@@ -336,9 +394,36 @@ def argument(
             provider_instance = get_provider_by_name(provider)
             if verbose:
                 console.print(f"[green]✓ {provider} initialized[/green]")
+        except ProviderUnavailableError as e:
+            # Provider CLI not available - show helpful error message
+            console.print(f"[red]Error: {e.reason}[/red]\n")
+            if e.suggestions:
+                console.print("[yellow]To fix this:[/yellow]")
+                for suggestion in e.suggestions:
+                    console.print(f"  • {suggestion}")
+            console.print(f"\n[yellow]Installation:[/yellow] {get_install_command(provider)}")
+            console.print(f"\n[dim]Run 'modelchorus list-providers --check' to see which providers are available[/dim]")
+            raise typer.Exit(1)
         except Exception as e:
             console.print(f"[red]Failed to initialize {provider}: {e}[/red]")
             raise typer.Exit(1)
+
+        # Load fallback providers from config
+        fallback_provider_names = config.get_workflow_default('argument', 'fallback_providers', [])
+        fallback_providers = []
+
+        if fallback_provider_names and verbose:
+            console.print(f"[cyan]Initializing fallback providers: {', '.join(fallback_provider_names)}[/cyan]")
+
+        for fallback_name in fallback_provider_names:
+            try:
+                fallback_instance = get_provider_by_name(fallback_name)
+                fallback_providers.append(fallback_instance)
+                if verbose:
+                    console.print(f"[green]✓ {fallback_name} initialized (fallback)[/green]")
+            except Exception as e:
+                if verbose:
+                    console.print(f"[yellow]⚠ Could not initialize fallback {fallback_name}: {e}[/yellow]")
 
         # Create conversation memory
         memory = ConversationMemory()
@@ -346,6 +431,7 @@ def argument(
         # Create workflow
         workflow = ArgumentWorkflow(
             provider=provider_instance,
+            fallback_providers=fallback_providers,
             conversation_memory=memory,
         )
 
@@ -378,6 +464,7 @@ def argument(
                 prompt=prompt,
                 continuation_id=continuation_id,
                 files=files,
+                skip_provider_check=skip_provider_check,
                 **config
             )
         )
@@ -490,6 +577,11 @@ def ideate(
         "-v",
         help="Show detailed execution information",
     ),
+    skip_provider_check: bool = typer.Option(
+        False,
+        "--skip-provider-check",
+        help="Skip provider availability check (faster startup)",
+    ),
 ):
     """
     Generate creative ideas through structured brainstorming.
@@ -521,9 +613,36 @@ def ideate(
             provider_instance = get_provider_by_name(provider)
             if verbose:
                 console.print(f"[green]✓ {provider} initialized[/green]")
+        except ProviderUnavailableError as e:
+            # Provider CLI not available - show helpful error message
+            console.print(f"[red]Error: {e.reason}[/red]\n")
+            if e.suggestions:
+                console.print("[yellow]To fix this:[/yellow]")
+                for suggestion in e.suggestions:
+                    console.print(f"  • {suggestion}")
+            console.print(f"\n[yellow]Installation:[/yellow] {get_install_command(provider)}")
+            console.print(f"\n[dim]Run 'modelchorus list-providers --check' to see which providers are available[/dim]")
+            raise typer.Exit(1)
         except Exception as e:
             console.print(f"[red]Failed to initialize {provider}: {e}[/red]")
             raise typer.Exit(1)
+
+        # Load fallback providers from config
+        fallback_provider_names = config.get_workflow_default('ideate', 'fallback_providers', [])
+        fallback_providers = []
+
+        if fallback_provider_names and verbose:
+            console.print(f"[cyan]Initializing fallback providers: {', '.join(fallback_provider_names)}[/cyan]")
+
+        for fallback_name in fallback_provider_names:
+            try:
+                fallback_instance = get_provider_by_name(fallback_name)
+                fallback_providers.append(fallback_instance)
+                if verbose:
+                    console.print(f"[green]✓ {fallback_name} initialized (fallback)[/green]")
+            except Exception as e:
+                if verbose:
+                    console.print(f"[yellow]⚠ Could not initialize fallback {fallback_name}: {e}[/yellow]")
 
         # Create conversation memory
         memory = ConversationMemory()
@@ -531,6 +650,7 @@ def ideate(
         # Create workflow
         workflow = IdeateWorkflow(
             provider=provider_instance,
+            fallback_providers=fallback_providers,
             conversation_memory=memory,
         )
 
@@ -565,6 +685,7 @@ def ideate(
                 prompt=prompt,
                 continuation_id=continuation_id,
                 files=files,
+                skip_provider_check=skip_provider_check,
                 **config
             )
         )
@@ -680,6 +801,11 @@ def research(
         "-v",
         help="Show detailed execution information",
     ),
+    skip_provider_check: bool = typer.Option(
+        False,
+        "--skip-provider-check",
+        help="Skip provider availability check (faster startup)",
+    ),
 ):
     """
     Conduct systematic research with evidence extraction and citations.
@@ -725,9 +851,36 @@ def research(
             provider_instance = get_provider_by_name(provider)
             if verbose:
                 console.print(f"[green]✓ {provider} initialized[/green]")
+        except ProviderUnavailableError as e:
+            # Provider CLI not available - show helpful error message
+            console.print(f"[red]Error: {e.reason}[/red]\n")
+            if e.suggestions:
+                console.print("[yellow]To fix this:[/yellow]")
+                for suggestion in e.suggestions:
+                    console.print(f"  • {suggestion}")
+            console.print(f"\n[yellow]Installation:[/yellow] {get_install_command(provider)}")
+            console.print(f"\n[dim]Run 'modelchorus list-providers --check' to see which providers are available[/dim]")
+            raise typer.Exit(1)
         except Exception as e:
             console.print(f"[red]Failed to initialize {provider}: {e}[/red]")
             raise typer.Exit(1)
+
+        # Load fallback providers from config
+        fallback_provider_names = config.get_workflow_default('research', 'fallback_providers', [])
+        fallback_providers = []
+
+        if fallback_provider_names and verbose:
+            console.print(f"[cyan]Initializing fallback providers: {', '.join(fallback_provider_names)}[/cyan]")
+
+        for fallback_name in fallback_provider_names:
+            try:
+                fallback_instance = get_provider_by_name(fallback_name)
+                fallback_providers.append(fallback_instance)
+                if verbose:
+                    console.print(f"[green]✓ {fallback_name} initialized (fallback)[/green]")
+            except Exception as e:
+                if verbose:
+                    console.print(f"[yellow]⚠ Could not initialize fallback {fallback_name}: {e}[/yellow]")
 
         # Create conversation memory
         memory = ConversationMemory()
@@ -735,6 +888,7 @@ def research(
         # Create workflow
         workflow = ResearchWorkflow(
             provider=provider_instance,
+            fallback_providers=fallback_providers,
             conversation_memory=memory,
         )
 
@@ -791,6 +945,7 @@ def research(
                 prompt=prompt,
                 continuation_id=continuation_id,
                 files=files,
+                skip_provider_check=skip_provider_check,
                 **config
             )
         )
@@ -1110,6 +1265,11 @@ def thinkdeep(
         "-v",
         help="Show detailed execution information",
     ),
+    skip_provider_check: bool = typer.Option(
+        False,
+        "--skip-provider-check",
+        help="Skip provider availability check (faster startup)",
+    ),
 ):
     """
     Start a ThinkDeep investigation for systematic problem analysis.
@@ -1161,6 +1321,23 @@ def thinkdeep(
             console.print(f"[red]Failed to initialize {model}: {e}[/red]")
             raise typer.Exit(1)
 
+        # Load fallback providers from config
+        fallback_provider_names = config.get_workflow_default('thinkdeep', 'fallback_providers', [])
+        fallback_providers = []
+
+        if fallback_provider_names and verbose:
+            console.print(f"[cyan]Initializing fallback providers: {', '.join(fallback_provider_names)}[/cyan]")
+
+        for fallback_name in fallback_provider_names:
+            try:
+                fallback_instance = get_provider_by_name(fallback_name)
+                fallback_providers.append(fallback_instance)
+                if verbose:
+                    console.print(f"[green]✓ {fallback_name} initialized (fallback)[/green]")
+            except Exception as e:
+                if verbose:
+                    console.print(f"[yellow]⚠ Could not initialize fallback {fallback_name}: {e}[/yellow]")
+
         # Create conversation memory
         memory = ConversationMemory()
 
@@ -1172,6 +1349,7 @@ def thinkdeep(
         # Create workflow
         workflow = ThinkDeepWorkflow(
             provider=provider_instance,
+            fallback_providers=fallback_providers,
             expert_provider=None,  # Expert will be handled by workflow if enabled
             conversation_memory=memory,
             config=config,
@@ -1215,6 +1393,7 @@ def thinkdeep(
                 confidence=confidence,
                 continuation_id=continuation_id,
                 files=files_list,
+                skip_provider_check=skip_provider_check,
                 temperature=temperature,
                 thinking_mode=thinking_mode,
             )
@@ -1627,8 +1806,17 @@ workflows:
 
 
 @app.command()
-def list_providers():
-    """List all available providers and their models."""
+def list_providers(
+    check: bool = typer.Option(
+        False,
+        "--check",
+        help="Check if provider CLIs are actually installed and working"
+    )
+):
+    """List all available providers and their models.
+
+    Use --check to verify which providers are actually installed and working.
+    """
     providers = {
         "claude": ClaudeProvider(),
         "codex": CodexProvider(),
@@ -1638,19 +1826,62 @@ def list_providers():
 
     console.print("\n[bold]Available Providers:[/bold]\n")
 
-    for name, provider in providers.items():
-        console.print(f"[cyan]● {name}[/cyan]")
-        console.print(f"  Provider: {provider.provider_name}")
-        console.print(f"  CLI Command: {provider.cli_command}")
+    async def check_provider_async(name: str, provider):
+        """Check a single provider's availability."""
+        is_available, error = await provider.check_availability()
+        return name, provider, is_available, error
 
-        models = provider.get_available_models()
-        console.print(f"  Models ({len(models)}):")
+    # If --check flag is set, test provider availability
+    if check:
+        console.print("[dim]Checking provider availability...[/dim]\n")
 
-        for model in models:
-            capabilities = [cap.value for cap in model.capabilities]
-            console.print(f"    - {model.model_id}: {', '.join(capabilities)}")
+        # Run all availability checks concurrently
+        async def check_all():
+            tasks = [check_provider_async(name, prov) for name, prov in providers.items()]
+            return await asyncio.gather(*tasks)
 
-        console.print()
+        results = asyncio.run(check_all())
+
+        for name, provider, is_available, error in results:
+            # Status indicator
+            if is_available:
+                status = "[green]✓ Installed and working[/green]"
+            else:
+                status = f"[red]✗ Not available[/red]"
+
+            console.print(f"[cyan]● {name}[/cyan]")
+            console.print(f"  Status: {status}")
+            console.print(f"  Provider: {provider.provider_name}")
+            console.print(f"  CLI Command: {provider.cli_command}")
+
+            if not is_available:
+                console.print(f"  [yellow]Issue:[/yellow] {error}")
+                console.print(f"  [yellow]Install:[/yellow] {get_install_command(name)}")
+            else:
+                models = provider.get_available_models()
+                console.print(f"  Models ({len(models)}):")
+                for model in models:
+                    capabilities = [cap.value for cap in model.capabilities]
+                    console.print(f"    - {model.model_id}: {', '.join(capabilities)}")
+
+            console.print()
+    else:
+        # Original behavior without availability checking
+        for name, provider in providers.items():
+            console.print(f"[cyan]● {name}[/cyan]")
+            console.print(f"  Provider: {provider.provider_name}")
+            console.print(f"  CLI Command: {provider.cli_command}")
+
+            models = provider.get_available_models()
+            console.print(f"  Models ({len(models)}):")
+
+            for model in models:
+                capabilities = [cap.value for cap in model.capabilities]
+                console.print(f"    - {model.model_id}: {', '.join(capabilities)}")
+
+            console.print()
+
+        console.print("[dim]Use --check to verify which providers are actually installed[/dim]\n")
 
 
 @app.command()

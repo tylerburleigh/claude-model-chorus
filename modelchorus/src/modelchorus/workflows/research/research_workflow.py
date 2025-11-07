@@ -156,6 +156,7 @@ class ResearchWorkflow(BaseWorkflow):
     def __init__(
         self,
         provider: ModelProvider,
+        fallback_providers: Optional[List[ModelProvider]] = None,
         config: Optional[Dict[str, Any]] = None,
         conversation_memory: Optional[ConversationMemory] = None
     ):
@@ -164,6 +165,7 @@ class ResearchWorkflow(BaseWorkflow):
 
         Args:
             provider: ModelProvider instance to use for research
+            fallback_providers: Optional list of fallback providers to try if primary fails
             config: Optional configuration dictionary
             conversation_memory: Optional ConversationMemory for multi-turn conversations
 
@@ -181,6 +183,7 @@ class ResearchWorkflow(BaseWorkflow):
         )
 
         self.provider = provider
+        self.fallback_providers = fallback_providers or []
         self.conversation_memory = conversation_memory
 
         # Initialize source registry for tracking research sources
@@ -245,6 +248,7 @@ class ResearchWorkflow(BaseWorkflow):
         self,
         prompt: str,
         continuation_id: Optional[str] = None,
+        skip_provider_check: bool = False,
         **kwargs
     ) -> WorkflowResult:
         """
@@ -253,6 +257,7 @@ class ResearchWorkflow(BaseWorkflow):
         Args:
             prompt: Research topic or question
             continuation_id: Optional thread ID for continuing research
+            skip_provider_check: Skip provider availability check (faster startup)
             **kwargs: Additional parameters for research customization
 
         Returns:
@@ -265,6 +270,30 @@ class ResearchWorkflow(BaseWorkflow):
             raise ValueError("Research prompt cannot be empty")
 
         logger.info(f"Starting research workflow: {prompt[:100]}...")
+
+        # Check provider availability
+        if not skip_provider_check:
+            has_available, available, unavailable = await self.check_provider_availability(
+                self.provider, self.fallback_providers
+            )
+
+            if not has_available:
+                from ...providers.cli_provider import ProviderUnavailableError
+                error_msg = "No providers available for research:\n"
+                for name, error in unavailable:
+                    error_msg += f"  - {name}: {error}\n"
+                raise ProviderUnavailableError(
+                    "all",
+                    error_msg,
+                    [
+                        "Check installations: modelchorus list-providers --check",
+                        "Install missing providers or update .modelchorusrc"
+                    ]
+                )
+
+            if unavailable and logger.isEnabledFor(logging.WARNING):
+                logger.warning(f"Some providers unavailable: {[n for n, _ in unavailable]}")
+                logger.info(f"Will use available providers: {available}")
 
         # Create or get conversation thread
         if continuation_id:
@@ -350,8 +379,12 @@ class ResearchWorkflow(BaseWorkflow):
         )
 
         try:
-            # Generate research questions
-            response: GenerationResponse = await self.provider.generate(request)
+            # Generate research questions with fallback
+            response, used_provider, failed = await self._execute_with_fallback(
+                request, self.provider, self.fallback_providers
+            )
+            if failed:
+                logger.warning(f"Providers failed before success: {', '.join(failed)}")
 
             # Add to conversation memory if available
             if self.conversation_memory:
@@ -763,11 +796,13 @@ Organize your questions by theme or category, and indicate priority (High/Medium
                     max_tokens=2000
                 )
 
-                # Execute with timeout
-                response = await asyncio.wait_for(
-                    self.provider.generate(request),
+                # Execute with timeout and fallback
+                response, used_provider, failed = await asyncio.wait_for(
+                    self._execute_with_fallback(request, self.provider, self.fallback_providers),
                     timeout=timeout
                 )
+                if failed:
+                    logger.warning(f"Providers failed for source {source_id}: {', '.join(failed)}")
 
                 # Parse evidence from response
                 evidence_items = self._parse_evidence_from_response(
@@ -1093,8 +1128,12 @@ Your extractions should be precise, well-organized, and ready for synthesis."""
                 max_tokens=1500
             )
 
-            # Get validation response
-            response = await self.provider.generate(request)
+            # Get validation response with fallback
+            response, used_provider, failed = await self._execute_with_fallback(
+                request, self.provider, self.fallback_providers
+            )
+            if failed:
+                logger.warning(f"Providers failed for validation of {evidence.evidence_id}: {', '.join(failed)}")
 
             # Parse validation result
             validation_result = self._parse_validation_response(

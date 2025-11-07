@@ -324,19 +324,19 @@ modelchorus consensus "Fact-check this claim" -p claude -p gemini -p codex -p cu
 
 ```bash
 # Get all responses separately (default)
-modelchorus consensus "Compare React vs Vue" -p claude -p gemini
+modelchorus consensus "Compare React vs Vue"
 
 # Get synthesized structured view
-modelchorus consensus "Best practices for API design" -p claude -p gemini -s synthesize
+modelchorus consensus "Best practices for API design" -s synthesize
 
 # Get majority consensus
-modelchorus consensus "What is 2 + 2?" -p claude -p gemini -p codex -s majority
+modelchorus consensus "What is 2 + 2?" -s majority
 
 # Get most detailed response
-modelchorus consensus "Explain microservices" -p claude -p gemini -s weighted
+modelchorus consensus "Explain microservices" -s weighted
 
 # Get fastest response with failover
-modelchorus consensus "Quick question about Python" -p claude -p gemini -s first_valid
+modelchorus consensus "Quick question about Python" -s first_valid
 ```
 
 **Strategy Selection:**
@@ -348,10 +348,10 @@ modelchorus consensus "Quick question about Python" -p claude -p gemini -s first
 
 ```bash
 # Include file context for all providers
-modelchorus consensus "Review this code" -p claude -p gemini -f src/main.py
+modelchorus consensus "Review this code" -f src/main.py
 
 # Multiple files with synthesis
-modelchorus consensus "Analyze these components" -p claude -p gemini -p codex -f models.py -f services.py -f api.py -s synthesize
+modelchorus consensus "Analyze these components" -f models.py -f services.py -f api.py -s synthesize
 ```
 
 **File Handling:**
@@ -363,10 +363,10 @@ modelchorus consensus "Analyze these components" -p claude -p gemini -p codex -f
 
 ```bash
 # Increase timeout for slower providers or complex queries
-modelchorus consensus "Detailed analysis needed" -p claude -p gemini --timeout 180
+modelchorus consensus "Detailed analysis needed" --timeout 180
 
 # Shorter timeout for quick queries
-modelchorus consensus "Fast check" -p claude -p gemini --timeout 60
+modelchorus consensus "Fast check" --timeout 60
 ```
 
 **Timeout Behavior:**
@@ -379,13 +379,13 @@ modelchorus consensus "Fast check" -p claude -p gemini --timeout 60
 
 ```bash
 # Lower temperature for factual consensus
-modelchorus consensus "What are the Python PEP 8 rules?" -p claude -p gemini -t 0.3
+modelchorus consensus "What are the Python PEP 8 rules?" -t 0.3
 
 # Higher temperature for creative perspectives
-modelchorus consensus "Brainstorm app names" -p claude -p gemini -t 0.9
+modelchorus consensus "Brainstorm app names" -t 0.9
 
 # Default balanced setting
-modelchorus consensus "Explain design patterns" -p claude -p gemini -t 0.7
+modelchorus consensus "Explain design patterns" -t 0.7
 ```
 
 **Temperature applies to all providers uniformly.**
@@ -394,7 +394,7 @@ modelchorus consensus "Explain design patterns" -p claude -p gemini -t 0.7
 
 ```bash
 # Save full consensus results to JSON
-modelchorus consensus "Evaluate this proposal" -p claude -p gemini -p codex -s synthesize --output evaluation.json
+modelchorus consensus "Evaluate this proposal" -s synthesize --output evaluation.json
 ```
 
 **Output file contains:**
@@ -424,7 +424,7 @@ modelchorus consensus "Evaluate this proposal" -p claude -p gemini -p codex -s s
 
 **Command:**
 ```bash
-modelchorus consensus "Should I use microservices or monolithic architecture for a mid-size SaaS product with 5 developers?" -p claude -p gemini -p codex -s synthesize --output architecture-decision.json
+modelchorus consensus "Should I use microservices or monolithic architecture for a mid-size SaaS product with 5 developers?" -s synthesize --output architecture-decision.json
 ```
 
 **Expected Outcome:** Structured synthesis showing each model's perspective on the architecture decision, allowing you to see complementary insights and make an informed choice.
@@ -437,7 +437,7 @@ modelchorus consensus "Should I use microservices or monolithic architecture for
 
 **Command:**
 ```bash
-modelchorus consensus "Is it true that Python's GIL prevents true multi-threading? Explain briefly." -p claude -p gemini -p codex -s majority -t 0.4
+modelchorus consensus "Is it true that Python's GIL prevents true multi-threading? Explain briefly." -s majority -t 0.4
 ```
 
 **Expected Outcome:** The most common answer among the three models, with low temperature ensuring factual accuracy. If models agree, high confidence in the answer.
@@ -450,7 +450,7 @@ modelchorus consensus "Is it true that Python's GIL prevents true multi-threadin
 
 **Command:**
 ```bash
-modelchorus consensus "Review this code for bugs, performance issues, and best practices" -p claude -p gemini -p codex -f src/auth.py -s all_responses
+modelchorus consensus "Review this code for bugs, performance issues, and best practices" -f src/auth.py -s all_responses
 ```
 
 **Expected Outcome:** Three separate code reviews showing different perspectives - one model might focus on security, another on performance, another on readability.
@@ -463,7 +463,7 @@ modelchorus consensus "Review this code for bugs, performance issues, and best p
 
 **Command:**
 ```bash
-modelchorus consensus "What does the Python 'yield' keyword do?" -p claude -p gemini -s first_valid --timeout 30
+modelchorus consensus "What does the Python 'yield' keyword do?" -s first_valid --timeout 30
 ```
 
 **Expected Outcome:** First successful response returns immediately. If Claude responds in 2 seconds, you get that answer without waiting for Gemini. If Claude times out, Gemini's response is used.
@@ -479,7 +479,7 @@ modelchorus consensus "What does the Python 'yield' keyword do?" -p claude -p ge
 **Solution:**
 ```bash
 # Increase timeout and try again
-modelchorus consensus "Your prompt" -p claude -p gemini --timeout 240
+modelchorus consensus "Your prompt" --timeout 240
 
 # Check provider availability
 modelchorus list-providers

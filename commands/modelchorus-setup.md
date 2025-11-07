@@ -83,9 +83,27 @@ Proceed to create configuration by gathering user preferences.
 
 #### Gather Configuration Preferences
 
-Use AskUserQuestion tool to gather all configuration preferences in one or two question sets:
+**IMPORTANT:** Use a tiered approach to configuration. First ask which tier, then ask questions based on that tier.
 
-**Question Set 1 (Provider & Generation Settings):**
+##### Tier Selection
+
+Use AskUserQuestion tool to ask about setup tier:
+
+**Question 1 - Setup Tier:**
+- **Header**: "Setup Tier"
+- **Question**: "How much configuration do you want to set up now?"
+- **Options**:
+  1. Quick Setup - Just the essentials (provider, temperature, timeout, max_tokens)
+  2. Standard Setup - Common workflows configured (Quick + consensus, research, thinkdeep)
+  3. Advanced Setup - Full configuration (Standard + all 6 workflows with detailed options)
+
+Based on the tier chosen, proceed with the appropriate question set below.
+
+---
+
+##### QUICK TIER Questions
+
+If user chose "Quick Setup", ask these 4 questions:
 
 **Question 1:**
 - **Header**: "Provider"
@@ -112,14 +130,127 @@ Use AskUserQuestion tool to gather all configuration preferences in one or two q
   2. Standard (120s) - Recommended default
   3. Extended (180s) - For complex tasks
 
-After gathering answers, create the configuration file using the helper script:
+**Question 4:**
+- **Header**: "Max Tokens"
+- **Question**: "What should be the maximum response length?"
+- **Options**:
+  1. Short (1000) - For brief responses
+  2. Medium (2000) - Recommended default
+  3. Long (4000) - For detailed responses
 
+Then create config:
 ```bash
-python -m modelchorus.cli.setup create-config --project . \
+python -m modelchorus.cli.setup create-tiered-config --project . \
+  --tier quick \
   --provider <chosen_provider> \
   --temperature <chosen_temperature> \
-  --timeout <chosen_timeout>
+  --timeout <chosen_timeout> \
+  --max-tokens <chosen_max_tokens>
 ```
+
+---
+
+##### STANDARD TIER Questions
+
+If user chose "Standard Setup", ask Quick tier questions PLUS these additional questions:
+
+**Questions 1-4:** Same as Quick tier
+
+**Question 5:**
+- **Header**: "Multi-Model"
+- **Question**: "Which providers should be used for multi-model workflows (consensus, research)?"
+- **multiSelect**: true
+- **Options**:
+  1. Claude (Anthropic) - Best for reasoning and analysis
+  2. Gemini (Google) - Good for creative tasks
+  3. Codex (OpenAI) - Alternative perspective
+
+**Question 6:**
+- **Header**: "Consensus"
+- **Question**: "How should consensus workflow combine multiple model responses?"
+- **Options**:
+  1. Show all responses - Display each model's response separately
+  2. Synthesize - Combine responses into one unified answer
+  3. Vote - Use majority opinion for binary questions
+
+**Question 7:**
+- **Header**: "Research"
+- **Question**: "What citation style should research workflow use?"
+- **Options**:
+  1. Informal - Simple mentions without formal citations
+  2. Academic - Formal academic style with references
+  3. APA - APA citation format
+  4. MLA - MLA citation format
+
+**Question 8:**
+- **Header**: "Research"
+- **Question**: "How thorough should the research workflow be?"
+- **Options**:
+  1. Quick - Fast overview of the topic
+  2. Thorough - Balanced depth and speed (recommended)
+  3. Comprehensive - Deep dive with extensive sources
+
+**Question 9:**
+- **Header**: "ThinkDeep"
+- **Question**: "What reasoning depth should thinkdeep workflow use?"
+- **Options**:
+  1. Low - Basic reasoning with fewer steps
+  2. Medium - Balanced reasoning (recommended)
+  3. High - Deep reasoning with extensive analysis
+
+Then create config:
+```bash
+python -m modelchorus.cli.setup create-tiered-config --project . \
+  --tier standard \
+  --provider <chosen_provider> \
+  --temperature <chosen_temperature> \
+  --timeout <chosen_timeout> \
+  --max-tokens <chosen_max_tokens> \
+  --consensus-providers <space_separated_providers> \
+  --consensus-strategy <chosen_strategy> \
+  --research-citation <chosen_citation> \
+  --research-depth <chosen_depth> \
+  --thinkdeep-mode <chosen_mode>
+```
+
+---
+
+##### ADVANCED TIER Questions
+
+If user chose "Advanced Setup", ask Standard tier questions PLUS:
+
+**Questions 1-9:** Same as Standard tier
+
+**Question 10:**
+- **Header**: "Ideate"
+- **Question**: "Which providers should be used for ideate workflow (creative brainstorming)?"
+- **multiSelect**: true
+- **Options**:
+  1. Claude (Anthropic) - Structured creative thinking
+  2. Gemini (Google) - Highly creative ideas
+  3. Codex (OpenAI) - Alternative perspective
+
+Then create config (same command as Standard, with additional --ideate-providers):
+```bash
+python -m modelchorus.cli.setup create-tiered-config --project . \
+  --tier advanced \
+  --provider <chosen_provider> \
+  --temperature <chosen_temperature> \
+  --timeout <chosen_timeout> \
+  --max-tokens <chosen_max_tokens> \
+  --consensus-providers <space_separated_providers> \
+  --consensus-strategy <chosen_strategy> \
+  --research-citation <chosen_citation> \
+  --research-depth <chosen_depth> \
+  --thinkdeep-mode <chosen_mode> \
+  --ideate-providers <space_separated_providers>
+```
+
+---
+
+##### Value Mappings
+
+Use these mappings when constructing the CLI command:
 
 **Temperature mapping:**
 - Conservative → 0.5
@@ -131,11 +262,37 @@ python -m modelchorus.cli.setup create-config --project . \
 - Standard → 120.0
 - Extended → 180.0
 
+**Max tokens mapping:**
+- Short → 1000
+- Medium → 2000
+- Long → 4000
+
 **Provider mapping:**
 - Claude (Anthropic) → claude
 - Gemini (Google) → gemini
 - Codex (OpenAI) → codex
 - Cursor Agent → cursor-agent
+
+**Consensus strategy mapping:**
+- Show all responses → all_responses
+- Synthesize → synthesize
+- Vote → vote
+
+**Research citation mapping:**
+- Informal → informal
+- Academic → academic
+- APA → apa
+- MLA → mla
+
+**Research depth mapping:**
+- Quick → quick
+- Thorough → thorough
+- Comprehensive → comprehensive
+
+**ThinkDeep mode mapping:**
+- Low → low
+- Medium → medium
+- High → high
 
 The script will create the `.modelchorusrc` file and return JSON with `success: true` if successful.
 
@@ -147,6 +304,8 @@ Your settings:
   • Default provider: <provider>
   • Temperature: <temperature>
   • Timeout: <timeout>s
+  • Max tokens: <max_tokens> (if configured)
+  • Tier: <tier>
 ```
 
 **On error:**
@@ -157,6 +316,23 @@ Error: <error_message>
 
 You can create the file manually by copying .modelchorusrc.example
 ```
+
+#### Add Configuration to .gitignore
+
+After successfully creating the config file, add it to `.gitignore`:
+
+```bash
+python -m modelchorus.cli.setup add-to-gitignore --project .
+```
+
+This will add `.modelchorusrc` and its variants to the project's `.gitignore` file.
+
+**On success:**
+```
+✅ Added .modelchorusrc to .gitignore
+```
+
+If the entries are already present, the command will report that and continue gracefully.
 
 Then proceed to Step 3.
 

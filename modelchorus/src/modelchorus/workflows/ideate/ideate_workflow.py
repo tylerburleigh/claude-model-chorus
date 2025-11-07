@@ -87,6 +87,7 @@ class IdeateWorkflow(BaseWorkflow):
     def __init__(
         self,
         provider: ModelProvider,
+        fallback_providers: Optional[List[ModelProvider]] = None,
         config: Optional[Dict[str, Any]] = None,
         conversation_memory: Optional[ConversationMemory] = None
     ):
@@ -95,6 +96,7 @@ class IdeateWorkflow(BaseWorkflow):
 
         Args:
             provider: ModelProvider instance to use for ideation
+            fallback_providers: Optional list of fallback providers to try if primary fails
             config: Optional configuration dictionary
             conversation_memory: Optional ConversationMemory for multi-turn conversations
 
@@ -111,6 +113,7 @@ class IdeateWorkflow(BaseWorkflow):
             conversation_memory=conversation_memory
         )
         self.provider = provider
+        self.fallback_providers = fallback_providers or []
 
         logger.info(f"IdeateWorkflow initialized with provider: {provider.provider_name}")
 
@@ -119,6 +122,7 @@ class IdeateWorkflow(BaseWorkflow):
         prompt: str,
         continuation_id: Optional[str] = None,
         files: Optional[List[str]] = None,
+        skip_provider_check: bool = False,
         **kwargs
     ) -> WorkflowResult:
         """
@@ -132,6 +136,7 @@ class IdeateWorkflow(BaseWorkflow):
             prompt: The topic or problem to ideate on
             continuation_id: Optional thread ID to continue an existing ideation session
             files: Optional list of file paths to include in context
+            skip_provider_check: Skip provider availability check (faster startup)
             **kwargs: Additional parameters passed to provider.generate()
                      (e.g., temperature, max_tokens, num_ideas)
 
@@ -147,6 +152,30 @@ class IdeateWorkflow(BaseWorkflow):
         """
         if not prompt or not prompt.strip():
             raise ValueError("Prompt cannot be empty")
+
+        # Check provider availability
+        if not skip_provider_check:
+            has_available, available, unavailable = await self.check_provider_availability(
+                self.provider, self.fallback_providers
+            )
+
+            if not has_available:
+                from ...providers.cli_provider import ProviderUnavailableError
+                error_msg = "No providers available for ideation:\n"
+                for name, error in unavailable:
+                    error_msg += f"  - {name}: {error}\n"
+                raise ProviderUnavailableError(
+                    "all",
+                    error_msg,
+                    [
+                        "Check installations: modelchorus list-providers --check",
+                        "Install missing providers or update .modelchorusrc"
+                    ]
+                )
+
+            if unavailable and logger.isEnabledFor(logging.WARNING):
+                logger.warning(f"Some providers unavailable: {[n for n, _ in unavailable]}")
+                logger.info(f"Will use available providers: {available}")
 
         # Get or create thread ID
         thread_id = continuation_id or str(uuid.uuid4())
@@ -180,8 +209,12 @@ class IdeateWorkflow(BaseWorkflow):
         logger.info(f"Executing ideation for prompt: {prompt[:100]}...")
 
         try:
-            # Generate ideas
-            response: GenerationResponse = await self.provider.generate(request)
+            # Generate ideas with fallback
+            response, used_provider, failed = await self._execute_with_fallback(
+                request, self.provider, self.fallback_providers
+            )
+            if failed:
+                logger.warning(f"Providers failed before success: {', '.join(failed)}")
 
             # Create workflow step
             step = WorkflowStep(
@@ -607,8 +640,12 @@ Generate diverse, innovative ideas. Think broadly and explore multiple approache
         )
 
         try:
-            # Execute extraction
-            response: GenerationResponse = await self.provider.generate(request)
+            # Execute extraction with fallback
+            response, used_provider, failed = await self._execute_with_fallback(
+                request, self.provider, self.fallback_providers
+            )
+            if failed:
+                logger.warning(f"Providers failed for idea extraction: {', '.join(failed)}")
 
             # Parse extracted ideas from response
             ideas = self._parse_extracted_ideas(response.content, perspectives_content)
@@ -799,8 +836,12 @@ Use the requested format exactly."""
         )
 
         try:
-            # Execute clustering
-            response: GenerationResponse = await self.provider.generate(request)
+            # Execute clustering with fallback
+            response, used_provider, failed = await self._execute_with_fallback(
+                request, self.provider, self.fallback_providers
+            )
+            if failed:
+                logger.warning(f"Providers failed for idea clustering: {', '.join(failed)}")
 
             # Parse clusters from response
             clusters = self._parse_clusters(response.content, ideas)
@@ -1018,8 +1059,12 @@ Use the requested format exactly."""
         )
 
         try:
-            # Execute scoring
-            response: GenerationResponse = await self.provider.generate(request)
+            # Execute scoring with fallback
+            response, used_provider, failed = await self._execute_with_fallback(
+                request, self.provider, self.fallback_providers
+            )
+            if failed:
+                logger.warning(f"Providers failed for idea scoring: {', '.join(failed)}")
 
             # Parse scores from response
             scored_clusters = self._parse_scores(response.content, clusters, scoring_criteria)
@@ -1991,8 +2036,12 @@ Use the requested format exactly."""
         )
 
         try:
-            # Generate elaborated outline
-            response: GenerationResponse = await self.provider.generate(request)
+            # Generate elaborated outline with fallback
+            response, used_provider, failed = await self._execute_with_fallback(
+                request, self.provider, self.fallback_providers
+            )
+            if failed:
+                logger.warning(f"Providers failed for cluster elaboration '{theme}': {', '.join(failed)}")
 
             # Parse outline sections from response
             outline_sections = self._parse_outline_sections(response.content)

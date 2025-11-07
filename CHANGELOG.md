@@ -5,6 +5,111 @@ All notable changes to ModelChorus will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2025-11-07
+
+### Added
+
+#### Provider Fallback and Resilience
+- **Automatic Provider Fallback**: All workflows now support fallback provider chains
+  - Primary provider fails → automatically tries fallback providers in order
+  - Configurable via `fallback_providers` in `.modelchorusrc`
+  - Works across CHAT, RESEARCH, ARGUMENT, IDEATE, and THINKDEEP workflows
+  - Example: `fallback_providers: [gemini, codex, cursor-agent]`
+
+- **Proactive Availability Checking**: Workflows check provider availability before execution
+  - Fail-fast behavior: detects unavailable providers immediately
+  - Clear error messages with installation instructions
+  - Concurrent availability checks for minimal overhead
+  - Optional `--skip-provider-check` flag for faster startup
+
+- **Enhanced Error Messages**: Provider unavailability errors now include:
+  - Specific reason (CLI not found, permission denied, etc.)
+  - Installation command for the specific provider
+  - Helpful suggestions (check installations, update config)
+  - Reference to `modelchorus list-providers --check`
+
+- **CLI Improvements**:
+  - `list-providers --check` command to verify all provider installations
+  - All workflow commands support `--skip-provider-check` flag
+  - Verbose output shows provider initialization and fallback attempts
+  - Installation commands added: claude, gemini, codex, cursor-agent
+
+#### Configuration
+- **Fallback Provider Configuration**: `.modelchorusrc.example` updated with comprehensive fallback examples
+  - Each workflow includes fallback provider list
+  - Example configurations for all 4 providers
+  - Documentation on provider fallback behavior
+  - Comments explaining fallback chain execution order
+
+### Changed
+
+#### Workflows
+- **ResearchWorkflow**: Added `fallback_providers` parameter and availability checking
+  - Constructor accepts `fallback_providers: Optional[List[ModelProvider]]`
+  - `run()` method accepts `skip_provider_check: bool` parameter
+  - All `provider.generate()` calls use `_execute_with_fallback()`
+
+- **ArgumentWorkflow**: Added `fallback_providers` parameter and availability checking
+  - Constructor accepts `fallback_providers: Optional[List[ModelProvider]]`
+  - `run()` method accepts `skip_provider_check: bool` parameter
+  - Provider failures handled gracefully with fallback
+
+- **IdeateWorkflow**: Added `fallback_providers` parameter and availability checking
+  - Constructor accepts `fallback_providers: Optional[List[ModelProvider]]`
+  - `run()` method accepts `skip_provider_check: bool` parameter
+  - All 5 provider.generate() calls use fallback mechanism
+
+- **ThinkDeepWorkflow**: Added `fallback_providers` parameter and availability checking
+  - Constructor accepts `fallback_providers: Optional[List[ModelProvider]]`
+  - `run()` method accepts `skip_provider_check: bool` parameter
+  - Main investigation uses fallback (expert provider intentionally excluded)
+
+- **ChatWorkflow**: Added `fallback_providers` parameter and availability checking
+  - Constructor accepts `fallback_providers: Optional[List[ModelProvider]]`
+  - `run()` method accepts `skip_provider_check: bool` parameter
+  - Conversation continuity maintained across fallback providers
+
+#### CLI Commands
+- All workflow CLI commands now:
+  - Load `fallback_providers` from configuration
+  - Initialize fallback provider instances
+  - Pass fallback providers to workflow constructors
+  - Support `--skip-provider-check` flag
+  - Show verbose output for provider initialization
+
+#### Infrastructure
+- **BaseWorkflow**: New fallback infrastructure methods
+  - `_execute_with_fallback()`: Tries primary then fallback providers sequentially
+  - `check_provider_availability()`: Concurrent provider availability testing
+  - Returns provider name, response, and failed providers list
+
+- **CLIProvider**: Enhanced error handling
+  - `ProviderUnavailableError` exception with suggestions
+  - `check_availability()` method for testing CLI installation
+  - Improved error classification (permanent vs transient)
+  - Smart retry logic that skips permanent errors
+
+### Documentation
+- **TESTING_FALLBACK.md**: Comprehensive manual testing guide
+  - 8 test scenarios covering all fallback cases
+  - Step-by-step testing procedures
+  - Expected results for each scenario
+  - Debugging tips and troubleshooting
+  - Success criteria checklist
+
+- **Configuration Examples**: Updated `.modelchorusrc.example`
+  - All workflows show fallback provider configuration
+  - Comprehensive comments explaining fallback behavior
+  - Provider fallback section with usage examples
+
+### Technical Details
+- Fallback mechanism uses sequential provider attempts with error tracking
+- Availability checking uses concurrent async execution for performance
+- Failed providers logged with warning messages
+- Successful fallback provider reported in metadata
+- Provider errors distinguished from model/content errors
+- Fallback only triggers on provider-level failures (CLI missing, auth errors)
+
 ## [0.3.0] - 2025-11-06
 
 ### Added

@@ -35,6 +35,10 @@ workflows:
   # CHAT - Interactive conversation with a single model
   chat:
     provider: claude
+    fallback_providers:     # Fallback chain if primary fails (tries in order)
+      - gemini
+      - codex
+      - cursor-agent
     temperature: 0.7
     max_tokens: 2000
 
@@ -51,6 +55,10 @@ workflows:
   # THINKDEEP - Extended reasoning with chain-of-thought
   thinkdeep:
     provider: claude
+    fallback_providers:     # Fallback chain if primary fails (tries in order)
+      - gemini
+      - codex
+      - cursor-agent
     thinking_mode: medium   # Options: low, medium, high
     temperature: 0.6        # Lower temp for more focused reasoning
     max_tokens: 4000        # Higher token limit for detailed reasoning
@@ -58,22 +66,30 @@ workflows:
   # ARGUMENT - Generate arguments for/against a position
   argument:
     provider: claude
+    fallback_providers:     # Fallback chain if primary fails (tries in order)
+      - gemini
+      - codex
+      - cursor-agent
     temperature: 0.8        # Slightly higher for diverse arguments
     max_tokens: 2000
 
   # IDEATE - Creative ideation and brainstorming
   ideate:
-    providers:              # Use multiple models for diverse ideas
-      - claude
+    provider: claude
+    fallback_providers:     # Fallback chain if primary fails (tries in order)
       - gemini
+      - codex
+      - cursor-agent
     temperature: 0.9        # Higher temp for more creativity
     max_tokens: 2000
 
   # RESEARCH - Multi-source research with citations
   research:
-    providers:
-      - claude
+    provider: claude
+    fallback_providers:     # Fallback chain if primary fails (tries in order)
       - gemini
+      - codex
+      - cursor-agent
     citation_style: academic  # Options: informal, academic, apa, mla
     depth: thorough           # Options: quick, thorough, comprehensive
     temperature: 0.5          # Lower temp for factual accuracy
@@ -120,3 +136,18 @@ workflows:
 # workflows:
 #   research:
 #     depth: quick
+
+# ============================================================================
+# Provider Fallback
+# ============================================================================
+# Workflows support automatic fallback if the primary provider fails.
+#
+# fallback_providers: List of providers to try if primary fails
+#   - Tried in order
+#   - Workflow succeeds if any provider succeeds
+#   - Useful for resilience and reliability
+#
+# Example: If claude CLI is not installed, will automatically use gemini
+#
+# To disable provider checking (faster startup):
+#   modelchorus research "topic" --skip-provider-check
