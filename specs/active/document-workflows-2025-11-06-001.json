@@ -1,7 +1,7 @@
 {
   "spec_id": "document-workflows-2025-11-06-001",
   "generated": "2025-11-06T13:00:00Z",
-  "last_updated": "2025-11-06T13:01:52.552000Z",
+  "last_updated": "2025-11-07T11:57:20.170005Z",
   "metadata": {
     "title": "Document Processing Workflows (DIGEST, SYNTHESIZE, REVIEW)",
     "description": "Implement document infrastructure and three document-focused workflows for ModelChorus: DIGEST (single-document summarization), SYNTHESIZE (multi-document analysis), and REVIEW (committee-based critical analysis)",
@@ -24,13 +24,17 @@
       "SYNTHESIZE maintains 95%+ citation accuracy",
       "All tests pass with >80% coverage",
       "User documentation complete for each workflow"
-    ]
+    ],
+    "status": "active",
+    "activated_date": "2025-11-07T11:49:27.816129Z",
+    "progress_percentage": 1,
+    "current_phase": "phase-1"
   },
   "hierarchy": {
     "spec-root": {
       "type": "spec",
       "title": "Document Processing Workflows (DIGEST, SYNTHESIZE, REVIEW)",
-      "status": "pending",
+      "status": "in_progress",
       "parent": null,
       "children": [
         "phase-1",
@@ -41,20 +45,20 @@
         "phase-6"
       ],
       "total_tasks": 64,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {}
     },
     "phase-1": {
       "type": "phase",
       "title": "Document Infrastructure",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "spec-root",
       "children": [
         "phase-1-files",
         "phase-1-verify"
       ],
       "total_tasks": 18,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "purpose": "Build document ingestion pipeline and parsing infrastructure for all document workflows",
         "risk_level": "high",
@@ -71,7 +75,7 @@
     "phase-1-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-1",
       "children": [
         "task-1-1",
@@ -81,7 +85,7 @@
         "task-1-5"
       ],
       "total_tasks": 15,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -92,7 +96,7 @@
     "task-1-1": {
       "type": "task",
       "title": "modelchorus/src/modelchorus/core/document_parser.py",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-1-files",
       "children": [
         "task-1-1-1",
@@ -112,7 +116,7 @@
         "depends": []
       },
       "total_tasks": 4,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "modelchorus/src/modelchorus/core/document_parser.py",
         "task_category": "implementation",
@@ -123,7 +127,7 @@
     "task-1-1-1": {
       "type": "subtask",
       "title": "Create DocumentParser base class with format detection",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-1-1",
       "children": [],
       "dependencies": {
@@ -132,8 +136,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
-      "metadata": {}
+      "completed_tasks": 1,
+      "metadata": {
+        "started_at": "2025-11-07T11:54:12.208700Z",
+        "completed_at": "2025-11-07T11:57:20.156196Z",
+        "needs_journaling": false,
+        "actual_hours": 0.052,
+        "journaled_at": "2025-11-07T11:57:20.164571Z"
+      }
     },
     "task-1-1-2": {
       "type": "subtask",
@@ -817,9 +827,7 @@
         "blocked_by": [
           "phase-1"
         ],
-        "depends": [
-          "general-purpose-workflows-2025-11-06-001:phase-1"
-        ]
+        "depends": []
       },
       "total_tasks": 12,
       "completed_tasks": 0,
@@ -1150,9 +1158,7 @@
         "blocked_by": [
           "phase-1"
         ],
-        "depends": [
-          "general-purpose-workflows-2025-11-06-001:phase-1"
-        ]
+        "depends": []
       },
       "total_tasks": 9,
       "completed_tasks": 0,
@@ -1896,5 +1902,16 @@
         "expected": "Documentation examples process documents and produce valid outputs"
       }
     }
-  }
+  },
+  "journal": [
+    {
+      "timestamp": "2025-11-07T11:57:20.164552Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Create DocumentParser base class with format detection",
+      "author": "claude-code",
+      "content": "Successfully created DocumentParser base class with format detection. Implementation includes:\n\n**Core Components Created:**\n1. Document models (Document, DocumentMetadata, DocumentFormat enum) in models.py\n2. DocumentParser abstract base class with parse() and supports_format() methods in parser.py\n3. Format detection using extension-based and MIME type strategies\n4. ParserRegistry system for registering and retrieving format-specific parsers\n5. Convenience parse_document() function for automatic format detection\n\n**Files Created:**\n- modelchorus/src/modelchorus/documents/__init__.py (module exports)\n- modelchorus/src/modelchorus/documents/models.py (data models)\n- modelchorus/src/modelchorus/documents/parser.py (parser infrastructure)\n- modelchorus/tests/test_document_parser.py (comprehensive unit tests)\n\n**Testing:**\n- All 24 unit tests passing (pytest)\n- 95% code coverage on parser module, 100% on models\n- Tests cover: format detection, model validation, parser registry, error handling\n\n**Verification:**\n- Module imports verified successfully\n- Follows established patterns from BaseWorkflow\n- Extensible design for future format-specific parsers\n\nThis task provides the foundation for document processing workflows (DIGEST, SYNTHESIZE, REVIEW).",
+      "metadata": {},
+      "task_id": "task-1-1-1"
+    }
+  ]
 }
