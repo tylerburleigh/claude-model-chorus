@@ -1,0 +1,1343 @@
+{
+  "spec_id": "modelchorus-skill-instructions-2025-11-07-001",
+  "generated": "2025-11-07T12:00:00Z",
+  "last_updated": "2025-11-07T12:23:43.561799Z",
+  "hierarchy": {
+    "spec-root": {
+      "type": "spec",
+      "title": "ModelChorus Skill Instructions",
+      "status": "in_progress",
+      "parent": null,
+      "children": [
+        "phase-1",
+        "phase-2",
+        "phase-3",
+        "phase-4",
+        "phase-5"
+      ],
+      "total_tasks": 39,
+      "completed_tasks": 1,
+      "metadata": {
+        "description": "Create comprehensive AI agent instructions (SKILL.md files) for all six ModelChorus workflows, enabling Claude Code to effectively guide users through multi-model orchestration patterns",
+        "estimated_hours": 32
+      }
+    },
+    "phase-1": {
+      "type": "phase",
+      "title": "Research & Analysis",
+      "status": "in_progress",
+      "parent": "spec-root",
+      "children": [
+        "phase-1-files",
+        "phase-1-verify"
+      ],
+      "total_tasks": 8,
+      "completed_tasks": 1,
+      "metadata": {
+        "purpose": "Understand existing patterns, gather context, and establish consistency framework",
+        "risk_level": "low"
+      },
+      "dependencies": {
+        "blocks": [
+          "phase-2"
+        ]
+      }
+    },
+    "phase-1-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "in_progress",
+      "parent": "phase-1",
+      "children": [
+        "task-1-1",
+        "task-1-2",
+        "task-1-3",
+        "task-1-4"
+      ],
+      "total_tasks": 7,
+      "completed_tasks": 1,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-1-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-1-1": {
+      "type": "task",
+      "title": "Analyze existing workflow documentation structure",
+      "status": "in_progress",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-1-1",
+        "task-1-1-2"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-1-4"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 1,
+      "metadata": {
+        "task_category": "investigation",
+        "estimated_hours": 1
+      }
+    },
+    "task-1-1-1": {
+      "type": "subtask",
+      "title": "Review docs/workflows/*.md files for structure patterns",
+      "status": "completed",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "task_category": "investigation",
+        "completed_at": "2025-11-07T12:23:43.550840Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-07T12:23:43.554611Z"
+      }
+    },
+    "task-1-1-2": {
+      "type": "subtask",
+      "title": "Identify common sections and formatting conventions",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "investigation"
+      }
+    },
+    "task-1-2": {
+      "type": "task",
+      "title": "Review workflow Python implementations",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-2-1",
+        "task-1-2-2"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-1-4"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "investigation",
+        "estimated_hours": 2
+      }
+    },
+    "task-1-2-1": {
+      "type": "subtask",
+      "title": "Analyze workflow classes in modelchorus/workflows/",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "investigation"
+      }
+    },
+    "task-1-2-2": {
+      "type": "subtask",
+      "title": "Document key workflow behaviors and parameters",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "research"
+      }
+    },
+    "task-1-3": {
+      "type": "task",
+      "title": "Extract CLI command reference from main.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-3-1",
+        "task-1-3-2"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-1-4"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "investigation",
+        "estimated_hours": 1
+      }
+    },
+    "task-1-3-1": {
+      "type": "subtask",
+      "title": "Extract command signatures and options for each workflow",
+      "status": "pending",
+      "parent": "task-1-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "investigation"
+      }
+    },
+    "task-1-3-2": {
+      "type": "subtask",
+      "title": "Document default values and parameter constraints",
+      "status": "pending",
+      "parent": "task-1-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "research"
+      }
+    },
+    "task-1-4": {
+      "type": "task",
+      "title": "Create consistency framework template",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "phase-2"
+        ],
+        "blocked_by": [
+          "task-1-1",
+          "task-1-2",
+          "task-1-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "decision",
+        "estimated_hours": 2,
+        "description": "Define standard structure that all SKILL.md files will follow",
+        "file_path": "task-1-4.md"
+      }
+    },
+    "phase-1-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "verify-1-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-1-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-1-1": {
+      "type": "verify",
+      "title": "Consistency framework is comprehensive",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Template includes all necessary sections for AI agent instructions",
+        "command": ""
+      }
+    },
+    "phase-2": {
+      "type": "phase",
+      "title": "Core Workflow Skills (CHAT, CONSENSUS, THINKDEEP)",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-2-files",
+        "phase-2-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-3"
+        ],
+        "blocked_by": [
+          "phase-1",
+          "task-1-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 12,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Implement skill instructions for the three foundational workflows",
+        "risk_level": "medium"
+      }
+    },
+    "phase-2-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "task-2-1",
+        "task-2-2",
+        "task-2-3"
+      ],
+      "total_tasks": 9,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-2-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-2-1": {
+      "type": "task",
+      "title": "skills/chat/SKILL.md",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-1-1",
+        "task-2-1-2",
+        "task-2-1-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": [
+          "task-1-4"
+        ]
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/chat/SKILL.md",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "description": "Create agent instructions for CHAT workflow - simple conversation with continuity"
+      }
+    },
+    "task-2-1-1": {
+      "type": "subtask",
+      "title": "Write overview and when to use sections",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation"
+      }
+    },
+    "task-2-1-2": {
+      "type": "subtask",
+      "title": "Document CLI usage patterns and continuation",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation"
+      }
+    },
+    "task-2-1-3": {
+      "type": "subtask",
+      "title": "Add examples and troubleshooting guidance",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation"
+      }
+    },
+    "task-2-2": {
+      "type": "task",
+      "title": "skills/consensus/SKILL.md",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-2-1",
+        "task-2-2-2",
+        "task-2-2-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": [
+          "task-1-4"
+        ]
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/consensus/SKILL.md",
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "description": "Create agent instructions for CONSENSUS workflow - multi-model perspectives"
+      }
+    },
+    "task-2-2-1": {
+      "type": "subtask",
+      "title": "Document consensus strategies and when to use each",
+      "status": "pending",
+      "parent": "task-2-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation"
+      }
+    },
+    "task-2-2-2": {
+      "type": "subtask",
+      "title": "Explain provider selection and parallel execution",
+      "status": "pending",
+      "parent": "task-2-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation"
+      }
+    },
+    "task-2-2-3": {
+      "type": "subtask",
+      "title": "Add decision-making use cases and examples",
+      "status": "pending",
+      "parent": "task-2-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation"
+      }
+    },
+    "task-2-3": {
+      "type": "task",
+      "title": "skills/thinkdeep/SKILL.md",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-3-1",
+        "task-2-3-2",
+        "task-2-3-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": [
+          "task-1-4"
+        ]
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/thinkdeep/SKILL.md",
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "description": "Create agent instructions for THINKDEEP workflow - systematic investigation"
+      }
+    },
+    "task-2-3-1": {
+      "type": "subtask",
+      "title": "Document hypothesis tracking and confidence progression",
+      "status": "pending",
+      "parent": "task-2-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation"
+      }
+    },
+    "task-2-3-2": {
+      "type": "subtask",
+      "title": "Explain investigation continuation and state inspection",
+      "status": "pending",
+      "parent": "task-2-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation"
+      }
+    },
+    "task-2-3-3": {
+      "type": "subtask",
+      "title": "Add debugging and investigation use cases",
+      "status": "pending",
+      "parent": "task-2-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation"
+      }
+    },
+    "phase-2-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "verify-2-1",
+        "verify-2-2",
+        "verify-2-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-2-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-2-1": {
+      "type": "verify",
+      "title": "All core skills follow consistency framework",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "CHAT, CONSENSUS, THINKDEEP skills have consistent structure",
+        "command": ""
+      }
+    },
+    "verify-2-2": {
+      "type": "verify",
+      "title": "Skills are clear and actionable for AI agents",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Instructions are specific enough for agent execution",
+        "command": ""
+      }
+    },
+    "verify-2-3": {
+      "type": "verify",
+      "title": "Examples accurately reflect CLI behavior",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Test examples against actual CLI",
+        "expected": "All command examples work as documented"
+      }
+    },
+    "phase-3": {
+      "type": "phase",
+      "title": "Advanced Workflow Skills (ARGUMENT, IDEATE, RESEARCH)",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-3-files",
+        "phase-3-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-4"
+        ],
+        "blocked_by": [
+          "phase-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 9,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Implement skill instructions for specialized dialectical and creative workflows",
+        "risk_level": "medium"
+      }
+    },
+    "phase-3-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "task-3-1",
+        "task-3-2",
+        "task-3-3"
+      ],
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-3-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-3-1": {
+      "type": "task",
+      "title": "skills/argument/SKILL.md",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-1-1",
+        "task-3-1-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": [
+          "task-2-1",
+          "task-2-2",
+          "task-2-3"
+        ]
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/argument/SKILL.md",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "description": "Create agent instructions for ARGUMENT workflow - dialectical reasoning"
+      }
+    },
+    "task-3-1-1": {
+      "type": "subtask",
+      "title": "Document three-role structure (Creator/Skeptic/Moderator)",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation"
+      }
+    },
+    "task-3-1-2": {
+      "type": "subtask",
+      "title": "Add argument analysis examples and policy use cases",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation"
+      }
+    },
+    "task-3-2": {
+      "type": "task",
+      "title": "skills/ideate/SKILL.md",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-2-1",
+        "task-3-2-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": [
+          "task-2-1",
+          "task-2-2",
+          "task-2-3"
+        ]
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/ideate/SKILL.md",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "description": "Create agent instructions for IDEATE workflow - collaborative brainstorming"
+      }
+    },
+    "task-3-2-1": {
+      "type": "subtask",
+      "title": "Document creative control via temperature and num_ideas",
+      "status": "pending",
+      "parent": "task-3-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation"
+      }
+    },
+    "task-3-2-2": {
+      "type": "subtask",
+      "title": "Add brainstorming patterns and feature ideation examples",
+      "status": "pending",
+      "parent": "task-3-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation"
+      }
+    },
+    "task-3-3": {
+      "type": "task",
+      "title": "skills/research/SKILL.md",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-3-1",
+        "task-3-3-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": [
+          "task-2-1",
+          "task-2-2",
+          "task-2-3"
+        ]
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/research/SKILL.md",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "description": "Create agent instructions for RESEARCH workflow - knowledge synthesis"
+      }
+    },
+    "task-3-3-1": {
+      "type": "subtask",
+      "title": "Document citation styles and research depth options",
+      "status": "pending",
+      "parent": "task-3-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation"
+      }
+    },
+    "task-3-3-2": {
+      "type": "subtask",
+      "title": "Add research workflow examples and source ingestion patterns",
+      "status": "pending",
+      "parent": "task-3-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation"
+      }
+    },
+    "phase-3-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "verify-3-1",
+        "verify-3-2",
+        "verify-3-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-3-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-3-1": {
+      "type": "verify",
+      "title": "All advanced skills follow consistency framework",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "ARGUMENT, IDEATE, RESEARCH skills match template structure",
+        "command": ""
+      }
+    },
+    "verify-3-2": {
+      "type": "verify",
+      "title": "Skills reference core workflows where patterns overlap",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Cross-references between related workflows are clear",
+        "command": ""
+      }
+    },
+    "verify-3-3": {
+      "type": "verify",
+      "title": "Examples accurately reflect CLI behavior",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Test examples against actual CLI",
+        "expected": "All command examples work as documented"
+      }
+    },
+    "phase-4": {
+      "type": "phase",
+      "title": "Multi-Model Review & Validation",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-4-files",
+        "phase-4-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-5"
+        ],
+        "blocked_by": [
+          "phase-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Use zen consensus to review all skills with codex and gemini for quality assurance",
+        "risk_level": "low"
+      }
+    },
+    "phase-4-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "task-4-1",
+        "task-4-2"
+      ],
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-4-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-4-1": {
+      "type": "task",
+      "title": "Perform multi-model consensus review of all skills",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-1-1",
+        "task-4-1-2"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-4-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "research",
+        "estimated_hours": 3,
+        "description": "Use mcp__zen__consensus with codex and gemini models"
+      }
+    },
+    "task-4-1-1": {
+      "type": "subtask",
+      "title": "Review core skills (CHAT, CONSENSUS, THINKDEEP) with consensus",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "research"
+      }
+    },
+    "task-4-1-2": {
+      "type": "subtask",
+      "title": "Review advanced skills (ARGUMENT, IDEATE, RESEARCH) with consensus",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "research"
+      }
+    },
+    "task-4-2": {
+      "type": "task",
+      "title": "Analyze review findings and identify improvements",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "phase-5"
+        ],
+        "blocked_by": [
+          "task-4-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "decision",
+        "estimated_hours": 2,
+        "description": "Document inconsistencies, gaps, and recommended improvements",
+        "file_path": "task-4-2.md"
+      }
+    },
+    "phase-4-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "verify-4-1",
+        "verify-4-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-4-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-4-1": {
+      "type": "verify",
+      "title": "Multi-model consensus successfully completed",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Reviews from codex and gemini models received and synthesized",
+        "command": ""
+      }
+    },
+    "verify-4-2": {
+      "type": "verify",
+      "title": "Review findings are actionable",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Clear action items identified for refinement phase",
+        "command": ""
+      }
+    },
+    "phase-5": {
+      "type": "phase",
+      "title": "Refinement & Integration",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-5-files",
+        "phase-5-verify"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-4",
+          "task-4-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Address review findings and ensure seamless Claude Code integration",
+        "risk_level": "low"
+      }
+    },
+    "phase-5-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "task-5-1",
+        "task-5-2",
+        "task-5-3"
+      ],
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-5-verify"
+        ]
+      }
+    },
+    "task-5-1": {
+      "type": "task",
+      "title": "Update skill files based on review feedback",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-5-2",
+          "task-5-3"
+        ],
+        "blocked_by": [],
+        "depends": [
+          "task-4-2"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "refactoring",
+        "estimated_hours": 4,
+        "description": "Address critical and high-priority findings from multi-model review",
+        "file_path": "task-5-1.md"
+      }
+    },
+    "task-5-2": {
+      "type": "task",
+      "title": "Validate cross-references between skills",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-5-3"
+        ],
+        "blocked_by": [
+          "task-5-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "investigation",
+        "estimated_hours": 1,
+        "description": "Ensure all cross-references between skills are accurate"
+      }
+    },
+    "task-5-3": {
+      "type": "task",
+      "title": "Confirm Claude Code plugin integration",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-5-1",
+          "task-5-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "investigation",
+        "estimated_hours": 1,
+        "description": "Verify skills are discoverable and work within Claude Code"
+      }
+    },
+    "phase-5-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "verify-5-1",
+        "verify-5-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-5-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-5-1": {
+      "type": "verify",
+      "title": "All review findings addressed",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Critical and high-priority review findings have been resolved",
+        "command": ""
+      }
+    },
+    "verify-5-2": {
+      "type": "verify",
+      "title": "Skills work correctly in Claude Code",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Test each skill in Claude Code environment",
+        "expected": "All 6 skills load and provide correct guidance to AI agents"
+      }
+    }
+  },
+  "metadata": {
+    "status": "active",
+    "activated_date": "2025-11-07T12:22:47.373941Z",
+    "progress_percentage": 2,
+    "current_phase": "phase-1"
+  },
+  "journal": [
+    {
+      "timestamp": "2025-11-07T12:23:43.554596Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Review docs/workflows/*.md files for structure patterns",
+      "author": "claude-code",
+      "content": "Reviewed all three workflow documentation files (ARGUMENT.md, IDEATE.md, RESEARCH.md) in docs/workflows/. Identified consistent structure pattern: Quick Reference table, What It Does, When to Use/NOT to Use, CLI Usage, Python API Usage, Advanced Features, Configuration Options, Best Practices, Common Use Patterns, Troubleshooting, Comparison with Other Workflows, Real-World Examples, and See Also sections. All workflow docs follow similar markdown structure with code examples in both bash and Python.",
+      "metadata": {},
+      "task_id": "task-1-1-1"
+    }
+  ]
+}
