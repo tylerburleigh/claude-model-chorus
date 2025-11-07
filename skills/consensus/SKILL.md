@@ -333,3 +333,159 @@ modelchorus consensus "Evaluate this proposal" \
 - Provider metadata and success/failure status
 - Strategy used
 - Execution timing and token usage
+
+## Best Practices
+
+1. **Choose appropriate strategies for use cases** - Use `all_responses` or `synthesize` for complex decisions, `majority` for factual verification, `weighted` for comprehensive answers, and `first_valid` for speed with failover.
+
+2. **Use multiple providers for diversity** - Include at least 2-3 different providers (e.g., claude + gemini + codex) to get genuinely diverse perspectives, not just redundancy.
+
+3. **Set appropriate timeouts** - Increase timeout (180-300s) for complex queries or slower providers; decrease (30-60s) for simple queries where speed matters.
+
+4. **Include relevant file context** - When reviewing code or documents, use `-f` flags to provide identical context to all providers for fair comparison.
+
+5. **Consider cost vs value** - Multi-model consensus costs more than single-model. Use CONSENSUS for decisions where multiple perspectives provide genuine value.
+
+## Examples
+
+### Example 1: Architecture Decision with Synthesized Perspectives
+
+**Scenario:** You need to decide between microservices and monolithic architecture for a new project.
+
+**Command:**
+```bash
+modelchorus consensus "Should I use microservices or monolithic architecture for a mid-size SaaS product with 5 developers?" \
+  -p claude -p gemini -p codex \
+  -s synthesize \
+  --output architecture-decision.json
+```
+
+**Expected Outcome:** Structured synthesis showing each model's perspective on the architecture decision, allowing you to see complementary insights and make an informed choice.
+
+---
+
+### Example 2: Fact Verification with Majority Consensus
+
+**Scenario:** You need to verify a technical claim or calculation.
+
+**Command:**
+```bash
+modelchorus consensus "Is it true that Python's GIL prevents true multi-threading? Explain briefly." \
+  -p claude -p gemini -p codex \
+  -s majority \
+  -t 0.4
+```
+
+**Expected Outcome:** The most common answer among the three models, with low temperature ensuring factual accuracy. If models agree, high confidence in the answer.
+
+---
+
+### Example 3: Code Review with Multiple Perspectives
+
+**Scenario:** You want diverse code review feedback from multiple AI models.
+
+**Command:**
+```bash
+modelchorus consensus "Review this code for bugs, performance issues, and best practices" \
+  -p claude -p gemini -p codex \
+  -f src/auth.py \
+  -s all_responses
+```
+
+**Expected Outcome:** Three separate code reviews showing different perspectives - one model might focus on security, another on performance, another on readability.
+
+---
+
+### Example 4: Quick Query with Failover
+
+**Scenario:** You need a fast answer and want automatic failover if primary provider is unavailable.
+
+**Command:**
+```bash
+modelchorus consensus "What does the Python 'yield' keyword do?" \
+  -p claude -p gemini \
+  -s first_valid \
+  --timeout 30
+```
+
+**Expected Outcome:** First successful response returns immediately. If Claude responds in 2 seconds, you get that answer without waiting for Gemini. If Claude times out, Gemini's response is used.
+
+## Troubleshooting
+
+### Issue: All providers failed
+
+**Symptoms:** Error message indicating all providers timed out or failed
+
+**Cause:** Network issues, provider outages, or timeout too short for complex queries
+
+**Solution:**
+```bash
+# Increase timeout and try again
+modelchorus consensus "Your prompt" -p claude -p gemini --timeout 240
+
+# Check provider availability
+modelchorus list-providers
+
+# Try with single provider to isolate issue
+modelchorus chat "Your prompt" -p claude
+```
+
+---
+
+### Issue: One provider consistently times out
+
+**Symptoms:** One specific provider always fails while others succeed
+
+**Cause:** That provider is slower, has quota limits, or is experiencing issues
+
+**Solution:**
+```bash
+# Increase timeout for that specific use case
+modelchorus consensus "Your prompt" -p claude -p gemini --timeout 180
+
+# Or exclude the problematic provider
+modelchorus consensus "Your prompt" -p claude -p codex
+```
+
+---
+
+### Issue: Responses are too similar/not diverse
+
+**Symptoms:** All models give nearly identical responses
+
+**Cause:** Models are trained similarly, or query has objectively correct answer
+
+**Solution:**
+- This is expected for factual queries (use `majority` to verify consensus)
+- For creative tasks, increase temperature: `--temperature 0.8`
+- For diverse perspectives, ensure you're asking for opinions, not facts
+- Consider using ARGUMENT workflow for dialectical analysis instead
+
+---
+
+### Issue: Strategy not producing expected output
+
+**Symptoms:** `majority` or `weighted` returning unexpected results
+
+**Cause:** Strategy implementation limitations or response format incompatibility
+
+**Solution:**
+```bash
+# Use all_responses or synthesize to see raw responses first
+modelchorus consensus "Your prompt" -p claude -p gemini -s all_responses
+
+# Then manually evaluate which strategy is appropriate
+# For complex responses, synthesize or all_responses work best
+```
+
+## Related Workflows
+
+- **CHAT** - When you only need a single model's perspective with conversation threading
+- **ARGUMENT** - When you need structured dialectical analysis with creator/skeptic/moderator roles rather than parallel independent perspectives
+
+---
+
+**See Also:**
+- ModelChorus Documentation: `/docs/WORKFLOWS.md`
+- Provider Information: `modelchorus list-providers`
+- General CLI Help: `modelchorus --help`
