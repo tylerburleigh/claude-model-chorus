@@ -46,6 +46,82 @@ Avoid the THINKDEEP workflow when:
 | Creative brainstorming | **IDEATE** - Structured idea generation |
 | Comprehensive research with citations | **RESEARCH** - Systematic information gathering |
 
+## Detailed Use Cases
+
+### Debugging Scenarios
+
+**Race Conditions and Timing Issues:**
+- Intermittent bugs that don't reproduce consistently
+- Authentication failures with no clear pattern
+- State management issues in async code
+- Example: "Users report random 401 errors, 5% of requests fail but logs show valid tokens"
+
+**Memory Leaks and Resource Issues:**
+- Gradually increasing memory usage
+- Connection pool exhaustion
+- File descriptor leaks
+- Example: "Service memory grows from 200MB to 2GB over 24 hours, then OOM crashes"
+
+**Integration Failures:**
+- API calls failing with unclear errors
+- Database connection issues
+- Third-party service timeouts
+- Example: "Payment processing fails 10% of the time with 'transaction timeout' but payment provider shows success"
+
+**Configuration Problems:**
+- Environment-specific bugs
+- Deployment issues
+- Feature flag interactions
+- Example: "Feature works in staging but fails in production, configuration appears identical"
+
+### Investigation Scenarios
+
+**Performance Analysis:**
+- Response time degradation
+- Query performance issues
+- CPU/memory spikes under load
+- Example: "API latency increased from 100ms to 2s after deployment, need to identify bottleneck"
+
+**Security Analysis:**
+- Vulnerability assessment
+- Access control verification
+- Input validation checking
+- Example: "Audit authentication flow for potential bypass vulnerabilities before security review"
+
+**Architecture Decisions:**
+- Technology selection (microservices vs monolith)
+- Database choice (SQL vs NoSQL)
+- Caching strategy evaluation
+- Example: "Team of 5 developers, 10k users expected, evaluate architecture tradeoffs"
+
+**Root Cause Analysis:**
+- Production incident investigation
+- Cascading failure analysis
+- Error spike investigation
+- Example: "500 error rate spiked from 0.1% to 15% at 2pm, trace back to root cause"
+
+### When to Use THINKDEEP for These Scenarios
+
+**Characteristics that indicate THINKDEEP is the right choice:**
+- ✅ Problem requires multiple investigation steps
+- ✅ Initial hypothesis may be wrong and need refinement
+- ✅ Evidence needs to accumulate across steps
+- ✅ Confidence level matters for decision-making
+- ✅ Investigation may span multiple sessions
+- ✅ Need to track what's been examined
+
+**Example decision:**
+```
+Problem: "Users report intermittent 401 errors"
+
+Simple fix? → NO (intermittent, unclear cause)
+Need hypothesis testing? → YES (multiple possible causes)
+Multi-step investigation? → YES (need to examine logs, code, flow)
+Confidence tracking valuable? → YES (want to know how certain about root cause)
+
+Decision: Use THINKDEEP ✓
+```
+
 ## Hypothesis Tracking
 
 THINKDEEP maintains hypothesis state across the investigation, allowing theories to evolve as evidence is gathered.
@@ -181,80 +257,47 @@ THINKDEEP supports multi-turn investigations where you can pause, resume, and bu
 
 **Pattern 1: Multi-Step Investigation**
 
+Step 1 - Initial investigation:
 ```bash
-# Step 1: Initial investigation
-modelchorus thinkdeep \
-  --model gpt5 \
-  --step "Investigate authentication failures in production" \
-  --step-number 1 \
-  --total-steps 3 \
-  --next-step-required true \
-  --findings "Examining auth service logs..." \
-  --confidence exploring
+modelchorus thinkdeep --model gpt-5 --step "Investigate authentication failures in production" --step-number 1 --total-steps 3 --next-step-required true --findings "Examining auth service logs..." --confidence exploring
+```
+Returns: `continuation_id = "auth-inv-abc123"`
 
-# Returns: continuation_id = "auth-inv-abc123"
+Step 2 - Continue with same thread:
+```bash
+modelchorus thinkdeep --continuation-id "auth-inv-abc123" --model gpt-5 --step "Check token validation logic based on log findings" --step-number 2 --total-steps 3 --next-step-required true --findings "Found race condition in async token validation" --confidence medium
+```
 
-# Step 2: Continue investigation with same thread
-modelchorus thinkdeep \
-  --continuation-id "auth-inv-abc123" \
-  --model gpt5 \
-  --step "Check token validation logic based on log findings" \
-  --step-number 2 \
-  --total-steps 3 \
-  --next-step-required true \
-  --findings "Found race condition in async token validation" \
-  --confidence medium
-
-# Step 3: Final analysis
-modelchorus thinkdeep \
-  --continuation-id "auth-inv-abc123" \
-  --model gpt5 \
-  --step "Verify race condition hypothesis with code analysis" \
-  --step-number 3 \
-  --total-steps 3 \
-  --next-step-required false \
-  --findings "Confirmed: missing await in auth middleware" \
-  --confidence high
+Step 3 - Final analysis:
+```bash
+modelchorus thinkdeep --continuation-id "auth-inv-abc123" --model gpt-5 --step "Verify race condition hypothesis with code analysis" --step-number 3 --total-steps 3 --next-step-required false --findings "Confirmed: missing await in auth middleware" --confidence high
 ```
 
 **Pattern 2: Investigation Branching**
 
 Start a new investigation branch while preserving original:
 
+Original investigation continues:
 ```bash
-# Original investigation continues...
-modelchorus thinkdeep \
-  --continuation-id "original-thread-xyz" \
-  ...
+modelchorus thinkdeep --continuation-id "original-thread-xyz" --step "Continue original investigation..." --step-number 4 --total-steps 5 --next-step-required true --findings "..." --confidence medium
+```
 
-# Branch to explore alternative hypothesis
-# (Omit continuation-id to start fresh branch)
-modelchorus thinkdeep \
-  --model gpt5 \
-  --step "Explore alternative: network latency causing timeouts" \
-  --findings "Investigating network layer..." \
-  --confidence low
+New branch (omit continuation-id to start fresh):
+```bash
+modelchorus thinkdeep --model gpt-5 --step "Explore alternative: network latency causing timeouts" --step-number 1 --total-steps 2 --next-step-required true --findings "Investigating network layer..." --confidence low
 ```
 
 **Pattern 3: Cross-Session Resume**
 
-Resume investigation after break or context reset:
-
+Day 1 - Original session:
 ```bash
-# Original session (day 1)
-modelchorus thinkdeep \
-  --step "Analyze memory leak in service" \
-  --findings "Found increasing heap usage over 24h" \
-  --confidence medium
-# Returns continuation_id: "mem-leak-xyz789"
+modelchorus thinkdeep --step "Analyze memory leak in service" --step-number 1 --total-steps 3 --next-step-required true --findings "Found increasing heap usage over 24h" --confidence medium
+```
+Returns: `continuation_id = "mem-leak-xyz789"`
 
-# Resume next session (day 2)
-# continuation_id preserves all previous context
-modelchorus thinkdeep \
-  --continuation-id "mem-leak-xyz789" \
-  --step "Trace heap allocations to identify source" \
-  --findings "Identified unclosed database connections" \
-  --confidence high
+Day 2 - Resume with preserved context:
+```bash
+modelchorus thinkdeep --continuation-id "mem-leak-xyz789" --step "Trace heap allocations to identify source" --step-number 2 --total-steps 3 --next-step-required true --findings "Identified unclosed database connections" --confidence high
 ```
 
 ### State Inspection
@@ -299,83 +342,41 @@ When starting a new investigation (no continuation_id):
 
 **Example 1: Debugging Race Condition**
 
-```python
-# Step 1: Initial symptoms
-{
-  "step": "Users report intermittent 401 errors",
-  "step_number": 1,
-  "total_steps": 4,
-  "next_step_required": True,
-  "findings": "Error rate: 5% of requests, no pattern found in logs",
-  "confidence": "exploring",
-  "hypothesis": "Unknown cause - investigate auth flow"
-}
-# Returns: continuation_id = "auth-race-001"
+Step 1 - Initial symptoms:
+```bash
+modelchorus thinkdeep --step "Users report intermittent 401 errors" --step-number 1 --total-steps 4 --next-step-required true --findings "Error rate: 5% of requests, no pattern found in logs" --confidence exploring --hypothesis "Unknown cause - investigate auth flow"
+```
+Returns: `continuation_id = "auth-race-001"`
 
-# Step 2: Investigate auth flow
-{
-  "continuation_id": "auth-race-001",  # Links to step 1
-  "step": "Examine token validation sequence",
-  "step_number": 2,
-  "total_steps": 4,
-  "next_step_required": True,
-  "findings": "Token checked before async validation completes",
-  "confidence": "medium",
-  "hypothesis": "Race condition in token validation"
-}
+Step 2 - Investigate auth flow:
+```bash
+modelchorus thinkdeep --continuation-id "auth-race-001" --step "Examine token validation sequence" --step-number 2 --total-steps 4 --next-step-required true --findings "Token checked before async validation completes" --confidence medium --hypothesis "Race condition in token validation"
+```
 
-# Step 3: Verify hypothesis
-{
-  "continuation_id": "auth-race-001",  # Links to steps 1-2
-  "step": "Trace async execution order",
-  "step_number": 3,
-  "total_steps": 4,
-  "next_step_required": True,
-  "findings": "Missing await causes request to proceed before validation",
-  "confidence": "high",
-  "hypothesis": "Confirmed: race condition due to missing await"
-}
+Step 3 - Verify hypothesis:
+```bash
+modelchorus thinkdeep --continuation-id "auth-race-001" --step "Trace async execution order" --step-number 3 --total-steps 4 --next-step-required true --findings "Missing await causes request to proceed before validation" --confidence high --hypothesis "Confirmed: race condition due to missing await"
+```
 
-# Step 4: Verify fix
-{
-  "continuation_id": "auth-race-001",  # Links to steps 1-3
-  "step": "Verify adding await resolves issue",
-  "step_number": 4,
-  "total_steps": 4,
-  "next_step_required": False,
-  "findings": "With await added, validation completes before auth check",
-  "confidence": "very_high",
-  "hypothesis": "Root cause: missing await in middleware"
-}
+Step 4 - Verify fix:
+```bash
+modelchorus thinkdeep --continuation-id "auth-race-001" --step "Verify adding await resolves issue" --step-number 4 --total-steps 4 --next-step-required false --findings "With await added, validation completes before auth check" --confidence very_high --hypothesis "Root cause: missing await in middleware"
 ```
 
 **Example 2: Architecture Decision**
 
-```python
-# Step 1: Analyze requirements
-{
-  "step": "Should we use microservices or monolith?",
-  "findings": "Team size: 5 devs, expected scale: 10k users",
-  "confidence": "exploring",
-  "hypothesis": "Need to evaluate tradeoffs"
-}
-# Returns: continuation_id = "arch-decision-002"
+Step 1 - Analyze requirements:
+```bash
+modelchorus thinkdeep --step "Should we use microservices or monolith?" --step-number 1 --total-steps 3 --next-step-required true --findings "Team size: 5 devs, expected scale: 10k users" --confidence exploring --hypothesis "Need to evaluate tradeoffs"
+```
+Returns: `continuation_id = "arch-decision-002"`
 
-# Step 2: Continue analysis
-{
-  "continuation_id": "arch-decision-002",
-  "step": "Evaluate team experience and deployment complexity",
-  "findings": "Team has limited k8s experience, deployment simplicity important",
-  "confidence": "medium",
-  "hypothesis": "Monolith may be better fit for team/scale"
-}
+Step 2 - Continue analysis:
+```bash
+modelchorus thinkdeep --continuation-id "arch-decision-002" --step "Evaluate team experience and deployment complexity" --step-number 2 --total-steps 3 --next-step-required true --findings "Team has limited k8s experience, deployment simplicity important" --confidence medium --hypothesis "Monolith may be better fit for team/scale"
+```
 
-# Step 3: Final recommendation
-{
-  "continuation_id": "arch-decision-002",
-  "step": "Consider future scaling and migration path",
-  "findings": "Can start monolith, extract services later if needed",
-  "confidence": "high",
-  "hypothesis": "Monolith is optimal: simpler ops, team fit, migration path exists"
-}
+Step 3 - Final recommendation:
+```bash
+modelchorus thinkdeep --continuation-id "arch-decision-002" --step "Consider future scaling and migration path" --step-number 3 --total-steps 3 --next-step-required false --findings "Can start monolith, extract services later if needed" --confidence high --hypothesis "Monolith is optimal: simpler ops, team fit, migration path exists"
 ```
