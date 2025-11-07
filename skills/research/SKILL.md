@@ -82,10 +82,10 @@ RESEARCH provides four depth levels that control investigation thoroughness:
 
 **Depth Selection Guide:**
 ```
-Quick overview needed? ’ shallow (2-3 findings, fast)
-Standard research task? ’ moderate (4-6 findings, recommended)
-Critical decision? ’ thorough (7-9 findings, deep)
-Exhaustive analysis? ’ comprehensive (10+ findings, maximum detail)
+Quick overview needed? ï¿½ shallow (2-3 findings, fast)
+Standard research task? ï¿½ moderate (4-6 findings, recommended)
+Critical decision? ï¿½ thorough (7-9 findings, deep)
+Exhaustive analysis? ï¿½ comprehensive (10+ findings, maximum detail)
 ```
 
 ## Citation Styles
@@ -165,9 +165,9 @@ References:
 ## Citation Style Selection Guide
 
 ```
-General documentation? ’ informal (natural language)
-Academic/formal report? ’ academic (APA-style)
-Technical specs/docs? ’ technical (numbered references)
+General documentation? ï¿½ informal (natural language)
+Academic/formal report? ï¿½ academic (APA-style)
+Technical specs/docs? ï¿½ technical (numbered references)
 ```
 
 ## Basic Usage
@@ -211,7 +211,7 @@ Thread ID: research-thread-abc123
 | Option | Short | Default | Description |
 |--------|-------|---------|-------------|
 | `--provider` | `-p` | `claude` | AI provider to use (`claude`, `gemini`, `codex`, `cursor-agent`) |
-| `--depth` | `-d` | `moderate` | Research depth (`shallow`, `moderate`, `thorough`, `comprehensive`) |
+| `--depth` | `-d` | `thorough` | Research depth (`shallow`, `moderate`, `thorough`, `comprehensive`) |
 | `--citation-style` | | `informal` | Citation format (`informal`, `academic`, `technical`) |
 | `--continue` | `-c` | None | Thread ID to continue research session |
 | `--file` | `-f` | None | Source file paths for context (repeatable) |
