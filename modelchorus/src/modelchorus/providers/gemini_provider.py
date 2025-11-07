@@ -120,11 +120,7 @@ class GeminiProvider(CLIProvider):
         Build the CLI command for a Gemini generation request.
 
         Constructs a command like:
-<<<<<<< HEAD
-            gemini "prompt text" --model pro -o json
-=======
-            gemini "..." --model pro --output-format json
->>>>>>> 397c12f (Add chat and thinkdeep skills with comprehensive documentation)
+            gemini "prompt text" --model pro --output-format json
 
         Args:
             request: GenerationRequest containing prompt and parameters

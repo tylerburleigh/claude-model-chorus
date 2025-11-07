@@ -158,6 +158,136 @@ ModelChorus supports integration with AI model CLIs. Each CLI has different argu
 
 ## Configuration
 
+ModelChorus supports multiple configuration methods to customize default behavior for workflows and providers.
+
+### Configuration Precedence
+
+Configuration is applied in the following order (highest to lowest priority):
+
+1. **CLI Arguments** - Explicitly provided command-line arguments
+2. **Workflow-Specific Config** - Settings in `.modelchorusrc` for specific workflows
+3. **Global Config** - Global defaults in `.modelchorusrc`
+4. **Hardcoded Defaults** - Built-in default values
+
+### Project Configuration File
+
+Create a `.modelchorusrc` file in your project root to set default providers, generation parameters, and workflow-specific settings.
+
+#### Creating a Config File
+
+```bash
+# Generate a sample configuration file
+modelchorus config init
+
+# Validate your configuration
+modelchorus config validate
+
+# View current effective configuration
+modelchorus config show
+```
+
+#### Config File Format
+
+ModelChorus supports both YAML and JSON formats. Use any of these filenames:
+- `.modelchorusrc` (YAML)
+- `.modelchorusrc.yaml`
+- `.modelchorusrc.yml`
+- `.modelchorusrc.json`
+
+#### Example Configuration
+
+```yaml
+# Global default provider (applies to all workflows unless overridden)
+default_provider: claude
+
+# Global generation parameters
+generation:
+  temperature: 0.7
+  max_tokens: 2000
+  timeout: 120.0
+
+# Workflow-specific overrides
+workflows:
+  chat:
+    provider: claude
+    temperature: 0.7
+
+  consensus:
+    providers:
+      - claude
+      - gemini
+    strategy: synthesize
+    temperature: 0.7
+
+  thinkdeep:
+    provider: claude
+    thinking_mode: medium
+    temperature: 0.6
+
+  argument:
+    provider: claude
+    temperature: 0.8
+
+  ideate:
+    providers:
+      - claude
+      - gemini
+    temperature: 0.9
+
+  research:
+    providers:
+      - claude
+      - gemini
+    citation_style: academic
+    depth: thorough
+    temperature: 0.5
+```
+
+#### Configurable Settings
+
+**Global Settings:**
+- `default_provider` - Default AI provider (claude, gemini, codex, cursor-agent)
+- `generation.temperature` - Default temperature for generation (0.0-2.0)
+- `generation.max_tokens` - Default maximum tokens
+- `generation.timeout` - Default timeout in seconds
+- `generation.system_prompt` - Default system prompt
+
+**Workflow-Specific Settings:**
+
+*All Workflows:*
+- `provider` - Single provider for the workflow
+- `providers` - Multiple providers (for consensus/research/ideate)
+- `temperature` - Creativity level
+- `max_tokens` - Maximum tokens to generate
+- `system_prompt` - Custom system prompt
+
+*Consensus Workflow:*
+- `strategy` - Consensus strategy (all_responses, synthesize, vote)
+- `timeout` - Per-provider timeout
+
+*ThinkDeep Workflow:*
+- `thinking_mode` - Reasoning depth (low, medium, high)
+
+*Research Workflow:*
+- `citation_style` - Citation format (informal, academic, apa, mla)
+- `depth` - Research depth (quick, thorough, comprehensive)
+
+#### CLI Commands
+
+```bash
+# Show current configuration
+modelchorus config show
+
+# Show detailed configuration (includes effective defaults)
+modelchorus config show --verbose
+
+# Validate configuration file
+modelchorus config validate
+
+# Create sample configuration
+modelchorus config init
+```
+
 ### Environment Variables
 
 ```bash

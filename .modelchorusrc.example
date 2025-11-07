@@ -1,0 +1,122 @@
+# ModelChorus Configuration Example
+#
+# Place this file as .modelchorusrc in your project root to configure
+# default settings for ModelChorus workflows.
+#
+# Supported formats: YAML (.modelchorusrc, .modelchorusrc.yaml, .modelchorusrc.yml)
+#                    JSON (.modelchorusrc.json)
+#
+# Configuration Precedence:
+#   CLI arguments > Workflow-specific config > Global defaults > Hardcoded defaults
+
+# ============================================================================
+# Global Defaults
+# ============================================================================
+
+# Default provider for all workflows (unless overridden)
+# Options: claude, gemini, codex, cursor-agent
+default_provider: claude
+
+# Global generation parameters (apply to all workflows unless overridden)
+generation:
+  temperature: 0.7        # 0.0-2.0, higher = more creative
+  max_tokens: 2000        # Maximum tokens in response
+  timeout: 120.0          # Timeout in seconds per provider
+  system_prompt: null     # Optional global system prompt
+
+# ============================================================================
+# Workflow-Specific Configuration
+# ============================================================================
+# Override global defaults for specific workflows
+# Available workflows: chat, consensus, thinkdeep, argument, ideate, research
+
+workflows:
+
+  # CHAT - Interactive conversation with a single model
+  chat:
+    provider: claude
+    temperature: 0.7
+    max_tokens: 2000
+
+  # CONSENSUS - Get responses from multiple models
+  consensus:
+    providers:              # List of providers for multi-model consensus
+      - claude
+      - gemini
+      - codex
+    strategy: all_responses # Options: all_responses, synthesize, vote
+    temperature: 0.7
+    timeout: 180.0
+
+  # THINKDEEP - Extended reasoning with chain-of-thought
+  thinkdeep:
+    provider: claude
+    thinking_mode: medium   # Options: low, medium, high
+    temperature: 0.6        # Lower temp for more focused reasoning
+    max_tokens: 4000        # Higher token limit for detailed reasoning
+
+  # ARGUMENT - Generate arguments for/against a position
+  argument:
+    provider: claude
+    temperature: 0.8        # Slightly higher for diverse arguments
+    max_tokens: 2000
+
+  # IDEATE - Creative ideation and brainstorming
+  ideate:
+    providers:              # Use multiple models for diverse ideas
+      - claude
+      - gemini
+    temperature: 0.9        # Higher temp for more creativity
+    max_tokens: 2000
+
+  # RESEARCH - Multi-source research with citations
+  research:
+    providers:
+      - claude
+      - gemini
+    citation_style: academic  # Options: informal, academic, apa, mla
+    depth: thorough           # Options: quick, thorough, comprehensive
+    temperature: 0.5          # Lower temp for factual accuracy
+    max_tokens: 3000
+
+# ============================================================================
+# Example Configurations for Different Use Cases
+# ============================================================================
+
+# Example 1: Prefer Gemini by default
+# ---
+# default_provider: gemini
+# generation:
+#   temperature: 0.8
+
+# Example 2: Conservative/Precise configuration
+# ---
+# default_provider: claude
+# generation:
+#   temperature: 0.3
+#   max_tokens: 1500
+# workflows:
+#   research:
+#     citation_style: academic
+#     depth: comprehensive
+
+# Example 3: Creative/Exploratory configuration
+# ---
+# default_provider: claude
+# generation:
+#   temperature: 1.0
+# workflows:
+#   ideate:
+#     temperature: 1.2
+#     providers: [claude, gemini, codex]
+#   argument:
+#     temperature: 1.0
+
+# Example 4: Fast/Efficient configuration
+# ---
+# generation:
+#   timeout: 60.0
+#   max_tokens: 1000
+# workflows:
+#   research:
+#     depth: quick

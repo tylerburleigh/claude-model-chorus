@@ -24,6 +24,7 @@ from ..providers import (
 )
 from ..workflows import ArgumentWorkflow, ChatWorkflow, ConsensusWorkflow, ConsensusStrategy, IdeateWorkflow, ResearchWorkflow, ThinkDeepWorkflow
 from ..core.conversation import ConversationMemory
+from ..core.config import get_config_loader
 
 app = typer.Typer(
     name="modelchorus",
@@ -31,6 +32,22 @@ app = typer.Typer(
     add_completion=False,
 )
 console = Console()
+
+# Initialize config loader
+_config_loader = None
+
+
+def get_config():
+    """Get the config loader instance, initializing if needed."""
+    global _config_loader
+    if _config_loader is None:
+        _config_loader = get_config_loader()
+        try:
+            _config_loader.load_config()
+        except Exception:
+            # If config fails to load, continue with defaults
+            pass
+    return _config_loader
 
 
 def get_provider_by_name(name: str):
@@ -54,11 +71,11 @@ def get_provider_by_name(name: str):
 @app.command()
 def chat(
     prompt: str = typer.Argument(..., help="Message to send to the AI model"),
-    provider: str = typer.Option(
-        "claude",
+    provider: Optional[str] = typer.Option(
+        None,
         "--provider",
         "-p",
-        help="Provider to use (claude, gemini, codex, cursor-agent)",
+        help="Provider to use (claude, gemini, codex, cursor-agent). Defaults to config or 'claude'",
     ),
     continuation_id: Optional[str] = typer.Option(
         None,
@@ -77,11 +94,11 @@ def chat(
         "--system",
         help="System prompt for context",
     ),
-    temperature: float = typer.Option(
-        0.7,
+    temperature: Optional[float] = typer.Option(
+        None,
         "--temperature",
         "-t",
-        help="Temperature for generation (0.0-1.0)",
+        help="Temperature for generation (0.0-1.0). Defaults to config or 0.7",
     ),
     max_tokens: Optional[int] = typer.Option(
         None,
@@ -115,6 +132,17 @@ def chat(
         modelchorus chat "Review this code" -f src/main.py -f tests/test_main.py
     """
     try:
+        # Apply config defaults if values not provided
+        config = get_config()
+        if provider is None:
+            provider = config.get_default_provider('chat', 'claude')
+        if temperature is None:
+            temperature = config.get_workflow_default('chat', 'temperature', 0.7)
+        if max_tokens is None:
+            max_tokens = config.get_workflow_default('chat', 'max_tokens', None)
+        if system is None:
+            system = config.get_workflow_default('chat', 'system_prompt', None)
+
         # Create provider instance
         if verbose:
             console.print(f"[cyan]Initializing provider: {provider}[/cyan]")
@@ -231,11 +259,11 @@ def chat(
 @app.command()
 def argument(
     prompt: str = typer.Argument(..., help="Argument, claim, or question to analyze"),
-    provider: str = typer.Option(
-        "claude",
+    provider: Optional[str] = typer.Option(
+        None,
         "--provider",
         "-p",
-        help="Provider to use (claude, gemini, codex, cursor-agent)",
+        help="Provider to use (claude, gemini, codex, cursor-agent). Defaults to config or 'claude'",
     ),
     continuation_id: Optional[str] = typer.Option(
         None,
@@ -295,6 +323,11 @@ def argument(
         modelchorus argument "Review this proposal" -f proposal.md -f data.csv
     """
     try:
+        # Apply config defaults if values not provided
+        config = get_config()
+        if provider is None:
+            provider = config.get_default_provider('argument', 'claude')
+
         # Create provider instance
         if verbose:
             console.print(f"[cyan]Initializing provider: {provider}[/cyan]")
@@ -405,11 +438,11 @@ def argument(
 @app.command()
 def ideate(
     prompt: str = typer.Argument(..., help="Topic or problem to brainstorm ideas for"),
-    provider: str = typer.Option(
-        "claude",
+    provider: Optional[str] = typer.Option(
+        None,
         "--provider",
         "-p",
-        help="Provider to use (claude, gemini, codex, cursor-agent)",
+        help="Provider to use (claude, gemini, codex, cursor-agent). Defaults to config or 'claude'",
     ),
     continuation_id: Optional[str] = typer.Option(
         None,
@@ -475,6 +508,11 @@ def ideate(
         modelchorus ideate "Refine the third idea" --continue thread-id-123
     """
     try:
+        # Apply config defaults if values not provided
+        config = get_config()
+        if provider is None:
+            provider = config.get_default_provider('ideate', 'claude')
+
         # Create provider instance
         if verbose:
             console.print(f"[cyan]Initializing provider: {provider}[/cyan]")
@@ -585,11 +623,11 @@ def ideate(
 @app.command()
 def research(
     prompt: str = typer.Argument(..., help="Research question or topic to investigate"),
-    provider: str = typer.Option(
-        "claude",
+    provider: Optional[str] = typer.Option(
+        None,
         "--provider",
         "-p",
-        help="Provider to use (claude, gemini, codex, cursor-agent)",
+        help="Provider to use (claude, gemini, codex, cursor-agent). Defaults to config or 'claude'",
     ),
     continuation_id: Optional[str] = typer.Option(
         None,
@@ -660,6 +698,11 @@ def research(
         modelchorus research "Security vulnerabilities in microservices" --depth comprehensive
     """
     try:
+        # Apply config defaults if values not provided
+        config = get_config()
+        if provider is None:
+            provider = config.get_default_provider('research', 'claude')
+
         # Validate citation style
         valid_styles = ['informal', 'academic', 'technical']
         if citation_style not in valid_styles:
@@ -811,38 +854,38 @@ def research(
 @app.command()
 def consensus(
     prompt: str = typer.Argument(..., help="Prompt to send to all models"),
-    providers: List[str] = typer.Option(
-        ["claude", "gemini"],
+    providers: Optional[List[str]] = typer.Option(
+        None,
         "--provider",
         "-p",
-        help="Providers to use (can specify multiple times)",
+        help="Providers to use (can specify multiple times). Defaults to config or ['claude', 'gemini']",
     ),
-    strategy: str = typer.Option(
-        "all_responses",
+    strategy: Optional[str] = typer.Option(
+        None,
         "--strategy",
         "-s",
-        help="Consensus strategy: all_responses, first_valid, majority, weighted, synthesize",
+        help="Consensus strategy: all_responses, first_valid, majority, weighted, synthesize. Defaults to config or 'all_responses'",
     ),
     system: Optional[str] = typer.Option(
         None,
         "--system",
         help="System prompt for context",
     ),
-    temperature: float = typer.Option(
-        0.7,
+    temperature: Optional[float] = typer.Option(
+        None,
         "--temperature",
         "-t",
-        help="Temperature for generation (0.0-1.0)",
+        help="Temperature for generation (0.0-1.0). Defaults to config or 0.7",
     ),
     max_tokens: Optional[int] = typer.Option(
         None,
         "--max-tokens",
         help="Maximum tokens to generate",
     ),
-    timeout: float = typer.Option(
-        120.0,
+    timeout: Optional[float] = typer.Option(
+        None,
         "--timeout",
-        help="Timeout per provider in seconds",
+        help="Timeout per provider in seconds. Defaults to config or 120.0",
     ),
     output: Optional[Path] = typer.Option(
         None,
@@ -864,6 +907,21 @@ def consensus(
         modelchorus consensus "Explain quantum computing" -p claude -p gemini -s synthesize
     """
     try:
+        # Apply config defaults if values not provided
+        config = get_config()
+        if providers is None or len(providers) == 0:
+            providers = config.get_default_providers('consensus', ['claude', 'gemini'])
+        if strategy is None:
+            strategy = config.get_workflow_default('consensus', 'strategy', 'all_responses')
+        if temperature is None:
+            temperature = config.get_workflow_default('consensus', 'temperature', 0.7)
+        if max_tokens is None:
+            max_tokens = config.get_workflow_default('consensus', 'max_tokens', None)
+        if timeout is None:
+            timeout = config.get_workflow_default('consensus', 'timeout', 120.0)
+        if system is None:
+            system = config.get_workflow_default('consensus', 'system_prompt', None)
+
         # Validate strategy
         try:
             strategy_enum = ConsensusStrategy[strategy.upper()]
@@ -1000,10 +1058,10 @@ def thinkdeep(
     total_steps: int = typer.Option(..., "--total-steps", help="Estimated total investigation steps"),
     next_step_required: bool = typer.Option(..., "--next-step-required", help="Whether more steps are needed (true/false)"),
     findings: str = typer.Option(..., "--findings", help="What was discovered in this step"),
-    model: str = typer.Option(
-        "claude",
+    model: Optional[str] = typer.Option(
+        None,
         "--model",
-        help="AI model to use (claude, gemini, codex, cursor-agent)",
+        help="AI model to use (claude, gemini, codex, cursor-agent). Defaults to config or 'claude'",
     ),
     continuation_id: Optional[str] = typer.Option(
         None,
@@ -1025,15 +1083,15 @@ def thinkdeep(
         "--files-checked",
         help="Comma-separated list of files examined",
     ),
-    temperature: float = typer.Option(
-        0.7,
+    temperature: Optional[float] = typer.Option(
+        None,
         "--temperature",
-        help="Creativity level (0.0-1.0)",
+        help="Creativity level (0.0-1.0). Defaults to config or 0.7",
     ),
-    thinking_mode: str = typer.Option(
-        "medium",
+    thinking_mode: Optional[str] = typer.Option(
+        None,
         "--thinking-mode",
-        help="Reasoning depth (minimal, low, medium, high, max)",
+        help="Reasoning depth (minimal, low, medium, high, max). Defaults to config or 'medium'",
     ),
     use_assistant_model: bool = typer.Option(
         True,
@@ -1070,6 +1128,15 @@ def thinkdeep(
         modelchorus thinkdeep --continuation-id "thread-123" --step "Verify fix resolves issue" --step-number 3 --total-steps 3 --next-step-required false --findings "Latency reduced to baseline" --confidence high --hypothesis "Confirmed: N+1 queries were root cause"
     """
     try:
+        # Apply config defaults if values not provided
+        config = get_config()
+        if model is None:
+            model = config.get_default_provider('thinkdeep', 'claude')
+        if temperature is None:
+            temperature = config.get_workflow_default('thinkdeep', 'temperature', 0.7)
+        if thinking_mode is None:
+            thinking_mode = config.get_workflow_default('thinkdeep', 'thinking_mode', 'medium')
+
         # Validate confidence level
         valid_confidence_levels = ['exploring', 'low', 'medium', 'high', 'very_high', 'almost_certain', 'certain']
         if confidence not in valid_confidence_levels:
@@ -1352,6 +1419,210 @@ def thinkdeep_status(
         if verbose:
             import traceback
             console.print(f"\n[red]{traceback.format_exc()}[/red]")
+        raise typer.Exit(1)
+
+
+@app.command(name="config")
+def config_cmd(
+    subcommand: str = typer.Argument(
+        ...,
+        help="Config subcommand: show, validate, or init"
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Show detailed information",
+    ),
+):
+    """
+    Manage ModelChorus configuration.
+
+    Subcommands:
+        show     - Display current effective configuration
+        validate - Validate .modelchorusrc file
+        init     - Generate sample .modelchorusrc file
+
+    Examples:
+        modelchorus config show
+        modelchorus config validate
+        modelchorus config init
+    """
+    try:
+        if subcommand == "show":
+            _config_show(verbose)
+        elif subcommand == "validate":
+            _config_validate(verbose)
+        elif subcommand == "init":
+            _config_init(verbose)
+        else:
+            console.print(f"[red]Error: Unknown config subcommand '{subcommand}'[/red]")
+            console.print("Valid subcommands: show, validate, init")
+            raise typer.Exit(1)
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Interrupted by user[/yellow]")
+        raise typer.Exit(130)
+    except Exception as e:
+        console.print(f"\n[red]Error: {e}[/red]")
+        if verbose:
+            import traceback
+            console.print(f"\n[red]{traceback.format_exc()}[/red]")
+        raise typer.Exit(1)
+
+
+def _config_show(verbose: bool):
+    """Show current effective configuration."""
+    loader = get_config()
+    config_obj = loader.get_config()
+
+    console.print("\n[bold cyan]ModelChorus Configuration[/bold cyan]\n")
+
+    # Show config file location
+    if loader.config_path:
+        console.print(f"[green]✓ Config file found:[/green] {loader.config_path}\n")
+    else:
+        console.print("[yellow]⚠ No config file found (using defaults)[/yellow]\n")
+
+    # Show global defaults
+    console.print("[bold]Global Defaults:[/bold]")
+    if config_obj.default_provider:
+        console.print(f"  default_provider: {config_obj.default_provider}")
+    else:
+        console.print("  default_provider: [dim](not set)[/dim]")
+
+    if config_obj.generation:
+        console.print("  generation:")
+        if config_obj.generation.temperature is not None:
+            console.print(f"    temperature: {config_obj.generation.temperature}")
+        if config_obj.generation.max_tokens is not None:
+            console.print(f"    max_tokens: {config_obj.generation.max_tokens}")
+        if config_obj.generation.timeout is not None:
+            console.print(f"    timeout: {config_obj.generation.timeout}")
+        if config_obj.generation.system_prompt is not None:
+            console.print(f"    system_prompt: {config_obj.generation.system_prompt[:50]}...")
+
+    # Show workflow-specific config
+    if config_obj.workflows:
+        console.print("\n[bold]Workflow-Specific Configuration:[/bold]")
+        for workflow_name, workflow_config in config_obj.workflows.items():
+            console.print(f"\n  [cyan]{workflow_name}:[/cyan]")
+            config_dict = workflow_config.model_dump(exclude_none=True)
+            for key, value in config_dict.items():
+                if isinstance(value, list):
+                    console.print(f"    {key}: {', '.join(value)}")
+                else:
+                    console.print(f"    {key}: {value}")
+
+    # Show effective defaults for each workflow if verbose
+    if verbose:
+        console.print("\n[bold]Effective Defaults by Workflow:[/bold]")
+        workflows = ['chat', 'consensus', 'thinkdeep', 'argument', 'ideate', 'research']
+        for workflow in workflows:
+            console.print(f"\n  [cyan]{workflow}:[/cyan]")
+            if workflow == 'consensus':
+                providers = loader.get_default_providers(workflow, ['claude', 'gemini'])
+                console.print(f"    providers: {', '.join(providers)}")
+            else:
+                provider = loader.get_default_provider(workflow, 'claude')
+                console.print(f"    provider: {provider}")
+            temp = loader.get_workflow_default(workflow, 'temperature', 0.7)
+            console.print(f"    temperature: {temp}")
+
+    console.print()
+
+
+def _config_validate(verbose: bool):
+    """Validate .modelchorusrc file."""
+    loader = get_config()
+
+    # Find config file
+    config_path = loader.find_config_file()
+
+    if not config_path:
+        console.print("[yellow]⚠ No .modelchorusrc file found in current directory or parent directories[/yellow]")
+        console.print("\nSearched for: .modelchorusrc, .modelchorusrc.yaml, .modelchorusrc.yml, .modelchorusrc.json")
+        console.print("\nTo create a sample config file, run: modelchorus config init")
+        raise typer.Exit(1)
+
+    console.print(f"\n[cyan]Validating config file:[/cyan] {config_path}\n")
+
+    # Try to load and validate
+    try:
+        loader.load_config(config_path)
+        console.print("[green]✓ Configuration is valid![/green]\n")
+
+        if verbose:
+            console.print("Configuration details:")
+            _config_show(verbose=False)
+    except Exception as e:
+        console.print(f"[red]✗ Configuration is invalid:[/red]\n")
+        console.print(f"  {str(e)}\n")
+        raise typer.Exit(1)
+
+
+def _config_init(verbose: bool):
+    """Initialize a sample .modelchorusrc file."""
+    config_filename = ".modelchorusrc"
+    config_path = Path.cwd() / config_filename
+
+    if config_path.exists():
+        console.print(f"[yellow]⚠ Config file already exists:[/yellow] {config_path}")
+        console.print("\nTo overwrite, delete the existing file first.")
+        raise typer.Exit(1)
+
+    # Read the example config from the package
+    example_config = """# ModelChorus Configuration
+# Supported formats: YAML or JSON
+
+# Default provider for all workflows
+default_provider: claude
+
+# Global generation parameters
+generation:
+  temperature: 0.7
+  max_tokens: 2000
+  timeout: 120.0
+
+# Workflow-specific overrides
+workflows:
+  chat:
+    provider: claude
+    temperature: 0.7
+
+  consensus:
+    providers:
+      - claude
+      - gemini
+    strategy: synthesize
+    temperature: 0.7
+
+  thinkdeep:
+    provider: claude
+    thinking_mode: medium
+    temperature: 0.6
+
+  research:
+    providers:
+      - claude
+      - gemini
+    citation_style: academic
+    depth: thorough
+    temperature: 0.5
+"""
+
+    try:
+        with open(config_path, 'w') as f:
+            f.write(example_config)
+
+        console.print(f"[green]✓ Created config file:[/green] {config_path}\n")
+        console.print("You can now edit this file to customize your ModelChorus configuration.")
+        console.print("\nTo validate your config, run: modelchorus config validate")
+
+        if verbose:
+            console.print(f"\n[dim]Config file contents:[/dim]")
+            console.print(example_config)
+    except Exception as e:
+        console.print(f"[red]✗ Failed to create config file:[/red] {e}")
         raise typer.Exit(1)
 
 
