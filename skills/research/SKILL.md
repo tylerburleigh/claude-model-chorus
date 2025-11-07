@@ -289,10 +289,7 @@ modelchorus research "Python async patterns and best practices" --provider codex
 modelchorus research "Analyze our API design" --file docs/api_spec.yaml
 
 # Multiple source files for comprehensive context
-modelchorus research "Compare GraphQL and REST for our use case" \
-  --file docs/graphql_evaluation.pdf \
-  --file docs/rest_api_analysis.md \
-  --file docs/performance_requirements.md
+modelchorus research "Compare GraphQL and REST for our use case" --file docs/graphql_evaluation.pdf --file docs/rest_api_analysis.md --file docs/performance_requirements.md
 ```
 
 **File Handling:**
@@ -345,37 +342,23 @@ modelchorus research "Future trends in cloud architecture" --temperature 0.7
 
 ```bash
 # Comprehensive formal research with academic citations
-modelchorus research "State of quantum computing 2024" \
-  --depth thorough \
-  --citation-style academic \
-  --provider claude \
-  --temperature 0.4 \
-  --output quantum_research.json
+modelchorus research "State of quantum computing 2024" --depth thorough --citation-style academic --provider claude --temperature 0.4 --output quantum_research.json
 
 # Quick technical research with source files
-modelchorus research "Evaluate GraphQL for our API" \
-  --depth shallow \
-  --citation-style technical \
-  --file current_api_spec.yaml \
-  --file requirements.md
+modelchorus research "Evaluate GraphQL for our API" --depth shallow --citation-style technical --file current_api_spec.yaml --file requirements.md
 
 # Iterative research session with threading
 modelchorus research "Kubernetes deployment strategies" --depth moderate
 # Returns: Session ID: research-thread-abc123
 
-modelchorus research "Focus on blue-green deployment details" \
-  --continue research-thread-abc123 \
-  --citation-style technical
+modelchorus research "Focus on blue-green deployment details" --continue research-thread-abc123 --citation-style technical
 ```
 
 ### Saving Results
 
 ```bash
 # Save comprehensive research to JSON file
-modelchorus research "GraphQL vs REST API comparison" \
-  --depth thorough \
-  --citation-style academic \
-  --output api_comparison_research.json
+modelchorus research "GraphQL vs REST API comparison" --depth thorough --citation-style academic --output api_comparison_research.json
 ```
 
 **Output file contains:**
@@ -411,11 +394,7 @@ modelchorus research "GraphQL vs REST API comparison" \
 
 **Command:**
 ```bash
-modelchorus research "Compare GraphQL and REST APIs: benefits, challenges, and use cases" \
-  --depth thorough \
-  --citation-style technical \
-  --provider claude \
-  --output api_comparison.json
+modelchorus research "Compare GraphQL and REST APIs: benefits, challenges, and use cases" --depth thorough --citation-style technical --provider claude --output api_comparison.json
 ```
 
 **Expected Outcome:** Comprehensive research with 7-9 findings covering benefits of each approach, implementation challenges, performance considerations, use case recommendations, and ecosystem maturity. Technical citations provide specific references for claims. Results saved to JSON for team review.
@@ -428,11 +407,7 @@ modelchorus research "Compare GraphQL and REST APIs: benefits, challenges, and u
 
 **Command:**
 ```bash
-modelchorus research "GDPR requirements for user data handling, storage, and deletion" \
-  --depth thorough \
-  --citation-style academic \
-  --temperature 0.3 \
-  --output gdpr_compliance.json
+modelchorus research "GDPR requirements for user data handling, storage, and deletion" --depth thorough --citation-style academic --temperature 0.3 --output gdpr_compliance.json
 ```
 
 **Expected Outcome:** Detailed research with 7-9 findings covering legal requirements, technical implementation requirements, user rights (access, deletion, portability), consent management, data breach protocols, and penalties. Academic citations provide authoritative legal references. Low temperature ensures factual accuracy critical for compliance.
@@ -450,13 +425,10 @@ modelchorus research "Microservices architecture patterns and best practices" --
 # Returns: Session ID: research-thread-xyz789
 
 # Drill into specific pattern
-modelchorus research "Expand on service mesh patterns: implementation and tradeoffs" \
-  --continue research-thread-xyz789
+modelchorus research "Expand on service mesh patterns: implementation and tradeoffs" --continue research-thread-xyz789
 
 # Explore application to specific context
-modelchorus research "How do these patterns apply to our 10-person team with moderate traffic?" \
-  --continue research-thread-xyz789 \
-  --file team_context.md
+modelchorus research "How do these patterns apply to our 10-person team with moderate traffic?" --continue research-thread-xyz789 --file team_context.md
 ```
 
 **Expected Outcome:** Multi-turn research session where each iteration builds on previous findings. First call provides broad overview (4-6 findings). Second call drills into service mesh with more detail. Third call applies findings to specific team context using provided file. Thread maintains source tracking across all turns.
@@ -469,13 +441,7 @@ modelchorus research "How do these patterns apply to our 10-person team with mod
 
 **Command:**
 ```bash
-modelchorus research "Evaluate our current API design against REST best practices" \
-  --depth moderate \
-  --citation-style technical \
-  --file current_api_spec.yaml \
-  --file api_design_docs.md \
-  --file performance_benchmarks.json \
-  --output api_evaluation.json
+modelchorus research "Evaluate our current API design against REST best practices" --depth moderate --citation-style technical --file current_api_spec.yaml --file api_design_docs.md --file performance_benchmarks.json --output api_evaluation.json
 ```
 
 **Expected Outcome:** Research that treats provided files as authoritative sources, cross-references them with industry best practices, identifies gaps or improvements, and provides evidence-backed recommendations. Technical citations reference both provided files and external sources.
@@ -615,10 +581,7 @@ modelchorus research "Related topic" --continue research-thread-abc123
 **Solution:**
 ```bash
 # Include relevant files as authoritative sources
-modelchorus research "Your topic" \
-  --file relevant_doc1.md \
-  --file relevant_spec.yaml \
-  --file context_file.txt
+modelchorus research "Your topic" --file relevant_doc1.md --file relevant_spec.yaml --file context_file.txt
 ```
 
 ---
