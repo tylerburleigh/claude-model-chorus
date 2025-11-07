@@ -1,15 +1,11 @@
 {
   "name": "model-chorus",
-  "displayName": "ModelChorus - Multi-Model Consensus",
   "description": "Multi-model consensus building through CLI-based AI provider orchestration. Coordinates responses from Claude, Gemini, Codex, and Cursor Agent to build robust, well-reasoned answers.",
   "version": "0.1.0",
   "author": {
     "name": "ModelChorus Contributors"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/tylerburleigh/claude-model-chorus"
-  },
+  "repository": "https://github.com/tylerburleigh/claude-model-chorus",
   "license": "MIT",
   "keywords": [
     "ai",
@@ -20,18 +16,5 @@
     "claude",
     "gemini",
     "openai"
-  ],
-  "requirements": {
-    "python": ">=3.9"
-  },
-  "setup": {
-    "postInstall": "Please run: cd ~/.claude/plugins/model-chorus/modelchorus && pip install -e ."
-  },
-  "components": {
-    "skills": [
-      "consensus",
-      "chat",
-      "thinkdeep"
-    ]
-  }
+  ]
 }
