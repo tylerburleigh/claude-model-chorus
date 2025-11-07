@@ -275,10 +275,7 @@ modelchorus consensus "Quick question about Python" -p claude -p gemini -s first
 modelchorus consensus "Review this code" -p claude -p gemini -f src/main.py
 
 # Multiple files with synthesis
-modelchorus consensus "Analyze these components" \
-  -p claude -p gemini -p codex \
-  -f models.py -f services.py -f api.py \
-  -s synthesize
+modelchorus consensus "Analyze these components" -p claude -p gemini -p codex -f models.py -f services.py -f api.py -s synthesize
 ```
 
 **File Handling:**
@@ -321,10 +318,7 @@ modelchorus consensus "Explain design patterns" -p claude -p gemini -t 0.7
 
 ```bash
 # Save full consensus results to JSON
-modelchorus consensus "Evaluate this proposal" \
-  -p claude -p gemini -p codex \
-  -s synthesize \
-  --output evaluation.json
+modelchorus consensus "Evaluate this proposal" -p claude -p gemini -p codex -s synthesize --output evaluation.json
 ```
 
 **Output file contains:**
@@ -354,10 +348,7 @@ modelchorus consensus "Evaluate this proposal" \
 
 **Command:**
 ```bash
-modelchorus consensus "Should I use microservices or monolithic architecture for a mid-size SaaS product with 5 developers?" \
-  -p claude -p gemini -p codex \
-  -s synthesize \
-  --output architecture-decision.json
+modelchorus consensus "Should I use microservices or monolithic architecture for a mid-size SaaS product with 5 developers?" -p claude -p gemini -p codex -s synthesize --output architecture-decision.json
 ```
 
 **Expected Outcome:** Structured synthesis showing each model's perspective on the architecture decision, allowing you to see complementary insights and make an informed choice.
@@ -370,10 +361,7 @@ modelchorus consensus "Should I use microservices or monolithic architecture for
 
 **Command:**
 ```bash
-modelchorus consensus "Is it true that Python's GIL prevents true multi-threading? Explain briefly." \
-  -p claude -p gemini -p codex \
-  -s majority \
-  -t 0.4
+modelchorus consensus "Is it true that Python's GIL prevents true multi-threading? Explain briefly." -p claude -p gemini -p codex -s majority -t 0.4
 ```
 
 **Expected Outcome:** The most common answer among the three models, with low temperature ensuring factual accuracy. If models agree, high confidence in the answer.
@@ -386,10 +374,7 @@ modelchorus consensus "Is it true that Python's GIL prevents true multi-threadin
 
 **Command:**
 ```bash
-modelchorus consensus "Review this code for bugs, performance issues, and best practices" \
-  -p claude -p gemini -p codex \
-  -f src/auth.py \
-  -s all_responses
+modelchorus consensus "Review this code for bugs, performance issues, and best practices" -p claude -p gemini -p codex -f src/auth.py -s all_responses
 ```
 
 **Expected Outcome:** Three separate code reviews showing different perspectives - one model might focus on security, another on performance, another on readability.
@@ -402,10 +387,7 @@ modelchorus consensus "Review this code for bugs, performance issues, and best p
 
 **Command:**
 ```bash
-modelchorus consensus "What does the Python 'yield' keyword do?" \
-  -p claude -p gemini \
-  -s first_valid \
-  --timeout 30
+modelchorus consensus "What does the Python 'yield' keyword do?" -p claude -p gemini -s first_valid --timeout 30
 ```
 
 **Expected Outcome:** First successful response returns immediately. If Claude responds in 2 seconds, you get that answer without waiting for Gemini. If Claude times out, Gemini's response is used.

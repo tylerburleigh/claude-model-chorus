@@ -380,3 +380,266 @@ Step 3 - Final recommendation:
 ```bash
 modelchorus thinkdeep --continuation-id "arch-decision-002" --step "Consider future scaling and migration path" --step-number 3 --total-steps 3 --next-step-required false --findings "Can start monolith, extract services later if needed" --confidence high --hypothesis "Monolith is optimal: simpler ops, team fit, migration path exists"
 ```
+
+## Basic Usage
+
+### Simple Example
+
+Basic investigation with single step:
+
+```bash
+modelchorus thinkdeep --step "Investigate why API latency increased from 100ms to 2s" --step-number 1 --total-steps 1 --next-step-required false --findings "Need to analyze recent deployment changes" --confidence exploring
+```
+
+### Common Options
+
+**Required Parameters:**
+- `--step`: Investigation step description
+- `--step-number`: Current step index (starts at 1)
+- `--total-steps`: Estimated total investigation steps
+- `--next-step-required`: Whether more steps are needed (true/false)
+- `--findings`: What was discovered in this step
+
+**Optional Parameters:**
+- `--model`: AI model to use (default: auto-selection)
+- `--continuation-id`: Resume previous investigation
+- `--hypothesis`: Current working theory
+- `--confidence`: Confidence level (exploring, low, medium, high, very_high, almost_certain, certain)
+- `--files-checked`: List of files examined
+- `--temperature`: Creativity level (0.0-1.0)
+- `--thinking-mode`: Reasoning depth (minimal, low, medium, high, max)
+
+## Advanced Usage
+
+### With Model Selection
+
+Specify which AI model to use for the investigation:
+
+```bash
+modelchorus thinkdeep --model gpt5 --step "Analyze security vulnerability in auth flow" --step-number 1 --total-steps 3 --next-step-required true --findings "Reviewing authentication middleware" --confidence exploring
+```
+
+### With File Context
+
+Include specific files relevant to the investigation:
+
+```bash
+modelchorus thinkdeep --step "Debug race condition in token validation" --step-number 2 --total-steps 3 --next-step-required true --findings "Found async timing issue" --confidence medium --files-checked "src/auth/middleware.ts,src/services/token.ts"
+```
+
+### Multi-Step Investigation
+
+Conduct systematic multi-step investigation with continuation:
+
+```bash
+modelchorus thinkdeep --step "Initial analysis of memory leak" --step-number 1 --total-steps 4 --next-step-required true --findings "Heap growing 50MB/hour" --confidence exploring
+```
+
+Then continue:
+
+```bash
+modelchorus thinkdeep --continuation-id "RETURNED_ID" --step "Trace allocation sources" --step-number 2 --total-steps 4 --next-step-required true --findings "Database connection pool not releasing" --confidence medium
+```
+
+### Adjusting Reasoning Depth
+
+Control how deeply the model thinks about the problem:
+
+```bash
+modelchorus thinkdeep --step "Complex architectural decision" --step-number 1 --total-steps 1 --next-step-required false --findings "Need thorough analysis" --confidence exploring --thinking-mode max
+```
+
+Options: `minimal`, `low`, `medium` (default), `high`, `max`
+
+### Expert Validation
+
+Get independent expert review of investigation findings:
+
+```bash
+modelchorus thinkdeep --step "Final hypothesis verification" --step-number 3 --total-steps 3 --next-step-required false --findings "Root cause identified" --confidence high --use-assistant-model true
+```
+
+## Best Practices
+
+### Investigation Planning
+
+**Start with clear problem statement:**
+- ✅ "Users report intermittent 401 errors, 5% failure rate, no pattern in logs"
+- ❌ "Auth is broken"
+
+**Estimate steps realistically:**
+- Simple bugs: 1-2 steps
+- Medium complexity: 3-5 steps
+- Complex investigations: 6-10 steps
+- Adjust `total-steps` as investigation progresses
+
+**Use appropriate confidence levels:**
+- Start at `exploring` or `low`
+- Progress through evidence accumulation
+- Reach `high` or `very_high` before concluding
+- Use `certain` only when hypothesis is proven
+
+### Hypothesis Management
+
+**Form specific hypotheses:**
+- ✅ "Race condition in async token validation due to missing await"
+- ❌ "Something wrong with auth"
+
+**Revise based on evidence:**
+- Update hypothesis when new evidence contradicts it
+- Track hypothesis evolution through investigation
+- Document why hypothesis changed
+
+**Test hypotheses systematically:**
+- Identify what evidence would support/refute
+- Gather that specific evidence
+- Evaluate fairly (avoid confirmation bias)
+
+### State Management
+
+**Use continuation for multi-step work:**
+- Always save continuation_id from first step
+- Pass to subsequent steps to maintain state
+- Enables cross-session resume
+
+**Track files examined:**
+- List all files checked in `--files-checked`
+- Prevents re-examining same files
+- Shows investigation coverage
+
+**Document findings clearly:**
+- Be specific about what was found
+- Include relevant details (error messages, patterns, metrics)
+- Note what was ruled out
+
+### When to Stop Investigating
+
+**Stop when:**
+- Confidence reaches `high` or above AND hypothesis explains all evidence
+- All relevant areas examined
+- Cost of further investigation exceeds value
+- Need input from domain expert or stakeholder
+
+**Don't stop when:**
+- Confidence still at `low` or `medium` with unanswered questions
+- Hypothesis doesn't explain all observed behavior
+- Contradicting evidence exists
+- Investigation feels incomplete
+
+## Examples
+
+### Example 1: Quick Bug Investigation
+
+Problem: Users seeing 500 errors on checkout
+
+```bash
+modelchorus thinkdeep --step "Investigate 500 errors in checkout flow" --step-number 1 --total-steps 1 --next-step-required false --findings "Error: 'payment_processor timeout'. Third-party API latency spike to 30s." --confidence high --hypothesis "Payment provider experiencing outage, not our bug"
+```
+
+Single-step investigation, clear finding, high confidence → done.
+
+### Example 2: Multi-Step Performance Investigation
+
+Step 1 - Initial analysis:
+```bash
+modelchorus thinkdeep --step "API latency increased from 100ms to 2s after deployment" --step-number 1 --total-steps 3 --next-step-required true --findings "Latency affects all endpoints equally, started at 3pm deployment" --confidence low --hypothesis "Deployment introduced performance regression"
+```
+
+Step 2 - Narrow down cause:
+```bash
+modelchorus thinkdeep --continuation-id "perf-inv-001" --step "Examine deployment changes" --step-number 2 --total-steps 3 --next-step-required true --findings "New logging middleware added, logs every request body. Bodies average 50KB." --confidence medium --hypothesis "Excessive logging causing I/O bottleneck"
+```
+
+Step 3 - Verify:
+```bash
+modelchorus thinkdeep --continuation-id "perf-inv-001" --step "Test hypothesis by disabling verbose logging" --step-number 3 --total-steps 3 --next-step-required false --findings "Latency drops to 120ms with logging disabled" --confidence very_high --hypothesis "Confirmed: verbose body logging causing 20x slowdown"
+```
+
+### Example 3: Security Audit
+
+Investigation with expert validation:
+
+```bash
+modelchorus thinkdeep --model gpt5 --step "Audit authentication flow for bypass vulnerabilities" --step-number 1 --total-steps 2 --next-step-required true --findings "Token validation occurs before permission check. JWT expiry not verified in middleware." --confidence medium --hypothesis "Potential bypass: expired tokens may pass through"
+```
+
+Then verify with expert:
+```bash
+modelchorus thinkdeep --continuation-id "sec-audit-001" --model gpt5 --step "Verify vulnerability hypothesis" --step-number 2 --total-steps 2 --next-step-required false --findings "Confirmed: expired tokens accepted if permission check passes. Critical vulnerability." --confidence very_high --use-assistant-model true
+```
+
+## Troubleshooting
+
+### Issue: Investigation feels stuck
+
+**Symptoms:**
+- Can't increase confidence past `low` or `medium`
+- Hypothesis keeps changing without progress
+- Findings don't lead anywhere
+
+**Solutions:**
+- Branch investigation: start new thread exploring alternative hypothesis
+- Consult expert or stakeholder for domain knowledge
+- Widen search: examine adjacent systems/layers
+- Narrow focus: concentrate on one specific aspect
+- Take break: resume with fresh perspective using continuation_id
+
+### Issue: Confidence too low despite strong evidence
+
+**Symptoms:**
+- Strong evidence supporting hypothesis
+- All tests pass, behavior explained
+- But still feel uncertain
+
+**Solutions:**
+- Review all evidence systematically
+- Check for contradicting evidence
+- Verify hypothesis explains ALL observations
+- Consider if seeking perfect certainty (which is rare)
+- Use expert validation for independent assessment
+
+### Issue: Multi-step investigation losing context
+
+**Symptoms:**
+- Later steps don't reference earlier findings
+- Repeating work from previous steps
+- Losing track of what's been examined
+
+**Solutions:**
+- Always use `--continuation-id` for multi-step investigations
+- Include comprehensive findings in each step
+- Reference earlier findings explicitly: "Building on Step 2's discovery of X..."
+- Use `--files-checked` to track examination history
+- Review continuation_id state before continuing
+
+### Issue: Investigation taking too long
+
+**Symptoms:**
+- 10+ steps without resolution
+- Total_steps keeps increasing
+- Confidence not progressing
+
+**Solutions:**
+- Reassess hypothesis: may be fundamentally wrong
+- Narrow scope: focus on specific sub-problem first
+- Check if problem actually solvable through investigation
+- Consider if need different approach (experiments, monitoring, etc.)
+- Set confidence threshold for "good enough" conclusion
+
+## Related Workflows
+
+**For single-turn analysis:** Use **CHAT** - Simple conversational queries don't need multi-step investigation state.
+
+**For multiple perspectives:** Use **CONSENSUS** - When you need diverse viewpoints on a problem rather than systematic investigation.
+
+**For structured debate:** Use **ARGUMENT** - When pros/cons analysis more appropriate than hypothesis testing.
+
+**For research:** Use **RESEARCH** - When gathering information is primary goal rather than solving specific problem.
+
+**For brainstorming:** Use **IDEATE** - When generating ideas rather than investigating existing problem.
+
+**Combining workflows:**
+- Start with **THINKDEEP** to identify root cause
+- Then use **CONSENSUS** to decide on solution approach
+- Then use **CHAT** for implementation questions
+- Use **RESEARCH** to gather context before investigation

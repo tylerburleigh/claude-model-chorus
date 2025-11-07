@@ -217,11 +217,7 @@ modelchorus chat "Show me a common mistake beginners make" -c thread-xyz-789 -t 
 **Command:**
 ```bash
 # Include multiple related files
-modelchorus chat "Explain how these components work together" \
-  -f src/models/user.py \
-  -f src/services/auth.py \
-  -f src/api/routes.py \
-  --output analysis.json
+modelchorus chat "Explain how these components work together" -f src/models/user.py -f src/services/auth.py -f src/api/routes.py --output analysis.json
 ```
 
 **Expected Outcome:** Comprehensive analysis of component relationships with results saved to JSON for later reference.
