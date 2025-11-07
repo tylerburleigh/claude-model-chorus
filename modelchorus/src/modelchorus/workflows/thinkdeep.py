@@ -128,53 +128,78 @@ class ThinkDeepWorkflow(BaseWorkflow):
 
     async def run(
         self,
-        prompt: str,
+        step: str,
+        step_number: int,
+        total_steps: int,
+        next_step_required: bool,
+        findings: str,
+        hypothesis: Optional[str] = None,
+        confidence: str = "exploring",
         continuation_id: Optional[str] = None,
         files: Optional[List[str]] = None,
+        thinking_mode: str = "medium",
         **kwargs
     ) -> WorkflowResult:
         """
-        Execute ThinkDeep investigation workflow.
+        Execute ThinkDeep investigation workflow with explicit multi-step control.
 
-        This method orchestrates a systematic investigation, maintaining state
-        across turns when continuation_id is provided. Each turn can add new
-        hypotheses, record investigation steps, update confidence levels, and
-        track examined files.
+        This method orchestrates a systematic investigation with explicit step management.
+        Each invocation represents one investigation step with specific findings, hypothesis,
+        and confidence level. State is maintained across steps via continuation_id.
 
         Args:
-            prompt: The investigation prompt/query
+            step: Investigation step description (what to investigate in this step)
+            step_number: Current step index (starts at 1)
+            total_steps: Estimated total number of steps in investigation
+            next_step_required: Whether more investigation steps are needed
+            findings: What was discovered in this step
+            hypothesis: Optional current working theory about the problem
+            confidence: Confidence level (exploring, low, medium, high, very_high, almost_certain, certain)
             continuation_id: Optional thread ID to continue an existing investigation
-            files: Optional list of file paths to examine during investigation
+            files: Optional list of file paths examined in this step
+            thinking_mode: Reasoning depth (minimal, low, medium, high, max)
             **kwargs: Additional parameters passed to provider.generate()
                      (e.g., temperature, max_tokens, system_prompt)
 
         Returns:
             WorkflowResult containing:
                 - success: True if investigation step succeeded
-                - synthesis: The model's investigation findings
+                - synthesis: The model's investigation analysis
                 - steps: Investigation steps with findings and confidence
-                - metadata: thread_id, investigation state, and progress info
+                - metadata: continuation_id, step info, and progress
 
         Raises:
             Exception: If provider.generate() fails
 
         Example:
-            >>> # Start new investigation
+            >>> # Start new investigation (step 1)
             >>> result = await workflow.run(
-            ...     "Investigate authentication bug",
+            ...     step="Investigate authentication failures",
+            ...     step_number=1,
+            ...     total_steps=3,
+            ...     next_step_required=True,
+            ...     findings="5% of requests failing with 401 errors",
+            ...     confidence="exploring",
             ...     files=["src/auth.py"]
             ... )
             >>>
-            >>> # Continue investigation
+            >>> # Continue investigation (step 2)
             >>> result2 = await workflow.run(
-            ...     "Test hypothesis about async race condition",
-            ...     continuation_id=result.metadata['thread_id'],
-            ...     files=["src/services/user.py"]
+            ...     step="Test hypothesis about async race condition",
+            ...     step_number=2,
+            ...     total_steps=3,
+            ...     next_step_required=True,
+            ...     findings="Found missing await in token validation",
+            ...     hypothesis="Race condition in async token validation",
+            ...     confidence="medium",
+            ...     continuation_id=result.metadata['continuation_id'],
+            ...     files=["src/services/token.py"]
             ... )
         """
         logger.info(
-            f"Starting ThinkDeep investigation - prompt length: {len(prompt)}, "
+            f"Starting ThinkDeep investigation step {step_number}/{total_steps} - "
             f"continuation: {continuation_id is not None}, "
+            f"confidence: {confidence}, "
             f"files: {len(files) if files else 0}"
         )
 
@@ -197,9 +222,18 @@ class ThinkDeepWorkflow(BaseWorkflow):
             # Load or initialize investigation state
             state = self._get_or_create_state(thread_id)
 
-            # Build the full prompt with investigation context
+            # Build the full prompt with multi-step investigation context
             full_prompt = self._build_investigation_prompt(
-                prompt, thread_id, state, files
+                step=step,
+                step_number=step_number,
+                total_steps=total_steps,
+                findings=findings,
+                hypothesis=hypothesis,
+                confidence=confidence,
+                thread_id=thread_id,
+                state=state,
+                files=files,
+                thinking_mode=thinking_mode
             )
 
             # Create generation request
@@ -219,12 +253,15 @@ class ThinkDeepWorkflow(BaseWorkflow):
                 f"{len(response.content)} chars"
             )
 
-            # Add user message to conversation history
+            # Add user message to conversation history (step description + findings)
             if self.conversation_memory:
+                user_message = f"Step {step_number}/{total_steps}: {step}\nFindings: {findings}"
+                if hypothesis:
+                    user_message += f"\nHypothesis: {hypothesis}"
                 self.add_message(
                     thread_id,
                     "user",
-                    prompt,
+                    user_message,
                     files=files,
                     workflow_name=self.name,
                     model_provider=self.provider.provider_name
@@ -241,15 +278,36 @@ class ThinkDeepWorkflow(BaseWorkflow):
                     model_name=response.model
                 )
 
-            # Create and add investigation step
-            step_number = len(state.steps) + 1
+            # Create and add investigation step with explicit parameters
             investigation_step = InvestigationStep(
                 step_number=step_number,
-                findings=self._extract_findings(response.content),
+                findings=findings,
                 files_checked=files if files else [],
-                confidence=state.current_confidence  # Will be updated with confidence extraction later
+                confidence=confidence
             )
             state.steps.append(investigation_step)
+
+            # Update current confidence
+            state.current_confidence = confidence
+
+            # Add/update hypothesis if provided
+            if hypothesis:
+                # Check if this hypothesis already exists
+                existing_hyp = next((h for h in state.hypotheses if h.hypothesis == hypothesis), None)
+                if existing_hyp:
+                    # Update existing hypothesis status based on confidence
+                    if confidence in ['very_high', 'almost_certain', 'certain']:
+                        existing_hyp.status = 'validated'
+                    else:
+                        existing_hyp.status = 'active'
+                else:
+                    # Add new hypothesis
+                    new_hyp = Hypothesis(
+                        hypothesis=hypothesis,
+                        status='active',
+                        evidence=[findings]  # Add current findings as evidence
+                    )
+                    state.hypotheses.append(new_hyp)
 
             # Track files examined
             if files:
@@ -282,22 +340,27 @@ class ThinkDeepWorkflow(BaseWorkflow):
                     model=f"{self.expert_provider.provider_name} (expert validation)"
                 )
 
-            # Add metadata
+            # Add metadata with continuation_id for next step
             result.metadata.update({
-                'thread_id': thread_id,
+                'thread_id': thread_id,  # Keep for backward compatibility
+                'continuation_id': thread_id,  # Primary ID for multi-step continuation
                 'provider': self.provider.provider_name,
                 'model': response.model,
                 'usage': response.usage,
                 'stop_reason': response.stop_reason,
-                'is_continuation': continuation_id is not None,
-                'investigation_step': len(state.steps) + 1,
-                'hypotheses_count': len(state.hypotheses),
-                'confidence': state.current_confidence,
-                'files_examined': len(state.relevant_files),
+                'step_number': step_number,
+                'total_steps': total_steps,
+                'next_step_required': next_step_required,
+                'confidence': confidence,
+                'hypothesis': hypothesis,
+                'findings': findings,
+                'files_examined_this_step': len(files) if files else 0,
+                'total_files_examined': len(state.relevant_files),
+                'total_hypotheses': len(state.hypotheses),
                 'expert_validation_performed': expert_validation is not None
             })
 
-            logger.info(f"ThinkDeep investigation step completed for thread: {thread_id}")
+            logger.info(f"ThinkDeep investigation step {step_number}/{total_steps} completed for thread: {thread_id}")
 
         except Exception as e:
             logger.error(f"ThinkDeep investigation failed: {e}", exc_info=True)
@@ -356,53 +419,67 @@ class ThinkDeepWorkflow(BaseWorkflow):
 
     def _build_investigation_prompt(
         self,
-        prompt: str,
+        step: str,
+        step_number: int,
+        total_steps: int,
+        findings: str,
+        hypothesis: Optional[str],
+        confidence: str,
         thread_id: str,
         state: ThinkDeepState,
-        files: Optional[List[str]] = None
+        files: Optional[List[str]] = None,
+        thinking_mode: str = "medium"
     ) -> str:
         """
-        Build investigation prompt with conversation history, state, and file context.
+        Build investigation prompt with multi-step context.
 
         Args:
-            prompt: Current investigation prompt
+            step: Investigation step description
+            step_number: Current step index
+            total_steps: Estimated total investigation steps
+            findings: What was discovered in this step
+            hypothesis: Optional current working theory
+            confidence: Confidence level
             thread_id: Thread ID to load history from
             state: Current investigation state
             files: Optional list of file paths to include in context
+            thinking_mode: Reasoning depth
 
         Returns:
-            Full prompt string with investigation context
+            Full prompt string with structured investigation context
         """
         context_parts = []
 
-        # Add investigation state summary if exists
-        if state.hypotheses or state.steps:
-            context_parts.append("Current investigation state:\n")
+        # Add multi-step investigation context
+        context_parts.append(f"# Systematic Investigation - Step {step_number}/{total_steps}\n")
+        context_parts.append(f"\n## Current Step\n{step}\n")
+        context_parts.append(f"\n## Findings So Far\n{findings}\n")
 
-            if state.hypotheses:
-                context_parts.append(f"\nHypotheses ({len(state.hypotheses)}):\n")
-                for i, hyp in enumerate(state.hypotheses, 1):
-                    context_parts.append(
-                        f"{i}. [{hyp.status.upper()}] {hyp.hypothesis}\n"
-                    )
-                    if hyp.evidence:
-                        context_parts.append(f"   Evidence: {', '.join(hyp.evidence[:3])}\n")
+        if hypothesis:
+            context_parts.append(f"\n## Current Hypothesis\n{hypothesis}\n")
 
-            if state.steps:
-                context_parts.append(f"\nInvestigation steps completed: {len(state.steps)}\n")
-                context_parts.append(f"Current confidence: {state.current_confidence}\n")
+        context_parts.append(f"\n## Confidence Level\n{confidence}\n")
+        context_parts.append(f"\n## Thinking Mode\n{thinking_mode}\n")
 
-            if state.relevant_files:
-                context_parts.append(
-                    f"\nFiles examined: {', '.join(state.relevant_files[:5])}"
-                )
-                if len(state.relevant_files) > 5:
-                    context_parts.append(f" (and {len(state.relevant_files) - 5} more)")
-                context_parts.append("\n")
+        # Add investigation state summary if continuing
+        if state.steps:
+            context_parts.append(f"\n## Previous Investigation Steps ({len(state.steps)})\n")
+            for i, prev_step in enumerate(state.steps[-3:], start=max(1, len(state.steps)-2)):
+                context_parts.append(f"\nStep {i}:\n")
+                context_parts.append(f"  Findings: {prev_step.findings[:150]}...\n" if len(prev_step.findings) > 150 else f"  Findings: {prev_step.findings}\n")
+                context_parts.append(f"  Confidence: {prev_step.confidence}\n")
 
-        # Add file contents if provided
+        if state.relevant_files:
+            context_parts.append(
+                f"\n## Files Examined Previously\n{', '.join(state.relevant_files[:10])}"
+            )
+            if len(state.relevant_files) > 10:
+                context_parts.append(f" (and {len(state.relevant_files) - 10} more)")
+            context_parts.append("\n")
+
+        # Add file contents if provided for this step
         if files:
-            context_parts.append("\nFile context for this step:\n")
+            context_parts.append("\n## Files for Analysis in This Step\n")
             for file_path in files:
                 try:
                     with open(file_path, 'r', encoding='utf-8') as f:
@@ -414,28 +491,20 @@ class ThinkDeepWorkflow(BaseWorkflow):
                     logger.warning(f"Failed to read file {file_path}: {e}")
                     context_parts.append(f"\n--- File: {file_path} (Failed to read: {e}) ---\n")
 
-        # Add conversation history if available
-        if self.conversation_memory:
-            messages = self.resume_conversation(thread_id)
-            if messages:
-                context_parts.append("\nPrevious investigation turns:\n")
-                for msg in messages:
-                    role_label = msg.role.upper()
-                    # Truncate long messages in history
-                    content = msg.content[:200] + "..." if len(msg.content) > 200 else msg.content
-                    context_parts.append(f"{role_label}: {content}\n")
+        # Add instruction for analysis
+        context_parts.append("\n## Task\n")
+        context_parts.append("Analyze the investigation step, findings, and hypothesis. Provide:")
+        context_parts.append("\n1. Assessment of the current hypothesis")
+        context_parts.append("\n2. Analysis of the findings")
+        context_parts.append("\n3. Recommendations for next steps")
+        context_parts.append("\n4. Updated confidence assessment if warranted\n")
 
-        # Add current prompt
-        if context_parts:
-            context_parts.append(f"\nCurrent investigation step:\n{prompt}")
-            full_prompt = "\n".join(context_parts)
-        else:
-            full_prompt = prompt
+        full_prompt = "\n".join(context_parts)
 
         logger.debug(
             f"Built investigation prompt - "
-            f"hypotheses: {len(state.hypotheses)}, "
-            f"steps: {len(state.steps)}, "
+            f"step {step_number}/{total_steps}, "
+            f"confidence: {confidence}, "
             f"files: {len(files) if files else 0}, "
             f"total length: {len(full_prompt)}"
         )

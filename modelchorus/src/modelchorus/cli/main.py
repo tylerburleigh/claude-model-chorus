@@ -995,51 +995,50 @@ def consensus(
 
 @app.command()
 def thinkdeep(
-    prompt: str = typer.Argument(..., help="Investigation problem statement or query"),
-    provider: str = typer.Option(
+    step: str = typer.Option(..., "--step", help="Investigation step description"),
+    step_number: int = typer.Option(..., "--step-number", help="Current step index (starts at 1)"),
+    total_steps: int = typer.Option(..., "--total-steps", help="Estimated total investigation steps"),
+    next_step_required: bool = typer.Option(..., "--next-step-required", help="Whether more steps are needed (true/false)"),
+    findings: str = typer.Option(..., "--findings", help="What was discovered in this step"),
+    model: str = typer.Option(
         "claude",
-        "--provider",
-        "-p",
-        help="Provider to use for investigation (claude, gemini, codex, cursor-agent)",
-    ),
-    expert_provider: Optional[str] = typer.Option(
-        None,
-        "--expert",
-        "-e",
-        help="Expert provider for validation (optional, uses different model for validation)",
+        "--model",
+        help="AI model to use (claude, gemini, codex, cursor-agent)",
     ),
     continuation_id: Optional[str] = typer.Option(
         None,
-        "--continue",
-        "-c",
-        help="Thread ID to continue an existing investigation",
+        "--continuation-id",
+        help="Resume previous investigation thread",
     ),
-    files: Optional[List[str]] = typer.Option(
+    hypothesis: Optional[str] = typer.Option(
         None,
-        "--file",
-        "-f",
-        help="File paths to examine during investigation (can specify multiple times)",
+        "--hypothesis",
+        help="Current working theory about the problem",
     ),
-    system: Optional[str] = typer.Option(
+    confidence: str = typer.Option(
+        "exploring",
+        "--confidence",
+        help="Confidence level (exploring, low, medium, high, very_high, almost_certain, certain)",
+    ),
+    files_checked: Optional[str] = typer.Option(
         None,
-        "--system",
-        help="System prompt for context",
+        "--files-checked",
+        help="Comma-separated list of files examined",
     ),
     temperature: float = typer.Option(
         0.7,
         "--temperature",
-        "-t",
-        help="Temperature for generation (0.0-1.0)",
+        help="Creativity level (0.0-1.0)",
     ),
-    max_tokens: Optional[int] = typer.Option(
-        None,
-        "--max-tokens",
-        help="Maximum tokens to generate",
+    thinking_mode: str = typer.Option(
+        "medium",
+        "--thinking-mode",
+        help="Reasoning depth (minimal, low, medium, high, max)",
     ),
-    disable_expert: bool = typer.Option(
-        False,
-        "--disable-expert",
-        help="Disable expert validation even if expert provider is specified",
+    use_assistant_model: bool = typer.Option(
+        True,
+        "--use-assistant-model",
+        help="Enable expert validation (default: true)",
     ),
     output: Optional[Path] = typer.Option(
         None,
@@ -1057,140 +1056,127 @@ def thinkdeep(
     """
     Start a ThinkDeep investigation for systematic problem analysis.
 
-    ThinkDeep provides extended reasoning with hypothesis tracking, confidence
-    progression, and optional expert validation.
+    ThinkDeep provides multi-step investigation with explicit hypothesis tracking,
+    confidence progression, and state management across investigation steps.
 
     Example:
         # Start new investigation
-        modelchorus thinkdeep "Why is authentication failing?" -p claude
+        modelchorus thinkdeep --step "Investigate why API latency increased" --step-number 1 --total-steps 3 --next-step-required true --findings "Examining deployment logs" --confidence exploring
 
         # Continue investigation
-        modelchorus thinkdeep "Check async patterns" --continue thread-id-123
+        modelchorus thinkdeep --continuation-id "thread-123" --step "Check database query performance" --step-number 2 --total-steps 3 --next-step-required true --findings "Found N+1 query pattern" --confidence medium --hypothesis "N+1 queries causing slowdown"
 
-        # Include files and expert validation
-        modelchorus thinkdeep "Analyze bug" -f src/auth.py -e gemini
+        # Final step
+        modelchorus thinkdeep --continuation-id "thread-123" --step "Verify fix resolves issue" --step-number 3 --total-steps 3 --next-step-required false --findings "Latency reduced to baseline" --confidence high --hypothesis "Confirmed: N+1 queries were root cause"
     """
     try:
-        # Create primary provider instance
-        if verbose:
-            console.print(f"[cyan]Initializing primary provider: {provider}[/cyan]")
-
-        try:
-            provider_instance = get_provider_by_name(provider)
-            if verbose:
-                console.print(f"[green]✓ {provider} initialized[/green]")
-        except Exception as e:
-            console.print(f"[red]Failed to initialize {provider}: {e}[/red]")
+        # Validate confidence level
+        valid_confidence_levels = ['exploring', 'low', 'medium', 'high', 'very_high', 'almost_certain', 'certain']
+        if confidence not in valid_confidence_levels:
+            console.print(f"[red]Error: Invalid confidence level '{confidence}'. Must be one of: {', '.join(valid_confidence_levels)}[/red]")
             raise typer.Exit(1)
 
-        # Create expert provider if specified
-        expert_instance = None
-        if expert_provider:
+        # Validate thinking mode
+        valid_thinking_modes = ['minimal', 'low', 'medium', 'high', 'max']
+        if thinking_mode not in valid_thinking_modes:
+            console.print(f"[red]Error: Invalid thinking mode '{thinking_mode}'. Must be one of: {', '.join(valid_thinking_modes)}[/red]")
+            raise typer.Exit(1)
+
+        # Create primary provider instance
+        if verbose:
+            console.print(f"[cyan]Initializing model: {model}[/cyan]")
+
+        try:
+            provider_instance = get_provider_by_name(model)
             if verbose:
-                console.print(f"[cyan]Initializing expert provider: {expert_provider}[/cyan]")
-            try:
-                expert_instance = get_provider_by_name(expert_provider)
-                if verbose:
-                    console.print(f"[green]✓ {expert_provider} initialized as expert[/green]")
-            except Exception as e:
-                console.print(f"[yellow]Warning: Failed to initialize expert provider: {e}[/yellow]")
-                console.print("[yellow]Continuing without expert validation[/yellow]")
+                console.print(f"[green]✓ {model} initialized[/green]")
+        except Exception as e:
+            console.print(f"[red]Failed to initialize {model}: {e}[/red]")
+            raise typer.Exit(1)
 
         # Create conversation memory
         memory = ConversationMemory()
 
         # Create workflow config
-        config = {}
-        if disable_expert:
-            config['enable_expert_validation'] = False
+        config = {
+            'enable_expert_validation': use_assistant_model
+        }
 
         # Create workflow
         workflow = ThinkDeepWorkflow(
             provider=provider_instance,
-            expert_provider=expert_instance,
+            expert_provider=None,  # Expert will be handled by workflow if enabled
             conversation_memory=memory,
-            config=config if config else None,
+            config=config,
         )
 
         if verbose:
             console.print(f"[cyan]Workflow: {workflow}[/cyan]")
 
-        # Validate files exist
-        if files:
-            for file_path in files:
+        # Parse files_checked if provided
+        files_list = None
+        if files_checked:
+            files_list = [f.strip() for f in files_checked.split(',') if f.strip()]
+            # Validate files exist
+            for file_path in files_list:
                 if not Path(file_path).exists():
                     console.print(f"[red]Error: File not found: {file_path}[/red]")
                     raise typer.Exit(1)
 
         # Display investigation info
-        console.print(f"\n[bold cyan]{'Continuing' if continuation_id else 'Starting new'} ThinkDeep investigation...[/bold cyan]")
-        console.print(f"Problem: {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
-        console.print(f"Primary Provider: {provider}")
-        if expert_instance:
-            expert_status = "disabled" if disable_expert else "enabled"
-            console.print(f"Expert Provider: {expert_provider} ({expert_status})")
+        console.print(f"\n[bold cyan]{'Continuing' if continuation_id else 'Starting'} ThinkDeep Investigation[/bold cyan]")
+        console.print(f"Step {step_number}/{total_steps}: {step}")
+        console.print(f"Model: {model}")
+        console.print(f"Confidence: {confidence}")
+        if hypothesis:
+            console.print(f"Hypothesis: {hypothesis}")
         if continuation_id:
             console.print(f"Thread ID: {continuation_id}")
-        if files:
-            console.print(f"Files: {', '.join(files)}")
+        if files_list:
+            console.print(f"Files: {', '.join(files_list)}")
         console.print()
 
-        # Run async workflow
+        # Run async workflow with multi-step parameters
         result = asyncio.run(
             workflow.run(
-                prompt=prompt,
+                step=step,
+                step_number=step_number,
+                total_steps=total_steps,
+                next_step_required=next_step_required,
+                findings=findings,
+                hypothesis=hypothesis,
+                confidence=confidence,
                 continuation_id=continuation_id,
-                files=files,
-                system_prompt=system,
+                files=files_list,
                 temperature=temperature,
-                max_tokens=max_tokens,
+                thinking_mode=thinking_mode,
             )
         )
 
         # Display results
         if result.success:
-            console.print(f"[bold green]✓ Investigation step completed[/bold green]\n")
+            console.print(f"[bold green]✓ Investigation step {step_number}/{total_steps} completed[/bold green]\n")
 
-            # Show thread info
+            # Show step info
             thread_id = result.metadata.get('thread_id')
-            is_continuation = result.metadata.get('is_continuation', False)
-            step_number = result.metadata.get('investigation_step', 1)
-            confidence = result.metadata.get('confidence', 'exploring')
-            hypotheses_count = result.metadata.get('hypotheses_count', 0)
-            expert_performed = result.metadata.get('expert_validation_performed', False)
-            files_examined = result.metadata.get('files_examined', 0)
+            returned_continuation_id = result.metadata.get('continuation_id', thread_id)
 
-            console.print(f"[cyan]Thread ID:[/cyan] {thread_id}")
-            console.print(f"[cyan]Investigation Step:[/cyan] {step_number}")
+            console.print(f"[cyan]Continuation ID:[/cyan] {returned_continuation_id}")
+            console.print(f"[cyan]Step:[/cyan] {step_number}/{total_steps}")
             console.print(f"[cyan]Confidence Level:[/cyan] {confidence}")
-            console.print(f"[cyan]Hypotheses:[/cyan] {hypotheses_count}")
-            console.print(f"[cyan]Files Examined:[/cyan] {files_examined}")
-            if expert_performed:
-                console.print(f"[cyan]Expert Validation:[/cyan] ✓ Performed")
-
-            # Show hypothesis details if continuing investigation
-            if is_continuation and hypotheses_count > 0:
-                console.print("\n[bold]Current Hypotheses:[/bold]")
-                # Get investigation state to show hypotheses
-                state = workflow.get_investigation_state(thread_id)
-                if state and state.hypotheses:
-                    for i, hyp in enumerate(state.hypotheses, 1):
-                        status_color = {
-                            'active': 'yellow',
-                            'validated': 'green',
-                            'disproven': 'red'
-                        }.get(hyp.status, 'white')
-                        console.print(f"  {i}. [{status_color}]{hyp.status.upper()}[/{status_color}] {hyp.hypothesis}")
-                        if hyp.evidence and verbose:
-                            console.print(f"     Evidence: {', '.join(hyp.evidence[:3])}")
+            if hypothesis:
+                console.print(f"[cyan]Hypothesis:[/cyan] {hypothesis}")
+            console.print(f"[cyan]Findings:[/cyan] {findings}")
+            if files_list:
+                console.print(f"[cyan]Files Examined:[/cyan] {len(files_list)}")
             console.print()
 
             # Show response
-            console.print("[bold]Investigation Findings:[/bold]\n")
+            console.print("[bold]Investigation Analysis:[/bold]\n")
             console.print(result.synthesis)
 
             # Show expert validation if present
-            if expert_performed and len(result.steps) > 1:
+            if use_assistant_model and len(result.steps) > 1:
                 console.print("\n[bold]Expert Validation:[/bold]\n")
                 console.print(result.steps[-1].content)
 
@@ -1202,28 +1188,32 @@ def thinkdeep(
             # Save to file if requested
             if output:
                 output_data = {
-                    "prompt": prompt,
-                    "provider": provider,
-                    "expert_provider": expert_provider,
-                    "thread_id": thread_id,
-                    "is_continuation": is_continuation,
-                    "investigation_step": step_number,
+                    "step": step,
+                    "step_number": step_number,
+                    "total_steps": total_steps,
+                    "next_step_required": next_step_required,
+                    "findings": findings,
+                    "hypothesis": hypothesis,
                     "confidence": confidence,
-                    "hypotheses_count": hypotheses_count,
-                    "expert_validation_performed": expert_performed,
+                    "model": model,
+                    "continuation_id": returned_continuation_id,
                     "response": result.synthesis,
-                    "model": result.metadata.get('model'),
                     "usage": usage,
                 }
-                if files:
-                    output_data["files"] = files
-                if expert_performed and len(result.steps) > 1:
+                if files_list:
+                    output_data["files"] = files_list
+                if use_assistant_model and len(result.steps) > 1:
                     output_data["expert_validation"] = result.steps[-1].content
 
                 output.write_text(json.dumps(output_data, indent=2))
                 console.print(f"\n[green]✓ Result saved to {output}[/green]")
 
-            console.print(f"\n[dim]To continue this investigation, use: --continue {thread_id}[/dim]")
+            # Show next step guidance
+            if next_step_required:
+                console.print(f"\n[dim]To continue this investigation:[/dim]")
+                console.print(f"[dim]  modelchorus thinkdeep --continuation-id {returned_continuation_id} --step \"Next investigation step\" --step-number {step_number + 1} --total-steps {total_steps} ...[/dim]")
+            else:
+                console.print(f"\n[green]✓ Investigation complete ({total_steps} steps)[/green]")
 
         else:
             console.print(f"[red]✗ Investigation failed: {result.error}[/red]")
