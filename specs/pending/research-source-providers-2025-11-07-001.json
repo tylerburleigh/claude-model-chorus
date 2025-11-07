@@ -1,0 +1,2355 @@
+{
+  "spec_id": "research-source-providers-2025-11-07-001",
+  "generated": "2025-11-07T10:00:00Z",
+  "last_updated": "2025-11-07T12:07:55.317311Z",
+  "metadata": {
+    "title": "External API Integration for Research Sources",
+    "description": "Add external source provider infrastructure to ModelChorus, enabling automatic discovery and fetching of research papers from Semantic Scholar, arXiv, and web search APIs",
+    "status": "pending",
+    "complexity": "high",
+    "estimated_hours": 55,
+    "created_by": "claude-sonnet-4-5",
+    "tags": [
+      "research",
+      "providers",
+      "api-integration",
+      "semantic-scholar",
+      "arxiv"
+    ],
+    "objectives": [
+      "Enable automatic source discovery for research workflows",
+      "Integrate Semantic Scholar API for academic papers (200M+ papers)",
+      "Integrate arXiv API for preprints",
+      "Support web search APIs (Brave, DuckDuckGo, Google Custom Search)",
+      "Maintain backward compatibility with manual source ingestion",
+      "Follow existing ModelChorus patterns (async, retry, registry, pydantic)",
+      "Provide comprehensive error handling, rate limiting, and timeout management"
+    ],
+    "success_criteria": [
+      "Users can run 'modelchorus research --auto-discover' to fetch sources",
+      "Rate limiting prevents API throttling",
+      "Sources validated with credibility scoring",
+      "Integration tests with mocked HTTP achieve >80% coverage",
+      "Documentation includes setup guides and examples"
+    ]
+  },
+  "hierarchy": {
+    "spec-root": {
+      "type": "spec",
+      "title": "External API Integration for Research Sources",
+      "status": "pending",
+      "parent": null,
+      "children": [
+        "phase-1",
+        "phase-2",
+        "phase-3",
+        "phase-4",
+        "phase-5",
+        "phase-6",
+        "phase-7",
+        "phase-8",
+        "task-2-1-6"
+      ],
+      "total_tasks": 79,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "phase-1": {
+      "type": "phase",
+      "title": "Foundation & Infrastructure",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-1-files",
+        "phase-1-verify"
+      ],
+      "total_tasks": 15,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Create base abstractions, models, and registry for source providers",
+        "risk_level": "low",
+        "estimated_hours": 10,
+        "dependencies": []
+      },
+      "dependencies": {
+        "blocks": [
+          "phase-2",
+          "phase-3",
+          "phase-6",
+          "phase-8"
+        ]
+      }
+    },
+    "phase-1-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "task-1-1",
+        "task-1-2",
+        "task-1-3",
+        "task-1-4",
+        "task-1-5",
+        "task-1-6",
+        "task-1-7"
+      ],
+      "total_tasks": 12,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-1-verify"
+        ]
+      }
+    },
+    "task-1-1": {
+      "type": "task",
+      "title": "src/modelchorus/providers/sources/__init__.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-1-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/modelchorus/providers/sources/__init__.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "description": "Create sources package initialization with public exports"
+      }
+    },
+    "task-1-1-1": {
+      "type": "subtask",
+      "title": "Export SourceProvider, SourceResult, SourceContent, SourceProviderRegistry",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-2": {
+      "type": "task",
+      "title": "src/modelchorus/providers/sources/base_source_provider.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-2-1",
+        "task-1-2-2",
+        "task-1-2-3",
+        "task-1-2-4"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-1-3",
+          "task-1-4"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/modelchorus/providers/sources/base_source_provider.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "description": "Abstract base class for all source providers with async interface"
+      }
+    },
+    "task-1-2-1": {
+      "type": "subtask",
+      "title": "Define SourceProvider abstract class with search() and fetch_content() methods",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-2-2": {
+      "type": "subtask",
+      "title": "Define Pydantic models: SourceResult, SourceContent, SearchParams",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-2-3": {
+      "type": "subtask",
+      "title": "Implement retry logic with exponential backoff (following CLIProvider pattern)",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-2-4": {
+      "type": "subtask",
+      "title": "Add timeout handling and error classification",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-3": {
+      "type": "task",
+      "title": "src/modelchorus/providers/sources/source_registry.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-3-1",
+        "task-1-3-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/modelchorus/providers/sources/source_registry.py",
+        "task_category": "implementation",
+        "estimated_hours": 1.5,
+        "description": "Registry for source providers following WorkflowRegistry pattern"
+      }
+    },
+    "task-1-3-1": {
+      "type": "subtask",
+      "title": "Create SourceProviderRegistry class with register/get/list methods",
+      "status": "pending",
+      "parent": "task-1-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-3-2": {
+      "type": "subtask",
+      "title": "Add decorator pattern @SourceProviderRegistry.register()",
+      "status": "pending",
+      "parent": "task-1-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-4": {
+      "type": "task",
+      "title": "src/modelchorus/providers/sources/http_utils.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-4-1",
+        "task-1-4-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/modelchorus/providers/sources/http_utils.py",
+        "task_category": "implementation",
+        "estimated_hours": 1.5,
+        "description": "HTTP client utilities using httpx for async requests"
+      }
+    },
+    "task-1-4-1": {
+      "type": "subtask",
+      "title": "Create async HTTP client wrapper with timeout and retry support",
+      "status": "pending",
+      "parent": "task-1-4",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-4-2": {
+      "type": "subtask",
+      "title": "Add rate limiting using asyncio.Semaphore",
+      "status": "pending",
+      "parent": "task-1-4",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-5": {
+      "type": "task",
+      "title": "src/modelchorus/config/sources.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-5-1"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-1-6"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/modelchorus/config/sources.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "description": "Configuration management for source providers"
+      }
+    },
+    "task-1-5-1": {
+      "type": "subtask",
+      "title": "Define source provider configs (API keys, rate limits, timeouts) with env var loading",
+      "status": "pending",
+      "parent": "task-1-5",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-6": {
+      "type": "task",
+      "title": "src/modelchorus/config/__init__.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-5"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/modelchorus/config/__init__.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.25,
+        "description": "Update config package exports to include sources"
+      }
+    },
+    "task-1-7": {
+      "type": "task",
+      "title": "pyproject.toml",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "pyproject.toml",
+        "task_category": "implementation",
+        "estimated_hours": 0.25,
+        "description": "Add optional dependencies: beautifulsoup4, pypdf (if needed for HTML/PDF parsing)"
+      }
+    },
+    "phase-1-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "verify-1-1",
+        "verify-1-2",
+        "verify-1-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-1-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-1-1": {
+      "type": "verify",
+      "title": "SourceProvider abstract class can be imported and has required methods",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "python -c \"from modelchorus.providers.sources import SourceProvider; assert hasattr(SourceProvider, 'search')\"",
+        "expected": "Import succeeds and abstract methods exist"
+      }
+    },
+    "verify-1-2": {
+      "type": "verify",
+      "title": "SourceProviderRegistry can register and retrieve providers",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "python -c \"from modelchorus.providers.sources import SourceProviderRegistry; assert hasattr(SourceProviderRegistry, 'register')\"",
+        "expected": "Registry pattern works correctly"
+      }
+    },
+    "verify-1-3": {
+      "type": "verify",
+      "title": "Pydantic models validate correctly",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "python -c \"from modelchorus.providers.sources import SourceResult; s = SourceResult(source_id='test', title='Test', url='http://test.com', source_type='paper'); assert s.source_id == 'test'\"",
+        "expected": "Models instantiate and validate"
+      }
+    },
+    "phase-2": {
+      "type": "phase",
+      "title": "Semantic Scholar Integration",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-2-files",
+        "phase-2-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-4",
+          "phase-7",
+          "phase-8"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 9,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Implement Semantic Scholar provider as first concrete implementation",
+        "risk_level": "medium",
+        "estimated_hours": 8,
+        "dependencies": [
+          "phase-1"
+        ]
+      }
+    },
+    "phase-2-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "task-2-1",
+        "task-2-2"
+      ],
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-2-verify"
+        ]
+      }
+    },
+    "task-2-1": {
+      "type": "task",
+      "title": "src/modelchorus/providers/sources/semantic_scholar_provider.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-1-1",
+        "task-2-1-2",
+        "task-2-1-3",
+        "task-2-1-4",
+        "task-2-1-5"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-2-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/modelchorus/providers/sources/semantic_scholar_provider.py",
+        "task_category": "implementation",
+        "estimated_hours": 6,
+        "description": "Semantic Scholar API provider implementation"
+      }
+    },
+    "task-2-1-1": {
+      "type": "subtask",
+      "title": "Create SemanticScholarProvider class extending SourceProvider",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-1-2": {
+      "type": "subtask",
+      "title": "Implement search() with query, filters (year, venue, citations), and pagination",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-1-3": {
+      "type": "subtask",
+      "title": "Implement fetch_content() for paper metadata, abstracts, citations, references",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-1-4": {
+      "type": "subtask",
+      "title": "Add rate limiting (100 req/5min for free tier)",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-1-5": {
+      "type": "subtask",
+      "title": "Add PDF access for open-access papers",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-1-6": {
+      "type": "subtask",
+      "title": "Register provider with @SourceProviderRegistry.register('semantic_scholar')",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-2": {
+      "type": "task",
+      "title": "src/modelchorus/providers/sources/__init__.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/modelchorus/providers/sources/__init__.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.25,
+        "description": "Export SemanticScholarProvider"
+      }
+    },
+    "phase-2-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "verify-2-1",
+        "verify-2-2",
+        "verify-2-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-2-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-2-1": {
+      "type": "verify",
+      "title": "SemanticScholarProvider can be instantiated and registered",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "python -c \"from modelchorus.providers.sources import SemanticScholarProvider; p = SemanticScholarProvider(); assert p is not None\"",
+        "expected": "Provider instantiates successfully"
+      }
+    },
+    "verify-2-2": {
+      "type": "verify",
+      "title": "Search returns properly formatted SourceResult objects",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Search results have correct structure with title, url, metadata",
+        "command": ""
+      }
+    },
+    "verify-2-3": {
+      "type": "verify",
+      "title": "Rate limiting prevents API throttling",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Multiple rapid requests don't exceed rate limits",
+        "command": ""
+      }
+    },
+    "phase-3": {
+      "type": "phase",
+      "title": "arXiv Integration",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-3-files",
+        "phase-3-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-4",
+          "phase-7",
+          "phase-8"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 8,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Implement arXiv provider for preprint access",
+        "risk_level": "low",
+        "estimated_hours": 6,
+        "dependencies": [
+          "phase-1"
+        ]
+      }
+    },
+    "phase-3-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "task-3-1",
+        "task-3-2"
+      ],
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-3-verify"
+        ]
+      }
+    },
+    "task-3-1": {
+      "type": "task",
+      "title": "src/modelchorus/providers/sources/arxiv_provider.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-1-1",
+        "task-3-1-2",
+        "task-3-1-3",
+        "task-3-1-4"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-3-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/modelchorus/providers/sources/arxiv_provider.py",
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "description": "arXiv API provider implementation"
+      }
+    },
+    "task-3-1-1": {
+      "type": "subtask",
+      "title": "Create ArXivProvider class extending SourceProvider",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-1-2": {
+      "type": "subtask",
+      "title": "Implement search() by category, author, title, abstract with XML parsing",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-1-3": {
+      "type": "subtask",
+      "title": "Implement fetch_content() for metadata and PDF access",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-1-4": {
+      "type": "subtask",
+      "title": "Add rate limiting (1 req/3sec) and register with @SourceProviderRegistry.register('arxiv')",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-2": {
+      "type": "task",
+      "title": "src/modelchorus/providers/sources/__init__.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-3-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/modelchorus/providers/sources/__init__.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.25,
+        "description": "Export ArXivProvider"
+      }
+    },
+    "phase-3-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "verify-3-1",
+        "verify-3-2",
+        "verify-3-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-3-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-3-1": {
+      "type": "verify",
+      "title": "ArXivProvider can be instantiated and registered",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "python -c \"from modelchorus.providers.sources import ArXivProvider; p = ArXivProvider(); assert p is not None\"",
+        "expected": "Provider instantiates successfully"
+      }
+    },
+    "verify-3-2": {
+      "type": "verify",
+      "title": "XML responses are correctly parsed to SourceResult",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "XML parsing extracts all metadata fields correctly",
+        "command": ""
+      }
+    },
+    "verify-3-3": {
+      "type": "verify",
+      "title": "PDF downloads work for available papers",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "PDF content can be fetched and is valid",
+        "command": ""
+      }
+    },
+    "phase-4": {
+      "type": "phase",
+      "title": "Research Workflow Integration",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-4-files",
+        "phase-4-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-5",
+          "phase-7",
+          "phase-8"
+        ],
+        "blocked_by": [
+          "phase-2",
+          "phase-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 10,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Connect source providers to existing ResearchWorkflow",
+        "risk_level": "medium",
+        "estimated_hours": 8,
+        "dependencies": [
+          "phase-2",
+          "phase-3"
+        ]
+      }
+    },
+    "phase-4-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "task-4-1",
+        "task-4-2"
+      ],
+      "total_tasks": 7,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-4-verify"
+        ]
+      }
+    },
+    "task-4-1": {
+      "type": "task",
+      "title": "src/modelchorus/workflows/research/research_workflow.py",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-1-1",
+        "task-4-1-2",
+        "task-4-1-3",
+        "task-4-1-4",
+        "task-4-1-5"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-4-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/modelchorus/workflows/research/research_workflow.py",
+        "task_category": "implementation",
+        "estimated_hours": 6,
+        "description": "Add source discovery and integration methods"
+      }
+    },
+    "task-4-1-1": {
+      "type": "subtask",
+      "title": "Add discover_sources() method using source providers",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-4-1-2": {
+      "type": "subtask",
+      "title": "Add auto_research() end-to-end method combining discovery and analysis",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-4-1-3": {
+      "type": "subtask",
+      "title": "Enhance ingest_source() to accept provider-fetched sources",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-4-1-4": {
+      "type": "subtask",
+      "title": "Add configuration options for auto-discovery (enabled, providers list, max results)",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-4-1-5": {
+      "type": "subtask",
+      "title": "Integrate source credibility assessment with provider metadata",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-4-2": {
+      "type": "task",
+      "title": "src/modelchorus/workflows/research/__init__.py",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-2-1",
+        "task-4-2-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-4-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/modelchorus/workflows/research/__init__.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "description": "Update exports and imports"
+      }
+    },
+    "task-4-2-1": {
+      "type": "subtask",
+      "title": "Import source provider classes",
+      "status": "pending",
+      "parent": "task-4-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-4-2-2": {
+      "type": "subtask",
+      "title": "Export discover_sources and auto_research methods",
+      "status": "pending",
+      "parent": "task-4-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "phase-4-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "verify-4-1",
+        "verify-4-2",
+        "verify-4-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-4-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-4-1": {
+      "type": "verify",
+      "title": "discover_sources() returns sources from multiple providers",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Sources from Semantic Scholar and arXiv are combined correctly",
+        "command": ""
+      }
+    },
+    "verify-4-2": {
+      "type": "verify",
+      "title": "auto_research() completes end-to-end workflow",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Research dossier includes auto-discovered sources",
+        "command": ""
+      }
+    },
+    "verify-4-3": {
+      "type": "verify",
+      "title": "Backward compatibility: manual source ingestion still works",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest tests/test_research_workflow.py -k test_ingest_source",
+        "expected": "Existing ingest_source tests pass"
+      }
+    },
+    "phase-5": {
+      "type": "phase",
+      "title": "CLI Enhancements",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-5-files",
+        "phase-5-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-8"
+        ],
+        "blocked_by": [
+          "phase-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 7,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Add CLI commands for source provider functionality",
+        "risk_level": "low",
+        "estimated_hours": 4,
+        "dependencies": [
+          "phase-4"
+        ]
+      }
+    },
+    "phase-5-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "task-5-1",
+        "task-5-2"
+      ],
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-5-verify"
+        ]
+      }
+    },
+    "task-5-1": {
+      "type": "task",
+      "title": "src/modelchorus/cli/research.py",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [
+        "task-5-1-1",
+        "task-5-1-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/modelchorus/cli/research.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "description": "Add auto-discovery flags to research command"
+      }
+    },
+    "task-5-1-1": {
+      "type": "subtask",
+      "title": "Add --auto-discover flag to research command",
+      "status": "pending",
+      "parent": "task-5-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-5-1-2": {
+      "type": "subtask",
+      "title": "Add --sources flag to select specific providers",
+      "status": "pending",
+      "parent": "task-5-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-5-2": {
+      "type": "task",
+      "title": "src/modelchorus/cli/sources.py",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [
+        "task-5-2-1",
+        "task-5-2-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/modelchorus/cli/sources.py",
+        "task_category": "implementation",
+        "estimated_hours": 1.5,
+        "description": "Add research-sources CLI commands"
+      }
+    },
+    "task-5-2-1": {
+      "type": "subtask",
+      "title": "Add 'research-sources list' command to show available providers",
+      "status": "pending",
+      "parent": "task-5-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-5-2-2": {
+      "type": "subtask",
+      "title": "Add 'research-sources test <provider>' command for connectivity testing",
+      "status": "pending",
+      "parent": "task-5-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "phase-5-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "verify-5-1",
+        "verify-5-2",
+        "verify-5-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-5-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-5-1": {
+      "type": "verify",
+      "title": "CLI help shows new flags and commands",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "modelchorus research --help | grep auto-discover",
+        "expected": "Help text shows --auto-discover flag"
+      }
+    },
+    "verify-5-2": {
+      "type": "verify",
+      "title": "research-sources list shows available providers",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "modelchorus research-sources list",
+        "expected": "Lists semantic_scholar and arxiv"
+      }
+    },
+    "verify-5-3": {
+      "type": "verify",
+      "title": "Auto-discover flag triggers source discovery",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Command with --auto-discover fetches sources automatically",
+        "command": ""
+      }
+    },
+    "phase-6": {
+      "type": "phase",
+      "title": "Web Search Integration",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-6-files",
+        "phase-6-verify"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 9,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Add web search capability with pluggable engines (Optional)",
+        "risk_level": "medium",
+        "estimated_hours": 8,
+        "dependencies": [
+          "phase-1"
+        ],
+        "optional": true
+      }
+    },
+    "phase-6-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-6",
+      "children": [
+        "task-6-1",
+        "task-6-2"
+      ],
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-6-verify"
+        ]
+      }
+    },
+    "task-6-1": {
+      "type": "task",
+      "title": "src/modelchorus/providers/sources/web_search_provider.py",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [
+        "task-6-1-1",
+        "task-6-1-2",
+        "task-6-1-3",
+        "task-6-1-4"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-6-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/modelchorus/providers/sources/web_search_provider.py",
+        "task_category": "implementation",
+        "estimated_hours": 6,
+        "description": "Web search provider with pluggable engines"
+      }
+    },
+    "task-6-1-1": {
+      "type": "subtask",
+      "title": "Create WebSearchProvider base class with engine selection",
+      "status": "pending",
+      "parent": "task-6-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-6-1-2": {
+      "type": "subtask",
+      "title": "Implement Brave Search API integration",
+      "status": "pending",
+      "parent": "task-6-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-6-1-3": {
+      "type": "subtask",
+      "title": "Implement DuckDuckGo API integration",
+      "status": "pending",
+      "parent": "task-6-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-6-1-4": {
+      "type": "subtask",
+      "title": "Add HTML content extraction with beautifulsoup4",
+      "status": "pending",
+      "parent": "task-6-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-6-2": {
+      "type": "task",
+      "title": "src/modelchorus/providers/sources/__init__.py",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [
+        "task-6-2-1",
+        "task-6-2-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-6-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/modelchorus/providers/sources/__init__.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.25,
+        "description": "Export WebSearchProvider"
+      }
+    },
+    "task-6-2-1": {
+      "type": "subtask",
+      "title": "Export WebSearchProvider",
+      "status": "pending",
+      "parent": "task-6-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-6-2-2": {
+      "type": "subtask",
+      "title": "Register with @SourceProviderRegistry.register('web_search')",
+      "status": "pending",
+      "parent": "task-6-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "phase-6-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-6",
+      "children": [
+        "verify-6-1",
+        "verify-6-2",
+        "verify-6-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-6-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-6-1": {
+      "type": "verify",
+      "title": "Engine selection works correctly",
+      "status": "pending",
+      "parent": "phase-6-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Can switch between Brave and DuckDuckGo engines",
+        "command": ""
+      }
+    },
+    "verify-6-2": {
+      "type": "verify",
+      "title": "HTML extraction returns clean text",
+      "status": "pending",
+      "parent": "phase-6-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Extracted content is readable without HTML tags",
+        "command": ""
+      }
+    },
+    "verify-6-3": {
+      "type": "verify",
+      "title": "Web search results integrate with ResearchWorkflow",
+      "status": "pending",
+      "parent": "phase-6-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Web sources appear alongside academic sources",
+        "command": ""
+      }
+    },
+    "phase-7": {
+      "type": "phase",
+      "title": "Testing Infrastructure",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-7-files",
+        "phase-7-verify"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-2",
+          "phase-3",
+          "phase-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 11,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Comprehensive test coverage for all providers and integration",
+        "risk_level": "low",
+        "estimated_hours": 10,
+        "dependencies": [
+          "phase-2",
+          "phase-3",
+          "phase-4"
+        ]
+      }
+    },
+    "phase-7-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-7",
+      "children": [
+        "task-7-1",
+        "task-7-2",
+        "task-7-3",
+        "task-7-4",
+        "task-7-5"
+      ],
+      "total_tasks": 8,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-7-verify"
+        ]
+      }
+    },
+    "task-7-1": {
+      "type": "task",
+      "title": "tests/test_source_providers.py",
+      "status": "pending",
+      "parent": "phase-7-files",
+      "children": [
+        "task-7-1-1",
+        "task-7-1-2",
+        "task-7-1-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "tests/test_source_providers.py",
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "description": "Unit tests for provider implementations"
+      }
+    },
+    "task-7-1-1": {
+      "type": "subtask",
+      "title": "Test SemanticScholarProvider with mocked HTTP responses",
+      "status": "pending",
+      "parent": "task-7-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-7-1-2": {
+      "type": "subtask",
+      "title": "Test ArXivProvider with mocked XML responses",
+      "status": "pending",
+      "parent": "task-7-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-7-1-3": {
+      "type": "subtask",
+      "title": "Test WebSearchProvider with mocked search results (if Phase 6 implemented)",
+      "status": "pending",
+      "parent": "task-7-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-7-2": {
+      "type": "task",
+      "title": "tests/test_source_registry.py",
+      "status": "pending",
+      "parent": "phase-7-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "tests/test_source_registry.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "description": "Test registry functionality"
+      }
+    },
+    "task-7-3": {
+      "type": "task",
+      "title": "tests/test_research_integration.py",
+      "status": "pending",
+      "parent": "phase-7-files",
+      "children": [
+        "task-7-3-1",
+        "task-7-3-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "tests/test_research_integration.py",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "description": "Integration tests with ResearchWorkflow"
+      }
+    },
+    "task-7-3-1": {
+      "type": "subtask",
+      "title": "Test discover_sources() integration",
+      "status": "pending",
+      "parent": "task-7-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-7-3-2": {
+      "type": "subtask",
+      "title": "Test auto_research() end-to-end workflow",
+      "status": "pending",
+      "parent": "task-7-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-7-4": {
+      "type": "task",
+      "title": "tests/test_rate_limiting.py",
+      "status": "pending",
+      "parent": "phase-7-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "tests/test_rate_limiting.py",
+        "task_category": "implementation",
+        "estimated_hours": 1.5,
+        "description": "Test rate limiting behavior"
+      }
+    },
+    "task-7-5": {
+      "type": "task",
+      "title": "tests/fixtures/source_responses.py",
+      "status": "pending",
+      "parent": "phase-7-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "tests/fixtures/source_responses.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "description": "Mock response fixtures for all providers"
+      }
+    },
+    "phase-7-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-7",
+      "children": [
+        "verify-7-1",
+        "verify-7-2",
+        "verify-7-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-7-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-7-1": {
+      "type": "verify",
+      "title": "All tests pass",
+      "status": "pending",
+      "parent": "phase-7-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest tests/ -v",
+        "expected": "All new tests pass with >80% coverage"
+      }
+    },
+    "verify-7-2": {
+      "type": "verify",
+      "title": "Coverage threshold met",
+      "status": "pending",
+      "parent": "phase-7-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest --cov=modelchorus.providers.sources --cov-report=term",
+        "expected": "Coverage >80% for source provider modules"
+      }
+    },
+    "verify-7-3": {
+      "type": "verify",
+      "title": "No regressions in existing tests",
+      "status": "pending",
+      "parent": "phase-7-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest tests/test_research_workflow.py",
+        "expected": "All existing ResearchWorkflow tests still pass"
+      }
+    },
+    "phase-8": {
+      "type": "phase",
+      "title": "Documentation",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-8-files",
+        "phase-8-verify"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-1",
+          "phase-2",
+          "phase-3",
+          "phase-4",
+          "phase-5"
+        ],
+        "depends": []
+      },
+      "total_tasks": 9,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Complete documentation for users and developers",
+        "risk_level": "low",
+        "estimated_hours": 6,
+        "dependencies": [
+          "phase-1",
+          "phase-2",
+          "phase-3",
+          "phase-4",
+          "phase-5"
+        ]
+      }
+    },
+    "phase-8-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-8",
+      "children": [
+        "task-8-1",
+        "task-8-2",
+        "task-8-3",
+        "task-8-4",
+        "task-8-5",
+        "task-8-6"
+      ],
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-8-verify"
+        ]
+      }
+    },
+    "task-8-1": {
+      "type": "task",
+      "title": "docs/source-providers/OVERVIEW.md",
+      "status": "pending",
+      "parent": "phase-8-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/source-providers/OVERVIEW.md",
+        "task_category": "implementation",
+        "estimated_hours": 1.5,
+        "description": "Architecture overview and usage guide"
+      }
+    },
+    "task-8-2": {
+      "type": "task",
+      "title": "docs/source-providers/SEMANTIC_SCHOLAR.md",
+      "status": "pending",
+      "parent": "phase-8-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/source-providers/SEMANTIC_SCHOLAR.md",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "description": "Semantic Scholar setup and API guide"
+      }
+    },
+    "task-8-3": {
+      "type": "task",
+      "title": "docs/source-providers/ARXIV.md",
+      "status": "pending",
+      "parent": "phase-8-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/source-providers/ARXIV.md",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "description": "arXiv setup and usage guide"
+      }
+    },
+    "task-8-4": {
+      "type": "task",
+      "title": "docs/source-providers/WEB_SEARCH.md",
+      "status": "pending",
+      "parent": "phase-8-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/source-providers/WEB_SEARCH.md",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "description": "Web search configuration guide (if Phase 6 implemented)"
+      }
+    },
+    "task-8-5": {
+      "type": "task",
+      "title": "docs/workflows/RESEARCH.md",
+      "status": "pending",
+      "parent": "phase-8-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/workflows/RESEARCH.md",
+        "task_category": "refactoring",
+        "estimated_hours": 1,
+        "description": "Update RESEARCH workflow docs with auto-discovery examples"
+      }
+    },
+    "task-8-6": {
+      "type": "task",
+      "title": "README.md",
+      "status": "pending",
+      "parent": "phase-8-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "README.md",
+        "task_category": "refactoring",
+        "estimated_hours": 0.5,
+        "description": "Add source providers to main README features section"
+      }
+    },
+    "phase-8-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-8",
+      "children": [
+        "verify-8-1",
+        "verify-8-2",
+        "verify-8-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-8-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-8-1": {
+      "type": "verify",
+      "title": "All documentation files are complete",
+      "status": "pending",
+      "parent": "phase-8-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "All docs have setup instructions, examples, and API references",
+        "command": ""
+      }
+    },
+    "verify-8-2": {
+      "type": "verify",
+      "title": "Documentation examples work correctly",
+      "status": "pending",
+      "parent": "phase-8-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Code examples in docs can be run successfully",
+        "command": ""
+      }
+    },
+    "verify-8-3": {
+      "type": "verify",
+      "title": "Links and cross-references are valid",
+      "status": "pending",
+      "parent": "phase-8-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "markdownlint docs/",
+        "expected": "No broken links or formatting issues"
+      }
+    }
+  }
+}

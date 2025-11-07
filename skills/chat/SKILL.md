@@ -1,326 +1,340 @@
 ---
-name: model-chorus:chat
-description: Single-model conversational peer consultation with threading and context continuity for rapid iteration and second opinions
+name: chat
+description: Single-model conversational interaction with threading support for general-purpose queries
 ---
 
-# ModelChorus: Chat
+# CHAT
 
-Engage in contextual, threaded conversations with a peer AI model for rapid iteration, second opinions, and focused sub-task delegation. Think of this as tapping a colleague on the shoulder for a quick question or brainstorming session.
+## Overview
+
+The CHAT workflow provides simple, straightforward consultation with a single AI model while maintaining conversation continuity through threading. This is ModelChorus's foundational workflow for basic conversational interactions, ideal for quick consultations and iterative refinement without the complexity of multi-model orchestration.
+
+**Key Capabilities:**
+- Single-model conversation with any configured provider (Claude, Gemini, Codex, Cursor Agent)
+- Conversation threading for multi-turn interactions with full history preservation
+- File context integration for grounding conversations in specific documents
+- Simple request/response pattern with automatic history management
+- Flexible temperature control for adjusting response creativity
+
+**Use Cases:**
+- Quick second opinions or consultations from an AI model
+- Iterative conversation development with follow-up questions
+- Code explanation with the ability to ask clarifying questions
+- Brainstorming sessions where you build on previous responses
+- General-purpose queries that benefit from conversational context
 
 ## When to Use
 
-Use this skill when you need:
+Use the CHAT workflow when you need to:
 
-### Seeking a Second Opinion
-- Validating a solution before implementing
-- Checking for flaws, alternatives, or improvements
-- Quick sanity check between larger workflow steps
-- **Trigger phrases:** "Is this the best way?", "Can you double-check this?", "What's another perspective on this?"
+- **Simple consultation** - Ask questions or get feedback from a single AI model without needing multiple perspectives
+- **Conversational refinement** - Build on previous exchanges with follow-up questions, clarifications, or iterations
+- **Context-aware dialogue** - Maintain conversation history so the model remembers earlier context and builds on it naturally
+- **Quick interactions** - Get fast responses without the overhead of multi-model orchestration or specialized workflows
+- **File-based consultation** - Discuss specific documents by including them as context in your conversation
 
-### Iterative Refinement
-- Back-and-forth adjustments on code, UI descriptions, or creative writing
-- Maintaining discussion thread where context continuity matters
-- Building on previous exchanges without re-explaining context
-- **Trigger phrases:** "That's close, but can you make it more...", "Let's try another approach", "Continue from where we left off"
+## When NOT to Use
 
-### Clarifying Ambiguity
-- User's request is unclear and needs exploration
-- Multiple possible interpretations exist
-- Need to understand requirements before diving deep
-- **Trigger phrases:** Broad requests like "build me an app", "help me with this problem"
+Avoid the CHAT workflow when:
 
-### Specialist Consultation
-- Need expertise outside your core domain
-- Specialized model would provide superior response
-- Want consistent tone/voice from a specific model
-- **Trigger phrases:** Niche technologies, specialized domains, specific model preferences
+| Situation | Use Instead |
+|-----------|-------------|
+| You need multiple AI perspectives or consensus | **CONSENSUS** - Multi-model consultation with synthesis strategies |
+| You need structured debate or dialectical analysis | **ARGUMENT** - Three-role creator/skeptic/moderator analysis |
+| You need systematic investigation with hypothesis tracking | **THINKDEEP** - Extended reasoning with confidence progression |
+| You need creative brainstorming with many ideas | **IDEATE** - Structured idea generation workflow |
+| You need comprehensive research with citations | **RESEARCH** - Systematic information gathering with source management |
 
-## How It Works
+## Basic Usage
 
-The `chat` workflow initiates a threaded session with a target model:
-
-1. **Send prompt** - Your question or task to the peer model
-2. **Receive response** - Model's answer with context awareness
-3. **Continue thread** - Use `--continue` with thread ID to maintain conversation
-4. **Build context** - Each turn remembers previous exchanges
-
-**Key Features:**
-- Session-based threading with unique thread IDs
-- Rolling context window maintains conversation history
-- Lightweight branching for testing alternatives
-- Auto-summarization after extended exchanges
-
-## Usage
+### Simple Example
 
 ```bash
-modelchorus chat [prompt] \
-  --provider [model] \
-  --continue [thread-id] \
-  [options]
+modelchorus chat "What is quantum computing?"
 ```
 
-## Parameters
+**Expected Output:**
+The command returns a conversational response from the default provider (Claude) explaining the topic. The response includes a thread ID for conversation continuation.
 
-### Required
-- **prompt** (positional argument): The message or question to send to the peer model
+### Common Options
 
-### Optional
-- `--provider, -p`: Model to chat with
-  - Default: `gemini`
-  - Options: `gemini`, `claude`, `codex`, `cursor-agent`
-  - Choose based on model strengths (reasoning, code, creativity)
+| Option | Short | Default | Description |
+|--------|-------|---------|-------------|
+| `--provider` | `-p` | `claude` | AI provider to use (`claude`, `gemini`, `codex`, `cursor-agent`) |
+| `--continue` | `-c` | None | Thread ID to continue conversation |
+| `--file` | `-f` | None | File paths for context (repeatable) |
+| `--system` | | None | Additional system prompt |
+| `--temperature` | `-t` | `0.7` | Creativity level (0.0-1.0) |
+| `--max-tokens` | | None | Maximum response length |
+| `--output` | `-o` | None | Save result to JSON file |
+| `--verbose` | `-v` | False | Show detailed execution info |
 
-- `--continue`: Thread ID to continue existing conversation
-  - Omit to start new conversation
-  - Use same ID to maintain context across turns
-  - Format: UUID string returned from previous interaction
+## Technical Contract
 
-- `--output, -o`: Save conversation to JSON file
-  - Useful for documentation or later reference
-  - Contains full thread history and metadata
+### Parameters
 
-- `--verbose, -v`: Show detailed execution information
-  - Displays provider status, timing, token usage
-  - Helpful for debugging or understanding model behavior
+**Required:**
+- `prompt` (string): The conversation prompt or question to send to the AI model
 
-- `--temperature, -t`: Control response creativity (0.0-1.0)
-  - Default: `0.7`
-  - Lower for factual/deterministic responses
-  - Higher for creative/exploratory discussions
+**Optional:**
+- `--provider, -p` (string): AI provider to use - Valid values: `claude`, `gemini`, `codex`, `cursor-agent` - Default: `claude`
+- `--continue, -c` (string): Thread ID to continue an existing conversation - Format: `thread-{uuid}` - Maintains full conversation history
+- `--file, -f` (string, repeatable): File paths to include as context - Can be specified multiple times - Files must exist before execution
+- `--system` (string): Additional system prompt to customize model behavior
+- `--temperature, -t` (float): Response creativity level - Range: 0.0-1.0 - Default: 0.7 - Lower values are more deterministic
+- `--max-tokens` (integer): Maximum response length in tokens - Provider-specific limits apply
+- `--output, -o` (string): Path to save JSON output file - Creates or overwrites file at specified path
+- `--verbose, -v` (boolean): Enable detailed execution information - Default: false - Shows provider details and timing
 
-- `--max-tokens`: Maximum tokens in response
-  - Useful for controlling response length
-  - Prevents overly verbose answers
+### Return Format
 
-- `--timeout`: Request timeout in seconds
-  - Default: `120.0`
-  - Increase for complex queries
+The CHAT workflow returns a JSON object with the following structure:
 
-## Strategic Examples
-
-### Example 1: Iterative Code Review
-
-**Goal:** Review and refine a Python function with context continuity
-
-```bash
-# Turn 1: Initial Review
-modelchorus chat "You are a Python expert. Please review the following function for correctness, efficiency, and PEP8 adherence:
-
-\`\`\`python
-def factorial(n):
-  if n == 0:
-    return 1
-  else:
-    return n * factorial(n-1)
-\`\`\`" \
-  --provider gemini \
-  --output factorial-review.json
-
-# Returns: thread-id: abc-123-def-456
-# Response: Provides feedback on recursion depth, suggests iterative alternative
-
-# Turn 2: Follow-up Question
-modelchorus chat "That's a great point about recursion limits. Could you rewrite using an iterative approach?" \
-  --provider gemini \
-  --continue abc-123-def-456
-
-# Response: Provides refactored iterative version
-```
-
-### Example 2: Creative Brainstorming
-
-**Goal:** Generate and refine project names
-
-```bash
-# Initial brainstorm
-modelchorus chat "Let's brainstorm names for a CLI tool that orchestrates AI models. Core concepts: collaboration, harmony, intelligence. Give me 5 initial ideas." \
-  --provider codex \
-  --temperature 0.9
-
-# Refine favorites
-modelchorus chat "I like 'ModelChorus' and 'SynapseHub'. Can you create variations on these themes?" \
-  --provider codex \
-  --continue [thread-id] \
-  --temperature 0.8
-```
-
-### Example 3: Debug Session
-
-**Goal:** Diagnose intermittent bug with peer assistance
-
-```bash
-# Start investigation
-modelchorus chat "I'm seeing intermittent 503 errors. Here are the symptoms: [symptoms]. What should I investigate first?" \
-  --provider claude \
-  --output debug-session.json
-
-# Follow up with findings
-modelchorus chat "I checked the database connections - pool is at 95% capacity. What's the likely root cause?" \
-  --provider claude \
-  --continue [thread-id]
-
-# Get specific recommendation
-modelchorus chat "Confirmed: missing index on users table. What's the best way to add this index with minimal downtime?" \
-  --provider claude \
-  --continue [thread-id]
-```
-
-### Example 4: Requirements Clarification
-
-**Goal:** Understand ambiguous user request before implementing
-
-```bash
-# Explore interpretations
-modelchorus chat "User asked to 'add authentication'. What are the most common interpretations and implementation approaches?" \
-  --provider gemini
-
-# Narrow down based on context
-modelchorus chat "It's a microservices architecture with existing OAuth setup. What's the recommended approach?" \
-  --provider gemini \
-  --continue [thread-id]
-```
-
-## Best Practices
-
-### DO:
-- ✅ **Be specific in prompting** - Clearly define role and expectations ("You are a security expert analyzing code for vulnerabilities")
-- ✅ **Manage session context** - Use `--continue` for related exchanges, start fresh for unrelated topics
-- ✅ **Keep turns focused** - One clear question or instruction per turn
-- ✅ **Choose the right peer** - Select models based on known strengths (gemini for reasoning, codex for code)
-- ✅ **Seed first turn well** - Include both the question and desired end state to minimize back-and-forth
-- ✅ **Save important sessions** - Use `--output` to preserve valuable conversations
-- ✅ **Adjust temperature** - Lower for facts (0.3-0.5), higher for creativity (0.8-0.9)
-
-### DON'T:
-- ❌ **Mix unrelated topics** - Start new conversation rather than contaminating context
-- ❌ **Forget thread IDs** - You'll lose conversation history without them
-- ❌ **Bundle multiple queries** - Keep each turn focused on one topic
-- ❌ **Skip role definition** - Models perform better with clear expertise framing
-- ❌ **Let threads drift** - Periodically restate the objective if conversation wanders
-- ❌ **Ignore temperature** - Default may not be optimal for your use case
-
-## Workflow Integration
-
-### Handoff to THINKDEEP
-When a chat reveals complexity requiring structured investigation:
-
-```bash
-# Chat uncovers need for deep analysis
-modelchorus chat "This caching strategy has multiple trade-offs..." \
-  --provider gemini \
-  --output chat-cache-discussion.json
-
-# Escalate to THINKDEEP for systematic analysis
-modelchorus thinkdeep "Analyze caching strategy trade-offs discovered in chat-cache-discussion.json" \
-  --provider gemini
-```
-
-### Handoff from CONSENSUS
-Use chat to explore consensus findings in depth:
-
-```bash
-# Run consensus on question
-modelchorus consensus "Best database for real-time analytics?" \
-  -p gemini -p codex \
-  --output db-consensus.json
-
-# Deep dive with one model
-modelchorus chat "Based on db-consensus.json, let's explore the PostgreSQL + TimescaleDB approach in detail" \
-  --provider gemini
-```
-
-## Error Handling
-
-### Model Not Responding
-- **Symptom:** Request times out or fails
-- **Action:** Retry once, then try different provider
-- **Command:** `--timeout 300` to increase wait time
-
-### Invalid Thread ID
-- **Symptom:** Error about expired or invalid session
-- **Action:** Context is lost; start fresh conversation
-- **Prevention:** Save thread IDs; don't wait too long between turns
-
-### Unexpected Output
-- **Symptom:** Response is irrelevant or nonsensical
-- **Action:** Terminate session and retry with more precise prompt
-- **Tip:** Add specific instructions like "Format response as bullet points"
-
-### Context Drift
-- **Symptom:** Model loses focus or misunderstands objective
-- **Action:** Restate the main goal explicitly
-- **Command:** Start new message with "To clarify, our objective is..."
-
-### Hallucinated Information
-- **Symptom:** Model invents facts, APIs, or code that don't exist
-- **Action:** Request citations and verify manually
-- **Prevention:** Lower temperature, ask for sources
-
-## Output Format
-
-**Terminal Output:**
-```
-Chat with gemini...
-Prompt: Review this Python function for...
-
-[Response from model]
-
-Thread ID: abc-123-def-456
-✓ Success (2.3s, 450 tokens)
-```
-
-**JSON Output (with --output):**
 ```json
 {
-  "thread_id": "abc-123-def-456",
-  "provider": "gemini",
-  "turns": [
-    {
-      "role": "user",
-      "content": "Review this Python function...",
-      "timestamp": "2025-11-06T10:30:00Z"
-    },
-    {
-      "role": "assistant",
-      "content": "...",
-      "model": "gemini-2.5-pro",
-      "usage": {"input_tokens": 120, "output_tokens": 450},
-      "timestamp": "2025-11-06T10:30:02Z"
-    }
-  ],
+  "result": "The model's conversational response text...",
+  "session_id": "thread-abc-123-def-456",
   "metadata": {
+    "provider": "claude",
+    "model": "claude-3-5-sonnet-20241022",
+    "prompt_tokens": 150,
+    "completion_tokens": 300,
+    "total_tokens": 450,
     "temperature": 0.7,
-    "total_tokens": 570
+    "timestamp": "2025-11-07T10:30:00Z"
   }
 }
 ```
 
-## Performance
+**Field Descriptions:**
 
-- **Typical latency:** 1-5 seconds depending on model and response length
-- **Context window:** Models maintain ~10-20 previous turns
-- **Auto-summary:** Triggered after ~15 exchanges to compress context
-- **Concurrency:** One turn at a time per thread (sequential)
+| Field | Type | Description |
+|-------|------|-------------|
+| `result` | string | The conversational response from the AI model |
+| `session_id` | string | Thread ID for continuing this conversation (format: `thread-{uuid}`) |
+| `metadata.provider` | string | The AI provider that processed the request (`claude`, `gemini`, `codex`, `cursor-agent`) |
+| `metadata.model` | string | Specific model version used by the provider |
+| `metadata.prompt_tokens` | integer | Number of tokens in the input (prompt + context + history) |
+| `metadata.completion_tokens` | integer | Number of tokens in the model's response |
+| `metadata.total_tokens` | integer | Total tokens consumed (prompt_tokens + completion_tokens) |
+| `metadata.temperature` | float | Temperature setting used for this request (0.0-1.0) |
+| `metadata.timestamp` | string | ISO 8601 timestamp of when the request was processed |
 
-## Limitations
+**Usage Notes:**
+- Save the `session_id` value to continue conversations using `--continue`
+- Token counts help track usage and costs across providers
+- The `result` field contains the complete response text suitable for display or further processing
 
-- Thread persistence limited to session duration (implementation-dependent)
-- Context window may truncate very long conversations
-- Model-specific rate limits apply
-- Threading requires unique ID management
-- No built-in conversation branching (use separate threads)
+## Advanced Usage
 
-## Provider Selection Guide
+### With Provider Selection
 
-| Provider | Best For | Strengths |
-|----------|----------|-----------|
-| `gemini` | General reasoning, fast responses | Balanced performance, good context retention |
-| `claude` | Code review, analysis, writing | Deep reasoning, nuanced understanding |
-| `codex` | Code generation, debugging | Technical accuracy, API knowledge |
-| `cursor-agent` | IDE integration, refactoring | Context from development environment |
+```bash
+# Use specific provider
+modelchorus chat "Explain neural networks" -p gemini
 
-## See Also
+# Use Codex for code-focused questions
+modelchorus chat "How does this algorithm work?" -p codex
+```
 
-- **THINKDEEP skill** - For complex multi-step investigations
-- **CONSENSUS skill** - For multi-model parallel consultation
-- **ModelChorus CLI** - Run `modelchorus --help` for all options
+**Provider Selection Tips:**
+- `claude`: Best for general conversation, reasoning, and nuanced responses
+- `gemini`: Strong for factual queries and technical explanations
+- `codex`: Optimized for code-related questions and programming tasks
+- `cursor-agent`: Ideal for development-focused consultations
+
+### With File Context
+
+```bash
+# Include single file for discussion
+modelchorus chat "Explain this code" -f src/main.py
+
+# Include multiple files for broader context
+modelchorus chat "Review these implementations" -f api.py -f models.py -f tests.py
+```
+
+**File Handling:**
+- All file paths must exist before execution
+- Files are read and included as context for the conversation
+- Multiple `-f` flags can be used to include multiple files
+- Large files may be truncated based on provider token limits
+
+### With Conversation Threading
+
+```bash
+# Start new conversation
+modelchorus chat "What is quantum computing?"
+# Output includes: Session ID: thread-abc-123-def-456
+
+# Continue conversation with follow-up
+modelchorus chat "How does it differ from classical computing?" --continue thread-abc-123-def-456
+
+# Further continuation in same thread
+modelchorus chat "Give me a practical example" -c thread-abc-123-def-456
+```
+
+**Threading Notes:**
+- Thread IDs persist across sessions
+- Conversation history is maintained and automatically included
+- Each message builds on the full conversation context
+- Thread IDs follow format: `thread-{uuid}`
+- Use short flag `-c` or long flag `--continue`
+
+### Adjusting Creativity
+
+```bash
+# Lower temperature for factual/precise output
+modelchorus chat "What are the Python PEP 8 guidelines?" --temperature 0.3
+
+# Higher temperature for creative/exploratory output
+modelchorus chat "Brainstorm app features for a fitness tracker" --temperature 0.9
+
+# Default balanced setting (0.7)
+modelchorus chat "Explain dependency injection" --temperature 0.7
+```
+
+**Temperature Guide:**
+- `0.0-0.3`: Deterministic, factual, precise (documentation, facts, specs)
+- `0.4-0.7`: Balanced creativity and accuracy (general conversation, explanations)
+- `0.8-1.0`: Maximum creativity, exploratory (brainstorming, ideation)
+
+### Saving Results
+
+```bash
+# Save output to JSON file
+modelchorus chat "Analyze this architecture" -f design.md --output analysis.json
+```
+
+**Output file contains:**
+- Original prompt
+- Model response/synthesis
+- Metadata (model name, token usage, timestamp)
+- Thread ID for continuation
+- Provider information
+
+## Best Practices
+
+1. **Use threading for multi-turn conversations** - Always save and reuse thread IDs when building on previous context. This ensures the model has full conversation history and provides more coherent responses.
+
+2. **Choose appropriate temperature** - Use lower temperatures (0.3-0.5) for factual queries and higher temperatures (0.7-0.9) for creative or exploratory conversations.
+
+3. **Include relevant files as context** - When discussing code, documentation, or specific content, use `-f` flags to include files rather than copying content into prompts.
+
+4. **Keep prompts clear and specific** - Even though CHAT is conversational, specific prompts yield better results than vague questions.
+
+5. **Select the right provider** - Match provider strengths to your task: Claude for reasoning, Gemini for facts, Codex for code.
+
+## Examples
+
+### Example 1: Code Review Conversation
+
+**Scenario:** You want to discuss code quality and get iterative feedback.
+
+**Command:**
+```bash
+# Start conversation with code file
+modelchorus chat "Review this implementation for potential issues" -f src/auth.py
+
+# Follow up with specific question (using thread ID from previous output)
+modelchorus chat "How would you refactor the login method?" -c thread-abc-123
+
+# Continue with implementation details
+modelchorus chat "Show me an example of the improved version" -c thread-abc-123
+```
+
+**Expected Outcome:** Multi-turn conversation where the model builds on previous context to provide detailed, contextual code review and refactoring suggestions.
+
+---
+
+### Example 2: Learning Session with Follow-ups
+
+**Scenario:** You're learning a new concept and want to ask progressively deeper questions.
+
+**Command:**
+```bash
+# Initial query with lower temperature for accuracy
+modelchorus chat "Explain Rust's ownership system" --temperature 0.5
+
+# Follow up (saves thread ID: thread-xyz-789)
+modelchorus chat "How does borrowing work with mutable references?" -c thread-xyz-789 -t 0.5
+
+# Ask for practical example
+modelchorus chat "Show me a common mistake beginners make" -c thread-xyz-789 -t 0.5
+```
+
+**Expected Outcome:** Educational conversation where each response builds on previous explanations, creating a coherent learning path.
+
+---
+
+### Example 3: Multi-file Analysis
+
+**Scenario:** You need to understand how multiple components interact.
+
+**Command:**
+```bash
+# Include multiple related files
+modelchorus chat "Explain how these components work together" -f src/models/user.py -f src/services/auth.py -f src/api/routes.py --output analysis.json
+```
+
+**Expected Outcome:** Comprehensive analysis of component relationships with results saved to JSON for later reference.
+
+## Troubleshooting
+
+### Issue: Thread ID not found
+
+**Symptoms:** Error message "Thread ID not found" or "Invalid session_id"
+
+**Cause:** The thread ID doesn't exist in conversation memory, either due to typo or expired/cleared memory
+
+**Solution:**
+```bash
+# Verify thread ID format (should be thread-{uuid})
+# Start a new conversation if thread is unavailable
+modelchorus chat "Your prompt here"
+```
+
+---
+
+### Issue: File not found error
+
+**Symptoms:** Error message indicating a file path doesn't exist
+
+**Cause:** File path provided to `-f` flag is invalid or file doesn't exist
+
+**Solution:**
+```bash
+# Verify file exists before running command
+ls -l path/to/file.py
+
+# Use correct absolute or relative path
+modelchorus chat "Review this code" -f ./src/main.py
+```
+
+---
+
+### Issue: Provider initialization failed
+
+**Symptoms:** Error about provider not being available or initialization failure
+
+**Cause:** Selected provider is not configured or invalid provider name
+
+**Solution:**
+```bash
+# Check available providers
+modelchorus list-providers
+
+# Use a valid provider name
+modelchorus chat "Your prompt" -p claude
+```
+
+## Related Workflows
+
+- **CONSENSUS** - When you need multiple AI perspectives on the same question instead of a single model's view
+- **THINKDEEP** - When the question requires deep investigation with hypothesis testing rather than conversational exchange
+
+---
+
+**See Also:**
+- ModelChorus Documentation: `/docs/WORKFLOWS.md`
+- Provider Information: `modelchorus list-providers`
+- General CLI Help: `modelchorus --help`
