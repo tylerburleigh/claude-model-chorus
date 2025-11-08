@@ -9,7 +9,7 @@ import logging
 from typing import Optional, List, Dict, Any
 from enum import Enum
 
-from ...core.models import InvestigationPhase, StudyState
+from ...core.models import InvestigationPhase, StudyState, ConfidenceLevel
 
 logger = logging.getLogger(__name__)
 
@@ -191,3 +191,94 @@ class InvestigationStateMachine:
             raise ValueError("Cannot reset from COMPLETE phase")
 
         return self.transition(InvestigationPhase.DISCOVERY, reason or "Resetting for additional exploration")
+
+    def update_confidence(self, new_confidence: ConfidenceLevel) -> None:
+        """
+        Update the confidence level in the investigation state.
+
+        Args:
+            new_confidence: New confidence level to set
+        """
+        old_confidence = ConfidenceLevel(self.state.confidence)
+        self.state.confidence = new_confidence.value
+
+        logger.info(f"Confidence updated: {old_confidence.value} → {new_confidence.value}")
+
+    def should_escalate_phase(self) -> bool:
+        """
+        Determine if confidence level is sufficient to escalate to next phase.
+
+        Uses confidence thresholds appropriate for each phase:
+        - DISCOVERY: Requires MEDIUM or higher to move to VALIDATION
+        - VALIDATION: Requires HIGH or higher to move to PLANNING
+        - PLANNING: Requires HIGH or higher to move to COMPLETE
+        - COMPLETE: Already terminal, returns False
+
+        Returns:
+            True if confidence is sufficient for phase escalation, False otherwise
+        """
+        current_confidence = ConfidenceLevel(self.state.confidence)
+
+        # Define confidence thresholds for phase transitions
+        thresholds = {
+            InvestigationPhase.DISCOVERY: ConfidenceLevel.MEDIUM,
+            InvestigationPhase.VALIDATION: ConfidenceLevel.HIGH,
+            InvestigationPhase.PLANNING: ConfidenceLevel.HIGH,
+        }
+
+        # COMPLETE is terminal, no escalation possible
+        if self.current_phase == InvestigationPhase.COMPLETE:
+            return False
+
+        required_confidence = thresholds.get(self.current_phase)
+        if required_confidence is None:
+            return False
+
+        # Get confidence level ordering for comparison
+        confidence_order = {
+            ConfidenceLevel.EXPLORING: 0,
+            ConfidenceLevel.LOW: 1,
+            ConfidenceLevel.MEDIUM: 2,
+            ConfidenceLevel.HIGH: 3,
+            ConfidenceLevel.VERY_HIGH: 4,
+            ConfidenceLevel.ALMOST_CERTAIN: 5,
+            ConfidenceLevel.CERTAIN: 6,
+        }
+
+        current_level = confidence_order.get(current_confidence, 0)
+        required_level = confidence_order.get(required_confidence, 0)
+
+        should_escalate = current_level >= required_level
+
+        if should_escalate:
+            logger.info(
+                f"Confidence level {current_confidence.value} meets threshold "
+                f"for escalation from {self.current_phase.value}"
+            )
+        else:
+            logger.debug(
+                f"Confidence level {current_confidence.value} below threshold "
+                f"{required_confidence.value} for {self.current_phase.value} escalation"
+            )
+
+        return should_escalate
+
+    def get_confidence_threshold(self, phase: Optional[InvestigationPhase] = None) -> Optional[ConfidenceLevel]:
+        """
+        Get the confidence threshold required for escalation from a given phase.
+
+        Args:
+            phase: Phase to get threshold for (defaults to current phase)
+
+        Returns:
+            Required confidence level for escalation, or None if phase is terminal
+        """
+        target_phase = phase or self.current_phase
+
+        thresholds = {
+            InvestigationPhase.DISCOVERY: ConfidenceLevel.MEDIUM,
+            InvestigationPhase.VALIDATION: ConfidenceLevel.HIGH,
+            InvestigationPhase.PLANNING: ConfidenceLevel.HIGH,
+        }
+
+        return thresholds.get(target_phase)
