@@ -583,3 +583,158 @@ def study_next(
             import traceback
             console.print(f"\n[red]{traceback.format_exc()}[/red]")
         raise typer.Exit(1)
+
+
+def study_view(
+    investigation: str = typer.Option(..., "--investigation", help="Investigation ID (thread ID) to view"),
+    persona: Optional[str] = typer.Option(
+        None,
+        "--persona",
+        help="Filter by specific persona (optional)",
+    ),
+    show_all: bool = typer.Option(
+        False,
+        "--show-all",
+        help="Show complete conversation history",
+    ),
+    format_json: bool = typer.Option(
+        False,
+        "--json",
+        help="Output in JSON format",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Show detailed information",
+    ),
+):
+    """
+    View memory and conversation history for a STUDY investigation.
+
+    This command displays the conversation memory for an investigation,
+    including all messages, persona contributions, and investigation metadata.
+    Useful for reviewing investigation history and debugging.
+
+    Example:
+        # View investigation summary
+        model-chorus study-view --investigation thread-id-123
+
+        # View all messages
+        model-chorus study-view --investigation thread-id-123 --show-all
+
+        # Filter by persona
+        model-chorus study-view --investigation thread-id-123 --persona Researcher
+
+        # Output as JSON
+        model-chorus study-view --investigation thread-id-123 --json
+    """
+    try:
+        # Create conversation memory
+        memory = ConversationMemory()
+
+        # Try to retrieve existing thread
+        thread = memory.get_thread(investigation)
+        if not thread:
+            console.print(f"[red]Error: Investigation not found: {investigation}[/red]")
+            console.print("[yellow]Make sure you're using the correct thread ID from a previous investigation.[/yellow]")
+            console.print("\nTo start a new investigation, use: model-chorus study --scenario \"...\"")
+            raise typer.Exit(1)
+
+        # Extract messages and metadata
+        messages = thread.messages
+        metadata = thread.metadata if hasattr(thread, 'metadata') else {}
+
+        # Filter by persona if specified
+        if persona:
+            messages = [
+                msg for msg in messages
+                if msg.metadata and msg.metadata.get('persona', '').lower() == persona.lower()
+            ]
+            if not messages:
+                console.print(f"[yellow]No messages found for persona '{persona}' in investigation {investigation}[/yellow]")
+                console.print(f"Total messages in thread: {len(thread.messages)}")
+                raise typer.Exit(0)
+
+        # JSON output format
+        if format_json:
+            output_data = {
+                "investigation_id": investigation,
+                "total_messages": len(thread.messages),
+                "filtered_messages": len(messages) if persona else len(thread.messages),
+                "metadata": metadata,
+                "messages": [
+                    {
+                        "role": msg.role,
+                        "content": msg.content[:200] + "..." if len(msg.content) > 200 and not show_all else msg.content,
+                        "metadata": msg.metadata if hasattr(msg, 'metadata') else {},
+                        "timestamp": msg.timestamp.isoformat() if hasattr(msg, 'timestamp') and msg.timestamp else None
+                    }
+                    for msg in messages
+                ]
+            }
+            if persona:
+                output_data["filter_persona"] = persona
+
+            console.print(json.dumps(output_data, indent=2))
+            return
+
+        # Display header
+        console.print(f"\n[bold cyan]STUDY Investigation Memory[/bold cyan]")
+        console.print(f"[cyan]Investigation ID:[/cyan] {investigation}")
+        console.print(f"[cyan]Total Messages:[/cyan] {len(thread.messages)}")
+        if persona:
+            console.print(f"[cyan]Filtered Persona:[/cyan] {persona} ({len(messages)} messages)")
+        console.print()
+
+        # Display metadata if available and verbose
+        if metadata and verbose:
+            console.print("[bold]Investigation Metadata:[/bold]")
+            for key, value in metadata.items():
+                console.print(f"  {key}: {value}")
+            console.print()
+
+        # Display messages
+        if not messages:
+            console.print("[yellow]No messages found in this investigation.[/yellow]")
+        else:
+            console.print("[bold]Conversation History:[/bold]\n")
+            for i, msg in enumerate(messages, 1):
+                # Extract persona from metadata if available
+                msg_persona = msg.metadata.get('persona', 'Unknown') if hasattr(msg, 'metadata') and msg.metadata else 'Unknown'
+                timestamp = msg.timestamp.strftime('%Y-%m-%d %H:%M:%S') if hasattr(msg, 'timestamp') and msg.timestamp else 'N/A'
+
+                # Display message header
+                console.print(f"[bold cyan]Message {i}[/bold cyan]")
+                console.print(f"  [dim]Role:[/dim] {msg.role}")
+                console.print(f"  [dim]Persona:[/dim] {msg_persona}")
+                if verbose:
+                    console.print(f"  [dim]Timestamp:[/dim] {timestamp}")
+
+                # Display content (truncated unless show_all)
+                content = msg.content
+                if not show_all and len(content) > 200:
+                    content = content[:200] + "..."
+                console.print(f"\n{content}\n")
+
+                # Show separator
+                if i < len(messages):
+                    console.print("[dim]" + "─" * 60 + "[/dim]\n")
+
+        # Show usage tips
+        if not show_all and any(len(msg.content) > 200 for msg in messages):
+            console.print(f"\n[dim]Use --show-all to see complete messages[/dim]")
+        if not persona and len(thread.messages) > 1:
+            console.print(f"[dim]Use --persona <name> to filter by persona[/dim]")
+        if not format_json:
+            console.print(f"[dim]Use --json for machine-readable output[/dim]")
+
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Interrupted by user[/yellow]")
+        raise typer.Exit(130)
+    except Exception as e:
+        console.print(f"\n[red]Error: {e}[/red]")
+        if verbose:
+            import traceback
+            console.print(f"\n[red]{traceback.format_exc()}[/red]")
+        raise typer.Exit(1)

@@ -1785,6 +1785,57 @@ def study_next(
     )
 
 
+@app.command(name="study-view")
+def study_view(
+    investigation: str = typer.Option(..., "--investigation", help="Investigation ID (thread ID) to view"),
+    persona: Optional[str] = typer.Option(
+        None,
+        "--persona",
+        help="Filter by specific persona (optional)",
+    ),
+    show_all: bool = typer.Option(
+        False,
+        "--show-all",
+        help="Show complete conversation history",
+    ),
+    format_json: bool = typer.Option(
+        False,
+        "--json",
+        help="Output in JSON format",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Show detailed information",
+    ),
+):
+    """
+    View memory and conversation history for a STUDY investigation.
+
+    This command displays the conversation memory for an investigation,
+    including all messages, persona contributions, and investigation metadata.
+
+    Example:
+        # View investigation summary
+        model-chorus study-view --investigation thread-id-123
+
+        # View all messages
+        model-chorus study-view --investigation thread-id-123 --show-all
+
+        # Filter by persona
+        model-chorus study-view --investigation thread-id-123 --persona Researcher
+    """
+    # Delegate to study_commands module
+    study_commands.study_view(
+        investigation=investigation,
+        persona=persona,
+        show_all=show_all,
+        format_json=format_json,
+        verbose=verbose,
+    )
+
+
 @app.command()
 def version():
     """Show version information."""
