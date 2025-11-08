@@ -5,6 +5,33 @@ All notable changes to ModelChorus will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2025-11-08
+
+### Removed
+
+#### RESEARCH Workflow
+- **Complete removal of RESEARCH workflow** - No longer within the scope of ModelChorus
+  - Removed `modelchorus research` CLI command
+  - Deleted ResearchWorkflow implementation (~1,750 lines)
+  - Removed ResearchEvidence, ResearchValidation, ResearchDossier, and ResearchState model classes
+  - Deleted research skill (`skills/research/`)
+  - Deleted research agent (`agents/research.md`)
+  - Removed all research workflow tests (~1,200 lines)
+  - Updated all cross-references in remaining workflows
+  - Removed research-specific documentation
+
+#### Impact
+- **Workflows reduced from 6 to 5**: CHAT, CONSENSUS, THINKDEEP, ARGUMENT, IDEATE remain
+- **~9,500 lines of code removed** from the codebase
+- **Breaking change**: `modelchorus research` command no longer available
+- **Breaking change**: ResearchWorkflow class no longer importable from `modelchorus.workflows`
+
+### Changed
+- Documentation updated to reflect 5 workflows instead of 6
+- Router skill updated to route among 5 workflows
+- All workflow selection guides updated to remove RESEARCH references
+- Examples updated to remove research workflow demonstrations
+
 ## [0.4.0] - 2025-11-07
 
 ### Added
