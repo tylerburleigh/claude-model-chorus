@@ -1,7 +1,7 @@
 {
   "spec_id": "persona-orchestration-study-workflow-2025-11-08-001",
   "generated": "2025-11-08T14:00:00Z",
-  "last_updated": "2025-11-08T16:12:40.112185Z",
+  "last_updated": "2025-11-08T16:13:50.751871Z",
   "metadata": {
     "title": "Persona Orchestration - STUDY Workflow",
     "description": "Implement persona-based investigation workflow with multi-perspective reasoning, temporal memory, and LLM-based routing",
@@ -16,7 +16,7 @@
       "history": []
     },
     "activated_date": "2025-11-08T14:53:02.145575Z",
-    "progress_percentage": 24,
+    "progress_percentage": 25,
     "current_phase": "phase-2"
   },
   "objectives": [
@@ -41,7 +41,7 @@
         "phase-6"
       ],
       "total_tasks": 70,
-      "completed_tasks": 17,
+      "completed_tasks": 18,
       "metadata": {
         "description": "Complete implementation of STUDY workflow with personas, memory, and routing"
       }
@@ -618,7 +618,7 @@
         "depends": []
       },
       "total_tasks": 10,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "purpose": "Implement three core personas with distinct reasoning approaches",
         "risk_level": "medium",
@@ -638,7 +638,7 @@
         "task-2-5"
       ],
       "total_tasks": 7,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -666,7 +666,7 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/workflows/study/persona.py",
         "task_category": "implementation",
@@ -698,7 +698,7 @@
     "task-2-1-2": {
       "type": "subtask",
       "title": "Create PersonaRegistry class for managing available personas",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-1",
       "children": [],
       "dependencies": {
@@ -707,9 +707,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "details": "Methods: register(), get(), list_all()"
+        "details": "Methods: register(), get(), list_all()",
+        "started_at": "2025-11-08T16:13:12.923893Z",
+        "completed_at": "2025-11-08T16:13:50.738179Z",
+        "needs_journaling": false,
+        "actual_hours": 0.011,
+        "journaled_at": "2025-11-08T16:13:50.747402Z"
       }
     },
     "task-2-1-3": {
@@ -2438,6 +2443,15 @@
       "content": "Created personas.py with Persona dataclass containing required fields (name, prompt_template, temperature, max_tokens). Verified import and instantiation work correctly. Temperature defaults to 0.7, max_tokens defaults to 4096 as specified.",
       "metadata": {},
       "task_id": "task-2-1-1"
+    },
+    {
+      "timestamp": "2025-11-08T16:13:50.747385Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Create PersonaRegistry class for managing available personas",
+      "author": "claude-code",
+      "content": "Created PersonaRegistry class in personas.py with all required methods (register, get, list_all). register() adds personas and prevents duplicates with ValueError. get() retrieves by name, returns None if not found. list_all() returns all registered personas. Verified all methods work correctly including duplicate detection.",
+      "metadata": {},
+      "task_id": "task-2-1-2"
     }
   ]
 }
