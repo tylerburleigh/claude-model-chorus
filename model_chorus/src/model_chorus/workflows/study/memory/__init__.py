@@ -74,13 +74,11 @@ Future Extensions:
     - Investigation dependency tracking
 """
 
-# Component imports (added as implemented):
+# Component imports (all implemented):
 from .models import MemoryEntry, MemoryMetadata, MemoryType, MemoryQuery
 from .cache import ShortTermCache
 from .persistence import LongTermStorage
-
-# Remaining components will be added in subsequent tasks:
-# from .controller import MemoryController
+from .controller import MemoryController
 
 __all__ = [
     # Data models (task 4-2 complete):
@@ -90,10 +88,10 @@ __all__ = [
     "MemoryQuery",
     # Cache implementation (task 4-3 complete):
     "ShortTermCache",
-    # Persistence implementation (task 4-4-1 complete):
+    # Persistence implementation (task 4-4 complete):
     "LongTermStorage",
-    # Remaining components (to be exported as implemented):
-    # "MemoryController",
+    # Controller implementation (task 4-5-1 complete):
+    "MemoryController",
 ]
 
 __version__ = "0.1.0"
