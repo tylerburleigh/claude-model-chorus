@@ -22,6 +22,8 @@ from ...core.role_orchestration import (
 from ...providers import ModelProvider, GenerationRequest, GenerationResponse
 from ...core.models import ConversationMessage
 from ...core.progress import emit_workflow_start, emit_workflow_complete
+from .persona_router import PersonaRouter
+from .personas import get_default_registry
 
 logger = logging.getLogger(__name__)
 
@@ -36,12 +38,15 @@ class StudyWorkflow(BaseWorkflow):
     through role-based orchestration and conversation threading.
 
     Architecture:
-    - Multi-persona role orchestration
+    - Multi-persona role orchestration with intelligent routing
+    - PersonaRouter for context-aware persona selection
     - Conversation threading and memory
     - Systematic hypothesis exploration
     - Persona-specific expertise and perspectives
 
     Key Features:
+    - Intelligent persona routing based on investigation phase and context
+    - Fallback routing for graceful error handling
     - Role-based investigation with distinct personas
     - Conversation threading for multi-turn exploration
     - Systematic knowledge building
@@ -56,9 +61,14 @@ class StudyWorkflow(BaseWorkflow):
     - Multi-faceted topic investigation
 
     Workflow Pattern:
-    1. **Persona Assignment**: Assign specialized roles for investigation
+    1. **Persona Assignment**: Intelligently route to appropriate persona via PersonaRouter
     2. **Collaborative Exploration**: Personas investigate from their perspectives
     3. **Synthesis**: Combine insights into comprehensive understanding
+
+    Attributes:
+        provider: Primary ModelProvider for persona invocations
+        fallback_providers: Optional fallback providers
+        persona_router: PersonaRouter instance for intelligent persona selection
 
     Example:
         >>> from model_chorus.providers import ClaudeProvider
@@ -116,7 +126,12 @@ class StudyWorkflow(BaseWorkflow):
         self.provider = provider
         self.fallback_providers = fallback_providers or []
 
+        # Initialize persona router with default registry
+        persona_registry = get_default_registry()
+        self.persona_router = PersonaRouter(persona_registry)
+
         logger.info(f"StudyWorkflow initialized with provider: {provider.provider_name}")
+        logger.info(f"PersonaRouter initialized with {len(self.persona_router.get_available_personas())} personas")
 
     async def run(
         self,
@@ -284,6 +299,14 @@ class StudyWorkflow(BaseWorkflow):
 
         This is the main investigation loop where personas explore the topic.
 
+        When fully implemented, this method will:
+        1. Create/update StudyState from investigation context
+        2. Call self.persona_router.route_next_persona(state) to get RoutingDecision
+        3. Use RoutingDecision.persona to invoke the selected persona
+        4. Pass RoutingDecision.guidance to persona invocation for context
+        5. Update StudyState with persona findings
+        6. Repeat until investigation complete (RoutingDecision.persona is None)
+
         Args:
             prompt: Research topic or question
             personas: List of persona configurations
@@ -297,14 +320,48 @@ class StudyWorkflow(BaseWorkflow):
         steps = []
 
         # TODO: Implement actual persona invocation and investigation
+        # PersonaRouter is available via self.persona_router
+        # Example routing flow (to be implemented):
+        #
+        # 1. Create StudyState from current context
+        # state = StudyState(
+        #     investigation_id=thread_id,
+        #     session_id=thread_id,
+        #     question=prompt,
+        #     current_phase="discovery",
+        #     confidence="medium",
+        #     findings=[],
+        #     personas_active=[]
+        # )
+        #
+        # 2. Route to next persona
+        # decision = self.persona_router.route_next_persona(state)
+        #
+        # 3. Invoke persona if not None
+        # if decision.persona:
+        #     response = await decision.persona.invoke({
+        #         "prompt": prompt,
+        #         "guidance": decision.guidance,
+        #         "context": state
+        #     })
+        #     # Process response and update state
+        #
+        # 4. Continue until decision.persona is None (investigation complete)
+
         # For now, create placeholder step
         step = WorkflowStep(
             step_number=1,
-            content="Investigation flow skeleton in place. Persona invocation to be implemented.",
+            content=(
+                "Investigation flow skeleton in place. PersonaRouter integrated.\n"
+                f"Available personas: {', '.join(self.persona_router.get_available_personas())}\n"
+                "Persona invocation to be implemented."
+            ),
             model=self.provider.provider_name,
             metadata={
                 "phase": "investigation",
-                "personas_ready": len(personas)
+                "personas_ready": len(personas),
+                "router_available": True,
+                "available_personas": self.persona_router.get_available_personas()
             }
         )
         steps.append(step)
@@ -335,4 +392,34 @@ class StudyWorkflow(BaseWorkflow):
             f"Study workflow investigation skeleton complete.\n"
             f"Completed {len(steps)} investigation step(s).\n"
             f"Persona invocation and synthesis logic ready for implementation."
+        )
+
+    def get_routing_history(
+        self,
+        investigation_id: Optional[str] = None,
+        limit: Optional[int] = None
+    ) -> List[Any]:
+        """
+        Get routing history from the PersonaRouter.
+
+        Provides access to historical routing decisions for analysis,
+        debugging, and understanding persona selection patterns.
+
+        Args:
+            investigation_id: Filter by specific investigation (None for all)
+            limit: Maximum number of entries to return (most recent first)
+
+        Returns:
+            List of RoutingHistoryEntry records
+
+        Example:
+            >>> workflow = StudyWorkflow(provider)
+            >>> # After running investigation...
+            >>> history = workflow.get_routing_history(limit=5)
+            >>> for entry in history:
+            ...     print(f"{entry.timestamp}: {entry.selected_persona}")
+        """
+        return self.persona_router.get_routing_history(
+            investigation_id=investigation_id,
+            limit=limit
         )
