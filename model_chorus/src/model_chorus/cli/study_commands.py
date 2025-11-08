@@ -678,7 +678,11 @@ def study_view(
                         "role": msg.role,
                         "content": msg.content[:200] + "..." if len(msg.content) > 200 and not show_all else msg.content,
                         "metadata": msg.metadata if hasattr(msg, 'metadata') else {},
-                        "timestamp": msg.timestamp.isoformat() if hasattr(msg, 'timestamp') and msg.timestamp else None
+                        "timestamp": (
+                            msg.timestamp if isinstance(msg.timestamp, str)
+                            else msg.timestamp.isoformat() if hasattr(msg.timestamp, 'isoformat')
+                            else None
+                        ) if hasattr(msg, 'timestamp') and msg.timestamp else None
                     }
                     for msg in messages
                 ]
@@ -712,7 +716,15 @@ def study_view(
             for i, msg in enumerate(messages, 1):
                 # Extract persona from metadata if available
                 msg_persona = msg.metadata.get('persona', 'Unknown') if hasattr(msg, 'metadata') and msg.metadata else 'Unknown'
-                timestamp = msg.timestamp.strftime('%Y-%m-%d %H:%M:%S') if hasattr(msg, 'timestamp') and msg.timestamp else 'N/A'
+
+                # Handle timestamp (could be datetime object or string)
+                if hasattr(msg, 'timestamp') and msg.timestamp:
+                    if isinstance(msg.timestamp, str):
+                        timestamp = msg.timestamp
+                    else:
+                        timestamp = msg.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+                else:
+                    timestamp = 'N/A'
 
                 # Display message header
                 console.print(f"[bold cyan]Message {i}[/bold cyan]")

@@ -193,7 +193,16 @@ class StudyWorkflow(BaseWorkflow):
                 logger.info(f"Will use available providers: {available}")
 
         # Get or create thread ID
-        thread_id = continuation_id or str(uuid.uuid4())
+        if continuation_id:
+            thread_id = continuation_id
+        else:
+            # Create new thread if conversation memory available
+            if self.conversation_memory:
+                thread_id = self.conversation_memory.create_thread(
+                    workflow_name="Study"
+                )
+            else:
+                thread_id = str(uuid.uuid4())
 
         # Retrieve conversation history if continuing
         history = []
@@ -226,6 +235,30 @@ class StudyWorkflow(BaseWorkflow):
             # PHASE 3: Synthesis (to be implemented)
             synthesis = await self._synthesize_findings(investigation_steps, **kwargs)
 
+            # Save user message to conversation history
+            if self.conversation_memory:
+                self.add_message(
+                    thread_id,
+                    "user",
+                    prompt,
+                    metadata={"workflow": "study", "is_continuation": bool(continuation_id)}
+                )
+
+            # Save investigation results to conversation history
+            if self.conversation_memory:
+                # Combine all investigation steps into assistant response
+                assistant_content = synthesis
+                self.add_message(
+                    thread_id,
+                    "assistant",
+                    assistant_content,
+                    metadata={
+                        "workflow": "study",
+                        "personas": [p.get('name', 'unknown') for p in personas],
+                        "steps": len(investigation_steps)
+                    }
+                )
+
             # Build result
             result.success = True
             result.steps = investigation_steps
@@ -235,7 +268,8 @@ class StudyWorkflow(BaseWorkflow):
                 "workflow_type": "study",
                 "personas_used": [p.get('name', 'unknown') for p in personas],
                 "investigation_rounds": len(investigation_steps),
-                "timestamp": datetime.now(timezone.utc).isoformat()
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "is_continuation": bool(continuation_id)
             }
 
             logger.info(f"Study workflow completed successfully. Thread: {thread_id}")
@@ -247,11 +281,7 @@ class StudyWorkflow(BaseWorkflow):
 
         finally:
             # Emit workflow complete event
-            emit_workflow_complete(
-                workflow_type="study",
-                success=result.success,
-                thread_id=result.metadata.get("thread_id") if result.metadata else None
-            )
+            emit_workflow_complete("study")
 
         self._result = result
         return result
