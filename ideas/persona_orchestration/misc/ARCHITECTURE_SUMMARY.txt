@@ -1,0 +1,511 @@
+================================================================================
+MODELCHORUS ARCHITECTURE EXPLORATION - SUMMARY FOR STUDY WORKFLOW SPECIFICATION
+================================================================================
+
+EXPLORATION DEPTH: Medium
+COMPLETED: November 8, 2025
+
+================================================================================
+1. DIRECTORY STRUCTURE
+================================================================================
+
+MAIN SOURCE TREE:
+  /home/tyler/Documents/GitHub/claude-model-chorus/model_chorus/src/model_chorus/
+
+CRITICAL LOCATIONS:
+  - core/base_workflow.py              [BaseWorkflow abstract class]
+  - core/role_orchestration.py         [RoleOrchestrator for multi-role execution]
+  - core/conversation.py               [ConversationMemory with threading]
+  - core/models.py                     [All Pydantic data models]
+  - core/registry.py                   [Workflow plugin system]
+  - core/config.py                     [Configuration management]
+  
+  - workflows/chat.py                  [Simple single-provider template]
+  - workflows/consensus.py             [Multi-provider template]
+  - workflows/thinkdeep.py             [State-based template]
+  - workflows/argument/                [Role-based template - USE THIS]
+  - workflows/ideate/                  [Creative workflow template]
+  
+  - providers/base_provider.py          [ModelProvider abstract class]
+  - providers/cli_provider.py           [CLIProvider base class]
+  - providers/claude_provider.py        [Claude implementation]
+  
+  - cli/main.py                        [CLI commands (Typer)]
+
+LOCAL STORAGE:
+  ~/.model-chorus/conversations/       [Thread-based conversation files]
+
+================================================================================
+2. KEY ABSTRACTIONS (What You Must Inherit/Extend)
+================================================================================
+
+REQUIRED INTERFACE:
+
+  class StudyWorkflow(BaseWorkflow):
+    def __init__(self, provider, conversation_memory=None, config=None):
+      super().__init__("Study", "Persona orchestration workflow", config, conversation_memory)
+    
+    @abstractmethod
+    async def run(self, prompt: str, **kwargs) -> WorkflowResult:
+      # Must return: WorkflowResult(success, steps, synthesis, error, metadata)
+      pass
+
+WORKFLOW RESULT STRUCTURE:
+
+  WorkflowResult:
+    - success: bool                    [True/False]
+    - steps: List[WorkflowStep]        [One per persona]
+    - synthesis: Optional[str]         [Final integration]
+    - error: Optional[str]             [Error message if failed]
+    - metadata: Dict[str, Any]         [thread_id, personas_used, etc.]
+
+ROLE ORCHESTRATOR USAGE:
+
+  # Define personas as roles
+  roles = [
+    ModelRole(
+      role="researcher",
+      model="claude-opus",
+      stance="neutral",
+      stance_prompt="You are a careful researcher investigating..."
+    ),
+    ModelRole(
+      role="critic",
+      model="claude-opus",
+      stance="skeptical",
+      stance_prompt="You are critically examining..."
+    )
+  ]
+  
+  # Execute with orchestrator
+  result = await orchestrator.execute(
+    prompt=user_input,
+    roles=roles,
+    pattern=OrchestrationPattern.SEQUENTIAL,  # or PARALLEL, HYBRID
+    synthesis=SynthesisStrategy.AI_SYNTHESIZE # or NONE, CONCATENATE, STRUCTURED
+  )
+
+CONVERSATION MEMORY USAGE:
+
+  memory = ConversationMemory()
+  
+  # Create new thread
+  thread_id = memory.create_thread("study", initial_context={...})
+  
+  # Add messages
+  memory.add_message(thread_id, "user", "What is AI?", files=[...])
+  memory.add_message(thread_id, "assistant", "AI is...", model_name="claude")
+  
+  # Retrieve
+  thread = memory.get_thread(thread_id)
+  messages = memory.get_messages(thread_id)  # Last 50 by default
+  
+  # Stored: ~/.model-chorus/conversations/{thread_id}.json
+
+================================================================================
+3. EXISTING WORKFLOWS - REFERENCE PATTERNS
+================================================================================
+
+ARGUMENT WORKFLOW (Best for role-based personas):
+  File: workflows/argument/argument_workflow.py
+  
+  Pattern:
+    1. Define 3 roles (Creator, Skeptic, Moderator)
+    2. Use RoleOrchestrator.execute() with SEQUENTIAL pattern
+    3. Each role produces one WorkflowStep
+    4. Final synthesis combines all perspectives
+  
+  Key: Uses @WorkflowRegistry.register("argument") decorator
+  
+  Inherit this pattern for STUDY workflow
+
+THINKDEEP WORKFLOW (Best for state persistence):
+  File: workflows/thinkdeep.py
+  
+  Pattern:
+    1. Maintain ThinkDeepState (hypotheses, steps, confidence, files)
+    2. On first run: create new thread
+    3. On continuation: retrieve state from thread
+    4. Update state, persist back to thread
+    5. State stored in conversation thread as JSON
+  
+  Key: get_investigation_state(thread_id) method
+  Key: State embedded in ConversationMemory messages
+  
+  Use this pattern for STUDY state persistence
+
+CHAT WORKFLOW (Simplest template):
+  File: workflows/chat.py
+  
+  Pattern:
+    1. Single provider
+    2. Get conversation history if continuation_id
+    3. Call provider.generate()
+    4. Add response to conversation memory
+    5. Return WorkflowResult
+
+================================================================================
+4. DATA MODELS TO DEFINE (core/models.py)
+================================================================================
+
+MINIMAL NEW MODELS NEEDED:
+
+  class PersonaState(BaseModel):
+    persona_id: str
+    name: str
+    role: str
+    description: str
+    perspective: str
+    memory: List[str]
+    expertise_areas: List[str]
+    reasoning_style: str
+    metadata: Dict[str, Any]
+
+  class StudyState(BaseModel):
+    thread_id: str
+    workflow_name: str = "study"
+    personas: List[PersonaState]
+    current_focus: str
+    investigation_steps: List[Dict]
+    persona_memories: Dict[str, List[str]]      # persona_id -> memories
+    cross_persona_insights: List[str]
+    created_at: datetime
+    updated_at: datetime
+
+OPTIONAL ADVANCED MODELS:
+
+  class PersonaRouting(BaseModel):
+    step_number: int
+    input_topic: str
+    selected_personas: List[str]
+    routing_reason: str
+    timestamp: datetime
+
+  class PersonaMemoryEntry(BaseModel):
+    persona_id: str
+    content: str
+    importance: float                           # 0.0-1.0
+    tags: List[str]
+    related_personas: List[str]
+    timestamp: datetime
+
+================================================================================
+5. CLI INTEGRATION (cli/main.py)
+================================================================================
+
+COMMAND PATTERN:
+
+  @app.command()
+  def study(
+      prompt: str = typer.Argument(..., help="Topic to study"),
+      provider: Optional[str] = typer.Option(None, "--provider", "-p"),
+      num_personas: int = typer.Option(3, "--personas", "-n"),
+      continuation_id: Optional[str] = typer.Option(None, "--continue", "-c"),
+      files: Optional[List[str]] = typer.Option(None, "--file", "-f"),
+      routing_strategy: str = typer.Option("sequential", "--routing"),
+      system: Optional[str] = typer.Option(None, "--system"),
+      temperature: Optional[float] = typer.Option(None, "--temperature", "-t"),
+      max_tokens: Optional[int] = typer.Option(None, "--max-tokens"),
+      output: Optional[Path] = typer.Option(None, "--output", "-o"),
+      verbose: bool = typer.Option(False, "--verbose", "-v"),
+      skip_provider_check: bool = typer.Option(False, "--skip-provider-check"),
+  ):
+      """Study a topic through coordinated persona exploration."""
+      # Implementation following existing patterns (see chat, consensus, etc.)
+
+COMMON PATTERN SEQUENCE:
+  1. Get config defaults
+  2. Create provider instance
+  3. Create conversation memory
+  4. Create workflow instance
+  5. Run async workflow
+  6. Display results
+  7. Save output if requested
+
+================================================================================
+6. WORKFLOW REGISTRATION
+================================================================================
+
+AUTOMATIC VIA DECORATOR:
+
+  @WorkflowRegistry.register("study")
+  class StudyWorkflow(BaseWorkflow):
+    # Implementation
+    pass
+
+AUTOMATICALLY AVAILABLE AS:
+  - WorkflowRegistry.get("study")
+  - WorkflowRegistry.list_workflows()
+
+NO ADDITIONAL REGISTRATION NEEDED - decorator handles it
+
+================================================================================
+7. CONFIGURATION (core/config.py)
+================================================================================
+
+ADD TO WorkflowConfig CLASS:
+
+  class WorkflowConfig(BaseModel):
+    # ... existing fields ...
+    
+    # Study-specific configuration
+    num_personas: Optional[int] = Field(None, ge=1, le=10)
+    routing_strategy: Optional[str] = Field(
+      None, 
+      pattern=r"^(sequential|round_robin|adaptive|expertise_based)$"
+    )
+    persona_temperature: Optional[float] = Field(None, ge=0.0, le=1.0)
+
+UPDATE ModelChorusConfig.validate_workflow_names():
+  valid_workflows = ['chat', 'consensus', 'thinkdeep', 'argument', 'ideate', 'research', 'study']
+
+DEFAULT CONFIG TEMPLATE (in _config_init()):
+  workflows:
+    study:
+      provider: claude
+      num_personas: 3
+      routing_strategy: sequential
+      temperature: 0.7
+
+================================================================================
+8. DESIGN DECISIONS FOR YOUR SPEC
+================================================================================
+
+DECISION 1: PROVIDER MODEL
+  Option A: Single provider - all personas use same provider (memory efficient)
+  Option B: Multi-provider - different providers per persona (diverse)
+  Option C: Hybrid - primary + fallbacks per persona
+  RECOMMEND: Start with Option A (single provider)
+
+DECISION 2: PERSONA DEFINITION
+  Option A: Hardcoded personas ("researcher", "critic", "synthesizer")
+  Option B: Generated personas - AI creates them based on topic
+  Option C: User-specified - users define custom personas
+  RECOMMEND: Start with Option A + allow customization
+
+DECISION 3: ROUTING STRATEGY
+  Option A: Sequential - all personas answer all questions
+  Option B: Round-robin - rotate which persona answers
+  Option C: Adaptive - LLM decides which personas are relevant
+  Option D: Expertise-based - match persona expertise to question
+  RECOMMEND: Start with A, add C as extension
+
+DECISION 4: MEMORY SYSTEM
+  Option A: Shallow - conversation history only, no persona-specific memory
+  Option B: Deep - separate memory per persona + shared context
+  Option C: Hybrid - shared working memory + persona specialization
+  RECOMMEND: Option C (like ThinkDeep)
+
+DECISION 5: STATE PERSISTENCE
+  Option A: Lightweight - just thread history, reconstruct personas
+  Option B: Full - persist persona states, memories, reasoning
+  Option C: Selective - persist only essential state
+  RECOMMEND: Option B (like ThinkDeep)
+
+================================================================================
+9. TESTING STRATEGY
+================================================================================
+
+PATTERN (based on codebase):
+
+  @pytest.mark.asyncio
+  async def test_study_workflow_creation():
+    provider = ClaudeProvider()
+    memory = ConversationMemory()
+    workflow = StudyWorkflow(provider, conversation_memory=memory)
+    assert workflow.name == "Study"
+
+  @pytest.mark.asyncio
+  async def test_study_workflow_run():
+    provider = ClaudeProvider()
+    memory = ConversationMemory()
+    workflow = StudyWorkflow(provider, conversation_memory=memory)
+    
+    result = await workflow.run(
+      prompt="What is AI safety?",
+      skip_provider_check=True,
+      num_personas=3
+    )
+    
+    assert result.success
+    assert len(result.steps) == 3
+    assert result.synthesis is not None
+    assert 'thread_id' in result.metadata
+
+  @pytest.mark.asyncio
+  async def test_study_workflow_continuation():
+    # Test resuming a study via continuation_id
+    pass
+
+  @pytest.mark.asyncio
+  async def test_persona_routing():
+    # Test intelligent routing decisions
+    pass
+
+CREATE: tests/test_study_workflow.py
+
+================================================================================
+10. CRITICAL FILES - ABSOLUTE PATHS
+================================================================================
+
+MUST READ FOR SPECIFICATION:
+
+1. Base Workflow Pattern:
+   /home/tyler/Documents/GitHub/claude-model-chorus/model_chorus/src/model_chorus/core/base_workflow.py
+   Read: Lines 58-112 (class definition + key methods)
+
+2. Role Orchestration:
+   /home/tyler/Documents/GitHub/claude-model-chorus/model_chorus/src/model_chorus/core/role_orchestration.py
+   Read: Lines 29-92 (enums), Lines 94-150 (ModelRole class)
+
+3. Conversation Memory:
+   /home/tyler/Documents/GitHub/claude-model-chorus/model_chorus/src/model_chorus/core/conversation.py
+   Read: Lines 36-100 (ConversationMemory class)
+
+4. Argument Workflow (Best Role-Based Example):
+   /home/tyler/Documents/GitHub/claude-model-chorus/model_chorus/src/model_chorus/workflows/argument/argument_workflow.py
+   Read: Lines 30-96 (docstring), Lines 98-200+ (implementation)
+
+5. ThinkDeep Workflow (Best State Example):
+   /home/tyler/Documents/GitHub/claude-model-chorus/model_chorus/src/model_chorus/workflows/thinkdeep.py
+   Read: Lines 28-82 (docstring), Full implementation for state patterns
+
+6. Chat Workflow (Simplest Example):
+   /home/tyler/Documents/GitHub/claude-model-chorus/model_chorus/src/model_chorus/workflows/chat.py
+   Read: Full file for simple pattern
+
+7. CLI Main:
+   /home/tyler/Documents/GitHub/claude-model-chorus/model_chorus/src/model_chorus/cli/main.py
+   Read: Lines 314-524 (argument command), Lines 528-743 (ideate command)
+   Study: Pattern repeated across all commands
+
+8. Config:
+   /home/tyler/Documents/GitHub/claude-model-chorus/model_chorus/src/model_chorus/core/config.py
+   Read: Lines 33-103 (WorkflowConfig validation)
+
+9. Models:
+   /home/tyler/Documents/GitHub/claude-model-chorus/model_chorus/src/model_chorus/core/models.py
+   This is a 64KB file - skim for ThinkDeepState, ConversationMessage patterns
+
+10. Registry:
+    /home/tyler/Documents/GitHub/claude-model-chorus/model_chorus/src/model_chorus/core/registry.py
+    Read: Full file (200 lines) - simple plugin system
+
+================================================================================
+11. QUICK SPEC OUTLINE
+================================================================================
+
+YOUR SPEC SHOULD DEFINE:
+
+  1. PURPOSE
+     - Study workflow enables multi-perspective investigation of topics
+     - Different AI personas examine topic from different angles
+     - Supports long-running conversations with state persistence
+
+  2. PERSONAS
+     - Structure (name, role, description, expertise areas, memory)
+     - Default personas (researcher, critic, synthesizer, etc.)
+     - Allow customization (user-defined personas)
+
+  3. ROUTING
+     - How personas are selected for each query
+     - Start with: sequential (all personas answer)
+     - Extend to: adaptive (LLM-based selection)
+
+  4. MEMORY
+     - Thread-based conversation history
+     - Persona-specific memory entries
+     - Shared investigation context
+     - Persistence to ~/.model-chorus/conversations/
+
+  5. STATE
+     - StudyState model (personas, memories, progress, insights)
+     - Stored in conversation thread
+     - Retrieved on continuation
+
+  6. CLI
+     - `model-chorus study <prompt>`
+     - Options: --personas, --routing, --continue, --file, --output, etc.
+     - Follow existing pattern (see argument, ideate, thinkdeep)
+
+  7. OUTPUT
+     - Individual persona responses (one per step)
+     - Cross-persona synthesis
+     - Investigation metadata
+     - Thread ID for resuming
+
+  8. CONFIGURATION
+     - Default num_personas (3)
+     - Default routing_strategy (sequential)
+     - Default persona_temperature (0.7)
+     - Can override in .model-chorusrc
+
+  9. EXTENSION POINTS
+     - Custom persona definitions
+     - Alternative routing algorithms
+     - Different synthesis strategies
+     - Persona memory management hooks
+
+  10. TESTING
+      - Creation tests
+      - Run tests with multiple personas
+      - Continuation/threading tests
+      - Routing logic tests
+      - State persistence tests
+
+================================================================================
+12. KEY ARCHITECTURAL INSIGHTS
+================================================================================
+
+INHERITANCE CHAIN:
+  ModelProvider (abstract)
+    └── CLIProvider (abstract, handles CLI execution)
+          └── ClaudeProvider, GeminiProvider, etc. (concrete)
+
+  BaseWorkflow (abstract)
+    └── ChatWorkflow, ConsensusWorkflow, ThinkDeepWorkflow, ArgumentWorkflow, IdeateWorkflow
+          └── StudyWorkflow (YOUR NEW WORKFLOW)
+
+ORCHESTRATION FRAMEWORK:
+  RoleOrchestrator - manages multi-role execution
+    - Takes: prompt + list of ModelRole objects
+    - Pattern: SEQUENTIAL | PARALLEL | HYBRID
+    - Synthesis: NONE | CONCATENATE | AI_SYNTHESIZE | STRUCTURED
+    - Perfect for persona system
+
+PERSISTENCE LAYER:
+  ConversationMemory - file-based threading
+    - Stores in ~/.model-chorus/conversations/{thread_id}.json
+    - Thread-safe with filelock
+    - TTL-based cleanup (default 3 hours)
+    - Can extend with custom metadata
+
+PLUGIN SYSTEM:
+  WorkflowRegistry - decorator-based registration
+    - @WorkflowRegistry.register("study")
+    - Automatic discovery
+    - No manual registration needed
+
+CONFIGURATION:
+  .model-chorusrc - YAML/JSON configuration
+    - Workflow-specific overrides
+    - Global defaults
+    - Searched up directory tree
+
+================================================================================
+READY FOR SPECIFICATION WRITING
+================================================================================
+
+You have all the information needed to:
+
+1. Understand existing architecture patterns
+2. Define STUDY workflow interface
+3. Plan data models (PersonaState, StudyState, etc.)
+4. Design routing and memory systems
+5. Plan CLI integration
+6. Define configuration options
+7. Outline testing strategy
+
+All paths are absolute and ready for reference.
+All patterns are documented with examples above.
+
