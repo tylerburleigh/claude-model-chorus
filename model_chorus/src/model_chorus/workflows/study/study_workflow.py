@@ -204,11 +204,7 @@ class StudyWorkflow(BaseWorkflow):
                 logger.info(f"Loaded {len(history)} messages from thread {continuation_id}")
 
         # Emit workflow start event
-        emit_workflow_start(
-            workflow_type="study",
-            prompt=prompt,
-            thread_id=thread_id
-        )
+        emit_workflow_start("study", "20-45s")
 
         # Create workflow result
         result = WorkflowResult(success=False)
