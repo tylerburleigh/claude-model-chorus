@@ -225,3 +225,95 @@ class MemoryMetadata(BaseModel):
         ge=0,
         description="Total storage size in bytes (for persistence layer)",
     )
+
+
+class MemoryQuery(BaseModel):
+    """
+    Query model for searching and filtering memory entries.
+
+    Supports flexible filtering across multiple dimensions to retrieve
+    relevant memory entries from cache or persistence storage.
+
+    Attributes:
+        investigation_id: Filter by specific investigation ID
+        persona: Filter by persona identifier
+        confidence_level: Filter by minimum confidence level
+        time_range_start: Filter by start time (ISO format)
+        time_range_end: Filter by end time (ISO format)
+        memory_type: Filter by memory entry type
+        limit: Maximum number of results to return
+        offset: Number of results to skip (for pagination)
+        sort_by: Field to sort by (timestamp, confidence_after, etc.)
+        sort_order: Sort order (asc or desc)
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "investigation_id": "inv-abc-123",
+                "persona": "researcher",
+                "confidence_level": "medium",
+                "time_range_start": "2025-11-08T00:00:00Z",
+                "time_range_end": "2025-11-08T23:59:59Z",
+                "memory_type": "finding",
+                "limit": 50,
+                "offset": 0,
+                "sort_by": "timestamp",
+                "sort_order": "desc",
+            }
+        }
+    )
+
+    investigation_id: Optional[str] = Field(
+        default=None,
+        description="Filter by specific investigation ID",
+    )
+
+    persona: Optional[str] = Field(
+        default=None,
+        description="Filter by persona identifier",
+    )
+
+    confidence_level: Optional[str] = Field(
+        default=None,
+        description="Filter by minimum confidence level",
+    )
+
+    time_range_start: Optional[str] = Field(
+        default=None,
+        description="Filter by start time (ISO format timestamp)",
+    )
+
+    time_range_end: Optional[str] = Field(
+        default=None,
+        description="Filter by end time (ISO format timestamp)",
+    )
+
+    memory_type: Optional[MemoryType] = Field(
+        default=None,
+        description="Filter by memory entry type",
+    )
+
+    limit: int = Field(
+        default=100,
+        ge=1,
+        le=1000,
+        description="Maximum number of results to return",
+    )
+
+    offset: int = Field(
+        default=0,
+        ge=0,
+        description="Number of results to skip (for pagination)",
+    )
+
+    sort_by: str = Field(
+        default="timestamp",
+        description="Field to sort by (timestamp, confidence_after, etc.)",
+    )
+
+    sort_order: str = Field(
+        default="desc",
+        pattern="^(asc|desc)$",
+        description="Sort order: 'asc' (ascending) or 'desc' (descending)",
+    )
