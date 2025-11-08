@@ -6,8 +6,11 @@ including Researcher, Critic, and other specialized investigation personas.
 """
 
 from .researcher import ResearcherPersona, create_researcher
+from .critic import CriticPersona, create_critic
 
 __all__ = [
     "ResearcherPersona",
     "create_researcher",
+    "CriticPersona",
+    "create_critic",
 ]
