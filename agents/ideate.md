@@ -5,9 +5,7 @@ model: haiku
 required_information:
   creative_ideation:
     - prompt (string): The topic or problem to generate ideas for
-    - provider (optional: string): AI provider (claude, gemini, codex, cursor-agent; default: claude)
     - num_ideas (optional: integer): Number of ideas to generate (default: 5-6)
-    - temperature (optional: float): Creativity level (0.0-1.0; default: 0.7)
     - continue (optional: string): Session ID to continue ideation (format: ideate-thread-{uuid})
 ---
 
@@ -31,7 +29,6 @@ Use this agent when you need to:
 - Multiple model perspectives (use CONSENSUS)
 - Systematic investigation (use THINKDEEP)
 - Simple question or fact (use CHAT)
-- Research with citations (use RESEARCH)
 
 ## How This Agent Works
 
@@ -57,8 +54,6 @@ This agent is a thin wrapper that invokes `Skill(modelchorus:ideate)`.
 
 **Optional but recommended:**
 - [ ] `num_ideas` (how many ideas to generate; default: 5-6)
-- [ ] `temperature` (creativity level 0.0-1.0; default: 0.7)
-- [ ] `provider` (default: claude)
 - [ ] `continue` (session ID for iterative refinement)
 
 ### If Information Is Missing
@@ -73,9 +68,6 @@ Required:
 Optional:
 - num_ideas: Number of ideas to generate (default: 5-6)
   Ranges: 3-4 (quick), 5-7 (standard), 8-10 (comprehensive), 10+ (exhaustive)
-- temperature: Creativity level (default: 0.7)
-  Ranges: 0.4-0.6 (practical), 0.7-0.8 (balanced), 0.9-1.0 (bold/creative)
-- provider: AI provider to use (default: claude)
 - continue: Session ID to continue previous ideation
 
 Please provide the ideation topic to continue.
@@ -94,14 +86,6 @@ Please provide the ideation topic to continue.
 | 8-10 | Comprehensive | Important decisions, thorough exploration |
 | 10+ | Exhaustive | Maximum diversity, all possibilities |
 
-### temperature (Creativity Control)
-
-| Range | Type | Use When |
-|-------|------|----------|
-| 0.4-0.6 | Practical | Technical work, infrastructure, proven approaches |
-| 0.7-0.8 | Balanced | General ideation, feature planning (recommended) |
-| 0.9-1.0 | Bold/Creative | Marketing, innovation, disruptive thinking |
-
 ## What to Report
 
 After the skill completes, report:
@@ -109,7 +93,6 @@ After the skill completes, report:
 - Synthesis and top recommendations
 - **Session ID** for continuation (format: ideate-thread-{uuid})
 - Number of ideas generated
-- Creativity level used (temperature)
 
 ## Example Invocations
 
@@ -121,9 +104,7 @@ After the skill completes, report:
 ```
 Skill(modelchorus:ideate) with prompt:
 "New features for task management mobile app
---num-ideas 6
---temperature 0.7
---provider claude"
+--num-ideas 6"
 ```
 
 ### Example 2: Quick Practical Wins
@@ -134,8 +115,7 @@ Skill(modelchorus:ideate) with prompt:
 ```
 Skill(modelchorus:ideate) with prompt:
 "Performance optimizations for API
---num-ideas 4
---temperature 0.5"
+--num-ideas 4"
 ```
 
 ### Example 3: Creative Marketing Campaign
@@ -146,9 +126,7 @@ Skill(modelchorus:ideate) with prompt:
 ```
 Skill(modelchorus:ideate) with prompt:
 "Bold, unconventional marketing campaigns for product launch
---num-ideas 8
---temperature 0.95
---provider claude"
+--num-ideas 8"
 ```
 
 ### Example 4: Iterative Refinement with Threading
@@ -157,8 +135,7 @@ Skill(modelchorus:ideate) with prompt:
 ```
 Skill(modelchorus:ideate) with prompt:
 "Product differentiation strategies
---num-ideas 10
---temperature 0.85"
+--num-ideas 10"
 ```
 
 **Follow-up refinement (using session_id returned):**
@@ -166,8 +143,7 @@ Skill(modelchorus:ideate) with prompt:
 Skill(modelchorus:ideate) with prompt:
 "Expand on ideas #2, #5, and #9 with implementation details
 --continue ideate-thread-abc123
---num-ideas 3
---temperature 0.6"
+--num-ideas 3"
 ```
 
 ### Example 5: Constrained Ideation
@@ -179,20 +155,19 @@ Skill(modelchorus:ideate) with prompt:
 Skill(modelchorus:ideate) with prompt:
 "Creative solutions for: Reducing customer support tickets by 40%
 --num-ideas 7
---temperature 0.8
 --system 'Constraints: Budget $50k, 3-month timeline, no additional headcount. Must improve user experience.'"
 ```
 
 ## Strategic Parameter Combinations
 
-| Goal | Temperature | num_ideas | Example Use Case |
-|------|-------------|-----------|------------------|
-| Quick fixes | 0.4-0.5 | 3-4 | Database query optimizations |
-| Feature additions | 0.6-0.7 | 5-7 | New app features |
-| Innovation session | 0.8-0.9 | 8-10 | Innovative product concepts |
-| Marketing creativity | 0.9-1.0 | 6-10 | Bold marketing campaigns |
-| Strategic planning | 0.7-0.8 | 8-12 | 5-year product roadmap |
-| Process improvement | 0.5-0.6 | 5-6 | Team workflow enhancements |
+| Goal | num_ideas | Example Use Case |
+|------|-----------|------------------|
+| Quick fixes | 3-4 | Database query optimizations |
+| Feature additions | 5-7 | New app features |
+| Innovation session | 8-10 | Innovative product concepts |
+| Marketing creativity | 6-10 | Bold marketing campaigns |
+| Strategic planning | 8-12 | 5-year product roadmap |
+| Process improvement | 5-6 | Team workflow enhancements |
 
 ## Error Handling
 
@@ -201,9 +176,7 @@ If the skill encounters errors, report:
 - The error message from the skill
 - Suggested resolution:
   - Invalid num_ideas? Must be positive integer
-  - Invalid temperature? Must be 0.0-1.0
   - Invalid session_id? Verify ID or start new ideation
-  - Provider unavailable? Try different provider
 
 ---
 

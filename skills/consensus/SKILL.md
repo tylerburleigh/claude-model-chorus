@@ -43,7 +43,6 @@ Avoid the CONSENSUS workflow when:
 | You need deep investigation with hypothesis tracking | **THINKDEEP** - Systematic investigation with confidence progression |
 | You need structured debate analysis | **ARGUMENT** - Three-role dialectical creator/skeptic/moderator |
 | You need creative brainstorming | **IDEATE** - Structured idea generation |
-| You need systematic research with citations | **RESEARCH** - Comprehensive information gathering |
 
 ## Consensus Strategies
 
@@ -209,8 +208,6 @@ The command executes on default providers (Claude and Gemini) in parallel using 
 | `--strategy` | `-s` | `all_responses` | Consensus strategy (`all_responses`, `synthesize`, `majority`, `weighted`, `first_valid`) |
 | `--file` | `-f` | None | File paths for context (repeatable) |
 | `--system` | | None | Additional system prompt |
-| `--temperature` | `-t` | `0.7` | Creativity level (0.0-1.0) |
-| `--max-tokens` | | None | Maximum response length |
 | `--timeout` | | `120.0` | Timeout per provider in seconds |
 | `--output` | `-o` | None | Save result to JSON file |
 | `--verbose` | `-v` | False | Show detailed execution info |
@@ -229,8 +226,6 @@ The command executes on default providers (Claude and Gemini) in parallel using 
 - `--strategy, -s` (string): Consensus synthesis strategy - Valid values: `all_responses`, `synthesize`, `majority`, `weighted`, `first_valid` - Default: `all_responses`
 - `--file, -f` (string, repeatable): File paths to include as context for all models - Can be specified multiple times - Files must exist before execution
 - `--system` (string): Additional system prompt to customize model behavior across all providers
-- `--temperature, -t` (float): Response creativity level for all models - Range: 0.0-1.0 - Default: 0.7 - Lower values are more deterministic
-- `--max-tokens` (integer): Maximum response length in tokens per provider - Provider-specific limits apply
 - `--timeout` (float): Timeout per provider in seconds - Default: 120.0 - Prevents hanging on slow providers
 - `--output, -o` (string): Path to save JSON output file - Creates or overwrites file at specified path
 - `--verbose, -v` (boolean): Enable detailed execution information - Default: false - Shows per-provider timing and status
@@ -249,21 +244,14 @@ The CONSENSUS workflow returns a JSON object with the following structure:
     "providers_succeeded": ["claude", "gemini"],
     "providers_failed": [],
     "execution_time_seconds": 3.45,
-    "temperature": 0.7,
     "timestamp": "2025-11-07T10:30:00Z",
     "provider_details": {
       "claude": {
         "model": "claude-3-5-sonnet-20241022",
-        "prompt_tokens": 150,
-        "completion_tokens": 300,
-        "total_tokens": 450,
         "response_time_seconds": 2.1
       },
       "gemini": {
         "model": "gemini-2.5-pro-latest",
-        "prompt_tokens": 145,
-        "completion_tokens": 280,
-        "total_tokens": 425,
         "response_time_seconds": 3.2
       }
     }
@@ -282,14 +270,13 @@ The CONSENSUS workflow returns a JSON object with the following structure:
 | `metadata.providers_succeeded` | array[string] | List of providers that returned successful responses |
 | `metadata.providers_failed` | array[string] | List of providers that failed or timed out |
 | `metadata.execution_time_seconds` | float | Total time for parallel execution (not sum of individual times) |
-| `metadata.temperature` | float | Temperature setting used for all providers (0.0-1.0) |
 | `metadata.timestamp` | string | ISO 8601 timestamp of when the request was processed |
-| `metadata.provider_details` | object | Per-provider execution details including model, tokens, and timing |
+| `metadata.provider_details` | object | Per-provider execution details including model and timing |
 
 **Usage Notes:**
 - CONSENSUS executes all providers in parallel for fast results
 - `providers_failed` will list any providers that timed out or returned errors
-- Token counts and response times are tracked per provider for analysis
+- Response times are tracked per provider for analysis
 - The `result` format varies by strategy (see Consensus Strategies section)
 - CONSENSUS does not support conversation threading - each invocation is independent
 
@@ -375,20 +362,6 @@ modelchorus consensus "Fast check" --timeout 60
 - Successful providers' responses are still returned and used
 - Default timeout: 120 seconds (2 minutes)
 
-### Adjusting Creativity
-
-```bash
-# Lower temperature for factual consensus
-modelchorus consensus "What are the Python PEP 8 rules?" -t 0.3
-
-# Higher temperature for creative perspectives
-modelchorus consensus "Brainstorm app names" -t 0.9
-
-# Default balanced setting
-modelchorus consensus "Explain design patterns" -t 0.7
-```
-
-**Temperature applies to all providers uniformly.**
 
 ### Saving Results
 
@@ -402,7 +375,7 @@ modelchorus consensus "Evaluate this proposal" -s synthesize --output evaluation
 - All individual provider responses
 - Provider metadata and success/failure status
 - Strategy used
-- Execution timing and token usage
+- Execution timing
 
 ## Best Practices
 
@@ -437,10 +410,10 @@ modelchorus consensus "Should I use microservices or monolithic architecture for
 
 **Command:**
 ```bash
-modelchorus consensus "Is it true that Python's GIL prevents true multi-threading? Explain briefly." -s majority -t 0.4
+modelchorus consensus "Is it true that Python's GIL prevents true multi-threading? Explain briefly." -s majority
 ```
 
-**Expected Outcome:** The most common answer among the three models, with low temperature ensuring factual accuracy. If models agree, high confidence in the answer.
+**Expected Outcome:** The most common answer among the three models. If models agree, high confidence in the answer.
 
 ---
 
@@ -515,7 +488,6 @@ modelchorus consensus "Your prompt" -p claude -p codex
 
 **Solution:**
 - This is expected for factual queries (use `majority` to verify consensus)
-- For creative tasks, increase temperature: `--temperature 0.8`
 - For diverse perspectives, ensure you're asking for opinions, not facts
 - Consider using ARGUMENT workflow for dialectical analysis instead
 

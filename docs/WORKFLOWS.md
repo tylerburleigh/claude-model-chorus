@@ -11,6 +11,8 @@ Complete guide to choosing and using ModelChorus workflows for different use cas
 | **CONSENSUS** | Multi-model | 2-4 providers | Multiple perspectives, robust answers | ❌ No | ❌ Stateless |
 | **CHAT** | Single-model | 1 provider | Quick consultations, iterative refinement | ✅ Yes | ✅ Stateful |
 | **THINKDEEP** | Single-model + Expert | 1-2 providers | Complex investigation, hypothesis testing | ✅ Yes | ✅ Stateful |
+| **ARGUMENT** | Single-model | 1 provider | Structured debate, balanced critique | ✅ Yes | ✅ Stateful |
+| **IDEATE** | Multi-model | 1-4 providers | Creative brainstorming, idea generation | ✅ Yes | ✅ Stateful |
 
 ---
 

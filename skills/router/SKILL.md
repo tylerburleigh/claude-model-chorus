@@ -15,7 +15,6 @@ The ROUTER skill helps AI agents make intelligent decisions about which ModelCho
 - **THINKDEEP** - Extended reasoning with hypothesis tracking
 - **ARGUMENT** - Three-role dialectical reasoning (Creator/Skeptic/Moderator)
 - **IDEATE** - Creative brainstorming with quantity/creativity control
-- **RESEARCH** - Systematic research with citations and sources
 
 **When to Use This Skill:**
 
@@ -43,12 +42,11 @@ Before selecting a workflow, extract these signals from the user's request:
 
 | Goal Category | Keywords/Patterns | Maps To |
 |---------------|-------------------|---------|
-| **Answer/Opinion** | "what is", "explain", "how does", "why", "quick question" | CHAT, RESEARCH |
+| **Answer/Opinion** | "what is", "explain", "how does", "why", "quick question" | CHAT |
 | **Evaluation** | "evaluate", "critique", "review", "pros and cons", "pre-mortem", "assess" | ARGUMENT, CONSENSUS |
 | **Generation** | "brainstorm", "ideas for", "suggest ways", "creative solutions", "come up with" | IDEATE |
 | **Investigation** | "debug", "investigate", "root cause", "why is X happening", "analyze problem" | THINKDEEP, CHAT |
 | **Decision** | "choose between", "compare A vs B", "decide on", "select", "which should" | CONSENSUS, ARGUMENT |
-| **Information Gathering** | "research", "gather information on", "best practices for", "comprehensive overview" | RESEARCH |
 
 ### 2. Complexity & Scope Indicators
 
@@ -62,7 +60,7 @@ Before selecting a workflow, extract these signals from the user's request:
 
 | Requirement | Signals | Workflow |
 |-------------|---------|----------|
-| **Single perspective sufficient** | No explicit need for validation | CHAT, THINKDEEP, ARGUMENT, IDEATE, RESEARCH |
+| **Single perspective sufficient** | No explicit need for validation | CHAT, THINKDEEP, ARGUMENT, IDEATE |
 | **Multiple perspectives needed** | "validate", "cross-check", "multiple viewpoints", "blind spots", "consensus", "compare approaches" | CONSENSUS |
 
 ### 4. Decision Impact & Risk
@@ -77,7 +75,6 @@ Before selecting a workflow, extract these signals from the user's request:
 
 | Requirement | Signals | Workflow |
 |-------------|---------|----------|
-| **Citations needed** | "with sources", "citations", "evidence", "references", "documented" | RESEARCH |
 | **Multiple options** | "different ways", "explore possibilities", "alternatives", "various approaches" | IDEATE, CONSENSUS |
 | **Structured debate** | "pro and con", "strengths and weaknesses", "balanced view", "critique" | ARGUMENT |
 | **Systematic analysis** | "step by step", "methodical", "build evidence", "track progress" | THINKDEEP |
@@ -88,14 +85,14 @@ Before selecting a workflow, extract these signals from the user's request:
 |-----------------|---------|--------|
 | **Time limited** | "quick", "fast", "urgent", "in a hurry", "ASAP" | Favor CHAT, IDEATE, ARGUMENT; avoid THINKDEEP, CONSENSUS |
 | **Budget limited** | "cheap", "low-cost", "economical", "minimal expense" | Favor CHAT, IDEATE; avoid CONSENSUS |
-| **Quality priority** | "thorough", "comprehensive", "validated", "high quality", "certain" | Favor CONSENSUS, THINKDEEP, RESEARCH |
+| **Quality priority** | "thorough", "comprehensive", "validated", "high quality", "certain" | Favor CONSENSUS, THINKDEEP |
 
 ### 7. Interaction Style
 
 | Style | Signals | Workflow |
 |-------|---------|----------|
 | **Conversational/iterative** | "let's explore", "I'll have follow-ups", "iterative", ongoing discussion | CHAT (supports threading) |
-| **One-shot synthesis** | "give me a complete analysis", "comprehensive answer" | CONSENSUS, RESEARCH, ARGUMENT |
+| **One-shot synthesis** | "give me a complete analysis", "comprehensive answer" | CONSENSUS, ARGUMENT |
 | **Multi-step investigation** | "investigate step by step", "build confidence", "test hypotheses" | THINKDEEP (supports state persistence) |
 
 ### 8. Artifact to Analyze
@@ -139,22 +136,19 @@ Follow this 6-step procedure to select the optimal workflow:
 
 Apply these rules in order. First match wins unless overridden by constraints in Step 3:
 
-1. **Citations/comprehensive information explicitly required** → **RESEARCH**
-   - Reference: Lines 271-277 ("Need comprehensive information... Citations are important")
-
-2. **Specific proposal/decision to evaluate** (artifact provided) → **ARGUMENT**
+1. **Specific proposal/decision to evaluate** (artifact provided) → **ARGUMENT**
    - Reference: Lines 193-199 ("Evaluating a specific proposal")
 
-3. **Creative options/brainstorming needed** → **IDEATE**
+2. **Creative options/brainstorming needed** → **IDEATE**
    - Reference: Lines 232-238 ("Need creative options")
 
-4. **High-impact decision needing multiple perspectives** → **CONSENSUS**
+3. **High-impact decision needing multiple perspectives** → **CONSENSUS**
    - Reference: Lines 113-119 ("Decision has significant impact... Multiple perspectives")
 
-5. **Complex/ambiguous investigation** (multi-step reasoning) → **THINKDEEP**
+4. **Complex/ambiguous investigation** (multi-step reasoning) → **THINKDEEP**
    - Reference: Lines 153-159 ("Problem is complex... Multi-step analysis beneficial")
 
-6. **Otherwise** (default) → **CHAT**
+5. **Otherwise** (default) → **CHAT**
    - Reference: Lines 74-80 ("Quick answer... One model's perspective")
 
 ###Step 3: Apply Constraint-Based Overrides
@@ -165,7 +159,7 @@ Apply these rules in order. First match wins unless overridden by constraints in
 - Reference: Lines 445-459 ("When budget/time is limited")
 
 **If quality is priority:**
-- Promote CONSENSUS, THINKDEEP, RESEARCH
+- Promote CONSENSUS, THINKDEEP
 - Reference: Lines 461-468 ("When quality is priority")
 
 ### Step 4: Conversation-Mode Routing
@@ -184,9 +178,6 @@ Apply these rules in order. First match wins unless overridden by constraints in
 **If multiple intents detected or staged work identified:**
 
 Use recommended patterns from WORKFLOW_SELECTION_GUIDE.md lines 475-505:
-
-- **Research → Decision Pattern**: RESEARCH → CONSENSUS → ARGUMENT
-  - Use for: Major technology decisions, architecture choices
 
 - **Generate → Evaluate Pattern**: IDEATE → ARGUMENT → CONSENSUS
   - Use for: Feature planning, solution design
@@ -232,12 +223,6 @@ Use recommended patterns from WORKFLOW_SELECTION_GUIDE.md lines 475-505:
 - **Use instead**: ARGUMENT or CONSENSUS
 - **Reference**: Lines 521-525
 
-### ❌ RESEARCH for Creative Ideas
-- **Bad**: "Come up with a creative feature idea" → RESEARCH
-- **Why wrong**: RESEARCH gathers existing info, doesn't ideate
-- **Use instead**: IDEATE
-- **Reference**: Lines 526-529
-
 ### ❌ THINKDEEP for Quick Facts
 - **Bad**: "What HTTP status code means unauthorized?" → THINKDEEP
 - **Why wrong**: Overly complex for simple lookup
@@ -251,7 +236,6 @@ Use recommended patterns from WORKFLOW_SELECTION_GUIDE.md lines 475-505:
 When you select a workflow, suggest appropriate parameters based on the user request:
 
 ### CHAT Parameters
-- `temperature`: 0.3 (factual), 0.7 (balanced), 0.9 (creative)
 - `continue`: thread ID if user is in ongoing conversation
 - `provider`: claude (default), gemini, codex, cursor-agent
 
@@ -270,18 +254,11 @@ When you select a workflow, suggest appropriate parameters based on the user req
 - Reference: Lines 340-341
 
 ### ARGUMENT Parameters
-- `temperature`: 0.5-0.6 (technical), 0.7 (balanced), 0.8-0.9 (creative proposals)
 - No specific parameters beyond the prompt
 
 ### IDEATE Parameters
 - `num_ideas`: 3-4 (quick), 5-7 (standard), 8-10 (comprehensive), 10+ (exhaustive)
-- `temperature`: 0.4-0.6 (practical), 0.7-0.8 (balanced), 0.9-1.0 (bold/creative)
 - Reference: Line 412
-
-### RESEARCH Parameters
-- `depth`: "shallow" (2-3 findings), "moderate" (4-6), "thorough" (7-9), "comprehensive" (10+)
-- `citation_style`: "informal" (default), "academic" (APA), "technical" (numbered)
-- Reference: Lines 348, 388
 
 ---
 
@@ -331,7 +308,7 @@ Return a JSON-structured decision object:
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `workflow` | string | Yes | One of: CHAT, CONSENSUS, THINKDEEP, ARGUMENT, IDEATE, RESEARCH |
+| `workflow` | string | Yes | One of: CHAT, CONSENSUS, THINKDEEP, ARGUMENT, IDEATE |
 | `confidence` | string | Yes | One of: "high", "medium", "low" |
 | `rationale` | string | Yes | 1-2 sentences explaining why this workflow was selected |
 | `parameters` | object | No | Workflow-specific parameters extracted from request |
@@ -354,9 +331,7 @@ Return a JSON-structured decision object:
   "workflow": "CHAT",
   "confidence": "high",
   "rationale": "Simple factual question requiring quick explanation. Single perspective sufficient.",
-  "parameters": {
-    "temperature": 0.5
-  },
+  "parameters": {},
   "used_signals": ["what is", "simple question", "factual"]
 }
 ```
@@ -375,26 +350,14 @@ Return a JSON-structured decision object:
     "strategy": "synthesize",
     "provider": ["claude", "gemini", "codex"]
   },
-  "alternatives": [
-    {
-      "workflow": "RESEARCH",
-      "when_to_use": "If you want comprehensive background first",
-      "reason": "Gather detailed comparison before decision"
-    }
-  ],
   "sequence": [
     {
       "step": 1,
-      "workflow": "RESEARCH",
-      "trigger": "Optional: Gather comprehensive comparison data"
-    },
-    {
-      "step": 2,
       "workflow": "CONSENSUS",
       "trigger": "Make final decision with synthesis"
     },
     {
-      "step": 3,
+      "step": 2,
       "workflow": "ARGUMENT",
       "trigger": "Critique the selected choice"
     }
@@ -459,9 +422,7 @@ Return a JSON-structured decision object:
   "workflow": "ARGUMENT",
   "confidence": "high",
   "rationale": "Specific proposal provided for evaluation. Structured dialectical critique (Creator/Skeptic/Moderator) provides balanced analysis.",
-  "parameters": {
-    "temperature": 0.6
-  },
+  "parameters": {},
   "alternatives": [
     {
       "workflow": "CONSENSUS",
@@ -489,8 +450,7 @@ Return a JSON-structured decision object:
   "confidence": "high",
   "rationale": "Creative idea generation needed. IDEATE provides structured brainstorming with configurable quantity.",
   "parameters": {
-    "num_ideas": 6,
-    "temperature": 0.8
+    "num_ideas": 6
   },
   "sequence": [
     {
@@ -513,30 +473,7 @@ Return a JSON-structured decision object:
 }
 ```
 
-### Example 6: Research with Citations → RESEARCH
-
-**User Request**: "Research GraphQL federation patterns with sources and citations"
-
-**Decision**:
-```json
-{
-  "workflow": "RESEARCH",
-  "confidence": "high",
-  "rationale": "Explicit requirement for citations and comprehensive information. RESEARCH provides structured dossier with source tracking.",
-  "parameters": {
-    "depth": "moderate",
-    "citation_style": "technical"
-  },
-  "used_signals": [
-    "research",
-    "citations required",
-    "sources needed",
-    "comprehensive information"
-  ]
-}
-```
-
-### Example 7: Ambiguous Request (Low Confidence) → Clarifying Question
+### Example 6: Ambiguous Request (Low Confidence) → Clarifying Question
 
 **User Request**: "Help with my project"
 
@@ -546,7 +483,7 @@ Return a JSON-structured decision object:
   "workflow": "CHAT",
   "confidence": "low",
   "rationale": "Request is too vague to determine optimal workflow. Defaulting to CHAT as safe fallback but requesting clarification.",
-  "clarifying_question": "What kind of help do you need? Are you trying to:\n- Generate creative ideas (brainstorming)\n- Debug or investigate a problem\n- Evaluate or critique a proposal\n- Research a topic with citations\n- Get a quick answer or opinion",
+  "clarifying_question": "What kind of help do you need? Are you trying to:\n- Generate creative ideas (brainstorming)\n- Debug or investigate a problem\n- Evaluate or critique a proposal\n- Get a quick answer or opinion",
   "used_signals": [
     "ambiguous intent",
     "no clear goal",
@@ -555,7 +492,7 @@ Return a JSON-structured decision object:
 }
 ```
 
-### Example 8: Multiple Valid Workflows → Alternatives Provided
+### Example 7: Multiple Valid Workflows → Alternatives Provided
 
 **User Request**: "Review this database schema design"
 
@@ -565,9 +502,7 @@ Return a JSON-structured decision object:
   "workflow": "ARGUMENT",
   "confidence": "medium",
   "rationale": "Evaluation of specific design. ARGUMENT provides structured critique (Creator/Skeptic/Moderator) at moderate cost.",
-  "parameters": {
-    "temperature": 0.6
-  },
+  "parameters": {},
   "alternatives": [
     {
       "workflow": "CONSENSUS",
@@ -589,7 +524,7 @@ Return a JSON-structured decision object:
 }
 ```
 
-### Example 9: Time Constraint Override → CHAT
+### Example 8: Time Constraint Override → CHAT
 
 **User Request**: "Quick: Should we use microservices or monolith for our 5-person team?"
 
@@ -599,9 +534,7 @@ Return a JSON-structured decision object:
   "workflow": "CHAT",
   "confidence": "medium",
   "rationale": "Time constraint ('quick') overrides typical CONSENSUS recommendation for architecture decisions. CHAT provides fast guidance with note about more thorough options.",
-  "parameters": {
-    "temperature": 0.6
-  },
+  "parameters": {},
   "alternatives": [
     {
       "workflow": "CONSENSUS",
@@ -617,45 +550,40 @@ Return a JSON-structured decision object:
 }
 ```
 
-### Example 10: Sequence Suggestion → Multi-Step Plan
+### Example 9: Sequence Suggestion → Multi-Step Plan
 
 **User Request**: "We need to add a new payment provider. Help us choose and implement."
 
 **Decision**:
 ```json
 {
-  "workflow": "RESEARCH",
+  "workflow": "CONSENSUS",
   "confidence": "high",
-  "rationale": "Multi-step task detected: research options → evaluate → implement. Starting with RESEARCH to gather comprehensive information.",
+  "rationale": "Multi-step task detected: evaluate options → critique → implement. Starting with CONSENSUS to gather multiple perspectives on payment providers.",
   "parameters": {
-    "depth": "moderate",
-    "citation_style": "technical"
+    "strategy": "synthesize",
+    "provider": ["claude", "gemini", "codex"]
   },
   "sequence": [
     {
       "step": 1,
-      "workflow": "RESEARCH",
-      "trigger": "Gather information on payment providers"
+      "workflow": "CONSENSUS",
+      "trigger": "Evaluate top 2-3 payment provider options with multiple perspectives"
     },
     {
       "step": 2,
-      "workflow": "CONSENSUS",
-      "trigger": "Evaluate top 2-3 options with multiple perspectives"
-    },
-    {
-      "step": 3,
       "workflow": "ARGUMENT",
       "trigger": "Critique selected provider before implementation"
     },
     {
-      "step": 4,
+      "step": 3,
       "workflow": "CHAT",
       "trigger": "Implementation guidance and iterative support"
     }
   ],
   "used_signals": [
     "multi-step task",
-    "research + decision + implementation",
+    "decision + implementation",
     "payment provider selection"
   ]
 }
@@ -708,11 +636,6 @@ Use these templates when confidence is low:
 
 ### Complexity Unclear
 **Template**: "How deep should I go? Do you need:\n- Quick guidance (fast, single perspective)\n- Thorough analysis (systematic investigation)\n- Validated decision (multiple perspectives)"
-
-### Citations Unclear
-**Template**: "Do you need citations and sources for this information?"
-- If yes → RESEARCH
-- If no → CHAT or other workflow
 
 ### Multiple Options Unclear
 **Template**: "Should I:\n- Explore multiple options/ideas\n- Evaluate a specific proposal\n- Give you one recommendation"

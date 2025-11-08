@@ -44,7 +44,6 @@ Avoid the THINKDEEP workflow when:
 | Need multiple model perspectives | **CONSENSUS** - Parallel multi-model consultation |
 | Need structured debate | **ARGUMENT** - Dialectical analysis with creator/skeptic/moderator |
 | Creative brainstorming | **IDEATE** - Structured idea generation |
-| Comprehensive research with citations | **RESEARCH** - Systematic information gathering |
 
 ## Detailed Use Cases
 
@@ -406,7 +405,6 @@ modelchorus thinkdeep --step "Investigate why API latency increased from 100ms t
 - `--hypothesis`: Current working theory
 - `--confidence`: Confidence level (exploring, low, medium, high, very_high, almost_certain, certain)
 - `--files-checked`: List of files examined
-- `--temperature`: Creativity level (0.0-1.0, default: 0.7)
 - `--thinking-mode`: Reasoning depth (minimal, low, medium, high, max)
 
 ## Technical Contract
@@ -429,7 +427,6 @@ modelchorus thinkdeep --step "Investigate why API latency increased from 100ms t
 - `--relevant-files` (string): Comma-separated list of files relevant to findings - Files identified as related to the problem - Format: `src/auth.py,tests/test_auth.py`
 - `--relevant-context` (string): Comma-separated list of methods/functions involved - Specific code locations identified - Format: `authenticate,validate_token,check_permissions`
 - `--issues-found` (string): JSON array of issues with severity levels - Format: `[{"severity":"high","description":"..."},...]`
-- `--temperature` (float): Creativity level for investigation reasoning - Range: 0.0-1.0 - Default: 0.7 - Lower values for more focused analysis
 - `--thinking-mode` (string): Reasoning depth for investigation - Valid values: `minimal`, `low`, `medium`, `high`, `max` - Default: `medium` - Higher modes for complex problems
 - `--output` (string): Path to save JSON output file - Creates or overwrites file at specified path
 - `--verbose` (boolean): Enable detailed execution information - Default: false - Shows provider details and timing
@@ -460,10 +457,6 @@ The THINKDEEP workflow returns a JSON object with the following structure:
         "description": "N+1 query pattern in user listing endpoint"
       }
     ],
-    "prompt_tokens": 850,
-    "completion_tokens": 450,
-    "total_tokens": 1300,
-    "temperature": 0.7,
     "thinking_mode": "high",
     "timestamp": "2025-11-07T10:30:00Z"
   }
@@ -488,10 +481,6 @@ The THINKDEEP workflow returns a JSON object with the following structure:
 | `metadata.relevant_files` | array[string] | Files identified as relevant to the problem |
 | `metadata.relevant_context` | array[string] | Methods/functions identified as involved in the issue |
 | `metadata.issues_found` | array[object] | Issues discovered with severity levels and descriptions |
-| `metadata.prompt_tokens` | integer | Number of tokens in the input (includes investigation history) |
-| `metadata.completion_tokens` | integer | Number of tokens in the model's response |
-| `metadata.total_tokens` | integer | Total tokens consumed (prompt_tokens + completion_tokens) |
-| `metadata.temperature` | float | Temperature setting used for this investigation step (0.0-1.0) |
 | `metadata.thinking_mode` | string | Reasoning depth used (`minimal`, `low`, `medium`, `high`, `max`) |
 | `metadata.timestamp` | string | ISO 8601 timestamp of when this step was processed |
 
@@ -739,12 +728,9 @@ Starting thinkdeep workflow...
 
 **For structured debate:** Use **ARGUMENT** - When pros/cons analysis more appropriate than hypothesis testing.
 
-**For research:** Use **RESEARCH** - When gathering information is primary goal rather than solving specific problem.
-
 **For brainstorming:** Use **IDEATE** - When generating ideas rather than investigating existing problem.
 
 **Combining workflows:**
 - Start with **THINKDEEP** to identify root cause
 - Then use **CONSENSUS** to decide on solution approach
 - Then use **CHAT** for implementation questions
-- Use **RESEARCH** to gather context before investigation

@@ -7,7 +7,7 @@ Multi-model AI consensus building. Orchestrate responses from multiple AI provid
 ModelChorus is both a **Python package** for multi-model AI orchestration and a **Claude Code plugin** for seamless consensus building within your development workflow.
 
 **Key Features:**
-- **Six Powerful Workflows** - CHAT, CONSENSUS, THINKDEEP, ARGUMENT, IDEATE, and RESEARCH for different use cases
+- **Five Powerful Workflows** - CHAT, CONSENSUS, THINKDEEP, ARGUMENT, and IDEATE for different use cases
 - **Multi-Provider Support** - Coordinate Claude, Gemini, OpenAI Codex, and Cursor Agent
 - **Provider Fallback & Resilience** - Automatic fallback to alternative providers when primary fails
 - **Conversation Continuity** - Multi-turn conversations with state persistence
@@ -20,7 +20,7 @@ ModelChorus is both a **Python package** for multi-model AI orchestration and a 
 
 ## Core Workflows
 
-ModelChorus provides six powerful workflows for different scenarios:
+ModelChorus provides five powerful workflows for different scenarios:
 
 ### CHAT - Simple Conversation
 
@@ -238,45 +238,9 @@ result = await workflow.run("Ways to improve user onboarding")
 
 ---
 
-### RESEARCH - Knowledge Synthesis
-
-**Multi-source research with citation and clustering**
-
-Research synthesis, topic exploration, and comprehensive analysis.
-
-**CLI Example:**
-```bash
-# Research a topic across multiple models
-modelchorus research "Quantum computing applications" \
-  -p claude -p gemini -p codex
-```
-
-**Python Example:**
-```python
-from modelchorus.workflows import ResearchWorkflow
-from modelchorus.providers import ClaudeProvider, GeminiProvider, CodexProvider
-
-providers = [ClaudeProvider(), GeminiProvider(), CodexProvider()]
-workflow = ResearchWorkflow(providers=providers)
-
-# Research with automatic citation and clustering
-result = await workflow.run("Quantum computing applications")
-```
-
-**Key Features:**
-- Automatic citation tracking
-- Semantic clustering of related ideas
-- Multi-model knowledge synthesis
-- Handles overlapping and contradictory information
-
-**When to use:** Topic research, literature review, comprehensive analysis, knowledge exploration
-
----
-
 **See [docs/workflows/](docs/workflows/) for detailed workflow guides:**
 - [ARGUMENT.md](docs/workflows/ARGUMENT.md) - Dialectical reasoning
 - [IDEATE.md](docs/workflows/IDEATE.md) - Collaborative brainstorming
-- [RESEARCH.md](docs/workflows/RESEARCH.md) - Knowledge synthesis
 
 ## Installation
 
@@ -349,12 +313,6 @@ modelchorus argument "Universal healthcare should be implemented" -p claude
 **IDEATE - Collaborative brainstorming:**
 ```bash
 modelchorus ideate "Ways to improve user onboarding" -p claude -p gemini
-```
-
-**RESEARCH - Knowledge synthesis:**
-```bash
-modelchorus research "Quantum computing applications" \
-  -p claude -p gemini -p codex
 ```
 
 ### Via Python API
@@ -433,17 +391,6 @@ workflow = IdeateWorkflow(providers=providers)
 result = await workflow.run("Ways to improve user onboarding")
 ```
 
-**RESEARCH workflow:**
-```python
-from modelchorus.workflows import ResearchWorkflow
-from modelchorus.providers import ClaudeProvider, GeminiProvider, CodexProvider
-
-providers = [ClaudeProvider(), GeminiProvider(), CodexProvider()]
-workflow = ResearchWorkflow(providers=providers)
-
-result = await workflow.run("Quantum computing applications")
-```
-
 ### Via Claude Code Skill
 
 ```bash
@@ -461,9 +408,6 @@ modelchorus argument "Universal healthcare should be implemented" -p claude
 
 # IDEATE workflow
 modelchorus ideate "Ways to improve user onboarding" -p claude -p gemini
-
-# RESEARCH workflow
-modelchorus research "Quantum computing applications" -p claude -p gemini -p codex
 ```
 
 ## Consensus Strategies
@@ -524,7 +468,7 @@ ModelChorus workflows automatically fallback to alternative providers if the pri
 ```yaml
 # .modelchorusrc configuration
 workflows:
-  research:
+  chat:
     provider: claude
     fallback_providers:  # Tries in order if primary fails
       - gemini
@@ -535,14 +479,14 @@ workflows:
 **Example**: If Claude is unavailable, the workflow automatically uses Gemini:
 
 ```bash
-$ modelchorus research "quantum computing" --verbose
+$ modelchorus chat "quantum computing" --verbose
 
 ⚠ Some providers unavailable:
   ✗ claude: CLI command 'claude' not found in PATH
 
 ✓ Will use available providers: gemini
 
-[Research completes successfully using gemini]
+[Chat completes successfully using gemini]
 ```
 
 **Check Provider Availability**:
@@ -565,7 +509,7 @@ modelchorus list-providers --check
 **Skip Provider Check** (faster startup):
 ```bash
 # Skip availability check for time-critical operations
-modelchorus research "topic" --skip-provider-check
+modelchorus chat "topic" --skip-provider-check
 ```
 
 ## CLI Commands
@@ -587,9 +531,6 @@ modelchorus argument "prompt" [options]
 # IDEATE workflow
 modelchorus ideate "prompt" [options]
 
-# RESEARCH workflow
-modelchorus research "prompt" [options]
-
 # List available providers and models
 modelchorus list-providers
 
@@ -603,7 +544,6 @@ modelchorus thinkdeep --help
 modelchorus consensus --help
 modelchorus argument --help
 modelchorus ideate --help
-modelchorus research --help
 ```
 
 ## CLI Options
@@ -698,24 +638,6 @@ modelchorus ideate [PROMPT]
 
 Arguments:
   PROMPT                    Topic or problem for brainstorming [required]
-
-Options:
-  -p, --provider TEXT       Provider to use (repeatable) [default: claude, gemini]
-  -f, --files TEXT         Files to include (repeatable)
-  --system TEXT            System prompt for context
-  -t, --temperature FLOAT   Temperature (0.0-1.0) [default: 0.7]
-  --max-tokens INTEGER      Maximum tokens to generate
-  --timeout FLOAT          Timeout per provider (seconds) [default: 120.0]
-  -o, --output PATH        Save results to JSON file
-  -v, --verbose            Show detailed execution info
-```
-
-### RESEARCH Command
-```
-modelchorus research [PROMPT]
-
-Arguments:
-  PROMPT                    Topic to research [required]
 
 Options:
   -p, --provider TEXT       Provider to use (repeatable) [default: claude, gemini]

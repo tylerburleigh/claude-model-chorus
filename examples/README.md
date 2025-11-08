@@ -13,7 +13,6 @@ Run a specific example:
 ```bash
 python examples/workflow_examples.py argument_basic
 python examples/workflow_examples.py ideate_creative
-python examples/workflow_examples.py research_sources
 ```
 
 ## Available Examples
@@ -39,17 +38,6 @@ python examples/workflow_examples.py research_sources
 | `ideate_refine` | Drilling down into specific ideas via continuation |
 
 **Use cases**: Product features, marketing campaigns, problem-solving
-
-### RESEARCH Workflow (Systematic Investigation)
-
-| Example | Description |
-|---------|-------------|
-| `research_basic` | Basic research with moderate depth |
-| `research_sources` | Research with source files and citations |
-| `research_depths` | Comparison of shallow/moderate/thorough depths |
-| `research_citations` | Different citation styles (informal/academic/technical) |
-
-**Use cases**: Literature review, competitive analysis, fact-checking
 
 ### Cross-Workflow Patterns
 
@@ -119,12 +107,6 @@ No workflow-specific parameters. Uses standard parameters above.
 - `num_ideas`: Number of ideas to generate (default: 5)
 - Higher `temperature` (0.9-1.0) recommended for creativity
 
-### RESEARCH Workflow
-
-- `citation_style`: "informal", "academic", or "technical" (default: "informal")
-- `research_depth`: "shallow", "moderate", "thorough", or "comprehensive" (default: "thorough")
-- Lower `temperature` (0.4-0.6) recommended for factual accuracy
-
 ## Tips for Effective Use
 
 ### ARGUMENT Workflow
@@ -141,13 +123,6 @@ No workflow-specific parameters. Uses standard parameters above.
 - High temperature (0.9-1.0) for unconventional ideas
 - Request more ideas (10-15) for diverse options
 
-### RESEARCH Workflow
-
-- Ingest source files for citation-based research
-- Match depth to complexity (shallow for overviews, comprehensive for deep dives)
-- Use academic citations for formal research
-- Lower temperature (0.4-0.6) for accuracy
-
 ## Troubleshooting
 
 ### "Provider not found" error
@@ -159,9 +134,8 @@ No workflow-specific parameters. Uses standard parameters above.
 - Check Python path if running from different directory
 
 ### Slow execution
-- Research workflow with `comprehensive` depth can be slow
-- Use `shallow` or `moderate` depth for faster results
 - Consider caching results for repeated queries
+- Use appropriate workflow for your needs
 
 ## Next Steps
 

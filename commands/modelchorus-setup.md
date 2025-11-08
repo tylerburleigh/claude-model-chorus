@@ -283,7 +283,7 @@ If user chose "Standard", ask Quick question PLUS these 2 additional questions (
 
 **Question 2:**
 - **Header**: "Multi-Model"
-- **Question**: "Which providers should be used for multi-model workflows (consensus, research)?"
+- **Question**: "Which providers should be used for multi-model workflows (consensus, ideate)?"
 - **multiSelect**: true
 - **Options**: ONLY include providers that are available from Step 3
   - If "claude" is available: Claude (Anthropic) - Best for reasoning and analysis
@@ -299,8 +299,7 @@ If user chose "Standard", ask Quick question PLUS these 2 additional questions (
   2. Synthesize - Combine responses into one unified answer
   3. Vote - Use majority opinion for binary questions
 
-**Note**: Research and ThinkDeep workflows will be configured with balanced defaults:
-- Research: informal citations, thorough depth
+**Note**: ThinkDeep workflow will be configured with balanced defaults:
 - ThinkDeep: medium reasoning mode
 
 Then create config:
@@ -322,23 +321,12 @@ If user chose "Advanced", ask Standard questions PLUS these 2 additional questio
 **Questions 1-4:** Same as Standard mode (Provider, Timeout, Multi-Model providers, Consensus strategy)
 
 **Question 5:**
-- **Header**: "Research"
-- **Question**: "Configure research workflow settings"
-- **Options**: Combine citation style and depth:
-  1. Quick + Informal - Fast overview with simple mentions
-  2. Thorough + Academic - Balanced depth with formal citations (recommended)
-  3. Comprehensive + APA - Deep dive with APA citations
-  4. Comprehensive + MLA - Deep dive with MLA citations
-
-**Question 6:**
 - **Header**: "ThinkDeep"
 - **Question**: "What reasoning depth should thinkdeep workflow use?"
 - **Options**:
   1. Low - Basic reasoning with fewer steps
   2. Medium - Balanced reasoning (recommended)
   3. High - Deep reasoning with extensive analysis
-
-**Note**: Ideate workflow will use the same providers as consensus.
 
 Then create config:
 ```bash
@@ -348,8 +336,6 @@ python -m modelchorus.cli.setup create-tiered-config --project . \
   --timeout <chosen_timeout> \
   --consensus-providers <space_separated_providers> \
   --consensus-strategy <chosen_strategy> \
-  --research-citation <chosen_citation> \
-  --research-depth <chosen_depth> \
   --thinkdeep-mode <chosen_mode>
 ```
 
@@ -374,12 +360,6 @@ Use these mappings when constructing the CLI command:
 - Show all responses → all_responses
 - Synthesize → synthesize
 - Vote → vote
-
-**Research citation mapping (Advanced mode):**
-- Quick + Informal → citation=informal, depth=quick
-- Thorough + Academic → citation=academic, depth=thorough
-- Comprehensive + APA → citation=apa, depth=comprehensive
-- Comprehensive + MLA → citation=mla, depth=comprehensive
 
 **ThinkDeep mode mapping:**
 - Low → low
@@ -645,6 +625,5 @@ After running this setup:
 - Use `modelchorus thinkdeep` for deep reasoning
 - Use `modelchorus argument` for dialectical analysis
 - Use `modelchorus ideate` for creative brainstorming
-- Use `modelchorus research` for systematic research
 
 See the README for detailed workflow documentation.

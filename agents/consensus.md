@@ -5,7 +5,6 @@ model: haiku
 required_information:
   consensus_query:
     - prompt (string): The question or statement to send to all selected AI models
-    - provider (optional: list of strings): AI providers to query (default: ["claude", "gemini"])
     - strategy (optional: string): Synthesis strategy (all_responses, synthesize, majority, weighted, first_valid; default: all_responses)
 ---
 
@@ -29,7 +28,6 @@ Use this agent when you need to:
 - Deep investigation with hypothesis tracking (use THINKDEEP)
 - Structured debate analysis (use ARGUMENT)
 - Creative brainstorming (use IDEATE)
-- Systematic research with citations (use RESEARCH)
 
 ## How This Agent Works
 
@@ -54,7 +52,6 @@ This agent is a thin wrapper that invokes `Skill(modelchorus:consensus)`.
 - [ ] `prompt` is provided (the question or statement for all models)
 
 **Optional but recommended:**
-- [ ] `provider` list (defaults to ["claude", "gemini"])
 - [ ] `strategy` (defaults to all_responses)
 
 ### If Information Is Missing
@@ -67,7 +64,6 @@ Required:
   Example: "Should I use microservices or monolithic architecture for a mid-size SaaS product?"
 
 Optional:
-- provider: List of AI providers to query (default: ["claude", "gemini"])
   Options: claude, gemini, codex, cursor-agent
   Example: ["claude", "gemini", "codex"]
 - strategy: Consensus synthesis strategy (default: all_responses)
@@ -111,9 +107,6 @@ After the skill completes, report:
 ```
 Skill(modelchorus:consensus) with prompt:
 "Should I use microservices or monolithic architecture for a mid-size SaaS product with 5 developers?
---provider claude
---provider gemini
---provider codex
 --strategy synthesize"
 ```
 
@@ -125,11 +118,7 @@ Skill(modelchorus:consensus) with prompt:
 ```
 Skill(modelchorus:consensus) with prompt:
 "Is it true that Python's GIL prevents true multi-threading? Explain briefly.
---provider claude
---provider gemini
---provider codex
---strategy majority
---temperature 0.4"
+--strategy majority"
 ```
 
 ### Example 3: Code Review with All Perspectives
@@ -140,9 +129,6 @@ Skill(modelchorus:consensus) with prompt:
 ```
 Skill(modelchorus:consensus) with prompt:
 "Review this code for bugs, performance issues, and best practices
---provider claude
---provider gemini
---provider codex
 --file src/auth.py
 --strategy all_responses"
 ```
@@ -155,8 +141,6 @@ Skill(modelchorus:consensus) with prompt:
 ```
 Skill(modelchorus:consensus) with prompt:
 "What does the Python 'yield' keyword do?
---provider claude
---provider gemini
 --strategy first_valid
 --timeout 30"
 ```

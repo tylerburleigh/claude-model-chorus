@@ -17,7 +17,7 @@ This glossary defines standardized terminology used across all ModelChorus workf
 - Format: `session-abc-123-def-456` (hyphen-separated alphanumeric)
 - Used with `--continue` flag to resume previous conversations
 - **State Preserved:**
-  - **CHAT, ARGUMENT, IDEATE, RESEARCH:** Conversation history only
+  - **CHAT, ARGUMENT, IDEATE:** Conversation history only
   - **THINKDEEP:** Full investigation context (hypothesis, findings, confidence, files_checked)
   - **CONSENSUS:** Not supported (single-turn workflow)
 
@@ -86,11 +86,6 @@ This glossary defines standardized terminology used across all ModelChorus workf
 - **Not recommended** for ModelChorus workflows (use absolute paths)
 - Can cause errors if working directory changes
 
-**source_file** (RESEARCH only)
-- File treated as authoritative source during research
-- Distinguished from general context files
-- Used for evidence extraction and citation
-
 ---
 
 ### Workflow Execution
@@ -117,7 +112,6 @@ This glossary defines standardized terminology used across all ModelChorus workf
 - Evidence, insights, or discoveries made during analysis
 - **Context-dependent meaning:**
   - **THINKDEEP:** Evidence accumulated during investigation
-  - **RESEARCH:** Research discoveries and extracted information
 - Cumulative: New findings build on previous ones
 - Structured: Organized by relevance and importance
 
@@ -141,7 +135,6 @@ This glossary defines standardized terminology used across all ModelChorus workf
   - **CONSENSUS:** Combining multiple model responses
   - **ARGUMENT:** Synthesizing role perspectives (Creator/Skeptic/Moderator)
   - **IDEATE:** Merging generated ideas
-  - **RESEARCH:** Compiling research findings into dossier
 - Common goal: Unified, comprehensive output from multiple sources
 
 **role** (ARGUMENT only)
@@ -152,26 +145,7 @@ This glossary defines standardized terminology used across all ModelChorus workf
 
 ---
 
-### Research & Ideation
-
-**depth** (RESEARCH only)
-- Research thoroughness level
-- Values: `shallow`, `moderate`, `thorough`, `comprehensive`
-- Higher depth: More sources, deeper analysis, longer execution
-- Parameter: `--depth [level]` or `--research-depth [level]`
-- Default: `moderate`
-
-**citation_style** (RESEARCH only)
-- Format for source references in research output
-- Values: `informal`, `academic`, `technical`
-- Affects: Citation formatting in research dossier
-- Parameter: `--citation-style [style]`
-
-**research_dossier** (RESEARCH only)
-- Structured compilation of research findings
-- Includes: Findings, sources, citations, evidence tables
-- Named output format specific to RESEARCH workflow
-- No equivalent in other workflows
+### Ideation
 
 **idea** (IDEATE only)
 - Individual concept generated during ideation session
@@ -225,13 +199,13 @@ This glossary defines standardized terminology used across all ModelChorus workf
 
 ### CLI Parameters
 - **Format:** kebab-case with double dashes
-- **Example:** `--session-id`, `--research-depth`, `--output-file`
+- **Example:** `--session-id`, `--thinking-mode`, `--output-file`
 - **Short flags:** Single dash with single letter: `-f`, `-o`, `-t`
 - **Boolean flags:** Presence indicates true: `--verbose`, `--json`
 
 ### Internal Parameters
 - **Format:** snake_case for code/config
-- **Example:** `session_id`, `research_depth`, `output_file`
+- **Example:** `session_id`, `thinking_mode`, `output_file`
 - **Reason:** Matches Python naming conventions
 - **Conversion:** CLI kebab-case automatically converts to internal snake_case
 
@@ -270,11 +244,6 @@ This glossary defines standardized terminology used across all ModelChorus workf
 - Key terms: `idea`, `num_ideas`, `synthesis`
 - Divergent thinking followed by convergence
 
-### RESEARCH
-- Systematic information gathering with citations
-- Key terms: `depth`, `citation_style`, `research_dossier`, `source_file`
-- Produces structured research output with references
-
 ---
 
 ## Common Patterns
@@ -286,10 +255,9 @@ Workflows supporting session continuation:
 - **THINKDEEP:** Yes (full investigation context)
 - **ARGUMENT:** Yes (conversation history)
 - **IDEATE:** Yes (conversation history)
-- **RESEARCH:** Yes (conversation history)
 
 ### State Preservation Levels
-- **Simple:** Conversation history only (CHAT, ARGUMENT, IDEATE, RESEARCH)
+- **Simple:** Conversation history only (CHAT, ARGUMENT, IDEATE)
 - **Complex:** Full context with structured state (THINKDEEP)
 - **None:** No continuation support (CONSENSUS)
 
@@ -306,7 +274,7 @@ Workflows that use multiple AI models:
 
 | Deprecated | Standard Replacement | Affected Workflows |
 |------------|---------------------|-------------------|
-| `thread_id` | `session_id` | CHAT, ARGUMENT, IDEATE, RESEARCH |
+| `thread_id` | `session_id` | CHAT, ARGUMENT, IDEATE |
 | `continuation_id` | `session_id` | THINKDEEP |
 | `--model` | `--provider` | THINKDEEP (legacy usage) |
 
@@ -336,7 +304,7 @@ modelchorus thinkdeep --provider gemini -f /absolute/path/to/file.py "Debug this
 
 ### Saving output
 ```bash
-modelchorus research --depth thorough --output /path/to/results.json "Research topic"
+modelchorus consensus --output /path/to/results.json "Analyze this topic"
 ```
 
 ### Complex multi-step investigation

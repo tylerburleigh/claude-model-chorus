@@ -27,13 +27,9 @@ START: What do you need?
 │  └─ Need balanced critique?
 │     └─ YES → **ARGUMENT** (Structured debate)
 │
-├─ Need creative ideas or brainstorming?
-│  └─ Exploring possibilities?
-│     └─ YES → **IDEATE** (Idea generation)
-│
-└─ Gathering information on a topic?
-   └─ Need comprehensive research with citations?
-      └─ YES → **RESEARCH** (Systematic research)
+└─ Need creative ideas or brainstorming?
+   └─ Exploring possibilities?
+      └─ YES → **IDEATE** (Idea generation)
 ```
 
 ---
@@ -47,7 +43,6 @@ START: What do you need?
 | **THINKDEEP** | Complex investigations | 🐢 Slowest | $$ Medium | ⭐⭐⭐ Complex | Investigation summary |
 | **ARGUMENT** | Idea evaluation, critique | ⚡ Fast | $$ Medium | ⭐⭐ Moderate | Balanced analysis |
 | **IDEATE** | Creative brainstorming | ⚡ Fast | $ Low | ⭐ Simple | List of ideas |
-| **RESEARCH** | Information gathering | 🐌 Slower | $$ Medium | ⭐⭐ Moderate | Research dossier |
 
 ---
 
@@ -82,7 +77,6 @@ Single-model conversational interface for straightforward questions and discussi
 - You need multiple perspectives (use CONSENSUS)
 - Problem requires systematic analysis (use THINKDEEP)
 - You need structured debate (use ARGUMENT)
-- You need comprehensive research (use RESEARCH)
 
 **Example use cases:**
 - Code review: "Review this function for potential bugs"
@@ -122,6 +116,7 @@ Parallel consultation of multiple AI models with strategy-based synthesis of the
 - Need iterative investigation (use THINKDEEP)
 - Problem is straightforward (use CHAT)
 - Need structured debate format (use ARGUMENT)
+- Need creative ideas (use IDEATE)
 
 **Example use cases:**
 - Architecture decision: "Microservices vs monolith for our scale?"
@@ -161,7 +156,7 @@ Multi-step investigation workflow with hypothesis tracking, evidence accumulatio
 - Need quick answer (use CHAT)
 - Need multiple perspectives (use CONSENSUS)
 - Problem is straightforward (use CHAT)
-- Just need information gathering (use RESEARCH)
+- Need creative ideas (use IDEATE)
 
 **Example use cases:**
 - Debugging: "Intermittent 401 errors, 5% of requests fail"
@@ -201,7 +196,7 @@ Dialectical analysis using three perspectives: Creator (proposes), Skeptic (chal
 - Need multiple real models (use CONSENSUS)
 - Need idea generation (use IDEATE)
 - Need systematic investigation (use THINKDEEP)
-- Just need information (use RESEARCH or CHAT)
+- Just need information (use CHAT)
 
 **Example use cases:**
 - Proposal evaluation: "Evaluate: Use serverless for our backend"
@@ -239,7 +234,7 @@ Structured idea generation with divergent thinking followed by synthesis.
 **Don't use IDEATE when:**
 - Need evaluation (use ARGUMENT or CONSENSUS)
 - Need investigation (use THINKDEEP)
-- Need information (use RESEARCH)
+- Need information (use CHAT)
 - Already have ideas to evaluate
 
 **Example use cases:**
@@ -247,45 +242,6 @@ Structured idea generation with divergent thinking followed by synthesis.
 - Solution brainstorming: "Creative solutions for reducing API latency"
 - Naming: "Suggest names for our new product"
 - Approach exploration: "Different ways to implement caching"
-
----
-
-### RESEARCH - Comprehensive Information Gathering
-
-**What it is:**
-Systematic information gathering with source tracking, citations, and structured research output.
-
-**Strengths:**
-- ✅ Comprehensive information compilation
-- ✅ Proper citations and sources
-- ✅ Structured research dossier
-- ✅ Evidence tables
-- ✅ Configurable depth
-
-**Weaknesses:**
-- ❌ Slower (thorough gathering)
-- ❌ Moderate cost
-- ✅ Limited to information (not analysis)
-- ❌ Quality depends on source quality
-
-**Use RESEARCH when:**
-- Need comprehensive information
-- Citations are important
-- Exploring unfamiliar topics
-- Evidence-based decisions
-- Creating documentation
-
-**Don't use RESEARCH when:**
-- Need creative ideas (use IDEATE)
-- Need investigation (use THINKDEEP)
-- Need quick facts (use CHAT)
-- Need evaluation (use ARGUMENT/CONSENSUS)
-
-**Example use cases:**
-- Technology research: "Research GraphQL federation patterns"
-- Market research: "Gather information on competitor APIs"
-- Best practices: "Research microservices monitoring patterns"
-- Background: "Research OAuth 2.1 security improvements"
 
 ---
 
@@ -343,15 +299,7 @@ modelchorus thinkdeep --step "API latency increased 20x after deployment" --step
 - **Pros:** Methodical, builds confidence, finds root cause
 - **Cons:** Slower, multiple steps
 
-**RESEARCH Approach:**
-```bash
-modelchorus research --depth moderate "Research common causes of API latency spikes after deployment"
-```
-- **Result:** General information on latency causes
-- **Pros:** Educational, comprehensive background
-- **Cons:** Not specific to your issue
-
-**Recommendation:** Use **THINKDEEP** for this complex debugging scenario. CHAT is too shallow, RESEARCH is too general.
+**Recommendation:** Use **THINKDEEP** for this complex debugging scenario. CHAT is too shallow for systematic investigation.
 
 ---
 
@@ -383,15 +331,7 @@ modelchorus argument "Proposal: Use MongoDB for our e-commerce platform. Team ha
 - **Pros:** Identifies specific concerns
 - **Cons:** Only evaluates one option
 
-**RESEARCH Approach:**
-```bash
-modelchorus research --depth thorough "Research PostgreSQL vs MongoDB vs DynamoDB for e-commerce applications"
-```
-- **Result:** Comprehensive comparison research
-- **Pros:** Educational, thorough background
-- **Cons:** May not reach specific recommendation
-
-**Recommendation:** Use **CONSENSUS** for high-impact technology selection, or **RESEARCH** + **ARGUMENT** combination (research first, then evaluate top choice).
+**Recommendation:** Use **CONSENSUS** for high-impact technology selection to get multiple perspectives on the tradeoffs.
 
 ---
 
@@ -438,7 +378,6 @@ modelchorus consensus --strategy all_responses "What are the best ways to improv
 | High-impact decision | CONSENSUS | THINKDEEP | Multiple perspectives |
 | Idea generation | IDEATE | CHAT | Structured brainstorming |
 | Idea evaluation | ARGUMENT | CONSENSUS | Balanced critique |
-| Information gathering | RESEARCH | CHAT | Comprehensive with citations |
 
 ### By Constraints
 
@@ -447,38 +386,27 @@ modelchorus consensus --strategy all_responses "What are the best ways to improv
 2. IDEATE (low cost)
 3. ARGUMENT (moderate)
 4. THINKDEEP (moderate, but multi-step)
-5. RESEARCH (moderate)
-6. CONSENSUS (most expensive)
+5. CONSENSUS (most expensive)
 
 **When time is limited:**
 1. CHAT (fastest)
 2. IDEATE (fast)
 3. ARGUMENT (fast)
-4. RESEARCH (moderate)
-5. THINKDEEP (slow, multi-step)
-6. CONSENSUS (slower, parallel calls)
+4. THINKDEEP (slow, multi-step)
+5. CONSENSUS (slower, parallel calls)
 
 **When quality is priority:**
 1. CONSENSUS (highest quality, validated)
 2. THINKDEEP (high quality, systematic)
-3. RESEARCH (high quality, comprehensive)
-4. ARGUMENT (good quality, balanced)
-5. CHAT (depends on prompt quality)
-6. IDEATE (generation focus, not validation)
+3. ARGUMENT (good quality, balanced)
+4. CHAT (depends on prompt quality)
+5. IDEATE (generation focus, not validation)
 
 ---
 
 ## Workflow Combinations
 
 ### Effective Workflow Sequences
-
-**Research → Decision Pattern:**
-```
-1. RESEARCH (gather information)
-2. CONSENSUS (evaluate options with multiple models)
-3. ARGUMENT (critique final choice)
-```
-Use for: Major technology decisions, architecture choices
 
 **Generate → Evaluate Pattern:**
 ```
@@ -523,11 +451,6 @@ Use for: Exploratory analysis that becomes complex
 **Why wrong:** IDEATE generates, doesn't evaluate
 **Use instead:** ARGUMENT or CONSENSUS
 
-### ❌ Using RESEARCH for Creative Ideas
-**Problem:** "Come up with a creative feature idea"
-**Why wrong:** RESEARCH gathers existing info, doesn't ideate
-**Use instead:** IDEATE
-
 ### ❌ Using THINKDEEP for Quick Facts
 **Problem:** "What HTTP status code means unauthorized?"
 **Why wrong:** Overly complex for simple lookup
@@ -557,7 +480,6 @@ Use for: Exploratory analysis that becomes complex
 **Finally explore advanced workflows:**
 - THINKDEEP for complex problems
 - CONSENSUS for important decisions
-- RESEARCH for comprehensive information
 
 ### Choosing Your First Workflow
 
@@ -570,7 +492,7 @@ Ask yourself:
 **Most common starting points:**
 - Developers: CHAT → THINKDEEP → CONSENSUS
 - Product managers: IDEATE → ARGUMENT → CONSENSUS
-- Architects: RESEARCH → CONSENSUS → ARGUMENT
+- Architects: CONSENSUS → ARGUMENT
 - Security engineers: THINKDEEP → CONSENSUS → ARGUMENT
 
 ---

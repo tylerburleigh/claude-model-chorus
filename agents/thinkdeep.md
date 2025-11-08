@@ -9,7 +9,6 @@ required_information:
     - total_steps (integer): Estimated total investigation steps
     - next_step_required (boolean): Whether another step is needed
     - findings (string): Discoveries from this step
-    - provider (optional: string): AI provider (claude, gemini, codex, cursor-agent; default: claude)
     - session_id (optional: string): Session ID to resume investigation (format: thinkdeep-{uuid})
     - hypothesis (optional: string): Current working theory
     - confidence (optional: string): Confidence level (exploring, low, medium, high, very_high, almost_certain, certain)
@@ -35,7 +34,6 @@ Use this agent when you need to:
 - Multiple model perspectives (use CONSENSUS)
 - Structured debate (use ARGUMENT)
 - Creative brainstorming (use IDEATE)
-- Research with citations (use RESEARCH)
 
 ## How This Agent Works
 
@@ -135,7 +133,6 @@ Skill(modelchorus:thinkdeep) with prompt:
 --findings 'Latency affects all endpoints equally, started at 3pm deployment'
 --confidence low
 --hypothesis 'Deployment introduced performance regression'
---provider claude"
 ```
 
 **Report:** Include session_id (e.g., "perf-inv-001") for continuation.
@@ -166,7 +163,6 @@ If the skill encounters errors, report:
 - Suggested resolution:
   - Missing parameters? Provide them
   - Invalid session_id? Verify ID or start fresh
-  - Provider unavailable? Try different provider
 
 ---
 

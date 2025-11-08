@@ -233,14 +233,6 @@ workflows:
       - claude
       - gemini
     temperature: 0.9
-
-  research:
-    providers:
-      - claude
-      - gemini
-    citation_style: academic
-    depth: thorough
-    temperature: 0.5
 ```
 
 #### Configurable Settings
@@ -256,7 +248,7 @@ workflows:
 
 *All Workflows:*
 - `provider` - Single provider for the workflow
-- `providers` - Multiple providers (for consensus/research/ideate)
+- `providers` - Multiple providers (for consensus/ideate)
 - `temperature` - Creativity level
 - `max_tokens` - Maximum tokens to generate
 - `system_prompt` - Custom system prompt
@@ -267,10 +259,6 @@ workflows:
 
 *ThinkDeep Workflow:*
 - `thinking_mode` - Reasoning depth (low, medium, high)
-
-*Research Workflow:*
-- `citation_style` - Citation format (informal, academic, apa, mla)
-- `depth` - Research depth (quick, thorough, comprehensive)
 
 #### CLI Commands
 

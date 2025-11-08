@@ -4,7 +4,6 @@ ModelChorus Workflow Examples
 This module provides comprehensive examples for using ModelChorus workflows:
 - ARGUMENT: Structured dialectical reasoning and argument analysis
 - IDEATE: Creative brainstorming with configurable parameters
-- RESEARCH: Systematic research with evidence extraction and citations
 
 Each workflow demonstrates:
 - Basic usage patterns
@@ -26,7 +25,7 @@ from typing import Optional
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent / "modelchorus" / "src"))
 
-from modelchorus.workflows import ArgumentWorkflow, IdeateWorkflow, ResearchWorkflow
+from modelchorus.workflows import ArgumentWorkflow, IdeateWorkflow
 from modelchorus.providers import ClaudeProvider, GeminiProvider
 from modelchorus.core.conversation import ConversationMemory
 
@@ -367,211 +366,6 @@ async def example_ideate_refine():
 
 
 # ============================================================================
-# RESEARCH WORKFLOW EXAMPLES
-# ============================================================================
-
-async def example_research_basic():
-    """
-    Example 9: Basic research query.
-
-    Demonstrates simple research with default parameters.
-    """
-    print("\n" + "="*80)
-    print("EXAMPLE 9: Basic Research")
-    print("="*80 + "\n")
-
-    provider = ClaudeProvider()
-    memory = ConversationMemory()
-    workflow = ResearchWorkflow(provider=provider, conversation_memory=memory)
-
-    question = "What are the key benefits and challenges of GraphQL compared to REST APIs?"
-
-    print(f"Research question: {question}\n")
-
-    result = await workflow.run(
-        prompt=question,
-        citation_style="informal",
-        research_depth="moderate",
-        temperature=0.5
-    )
-
-    if result.success:
-        print("✓ Research Complete\n")
-
-        # Show findings
-        for step in result.steps:
-            finding_name = step.metadata.get('name', 'Finding')
-            print(f"--- {finding_name} ---")
-            print(step.content)
-            print()
-
-        # Show dossier
-        if result.synthesis:
-            print("--- Research Dossier ---")
-            print(result.synthesis)
-
-
-async def example_research_with_sources():
-    """
-    Example 10: Research with source files and citations.
-
-    Shows how to conduct research using provided source documents
-    with proper citation formatting.
-    """
-    print("\n" + "="*80)
-    print("EXAMPLE 10: Research with Source Files")
-    print("="*80 + "\n")
-
-    # Create sample source files
-    source1 = Path("examples/graphql_paper.txt")
-    source1.write_text("""
-    GraphQL: A Query Language for APIs (2015)
-
-    GraphQL provides a complete description of the data in your API, gives clients
-    the power to ask for exactly what they need, makes it easier to evolve APIs
-    over time, and enables powerful developer tools.
-
-    Key advantages:
-    - Precise data fetching (no over-fetching or under-fetching)
-    - Single endpoint for all queries
-    - Strong typing with schema
-    - Introspection capabilities
-
-    Challenges:
-    - Caching complexity compared to REST
-    - Learning curve for developers
-    - Query optimization required to prevent N+1 problems
-    """)
-
-    source2 = Path("examples/rest_comparison.txt")
-    source2.write_text("""
-    REST vs GraphQL: Performance Analysis (2023)
-
-    Study of 50 production APIs shows:
-    - GraphQL reduces payload size by 34% on average
-    - REST has better caching infrastructure (HTTP caching)
-    - GraphQL eliminates 67% of unnecessary round trips
-    - REST is simpler for simple CRUD operations
-
-    Recommendation: Choose based on use case complexity and team expertise.
-    """)
-
-    provider = ClaudeProvider()
-    memory = ConversationMemory()
-    workflow = ResearchWorkflow(provider=provider, conversation_memory=memory)
-
-    # Ingest sources
-    workflow.ingest_source(
-        title="GraphQL Paper 2015",
-        url=str(source1.absolute()),
-        source_type="document",
-        credibility="high"
-    )
-
-    workflow.ingest_source(
-        title="REST vs GraphQL Study 2023",
-        url=str(source2.absolute()),
-        source_type="document",
-        credibility="high"
-    )
-
-    question = "Compare GraphQL and REST for a data-heavy mobile application"
-
-    print(f"Research question: {question}")
-    print(f"Sources: {len([source1, source2])} documents\n")
-
-    result = await workflow.run(
-        prompt=question,
-        files=[str(source1), str(source2)],
-        citation_style="academic",
-        research_depth="thorough",
-        temperature=0.4
-    )
-
-    if result.success:
-        print("✓ Research Complete (with citations)\n")
-        print(result.synthesis)
-        print(f"\nSources analyzed: {result.metadata.get('sources_analyzed', 0)}")
-
-    # Cleanup
-    source1.unlink(missing_ok=True)
-    source2.unlink(missing_ok=True)
-
-
-async def example_research_depths():
-    """
-    Example 11: Research with different depth levels.
-
-    Demonstrates how depth parameter affects research thoroughness.
-    """
-    print("\n" + "="*80)
-    print("EXAMPLE 11: Research Depth Comparison")
-    print("="*80 + "\n")
-
-    provider = ClaudeProvider()
-    memory = ConversationMemory()
-
-    question = "What is the current state of quantum computing?"
-
-    depths = ["shallow", "moderate", "thorough"]
-
-    for depth in depths:
-        print(f"\n--- Depth: {depth.upper()} ---\n")
-
-        workflow = ResearchWorkflow(provider=provider, conversation_memory=memory)
-
-        result = await workflow.run(
-            prompt=question,
-            research_depth=depth,
-            temperature=0.5
-        )
-
-        if result.success:
-            print(f"✓ {depth.capitalize()} research complete")
-            print(f"Response length: {len(result.synthesis)} characters")
-            print(f"Steps: {len(result.steps)}")
-        else:
-            print(f"✗ Failed: {result.error}")
-
-
-async def example_research_citation_styles():
-    """
-    Example 12: Research with different citation styles.
-
-    Shows how citation format changes based on the style parameter.
-    """
-    print("\n" + "="*80)
-    print("EXAMPLE 12: Citation Style Comparison")
-    print("="*80 + "\n")
-
-    provider = ClaudeProvider()
-    memory = ConversationMemory()
-
-    question = "What are best practices for API versioning?"
-
-    styles = ["informal", "academic", "technical"]
-
-    for style in styles:
-        print(f"\n--- Style: {style.upper()} ---\n")
-
-        workflow = ResearchWorkflow(provider=provider, conversation_memory=memory)
-
-        result = await workflow.run(
-            prompt=question,
-            citation_style=style,
-            research_depth="moderate",
-            temperature=0.5
-        )
-
-        if result.success:
-            print(f"✓ Research with {style} citations")
-            # Show a sample of the output to see citation format
-            print(result.synthesis[:500] + "...")
-        else:
-            print(f"✗ Failed: {result.error}")
-
-
-# ============================================================================
 # CROSS-WORKFLOW PATTERNS
 # ============================================================================
 
@@ -726,10 +520,6 @@ async def run_all_examples():
         ("Ideate: High Creativity", example_ideate_high_creativity),
         ("Ideate: With Constraints", example_ideate_with_constraints),
         ("Ideate: Refinement", example_ideate_refine),
-        ("Research: Basic", example_research_basic),
-        ("Research: With Sources", example_research_with_sources),
-        ("Research: Depth Levels", example_research_depths),
-        ("Research: Citation Styles", example_research_citation_styles),
         ("Error Handling", example_error_handling),
         ("Output Management", example_output_management),
         ("Provider Comparison", example_provider_comparison),
@@ -768,10 +558,6 @@ async def run_specific_example(example_name: str):
         "ideate_creative": example_ideate_high_creativity,
         "ideate_constraints": example_ideate_with_constraints,
         "ideate_refine": example_ideate_refine,
-        "research_basic": example_research_basic,
-        "research_sources": example_research_with_sources,
-        "research_depths": example_research_depths,
-        "research_citations": example_research_citation_styles,
         "error_handling": example_error_handling,
         "output_management": example_output_management,
         "provider_comparison": example_provider_comparison,

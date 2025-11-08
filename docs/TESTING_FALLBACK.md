@@ -19,15 +19,15 @@ This guide provides manual testing procedures for the provider fallback and avai
 modelchorus list-providers --check
 ```
 
-**Test**: Run a research workflow
+**Test**: Run a chat workflow
 ```bash
-modelchorus research "What is quantum computing?" --verbose
+modelchorus chat "What is quantum computing?" --verbose
 ```
 
 **Expected Result**:
 - Workflow uses primary provider (claude by default)
 - No warnings about unavailable providers
-- Research completes successfully
+- Chat completes successfully
 
 ---
 
@@ -44,16 +44,16 @@ sudo mv /path/to/claude /path/to/claude.bak
 modelchorus list-providers --check
 ```
 
-**Test**: Run research workflow with verbose output
+**Test**: Run chat workflow with verbose output
 ```bash
-modelchorus research "What is quantum computing?" --verbose
+modelchorus chat "What is quantum computing?" --verbose
 ```
 
 **Expected Result**:
 - Warning message: "Some providers unavailable: ['claude']"
 - Info message: "Will use available providers: ['gemini', ...]"
 - Workflow succeeds using gemini (first fallback)
-- Research completes successfully
+- Chat completes successfully
 
 **Cleanup**:
 ```bash
@@ -73,9 +73,9 @@ sudo mv /path/to/gemini /path/to/gemini.bak
 # ... etc for all providers
 ```
 
-**Test**: Run research workflow
+**Test**: Run chat workflow
 ```bash
-modelchorus research "What is quantum computing?"
+modelchorus chat "What is quantum computing?"
 ```
 
 **Expected Result**:
@@ -99,7 +99,7 @@ sudo mv /path/to/gemini.bak /path/to/gemini
 
 **Test**: Run workflow with `--skip-provider-check`
 ```bash
-time modelchorus research "topic" --skip-provider-check --verbose
+time modelchorus chat "What is quantum computing?" --skip-provider-check --verbose
 ```
 
 **Expected Result**:
@@ -110,7 +110,7 @@ time modelchorus research "topic" --skip-provider-check --verbose
 
 **Comparison**: Run without the flag
 ```bash
-time modelchorus research "topic" --verbose
+time modelchorus chat "What is quantum computing?" --verbose
 ```
 
 **Expected Result**:
@@ -129,16 +129,16 @@ time modelchorus research "topic" --verbose
 # This tests runtime fallback, not availability check
 ```
 
-**Test**: Run research workflow
+**Test**: Run chat workflow
 ```bash
-modelchorus research "topic" --verbose
+modelchorus chat "What is quantum computing?" --verbose
 ```
 
 **Expected Result**:
 - Primary provider fails during execution
 - Warning logged: "Providers failed before success: ['claude']"
 - Workflow automatically tries first fallback
-- Research completes successfully with fallback provider
+- Chat completes successfully with fallback provider
 
 ---
 
@@ -188,7 +188,7 @@ modelchorus thinkdeep \
 cat .modelchorusrc
 
 # Run with verbose to see provider initialization
-modelchorus research "topic" --verbose
+modelchorus chat "What is quantum computing?" --verbose
 ```
 
 **Expected Result**:
@@ -236,17 +236,17 @@ Quick test suite for basic functionality:
 modelchorus list-providers --check
 
 # 2. Test each workflow with verbose output
-modelchorus chat "Test" --verbose
-modelchorus research "Test topic" --verbose
+modelchorus chat "What is TypeScript?" --verbose
+modelchorus chat "What is quantum computing?" --verbose
 modelchorus argument "Test claim" --verbose
 modelchorus ideate "Test ideas" --verbose
 
 # 3. Test skip-provider-check flag
-modelchorus research "Test" --skip-provider-check --verbose
+modelchorus chat "What is TypeScript?" --skip-provider-check --verbose
 
 # 4. Test with output files
-modelchorus research "Test" -o /tmp/research-test.json
-cat /tmp/research-test.json | jq '.metadata'
+modelchorus chat "What is TypeScript?" -o /tmp/chat-test.json
+cat /tmp/chat-test.json | jq '.metadata'
 ```
 
 ---
@@ -257,7 +257,7 @@ cat /tmp/research-test.json | jq '.metadata'
 
 ```bash
 export MODELCHORUS_LOG_LEVEL=DEBUG
-modelchorus research "topic" --verbose
+modelchorus chat "What is quantum computing?" --verbose
 ```
 
 ### Check Provider CLIs Directly
@@ -277,7 +277,7 @@ cursor-agent --version
 cat ~/.modelchorusrc  # or project .modelchorusrc
 
 # Check which config is being used
-modelchorus research "test" --verbose 2>&1 | grep -i "config"
+modelchorus chat "test" --verbose 2>&1 | grep -i "config"
 ```
 
 ### Provider Not Found Issues
@@ -333,7 +333,7 @@ If you encounter issues during testing:
 
 1. Collect logs with verbose output:
    ```bash
-   modelchorus research "topic" --verbose 2>&1 | tee debug.log
+   modelchorus chat "What is quantum computing?" --verbose 2>&1 | tee debug.log
    ```
 
 2. Check provider availability:

@@ -5,9 +5,7 @@ model: haiku
 required_information:
   dialectical_analysis:
     - prompt (string): The argument, claim, or proposal to analyze
-    - provider (optional: string): AI provider (claude, gemini, codex, cursor-agent; default: claude)
     - continue (optional: string): Session ID to continue analysis (format: argument-thread-{uuid})
-    - temperature (optional: float): Creativity level (0.0-1.0; default: 0.7)
 ---
 
 # ARGUMENT Subagent
@@ -30,7 +28,6 @@ Use this agent when you need to:
 - Multiple model perspectives (use CONSENSUS)
 - Systematic investigation with hypothesis tracking (use THINKDEEP)
 - Creative brainstorming (use IDEATE)
-- Research with citations (use RESEARCH)
 
 ## Three-Role Structure
 
@@ -63,8 +60,6 @@ This agent is a thin wrapper that invokes `Skill(modelchorus:argument)`.
 - [ ] `prompt` is provided (the argument, claim, or proposal to analyze)
 
 **Optional but recommended:**
-- [ ] `provider` (default: claude)
-- [ ] `temperature` (0.0-1.0; default: 0.7)
 - [ ] `continue` (session ID for multi-turn analysis)
 
 ### If Information Is Missing
@@ -77,24 +72,12 @@ Required:
   Example: "Should we migrate from monolithic to microservices architecture?"
 
 Optional:
-- provider: AI provider to use (default: claude)
-- temperature: Creativity level (default: 0.7)
-  Ranges: 0.0-0.4 (technical analysis), 0.5-0.7 (general),
-          0.8-1.0 (creative proposals)
 - continue: Session ID to continue previous analysis
 
 Please provide the argument or claim to analyze.
 ```
 
 **DO NOT attempt to guess or infer missing required information.**
-
-## Temperature Guidelines
-
-| Range | Use Case | Characteristics |
-|-------|----------|----------------|
-| 0.0-0.4 | Technical analysis, security reviews | Focused, conservative, analytical |
-| 0.5-0.7 | General arguments, policy analysis | Balanced (recommended for most uses) |
-| 0.8-1.0 | Creative proposals, brainstorming | Exploratory, unconventional perspectives |
 
 ## What to Report
 
@@ -115,9 +98,7 @@ After the skill completes, report:
 **Agent invocation:**
 ```
 Skill(modelchorus:argument) with prompt:
-"Should we adopt GraphQL for our API?
---provider claude
---temperature 0.6"
+"Should we adopt GraphQL for our API?"
 ```
 
 ### Example 2: Policy Analysis
@@ -127,9 +108,7 @@ Skill(modelchorus:argument) with prompt:
 **Agent invocation:**
 ```
 Skill(modelchorus:argument) with prompt:
-"Universal basic income: evaluate the policy from economic and social perspectives
---provider claude
---temperature 0.7"
+"Universal basic income: evaluate the policy from economic and social perspectives"
 ```
 
 ### Example 3: Architecture Decision with Context
@@ -140,9 +119,7 @@ Skill(modelchorus:argument) with prompt:
 ```
 Skill(modelchorus:argument) with prompt:
 "Should we migrate from monolithic to microservices architecture?
---provider claude
---system 'Team size: 5 developers, 3 existing services, budget: $10k/month'
---temperature 0.5"
+--system 'Team size: 5 developers, 3 existing services, budget: $10k/month'"
 ```
 
 ### Example 4: Multi-Turn Analysis with Threading
@@ -150,16 +127,14 @@ Skill(modelchorus:argument) with prompt:
 **Initial analysis:**
 ```
 Skill(modelchorus:argument) with prompt:
-"Should we implement feature flags in our deployment pipeline?
---provider claude"
+"Should we implement feature flags in our deployment pipeline?"
 ```
 
 **Follow-up analysis (using session_id returned):**
 ```
 Skill(modelchorus:argument) with prompt:
 "Given the previous analysis, focus specifically on the operational overhead concerns
---continue argument-thread-abc123
---provider claude"
+--continue argument-thread-abc123"
 ```
 
 ### Example 5: Technical Analysis with File Context
@@ -171,9 +146,7 @@ Skill(modelchorus:argument) with prompt:
 Skill(modelchorus:argument) with prompt:
 "Evaluate our current caching strategy for the API
 --file docs/caching_design.md
---file config/cache_config.yaml
---provider claude
---temperature 0.5"
+--file config/cache_config.yaml"
 ```
 
 ## Error Handling
@@ -182,9 +155,7 @@ If the skill encounters errors, report:
 - What argument analysis was attempted
 - The error message from the skill
 - Suggested resolution:
-  - Invalid temperature? Must be 0.0-1.0
   - Invalid session_id? Verify ID or start new analysis
-  - Provider unavailable? Try different provider
   - File not found? Verify file paths exist
 
 ---

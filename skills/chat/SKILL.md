@@ -10,11 +10,10 @@ description: Single-model conversational interaction with threading support for 
 The CHAT workflow provides simple, straightforward consultation with a single AI model while maintaining conversation continuity through threading. This is ModelChorus's foundational workflow for basic conversational interactions, ideal for quick consultations and iterative refinement without the complexity of multi-model orchestration.
 
 **Key Capabilities:**
-- Single-model conversation with any configured provider (Claude, Gemini, Codex, Cursor Agent)
+- Single-model conversation with configured AI
 - Conversation threading for multi-turn interactions with full history preservation
 - File context integration for grounding conversations in specific documents
 - Simple request/response pattern with automatic history management
-- Flexible temperature control for adjusting response creativity
 
 **Use Cases:**
 - Quick second opinions or consultations from an AI model
@@ -43,7 +42,6 @@ Avoid the CHAT workflow when:
 | You need structured debate or dialectical analysis | **ARGUMENT** - Three-role creator/skeptic/moderator analysis |
 | You need systematic investigation with hypothesis tracking | **THINKDEEP** - Extended reasoning with confidence progression |
 | You need creative brainstorming with many ideas | **IDEATE** - Structured idea generation workflow |
-| You need comprehensive research with citations | **RESEARCH** - Systematic information gathering with source management |
 
 ## Basic Usage
 
@@ -54,18 +52,15 @@ modelchorus chat "What is quantum computing?"
 ```
 
 **Expected Output:**
-The command returns a conversational response from the default provider (Claude) explaining the topic. The response includes a thread ID for conversation continuation.
+The command returns a conversational response explaining the topic. The response includes a thread ID for conversation continuation.
 
 ### Common Options
 
 | Option | Short | Default | Description |
 |--------|-------|---------|-------------|
-| `--provider` | `-p` | `claude` | AI provider to use (`claude`, `gemini`, `codex`, `cursor-agent`) |
 | `--continue` | `-c` | None | Thread ID to continue conversation |
 | `--file` | `-f` | None | File paths for context (repeatable) |
 | `--system` | | None | Additional system prompt |
-| `--temperature` | `-t` | `0.7` | Creativity level (0.0-1.0) |
-| `--max-tokens` | | None | Maximum response length |
 | `--output` | `-o` | None | Save result to JSON file |
 | `--verbose` | `-v` | False | Show detailed execution info |
 
@@ -77,12 +72,9 @@ The command returns a conversational response from the default provider (Claude)
 - `prompt` (string): The conversation prompt or question to send to the AI model
 
 **Optional:**
-- `--provider, -p` (string): AI provider to use - Valid values: `claude`, `gemini`, `codex`, `cursor-agent` - Default: `claude`
 - `--continue, -c` (string): Thread ID to continue an existing conversation - Format: `thread-{uuid}` - Maintains full conversation history
 - `--file, -f` (string, repeatable): File paths to include as context - Can be specified multiple times - Files must exist before execution
 - `--system` (string): Additional system prompt to customize model behavior
-- `--temperature, -t` (float): Response creativity level - Range: 0.0-1.0 - Default: 0.7 - Lower values are more deterministic
-- `--max-tokens` (integer): Maximum response length in tokens - Provider-specific limits apply
 - `--output, -o` (string): Path to save JSON output file - Creates or overwrites file at specified path
 - `--verbose, -v` (boolean): Enable detailed execution information - Default: false - Shows provider details and timing
 
@@ -97,10 +89,6 @@ The CHAT workflow returns a JSON object with the following structure:
   "metadata": {
     "provider": "claude",
     "model": "claude-3-5-sonnet-20241022",
-    "prompt_tokens": 150,
-    "completion_tokens": 300,
-    "total_tokens": 450,
-    "temperature": 0.7,
     "timestamp": "2025-11-07T10:30:00Z"
   }
 }
@@ -114,34 +102,13 @@ The CHAT workflow returns a JSON object with the following structure:
 | `session_id` | string | Thread ID for continuing this conversation (format: `thread-{uuid}`) |
 | `metadata.provider` | string | The AI provider that processed the request (`claude`, `gemini`, `codex`, `cursor-agent`) |
 | `metadata.model` | string | Specific model version used by the provider |
-| `metadata.prompt_tokens` | integer | Number of tokens in the input (prompt + context + history) |
-| `metadata.completion_tokens` | integer | Number of tokens in the model's response |
-| `metadata.total_tokens` | integer | Total tokens consumed (prompt_tokens + completion_tokens) |
-| `metadata.temperature` | float | Temperature setting used for this request (0.0-1.0) |
 | `metadata.timestamp` | string | ISO 8601 timestamp of when the request was processed |
 
 **Usage Notes:**
 - Save the `session_id` value to continue conversations using `--continue`
-- Token counts help track usage and costs across providers
 - The `result` field contains the complete response text suitable for display or further processing
 
 ## Advanced Usage
-
-### With Provider Selection
-
-```bash
-# Use specific provider
-modelchorus chat "Explain neural networks" -p gemini
-
-# Use Codex for code-focused questions
-modelchorus chat "How does this algorithm work?" -p codex
-```
-
-**Provider Selection Tips:**
-- `claude`: Best for general conversation, reasoning, and nuanced responses
-- `gemini`: Strong for factual queries and technical explanations
-- `codex`: Optimized for code-related questions and programming tasks
-- `cursor-agent`: Ideal for development-focused consultations
 
 ### With File Context
 
@@ -180,23 +147,6 @@ modelchorus chat "Give me a practical example" -c thread-abc-123-def-456
 - Thread IDs follow format: `thread-{uuid}`
 - Use short flag `-c` or long flag `--continue`
 
-### Adjusting Creativity
-
-```bash
-# Lower temperature for factual/precise output
-modelchorus chat "What are the Python PEP 8 guidelines?" --temperature 0.3
-
-# Higher temperature for creative/exploratory output
-modelchorus chat "Brainstorm app features for a fitness tracker" --temperature 0.9
-
-# Default balanced setting (0.7)
-modelchorus chat "Explain dependency injection" --temperature 0.7
-```
-
-**Temperature Guide:**
-- `0.0-0.3`: Deterministic, factual, precise (documentation, facts, specs)
-- `0.4-0.7`: Balanced creativity and accuracy (general conversation, explanations)
-- `0.8-1.0`: Maximum creativity, exploratory (brainstorming, ideation)
 
 ### Saving Results
 
@@ -216,13 +166,9 @@ modelchorus chat "Analyze this architecture" -f design.md --output analysis.json
 
 1. **Use threading for multi-turn conversations** - Always save and reuse thread IDs when building on previous context. This ensures the model has full conversation history and provides more coherent responses.
 
-2. **Choose appropriate temperature** - Use lower temperatures (0.3-0.5) for factual queries and higher temperatures (0.7-0.9) for creative or exploratory conversations.
+2. **Include relevant files as context** - When discussing code, documentation, or specific content, use `-f` flags to include files rather than copying content into prompts.
 
-3. **Include relevant files as context** - When discussing code, documentation, or specific content, use `-f` flags to include files rather than copying content into prompts.
-
-4. **Keep prompts clear and specific** - Even though CHAT is conversational, specific prompts yield better results than vague questions.
-
-5. **Select the right provider** - Match provider strengths to your task: Claude for reasoning, Gemini for facts, Codex for code.
+3. **Keep prompts clear and specific** - Even though CHAT is conversational, specific prompts yield better results than vague questions.
 
 ## Examples
 
@@ -252,14 +198,14 @@ modelchorus chat "Show me an example of the improved version" -c thread-abc-123
 
 **Command:**
 ```bash
-# Initial query with lower temperature for accuracy
-modelchorus chat "Explain Rust's ownership system" --temperature 0.5
+# Initial query
+modelchorus chat "Explain Rust's ownership system"
 
 # Follow up (saves thread ID: thread-xyz-789)
-modelchorus chat "How does borrowing work with mutable references?" -c thread-xyz-789 -t 0.5
+modelchorus chat "How does borrowing work with mutable references?" -c thread-xyz-789
 
 # Ask for practical example
-modelchorus chat "Show me a common mistake beginners make" -c thread-xyz-789 -t 0.5
+modelchorus chat "Show me a common mistake beginners make" -c thread-xyz-789
 ```
 
 **Expected Outcome:** Educational conversation where each response builds on previous explanations, creating a coherent learning path.
@@ -312,21 +258,6 @@ modelchorus chat "Review this code" -f ./src/main.py
 
 ---
 
-### Issue: Provider initialization failed
-
-**Symptoms:** Error about provider not being available or initialization failure
-
-**Cause:** Selected provider is not configured or invalid provider name
-
-**Solution:**
-```bash
-# Check available providers
-modelchorus list-providers
-
-# Use a valid provider name
-modelchorus chat "Your prompt" -p claude
-```
-
 ## Progress Reporting
 
 The CHAT workflow automatically displays progress updates to stderr as it executes. You will see messages like:
@@ -347,5 +278,4 @@ Starting chat workflow...
 
 **See Also:**
 - ModelChorus Documentation: `/docs/WORKFLOWS.md`
-- Provider Information: `modelchorus list-providers`
 - General CLI Help: `modelchorus --help`
