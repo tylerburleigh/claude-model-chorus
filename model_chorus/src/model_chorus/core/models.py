@@ -781,6 +781,94 @@ class ThinkDeepState(BaseModel):
     )
 
 
+class StudyState(BaseModel):
+    """
+    State model for Study workflow multi-persona investigations.
+
+    Maintains the complete investigation state across conversation turns,
+    tracking investigation phase, persona findings, confidence levels,
+    and collaborative exploration progress.
+
+    Attributes:
+        investigation_id: Unique identifier for this investigation session
+        session_id: Session/thread identifier for conversation continuity
+        current_phase: Current phase of investigation (InvestigationPhase)
+        confidence: Overall confidence level in findings (ConfidenceLevel)
+        iteration_count: Number of investigation iterations completed
+        findings: List of all findings from persona investigations
+        personas_active: List of personas currently participating
+        relevant_files: Files examined during investigation
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "investigation_id": "inv_2025-11-08_001",
+                "session_id": "thread_abc123",
+                "current_phase": "discovery",
+                "confidence": "medium",
+                "iteration_count": 3,
+                "findings": [
+                    {
+                        "persona": "Researcher",
+                        "finding": "Authentication uses JWT tokens",
+                        "evidence": ["Found JWT library in dependencies"],
+                        "confidence": "high"
+                    },
+                    {
+                        "persona": "Critic",
+                        "finding": "Token expiration not consistently checked",
+                        "evidence": ["Missing validation in 3 endpoints"],
+                        "confidence": "medium"
+                    }
+                ],
+                "personas_active": ["Researcher", "Critic"],
+                "relevant_files": ["src/auth.py", "src/middleware/jwt.py"]
+            }
+        }
+    )
+
+    investigation_id: str = Field(
+        ...,
+        description="Unique identifier for this investigation session",
+    )
+
+    session_id: str = Field(
+        ...,
+        description="Session/thread identifier for conversation continuity",
+    )
+
+    current_phase: str = Field(
+        default="discovery",
+        description="Current investigation phase (InvestigationPhase value)",
+    )
+
+    confidence: str = Field(
+        default="exploring",
+        description="Overall confidence level in findings (ConfidenceLevel value)",
+    )
+
+    iteration_count: int = Field(
+        default=0,
+        description="Number of investigation iterations completed",
+    )
+
+    findings: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="List of all findings from persona investigations",
+    )
+
+    personas_active: List[str] = Field(
+        default_factory=list,
+        description="List of personas currently participating in investigation",
+    )
+
+    relevant_files: List[str] = Field(
+        default_factory=list,
+        description="Files examined during investigation",
+    )
+
+
 class ConversationState(BaseModel):
     """
     Generic state container for workflow-specific conversation data.
