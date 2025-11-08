@@ -1,7 +1,7 @@
 {
   "spec_id": "persona-orchestration-study-workflow-2025-11-08-001",
   "generated": "2025-11-08T14:00:00Z",
-  "last_updated": "2025-11-08T15:31:58.749117Z",
+  "last_updated": "2025-11-08T15:32:43.511020Z",
   "metadata": {
     "title": "Persona Orchestration - STUDY Workflow",
     "description": "Implement persona-based investigation workflow with multi-perspective reasoning, temporal memory, and LLM-based routing",
@@ -16,7 +16,7 @@
       "history": []
     },
     "activated_date": "2025-11-08T14:53:02.145575Z",
-    "progress_percentage": 7,
+    "progress_percentage": 8,
     "current_phase": "phase-1"
   },
   "objectives": [
@@ -41,7 +41,7 @@
         "phase-6"
       ],
       "total_tasks": 70,
-      "completed_tasks": 5,
+      "completed_tasks": 6,
       "metadata": {
         "description": "Complete implementation of STUDY workflow with personas, memory, and routing"
       }
@@ -56,7 +56,7 @@
         "phase-1-verify"
       ],
       "total_tasks": 16,
-      "completed_tasks": 5,
+      "completed_tasks": 6,
       "metadata": {
         "purpose": "Establish foundational architecture, data models, and workflow structure",
         "risk_level": "medium",
@@ -82,7 +82,7 @@
         "task-1-6"
       ],
       "total_tasks": 13,
-      "completed_tasks": 5,
+      "completed_tasks": 6,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -231,7 +231,7 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/workflows/study/study_workflow.py",
         "task_category": "implementation",
@@ -264,7 +264,7 @@
     "task-1-3-2": {
       "type": "subtask",
       "title": "Add WorkflowRegistry decorator for plugin registration",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-1-3",
       "children": [],
       "dependencies": {
@@ -273,9 +273,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "details": "@WorkflowRegistry.register('study')"
+        "details": "@WorkflowRegistry.register('study')",
+        "started_at": "2025-11-08T15:32:29.841850Z",
+        "completed_at": "2025-11-08T15:32:43.494005Z",
+        "needs_journaling": false,
+        "actual_hours": 0.004,
+        "journaled_at": "2025-11-08T15:32:43.506543Z"
       }
     },
     "task-1-3-3": {
@@ -2225,6 +2230,15 @@
       "content": "Successfully created StudyWorkflow class extending BaseWorkflow in study_workflow.py. Implementation includes: (1) Proper class inheritance from BaseWorkflow, (2) @WorkflowRegistry.register(\"study\") decorator for workflow registration, (3) __init__ method matching pattern from IdeateWorkflow with provider, fallback_providers, config, and conversation_memory parameters, (4) async run() method with proper signature including prompt, continuation_id, files, and skip_provider_check parameters, (5) Comprehensive docstrings explaining persona-based research workflow, (6) Placeholder implementation with proper event emission (emit_workflow_start/complete), (7) Import verification successful - module can be imported and class is properly registered. File created at model_chorus/src/model_chorus/workflows/study/study_workflow.py (222 lines).",
       "metadata": {},
       "task_id": "task-1-3-1"
+    },
+    {
+      "timestamp": "2025-11-08T15:32:43.506531Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add WorkflowRegistry decorator for plugin registration",
+      "author": "claude-code",
+      "content": "WorkflowRegistry decorator already added to StudyWorkflow class during task-1-3-1 implementation. Verified decorator exists at line 29 of study_workflow.py with correct registration key \"study\". The @WorkflowRegistry.register(\"study\") decorator properly registers the workflow in the plugin system, allowing it to be discovered and instantiated by the workflow factory. Registration confirmed via import test in previous task.",
+      "metadata": {},
+      "task_id": "task-1-3-2"
     }
   ]
 }
