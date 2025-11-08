@@ -1,7 +1,7 @@
 {
   "spec_id": "persona-orchestration-study-workflow-2025-11-08-001",
   "generated": "2025-11-08T14:00:00Z",
-  "last_updated": "2025-11-08T20:32:36.394079Z",
+  "last_updated": "2025-11-08T20:34:20.868490Z",
   "metadata": {
     "title": "Persona Orchestration - STUDY Workflow",
     "description": "Implement persona-based investigation workflow with multi-perspective reasoning, temporal memory, and LLM-based routing",
@@ -16,7 +16,7 @@
       "history": []
     },
     "activated_date": "2025-11-08T14:53:02.145575Z",
-    "progress_percentage": 55,
+    "progress_percentage": 57,
     "current_phase": "phase-4"
   },
   "objectives": [
@@ -41,7 +41,7 @@
         "phase-6"
       ],
       "total_tasks": 70,
-      "completed_tasks": 39,
+      "completed_tasks": 40,
       "metadata": {
         "description": "Complete implementation of STUDY workflow with personas, memory, and routing"
       }
@@ -1354,7 +1354,7 @@
         "depends": []
       },
       "total_tasks": 15,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {
         "purpose": "Implement dual-layer memory system with caching and persistence",
         "risk_level": "high",
@@ -1374,7 +1374,7 @@
         "task-4-5"
       ],
       "total_tasks": 12,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1482,7 +1482,7 @@
     "task-4-3": {
       "type": "task",
       "title": "model_chorus/src/model_chorus/workflows/study/memory/cache.py",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-4-files",
       "children": [
         "task-4-3-1",
@@ -1499,7 +1499,7 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/workflows/study/memory/cache.py",
         "task_category": "implementation",
@@ -1510,7 +1510,7 @@
     "task-4-3-1": {
       "type": "subtask",
       "title": "Create ShortTermCache class with LRU eviction",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-4-3",
       "children": [],
       "dependencies": {
@@ -1519,9 +1519,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "details": "Use OrderedDict for LRU, configurable max size (default 100 entries)"
+        "details": "Use OrderedDict for LRU, configurable max size (default 100 entries)",
+        "started_at": "2025-11-08T20:33:01.307679Z",
+        "completed_at": "2025-11-08T20:34:20.852108Z",
+        "needs_journaling": false,
+        "actual_hours": 0.022,
+        "journaled_at": "2025-11-08T20:34:20.864347Z"
       }
     },
     "task-4-3-2": {
@@ -2815,6 +2820,15 @@
       "content": "Successfully created MemoryQuery Pydantic model for search operations in memory/models.py. Implemented:\n- MemoryQuery model with comprehensive filtering support\n- Filter fields: investigation_id, persona, confidence_level, time_range_start, time_range_end, memory_type\n- Pagination support: limit (1-1000, default 100), offset (default 0)\n- Sorting support: sort_by (default 'timestamp'), sort_order (asc/desc with regex pattern validation)\n- Optional filtering (all fields Optional except limit/offset/sort_by/sort_order)\n- Example JSON schema in model_config\n- Exported MemoryQuery in __init__.py\n- Verified model importable and instantiable via Python test\n\nThe query model enables flexible memory retrieval with filtering, pagination, and sorting across all required dimensions (investigation, persona, confidence, time range).",
       "metadata": {},
       "task_id": "task-4-2-2"
+    },
+    {
+      "timestamp": "2025-11-08T20:34:20.864331Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Create ShortTermCache class with LRU eviction",
+      "author": "claude-code",
+      "content": "Successfully created ShortTermCache class in memory/cache.py with LRU eviction. Implemented:\n- OrderedDict-based LRU cache with configurable max_size (default 100 entries)\n- Thread-safe operations using threading.Lock for concurrent access\n- Core operations: get(), put(), delete(), query(), clear(), size()\n- LRU eviction: move_to_end() on access, popitem(last=False) on overflow\n- Statistics tracking: hits, misses, evictions, puts, deletes\n- Query support: filter by investigation_id, persona, memory_type, confidence_level, time_range\n- Pagination and sorting support for query results\n- get_metadata() returns MemoryMetadata with cache statistics\n- get_stats() returns detailed operation counts\n- Comprehensive logging for debugging\n- Exported ShortTermCache in __init__.py\n- Verified cache functionality via Python tests (put, get, size, stats)\n\nThe cache provides fast in-memory access to recent investigation findings with automatic LRU eviction when capacity is reached.",
+      "metadata": {},
+      "task_id": "task-4-3-1"
     }
   ]
 }
