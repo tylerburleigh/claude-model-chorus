@@ -1,7 +1,7 @@
 {
   "spec_id": "persona-orchestration-study-workflow-2025-11-08-001",
   "generated": "2025-11-08T14:00:00Z",
-  "last_updated": "2025-11-08T20:43:31.306905Z",
+  "last_updated": "2025-11-08T20:44:56.447091Z",
   "metadata": {
     "title": "Persona Orchestration - STUDY Workflow",
     "description": "Implement persona-based investigation workflow with multi-perspective reasoning, temporal memory, and LLM-based routing",
@@ -16,7 +16,7 @@
       "history": []
     },
     "activated_date": "2025-11-08T14:53:02.145575Z",
-    "progress_percentage": 70,
+    "progress_percentage": 71,
     "current_phase": "phase-4"
   },
   "objectives": [
@@ -41,7 +41,7 @@
         "phase-6"
       ],
       "total_tasks": 70,
-      "completed_tasks": 49,
+      "completed_tasks": 50,
       "metadata": {
         "description": "Complete implementation of STUDY workflow with personas, memory, and routing"
       }
@@ -1354,7 +1354,7 @@
         "depends": []
       },
       "total_tasks": 15,
-      "completed_tasks": 13,
+      "completed_tasks": 14,
       "metadata": {
         "purpose": "Implement dual-layer memory system with caching and persistence",
         "risk_level": "high",
@@ -1766,7 +1766,7 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {}
     },
     "verify-4-1": {
@@ -1796,7 +1796,7 @@
     "verify-4-2": {
       "type": "verify",
       "title": "Cache eviction and promotion working as expected",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-4-verify",
       "children": [],
       "dependencies": {
@@ -1805,11 +1805,16 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "auto",
         "command": "pytest model_chorus/tests/workflows/study/memory/test_cache.py",
-        "expected": "LRU eviction triggers correctly, cache metrics accurate"
+        "expected": "LRU eviction triggers correctly, cache metrics accurate",
+        "started_at": "2025-11-08T20:43:52.238833Z",
+        "completed_at": "2025-11-08T20:44:56.432585Z",
+        "needs_journaling": false,
+        "actual_hours": 0.018,
+        "journaled_at": "2025-11-08T20:44:56.442569Z"
       }
     },
     "verify-4-3": {
@@ -2960,6 +2965,15 @@
       "content": "Memory persistence and retrieval verified working correctly. Created comprehensive test suite in tests/workflows/study/memory/test_persistence.py with 7 tests, all passing:\n- test_save_and_retrieve: Verified entries save and retrieve with correct data\n- test_persistence_across_sessions: Verified data persists after storage close/reopen\n- test_query_by_investigation: Verified filtering by investigation_id\n- test_query_by_persona: Verified filtering by persona\n- test_delete: Verified deletion removes entries correctly\n- test_memory_references: Verified memory reference relationships persist\n- test_get_metadata: Verified metadata returns correct counts and statistics\n\nAll tests passed (7/7) in 5.57s. Memory CRUD operations work correctly and data persists across sessions as expected.",
       "metadata": {},
       "task_id": "verify-4-1"
+    },
+    {
+      "timestamp": "2025-11-08T20:44:56.442557Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Cache eviction and promotion working as expected",
+      "author": "claude-code",
+      "content": "Cache eviction and promotion verified working correctly. Created comprehensive test suite in tests/workflows/study/memory/test_cache.py with 8 tests, all passing:\n- test_lru_eviction: Verified LRU eviction triggers when cache full, least recently used entry evicted\n- test_cache_metrics_hits_and_misses: Verified hit/miss metrics tracked accurately\n- test_cache_eviction_metric: Verified eviction count increments correctly\n- test_cache_update_existing: Verified updating existing entry doesn't increase size\n- test_cache_delete: Verified deletion removes entries and updates size\n- test_cache_query: Verified filtering by investigation_id and persona\n- test_cache_clear: Verified clearing all entries works correctly\n- test_cache_metadata: Verified metadata returns accurate hit rate and counts\n\nAll tests passed (8/8) in 3.49s. LRU eviction works correctly, cache metrics are accurate, and all cache operations function as expected.",
+      "metadata": {},
+      "task_id": "verify-4-2"
     }
   ]
 }
