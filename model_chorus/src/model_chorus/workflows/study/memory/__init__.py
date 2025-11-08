@@ -74,16 +74,20 @@ Future Extensions:
     - Investigation dependency tracking
 """
 
-# Component imports will be added as they're implemented in subsequent tasks:
-# from .models import MemoryEntry, MemoryMetadata
+# Component imports (added as implemented):
+from .models import MemoryEntry, MemoryMetadata, MemoryType
+
+# Remaining components will be added in subsequent tasks:
 # from .cache import MemoryCache
 # from .persistence import MemoryPersistence
 # from .controller import MemoryController
 
 __all__ = [
-    # Components (to be exported as implemented):
-    # "MemoryEntry",
-    # "MemoryMetadata",
+    # Data models (task 4-2 complete):
+    "MemoryEntry",
+    "MemoryMetadata",
+    "MemoryType",
+    # Remaining components (to be exported as implemented):
     # "MemoryCache",
     # "MemoryPersistence",
     # "MemoryController",
