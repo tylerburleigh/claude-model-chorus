@@ -1,7 +1,7 @@
 {
   "spec_id": "persona-orchestration-study-workflow-2025-11-08-001",
   "generated": "2025-11-08T14:00:00Z",
-  "last_updated": "2025-11-08T20:37:34.798444Z",
+  "last_updated": "2025-11-08T20:37:51.827046Z",
   "metadata": {
     "title": "Persona Orchestration - STUDY Workflow",
     "description": "Implement persona-based investigation workflow with multi-perspective reasoning, temporal memory, and LLM-based routing",
@@ -16,7 +16,7 @@
       "history": []
     },
     "activated_date": "2025-11-08T14:53:02.145575Z",
-    "progress_percentage": 62,
+    "progress_percentage": 64,
     "current_phase": "phase-4"
   },
   "objectives": [
@@ -41,7 +41,7 @@
         "phase-6"
       ],
       "total_tasks": 70,
-      "completed_tasks": 44,
+      "completed_tasks": 45,
       "metadata": {
         "description": "Complete implementation of STUDY workflow with personas, memory, and routing"
       }
@@ -1354,7 +1354,7 @@
         "depends": []
       },
       "total_tasks": 15,
-      "completed_tasks": 8,
+      "completed_tasks": 9,
       "metadata": {
         "purpose": "Implement dual-layer memory system with caching and persistence",
         "risk_level": "high",
@@ -1374,7 +1374,7 @@
         "task-4-5"
       ],
       "total_tasks": 12,
-      "completed_tasks": 8,
+      "completed_tasks": 9,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1570,7 +1570,7 @@
     "task-4-4": {
       "type": "task",
       "title": "model_chorus/src/model_chorus/workflows/study/memory/persistence.py",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-4-files",
       "children": [
         "task-4-4-1",
@@ -1587,7 +1587,7 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/workflows/study/memory/persistence.py",
         "task_category": "implementation",
@@ -1639,7 +1639,7 @@
     "task-4-4-3": {
       "type": "subtask",
       "title": "Add indexing for efficient queries (investigation_id, timestamp, persona)",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-4-4",
       "children": [],
       "dependencies": {
@@ -1648,8 +1648,12 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
-      "metadata": {}
+      "completed_tasks": 1,
+      "metadata": {
+        "completed_at": "2025-11-08T20:37:51.816697Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-08T20:37:51.822131Z"
+      }
     },
     "task-4-5": {
       "type": "task",
@@ -2882,6 +2886,15 @@
       "content": "Storage operations already implemented in task-4-4-1. The LongTermStorage class includes:\n- save(entry_id, entry): Persist entry to SQLite with automatic investigation creation\n- query(MemoryQuery): Dynamic SQL query with filters, pagination, sorting\n- get(entry_id): Retrieve specific entry by ID\n- Additional operations: delete(entry_id), get_metadata(), close()\n- All operations handle SQLite transactions properly with error handling\nVerified working via Python tests (save/get/query cycle successful).",
       "metadata": {},
       "task_id": "task-4-4-2"
+    },
+    {
+      "timestamp": "2025-11-08T20:37:51.822116Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add indexing for efficient queries (investigation_id, timestamp, persona)",
+      "author": "claude-code",
+      "content": "Database indexing already implemented in task-4-4-1. The initialize() method creates indexes:\n- idx_memory_entries_investigation: Index on investigation_id for investigation-scoped queries\n- idx_memory_entries_persona: Index on persona for persona-filtered queries\n- idx_memory_entries_timestamp: Index on timestamp for time-range queries and sorting\n- idx_memory_references_source: Index on source_entry_id for reference lookups\nAll indexes created with CREATE INDEX IF NOT EXISTS for idempotency.\nThese indexes optimize the common query patterns used in query() method.",
+      "metadata": {},
+      "task_id": "task-4-4-3"
     }
   ]
 }
