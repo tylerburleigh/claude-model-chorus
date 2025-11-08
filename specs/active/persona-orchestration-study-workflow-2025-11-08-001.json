@@ -1,7 +1,7 @@
 {
   "spec_id": "persona-orchestration-study-workflow-2025-11-08-001",
   "generated": "2025-11-08T14:00:00Z",
-  "last_updated": "2025-11-08T21:00:35.137299Z",
+  "last_updated": "2025-11-08T21:25:15.993047Z",
   "metadata": {
     "title": "Persona Orchestration - STUDY Workflow",
     "description": "Implement persona-based investigation workflow with multi-perspective reasoning, temporal memory, and LLM-based routing",
@@ -16,8 +16,8 @@
       "history": []
     },
     "activated_date": "2025-11-08T14:53:02.145575Z",
-    "progress_percentage": 72,
-    "current_phase": "phase-4"
+    "progress_percentage": 74,
+    "current_phase": "phase-5"
   },
   "objectives": [
     "Enable multi-perspective investigation through sequential persona reasoning",
@@ -41,7 +41,7 @@
         "phase-6"
       ],
       "total_tasks": 70,
-      "completed_tasks": 51,
+      "completed_tasks": 52,
       "metadata": {
         "description": "Complete implementation of STUDY workflow with personas, memory, and routing"
       }
@@ -1857,7 +1857,7 @@
     "phase-5": {
       "type": "phase",
       "title": "CLI Integration",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "spec-root",
       "children": [
         "phase-5-files",
@@ -1873,7 +1873,7 @@
         "depends": []
       },
       "total_tasks": 10,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "purpose": "Integrate STUDY workflow into ModelChorus CLI",
         "risk_level": "low",
@@ -1883,7 +1883,7 @@
     "phase-5-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-5",
       "children": [
         "task-5-1",
@@ -1892,7 +1892,7 @@
         "task-5-4"
       ],
       "total_tasks": 7,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1903,7 +1903,7 @@
     "task-5-1": {
       "type": "task",
       "title": "model_chorus/src/model_chorus/cli/study_commands.py",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-5-files",
       "children": [
         "task-5-1-1",
@@ -1919,7 +1919,7 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/cli/study_commands.py",
         "task_category": "implementation",
@@ -1930,7 +1930,7 @@
     "task-5-1-1": {
       "type": "subtask",
       "title": "Implement `study` command for new investigations",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-5-1",
       "children": [],
       "dependencies": {
@@ -1939,9 +1939,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "details": "Usage: model-chorus study --scenario 'investigation description' [--provider claude]"
+        "details": "Usage: model-chorus study --scenario 'investigation description' [--provider claude]",
+        "started_at": "2025-11-08T21:23:12.581725Z",
+        "completed_at": "2025-11-08T21:25:15.954142Z",
+        "needs_journaling": false,
+        "actual_hours": 0.034,
+        "journaled_at": "2025-11-08T21:25:15.980316Z"
       }
     },
     "task-5-1-2": {
@@ -3011,6 +3016,15 @@
       "content": "All child tasks in phase phase-4 have been completed.",
       "metadata": {},
       "task_id": "phase-4"
+    },
+    {
+      "timestamp": "2025-11-08T21:25:15.980282Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Implement `study` command for new investigations",
+      "author": "claude-code",
+      "content": "Successfully implemented the `study` command for new investigations in model_chorus/src/model_chorus/cli/study_commands.py. The command follows the existing CLI pattern with full argument support for provider selection, conversation continuation, file inclusion, persona specification, and all standard parameters (temperature, max_tokens, verbose, etc.). Integrated the command into the main CLI app in main.py by importing study_commands and delegating to study_commands.study(). Verified the command is properly registered and displays correct help text with all options.",
+      "metadata": {},
+      "task_id": "task-5-1-1"
     }
   ]
 }

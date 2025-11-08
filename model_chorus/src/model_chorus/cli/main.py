@@ -24,10 +24,12 @@ from ..providers import (
 )
 from ..providers.cli_provider import ProviderUnavailableError
 from ..workflows import ArgumentWorkflow, ChatWorkflow, ConsensusWorkflow, ConsensusStrategy, IdeateWorkflow, ThinkDeepWorkflow
+from ..workflows.study import StudyWorkflow
 from ..core.conversation import ConversationMemory
 from ..core.config import get_config_loader
 from ..core.progress import set_progress_enabled
 from model_chorus import __version__
+from . import study_commands
 
 app = typer.Typer(
     name="model-chorus",
@@ -1618,6 +1620,102 @@ def list_providers(
             console.print()
 
         console.print("[dim]Use --check to verify which providers are actually installed[/dim]\n")
+
+
+@app.command()
+def study(
+    scenario: str = typer.Option(..., "--scenario", help="Investigation description or research question"),
+    provider: Optional[str] = typer.Option(
+        None,
+        "--provider",
+        "-p",
+        help="Provider to use (claude, gemini, codex, cursor-agent). Defaults to config or 'claude'",
+    ),
+    continuation_id: Optional[str] = typer.Option(
+        None,
+        "--continue",
+        "-c",
+        help="Thread ID to continue an existing investigation",
+    ),
+    files: Optional[List[str]] = typer.Option(
+        None,
+        "--file",
+        "-f",
+        help="File paths to include in research context (can specify multiple times)",
+    ),
+    personas: Optional[List[str]] = typer.Option(
+        None,
+        "--persona",
+        help="Specific personas to use (can specify multiple times)",
+    ),
+    system: Optional[str] = typer.Option(
+        None,
+        "--system",
+        help="System prompt for context",
+    ),
+    temperature: Optional[float] = typer.Option(
+        None,
+        "--temperature",
+        "-t",
+        help="Temperature for generation (0.0-1.0). Defaults to config or 0.7",
+    ),
+    max_tokens: Optional[int] = typer.Option(
+        None,
+        "--max-tokens",
+        help="Maximum tokens to generate",
+    ),
+    output: Optional[Path] = typer.Option(
+        None,
+        "--output",
+        "-o",
+        help="Output file for result (JSON format)",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Show detailed execution information",
+    ),
+    skip_provider_check: bool = typer.Option(
+        False,
+        "--skip-provider-check",
+        help="Skip provider availability check (faster startup)",
+    ),
+):
+    """
+    Conduct persona-based collaborative research.
+
+    The STUDY workflow provides multi-persona investigation with role-based
+    orchestration, enabling collaborative exploration of complex topics through
+    specialized personas with distinct expertise.
+
+    Example:
+        # Start new investigation
+        model-chorus study --scenario "Explore authentication system patterns"
+
+        # Continue investigation
+        model-chorus study --scenario "Deep dive into OAuth 2.0" --continue thread-id-123
+
+        # Include files
+        model-chorus study --scenario "Analyze this codebase" -f src/auth.py -f tests/test_auth.py
+
+        # Specify personas
+        model-chorus study --scenario "Security analysis" --persona SecurityExpert --persona Architect
+    """
+    # Delegate to study_commands module
+    study_commands.study(
+        scenario=scenario,
+        provider=provider,
+        continuation_id=continuation_id,
+        files=files,
+        personas=personas,
+        system=system,
+        temperature=temperature,
+        max_tokens=max_tokens,
+        output=output,
+        verbose=verbose,
+        skip_provider_check=skip_provider_check,
+    )
 
 
 @app.command()
