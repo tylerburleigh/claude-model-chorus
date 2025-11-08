@@ -93,6 +93,15 @@ class PersonaRouter:
         routing_history: List of historical routing decisions for analysis
     """
 
+    # Fallback mapping for when skill invocation fails
+    # Maps investigation phase to appropriate persona
+    FALLBACK_PERSONA_MAP = {
+        "discovery": "Researcher",
+        "validation": "Critic",
+        "planning": "Planner",
+        "complete": None  # No persona needed when complete
+    }
+
     def __init__(self, registry: PersonaRegistry):
         """
         Initialize PersonaRouter with a persona registry.
@@ -103,6 +112,76 @@ class PersonaRouter:
         self.registry = registry
         self.routing_history: List[RoutingHistoryEntry] = []
         logger.info("PersonaRouter initialized")
+
+    def _get_fallback_persona(
+        self,
+        current_phase: str,
+        confidence: str
+    ) -> Tuple[Optional[str], str, List[str]]:
+        """
+        Get fallback persona when context analysis skill fails.
+
+        Uses simple rule-based mapping from investigation phase to persona:
+        - DISCOVERY → researcher (for systematic exploration)
+        - VALIDATION → critic (for rigorous testing)
+        - PLANNING → planner (for synthesis and roadmap)
+        - COMPLETE → None (investigation complete)
+
+        For unknown phases, defaults to researcher as the safest option.
+
+        Args:
+            current_phase: Current investigation phase
+            confidence: Current confidence level
+
+        Returns:
+            Tuple of (persona_name, reasoning, guidance_list)
+        """
+        # Normalize phase to lowercase for lookup
+        phase_normalized = current_phase.lower()
+
+        # Get fallback persona from map (default to Researcher for unknown phases)
+        persona_name = self.FALLBACK_PERSONA_MAP.get(phase_normalized, "Researcher")
+
+        # Build reasoning message
+        reasoning = (
+            f"Fallback routing used due to context analysis failure. "
+            f"Selected '{persona_name}' based on phase '{current_phase}'. "
+        )
+
+        # Provide generic guidance based on persona
+        if persona_name == "Researcher":
+            guidance = [
+                "Systematically gather information",
+                "Identify key patterns and relationships",
+                "Build comprehensive understanding"
+            ]
+            reasoning += "Researcher is appropriate for exploration and information gathering."
+        elif persona_name == "Critic":
+            guidance = [
+                "Challenge assumptions and findings",
+                "Look for edge cases or contradictions",
+                "Ensure robustness of conclusions"
+            ]
+            reasoning += "Critic is appropriate for validation and testing."
+        elif persona_name == "Planner":
+            guidance = [
+                "Synthesize findings into coherent plan",
+                "Define clear action items",
+                "Prioritize next steps"
+            ]
+            reasoning += "Planner is appropriate for synthesis and planning."
+        elif persona_name is None:
+            guidance = ["Investigation complete - no further action needed"]
+            reasoning += "Investigation is complete."
+        else:
+            # Unknown persona (shouldn't happen with current map)
+            guidance = ["Consult persona for investigation guidance"]
+
+        logger.info(
+            f"Fallback routing: phase='{current_phase}' → persona='{persona_name}'"
+        )
+
+        return (persona_name, reasoning, guidance)
 
     def route_next_persona(
         self,
@@ -152,22 +231,67 @@ class PersonaRouter:
             f"questions={len(questions)}, prior_persona={prior_persona}"
         )
 
-        # Invoke context analysis skill
-        context_input = ContextAnalysisInput(
-            current_phase=current_phase,
-            confidence=confidence,
-            findings=findings,
-            unresolved_questions=questions,
-            prior_persona=prior_persona
-        )
+        # Invoke context analysis skill with fallback handling
+        analysis_result: Optional[ContextAnalysisResult] = None
+        used_fallback = False
 
-        analysis_result: ContextAnalysisResult = analyze_context(context_input)
+        try:
+            context_input = ContextAnalysisInput(
+                current_phase=current_phase,
+                confidence=confidence,
+                findings=findings,
+                unresolved_questions=questions,
+                prior_persona=prior_persona
+            )
 
-        # Log routing decision
-        logger.info(
-            f"Context analysis recommended: {analysis_result.recommended_persona}"
-        )
-        logger.debug(f"Reasoning: {analysis_result.reasoning}")
+            analysis_result = analyze_context(context_input)
+
+            # Log routing decision
+            logger.info(
+                f"Context analysis recommended: {analysis_result.recommended_persona}"
+            )
+            logger.debug(f"Reasoning: {analysis_result.reasoning}")
+
+        except Exception as e:
+            # Context analysis failed - use fallback routing
+            logger.warning(
+                f"Context analysis skill failed: {type(e).__name__}: {str(e)}. "
+                f"Using fallback routing based on phase."
+            )
+            used_fallback = True
+
+            # Get fallback persona based on current phase
+            fallback_persona, fallback_reasoning, fallback_guidance = (
+                self._get_fallback_persona(current_phase, confidence)
+            )
+
+            # Create synthetic analysis result from fallback
+            analysis_result = ContextAnalysisResult(
+                recommended_persona=fallback_persona or "None",
+                reasoning=fallback_reasoning,
+                context_summary=(
+                    f"Phase: {current_phase.upper()}, "
+                    f"Confidence: {confidence}, "
+                    f"{len(findings)} finding(s), "
+                    f"{len(questions)} unresolved question(s) "
+                    f"(fallback routing)"
+                ),
+                confidence=confidence,
+                guidance=fallback_guidance,
+                metadata={
+                    "fallback_used": True,
+                    "fallback_reason": str(e),
+                    "original_error_type": type(e).__name__,
+                    "phase": current_phase,
+                    "findings_count": len(findings),
+                    "has_questions": len(questions) > 0,
+                    "prior_persona": prior_persona
+                }
+            )
+
+            logger.info(
+                f"Fallback routing selected: {analysis_result.recommended_persona}"
+            )
 
         # Retrieve persona from registry
         persona_name = analysis_result.recommended_persona
