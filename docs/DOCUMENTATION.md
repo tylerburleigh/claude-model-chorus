@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-08 18:00:17
+**Generated:** 2025-11-08 18:02:27
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 95
-- **Total Lines:** 40639
-- **Total Classes:** 218
+- **Total Files:** 96
+- **Total Lines:** 41313
+- **Total Classes:** 227
 - **Total Functions:** 174
 - **Avg Complexity:** 4.76
 - **Max Complexity:** 43
@@ -4746,6 +4746,59 @@ with long-running conversations with many messages.
 
 ---
 
+### `TestStudyWorkflowConversationHandling`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/workflows/study/test_study_workflow.py:291`
+
+**Description:**
+> Test suite for conversation memory integration in StudyWorkflow.
+
+**Methods:**
+- `mock_provider()`
+- `workflow_with_memory()`
+- `workflow_without_memory()`
+- `test_run_creates_thread_in_memory()`
+- `test_run_stores_messages_in_memory()`
+- `test_run_without_memory_still_works()`
+- `test_run_reuses_thread_on_continuation()`
+
+---
+
+### `TestStudyWorkflowErrorHandling`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/workflows/study/test_study_workflow.py:510`
+
+**Description:**
+> Test suite for error handling in StudyWorkflow.
+
+**Methods:**
+- `mock_provider()`
+- `workflow()`
+- `test_run_error_returns_false_success()`
+- `test_run_captures_error_message()`
+
+---
+
+### `TestStudyWorkflowInitialization`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/workflows/study/test_study_workflow.py:22`
+
+**Description:**
+> Test suite for StudyWorkflow initialization.
+
+**Methods:**
+- `test_init_with_provider()`
+- `test_init_with_fallback_providers()`
+- `test_init_provider_none_raises_error()`
+- `test_init_with_conversation_memory()`
+- `test_init_persona_router_ready()`
+- `test_init_with_config()`
+
+---
+
 ### `TestStudyWorkflowIntegration`
 
 **Language:** python
@@ -4757,6 +4810,122 @@ with long-running conversations with many messages.
 **Methods:**
 - `test_workflow_has_router()`
 - `test_workflow_routing_history_access()`
+
+---
+
+### `TestStudyWorkflowIntegration`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/workflows/study/test_study_workflow.py:586`
+
+**Description:**
+> Integration tests for StudyWorkflow.
+
+**Methods:**
+- `mock_provider()`
+- `workflow_with_memory()`
+- `test_full_workflow_execution()`
+- `test_conversation_continuation_flow()`
+- `test_workflow_with_custom_personas()`
+- `test_router_persona_count()`
+
+---
+
+### `TestStudyWorkflowInvestigation`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/workflows/study/test_study_workflow.py:368`
+
+**Description:**
+> Test suite for investigation flow in StudyWorkflow.
+
+**Methods:**
+- `mock_provider()`
+- `workflow()`
+- `test_investigation_returns_steps()`
+- `test_investigation_steps_have_metadata()`
+- `test_investigation_includes_available_personas()`
+- `test_investigation_empty_personas()`
+
+---
+
+### `TestStudyWorkflowPersonaSetup`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/workflows/study/test_study_workflow.py:226`
+
+**Description:**
+> Test suite for persona setup in StudyWorkflow.
+
+**Methods:**
+- `mock_provider()`
+- `workflow()`
+- `test_setup_personas_default()`
+- `test_setup_personas_default_structure()`
+- `test_setup_personas_custom()`
+- `test_setup_personas_empty_list()`
+- `test_run_personas_in_metadata()`
+
+---
+
+### `TestStudyWorkflowRoutingHistory`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/workflows/study/test_study_workflow.py:549`
+
+**Description:**
+> Test suite for routing history access in StudyWorkflow.
+
+**Methods:**
+- `mock_provider()`
+- `workflow()`
+- `test_get_routing_history_available()`
+- `test_get_routing_history_with_limit()`
+- `test_get_routing_history_with_investigation_id()`
+
+---
+
+### `TestStudyWorkflowRun`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/workflows/study/test_study_workflow.py:91`
+
+**Description:**
+> Test suite for StudyWorkflow.run() method.
+
+**Methods:**
+- `mock_provider()`
+- `workflow()`
+- `test_run_with_valid_prompt()`
+- `test_run_empty_prompt_raises_error()`
+- `test_run_whitespace_prompt_raises_error()`
+- `test_run_returns_workflow_result()`
+- `test_run_result_metadata_structure()`
+- `test_run_result_steps_is_list()`
+- `test_run_result_steps_are_workflow_steps()`
+- `test_run_creates_thread_id()`
+- `test_run_with_continuation_id()`
+- `test_run_without_continuation_is_not_continuation()`
+- `test_run_metadata_timestamp_format()`
+- `test_run_synthesis_is_string()`
+
+---
+
+### `TestStudyWorkflowSynthesis`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/workflows/study/test_study_workflow.py:447`
+
+**Description:**
+> Test suite for synthesis in StudyWorkflow.
+
+**Methods:**
+- `mock_provider()`
+- `workflow()`
+- `test_synthesize_findings_returns_string()`
+- `test_synthesize_findings_empty_steps()`
+- `test_synthesize_findings_multiple_steps()`
+- `test_synthesize_includes_step_count()`
 
 ---
 
@@ -9695,6 +9864,21 @@ Returns:
 - `model_chorus.core.models.StudyState`
 - `model_chorus.workflows.study.state_machine.InvestigationStateMachine`
 - `pytest`
+
+### `model_chorus/tests/workflows/study/test_study_workflow.py`
+
+- `datetime.datetime`
+- `datetime.timezone`
+- `model_chorus.core.base_workflow.WorkflowResult`
+- `model_chorus.core.base_workflow.WorkflowStep`
+- `model_chorus.core.conversation.ConversationMemory`
+- `model_chorus.core.models.ConversationMessage`
+- `model_chorus.workflows.study.study_workflow.StudyWorkflow`
+- `pytest`
+- `unittest.mock.AsyncMock`
+- `unittest.mock.MagicMock`
+- `unittest.mock.Mock`
+- `unittest.mock.patch`
 
 ### `tests/test_argument_workflow.py`
 

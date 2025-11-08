@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-08T23:00:17.730448Z",
+    "generated_at": "2025-11-08T23:02:27.946430Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 95,
-    "total_lines": 40639,
-    "total_classes": 218,
+    "total_files": 96,
+    "total_lines": 41313,
+    "total_classes": 227,
     "total_functions": 174,
     "avg_complexity": 4.76,
     "max_complexity": 43,
@@ -24,9 +24,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 95,
-        "lines": 40639,
-        "classes": 218,
+        "files": 96,
+        "lines": 41313,
+        "classes": 227,
         "functions": 174,
         "avg_complexity": 4.76
       }
@@ -2074,6 +2074,40 @@
       "lines": 457
     },
     {
+      "name": "test_study_workflow",
+      "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+      "language": "python",
+      "docstring": "Tests for StudyWorkflow.\n\nTests verify that the StudyWorkflow correctly:\n- Initializes with providers and persona router\n- Executes investigation workflow with role-based personas\n- Manages conversation threading and history\n- Handles errors gracefully\n- Integrates with PersonaRouter for intelligent persona selection",
+      "classes": [
+        "TestStudyWorkflowInitialization",
+        "TestStudyWorkflowRun",
+        "TestStudyWorkflowPersonaSetup",
+        "TestStudyWorkflowConversationHandling",
+        "TestStudyWorkflowInvestigation",
+        "TestStudyWorkflowSynthesis",
+        "TestStudyWorkflowErrorHandling",
+        "TestStudyWorkflowRoutingHistory",
+        "TestStudyWorkflowIntegration"
+      ],
+      "functions": [],
+      "imports": [
+        "pytest",
+        "unittest.mock.Mock",
+        "unittest.mock.patch",
+        "unittest.mock.AsyncMock",
+        "unittest.mock.MagicMock",
+        "datetime.datetime",
+        "datetime.timezone",
+        "model_chorus.workflows.study.study_workflow.StudyWorkflow",
+        "model_chorus.core.base_workflow.WorkflowResult",
+        "model_chorus.core.base_workflow.WorkflowStep",
+        "model_chorus.core.conversation.ConversationMemory",
+        "model_chorus.core.models.ConversationMessage"
+      ],
+      "exports": [],
+      "lines": 674
+    },
+    {
       "name": "__init__",
       "file": "tests/__init__.py",
       "language": "python",
@@ -2749,6 +2783,60 @@
           ]
         },
         {
+          "instantiator": "test_synthesize_findings_returns_string",
+          "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+          "line": 465,
+          "context": [
+            "TestStudyWorkflowSynthesis",
+            "test_synthesize_findings_returns_string"
+          ]
+        },
+        {
+          "instantiator": "test_synthesize_findings_multiple_steps",
+          "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+          "line": 487,
+          "context": [
+            "TestStudyWorkflowSynthesis",
+            "test_synthesize_findings_multiple_steps"
+          ]
+        },
+        {
+          "instantiator": "test_synthesize_findings_multiple_steps",
+          "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+          "line": 488,
+          "context": [
+            "TestStudyWorkflowSynthesis",
+            "test_synthesize_findings_multiple_steps"
+          ]
+        },
+        {
+          "instantiator": "test_synthesize_findings_multiple_steps",
+          "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+          "line": 489,
+          "context": [
+            "TestStudyWorkflowSynthesis",
+            "test_synthesize_findings_multiple_steps"
+          ]
+        },
+        {
+          "instantiator": "test_synthesize_includes_step_count",
+          "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+          "line": 501,
+          "context": [
+            "TestStudyWorkflowSynthesis",
+            "test_synthesize_includes_step_count"
+          ]
+        },
+        {
+          "instantiator": "test_synthesize_includes_step_count",
+          "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+          "line": 502,
+          "context": [
+            "TestStudyWorkflowSynthesis",
+            "test_synthesize_includes_step_count"
+          ]
+        },
+        {
           "instantiator": "mock_workflow_result",
           "file": "tests/test_cli_integration.py",
           "line": 53,
@@ -2857,7 +2945,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 24
+      "instantiation_count": 30
     },
     {
       "name": "WorkflowResult",
@@ -4170,6 +4258,33 @@
           ]
         },
         {
+          "instantiator": "test_init_with_conversation_memory",
+          "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+          "line": 62,
+          "context": [
+            "TestStudyWorkflowInitialization",
+            "test_init_with_conversation_memory"
+          ]
+        },
+        {
+          "instantiator": "workflow_with_memory",
+          "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+          "line": 304,
+          "context": [
+            "TestStudyWorkflowConversationHandling",
+            "workflow_with_memory"
+          ]
+        },
+        {
+          "instantiator": "workflow_with_memory",
+          "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+          "line": 599,
+          "context": [
+            "TestStudyWorkflowIntegration",
+            "workflow_with_memory"
+          ]
+        },
+        {
           "instantiator": "conversation_memory",
           "file": "tests/test_argument_workflow.py",
           "line": 44,
@@ -4322,7 +4437,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 60
+      "instantiation_count": 63
     },
     {
       "name": "GapType",
@@ -4673,6 +4788,60 @@
           ]
         },
         {
+          "instantiator": "test_synthesize_findings_returns_string",
+          "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+          "line": 465,
+          "context": [
+            "TestStudyWorkflowSynthesis",
+            "test_synthesize_findings_returns_string"
+          ]
+        },
+        {
+          "instantiator": "test_synthesize_findings_multiple_steps",
+          "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+          "line": 487,
+          "context": [
+            "TestStudyWorkflowSynthesis",
+            "test_synthesize_findings_multiple_steps"
+          ]
+        },
+        {
+          "instantiator": "test_synthesize_findings_multiple_steps",
+          "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+          "line": 488,
+          "context": [
+            "TestStudyWorkflowSynthesis",
+            "test_synthesize_findings_multiple_steps"
+          ]
+        },
+        {
+          "instantiator": "test_synthesize_findings_multiple_steps",
+          "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+          "line": 489,
+          "context": [
+            "TestStudyWorkflowSynthesis",
+            "test_synthesize_findings_multiple_steps"
+          ]
+        },
+        {
+          "instantiator": "test_synthesize_includes_step_count",
+          "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+          "line": 501,
+          "context": [
+            "TestStudyWorkflowSynthesis",
+            "test_synthesize_includes_step_count"
+          ]
+        },
+        {
+          "instantiator": "test_synthesize_includes_step_count",
+          "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+          "line": 502,
+          "context": [
+            "TestStudyWorkflowSynthesis",
+            "test_synthesize_includes_step_count"
+          ]
+        },
+        {
           "instantiator": "mock_workflow_result",
           "file": "tests/test_cli_integration.py",
           "line": 53,
@@ -4781,7 +4950,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 24
+      "instantiation_count": 30
     },
     {
       "name": "ModelResponse",
@@ -12901,10 +13070,145 @@
             "TestStudyWorkflowIntegration",
             "test_workflow_routing_history_access"
           ]
+        },
+        {
+          "instantiator": "test_init_with_provider",
+          "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+          "line": 30,
+          "context": [
+            "TestStudyWorkflowInitialization",
+            "test_init_with_provider"
+          ]
+        },
+        {
+          "instantiator": "test_init_with_fallback_providers",
+          "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+          "line": 46,
+          "context": [
+            "TestStudyWorkflowInitialization",
+            "test_init_with_fallback_providers"
+          ]
+        },
+        {
+          "instantiator": "test_init_provider_none_raises_error",
+          "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+          "line": 56,
+          "context": [
+            "TestStudyWorkflowInitialization",
+            "test_init_provider_none_raises_error"
+          ]
+        },
+        {
+          "instantiator": "test_init_with_conversation_memory",
+          "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+          "line": 64,
+          "context": [
+            "TestStudyWorkflowInitialization",
+            "test_init_with_conversation_memory"
+          ]
+        },
+        {
+          "instantiator": "test_init_persona_router_ready",
+          "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+          "line": 73,
+          "context": [
+            "TestStudyWorkflowInitialization",
+            "test_init_persona_router_ready"
+          ]
+        },
+        {
+          "instantiator": "test_init_with_config",
+          "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+          "line": 86,
+          "context": [
+            "TestStudyWorkflowInitialization",
+            "test_init_with_config"
+          ]
+        },
+        {
+          "instantiator": "workflow",
+          "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+          "line": 104,
+          "context": [
+            "TestStudyWorkflowRun",
+            "workflow"
+          ]
+        },
+        {
+          "instantiator": "workflow",
+          "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+          "line": 239,
+          "context": [
+            "TestStudyWorkflowPersonaSetup",
+            "workflow"
+          ]
+        },
+        {
+          "instantiator": "workflow_with_memory",
+          "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+          "line": 305,
+          "context": [
+            "TestStudyWorkflowConversationHandling",
+            "workflow_with_memory"
+          ]
+        },
+        {
+          "instantiator": "workflow_without_memory",
+          "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+          "line": 310,
+          "context": [
+            "TestStudyWorkflowConversationHandling",
+            "workflow_without_memory"
+          ]
+        },
+        {
+          "instantiator": "workflow",
+          "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+          "line": 381,
+          "context": [
+            "TestStudyWorkflowInvestigation",
+            "workflow"
+          ]
+        },
+        {
+          "instantiator": "workflow",
+          "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+          "line": 460,
+          "context": [
+            "TestStudyWorkflowSynthesis",
+            "workflow"
+          ]
+        },
+        {
+          "instantiator": "workflow",
+          "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+          "line": 523,
+          "context": [
+            "TestStudyWorkflowErrorHandling",
+            "workflow"
+          ]
+        },
+        {
+          "instantiator": "workflow",
+          "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+          "line": 562,
+          "context": [
+            "TestStudyWorkflowRoutingHistory",
+            "workflow"
+          ]
+        },
+        {
+          "instantiator": "workflow_with_memory",
+          "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+          "line": 600,
+          "context": [
+            "TestStudyWorkflowIntegration",
+            "workflow_with_memory"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 4
+      "instantiation_count": 19
     },
     {
       "name": "ThinkDeepWorkflow",
@@ -14724,6 +15028,202 @@
         "test_full_investigation_flow",
         "test_investigation_with_backtrack",
         "test_multiple_confidence_updates_in_phase"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestStudyWorkflowInitialization",
+      "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+      "line": 22,
+      "language": "python",
+      "docstring": "Test suite for StudyWorkflow initialization.",
+      "bases": [],
+      "methods": [
+        "test_init_with_provider",
+        "test_init_with_fallback_providers",
+        "test_init_provider_none_raises_error",
+        "test_init_with_conversation_memory",
+        "test_init_persona_router_ready",
+        "test_init_with_config"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestStudyWorkflowRun",
+      "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+      "line": 91,
+      "language": "python",
+      "docstring": "Test suite for StudyWorkflow.run() method.",
+      "bases": [],
+      "methods": [
+        "mock_provider",
+        "workflow",
+        "test_run_with_valid_prompt",
+        "test_run_empty_prompt_raises_error",
+        "test_run_whitespace_prompt_raises_error",
+        "test_run_returns_workflow_result",
+        "test_run_result_metadata_structure",
+        "test_run_result_steps_is_list",
+        "test_run_result_steps_are_workflow_steps",
+        "test_run_creates_thread_id",
+        "test_run_with_continuation_id",
+        "test_run_without_continuation_is_not_continuation",
+        "test_run_metadata_timestamp_format",
+        "test_run_synthesis_is_string"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestStudyWorkflowPersonaSetup",
+      "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+      "line": 226,
+      "language": "python",
+      "docstring": "Test suite for persona setup in StudyWorkflow.",
+      "bases": [],
+      "methods": [
+        "mock_provider",
+        "workflow",
+        "test_setup_personas_default",
+        "test_setup_personas_default_structure",
+        "test_setup_personas_custom",
+        "test_setup_personas_empty_list",
+        "test_run_personas_in_metadata"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestStudyWorkflowConversationHandling",
+      "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+      "line": 291,
+      "language": "python",
+      "docstring": "Test suite for conversation memory integration in StudyWorkflow.",
+      "bases": [],
+      "methods": [
+        "mock_provider",
+        "workflow_with_memory",
+        "workflow_without_memory",
+        "test_run_creates_thread_in_memory",
+        "test_run_stores_messages_in_memory",
+        "test_run_without_memory_still_works",
+        "test_run_reuses_thread_on_continuation"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestStudyWorkflowInvestigation",
+      "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+      "line": 368,
+      "language": "python",
+      "docstring": "Test suite for investigation flow in StudyWorkflow.",
+      "bases": [],
+      "methods": [
+        "mock_provider",
+        "workflow",
+        "test_investigation_returns_steps",
+        "test_investigation_steps_have_metadata",
+        "test_investigation_includes_available_personas",
+        "test_investigation_empty_personas"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestStudyWorkflowSynthesis",
+      "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+      "line": 447,
+      "language": "python",
+      "docstring": "Test suite for synthesis in StudyWorkflow.",
+      "bases": [],
+      "methods": [
+        "mock_provider",
+        "workflow",
+        "test_synthesize_findings_returns_string",
+        "test_synthesize_findings_empty_steps",
+        "test_synthesize_findings_multiple_steps",
+        "test_synthesize_includes_step_count"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestStudyWorkflowErrorHandling",
+      "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+      "line": 510,
+      "language": "python",
+      "docstring": "Test suite for error handling in StudyWorkflow.",
+      "bases": [],
+      "methods": [
+        "mock_provider",
+        "workflow",
+        "test_run_error_returns_false_success",
+        "test_run_captures_error_message"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestStudyWorkflowRoutingHistory",
+      "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+      "line": 549,
+      "language": "python",
+      "docstring": "Test suite for routing history access in StudyWorkflow.",
+      "bases": [],
+      "methods": [
+        "mock_provider",
+        "workflow",
+        "test_get_routing_history_available",
+        "test_get_routing_history_with_limit",
+        "test_get_routing_history_with_investigation_id"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestStudyWorkflowIntegration",
+      "file": "model_chorus/tests/workflows/study/test_study_workflow.py",
+      "line": 586,
+      "language": "python",
+      "docstring": "Integration tests for StudyWorkflow.",
+      "bases": [],
+      "methods": [
+        "mock_provider",
+        "workflow_with_memory",
+        "test_full_workflow_execution",
+        "test_conversation_continuation_flow",
+        "test_workflow_with_custom_personas",
+        "test_router_persona_count"
       ],
       "properties": [],
       "is_exported": false,
@@ -35293,6 +35793,20 @@
       "model_chorus.core.models.StudyState",
       "model_chorus.core.models.ConfidenceLevel",
       "model_chorus.workflows.study.state_machine.InvestigationStateMachine"
+    ],
+    "model_chorus/tests/workflows/study/test_study_workflow.py": [
+      "pytest",
+      "unittest.mock.Mock",
+      "unittest.mock.patch",
+      "unittest.mock.AsyncMock",
+      "unittest.mock.MagicMock",
+      "datetime.datetime",
+      "datetime.timezone",
+      "model_chorus.workflows.study.study_workflow.StudyWorkflow",
+      "model_chorus.core.base_workflow.WorkflowResult",
+      "model_chorus.core.base_workflow.WorkflowStep",
+      "model_chorus.core.conversation.ConversationMemory",
+      "model_chorus.core.models.ConversationMessage"
     ],
     "tests/test_argument_workflow.py": [
       "pytest",
