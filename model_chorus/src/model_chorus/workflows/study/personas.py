@@ -5,8 +5,27 @@ This module defines the Persona dataclass and related persona management
 for persona-based collaborative research.
 """
 
-from dataclasses import dataclass
-from typing import Optional, Dict, List
+from dataclasses import dataclass, field
+from typing import Optional, Dict, List, Any
+
+
+@dataclass
+class PersonaResponse:
+    """
+    Response from a persona invocation.
+
+    Contains the persona's findings and any confidence level updates
+    based on the investigation.
+
+    Attributes:
+        findings: List of findings or insights from the persona
+        confidence_update: Optional confidence level change based on findings
+        metadata: Additional response metadata
+    """
+
+    findings: List[str] = field(default_factory=list)
+    confidence_update: Optional[str] = None
+    metadata: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -28,6 +47,31 @@ class Persona:
     prompt_template: str
     temperature: Optional[float] = 0.7
     max_tokens: Optional[int] = 4096
+
+    def invoke(self, context: Dict[str, Any]) -> PersonaResponse:
+        """
+        Invoke the persona with the given context.
+
+        This method executes the persona's investigation logic based on the
+        provided context, returning findings and potential confidence updates.
+
+        Args:
+            context: Investigation context including prompt, history, etc.
+
+        Returns:
+            PersonaResponse containing findings and confidence updates
+
+        Note:
+            This is a placeholder implementation. Actual persona invocation
+            logic will be implemented in subsequent tasks.
+        """
+        # Placeholder implementation
+        # TODO: Implement actual persona invocation with provider
+        return PersonaResponse(
+            findings=[f"{self.name} placeholder finding"],
+            confidence_update=None,
+            metadata={"persona": self.name, "invoked": True}
+        )
 
 
 class PersonaRegistry:
