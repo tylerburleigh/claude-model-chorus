@@ -77,9 +77,9 @@ Future Extensions:
 # Component imports (added as implemented):
 from .models import MemoryEntry, MemoryMetadata, MemoryType, MemoryQuery
 from .cache import ShortTermCache
+from .persistence import LongTermStorage
 
 # Remaining components will be added in subsequent tasks:
-# from .persistence import MemoryPersistence
 # from .controller import MemoryController
 
 __all__ = [
@@ -88,10 +88,11 @@ __all__ = [
     "MemoryMetadata",
     "MemoryType",
     "MemoryQuery",
-    # Cache implementation (task 4-3-1 complete):
+    # Cache implementation (task 4-3 complete):
     "ShortTermCache",
+    # Persistence implementation (task 4-4-1 complete):
+    "LongTermStorage",
     # Remaining components (to be exported as implemented):
-    # "MemoryPersistence",
     # "MemoryController",
 ]
 

@@ -1,7 +1,7 @@
 {
   "spec_id": "persona-orchestration-study-workflow-2025-11-08-001",
   "generated": "2025-11-08T14:00:00Z",
-  "last_updated": "2025-11-08T20:35:11.064879Z",
+  "last_updated": "2025-11-08T20:37:09.975569Z",
   "metadata": {
     "title": "Persona Orchestration - STUDY Workflow",
     "description": "Implement persona-based investigation workflow with multi-perspective reasoning, temporal memory, and LLM-based routing",
@@ -16,7 +16,7 @@
       "history": []
     },
     "activated_date": "2025-11-08T14:53:02.145575Z",
-    "progress_percentage": 60,
+    "progress_percentage": 61,
     "current_phase": "phase-4"
   },
   "objectives": [
@@ -41,7 +41,7 @@
         "phase-6"
       ],
       "total_tasks": 70,
-      "completed_tasks": 42,
+      "completed_tasks": 43,
       "metadata": {
         "description": "Complete implementation of STUDY workflow with personas, memory, and routing"
       }
@@ -1354,7 +1354,7 @@
         "depends": []
       },
       "total_tasks": 15,
-      "completed_tasks": 6,
+      "completed_tasks": 7,
       "metadata": {
         "purpose": "Implement dual-layer memory system with caching and persistence",
         "risk_level": "high",
@@ -1374,7 +1374,7 @@
         "task-4-5"
       ],
       "total_tasks": 12,
-      "completed_tasks": 6,
+      "completed_tasks": 7,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1570,7 +1570,7 @@
     "task-4-4": {
       "type": "task",
       "title": "model_chorus/src/model_chorus/workflows/study/memory/persistence.py",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-4-files",
       "children": [
         "task-4-4-1",
@@ -1587,7 +1587,7 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/workflows/study/memory/persistence.py",
         "task_category": "implementation",
@@ -1598,7 +1598,7 @@
     "task-4-4-1": {
       "type": "subtask",
       "title": "Create LongTermStorage class with SQLite backend",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-4-4",
       "children": [],
       "dependencies": {
@@ -1607,9 +1607,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "details": "Database schema: investigations, memory_entries, memory_references tables"
+        "details": "Database schema: investigations, memory_entries, memory_references tables",
+        "started_at": "2025-11-08T20:35:32.885374Z",
+        "completed_at": "2025-11-08T20:37:09.956446Z",
+        "needs_journaling": false,
+        "actual_hours": 0.027,
+        "journaled_at": "2025-11-08T20:37:09.969638Z"
       }
     },
     "task-4-4-2": {
@@ -2855,6 +2860,15 @@
       "content": "Cache metrics tracking already implemented in task-4-3-1. The ShortTermCache class includes comprehensive metrics:\n- Statistics dictionary tracking: hits, misses, evictions, puts, deletes\n- Incremented automatically during operations (get increments hits/misses, put increments puts/evictions, delete increments deletes)\n- get_stats() method returns copy of stats dictionary\n- get_metadata() method returns MemoryMetadata with calculated cache_hit_rate\n- Hit rate calculated as hits/(hits+misses)\n- All stats operations thread-safe via same lock as cache operations\nVerified working via Python tests showing hits=1, misses=0 after put/get sequence.",
       "metadata": {},
       "task_id": "task-4-3-3"
+    },
+    {
+      "timestamp": "2025-11-08T20:37:09.969607Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Create LongTermStorage class with SQLite backend",
+      "author": "claude-code",
+      "content": "Successfully created LongTermStorage class in memory/persistence.py with SQLite backend. Implemented:\n- SQLite database with normalized schema (3 tables: investigations, memory_entries, memory_references)\n- Investigations table: tracks investigation metadata (id, timestamps, counts)\n- Memory_entries table: stores full entry data with foreign key to investigations\n- Memory_references table: tracks relationships between entries\n- Indexes on investigation_id, persona, timestamp for query performance\n- Core operations: initialize(), save(), get(), query(), delete(), close()\n- save() creates investigation automatically if doesn't exist, updates entry counts\n- get() retrieves entry with memory references reconstructed\n- query() builds dynamic SQL with WHERE clauses from MemoryQuery filters\n- Pagination and sorting support (timestamp, confidence_after, persona)\n- delete() handles foreign key cascade (removes references first)\n- get_metadata() returns MemoryMetadata with entry counts, investigation count, file size\n- Thread-safe via separate connections per operation\n- Comprehensive error handling and logging\n- Exported LongTermStorage in __init__.py\n- Verified via Python tests (initialize, save, get, metadata retrieval)\n\nThe persistence layer provides durable SQLite storage for completed investigations with full query support.",
+      "metadata": {},
+      "task_id": "task-4-4-1"
     }
   ]
 }
