@@ -13,8 +13,9 @@ Skill Input Parameters:
     prior_persona: Previously consulted persona name (optional)
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
 from typing import Optional, List, Dict, Any
+import json
 from pydantic import BaseModel, Field, field_validator
 
 from ...core.models import InvestigationPhase, ConfidenceLevel
@@ -146,6 +147,7 @@ class ContextAnalysisResult:
         recommended_persona: Name of the persona to consult next
         reasoning: Explanation for why this persona was selected
         context_summary: Summary of current investigation context
+        confidence: Current confidence level from context
         guidance: Specific guidance or focus areas for the persona
         metadata: Additional analysis metadata
     """
@@ -153,8 +155,42 @@ class ContextAnalysisResult:
     recommended_persona: str
     reasoning: str
     context_summary: str
+    confidence: str
     guidance: List[str] = field(default_factory=list)
     metadata: Dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> Dict[str, Any]:
+        """
+        Convert the result to a dictionary.
+
+        Returns:
+            Dictionary representation with all fields
+        """
+        return asdict(self)
+
+    def to_json(self, indent: Optional[int] = 2) -> str:
+        """
+        Convert the result to a JSON string.
+
+        Args:
+            indent: Number of spaces for indentation (default: 2, None for compact)
+
+        Returns:
+            JSON string representation
+
+        Example:
+            >>> result = ContextAnalysisResult(...)
+            >>> print(result.to_json())
+            {
+              "recommended_persona": "Researcher",
+              "reasoning": "In discovery phase...",
+              "context_summary": "Phase: DISCOVERY...",
+              "confidence": "medium",
+              "guidance": ["Gather initial information"],
+              "metadata": {...}
+            }
+        """
+        return json.dumps(self.to_dict(), indent=indent)
 
 
 def _select_persona_by_phase_and_state(
@@ -335,10 +371,10 @@ def analyze_context(context_input: ContextAnalysisInput) -> ContextAnalysisResul
         recommended_persona=persona,
         reasoning=reasoning,
         context_summary=context_summary,
+        confidence=context_input.confidence,
         guidance=guidance,
         metadata={
             "phase": phase,
-            "confidence": context_input.confidence,
             "findings_count": findings_count,
             "has_questions": has_questions,
             "prior_persona": prior_persona,
