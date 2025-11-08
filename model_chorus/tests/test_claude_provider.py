@@ -164,3 +164,40 @@ class TestClaudeProvider:
         assert provider.supports_thinking("opus") is True
         assert provider.supports_thinking("sonnet") is True
         assert provider.supports_thinking("haiku") is False
+
+    def test_read_only_mode_allowed_tools(self, sample_generation_request):
+        """Test that read-only mode restricts tools to allowed list."""
+        provider = ClaudeProvider()
+        command = provider.build_command(sample_generation_request)
+
+        # Verify allowedTools flag is present
+        assert "--allowedTools" in command
+
+        # Get the allowed tools list
+        allowed_tools_idx = command.index("--allowedTools")
+        allowed_tools = command[allowed_tools_idx + 1]
+
+        # Verify read-only tools are allowed
+        assert "Read" in allowed_tools
+        assert "Grep" in allowed_tools
+        assert "Glob" in allowed_tools
+        assert "WebSearch" in allowed_tools
+        assert "WebFetch" in allowed_tools
+        assert "Task" in allowed_tools
+
+    def test_read_only_mode_disallowed_tools(self, sample_generation_request):
+        """Test that read-only mode blocks write operations."""
+        provider = ClaudeProvider()
+        command = provider.build_command(sample_generation_request)
+
+        # Verify disallowedTools flag is present
+        assert "--disallowedTools" in command
+
+        # Get the disallowed tools list
+        disallowed_tools_idx = command.index("--disallowedTools")
+        disallowed_tools = command[disallowed_tools_idx + 1]
+
+        # Verify write tools are blocked
+        assert "Write" in disallowed_tools
+        assert "Edit" in disallowed_tools
+        assert "Bash" in disallowed_tools

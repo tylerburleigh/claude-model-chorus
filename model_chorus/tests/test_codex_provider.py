@@ -178,3 +178,33 @@ class TestCodexProvider:
         assert provider.supports_function_calling("gpt4") is True
         assert provider.supports_function_calling("gpt4-turbo") is True
         assert provider.supports_function_calling("gpt35-turbo") is True
+
+    def test_read_only_sandbox_mode(self, sample_generation_request):
+        """Test that read-only sandbox mode is enabled."""
+        provider = CodexProvider()
+        command = provider.build_command(sample_generation_request)
+
+        # Verify sandbox flag is present with read-only mode
+        assert "--sandbox" in command
+
+        # Get the sandbox mode value
+        sandbox_idx = command.index("--sandbox")
+        sandbox_mode = command[sandbox_idx + 1]
+
+        # Verify it's set to read-only
+        assert sandbox_mode == "read-only"
+
+    def test_non_interactive_approval_mode(self, sample_generation_request):
+        """Test that approval prompts are disabled for automation."""
+        provider = CodexProvider()
+        command = provider.build_command(sample_generation_request)
+
+        # Verify ask-for-approval flag is present
+        assert "--ask-for-approval" in command
+
+        # Get the approval policy value
+        approval_idx = command.index("--ask-for-approval")
+        approval_policy = command[approval_idx + 1]
+
+        # Verify it's set to never
+        assert approval_policy == "never"

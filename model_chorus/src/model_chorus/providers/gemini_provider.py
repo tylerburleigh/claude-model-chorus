@@ -145,6 +145,10 @@ class GeminiProvider(CLIProvider):
         # Add JSON output format for easier parsing
         command.extend(["--output-format", "json"])
 
+        # SECURITY: We intentionally do NOT add --yolo flag here
+        # In non-interactive mode without --yolo, Gemini defaults to read-only tools only
+        # This provides safe operation when used by ModelChorus workflows
+
         logger.debug(f"Built Gemini command: {' '.join(command)}")
         logger.warning(
             "Note: Gemini CLI does not support temperature, max_tokens, system_prompt, "

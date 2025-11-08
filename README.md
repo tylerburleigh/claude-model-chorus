@@ -15,6 +15,28 @@ ModelChorus is both a **Python package** for multi-model AI orchestration and a 
 - **CLI & Python API** - Use via command-line or programmatically
 - **Async Execution** - Parallel provider calls for speed
 - **Rich Output** - Beautiful terminal output with detailed results
+- **🔒 Read-Only Security Model** - Providers restricted to safe operations (no file modifications)
+
+---
+
+## Security
+
+**ModelChorus operates with a read-only security model.** When workflows invoke external CLI agents, those agents are restricted to safe, read-only operations:
+
+✅ **Allowed Operations:**
+- Reading files and searching code
+- Web searches and fetching documentation
+- Analyzing and generating insights
+- Launching sub-agents for research
+
+❌ **Blocked Operations:**
+- Writing or modifying files
+- Executing shell commands
+- Any operations that change system state
+
+This ensures workflows can gather context and generate analysis without risk of unintended modifications. All providers (Claude, Gemini, Codex, Cursor Agent) enforce read-only mode automatically.
+
+**Learn more:** See [docs/SECURITY.md](docs/SECURITY.md) for detailed security architecture and controls.
 
 ---
 

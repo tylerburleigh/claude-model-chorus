@@ -152,6 +152,10 @@ class CursorAgentProvider(CLIProvider):
         # Add JSON output format for easier parsing
         command.append("--json")
 
+        # SECURITY: We intentionally do NOT add --force flag here
+        # Without --force, Cursor Agent operates in propose-only mode (read-only)
+        # Changes are suggested but not applied, providing safe operation
+
         logger.debug(f"Built Cursor Agent command: {' '.join(command)}")
         return command
 

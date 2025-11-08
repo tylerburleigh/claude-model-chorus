@@ -134,6 +134,15 @@ class ClaudeProvider(CLIProvider):
         # Use JSON output format for easier parsing
         command.extend(["--output-format", "json"])
 
+        # Add read-only tool restrictions for security
+        # Allow only read-only and information-gathering tools
+        readonly_tools = ["Read", "Grep", "Glob", "WebSearch", "WebFetch", "Task", "Explore"]
+        command.extend(["--allowedTools", ",".join(readonly_tools)])
+
+        # Explicitly block write operations
+        write_tools = ["Write", "Edit", "Bash"]
+        command.extend(["--disallowedTools", ",".join(write_tools)])
+
         # Add system prompt if provided
         if request.system_prompt:
             command.extend(["--system-prompt", request.system_prompt])
