@@ -269,17 +269,17 @@ Complex research, codebase analysis, and collaborative exploration with speciali
 **CLI Example:**
 ```bash
 # Start new investigation
-model-chorus study study --scenario "Explore authentication system patterns"
+model-chorus study start --scenario "Explore authentication system patterns"
 
 # Continue investigation
-model-chorus study study --scenario "Deep dive into OAuth 2.0" --continue thread-id-123
+model-chorus study start --scenario "Deep dive into OAuth 2.0" --continue thread-id-123
 
 # Include files for context
-model-chorus study study --scenario "Analyze this codebase" \
+model-chorus study start --scenario "Analyze this codebase" \
   -f src/auth.py -f tests/test_auth.py
 
 # Use specific personas
-model-chorus study study --scenario "Security analysis" \
+model-chorus study start --scenario "Security analysis" \
   --persona SecurityExpert --persona Architect
 
 # Continue existing investigation
@@ -411,7 +411,7 @@ model-chorus ideate "Ways to improve user onboarding" -p claude -p gemini
 **STUDY - Persona-based research:**
 ```bash
 # Start new investigation
-model-chorus study study --scenario "Explore authentication patterns"
+model-chorus study start --scenario "Explore authentication patterns"
 
 # Continue investigation
 model-chorus study next --investigation thread-id-123

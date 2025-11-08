@@ -90,7 +90,7 @@ def get_provider_by_name(name: str):
 
 
 @study_app.command()
-def study(
+def start(
     scenario: str = typer.Option(..., "--scenario", help="Investigation description or research question"),
     provider: Optional[str] = typer.Option(
         None,
@@ -158,16 +158,16 @@ def study(
 
     Example:
         # Start new investigation
-        model-chorus study --scenario "Explore authentication system patterns"
+        model-chorus study start --scenario "Explore authentication system patterns"
 
         # Continue investigation
-        model-chorus study --scenario "Deep dive into OAuth 2.0" --continue thread-id-123
+        model-chorus study start --scenario "Deep dive into OAuth 2.0" --continue thread-id-123
 
         # Include files
-        model-chorus study --scenario "Analyze this codebase" -f src/auth.py -f tests/test_auth.py
+        model-chorus study start --scenario "Analyze this codebase" -f src/auth.py -f tests/test_auth.py
 
         # Specify personas
-        model-chorus study --scenario "Security analysis" --persona SecurityExpert --persona Architect
+        model-chorus study start --scenario "Security analysis" --persona SecurityExpert --persona Architect
     """
     try:
         # Apply config defaults if values not provided
