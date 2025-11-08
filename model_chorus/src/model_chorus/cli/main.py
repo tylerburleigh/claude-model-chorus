@@ -24,12 +24,11 @@ from ..providers import (
 )
 from ..providers.cli_provider import ProviderUnavailableError
 from ..workflows import ArgumentWorkflow, ChatWorkflow, ConsensusWorkflow, ConsensusStrategy, IdeateWorkflow, ThinkDeepWorkflow
-from ..workflows.study import StudyWorkflow
 from ..core.conversation import ConversationMemory
 from ..core.config import get_config_loader
 from ..core.progress import set_progress_enabled
 from model_chorus import __version__
-from . import study_commands
+from .study_commands import study_app
 
 app = typer.Typer(
     name="model-chorus",
@@ -37,6 +36,9 @@ app = typer.Typer(
     add_completion=False,
 )
 console = Console()
+
+# Register study command group
+app.add_typer(study_app, name='study')
 
 # Initialize config loader
 _config_loader = None
@@ -1622,218 +1624,6 @@ def list_providers(
         console.print("[dim]Use --check to verify which providers are actually installed[/dim]\n")
 
 
-@app.command()
-def study(
-    scenario: str = typer.Option(..., "--scenario", help="Investigation description or research question"),
-    provider: Optional[str] = typer.Option(
-        None,
-        "--provider",
-        "-p",
-        help="Provider to use (claude, gemini, codex, cursor-agent). Defaults to config or 'claude'",
-    ),
-    continuation_id: Optional[str] = typer.Option(
-        None,
-        "--continue",
-        "-c",
-        help="Thread ID to continue an existing investigation",
-    ),
-    files: Optional[List[str]] = typer.Option(
-        None,
-        "--file",
-        "-f",
-        help="File paths to include in research context (can specify multiple times)",
-    ),
-    personas: Optional[List[str]] = typer.Option(
-        None,
-        "--persona",
-        help="Specific personas to use (can specify multiple times)",
-    ),
-    system: Optional[str] = typer.Option(
-        None,
-        "--system",
-        help="System prompt for context",
-    ),
-    temperature: Optional[float] = typer.Option(
-        None,
-        "--temperature",
-        "-t",
-        help="Temperature for generation (0.0-1.0). Defaults to config or 0.7",
-    ),
-    max_tokens: Optional[int] = typer.Option(
-        None,
-        "--max-tokens",
-        help="Maximum tokens to generate",
-    ),
-    output: Optional[Path] = typer.Option(
-        None,
-        "--output",
-        "-o",
-        help="Output file for result (JSON format)",
-    ),
-    verbose: bool = typer.Option(
-        False,
-        "--verbose",
-        "-v",
-        help="Show detailed execution information",
-    ),
-    skip_provider_check: bool = typer.Option(
-        False,
-        "--skip-provider-check",
-        help="Skip provider availability check (faster startup)",
-    ),
-):
-    """
-    Conduct persona-based collaborative research.
-
-    The STUDY workflow provides multi-persona investigation with role-based
-    orchestration, enabling collaborative exploration of complex topics through
-    specialized personas with distinct expertise.
-
-    Example:
-        # Start new investigation
-        model-chorus study --scenario "Explore authentication system patterns"
-
-        # Continue investigation
-        model-chorus study --scenario "Deep dive into OAuth 2.0" --continue thread-id-123
-
-        # Include files
-        model-chorus study --scenario "Analyze this codebase" -f src/auth.py -f tests/test_auth.py
-
-        # Specify personas
-        model-chorus study --scenario "Security analysis" --persona SecurityExpert --persona Architect
-    """
-    # Delegate to study_commands module
-    study_commands.study(
-        scenario=scenario,
-        provider=provider,
-        continuation_id=continuation_id,
-        files=files,
-        personas=personas,
-        system=system,
-        temperature=temperature,
-        max_tokens=max_tokens,
-        output=output,
-        verbose=verbose,
-        skip_provider_check=skip_provider_check,
-    )
-
-
-@app.command(name="study-next")
-def study_next(
-    investigation: str = typer.Option(..., "--investigation", help="Investigation ID (thread ID) to continue"),
-    provider: Optional[str] = typer.Option(
-        None,
-        "--provider",
-        "-p",
-        help="Provider to use (claude, gemini, codex, cursor-agent). Defaults to config or 'claude'",
-    ),
-    files: Optional[List[str]] = typer.Option(
-        None,
-        "--file",
-        "-f",
-        help="Additional file paths to include in context (can specify multiple times)",
-    ),
-    max_tokens: Optional[int] = typer.Option(
-        None,
-        "--max-tokens",
-        help="Maximum tokens to generate",
-    ),
-    output: Optional[Path] = typer.Option(
-        None,
-        "--output",
-        "-o",
-        help="Output file for result (JSON format)",
-    ),
-    verbose: bool = typer.Option(
-        False,
-        "--verbose",
-        "-v",
-        help="Show detailed execution information",
-    ),
-    skip_provider_check: bool = typer.Option(
-        False,
-        "--skip-provider-check",
-        help="Skip provider availability check (faster startup)",
-    ),
-):
-    """
-    Continue an existing STUDY investigation.
-
-    This command automatically continues an investigation using the existing
-    thread context and personas. It's a convenience wrapper around the study
-    command with automatic continuation.
-
-    Example:
-        # Continue investigation with automatic next step
-        model-chorus study-next --investigation thread-id-123
-
-        # Continue with additional files
-        model-chorus study-next --investigation thread-id-123 -f new_data.py
-
-        # Continue with specific provider
-        model-chorus study-next --investigation thread-id-123 -p gemini
-    """
-    # Delegate to study_commands module
-    study_commands.study_next(
-        investigation=investigation,
-        provider=provider,
-        files=files,
-        max_tokens=max_tokens,
-        output=output,
-        verbose=verbose,
-        skip_provider_check=skip_provider_check,
-    )
-
-
-@app.command(name="study-view")
-def study_view(
-    investigation: str = typer.Option(..., "--investigation", help="Investigation ID (thread ID) to view"),
-    persona: Optional[str] = typer.Option(
-        None,
-        "--persona",
-        help="Filter by specific persona (optional)",
-    ),
-    show_all: bool = typer.Option(
-        False,
-        "--show-all",
-        help="Show complete conversation history",
-    ),
-    format_json: bool = typer.Option(
-        False,
-        "--json",
-        help="Output in JSON format",
-    ),
-    verbose: bool = typer.Option(
-        False,
-        "--verbose",
-        "-v",
-        help="Show detailed information",
-    ),
-):
-    """
-    View memory and conversation history for a STUDY investigation.
-
-    This command displays the conversation memory for an investigation,
-    including all messages, persona contributions, and investigation metadata.
-
-    Example:
-        # View investigation summary
-        model-chorus study-view --investigation thread-id-123
-
-        # View all messages
-        model-chorus study-view --investigation thread-id-123 --show-all
-
-        # Filter by persona
-        model-chorus study-view --investigation thread-id-123 --persona Researcher
-    """
-    # Delegate to study_commands module
-    study_commands.study_view(
-        investigation=investigation,
-        persona=persona,
-        show_all=show_all,
-        format_json=format_json,
-        verbose=verbose,
-    )
 
 
 @app.command()

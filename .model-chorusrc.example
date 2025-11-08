@@ -139,7 +139,7 @@ workflows:
 # Example: If claude CLI is not installed, will automatically use gemini
 #
 # To disable provider checking (faster startup):
-#   modelchorus research "topic" --skip-provider-check
+#   model-chorusresearch "topic" --skip-provider-check
 
 # ============================================================================
 # Provider Models

@@ -29,6 +29,13 @@ from ..core.config import get_config_loader
 
 console = Console()
 
+# Create study command group
+study_app = typer.Typer(
+    name="study",
+    help="Persona-based collaborative research workflows",
+    add_completion=False,
+)
+
 # Initialize config loader
 _config_loader = None
 
@@ -82,6 +89,7 @@ def get_provider_by_name(name: str):
     return provider_class()
 
 
+@study_app.command()
 def study(
     scenario: str = typer.Option(..., "--scenario", help="Investigation description or research question"),
     provider: Optional[str] = typer.Option(
@@ -354,6 +362,7 @@ def study(
         raise typer.Exit(1)
 
 
+@study_app.command(name="next")
 def study_next(
     investigation: str = typer.Option(..., "--investigation", help="Investigation ID (thread ID) to continue"),
     provider: Optional[str] = typer.Option(
@@ -585,6 +594,7 @@ def study_next(
         raise typer.Exit(1)
 
 
+@study_app.command(name="view")
 def study_view(
     investigation: str = typer.Option(..., "--investigation", help="Investigation ID (thread ID) to view"),
     persona: Optional[str] = typer.Option(
