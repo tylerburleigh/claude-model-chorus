@@ -1718,6 +1718,73 @@ def study(
     )
 
 
+@app.command(name="study-next")
+def study_next(
+    investigation: str = typer.Option(..., "--investigation", help="Investigation ID (thread ID) to continue"),
+    provider: Optional[str] = typer.Option(
+        None,
+        "--provider",
+        "-p",
+        help="Provider to use (claude, gemini, codex, cursor-agent). Defaults to config or 'claude'",
+    ),
+    files: Optional[List[str]] = typer.Option(
+        None,
+        "--file",
+        "-f",
+        help="Additional file paths to include in context (can specify multiple times)",
+    ),
+    max_tokens: Optional[int] = typer.Option(
+        None,
+        "--max-tokens",
+        help="Maximum tokens to generate",
+    ),
+    output: Optional[Path] = typer.Option(
+        None,
+        "--output",
+        "-o",
+        help="Output file for result (JSON format)",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Show detailed execution information",
+    ),
+    skip_provider_check: bool = typer.Option(
+        False,
+        "--skip-provider-check",
+        help="Skip provider availability check (faster startup)",
+    ),
+):
+    """
+    Continue an existing STUDY investigation.
+
+    This command automatically continues an investigation using the existing
+    thread context and personas. It's a convenience wrapper around the study
+    command with automatic continuation.
+
+    Example:
+        # Continue investigation with automatic next step
+        model-chorus study-next --investigation thread-id-123
+
+        # Continue with additional files
+        model-chorus study-next --investigation thread-id-123 -f new_data.py
+
+        # Continue with specific provider
+        model-chorus study-next --investigation thread-id-123 -p gemini
+    """
+    # Delegate to study_commands module
+    study_commands.study_next(
+        investigation=investigation,
+        provider=provider,
+        files=files,
+        max_tokens=max_tokens,
+        output=output,
+        verbose=verbose,
+        skip_provider_check=skip_provider_check,
+    )
+
+
 @app.command()
 def version():
     """Show version information."""
