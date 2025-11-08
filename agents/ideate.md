@@ -32,13 +32,13 @@ Use this agent when you need to:
 
 ## How This Agent Works
 
-This agent is a thin wrapper that invokes `Skill(modelchorus:ideate)`.
+This agent is a thin wrapper that invokes `Skill(model-chorus:ideate)`.
 
 **Your task:**
 1. Parse the user's request to understand ideation topic
 2. **VALIDATE** that you have all required information (see Contract Validation below)
 3. If information is missing, **STOP and return immediately** with error message
-4. If sufficient information, invoke: `Skill(modelchorus:ideate)`
+4. If sufficient information, invoke: `Skill(model-chorus:ideate)`
 5. Pass a clear prompt describing the ideation request
 6. Wait for the skill to complete
 7. Report generated ideas, synthesis, and **session_id** for continuation
@@ -102,7 +102,7 @@ After the skill completes, report:
 
 **Agent invocation:**
 ```
-Skill(modelchorus:ideate) with prompt:
+Skill(model-chorus:ideate) with prompt:
 "New features for task management mobile app
 --num-ideas 6"
 ```
@@ -113,7 +113,7 @@ Skill(modelchorus:ideate) with prompt:
 
 **Agent invocation:**
 ```
-Skill(modelchorus:ideate) with prompt:
+Skill(model-chorus:ideate) with prompt:
 "Performance optimizations for API
 --num-ideas 4"
 ```
@@ -124,7 +124,7 @@ Skill(modelchorus:ideate) with prompt:
 
 **Agent invocation:**
 ```
-Skill(modelchorus:ideate) with prompt:
+Skill(model-chorus:ideate) with prompt:
 "Bold, unconventional marketing campaigns for product launch
 --num-ideas 8"
 ```
@@ -133,14 +133,14 @@ Skill(modelchorus:ideate) with prompt:
 
 **Initial ideation:**
 ```
-Skill(modelchorus:ideate) with prompt:
+Skill(model-chorus:ideate) with prompt:
 "Product differentiation strategies
 --num-ideas 10"
 ```
 
 **Follow-up refinement (using session_id returned):**
 ```
-Skill(modelchorus:ideate) with prompt:
+Skill(model-chorus:ideate) with prompt:
 "Expand on ideas #2, #5, and #9 with implementation details
 --continue ideate-thread-abc123
 --num-ideas 3"
@@ -152,7 +152,7 @@ Skill(modelchorus:ideate) with prompt:
 
 **Agent invocation:**
 ```
-Skill(modelchorus:ideate) with prompt:
+Skill(model-chorus:ideate) with prompt:
 "Creative solutions for: Reducing customer support tickets by 40%
 --num-ideas 7
 --system 'Constraints: Budget $50k, 3-month timeline, no additional headcount. Must improve user experience.'"
@@ -180,4 +180,4 @@ If the skill encounters errors, report:
 
 ---
 
-**Note:** All idea generation logic, creativity control, synthesis, and iteration handling are handled by `Skill(modelchorus:ideate)`. This agent's role is simply to validate inputs, invoke the skill, and communicate generated ideas including the session_id for iterative refinement.
+**Note:** All idea generation logic, creativity control, synthesis, and iteration handling are handled by `Skill(model-chorus:ideate)`. This agent's role is simply to validate inputs, invoke the skill, and communicate generated ideas including the session_id for iterative refinement.

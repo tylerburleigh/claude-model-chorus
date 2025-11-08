@@ -14,10 +14,10 @@ from unittest.mock import AsyncMock
 import uuid
 import sys
 
-from modelchorus.workflows.chat import ChatWorkflow
-from modelchorus.workflows.thinkdeep import ThinkDeepWorkflow
-from modelchorus.providers.base_provider import GenerationResponse
-from modelchorus.core.conversation import ConversationMemory
+from model_chorus.workflows.chat import ChatWorkflow
+from model_chorus.workflows.thinkdeep import ThinkDeepWorkflow
+from model_chorus.providers.base_provider import GenerationResponse
+from model_chorus.core.conversation import ConversationMemory
 
 
 class TestMemoryManagement:

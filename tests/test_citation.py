@@ -6,8 +6,8 @@ according to different academic styles (APA, MLA, Chicago).
 """
 
 import pytest
-from modelchorus.core.models import Citation, CitationMap
-from modelchorus.utils.citation_formatter import (
+from model_chorus.core.models import Citation, CitationMap
+from model_chorus.utils.citation_formatter import (
     CitationStyle,
     format_citation,
     format_citation_map,

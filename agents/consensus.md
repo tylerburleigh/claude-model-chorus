@@ -31,13 +31,13 @@ Use this agent when you need to:
 
 ## How This Agent Works
 
-This agent is a thin wrapper that invokes `Skill(modelchorus:consensus)`.
+This agent is a thin wrapper that invokes `Skill(model-chorus:consensus)`.
 
 **Your task:**
 1. Parse the user's request to understand what needs multi-model consultation
 2. **VALIDATE** that you have all required information (see Contract Validation below)
 3. If information is missing, **STOP and return immediately** with error message
-4. If sufficient information, invoke: `Skill(modelchorus:consensus)`
+4. If sufficient information, invoke: `Skill(model-chorus:consensus)`
 5. Pass a clear prompt describing the consensus request
 6. Wait for the skill to complete (providers execute in parallel)
 7. Report synthesized results based on selected strategy
@@ -105,7 +105,7 @@ After the skill completes, report:
 
 **Agent invocation:**
 ```
-Skill(modelchorus:consensus) with prompt:
+Skill(model-chorus:consensus) with prompt:
 "Should I use microservices or monolithic architecture for a mid-size SaaS product with 5 developers?
 --strategy synthesize"
 ```
@@ -116,7 +116,7 @@ Skill(modelchorus:consensus) with prompt:
 
 **Agent invocation:**
 ```
-Skill(modelchorus:consensus) with prompt:
+Skill(model-chorus:consensus) with prompt:
 "Is it true that Python's GIL prevents true multi-threading? Explain briefly.
 --strategy majority"
 ```
@@ -127,7 +127,7 @@ Skill(modelchorus:consensus) with prompt:
 
 **Agent invocation:**
 ```
-Skill(modelchorus:consensus) with prompt:
+Skill(model-chorus:consensus) with prompt:
 "Review this code for bugs, performance issues, and best practices
 --file src/auth.py
 --strategy all_responses"
@@ -139,7 +139,7 @@ Skill(modelchorus:consensus) with prompt:
 
 **Agent invocation:**
 ```
-Skill(modelchorus:consensus) with prompt:
+Skill(model-chorus:consensus) with prompt:
 "What does the Python 'yield' keyword do?
 --strategy first_valid
 --timeout 30"
@@ -158,4 +158,4 @@ If the skill encounters errors, report:
 
 ---
 
-**Note:** All multi-provider execution, parallel processing, synthesis strategies, and timeout handling are handled by `Skill(modelchorus:consensus)`. This agent's role is simply to validate inputs, invoke the skill, and communicate synthesized results.
+**Note:** All multi-provider execution, parallel processing, synthesis strategies, and timeout handling are handled by `Skill(model-chorus:consensus)`. This agent's role is simply to validate inputs, invoke the skill, and communicate synthesized results.

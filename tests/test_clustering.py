@@ -15,7 +15,7 @@ import pytest
 import numpy as np
 from unittest.mock import Mock, patch, MagicMock
 
-from modelchorus.core.clustering import (
+from model_chorus.core.clustering import (
     SemanticClustering,
     ClusterResult,
 )

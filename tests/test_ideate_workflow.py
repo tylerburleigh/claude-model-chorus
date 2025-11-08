@@ -11,11 +11,11 @@ import uuid
 from unittest.mock import AsyncMock, MagicMock, patch
 from pathlib import Path
 
-from modelchorus.workflows.ideate import IdeateWorkflow
-from modelchorus.providers.base_provider import GenerationRequest, GenerationResponse
-from modelchorus.core.conversation import ConversationMemory
-from modelchorus.core.models import Idea, IdeaCluster, IdeationState
-from modelchorus.core.role_orchestration import OrchestrationResult, OrchestrationPattern
+from model_chorus.workflows.ideate import IdeateWorkflow
+from model_chorus.providers.base_provider import GenerationRequest, GenerationResponse
+from model_chorus.core.conversation import ConversationMemory
+from model_chorus.core.models import Idea, IdeaCluster, IdeationState
+from model_chorus.core.role_orchestration import OrchestrationResult, OrchestrationPattern
 
 
 @pytest.fixture
@@ -291,7 +291,7 @@ class TestParallelBrainstorming:
         }
 
         # Mock RoleOrchestrator
-        with patch('modelchorus.workflows.ideate.ideate_workflow.RoleOrchestrator') as mock_orch:
+        with patch('model_chorus.workflows.ideate.ideate_workflow.RoleOrchestrator') as mock_orch:
             # Create mock orchestration result
             mock_result = MagicMock()
             mock_result.role_responses = [
@@ -351,7 +351,7 @@ class TestConvergentAnalysis:
     @pytest.fixture
     def mock_brainstorming_result(self):
         """Create mock brainstorming result for convergent analysis."""
-        from modelchorus.core.base_workflow import WorkflowResult, WorkflowStep
+        from model_chorus.core.base_workflow import WorkflowResult, WorkflowStep
 
         steps = [
             WorkflowStep(
@@ -416,7 +416,7 @@ class TestConvergentAnalysis:
     @pytest.mark.asyncio
     async def test_idea_clustering(self, ideate_workflow):
         """Test idea clustering functionality."""
-        from modelchorus.core.base_workflow import WorkflowStep
+        from model_chorus.core.base_workflow import WorkflowStep
 
         # Create mock extraction step with ideas
         extraction_step = WorkflowStep(
@@ -447,7 +447,7 @@ class TestConvergentAnalysis:
     @pytest.mark.asyncio
     async def test_idea_scoring(self, ideate_workflow):
         """Test idea scoring functionality."""
-        from modelchorus.core.base_workflow import WorkflowStep
+        from model_chorus.core.base_workflow import WorkflowStep
 
         # Create mock clustering step
         clustering_step = WorkflowStep(
@@ -495,7 +495,7 @@ class TestInteractiveSelection:
     @pytest.fixture
     def mock_convergent_result(self):
         """Create mock convergent result for selection testing."""
-        from modelchorus.core.base_workflow import WorkflowResult, WorkflowStep
+        from model_chorus.core.base_workflow import WorkflowResult, WorkflowStep
 
         clustering_step = WorkflowStep(
             step_number=2,
@@ -583,7 +583,7 @@ class TestElaboration:
     @pytest.fixture
     def mock_selection_result(self):
         """Create mock selection result for elaboration testing."""
-        from modelchorus.core.base_workflow import WorkflowResult, WorkflowStep
+        from model_chorus.core.base_workflow import WorkflowResult, WorkflowStep
 
         selection_step = WorkflowStep(
             step_number=1,
@@ -688,7 +688,7 @@ class TestCompleteIdeation:
         }
 
         # Mock RoleOrchestrator for parallel brainstorming
-        with patch('modelchorus.workflows.ideate.ideate_workflow.RoleOrchestrator') as mock_orch:
+        with patch('model_chorus.workflows.ideate.ideate_workflow.RoleOrchestrator') as mock_orch:
             mock_result = MagicMock()
             mock_result.role_responses = [
                 ("brainstormer-practical", GenerationResponse(
@@ -760,7 +760,7 @@ class TestErrorHandling:
     @pytest.mark.asyncio
     async def test_extraction_with_no_brainstorming_steps(self, ideate_workflow):
         """Test extraction fails gracefully with no brainstorming steps."""
-        from modelchorus.core.base_workflow import WorkflowResult
+        from model_chorus.core.base_workflow import WorkflowResult
 
         empty_result = WorkflowResult(
             success=True,
@@ -780,7 +780,7 @@ class TestErrorHandling:
     @pytest.mark.asyncio
     async def test_clustering_with_no_extracted_ideas(self, ideate_workflow):
         """Test clustering fails with no extracted ideas."""
-        from modelchorus.core.base_workflow import WorkflowStep
+        from model_chorus.core.base_workflow import WorkflowStep
 
         extraction_step = WorkflowStep(
             step_number=1,
@@ -795,7 +795,7 @@ class TestErrorHandling:
     @pytest.mark.asyncio
     async def test_scoring_with_no_clusters(self, ideate_workflow):
         """Test scoring fails with no clusters."""
-        from modelchorus.core.base_workflow import WorkflowStep
+        from model_chorus.core.base_workflow import WorkflowStep
 
         clustering_step = WorkflowStep(
             step_number=2,

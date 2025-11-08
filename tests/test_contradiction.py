@@ -6,7 +6,7 @@ with appropriate severity levels.
 """
 
 import pytest
-from modelchorus.core.contradiction import (
+from model_chorus.core.contradiction import (
     Contradiction,
     ContradictionSeverity,
     detect_contradiction,

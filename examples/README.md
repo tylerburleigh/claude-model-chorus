@@ -51,7 +51,7 @@ python examples/workflow_examples.py ideate_creative
 
 1. **Install ModelChorus**:
    ```bash
-   pip install modelchorus
+   pip install model-chorus
    ```
 
 2. **Configure Provider CLIs**:
@@ -130,7 +130,7 @@ No workflow-specific parameters. Uses standard parameters above.
 - Check API keys are set in environment
 
 ### "Import error"
-- Verify ModelChorus is installed: `pip install modelchorus`
+- Verify ModelChorus is installed: `pip install model-chorus`
 - Check Python path if running from different directory
 
 ### Slow execution

@@ -52,46 +52,46 @@ Use IDEATE when you need:
 ### Product & Feature Brainstorming
 ```bash
 # Generate feature ideas
-modelchorus ideate "New features for a personal task management app" --num-ideas 7
+model-chorus ideate "New features for a personal task management app" --num-ideas 7
 
 # Explore product directions
-modelchorus ideate "Revenue streams for a developer tools startup" --temperature 0.9
+model-chorus ideate "Revenue streams for a developer tools startup" --temperature 0.9
 ```
 
 ### Problem-Solving
 ```bash
 # Find creative solutions
-modelchorus ideate "Ways to reduce API latency by 50%"
+model-chorus ideate "Ways to reduce API latency by 50%"
 
 # Explore alternatives
-modelchorus ideate "Alternative approaches to user authentication that improve UX"
+model-chorus ideate "Alternative approaches to user authentication that improve UX"
 ```
 
 ### Marketing & Business Strategy
 ```bash
 # Marketing campaigns
-modelchorus ideate "Creative marketing campaigns for sustainable fashion brand" --temperature 1.0
+model-chorus ideate "Creative marketing campaigns for sustainable fashion brand" --temperature 1.0
 
 # Growth strategies
-modelchorus ideate "User acquisition strategies for B2B SaaS startup"
+model-chorus ideate "User acquisition strategies for B2B SaaS startup"
 ```
 
 ### Technical Innovation
 ```bash
 # Architecture ideas
-modelchorus ideate "Innovative ways to handle real-time data synchronization"
+model-chorus ideate "Innovative ways to handle real-time data synchronization"
 
 # Performance optimizations
-modelchorus ideate "Creative caching strategies for our API"
+model-chorus ideate "Creative caching strategies for our API"
 ```
 
 ### Process Improvement
 ```bash
 # Team workflows
-modelchorus ideate "Ways to improve code review processes"
+model-chorus ideate "Ways to improve code review processes"
 
 # Developer experience
-modelchorus ideate "Ideas for better developer onboarding"
+model-chorus ideate "Ideas for better developer onboarding"
 ```
 
 ---
@@ -116,7 +116,7 @@ modelchorus ideate "Ideas for better developer onboarding"
 
 **Simple ideation:**
 ```bash
-modelchorus ideate "New features for task management app"
+model-chorus ideate "New features for task management app"
 ```
 
 **Expected output:**
@@ -149,13 +149,13 @@ Thread ID: ideate-thread-abc123
 **Control how many ideas are generated:**
 ```bash
 # Generate 3 ideas (quick brainstorming)
-modelchorus ideate "API versioning strategies" --num-ideas 3
+model-chorus ideate "API versioning strategies" --num-ideas 3
 
 # Generate 5 ideas (default, balanced)
-modelchorus ideate "API versioning strategies"
+model-chorus ideate "API versioning strategies"
 
 # Generate 10 ideas (comprehensive exploration)
-modelchorus ideate "API versioning strategies" --num-ideas 10
+model-chorus ideate "API versioning strategies" --num-ideas 10
 ```
 
 **Guidelines:**
@@ -168,13 +168,13 @@ modelchorus ideate "API versioning strategies" --num-ideas 10
 **Adjust creativity level:**
 ```bash
 # Low creativity (0.3-0.5): Practical, conventional ideas
-modelchorus ideate "Database optimization techniques" --temperature 0.5
+model-chorus ideate "Database optimization techniques" --temperature 0.5
 
 # Medium creativity (0.6-0.8): Balanced creativity (default)
-modelchorus ideate "User engagement strategies" --temperature 0.7
+model-chorus ideate "User engagement strategies" --temperature 0.7
 
 # High creativity (0.9-1.0): Bold, unconventional ideas
-modelchorus ideate "Disruptive product features" --temperature 1.0
+model-chorus ideate "Disruptive product features" --temperature 1.0
 ```
 
 ### With Provider Selection
@@ -182,13 +182,13 @@ modelchorus ideate "Disruptive product features" --temperature 1.0
 **Specify which AI provider to use:**
 ```bash
 # Use Claude (excellent for creative ideation)
-modelchorus ideate "Marketing campaign ideas" --provider claude
+model-chorus ideate "Marketing campaign ideas" --provider claude
 
 # Use Gemini (strong analytical creativity)
-modelchorus ideate "Technical architecture ideas" --provider gemini
+model-chorus ideate "Technical architecture ideas" --provider gemini
 
 # Use Codex (best for code-related ideas)
-modelchorus ideate "Code refactoring approaches" --provider codex
+model-chorus ideate "Code refactoring approaches" --provider codex
 ```
 
 ### With Constraints
@@ -196,11 +196,11 @@ modelchorus ideate "Code refactoring approaches" --provider codex
 **Add specific constraints or criteria:**
 ```bash
 # Use system prompt for constraints
-modelchorus ideate "Revenue streams for startup" \
+model-chorus ideate "Revenue streams for startup" \
   --system "Must be implementable within 6 months, budget under $50k, target individual developers"
 
 # Focus ideation with context
-modelchorus ideate "API design improvements" \
+model-chorus ideate "API design improvements" \
   --system "Current API has 50k requests/day, RESTful, needs backward compatibility"
 ```
 
@@ -209,11 +209,11 @@ modelchorus ideate "API design improvements" \
 **Provide supporting documents:**
 ```bash
 # Single file
-modelchorus ideate "Improvements for this codebase" \
+model-chorus ideate "Improvements for this codebase" \
   --file src/architecture.md
 
 # Multiple files
-modelchorus ideate "Refactoring strategies for auth system" \
+model-chorus ideate "Refactoring strategies for auth system" \
   --file src/auth/current_impl.py \
   --file docs/auth_requirements.md \
   --file docs/known_issues.md
@@ -224,15 +224,15 @@ modelchorus ideate "Refactoring strategies for auth system" \
 **Continue brainstorming session:**
 ```bash
 # Initial brainstorming
-modelchorus ideate "Gamification features for learning platform"
+model-chorus ideate "Gamification features for learning platform"
 # Returns: Thread ID: ideate-thread-xyz789
 
 # Drill into specific idea
-modelchorus ideate "Expand on idea #2 (achievement system). Provide implementation details." \
+model-chorus ideate "Expand on idea #2 (achievement system). Provide implementation details." \
   --continue ideate-thread-xyz789
 
 # Explore variations
-modelchorus ideate "What if we combine ideas #1 and #3?" \
+model-chorus ideate "What if we combine ideas #1 and #3?" \
   --continue ideate-thread-xyz789
 ```
 
@@ -244,9 +244,9 @@ modelchorus ideate "What if we combine ideas #1 and #3?" \
 
 ```python
 import asyncio
-from modelchorus.workflows import IdeateWorkflow
-from modelchorus.providers import ClaudeProvider
-from modelchorus.core.conversation import ConversationMemory
+from model_chorus.workflows import IdeateWorkflow
+from model_chorus.providers import ClaudeProvider
+from model_chorus.core.conversation import ConversationMemory
 
 async def generate_ideas():
     # Initialize provider and memory
@@ -899,7 +899,7 @@ claude --version
 gemini --version
 
 # Try different provider
-modelchorus ideate "test ideas" --provider gemini
+model-chorus ideate "test ideas" --provider gemini
 ```
 
 ### Issue: Ideas Too Brief
@@ -938,10 +938,10 @@ result = await workflow.run(prompt="...", num_ideas=3)
 **Example:**
 ```bash
 # Use IDEATE for brainstorming
-modelchorus ideate "Feature ideas for mobile app"
+model-chorus ideate "Feature ideas for mobile app"
 
 # Use CHAT for discussion
-modelchorus chat "What do users want in a mobile app?" -p claude
+model-chorus chat "What do users want in a mobile app?" -p claude
 ```
 
 ### IDEATE vs ARGUMENT
@@ -957,10 +957,10 @@ modelchorus chat "What do users want in a mobile app?" -p claude
 **Example:**
 ```bash
 # Use IDEATE to generate options
-modelchorus ideate "Alternative authentication methods"
+model-chorus ideate "Alternative authentication methods"
 
 # Use ARGUMENT to evaluate specific option
-modelchorus argument "Passwordless auth improves security"
+model-chorus argument "Passwordless auth improves security"
 ```
 
 ### IDEATE vs CONSENSUS
@@ -976,10 +976,10 @@ modelchorus argument "Passwordless auth improves security"
 **Example:**
 ```bash
 # Use IDEATE for idea generation
-modelchorus ideate "Marketing strategies" --num-ideas 7
+model-chorus ideate "Marketing strategies" --num-ideas 7
 
 # Use CONSENSUS to evaluate best strategy
-modelchorus consensus "Which marketing strategy is best?" \
+model-chorus consensus "Which marketing strategy is best?" \
   -p claude -p gemini -s synthesize
 ```
 
@@ -990,7 +990,7 @@ modelchorus consensus "Which marketing strategy is best?" \
 ### Example 1: Product Feature Brainstorming
 
 ```bash
-modelchorus ideate "New features for developer productivity tool" \
+model-chorus ideate "New features for developer productivity tool" \
   --num-ideas 8 \
   --temperature 0.8 \
   --system "Target: Individual developers and small teams. Must integrate with VS Code and GitHub."
@@ -1010,7 +1010,7 @@ modelchorus ideate "New features for developer productivity tool" \
 ### Example 2: Marketing Campaign Ideas
 
 ```bash
-modelchorus ideate "Creative marketing campaigns for sustainable fashion brand" \
+model-chorus ideate "Creative marketing campaigns for sustainable fashion brand" \
   --num-ideas 6 \
   --temperature 1.0
 ```
@@ -1027,7 +1027,7 @@ modelchorus ideate "Creative marketing campaigns for sustainable fashion brand" 
 ### Example 3: Technical Problem-Solving
 
 ```bash
-modelchorus ideate "Ways to reduce API latency by 50%" \
+model-chorus ideate "Ways to reduce API latency by 50%" \
   --file docs/current_architecture.md \
   --file logs/performance_analysis.log \
   --num-ideas 7 \

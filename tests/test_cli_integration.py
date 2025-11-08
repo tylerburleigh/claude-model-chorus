@@ -11,9 +11,9 @@ from pathlib import Path
 from typer.testing import CliRunner
 from unittest.mock import AsyncMock, MagicMock, patch, mock_open
 
-from modelchorus.cli.main import app
-from modelchorus.providers.base_provider import GenerationResponse
-from modelchorus.core.base_workflow import WorkflowResult, WorkflowStep
+from model_chorus.cli.main import app
+from model_chorus.providers.base_provider import GenerationResponse
+from model_chorus.core.base_workflow import WorkflowResult, WorkflowStep
 
 
 # Test fixtures
@@ -86,8 +86,8 @@ def temp_output_file(tmp_path):
 class TestArgumentCommand:
     """Test suite for 'argument' CLI command."""
 
-    @patch('modelchorus.cli.main.get_provider_by_name')
-    @patch('modelchorus.cli.main.ArgumentWorkflow')
+    @patch('model_chorus.cli.main.get_provider_by_name')
+    @patch('model_chorus.cli.main.ArgumentWorkflow')
     def test_argument_basic_invocation(
         self,
         mock_workflow_class,
@@ -113,8 +113,8 @@ class TestArgumentCommand:
         mock_get_provider.assert_called_once_with("claude")
         mock_workflow.run.assert_called_once()
 
-    @patch('modelchorus.cli.main.get_provider_by_name')
-    @patch('modelchorus.cli.main.ArgumentWorkflow')
+    @patch('model_chorus.cli.main.get_provider_by_name')
+    @patch('model_chorus.cli.main.ArgumentWorkflow')
     def test_argument_with_provider_option(
         self,
         mock_workflow_class,
@@ -137,8 +137,8 @@ class TestArgumentCommand:
         assert result.exit_code == 0
         mock_get_provider.assert_called_once_with("gemini")
 
-    @patch('modelchorus.cli.main.get_provider_by_name')
-    @patch('modelchorus.cli.main.ArgumentWorkflow')
+    @patch('model_chorus.cli.main.get_provider_by_name')
+    @patch('model_chorus.cli.main.ArgumentWorkflow')
     def test_argument_with_continuation(
         self,
         mock_workflow_class,
@@ -180,8 +180,8 @@ class TestArgumentCommand:
         assert result.exit_code == 0
         assert "Continued" in result.stdout or "3 messages" in result.stdout
 
-    @patch('modelchorus.cli.main.get_provider_by_name')
-    @patch('modelchorus.cli.main.ArgumentWorkflow')
+    @patch('model_chorus.cli.main.get_provider_by_name')
+    @patch('model_chorus.cli.main.ArgumentWorkflow')
     def test_argument_with_file(
         self,
         mock_workflow_class,
@@ -207,7 +207,7 @@ class TestArgumentCommand:
         call_kwargs = mock_workflow.run.call_args[1]
         assert call_kwargs['files'] == [str(temp_test_file)]
 
-    @patch('modelchorus.cli.main.get_provider_by_name')
+    @patch('model_chorus.cli.main.get_provider_by_name')
     def test_argument_with_nonexistent_file(
         self,
         mock_get_provider,
@@ -225,8 +225,8 @@ class TestArgumentCommand:
         assert result.exit_code == 1
         assert "File not found" in result.stdout
 
-    @patch('modelchorus.cli.main.get_provider_by_name')
-    @patch('modelchorus.cli.main.ArgumentWorkflow')
+    @patch('model_chorus.cli.main.get_provider_by_name')
+    @patch('model_chorus.cli.main.ArgumentWorkflow')
     def test_argument_with_temperature(
         self,
         mock_workflow_class,
@@ -250,8 +250,8 @@ class TestArgumentCommand:
         call_kwargs = mock_workflow.run.call_args[1]
         assert call_kwargs['temperature'] == 0.9
 
-    @patch('modelchorus.cli.main.get_provider_by_name')
-    @patch('modelchorus.cli.main.ArgumentWorkflow')
+    @patch('model_chorus.cli.main.get_provider_by_name')
+    @patch('model_chorus.cli.main.ArgumentWorkflow')
     def test_argument_with_output_file(
         self,
         mock_workflow_class,
@@ -284,8 +284,8 @@ class TestArgumentCommand:
         assert 'steps' in output_data
         assert 'metadata' in output_data
 
-    @patch('modelchorus.cli.main.get_provider_by_name')
-    @patch('modelchorus.cli.main.ArgumentWorkflow')
+    @patch('model_chorus.cli.main.get_provider_by_name')
+    @patch('model_chorus.cli.main.ArgumentWorkflow')
     def test_argument_verbose_mode(
         self,
         mock_workflow_class,
@@ -309,7 +309,7 @@ class TestArgumentCommand:
         # Verbose should show initialization and metadata
         assert "Initializing provider" in result.stdout or "claude" in result.stdout
 
-    @patch('modelchorus.cli.main.get_provider_by_name')
+    @patch('model_chorus.cli.main.get_provider_by_name')
     def test_argument_invalid_provider(
         self,
         mock_get_provider,
@@ -331,8 +331,8 @@ class TestArgumentCommand:
 class TestIdeateCommand:
     """Test suite for 'ideate' CLI command."""
 
-    @patch('modelchorus.cli.main.get_provider_by_name')
-    @patch('modelchorus.cli.main.IdeateWorkflow')
+    @patch('model_chorus.cli.main.get_provider_by_name')
+    @patch('model_chorus.cli.main.IdeateWorkflow')
     def test_ideate_basic_invocation(
         self,
         mock_workflow_class,
@@ -356,8 +356,8 @@ class TestIdeateCommand:
         assert "Generating creative ideas" in result.stdout
         assert "Test synthesis result" in result.stdout
 
-    @patch('modelchorus.cli.main.get_provider_by_name')
-    @patch('modelchorus.cli.main.IdeateWorkflow')
+    @patch('model_chorus.cli.main.get_provider_by_name')
+    @patch('model_chorus.cli.main.IdeateWorkflow')
     def test_ideate_with_num_ideas(
         self,
         mock_workflow_class,
@@ -381,8 +381,8 @@ class TestIdeateCommand:
         call_kwargs = mock_workflow.run.call_args[1]
         assert call_kwargs['num_ideas'] == 10
 
-    @patch('modelchorus.cli.main.get_provider_by_name')
-    @patch('modelchorus.cli.main.IdeateWorkflow')
+    @patch('model_chorus.cli.main.get_provider_by_name')
+    @patch('model_chorus.cli.main.IdeateWorkflow')
     def test_ideate_with_high_temperature(
         self,
         mock_workflow_class,
@@ -406,8 +406,8 @@ class TestIdeateCommand:
         call_kwargs = mock_workflow.run.call_args[1]
         assert call_kwargs['temperature'] == 1.0
 
-    @patch('modelchorus.cli.main.get_provider_by_name')
-    @patch('modelchorus.cli.main.IdeateWorkflow')
+    @patch('model_chorus.cli.main.get_provider_by_name')
+    @patch('model_chorus.cli.main.IdeateWorkflow')
     def test_ideate_with_continuation(
         self,
         mock_workflow_class,
@@ -443,8 +443,8 @@ class TestIdeateCommand:
 
         assert result.exit_code == 0
 
-    @patch('modelchorus.cli.main.get_provider_by_name')
-    @patch('modelchorus.cli.main.IdeateWorkflow')
+    @patch('model_chorus.cli.main.get_provider_by_name')
+    @patch('model_chorus.cli.main.IdeateWorkflow')
     def test_ideate_with_files(
         self,
         mock_workflow_class,
@@ -469,8 +469,8 @@ class TestIdeateCommand:
         call_kwargs = mock_workflow.run.call_args[1]
         assert call_kwargs['files'] == [str(temp_test_file)]
 
-    @patch('modelchorus.cli.main.get_provider_by_name')
-    @patch('modelchorus.cli.main.IdeateWorkflow')
+    @patch('model_chorus.cli.main.get_provider_by_name')
+    @patch('model_chorus.cli.main.IdeateWorkflow')
     def test_ideate_with_output(
         self,
         mock_workflow_class,
@@ -512,8 +512,8 @@ class TestErrorHandling:
 
         assert result.exit_code != 0
 
-    @patch('modelchorus.cli.main.get_provider_by_name')
-    @patch('modelchorus.cli.main.ArgumentWorkflow')
+    @patch('model_chorus.cli.main.get_provider_by_name')
+    @patch('model_chorus.cli.main.ArgumentWorkflow')
     def test_workflow_failure(
         self,
         mock_workflow_class,
@@ -540,8 +540,8 @@ class TestErrorHandling:
         assert result.exit_code == 1
         assert "Error" in result.stdout or "error" in result.stdout
 
-    @patch('modelchorus.cli.main.get_provider_by_name')
-    @patch('modelchorus.cli.main.ArgumentWorkflow')
+    @patch('model_chorus.cli.main.get_provider_by_name')
+    @patch('model_chorus.cli.main.ArgumentWorkflow')
     def test_keyboard_interrupt(
         self,
         mock_workflow_class,
@@ -577,7 +577,7 @@ class TestErrorHandling:
         # Will fail at provider initialization but shouldn't crash on input length
         assert result.exit_code in [0, 1]  # Either success or graceful failure
 
-    @patch('modelchorus.cli.main.get_provider_by_name')
+    @patch('model_chorus.cli.main.get_provider_by_name')
     def test_special_characters_in_prompt(
         self,
         mock_get_provider,
@@ -602,10 +602,10 @@ class TestErrorHandling:
 class TestCommandIntegration:
     """Test suite for cross-command integration."""
 
-    @patch('modelchorus.cli.main.get_provider_by_name')
-    @patch('modelchorus.cli.main.ArgumentWorkflow')
-    @patch('modelchorus.cli.main.IdeateWorkflow')
-    @patch('modelchorus.cli.main.ResearchWorkflow')
+    @patch('model_chorus.cli.main.get_provider_by_name')
+    @patch('model_chorus.cli.main.ArgumentWorkflow')
+    @patch('model_chorus.cli.main.IdeateWorkflow')
+    @patch('model_chorus.cli.main.ResearchWorkflow')
     def test_all_commands_available(
         self,
         mock_research_wf,
@@ -646,7 +646,7 @@ class TestCommandIntegration:
         assert "ideate" in result.stdout
         assert "research" in result.stdout
 
-    @patch('modelchorus.cli.main.get_provider_by_name')
+    @patch('model_chorus.cli.main.get_provider_by_name')
     def test_common_options_work_across_commands(
         self,
         mock_get_provider,

@@ -289,27 +289,27 @@ Workflows that use multiple AI models:
 
 ### Starting a new session
 ```bash
-modelchorus chat --provider claude --temperature 0.7 "Analyze this code structure"
+model-chorus chat --provider claude --temperature 0.7 "Analyze this code structure"
 ```
 
 ### Continuing a session
 ```bash
-modelchorus chat --continue session-abc-123 "What about error handling?"
+model-chorus chat --continue session-abc-123 "What about error handling?"
 ```
 
 ### With file context
 ```bash
-modelchorus thinkdeep --provider gemini -f /absolute/path/to/file.py "Debug this function"
+model-chorus thinkdeep --provider gemini -f /absolute/path/to/file.py "Debug this function"
 ```
 
 ### Saving output
 ```bash
-modelchorus consensus --output /path/to/results.json "Analyze this topic"
+model-chorus consensus --output /path/to/results.json "Analyze this topic"
 ```
 
 ### Complex multi-step investigation
 ```bash
-modelchorus thinkdeep \
+model-chorus thinkdeep \
   --provider claude \
   --thinking-mode high \
   -f /project/src/main.py \

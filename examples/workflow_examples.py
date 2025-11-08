@@ -12,7 +12,7 @@ Each workflow demonstrates:
 - Best practices
 
 Requirements:
-- ModelChorus installed: pip install modelchorus
+- ModelChorus installed: pip install model-chorus
 - Provider CLI tools configured (claude, gemini, codex, etc.)
 - API keys set in environment variables
 """
@@ -23,11 +23,11 @@ from pathlib import Path
 from typing import Optional
 
 # Add parent directory to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent / "modelchorus" / "src"))
+sys.path.insert(0, str(Path(__file__).parent.parent / "model-chorus" / "src"))
 
-from modelchorus.workflows import ArgumentWorkflow, IdeateWorkflow
-from modelchorus.providers import ClaudeProvider, GeminiProvider
-from modelchorus.core.conversation import ConversationMemory
+from model_chorus.workflows import ArgumentWorkflow, IdeateWorkflow
+from model_chorus.providers import ClaudeProvider, GeminiProvider
+from model_chorus.core.conversation import ConversationMemory
 
 
 # ============================================================================

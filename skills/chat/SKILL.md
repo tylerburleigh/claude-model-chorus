@@ -48,7 +48,7 @@ Avoid the CHAT workflow when:
 ### Simple Example
 
 ```bash
-modelchorus chat "What is quantum computing?"
+model-chorus chat "What is quantum computing?"
 ```
 
 **Expected Output:**
@@ -114,10 +114,10 @@ The CHAT workflow returns a JSON object with the following structure:
 
 ```bash
 # Include single file for discussion
-modelchorus chat "Explain this code" -f src/main.py
+model-chorus chat "Explain this code" -f src/main.py
 
 # Include multiple files for broader context
-modelchorus chat "Review these implementations" -f api.py -f models.py -f tests.py
+model-chorus chat "Review these implementations" -f api.py -f models.py -f tests.py
 ```
 
 **File Handling:**
@@ -130,14 +130,14 @@ modelchorus chat "Review these implementations" -f api.py -f models.py -f tests.
 
 ```bash
 # Start new conversation
-modelchorus chat "What is quantum computing?"
+model-chorus chat "What is quantum computing?"
 # Output includes: Session ID: thread-abc-123-def-456
 
 # Continue conversation with follow-up
-modelchorus chat "How does it differ from classical computing?" --continue thread-abc-123-def-456
+model-chorus chat "How does it differ from classical computing?" --continue thread-abc-123-def-456
 
 # Further continuation in same thread
-modelchorus chat "Give me a practical example" -c thread-abc-123-def-456
+model-chorus chat "Give me a practical example" -c thread-abc-123-def-456
 ```
 
 **Threading Notes:**
@@ -152,7 +152,7 @@ modelchorus chat "Give me a practical example" -c thread-abc-123-def-456
 
 ```bash
 # Save output to JSON file
-modelchorus chat "Analyze this architecture" -f design.md --output analysis.json
+model-chorus chat "Analyze this architecture" -f design.md --output analysis.json
 ```
 
 **Output file contains:**
@@ -179,13 +179,13 @@ modelchorus chat "Analyze this architecture" -f design.md --output analysis.json
 **Command:**
 ```bash
 # Start conversation with code file
-modelchorus chat "Review this implementation for potential issues" -f src/auth.py
+model-chorus chat "Review this implementation for potential issues" -f src/auth.py
 
 # Follow up with specific question (using thread ID from previous output)
-modelchorus chat "How would you refactor the login method?" -c thread-abc-123
+model-chorus chat "How would you refactor the login method?" -c thread-abc-123
 
 # Continue with implementation details
-modelchorus chat "Show me an example of the improved version" -c thread-abc-123
+model-chorus chat "Show me an example of the improved version" -c thread-abc-123
 ```
 
 **Expected Outcome:** Multi-turn conversation where the model builds on previous context to provide detailed, contextual code review and refactoring suggestions.
@@ -199,13 +199,13 @@ modelchorus chat "Show me an example of the improved version" -c thread-abc-123
 **Command:**
 ```bash
 # Initial query
-modelchorus chat "Explain Rust's ownership system"
+model-chorus chat "Explain Rust's ownership system"
 
 # Follow up (saves thread ID: thread-xyz-789)
-modelchorus chat "How does borrowing work with mutable references?" -c thread-xyz-789
+model-chorus chat "How does borrowing work with mutable references?" -c thread-xyz-789
 
 # Ask for practical example
-modelchorus chat "Show me a common mistake beginners make" -c thread-xyz-789
+model-chorus chat "Show me a common mistake beginners make" -c thread-xyz-789
 ```
 
 **Expected Outcome:** Educational conversation where each response builds on previous explanations, creating a coherent learning path.
@@ -219,7 +219,7 @@ modelchorus chat "Show me a common mistake beginners make" -c thread-xyz-789
 **Command:**
 ```bash
 # Include multiple related files
-modelchorus chat "Explain how these components work together" -f src/models/user.py -f src/services/auth.py -f src/api/routes.py --output analysis.json
+model-chorus chat "Explain how these components work together" -f src/models/user.py -f src/services/auth.py -f src/api/routes.py --output analysis.json
 ```
 
 **Expected Outcome:** Comprehensive analysis of component relationships with results saved to JSON for later reference.
@@ -236,7 +236,7 @@ modelchorus chat "Explain how these components work together" -f src/models/user
 ```bash
 # Verify thread ID format (should be thread-{uuid})
 # Start a new conversation if thread is unavailable
-modelchorus chat "Your prompt here"
+model-chorus chat "Your prompt here"
 ```
 
 ---
@@ -253,7 +253,7 @@ modelchorus chat "Your prompt here"
 ls -l path/to/file.py
 
 # Use correct absolute or relative path
-modelchorus chat "Review this code" -f ./src/main.py
+model-chorus chat "Review this code" -f ./src/main.py
 ```
 
 ---
@@ -278,4 +278,4 @@ Starting chat workflow...
 
 **See Also:**
 - ModelChorus Documentation: `/docs/WORKFLOWS.md`
-- General CLI Help: `modelchorus --help`
+- General CLI Help: `model-chorus --help`

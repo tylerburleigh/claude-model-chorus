@@ -6,7 +6,7 @@ This guide provides manual testing procedures for the provider fallback and avai
 
 - ModelChorus installed
 - At least one provider CLI installed (claude, gemini, codex, or cursor-agent)
-- `.modelchorusrc` configured with fallback providers
+- `.model-chorusrc` configured with fallback providers
 
 ## Test Scenarios
 
@@ -16,12 +16,12 @@ This guide provides manual testing procedures for the provider fallback and avai
 
 ```bash
 # Verify all providers are available
-modelchorus list-providers --check
+model-chorus list-providers --check
 ```
 
 **Test**: Run a chat workflow
 ```bash
-modelchorus chat "What is quantum computing?" --verbose
+model-chorus chat "What is quantum computing?" --verbose
 ```
 
 **Expected Result**:
@@ -41,12 +41,12 @@ which claude  # Note the path
 sudo mv /path/to/claude /path/to/claude.bak
 
 # Verify claude is unavailable
-modelchorus list-providers --check
+model-chorus list-providers --check
 ```
 
 **Test**: Run chat workflow with verbose output
 ```bash
-modelchorus chat "What is quantum computing?" --verbose
+model-chorus chat "What is quantum computing?" --verbose
 ```
 
 **Expected Result**:
@@ -75,15 +75,15 @@ sudo mv /path/to/gemini /path/to/gemini.bak
 
 **Test**: Run chat workflow
 ```bash
-modelchorus chat "What is quantum computing?"
+model-chorus chat "What is quantum computing?"
 ```
 
 **Expected Result**:
 - Clear error message: "No providers available for research:"
 - List of unavailable providers with reasons
 - Helpful suggestions:
-  - "Check installations: modelchorus list-providers --check"
-  - "Install missing providers or update .modelchorusrc"
+  - "Check installations: model-chorus list-providers --check"
+  - "Install missing providers or update .model-chorusrc"
 - Non-zero exit code
 
 **Cleanup**:
@@ -99,7 +99,7 @@ sudo mv /path/to/gemini.bak /path/to/gemini
 
 **Test**: Run workflow with `--skip-provider-check`
 ```bash
-time modelchorus chat "What is quantum computing?" --skip-provider-check --verbose
+time model-chorus chat "What is quantum computing?" --skip-provider-check --verbose
 ```
 
 **Expected Result**:
@@ -110,7 +110,7 @@ time modelchorus chat "What is quantum computing?" --skip-provider-check --verbo
 
 **Comparison**: Run without the flag
 ```bash
-time modelchorus chat "What is quantum computing?" --verbose
+time model-chorus chat "What is quantum computing?" --verbose
 ```
 
 **Expected Result**:
@@ -125,13 +125,13 @@ time modelchorus chat "What is quantum computing?" --verbose
 **Setup**: Configure a provider that will fail during execution (e.g., invalid API key)
 
 ```bash
-# Edit .modelchorusrc to use a provider with invalid credentials
+# Edit .model-chorusrc to use a provider with invalid credentials
 # This tests runtime fallback, not availability check
 ```
 
 **Test**: Run chat workflow
 ```bash
-modelchorus chat "What is quantum computing?" --verbose
+model-chorus chat "What is quantum computing?" --verbose
 ```
 
 **Expected Result**:
@@ -148,22 +148,22 @@ Test fallback across different workflows:
 
 **Chat**:
 ```bash
-modelchorus chat "Hello" --verbose
+model-chorus chat "Hello" --verbose
 ```
 
 **Argument**:
 ```bash
-modelchorus argument "AI is beneficial" --verbose
+model-chorus argument "AI is beneficial" --verbose
 ```
 
 **Ideate**:
 ```bash
-modelchorus ideate "New app features" --verbose
+model-chorus ideate "New app features" --verbose
 ```
 
 **ThinkDeep**:
 ```bash
-modelchorus thinkdeep \
+model-chorus thinkdeep \
   --step "Investigate problem" \
   --step-number 1 \
   --total-steps 1 \
@@ -184,11 +184,11 @@ modelchorus thinkdeep \
 **Test**: Verify fallback providers are loaded from config
 
 ```bash
-# Check your .modelchorusrc has fallback_providers defined
-cat .modelchorusrc
+# Check your .model-chorusrc has fallback_providers defined
+cat .model-chorusrc
 
 # Run with verbose to see provider initialization
-modelchorus chat "What is quantum computing?" --verbose
+model-chorus chat "What is quantum computing?" --verbose
 ```
 
 **Expected Result**:
@@ -210,7 +210,7 @@ sudo mv /path/to/codex /path/to/codex.bak
 
 **Test**: Run consensus workflow
 ```bash
-modelchorus consensus "Best programming language?" --verbose
+model-chorus consensus "Best programming language?" --verbose
 ```
 
 **Expected Result**:
@@ -233,19 +233,19 @@ Quick test suite for basic functionality:
 
 ```bash
 # 1. Check provider availability
-modelchorus list-providers --check
+model-chorus list-providers --check
 
 # 2. Test each workflow with verbose output
-modelchorus chat "What is TypeScript?" --verbose
-modelchorus chat "What is quantum computing?" --verbose
-modelchorus argument "Test claim" --verbose
-modelchorus ideate "Test ideas" --verbose
+model-chorus chat "What is TypeScript?" --verbose
+model-chorus chat "What is quantum computing?" --verbose
+model-chorus argument "Test claim" --verbose
+model-chorus ideate "Test ideas" --verbose
 
 # 3. Test skip-provider-check flag
-modelchorus chat "What is TypeScript?" --skip-provider-check --verbose
+model-chorus chat "What is TypeScript?" --skip-provider-check --verbose
 
 # 4. Test with output files
-modelchorus chat "What is TypeScript?" -o /tmp/chat-test.json
+model-chorus chat "What is TypeScript?" -o /tmp/chat-test.json
 cat /tmp/chat-test.json | jq '.metadata'
 ```
 
@@ -257,7 +257,7 @@ cat /tmp/chat-test.json | jq '.metadata'
 
 ```bash
 export MODELCHORUS_LOG_LEVEL=DEBUG
-modelchorus chat "What is quantum computing?" --verbose
+model-chorus chat "What is quantum computing?" --verbose
 ```
 
 ### Check Provider CLIs Directly
@@ -274,10 +274,10 @@ cursor-agent --version
 
 ```bash
 # Check config file
-cat ~/.modelchorusrc  # or project .modelchorusrc
+cat ~/.model-chorusrc  # or project .model-chorusrc
 
 # Check which config is being used
-modelchorus chat "test" --verbose 2>&1 | grep -i "config"
+model-chorus chat "test" --verbose 2>&1 | grep -i "config"
 ```
 
 ### Provider Not Found Issues
@@ -333,12 +333,12 @@ If you encounter issues during testing:
 
 1. Collect logs with verbose output:
    ```bash
-   modelchorus chat "What is quantum computing?" --verbose 2>&1 | tee debug.log
+   model-chorus chat "What is quantum computing?" --verbose 2>&1 | tee debug.log
    ```
 
 2. Check provider availability:
    ```bash
-   modelchorus list-providers --check 2>&1 | tee providers.log
+   model-chorus list-providers --check 2>&1 | tee providers.log
    ```
 
 3. Include in bug report:

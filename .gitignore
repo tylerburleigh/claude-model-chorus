@@ -51,7 +51,7 @@ specs/.backups/
 specs/.human-readable/
 
 # ModelChorus
-.modelchorusrc
-.modelchorusrc.yaml
-.modelchorusrc.yml
-.modelchorusrc.json
+.model-chorusrc
+.model-chorusrc.yaml
+.model-chorusrc.yml
+.model-chorusrc.json

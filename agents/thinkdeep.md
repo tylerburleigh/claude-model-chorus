@@ -37,13 +37,13 @@ Use this agent when you need to:
 
 ## How This Agent Works
 
-This agent is a thin wrapper that invokes `Skill(modelchorus:thinkdeep)`.
+This agent is a thin wrapper that invokes `Skill(model-chorus:thinkdeep)`.
 
 **Your task:**
 1. Parse the user's request to understand what needs investigation
 2. **VALIDATE** that you have all required information (see Contract Validation below)
 3. If information is missing, **STOP and return immediately** with error message
-4. If sufficient information, invoke: `Skill(modelchorus:thinkdeep)`
+4. If sufficient information, invoke: `Skill(model-chorus:thinkdeep)`
 5. Pass a clear prompt describing the investigation request
 6. Wait for the skill to complete
 7. Report results including **session_id** for continuation
@@ -107,7 +107,7 @@ After the skill completes, report:
 
 **Agent invocation:**
 ```
-Skill(modelchorus:thinkdeep) with prompt:
+Skill(model-chorus:thinkdeep) with prompt:
 "Investigate 500 errors in checkout flow
 --step 'Investigate 500 errors in checkout flow'
 --step-number 1
@@ -124,7 +124,7 @@ Skill(modelchorus:thinkdeep) with prompt:
 
 **Agent invocation:**
 ```
-Skill(modelchorus:thinkdeep) with prompt:
+Skill(model-chorus:thinkdeep) with prompt:
 "Investigate API latency increase
 --step 'API latency increased from 100ms to 2s after deployment'
 --step-number 1
@@ -143,7 +143,7 @@ Skill(modelchorus:thinkdeep) with prompt:
 
 **Agent invocation:**
 ```
-Skill(modelchorus:thinkdeep) with prompt:
+Skill(model-chorus:thinkdeep) with prompt:
 "Continue performance investigation
 --session-id 'perf-inv-001'
 --step 'Examine deployment changes'
@@ -166,4 +166,4 @@ If the skill encounters errors, report:
 
 ---
 
-**Note:** All investigation logic, hypothesis tracking, and state management are handled by `Skill(modelchorus:thinkdeep)`. This agent's role is simply to validate inputs, invoke the skill, and communicate results including the session_id for continuation.
+**Note:** All investigation logic, hypothesis tracking, and state management are handled by `Skill(model-chorus:thinkdeep)`. This agent's role is simply to validate inputs, invoke the skill, and communicate results including the session_id for continuation.

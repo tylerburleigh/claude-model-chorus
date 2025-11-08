@@ -12,11 +12,11 @@ import pytest
 from unittest.mock import AsyncMock, patch
 import uuid
 
-from modelchorus.workflows.consensus import ConsensusWorkflow, ConsensusStrategy
-from modelchorus.workflows.thinkdeep import ThinkDeepWorkflow
-from modelchorus.workflows.chat import ChatWorkflow
-from modelchorus.providers.base_provider import GenerationResponse, GenerationRequest
-from modelchorus.core.conversation import ConversationMemory
+from model_chorus.workflows.consensus import ConsensusWorkflow, ConsensusStrategy
+from model_chorus.workflows.thinkdeep import ThinkDeepWorkflow
+from model_chorus.workflows.chat import ChatWorkflow
+from model_chorus.providers.base_provider import GenerationResponse, GenerationRequest
+from model_chorus.core.conversation import ConversationMemory
 
 
 class TestConsensusThinkDeepChatChaining:

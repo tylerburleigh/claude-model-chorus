@@ -39,13 +39,13 @@ Use this agent when you need to:
 
 ## How This Agent Works
 
-This agent is a thin wrapper that invokes `Skill(modelchorus:argument)`.
+This agent is a thin wrapper that invokes `Skill(model-chorus:argument)`.
 
 **Your task:**
 1. Parse the user's request to understand the argument or claim
 2. **VALIDATE** that you have all required information (see Contract Validation below)
 3. If information is missing, **STOP and return immediately** with error message
-4. If sufficient information, invoke: `Skill(modelchorus:argument)`
+4. If sufficient information, invoke: `Skill(model-chorus:argument)`
 5. Pass a clear prompt describing the argument analysis request
 6. Wait for the skill to complete (all three roles execute sequentially)
 7. Report all three role analyses and **session_id** for continuation
@@ -97,7 +97,7 @@ After the skill completes, report:
 
 **Agent invocation:**
 ```
-Skill(modelchorus:argument) with prompt:
+Skill(model-chorus:argument) with prompt:
 "Should we adopt GraphQL for our API?"
 ```
 
@@ -107,7 +107,7 @@ Skill(modelchorus:argument) with prompt:
 
 **Agent invocation:**
 ```
-Skill(modelchorus:argument) with prompt:
+Skill(model-chorus:argument) with prompt:
 "Universal basic income: evaluate the policy from economic and social perspectives"
 ```
 
@@ -117,7 +117,7 @@ Skill(modelchorus:argument) with prompt:
 
 **Agent invocation:**
 ```
-Skill(modelchorus:argument) with prompt:
+Skill(model-chorus:argument) with prompt:
 "Should we migrate from monolithic to microservices architecture?
 --system 'Team size: 5 developers, 3 existing services, budget: $10k/month'"
 ```
@@ -126,13 +126,13 @@ Skill(modelchorus:argument) with prompt:
 
 **Initial analysis:**
 ```
-Skill(modelchorus:argument) with prompt:
+Skill(model-chorus:argument) with prompt:
 "Should we implement feature flags in our deployment pipeline?"
 ```
 
 **Follow-up analysis (using session_id returned):**
 ```
-Skill(modelchorus:argument) with prompt:
+Skill(model-chorus:argument) with prompt:
 "Given the previous analysis, focus specifically on the operational overhead concerns
 --continue argument-thread-abc123"
 ```
@@ -143,7 +143,7 @@ Skill(modelchorus:argument) with prompt:
 
 **Agent invocation:**
 ```
-Skill(modelchorus:argument) with prompt:
+Skill(model-chorus:argument) with prompt:
 "Evaluate our current caching strategy for the API
 --file docs/caching_design.md
 --file config/cache_config.yaml"
@@ -160,4 +160,4 @@ If the skill encounters errors, report:
 
 ---
 
-**Note:** All three-role execution, dialectical reasoning, and synthesis logic are handled by `Skill(modelchorus:argument)`. This agent's role is simply to validate inputs, invoke the skill, and communicate all three role perspectives including the session_id for continuation.
+**Note:** All three-role execution, dialectical reasoning, and synthesis logic are handled by `Skill(model-chorus:argument)`. This agent's role is simply to validate inputs, invoke the skill, and communicate all three role perspectives including the session_id for continuation.

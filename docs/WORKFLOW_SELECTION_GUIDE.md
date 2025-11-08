@@ -253,7 +253,7 @@ Structured idea generation with divergent thinking followed by synthesis.
 
 **CHAT Approach:**
 ```bash
-modelchorus chat "Design a REST API for user management with CRUD operations"
+model-chorus chat "Design a REST API for user management with CRUD operations"
 ```
 - **Result:** Single design proposal
 - **Pros:** Fast, actionable
@@ -261,7 +261,7 @@ modelchorus chat "Design a REST API for user management with CRUD operations"
 
 **CONSENSUS Approach:**
 ```bash
-modelchorus consensus --strategy synthesize "Design a REST API for user management. Consider endpoints, authentication, error handling, and versioning"
+model-chorus consensus --strategy synthesize "Design a REST API for user management. Consider endpoints, authentication, error handling, and versioning"
 ```
 - **Result:** Multiple design approaches synthesized
 - **Pros:** Validated, comprehensive
@@ -269,7 +269,7 @@ modelchorus consensus --strategy synthesize "Design a REST API for user manageme
 
 **ARGUMENT Approach:**
 ```bash
-modelchorus argument "Evaluate this API design proposal: [paste design]. Focus on scalability, security, and developer experience"
+model-chorus argument "Evaluate this API design proposal: [paste design]. Focus on scalability, security, and developer experience"
 ```
 - **Result:** Balanced critique with strengths/weaknesses
 - **Pros:** Identifies issues, structured feedback
@@ -285,7 +285,7 @@ modelchorus argument "Evaluate this API design proposal: [paste design]. Focus o
 
 **CHAT Approach:**
 ```bash
-modelchorus chat "API latency went from 100ms to 2s after deployment. What could be wrong?"
+model-chorus chat "API latency went from 100ms to 2s after deployment. What could be wrong?"
 ```
 - **Result:** List of possible causes
 - **Pros:** Fast suggestions
@@ -293,7 +293,7 @@ modelchorus chat "API latency went from 100ms to 2s after deployment. What could
 
 **THINKDEEP Approach:**
 ```bash
-modelchorus thinkdeep --step "API latency increased 20x after deployment" --step-number 1 --total-steps 3 --next-step-required true --findings "Affects all endpoints equally, started at 3pm deployment" --confidence low
+model-chorus thinkdeep --step "API latency increased 20x after deployment" --step-number 1 --total-steps 3 --next-step-required true --findings "Affects all endpoints equally, started at 3pm deployment" --confidence low
 ```
 - **Result:** Systematic investigation with hypothesis testing
 - **Pros:** Methodical, builds confidence, finds root cause
@@ -309,7 +309,7 @@ modelchorus thinkdeep --step "API latency increased 20x after deployment" --step
 
 **CHAT Approach:**
 ```bash
-modelchorus chat "Should I use PostgreSQL, MongoDB, or DynamoDB for my e-commerce app?"
+model-chorus chat "Should I use PostgreSQL, MongoDB, or DynamoDB for my e-commerce app?"
 ```
 - **Result:** Single recommendation
 - **Pros:** Fast decision
@@ -317,7 +317,7 @@ modelchorus chat "Should I use PostgreSQL, MongoDB, or DynamoDB for my e-commerc
 
 **CONSENSUS Approach:**
 ```bash
-modelchorus consensus --strategy synthesize "Evaluate PostgreSQL, MongoDB, and DynamoDB for e-commerce platform. Consider: 10k users, ACID requirements, query patterns, team expertise (SQL background)"
+model-chorus consensus --strategy synthesize "Evaluate PostgreSQL, MongoDB, and DynamoDB for e-commerce platform. Consider: 10k users, ACID requirements, query patterns, team expertise (SQL background)"
 ```
 - **Result:** Multi-model evaluation with consensus
 - **Pros:** Comprehensive, validated, considers tradeoffs
@@ -325,7 +325,7 @@ modelchorus consensus --strategy synthesize "Evaluate PostgreSQL, MongoDB, and D
 
 **ARGUMENT Approach:**
 ```bash
-modelchorus argument "Proposal: Use MongoDB for our e-commerce platform. Team has SQL background, need ACID transactions, 10k users expected"
+model-chorus argument "Proposal: Use MongoDB for our e-commerce platform. Team has SQL background, need ACID transactions, 10k users expected"
 ```
 - **Result:** Balanced critique of MongoDB choice
 - **Pros:** Identifies specific concerns
@@ -341,7 +341,7 @@ modelchorus argument "Proposal: Use MongoDB for our e-commerce platform. Team ha
 
 **CHAT Approach:**
 ```bash
-modelchorus chat "Suggest ways to improve our user onboarding"
+model-chorus chat "Suggest ways to improve our user onboarding"
 ```
 - **Result:** List of suggestions
 - **Pros:** Fast ideas
@@ -349,7 +349,7 @@ modelchorus chat "Suggest ways to improve our user onboarding"
 
 **IDEATE Approach:**
 ```bash
-modelchorus ideate --num-ideas 5 "Generate creative ideas to improve user onboarding experience. Current issues: 40% drop-off, users confused about first steps"
+model-chorus ideate --num-ideas 5 "Generate creative ideas to improve user onboarding experience. Current issues: 40% drop-off, users confused about first steps"
 ```
 - **Result:** 5 diverse ideas with synthesis
 - **Pros:** Structured brainstorming, explores space
@@ -357,7 +357,7 @@ modelchorus ideate --num-ideas 5 "Generate creative ideas to improve user onboar
 
 **CONSENSUS Approach:**
 ```bash
-modelchorus consensus --strategy all_responses "What are the best ways to improve user onboarding? Current drop-off: 40%"
+model-chorus consensus --strategy all_responses "What are the best ways to improve user onboarding? Current drop-off: 40%"
 ```
 - **Result:** Multiple perspectives on improvements
 - **Pros:** Validated ideas from multiple models

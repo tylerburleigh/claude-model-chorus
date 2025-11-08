@@ -47,43 +47,43 @@ Use ARGUMENT when you need:
 ### Policy & Governance Analysis
 ```bash
 # Analyze policy proposals from multiple angles
-modelchorus argument "Universal healthcare should be implemented in the US"
+model-chorus argument "Universal healthcare should be implemented in the US"
 
 # Evaluate regulatory changes
-modelchorus argument "Cryptocurrency should be regulated like traditional securities"
+model-chorus argument "Cryptocurrency should be regulated like traditional securities"
 ```
 
 ### Technology & Architecture Decisions
 ```bash
 # Debate technical approaches
-modelchorus argument "GraphQL should replace all REST APIs in our application"
+model-chorus argument "GraphQL should replace all REST APIs in our application"
 
 # Evaluate framework choices
-modelchorus argument "Our team should migrate from React to Svelte"
+model-chorus argument "Our team should migrate from React to Svelte"
 ```
 
 ### Feature & Product Proposals
 ```bash
 # Analyze feature proposals
-modelchorus argument "We should add AI-powered code review to our platform"
+model-chorus argument "We should add AI-powered code review to our platform"
 
 # Evaluate business strategies
-modelchorus argument "Freemium model would be better than enterprise-only licensing"
+model-chorus argument "Freemium model would be better than enterprise-only licensing"
 ```
 
 ### Research & Critical Analysis
 ```bash
 # Academic arguments
-modelchorus argument "Remote work increases overall productivity for knowledge workers"
+model-chorus argument "Remote work increases overall productivity for knowledge workers"
 
 # Scientific hypotheses
-modelchorus argument "Quantum computing will make classical cryptography obsolete within 10 years"
+model-chorus argument "Quantum computing will make classical cryptography obsolete within 10 years"
 ```
 
 ### Code Review Alternatives
 ```bash
 # Evaluate implementation approaches
-modelchorus argument "This refactoring will improve maintainability without introducing bugs" \
+model-chorus argument "This refactoring will improve maintainability without introducing bugs" \
   -f src/auth.py -f src/auth_refactored.py
 ```
 
@@ -109,7 +109,7 @@ modelchorus argument "This refactoring will improve maintainability without intr
 
 **Simple argument analysis:**
 ```bash
-modelchorus argument "Universal basic income would reduce poverty"
+model-chorus argument "Universal basic income would reduce poverty"
 ```
 
 **Expected output:**
@@ -133,13 +133,13 @@ Thread ID: argument-thread-abc123
 **Specify which AI provider to use:**
 ```bash
 # Use Claude
-modelchorus argument "Remote work increases productivity" --provider claude
+model-chorus argument "Remote work increases productivity" --provider claude
 
 # Use Gemini
-modelchorus argument "Remote work increases productivity" --provider gemini
+model-chorus argument "Remote work increases productivity" --provider gemini
 
 # Use Codex
-modelchorus argument "Remote work increases productivity" --provider codex
+model-chorus argument "Remote work increases productivity" --provider codex
 ```
 
 ### With File Context
@@ -147,11 +147,11 @@ modelchorus argument "Remote work increases productivity" --provider codex
 **Provide supporting documents:**
 ```bash
 # Single file
-modelchorus argument "This refactoring improves code quality" \
+model-chorus argument "This refactoring improves code quality" \
   --file src/auth.py
 
 # Multiple files
-modelchorus argument "GraphQL would improve our API" \
+model-chorus argument "GraphQL would improve our API" \
   --file docs/api_requirements.md \
   --file docs/current_rest_api.md \
   --file docs/performance_analysis.md
@@ -162,15 +162,15 @@ modelchorus argument "GraphQL would improve our API" \
 **Continue a previous argument analysis:**
 ```bash
 # Initial analysis
-modelchorus argument "TypeScript should replace JavaScript in our codebase"
+model-chorus argument "TypeScript should replace JavaScript in our codebase"
 # Returns: Thread ID: argument-thread-xyz789
 
 # Follow-up analysis
-modelchorus argument "But what about the migration cost and learning curve?" \
+model-chorus argument "But what about the migration cost and learning curve?" \
   --continue argument-thread-xyz789
 
 # Further exploration
-modelchorus argument "How would this affect our existing libraries?" \
+model-chorus argument "How would this affect our existing libraries?" \
   --continue argument-thread-xyz789
 ```
 
@@ -185,22 +185,22 @@ modelchorus argument "How would this affect our existing libraries?" \
 **Temperature control (creativity vs focus):**
 ```bash
 # Lower temperature for focused, analytical debate
-modelchorus argument "Should we use microservices?" --temperature 0.5
+model-chorus argument "Should we use microservices?" --temperature 0.5
 
 # Higher temperature for more creative perspectives
-modelchorus argument "How can we improve team productivity?" --temperature 0.9
+model-chorus argument "How can we improve team productivity?" --temperature 0.9
 ```
 
 **Token limit:**
 ```bash
 # Limit response length
-modelchorus argument "Evaluate our caching strategy" --max-tokens 1500
+model-chorus argument "Evaluate our caching strategy" --max-tokens 1500
 ```
 
 **System prompt for context:**
 ```bash
 # Add specific context or constraints
-modelchorus argument "Should we adopt Kubernetes?" \
+model-chorus argument "Should we adopt Kubernetes?" \
   --system "Our team has 5 developers, 3 microservices, budget under $10k/month"
 ```
 
@@ -212,9 +212,9 @@ modelchorus argument "Should we adopt Kubernetes?" \
 
 ```python
 import asyncio
-from modelchorus.workflows import ArgumentWorkflow
-from modelchorus.providers import ClaudeProvider
-from modelchorus.core.conversation import ConversationMemory
+from model_chorus.workflows import ArgumentWorkflow
+from model_chorus.providers import ClaudeProvider
+from model_chorus.core.conversation import ConversationMemory
 
 async def analyze_argument():
     # Initialize provider and memory
@@ -428,7 +428,7 @@ result4 = await workflow.run(
 Get diverse perspectives by running with different providers:
 
 ```python
-from modelchorus.providers import ClaudeProvider, GeminiProvider
+from model_chorus.providers import ClaudeProvider, GeminiProvider
 
 providers = [
     ("Claude", ClaudeProvider()),
@@ -491,13 +491,13 @@ for name, provider in providers:
 **Good:**
 ```bash
 # Clear, specific claim
-modelchorus argument "Adopting TypeScript would improve code quality in our project"
+model-chorus argument "Adopting TypeScript would improve code quality in our project"
 ```
 
 **Less Effective:**
 ```bash
 # Vague, open-ended question
-modelchorus argument "What do you think about TypeScript?"
+model-chorus argument "What do you think about TypeScript?"
 ```
 
 ### 2. Provide Context When Needed
@@ -718,7 +718,7 @@ gemini --version
 claude "test message"
 
 # Try different provider
-modelchorus argument "test" --provider gemini
+model-chorus argument "test" --provider gemini
 ```
 
 ### Issue: High Costs
@@ -757,10 +757,10 @@ result = await workflow.run(prompt="...", max_tokens=1500)
 **Example:**
 ```bash
 # Use ARGUMENT for debate
-modelchorus argument "Should we adopt GraphQL?"
+model-chorus argument "Should we adopt GraphQL?"
 
 # Use CHAT for quick question
-modelchorus chat "What is GraphQL?" -p claude
+model-chorus chat "What is GraphQL?" -p claude
 ```
 
 ### ARGUMENT vs CONSENSUS
@@ -776,10 +776,10 @@ modelchorus chat "What is GraphQL?" -p claude
 **Example:**
 ```bash
 # Use ARGUMENT for structured debate
-modelchorus argument "Microservices vs monolith for our scale"
+model-chorus argument "Microservices vs monolith for our scale"
 
 # Use CONSENSUS for multi-model perspectives
-modelchorus consensus "Microservices vs monolith for our scale" \
+model-chorus consensus "Microservices vs monolith for our scale" \
   -p claude -p gemini -p codex -s synthesize
 ```
 
@@ -796,10 +796,10 @@ modelchorus consensus "Microservices vs monolith for our scale" \
 **Example:**
 ```bash
 # Use ARGUMENT for claim analysis
-modelchorus argument "Remote work increases productivity"
+model-chorus argument "Remote work increases productivity"
 
 # Use THINKDEEP for investigation
-modelchorus thinkdeep "Why is our API slow?" -f src/api.py
+model-chorus thinkdeep "Why is our API slow?" -f src/api.py
 ```
 
 ---
@@ -809,7 +809,7 @@ modelchorus thinkdeep "Why is our API slow?" -f src/api.py
 ### Example 1: Technology Decision
 
 ```bash
-modelchorus argument "Our team should migrate from REST to GraphQL" \
+model-chorus argument "Our team should migrate from REST to GraphQL" \
   --file docs/current_api.md \
   --file docs/client_requirements.md \
   --temperature 0.7
@@ -823,7 +823,7 @@ modelchorus argument "Our team should migrate from REST to GraphQL" \
 ### Example 2: Policy Analysis
 
 ```bash
-modelchorus argument "Universal healthcare would improve public health outcomes" \
+model-chorus argument "Universal healthcare would improve public health outcomes" \
   --file research/healthcare_studies.pdf \
   --file research/cost_analysis.xlsx \
   --temperature 0.6
@@ -837,7 +837,7 @@ modelchorus argument "Universal healthcare would improve public health outcomes"
 ### Example 3: Code Review Alternative
 
 ```bash
-modelchorus argument "This refactoring improves maintainability without bugs" \
+model-chorus argument "This refactoring improves maintainability without bugs" \
   --file src/old_implementation.py \
   --file src/new_implementation.py \
   --file tests/test_suite.py \

@@ -9,11 +9,11 @@ ModelProvider abstract interface.
 import sys
 from pathlib import Path
 
-# Add modelchorus to path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "modelchorus" / "src"))
+# Add model_chorus to path
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / "model-chorus" / "src"))
 
 import pytest
-from modelchorus.providers import (
+from model_chorus.providers import (
     ModelProvider,
     CLIProvider,
     ClaudeProvider,

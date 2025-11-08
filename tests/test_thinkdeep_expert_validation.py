@@ -13,10 +13,10 @@ import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 import uuid
 
-from modelchorus.workflows.thinkdeep import ThinkDeepWorkflow
-from modelchorus.providers.base_provider import GenerationResponse, GenerationRequest
-from modelchorus.core.conversation import ConversationMemory
-from modelchorus.core.models import (
+from model_chorus.workflows.thinkdeep import ThinkDeepWorkflow
+from model_chorus.providers.base_provider import GenerationResponse, GenerationRequest
+from model_chorus.core.conversation import ConversationMemory
+from model_chorus.core.models import (
     ConfidenceLevel,
     Hypothesis,
     InvestigationStep,

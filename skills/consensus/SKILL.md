@@ -192,7 +192,7 @@ Need fastest response with fallback? � first_valid
 ### Simple Example
 
 ```bash
-modelchorus consensus "What is quantum computing?"
+model-chorus consensus "What is quantum computing?"
 ```
 
 **Expected Output:**
@@ -286,13 +286,13 @@ The CONSENSUS workflow returns a JSON object with the following structure:
 
 ```bash
 # Use two specific providers
-modelchorus consensus "Explain neural networks" -p claude -p gemini
+model-chorus consensus "Explain neural networks" -p claude -p gemini
 
 # Use three providers for more perspectives
-modelchorus consensus "Review this architecture" -p claude -p gemini -p codex
+model-chorus consensus "Review this architecture" -p claude -p gemini -p codex
 
 # Use all available providers
-modelchorus consensus "Fact-check this claim" -p claude -p gemini -p codex -p cursor-agent
+model-chorus consensus "Fact-check this claim" -p claude -p gemini -p codex -p cursor-agent
 ```
 
 **Provider Selection Tips:**
@@ -311,19 +311,19 @@ modelchorus consensus "Fact-check this claim" -p claude -p gemini -p codex -p cu
 
 ```bash
 # Get all responses separately (default)
-modelchorus consensus "Compare React vs Vue"
+model-chorus consensus "Compare React vs Vue"
 
 # Get synthesized structured view
-modelchorus consensus "Best practices for API design" -s synthesize
+model-chorus consensus "Best practices for API design" -s synthesize
 
 # Get majority consensus
-modelchorus consensus "What is 2 + 2?" -s majority
+model-chorus consensus "What is 2 + 2?" -s majority
 
 # Get most detailed response
-modelchorus consensus "Explain microservices" -s weighted
+model-chorus consensus "Explain microservices" -s weighted
 
 # Get fastest response with failover
-modelchorus consensus "Quick question about Python" -s first_valid
+model-chorus consensus "Quick question about Python" -s first_valid
 ```
 
 **Strategy Selection:**
@@ -335,10 +335,10 @@ modelchorus consensus "Quick question about Python" -s first_valid
 
 ```bash
 # Include file context for all providers
-modelchorus consensus "Review this code" -f src/main.py
+model-chorus consensus "Review this code" -f src/main.py
 
 # Multiple files with synthesis
-modelchorus consensus "Analyze these components" -f models.py -f services.py -f api.py -s synthesize
+model-chorus consensus "Analyze these components" -f models.py -f services.py -f api.py -s synthesize
 ```
 
 **File Handling:**
@@ -350,10 +350,10 @@ modelchorus consensus "Analyze these components" -f models.py -f services.py -f 
 
 ```bash
 # Increase timeout for slower providers or complex queries
-modelchorus consensus "Detailed analysis needed" --timeout 180
+model-chorus consensus "Detailed analysis needed" --timeout 180
 
 # Shorter timeout for quick queries
-modelchorus consensus "Fast check" --timeout 60
+model-chorus consensus "Fast check" --timeout 60
 ```
 
 **Timeout Behavior:**
@@ -367,7 +367,7 @@ modelchorus consensus "Fast check" --timeout 60
 
 ```bash
 # Save full consensus results to JSON
-modelchorus consensus "Evaluate this proposal" -s synthesize --output evaluation.json
+model-chorus consensus "Evaluate this proposal" -s synthesize --output evaluation.json
 ```
 
 **Output file contains:**
@@ -397,7 +397,7 @@ modelchorus consensus "Evaluate this proposal" -s synthesize --output evaluation
 
 **Command:**
 ```bash
-modelchorus consensus "Should I use microservices or monolithic architecture for a mid-size SaaS product with 5 developers?" -s synthesize --output architecture-decision.json
+model-chorus consensus "Should I use microservices or monolithic architecture for a mid-size SaaS product with 5 developers?" -s synthesize --output architecture-decision.json
 ```
 
 **Expected Outcome:** Structured synthesis showing each model's perspective on the architecture decision, allowing you to see complementary insights and make an informed choice.
@@ -410,7 +410,7 @@ modelchorus consensus "Should I use microservices or monolithic architecture for
 
 **Command:**
 ```bash
-modelchorus consensus "Is it true that Python's GIL prevents true multi-threading? Explain briefly." -s majority
+model-chorus consensus "Is it true that Python's GIL prevents true multi-threading? Explain briefly." -s majority
 ```
 
 **Expected Outcome:** The most common answer among the three models. If models agree, high confidence in the answer.
@@ -423,7 +423,7 @@ modelchorus consensus "Is it true that Python's GIL prevents true multi-threadin
 
 **Command:**
 ```bash
-modelchorus consensus "Review this code for bugs, performance issues, and best practices" -f src/auth.py -s all_responses
+model-chorus consensus "Review this code for bugs, performance issues, and best practices" -f src/auth.py -s all_responses
 ```
 
 **Expected Outcome:** Three separate code reviews showing different perspectives - one model might focus on security, another on performance, another on readability.
@@ -436,7 +436,7 @@ modelchorus consensus "Review this code for bugs, performance issues, and best p
 
 **Command:**
 ```bash
-modelchorus consensus "What does the Python 'yield' keyword do?" -s first_valid --timeout 30
+model-chorus consensus "What does the Python 'yield' keyword do?" -s first_valid --timeout 30
 ```
 
 **Expected Outcome:** First successful response returns immediately. If Claude responds in 2 seconds, you get that answer without waiting for Gemini. If Claude times out, Gemini's response is used.
@@ -452,13 +452,13 @@ modelchorus consensus "What does the Python 'yield' keyword do?" -s first_valid 
 **Solution:**
 ```bash
 # Increase timeout and try again
-modelchorus consensus "Your prompt" --timeout 240
+model-chorus consensus "Your prompt" --timeout 240
 
 # Check provider availability
-modelchorus list-providers
+model-chorus list-providers
 
 # Try with single provider to isolate issue
-modelchorus chat "Your prompt" -p claude
+model-chorus chat "Your prompt" -p claude
 ```
 
 ---
@@ -472,10 +472,10 @@ modelchorus chat "Your prompt" -p claude
 **Solution:**
 ```bash
 # Increase timeout for that specific use case
-modelchorus consensus "Your prompt" -p claude -p gemini --timeout 180
+model-chorus consensus "Your prompt" -p claude -p gemini --timeout 180
 
 # Or exclude the problematic provider
-modelchorus consensus "Your prompt" -p claude -p codex
+model-chorus consensus "Your prompt" -p claude -p codex
 ```
 
 ---
@@ -502,7 +502,7 @@ modelchorus consensus "Your prompt" -p claude -p codex
 **Solution:**
 ```bash
 # Use all_responses or synthesize to see raw responses first
-modelchorus consensus "Your prompt" -p claude -p gemini -s all_responses
+model-chorus consensus "Your prompt" -p claude -p gemini -s all_responses
 
 # Then manually evaluate which strategy is appropriate
 # For complex responses, synthesize or all_responses work best
@@ -532,5 +532,5 @@ Starting consensus workflow (estimated: 10-30s)...
 
 **See Also:**
 - ModelChorus Documentation: `/docs/WORKFLOWS.md`
-- Provider Information: `modelchorus list-providers`
-- General CLI Help: `modelchorus --help`
+- Provider Information: `model-chorus list-providers`
+- General CLI Help: `model-chorus --help`

@@ -43,15 +43,15 @@ Complete guide to choosing and using ModelChorus workflows for different use cas
 **Example scenarios:**
 ```bash
 # Architecture decision
-modelchorus consensus "REST vs GraphQL for our API?" \
+model-chorus consensus "REST vs GraphQL for our API?" \
   -p claude -p gemini -p codex -s synthesize
 
 # Code review from multiple perspectives
-modelchorus consensus "Review this authentication implementation" \
+model-chorus consensus "Review this authentication implementation" \
   -p claude -p gemini -s all_responses
 
 # Technology evaluation
-modelchorus consensus "Should we use TypeScript or JavaScript?" \
+model-chorus consensus "Should we use TypeScript or JavaScript?" \
   -p claude -p codex -s majority
 ```
 
@@ -93,23 +93,23 @@ modelchorus consensus "Should we use TypeScript or JavaScript?" \
 **Example scenarios:**
 ```bash
 # Iterative API design
-modelchorus chat "Design a user API" -p claude
+model-chorus chat "Design a user API" -p claude
 # Thread: thread-001
 
-modelchorus chat "Add rate limiting" --continue thread-001
-modelchorus chat "Add pagination" --continue thread-001
+model-chorus chat "Add rate limiting" --continue thread-001
+model-chorus chat "Add pagination" --continue thread-001
 
 # Code review with follow-ups
-modelchorus chat "Review auth.py" -f src/auth.py -p claude
+model-chorus chat "Review auth.py" -f src/auth.py -p claude
 # Thread: thread-002
 
-modelchorus chat "How would you refactor the token validation?" --continue thread-002
+model-chorus chat "How would you refactor the token validation?" --continue thread-002
 
 # Learning conversation
-modelchorus chat "Explain async/await in Python" -p claude
+model-chorus chat "Explain async/await in Python" -p claude
 # Thread: thread-003
 
-modelchorus chat "Show me an example with error handling" --continue thread-003
+model-chorus chat "Show me an example with error handling" --continue thread-003
 ```
 
 **Strengths:**
@@ -153,27 +153,27 @@ modelchorus chat "Show me an example with error handling" --continue thread-003
 **Example scenarios:**
 ```bash
 # Debug intermittent bug
-modelchorus thinkdeep "Users report 500 errors intermittently" \
+model-chorus thinkdeep "Users report 500 errors intermittently" \
   -f src/api/users.py -f logs/errors.log \
   -p claude -e gemini
 # Thread: thread-004
 
-modelchorus thinkdeep "Found race condition pattern" --continue thread-004
+model-chorus thinkdeep "Found race condition pattern" --continue thread-004
 
 # Security analysis
-modelchorus thinkdeep "Analyze SQL injection vectors" \
+model-chorus thinkdeep "Analyze SQL injection vectors" \
   -f src/db/queries.py -f src/api/handlers.py \
   -p claude -e gemini
 # Thread: thread-005
 
 # Performance investigation
-modelchorus thinkdeep "Response time degrades under load" \
+model-chorus thinkdeep "Response time degrades under load" \
   -f src/cache/redis.py -f monitoring/metrics.json \
   -p claude
 # Thread: thread-006
 
 # Check investigation progress
-modelchorus thinkdeep-status thread-006 --steps --files
+model-chorus thinkdeep-status thread-006 --steps --files
 ```
 
 **Strengths:**
@@ -232,24 +232,24 @@ Start here:
 
 **Step 1: Get multiple perspectives (CONSENSUS)**
 ```bash
-modelchorus consensus "Microservices vs Monolith for our scale?" \
+model-chorus consensus "Microservices vs Monolith for our scale?" \
   -p claude -p gemini -p codex -s synthesize
 ```
 
 **Step 2: Deep investigation of chosen approach (THINKDEEP)**
 ```bash
-modelchorus thinkdeep "Investigate microservices scalability patterns" \
+model-chorus thinkdeep "Investigate microservices scalability patterns" \
   -p claude -e gemini
 # Thread: thread-007
 ```
 
 **Step 3: Refine implementation details (CHAT)**
 ```bash
-modelchorus chat "Design service discovery mechanism" \
+model-chorus chat "Design service discovery mechanism" \
   -p claude
 # Thread: thread-008
 
-modelchorus chat "Add health checks" --continue thread-008
+model-chorus chat "Add health checks" --continue thread-008
 ```
 
 ### Pattern 2: THINKDEEP with Expert Escalation
@@ -258,7 +258,7 @@ modelchorus chat "Add health checks" --continue thread-008
 
 **Step 1: Initial investigation**
 ```bash
-modelchorus thinkdeep "Memory leak in production" \
+model-chorus thinkdeep "Memory leak in production" \
   -f src/cache/manager.py \
   -p claude --disable-expert
 # Thread: thread-009
@@ -266,13 +266,13 @@ modelchorus thinkdeep "Memory leak in production" \
 
 **Step 2: Check confidence**
 ```bash
-modelchorus thinkdeep-status thread-009
+model-chorus thinkdeep-status thread-009
 # Confidence: medium (not certain)
 ```
 
 **Step 3: Continue with expert validation**
 ```bash
-modelchorus thinkdeep "Found weak reference issues" \
+model-chorus thinkdeep "Found weak reference issues" \
   --continue thread-009 \
   -e gemini  # Now enable expert
 ```
@@ -283,16 +283,16 @@ modelchorus thinkdeep "Found weak reference issues" \
 
 **Step 1: Iterate design with CHAT**
 ```bash
-modelchorus chat "Design caching strategy" -p claude
+model-chorus chat "Design caching strategy" -p claude
 # Thread: thread-010
 
-modelchorus chat "Add Redis tier" --continue thread-010
-modelchorus chat "Add invalidation logic" --continue thread-010
+model-chorus chat "Add Redis tier" --continue thread-010
+model-chorus chat "Add invalidation logic" --continue thread-010
 ```
 
 **Step 2: Validate final design with CONSENSUS**
 ```bash
-modelchorus consensus "Review this caching design: [paste from thread-010]" \
+model-chorus consensus "Review this caching design: [paste from thread-010]" \
   -p claude -p gemini -p codex -s synthesize
 ```
 
@@ -301,8 +301,8 @@ modelchorus consensus "Review this caching design: [paste from thread-010]" \
 **Use case:** Explore alternatives without losing main thread
 
 ```python
-from modelchorus.core.conversation import ConversationMemory
-from modelchorus.workflows import ChatWorkflow
+from model_chorus.core.conversation import ConversationMemory
+from model_chorus.workflows import ChatWorkflow
 
 memory = ConversationMemory()
 chat = ChatWorkflow(provider, conversation_memory=memory)
@@ -337,7 +337,7 @@ result4 = await chat.run(
 **Use case:** Complex investigation with multiple competing hypotheses
 
 ```python
-from modelchorus.workflows import ThinkDeepWorkflow
+from model_chorus.workflows import ThinkDeepWorkflow
 
 workflow = ThinkDeepWorkflow(provider, conversation_memory=memory)
 
@@ -497,13 +497,13 @@ print(f"Validated hypotheses: {len([h for h in state.hypotheses if h.status == '
 
 **Simple bug** → CHAT
 ```bash
-modelchorus chat "Why is this function returning None?" \
+model-chorus chat "Why is this function returning None?" \
   -f src/utils.py -p claude
 ```
 
 **Complex bug** → THINKDEEP
 ```bash
-modelchorus thinkdeep "Intermittent race condition in order processing" \
+model-chorus thinkdeep "Intermittent race condition in order processing" \
   -f src/orders/processor.py -f src/db/transactions.py \
   -p claude -e gemini
 ```
@@ -512,18 +512,18 @@ modelchorus thinkdeep "Intermittent race condition in order processing" \
 
 **Quick consultation** → CHAT
 ```bash
-modelchorus chat "Should I use Redis or Memcached?" -p claude
+model-chorus chat "Should I use Redis or Memcached?" -p claude
 ```
 
 **Important decision** → CONSENSUS
 ```bash
-modelchorus consensus "Evaluate Redis vs Memcached for session storage" \
+model-chorus consensus "Evaluate Redis vs Memcached for session storage" \
   -p claude -p gemini -p codex -s synthesize
 ```
 
 **Deep analysis** → THINKDEEP
 ```bash
-modelchorus thinkdeep "Analyze scalability of current caching architecture" \
+model-chorus thinkdeep "Analyze scalability of current caching architecture" \
   -f src/cache/ -p claude -e gemini
 ```
 
@@ -531,18 +531,18 @@ modelchorus thinkdeep "Analyze scalability of current caching architecture" \
 
 **Quick review** → CHAT
 ```bash
-modelchorus chat "Review this function" -f src/auth.py -p claude
+model-chorus chat "Review this function" -f src/auth.py -p claude
 ```
 
 **Multiple perspectives** → CONSENSUS
 ```bash
-modelchorus consensus "Review authentication implementation" \
+model-chorus consensus "Review authentication implementation" \
   -f src/auth.py -p claude -p codex -s all_responses
 ```
 
 **Security review** → THINKDEEP
 ```bash
-modelchorus thinkdeep "Security audit of authentication system" \
+model-chorus thinkdeep "Security audit of authentication system" \
   -f src/auth.py -f src/middleware/jwt.py \
   -p claude -e gemini
 ```
@@ -551,15 +551,15 @@ modelchorus thinkdeep "Security audit of authentication system" \
 
 **Q&A** → CHAT
 ```bash
-modelchorus chat "Explain async/await in Python" -p claude
+model-chorus chat "Explain async/await in Python" -p claude
 # Thread: thread-020
 
-modelchorus chat "Show example with error handling" --continue thread-020
+model-chorus chat "Show example with error handling" --continue thread-020
 ```
 
 **Compare approaches** → CONSENSUS
 ```bash
-modelchorus consensus "Explain async/await patterns" \
+model-chorus consensus "Explain async/await patterns" \
   -p claude -p gemini -s all_responses
 ```
 
@@ -576,7 +576,7 @@ claude "Explain quantum computing"
 
 **After (CHAT):**
 ```bash
-modelchorus chat "Explain quantum computing" -p claude
+model-chorus chat "Explain quantum computing" -p claude
 # Gets conversation tracking + state management
 ```
 
@@ -592,7 +592,7 @@ codex "Design API" > codex.txt
 
 **After (CONSENSUS):**
 ```bash
-modelchorus consensus "Design API" \
+model-chorus consensus "Design API" \
   -p claude -p gemini -p codex -s synthesize
 # Automatic synthesis
 ```
@@ -610,7 +610,7 @@ claude "Review error logs"
 
 **After (THINKDEEP):**
 ```bash
-modelchorus thinkdeep "Authentication bug investigation" \
+model-chorus thinkdeep "Authentication bug investigation" \
   -f src/auth.py -f logs/errors.log \
   -p claude
 # Automatic hypothesis tracking + confidence progression
@@ -637,7 +637,7 @@ modelchorus thinkdeep "Authentication bug investigation" \
 **Lost thread context**
 - Check thread ID is correct
 - Verify conversation not expired (72hr default TTL)
-- Check `~/.modelchorus/conversations/` directory
+- Check `~/.model-chorus/conversations/` directory
 
 **Context too long**
 - Clear conversation and start fresh

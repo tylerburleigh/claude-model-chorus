@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### RESEARCH Workflow
 - **Complete removal of RESEARCH workflow** - No longer within the scope of ModelChorus
-  - Removed `modelchorus research` CLI command
+  - Removed `model-chorus research` CLI command
   - Deleted ResearchWorkflow implementation (~1,750 lines)
   - Removed ResearchEvidence, ResearchValidation, ResearchDossier, and ResearchState model classes
   - Deleted research skill (`skills/research/`)
@@ -23,8 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Impact
 - **Workflows reduced from 6 to 5**: CHAT, CONSENSUS, THINKDEEP, ARGUMENT, IDEATE remain
 - **~9,500 lines of code removed** from the codebase
-- **Breaking change**: `modelchorus research` command no longer available
-- **Breaking change**: ResearchWorkflow class no longer importable from `modelchorus.workflows`
+- **Breaking change**: `model-chorus research` command no longer available
+- **Breaking change**: ResearchWorkflow class no longer importable from `model_chorus.workflows`
 
 ### Changed
 - Documentation updated to reflect 5 workflows instead of 6
@@ -39,7 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Provider Fallback and Resilience
 - **Automatic Provider Fallback**: All workflows now support fallback provider chains
   - Primary provider fails → automatically tries fallback providers in order
-  - Configurable via `fallback_providers` in `.modelchorusrc`
+  - Configurable via `fallback_providers` in `.model-chorusrc`
   - Works across CHAT, RESEARCH, ARGUMENT, IDEATE, and THINKDEEP workflows
   - Example: `fallback_providers: [gemini, codex, cursor-agent]`
 
@@ -53,7 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Specific reason (CLI not found, permission denied, etc.)
   - Installation command for the specific provider
   - Helpful suggestions (check installations, update config)
-  - Reference to `modelchorus list-providers --check`
+  - Reference to `model-chorus list-providers --check`
 
 - **CLI Improvements**:
   - `list-providers --check` command to verify all provider installations
@@ -62,7 +62,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Installation commands added: claude, gemini, codex, cursor-agent
 
 #### Configuration
-- **Fallback Provider Configuration**: `.modelchorusrc.example` updated with comprehensive fallback examples
+- **Fallback Provider Configuration**: `.model-chorusrc.example` updated with comprehensive fallback examples
   - Each workflow includes fallback provider list
   - Example configurations for all 4 providers
   - Documentation on provider fallback behavior
@@ -124,7 +124,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Debugging tips and troubleshooting
   - Success criteria checklist
 
-- **Configuration Examples**: Updated `.modelchorusrc.example`
+- **Configuration Examples**: Updated `.model-chorusrc.example`
   - All workflows show fallback provider configuration
   - Comprehensive comments explaining fallback behavior
   - Provider fallback section with usage examples
@@ -147,7 +147,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Balanced multi-perspective analysis avoiding single-perspective bias
 - Identification of trade-offs and common ground
 - Conversation continuity for iterative argument refinement
-- CLI command: `modelchorus argument` with continuation support
+- CLI command: `model-chorus argument` with continuation support
 - Python API with conversation memory integration
 - Comprehensive documentation in `docs/workflows/ARGUMENT.md`
 - Use cases for policy analysis, technology evaluation, and balanced decision-making
@@ -158,7 +158,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Automatic idea clustering and categorization
 - Synthesis of complementary perspectives from different models
 - Constructive handling of model disagreements
-- CLI command: `modelchorus ideate` with multi-provider support
+- CLI command: `model-chorus ideate` with multi-provider support
 - Python API with idea clustering and synthesis
 - Comprehensive documentation in `docs/workflows/IDEATE.md`
 - Use cases for feature brainstorming, creative problem-solving, and innovation sessions
@@ -169,7 +169,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Semantic clustering of related ideas and concepts
 - Multi-model knowledge synthesis with overlap detection
 - Handling of contradictory information across sources
-- CLI command: `modelchorus research` with multi-provider support
+- CLI command: `model-chorus research` with multi-provider support
 - Python API with citation engine and clustering algorithms
 - Role-based orchestration framework for specialized provider roles
 - Comprehensive documentation in `docs/workflows/RESEARCH.md`
@@ -208,7 +208,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multi-turn conversation support with conversation memory
 - Thread-based conversation persistence across sessions
 - File context sharing in conversations
-- CLI commands: `modelchorus chat` with continuation support
+- CLI commands: `model-chorus chat` with continuation support
 - Python API with `continuation_id` parameter for follow-up messages
 - Comprehensive test coverage for chat workflow
 
@@ -219,7 +219,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Optional expert validation from second AI model
 - Investigation step execution with state persistence
 - File examination tracking across investigation steps
-- CLI commands: `modelchorus thinkdeep` and `modelchorus thinkdeep-status`
+- CLI commands: `model-chorus thinkdeep` and `model-chorus thinkdeep-status`
 - Investigation state inspection with `--steps` and `--files` flags
 - Python API with investigation state management
 - Comprehensive test coverage for thinkdeep workflow
@@ -257,7 +257,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial release with CONSENSUS workflow
 - Multi-provider support (Claude, Gemini, Codex, Cursor Agent)
 - Five consensus strategies: all_responses, first_valid, majority, weighted, synthesize
-- CLI interface with `modelchorus consensus` command
+- CLI interface with `model-chorus consensus` command
 - Python API with `ConsensusWorkflow` class
 - Provider abstraction layer with CLI-based provider implementations
 - Type-safe request/response models with Pydantic

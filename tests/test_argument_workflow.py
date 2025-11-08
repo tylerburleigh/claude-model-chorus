@@ -11,11 +11,11 @@ import uuid
 from unittest.mock import AsyncMock, MagicMock, patch
 from pathlib import Path
 
-from modelchorus.workflows.argument import ArgumentWorkflow
-from modelchorus.providers.base_provider import GenerationRequest, GenerationResponse
-from modelchorus.core.conversation import ConversationMemory
-from modelchorus.core.models import ArgumentMap, ArgumentPerspective
-from modelchorus.core.role_orchestration import OrchestrationResult, OrchestrationPattern
+from model_chorus.workflows.argument import ArgumentWorkflow
+from model_chorus.providers.base_provider import GenerationRequest, GenerationResponse
+from model_chorus.core.conversation import ConversationMemory
+from model_chorus.core.models import ArgumentMap, ArgumentPerspective
+from model_chorus.core.role_orchestration import OrchestrationResult, OrchestrationPattern
 
 
 @pytest.fixture
@@ -290,7 +290,7 @@ class TestArgumentWorkflowExecution:
         )
 
         # Patch RoleOrchestrator.execute
-        with patch('modelchorus.workflows.argument.argument_workflow.RoleOrchestrator') as MockOrchestrator:
+        with patch('model_chorus.workflows.argument.argument_workflow.RoleOrchestrator') as MockOrchestrator:
             mock_orchestrator_instance = MockOrchestrator.return_value
             mock_orchestrator_instance.execute = AsyncMock(return_value=mock_orchestration_result)
 
@@ -364,7 +364,7 @@ class TestArgumentWorkflowExecution:
             execution_order=["creator", "skeptic", "moderator"]
         )
 
-        with patch('modelchorus.workflows.argument.argument_workflow.RoleOrchestrator') as MockOrchestrator:
+        with patch('model_chorus.workflows.argument.argument_workflow.RoleOrchestrator') as MockOrchestrator:
             mock_orchestrator_instance = MockOrchestrator.return_value
             mock_orchestrator_instance.execute = AsyncMock(return_value=mock_orchestration_result)
 
@@ -404,7 +404,7 @@ class TestConversationThreading:
             execution_order=["creator", "skeptic", "moderator"]
         )
 
-        with patch('modelchorus.workflows.argument.argument_workflow.RoleOrchestrator') as MockOrchestrator:
+        with patch('model_chorus.workflows.argument.argument_workflow.RoleOrchestrator') as MockOrchestrator:
             mock_orchestrator_instance = MockOrchestrator.return_value
             mock_orchestrator_instance.execute = AsyncMock(return_value=mock_result)
 
@@ -437,7 +437,7 @@ class TestConversationThreading:
             execution_order=["creator", "skeptic", "moderator"]
         )
 
-        with patch('modelchorus.workflows.argument.argument_workflow.RoleOrchestrator') as MockOrchestrator:
+        with patch('model_chorus.workflows.argument.argument_workflow.RoleOrchestrator') as MockOrchestrator:
             mock_orchestrator_instance = MockOrchestrator.return_value
             mock_orchestrator_instance.execute = AsyncMock(return_value=mock_result)
 
@@ -461,7 +461,7 @@ class TestErrorHandling:
     @pytest.mark.asyncio
     async def test_workflow_handles_orchestration_failure(self, argument_workflow):
         """Test that workflow handles orchestration failures gracefully."""
-        with patch('modelchorus.workflows.argument.argument_workflow.RoleOrchestrator') as MockOrchestrator:
+        with patch('model_chorus.workflows.argument.argument_workflow.RoleOrchestrator') as MockOrchestrator:
             mock_orchestrator_instance = MockOrchestrator.return_value
             mock_orchestrator_instance.execute = AsyncMock(
                 side_effect=Exception("Orchestration failed")
@@ -493,7 +493,7 @@ class TestErrorHandling:
             execution_order=["creator", "skeptic"]
         )
 
-        with patch('modelchorus.workflows.argument.argument_workflow.RoleOrchestrator') as MockOrchestrator:
+        with patch('model_chorus.workflows.argument.argument_workflow.RoleOrchestrator') as MockOrchestrator:
             mock_orchestrator_instance = MockOrchestrator.return_value
             mock_orchestrator_instance.execute = AsyncMock(return_value=mock_result)
 

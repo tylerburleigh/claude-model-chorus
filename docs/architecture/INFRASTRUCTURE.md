@@ -21,7 +21,7 @@ The Citation Engine is a comprehensive system for tracking, formatting, and vali
 - **RESEARCH:** Source tracking, evidence gathering, and research dossier generation
 - **ARGUMENT:** Claim-to-citation mapping, evidence verification, and dialectical analysis
 
-**Location:** `modelchorus/src/modelchorus/utils/citation_formatter.py`
+**Location:** `model_chorus/src/model_chorus/utils/citation_formatter.py`
 
 ---
 
@@ -29,7 +29,7 @@ The Citation Engine is a comprehensive system for tracking, formatting, and vali
 
 #### Data Models
 
-The citation engine uses two core Pydantic models defined in `modelchorus/src/modelchorus/core/models.py`:
+The citation engine uses two core Pydantic models defined in `model_chorus/src/model_chorus/core/models.py`:
 
 ##### Citation Model
 
@@ -52,7 +52,7 @@ Represents a single source citation with metadata.
 
 **Example:**
 ```python
-from modelchorus.core.models import Citation
+from model_chorus.core.models import Citation
 
 citation = Citation(
     source="https://arxiv.org/abs/2401.12345",
@@ -87,7 +87,7 @@ Maps claims to their supporting citations for evidence tracking and verification
 
 **Example:**
 ```python
-from modelchorus.core.models import Citation, CitationMap
+from model_chorus.core.models import Citation, CitationMap
 
 citations = [
     Citation(
@@ -143,7 +143,7 @@ The citation engine supports three academic citation styles, each with distinct 
 ##### Style Selection
 
 ```python
-from modelchorus.utils.citation_formatter import CitationStyle
+from model_chorus.utils.citation_formatter import CitationStyle
 
 # Available styles
 CitationStyle.APA       # "apa"
@@ -169,7 +169,7 @@ Validates citations for completeness and quality.
 
 **Example:**
 ```python
-from modelchorus.utils.citation_formatter import validate_citation
+from model_chorus.utils.citation_formatter import validate_citation
 
 is_valid, issues = validate_citation(citation)
 if not is_valid:
@@ -192,7 +192,7 @@ Multi-factor confidence assessment evaluates citation reliability.
 
 **Example:**
 ```python
-from modelchorus.utils.citation_formatter import calculate_citation_confidence
+from model_chorus.utils.citation_formatter import calculate_citation_confidence
 
 scores = calculate_citation_confidence(citation)
 
@@ -221,7 +221,7 @@ Aggregate confidence scoring for claims supported by multiple citations.
 
 **Example:**
 ```python
-from modelchorus.utils.citation_formatter import calculate_citation_map_confidence
+from model_chorus.utils.citation_formatter import calculate_citation_map_confidence
 
 scores = calculate_citation_map_confidence(citation_map)
 
@@ -238,7 +238,7 @@ print(f"Min/Max confidence: {scores['min_confidence']:.2f} / {scores['max_confid
 #### Basic Citation Creation
 
 ```python
-from modelchorus.core.models import Citation
+from model_chorus.core.models import Citation
 
 # Minimal citation
 citation = Citation(
@@ -266,7 +266,7 @@ citation = Citation(
 
 **Format Single Citation:**
 ```python
-from modelchorus.utils.citation_formatter import format_citation, CitationStyle
+from model_chorus.utils.citation_formatter import format_citation, CitationStyle
 
 # APA format
 apa_citation = format_citation(citation, CitationStyle.APA)
@@ -283,7 +283,7 @@ chicago_citation = format_citation(citation, CitationStyle.CHICAGO)
 
 **Format Citation Map:**
 ```python
-from modelchorus.utils.citation_formatter import format_citation_map, CitationStyle
+from model_chorus.utils.citation_formatter import format_citation_map, CitationStyle
 
 # Format with claim text and all citations
 formatted = format_citation_map(citation_map, CitationStyle.APA, include_claim=True)
@@ -300,7 +300,7 @@ print(formatted)
 #### Citation Validation
 
 ```python
-from modelchorus.utils.citation_formatter import validate_citation, calculate_citation_confidence
+from model_chorus.utils.citation_formatter import validate_citation, calculate_citation_confidence
 
 # Validate citation
 is_valid, issues = validate_citation(citation)
@@ -326,9 +326,9 @@ print(f"  Location specific: {scores['location_score']:.2f}")
 
 **RESEARCH Workflow - Source Tracking:**
 ```python
-from modelchorus.workflows import ResearchWorkflow
-from modelchorus.providers import ClaudeProvider
-from modelchorus.core.conversation import ConversationMemory
+from model_chorus.workflows import ResearchWorkflow
+from model_chorus.providers import ClaudeProvider
+from model_chorus.core.conversation import ConversationMemory
 
 provider = ClaudeProvider()
 memory = ConversationMemory()
@@ -365,7 +365,7 @@ dossier = workflow.generate_dossier(
 
 **ARGUMENT Workflow - Evidence Verification:**
 ```python
-from modelchorus.core.models import Citation, CitationMap
+from model_chorus.core.models import Citation, CitationMap
 
 # Create citations for proponent argument
 pro_citation = Citation(
@@ -591,7 +591,7 @@ The Semantic Clustering Engine provides theme-based organization of textual cont
 - **ARGUMENT:** Cluster claims by topic for better organization
 - **RESEARCH:** Group findings by theme (future enhancement)
 
-**Location:** `modelchorus/src/modelchorus/core/clustering.py`
+**Location:** `model_chorus/src/model_chorus/core/clustering.py`
 
 ---
 
@@ -624,7 +624,7 @@ Represents the result of a clustering operation with all metadata.
 
 **Example:**
 ```python
-from modelchorus.core.clustering import ClusterResult
+from model_chorus.core.clustering import ClusterResult
 import numpy as np
 
 cluster = ClusterResult(
@@ -672,7 +672,7 @@ The clustering engine uses **sentence transformers** to compute semantic embeddi
 
 **Example:**
 ```python
-from modelchorus.core.clustering import SemanticClustering
+from model_chorus.core.clustering import SemanticClustering
 
 clustering = SemanticClustering()
 
@@ -856,7 +856,7 @@ else:
 
 **Simple text clustering:**
 ```python
-from modelchorus.core.clustering import SemanticClustering
+from model_chorus.core.clustering import SemanticClustering
 
 # Initialize engine
 clustering = SemanticClustering(
@@ -893,9 +893,9 @@ for cluster in clusters:
 
 **Organize brainstormed ideas:**
 ```python
-from modelchorus.workflows import IdeateWorkflow
-from modelchorus.providers import ClaudeProvider
-from modelchorus.core.conversation import ConversationMemory
+from model_chorus.workflows import IdeateWorkflow
+from model_chorus.providers import ClaudeProvider
+from model_chorus.core.conversation import ConversationMemory
 
 provider = ClaudeProvider()
 memory = ConversationMemory()
@@ -929,8 +929,8 @@ print(analysis_result.synthesis)
 
 **Cluster argument claims by topic:**
 ```python
-from modelchorus.workflows.argument.semantic import cluster_claims_kmeans
-from modelchorus.core.models import CitationMap, Citation
+from model_chorus.workflows.argument.semantic import cluster_claims_kmeans
+from model_chorus.core.models import CitationMap, Citation
 
 # Create claims about TypeScript
 claims = [
@@ -1356,7 +1356,7 @@ for cluster in clusters:
 
 #### Test Coverage
 
-Comprehensive tests in `modelchorus/tests/test_clustering.py`:
+Comprehensive tests in `model_chorus/tests/test_clustering.py`:
 
 **Core Functionality Tests:**
 - Embedding computation with various model sizes
@@ -1382,13 +1382,13 @@ Comprehensive tests in `modelchorus/tests/test_clustering.py`:
 
 ```bash
 # Run all clustering tests
-pytest modelchorus/tests/test_clustering.py -v
+pytest model_chorus/tests/test_clustering.py -v
 
 # Run specific test
-pytest modelchorus/tests/test_clustering.py::TestSemanticClustering::test_cluster_kmeans -v
+pytest model_chorus/tests/test_clustering.py::TestSemanticClustering::test_cluster_kmeans -v
 
 # Run with coverage
-pytest modelchorus/tests/test_clustering.py --cov=modelchorus.core.clustering
+pytest model_chorus/tests/test_clustering.py --cov=model_chorus.core.clustering
 ```
 
 ---
@@ -1446,7 +1446,7 @@ The Role-Based Orchestration Framework provides infrastructure for coordinating 
 - **IDEATE:** Parallel brainstorming from multiple creative perspectives
 - **RESEARCH:** Multi-angle investigation with specialized research roles (planned)
 
-**Location:** `modelchorus/src/modelchorus/core/role_orchestration.py`
+**Location:** `model_chorus/src/model_chorus/core/role_orchestration.py`
 
 ---
 
@@ -1490,7 +1490,7 @@ Represents a specific role assignment for an AI model in a multi-model workflow.
 
 **Example:**
 ```python
-from modelchorus.core.role_orchestration import ModelRole
+from model_chorus.core.role_orchestration import ModelRole
 
 proponent = ModelRole(
     role="proponent",
@@ -1534,7 +1534,7 @@ Result from orchestrating multiple models with assigned roles.
 
 **Example:**
 ```python
-from modelchorus.core.role_orchestration import OrchestrationResult, OrchestrationPattern
+from model_chorus.core.role_orchestration import OrchestrationResult, OrchestrationPattern
 
 result = OrchestrationResult(
     role_responses=[
@@ -1581,7 +1581,7 @@ The framework supports three execution patterns, each optimized for different wo
 
 **Example:**
 ```python
-from modelchorus.core.role_orchestration import RoleOrchestrator, OrchestrationPattern
+from model_chorus.core.role_orchestration import RoleOrchestrator, OrchestrationPattern
 
 # Sequential debate: Creator → Skeptic → Moderator
 orchestrator = RoleOrchestrator(
@@ -1775,8 +1775,8 @@ print(synthesized.synthesized_output)
 
 **Two-role debate:**
 ```python
-from modelchorus.core.role_orchestration import RoleOrchestrator, ModelRole, OrchestrationPattern
-from modelchorus.providers import ClaudeProvider, GeminiProvider
+from model_chorus.core.role_orchestration import RoleOrchestrator, ModelRole, OrchestrationPattern
+from model_chorus.providers import ClaudeProvider, GeminiProvider
 
 # Define roles
 proponent = ModelRole(
@@ -1908,8 +1908,8 @@ for role_name, data in synthesized.synthesized_output.items():
 
 **How ARGUMENT uses RoleOrchestrator:**
 ```python
-from modelchorus.workflows import ArgumentWorkflow
-from modelchorus.providers import ClaudeProvider
+from model_chorus.workflows import ArgumentWorkflow
+from model_chorus.providers import ClaudeProvider
 
 # ArgumentWorkflow internally creates three roles:
 # 1. Creator (stance: "for") - Generates thesis
@@ -2357,7 +2357,7 @@ result = await orchestrator.execute("Evaluate cloud migration options")
 
 #### Test Coverage
 
-Comprehensive tests in `modelchorus/tests/test_role_orchestration.py`:
+Comprehensive tests in `model_chorus/tests/test_role_orchestration.py`:
 
 **ModelRole Tests:**
 - Role creation with all fields
@@ -2389,13 +2389,13 @@ Comprehensive tests in `modelchorus/tests/test_role_orchestration.py`:
 
 ```bash
 # Run all orchestration tests
-pytest modelchorus/tests/test_role_orchestration.py -v
+pytest model_chorus/tests/test_role_orchestration.py -v
 
 # Run specific test
-pytest modelchorus/tests/test_role_orchestration.py::TestRoleOrchestrator::test_sequential_execution -v
+pytest model_chorus/tests/test_role_orchestration.py::TestRoleOrchestrator::test_sequential_execution -v
 
 # Run with coverage
-pytest modelchorus/tests/test_role_orchestration.py --cov=modelchorus.core.role_orchestration
+pytest model_chorus/tests/test_role_orchestration.py --cov=model_chorus.core.role_orchestration
 ```
 
 ---
@@ -2543,7 +2543,7 @@ citation = Citation(
 
 #### Test Coverage
 
-The citation engine has comprehensive test coverage in `modelchorus/tests/test_citation.py`:
+The citation engine has comprehensive test coverage in `model_chorus/tests/test_citation.py`:
 
 **Citation Model Tests:**
 - Citation creation with all fields
@@ -2575,19 +2575,19 @@ The citation engine has comprehensive test coverage in `modelchorus/tests/test_c
 
 ```bash
 # Run all citation tests
-pytest modelchorus/tests/test_citation.py -v
+pytest model_chorus/tests/test_citation.py -v
 
 # Run specific test class
-pytest modelchorus/tests/test_citation.py::TestCitation -v
-pytest modelchorus/tests/test_citation.py::TestCitationMap -v
+pytest model_chorus/tests/test_citation.py::TestCitation -v
+pytest model_chorus/tests/test_citation.py::TestCitationMap -v
 
 # Run with coverage
-pytest modelchorus/tests/test_citation.py --cov=modelchorus.core.models --cov=modelchorus.utils.citation_formatter
+pytest model_chorus/tests/test_citation.py --cov=model_chorus.core.models --cov=model_chorus.utils.citation_formatter
 ```
 
 #### Test Examples
 
-See `modelchorus/tests/test_citation.py` for extensive examples of:
+See `model_chorus/tests/test_citation.py` for extensive examples of:
 - Citation model usage patterns
 - CitationMap construction
 - Validation edge cases
@@ -2647,9 +2647,9 @@ See `modelchorus/tests/test_citation.py` for extensive examples of:
 - [WORKFLOWS.md](../WORKFLOWS.md) - Complete workflow overview
 
 **Code Files:**
-- `modelchorus/src/modelchorus/utils/citation_formatter.py` - Citation formatting implementation
-- `modelchorus/src/modelchorus/core/models.py` - Citation and CitationMap models
-- `modelchorus/tests/test_citation.py` - Comprehensive test suite
+- `model_chorus/src/model_chorus/utils/citation_formatter.py` - Citation formatting implementation
+- `model_chorus/src/model_chorus/core/models.py` - Citation and CitationMap models
+- `model_chorus/tests/test_citation.py` - Comprehensive test suite
 
 **API Reference:**
 - [DOCUMENTATION.md](../DOCUMENTATION.md) - Complete API documentation

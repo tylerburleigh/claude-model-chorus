@@ -31,13 +31,13 @@ Use this agent when you need to:
 
 ## How This Agent Works
 
-This agent is a thin wrapper that invokes `Skill(modelchorus:chat)`.
+This agent is a thin wrapper that invokes `Skill(model-chorus:chat)`.
 
 **Your task:**
 1. Parse the user's request to understand the query
 2. **VALIDATE** that you have all required information (see Contract Validation below)
 3. If information is missing, **STOP and return immediately** with error message
-4. If sufficient information, invoke: `Skill(modelchorus:chat)`
+4. If sufficient information, invoke: `Skill(model-chorus:chat)`
 5. Pass a clear prompt describing the conversation request
 6. Wait for the skill to complete
 7. Report the response and **session_id** for continuation
@@ -86,7 +86,7 @@ After the skill completes, report:
 
 **Agent invocation:**
 ```
-Skill(modelchorus:chat) with prompt:
+Skill(model-chorus:chat) with prompt:
 "What is quantum computing?"
 ```
 
@@ -94,20 +94,20 @@ Skill(modelchorus:chat) with prompt:
 
 **Initial conversation:**
 ```
-Skill(modelchorus:chat) with prompt:
+Skill(model-chorus:chat) with prompt:
 "What is quantum computing?"
 ```
 
 **Follow-up (using session_id returned):**
 ```
-Skill(modelchorus:chat) with prompt:
+Skill(model-chorus:chat) with prompt:
 "How does it differ from classical computing?
 --continue thread-abc-123-def-456"
 ```
 
 **Further continuation:**
 ```
-Skill(modelchorus:chat) with prompt:
+Skill(model-chorus:chat) with prompt:
 "Give me a practical example
 --continue thread-abc-123-def-456"
 ```
@@ -118,7 +118,7 @@ Skill(modelchorus:chat) with prompt:
 
 **Agent invocation:**
 ```
-Skill(modelchorus:chat) with prompt:
+Skill(model-chorus:chat) with prompt:
 "Explain this code
 --file src/main.py"
 ```
@@ -134,4 +134,4 @@ If the skill encounters errors, report:
 
 ---
 
-**Note:** All conversation logic, history management, and threading are managed by `Skill(modelchorus:chat)`. This agent's role is simply to validate inputs, invoke the skill, and communicate the response including the session_id for conversation continuation.
+**Note:** All conversation logic, history management, and threading are managed by `Skill(model-chorus:chat)`. This agent's role is simply to validate inputs, invoke the skill, and communicate the response including the session_id for conversation continuation.

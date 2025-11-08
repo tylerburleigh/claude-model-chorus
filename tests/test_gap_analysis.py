@@ -6,7 +6,7 @@ and unsupported claims accurately with appropriate severity levels.
 """
 
 import pytest
-from modelchorus.core.gap_analysis import (
+from model_chorus.core.gap_analysis import (
     Gap,
     GapType,
     GapSeverity,

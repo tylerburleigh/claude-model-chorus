@@ -31,18 +31,18 @@ Quick consultations, iterative refinement, and building on previous responses.
 **CLI Example:**
 ```bash
 # Start conversation
-modelchorus chat "What is quantum computing?" -p claude
+model-chorus chat "What is quantum computing?" -p claude
 # Returns: Thread ID: abc-123
 
 # Continue conversation
-modelchorus chat "Give me an example" --continue abc-123
+model-chorus chat "Give me an example" --continue abc-123
 ```
 
 **Python Example:**
 ```python
-from modelchorus.workflows import ChatWorkflow
-from modelchorus.providers import ClaudeProvider
-from modelchorus.core.conversation import ConversationMemory
+from model_chorus.workflows import ChatWorkflow
+from model_chorus.providers import ClaudeProvider
+from model_chorus.core.conversation import ConversationMemory
 
 provider = ClaudeProvider()
 memory = ConversationMemory()
@@ -72,22 +72,22 @@ Complex debugging, security analysis, and problems requiring methodical investig
 **CLI Example:**
 ```bash
 # Start investigation
-modelchorus thinkdeep "Why is authentication failing?" \
+model-chorus thinkdeep "Why is authentication failing?" \
   -f src/auth.py -p claude -e gemini
 # Returns: Thread ID: def-456
 
 # Continue investigation
-modelchorus thinkdeep "Check async patterns" --continue def-456
+model-chorus thinkdeep "Check async patterns" --continue def-456
 
 # Check progress
-modelchorus thinkdeep-status def-456 --steps
+model-chorus thinkdeep-status def-456 --steps
 ```
 
 **Python Example:**
 ```python
-from modelchorus.workflows import ThinkDeepWorkflow
-from modelchorus.providers import ClaudeProvider, GeminiProvider
-from modelchorus.core.conversation import ConversationMemory
+from model_chorus.workflows import ThinkDeepWorkflow
+from model_chorus.providers import ClaudeProvider, GeminiProvider
+from model_chorus.core.conversation import ConversationMemory
 
 provider = ClaudeProvider()
 expert = GeminiProvider()  # Optional
@@ -137,14 +137,14 @@ Architecture decisions, technology evaluations, and reducing single-model bias.
 **CLI Example:**
 ```bash
 # Get multiple perspectives
-modelchorus consensus "REST vs GraphQL for our API?" \
+model-chorus consensus "REST vs GraphQL for our API?" \
   -p claude -p gemini -p codex -s synthesize
 ```
 
 **Python Example:**
 ```python
-from modelchorus.workflows import ConsensusWorkflow, ConsensusStrategy
-from modelchorus.providers import ClaudeProvider, GeminiProvider
+from model_chorus.workflows import ConsensusWorkflow, ConsensusStrategy
+from model_chorus.providers import ClaudeProvider, GeminiProvider
 
 providers = [ClaudeProvider(), GeminiProvider()]
 workflow = ConsensusWorkflow(
@@ -174,15 +174,15 @@ Policy debates, technology decisions, and balanced argument analysis.
 **CLI Example:**
 ```bash
 # Analyze an argument from multiple perspectives
-modelchorus argument "Universal healthcare should be implemented" \
+model-chorus argument "Universal healthcare should be implemented" \
   -p claude
 ```
 
 **Python Example:**
 ```python
-from modelchorus.workflows import ArgumentWorkflow
-from modelchorus.providers import ClaudeProvider
-from modelchorus.core.conversation import ConversationMemory
+from model_chorus.workflows import ArgumentWorkflow
+from model_chorus.providers import ClaudeProvider
+from model_chorus.core.conversation import ConversationMemory
 
 provider = ClaudeProvider()
 memory = ConversationMemory()
@@ -212,14 +212,14 @@ Creative problem-solving, feature brainstorming, and solution exploration.
 **CLI Example:**
 ```bash
 # Generate ideas from multiple perspectives
-modelchorus ideate "Ways to improve user onboarding" \
+model-chorus ideate "Ways to improve user onboarding" \
   -p claude -p gemini
 ```
 
 **Python Example:**
 ```python
-from modelchorus.workflows import IdeateWorkflow
-from modelchorus.providers import ClaudeProvider, GeminiProvider
+from model_chorus.workflows import IdeateWorkflow
+from model_chorus.providers import ClaudeProvider, GeminiProvider
 
 providers = [ClaudeProvider(), GeminiProvider()]
 workflow = IdeateWorkflow(providers=providers)
@@ -263,7 +263,7 @@ Or add locally for development:
 After installing the plugin, install the Python package:
 
 ```bash
-cd ~/.claude/plugins/model-chorus/modelchorus
+cd ~/.claude/plugins/model-chorus/model_chorus
 pip install -e .
 ```
 
@@ -272,7 +272,7 @@ pip install -e .
 ```bash
 # From source
 git clone https://github.com/tylerburleigh/claude-model-chorus.git
-cd claude-model-chorus/modelchorus
+cd claude-model-chorus/model_chorus
 pip install -e .
 
 # For development
@@ -285,43 +285,43 @@ pip install -e ".[dev]"
 
 **CHAT - Simple conversation:**
 ```bash
-modelchorus chat "Explain quantum computing" -p claude
+model-chorus chat "Explain quantum computing" -p claude
 # Returns: Thread ID: abc-123
 
-modelchorus chat "Give me an example" --continue abc-123
+model-chorus chat "Give me an example" --continue abc-123
 ```
 
 **THINKDEEP - Systematic investigation:**
 ```bash
-modelchorus thinkdeep "Debug authentication issue" \
+model-chorus thinkdeep "Debug authentication issue" \
   -f src/auth.py -p claude -e gemini
 
-modelchorus thinkdeep-status thread-id-here --steps
+model-chorus thinkdeep-status thread-id-here --steps
 ```
 
 **CONSENSUS - Multi-model perspectives:**
 ```bash
-modelchorus consensus "REST vs GraphQL?" \
+model-chorus consensus "REST vs GraphQL?" \
   -p claude -p gemini -s synthesize
 ```
 
 **ARGUMENT - Dialectical reasoning:**
 ```bash
-modelchorus argument "Universal healthcare should be implemented" -p claude
+model-chorus argument "Universal healthcare should be implemented" -p claude
 ```
 
 **IDEATE - Collaborative brainstorming:**
 ```bash
-modelchorus ideate "Ways to improve user onboarding" -p claude -p gemini
+model-chorus ideate "Ways to improve user onboarding" -p claude -p gemini
 ```
 
 ### Via Python API
 
 **CHAT workflow:**
 ```python
-from modelchorus.workflows import ChatWorkflow
-from modelchorus.providers import ClaudeProvider
-from modelchorus.core.conversation import ConversationMemory
+from model_chorus.workflows import ChatWorkflow
+from model_chorus.providers import ClaudeProvider
+from model_chorus.core.conversation import ConversationMemory
 
 provider = ClaudeProvider()
 memory = ConversationMemory()
@@ -339,9 +339,9 @@ result2 = await workflow.run(
 
 **THINKDEEP workflow:**
 ```python
-from modelchorus.workflows import ThinkDeepWorkflow
-from modelchorus.providers import ClaudeProvider, GeminiProvider
-from modelchorus.core.conversation import ConversationMemory
+from model_chorus.workflows import ThinkDeepWorkflow
+from model_chorus.providers import ClaudeProvider, GeminiProvider
+from model_chorus.core.conversation import ConversationMemory
 
 provider = ClaudeProvider()
 expert = GeminiProvider()
@@ -357,8 +357,8 @@ state = workflow.get_investigation_state(result.metadata['thread_id'])
 
 **CONSENSUS workflow:**
 ```python
-from modelchorus.workflows import ConsensusWorkflow, ConsensusStrategy
-from modelchorus.providers import ClaudeProvider, GeminiProvider, GenerationRequest
+from model_chorus.workflows import ConsensusWorkflow, ConsensusStrategy
+from model_chorus.providers import ClaudeProvider, GeminiProvider, GenerationRequest
 
 providers = [ClaudeProvider(), GeminiProvider()]
 workflow = ConsensusWorkflow(providers=providers, strategy=ConsensusStrategy.SYNTHESIZE)
@@ -369,9 +369,9 @@ result = await workflow.execute(request)
 
 **ARGUMENT workflow:**
 ```python
-from modelchorus.workflows import ArgumentWorkflow
-from modelchorus.providers import ClaudeProvider
-from modelchorus.core.conversation import ConversationMemory
+from model_chorus.workflows import ArgumentWorkflow
+from model_chorus.providers import ClaudeProvider
+from model_chorus.core.conversation import ConversationMemory
 
 provider = ClaudeProvider()
 memory = ConversationMemory()
@@ -382,8 +382,8 @@ result = await workflow.run("Universal healthcare should be implemented")
 
 **IDEATE workflow:**
 ```python
-from modelchorus.workflows import IdeateWorkflow
-from modelchorus.providers import ClaudeProvider, GeminiProvider
+from model_chorus.workflows import IdeateWorkflow
+from model_chorus.providers import ClaudeProvider, GeminiProvider
 
 providers = [ClaudeProvider(), GeminiProvider()]
 workflow = IdeateWorkflow(providers=providers)
@@ -395,19 +395,19 @@ result = await workflow.run("Ways to improve user onboarding")
 
 ```bash
 # CHAT workflow
-modelchorus chat "How do I implement JWT auth?" -p claude
+model-chorus chat "How do I implement JWT auth?" -p claude
 
 # THINKDEEP workflow
-modelchorus thinkdeep "Investigate memory leak" -f src/cache.py -p claude -e gemini
+model-chorus thinkdeep "Investigate memory leak" -f src/cache.py -p claude -e gemini
 
 # CONSENSUS workflow
-modelchorus consensus "TypeScript vs JavaScript?" -p claude -p gemini -s synthesize
+model-chorus consensus "TypeScript vs JavaScript?" -p claude -p gemini -s synthesize
 
 # ARGUMENT workflow
-modelchorus argument "Universal healthcare should be implemented" -p claude
+model-chorus argument "Universal healthcare should be implemented" -p claude
 
 # IDEATE workflow
-modelchorus ideate "Ways to improve user onboarding" -p claude -p gemini
+model-chorus ideate "Ways to improve user onboarding" -p claude -p gemini
 ```
 
 ## Consensus Strategies
@@ -466,7 +466,7 @@ export OPENAI_API_KEY="your-key"
 ModelChorus workflows automatically fallback to alternative providers if the primary fails:
 
 ```yaml
-# .modelchorusrc configuration
+# .model-chorusrc configuration
 workflows:
   chat:
     provider: claude
@@ -479,7 +479,7 @@ workflows:
 **Example**: If Claude is unavailable, the workflow automatically uses Gemini:
 
 ```bash
-$ modelchorus chat "quantum computing" --verbose
+$ model-chorus chat "quantum computing" --verbose
 
 ⚠ Some providers unavailable:
   ✗ claude: CLI command 'claude' not found in PATH
@@ -492,7 +492,7 @@ $ modelchorus chat "quantum computing" --verbose
 **Check Provider Availability**:
 ```bash
 # Verify all providers are installed and working
-modelchorus list-providers --check
+model-chorus list-providers --check
 
 # Output shows status for each provider:
 ● claude
@@ -509,48 +509,48 @@ modelchorus list-providers --check
 **Skip Provider Check** (faster startup):
 ```bash
 # Skip availability check for time-critical operations
-modelchorus chat "topic" --skip-provider-check
+model-chorus chat "topic" --skip-provider-check
 ```
 
 ## CLI Commands
 
 ```bash
 # CHAT workflow
-modelchorus chat "prompt" [options]
+model-chorus chat "prompt" [options]
 
 # THINKDEEP workflow
-modelchorus thinkdeep "prompt" [options]
-modelchorus thinkdeep-status THREAD_ID [options]
+model-chorus thinkdeep "prompt" [options]
+model-chorus thinkdeep-status THREAD_ID [options]
 
 # CONSENSUS workflow
-modelchorus consensus "prompt" [options]
+model-chorus consensus "prompt" [options]
 
 # ARGUMENT workflow
-modelchorus argument "prompt" [options]
+model-chorus argument "prompt" [options]
 
 # IDEATE workflow
-modelchorus ideate "prompt" [options]
+model-chorus ideate "prompt" [options]
 
 # List available providers and models
-modelchorus list-providers
+model-chorus list-providers
 
 # Show version
-modelchorus version
+model-chorus version
 
 # Help
-modelchorus --help
-modelchorus chat --help
-modelchorus thinkdeep --help
-modelchorus consensus --help
-modelchorus argument --help
-modelchorus ideate --help
+model-chorus --help
+model-chorus chat --help
+model-chorus thinkdeep --help
+model-chorus consensus --help
+model-chorus argument --help
+model-chorus ideate --help
 ```
 
 ## CLI Options
 
 ### CHAT Command
 ```
-modelchorus chat [PROMPT]
+model-chorus chat [PROMPT]
 
 Arguments:
   PROMPT                    Your question or message [required]
@@ -568,7 +568,7 @@ Options:
 
 ### THINKDEEP Command
 ```
-modelchorus thinkdeep [PROMPT]
+model-chorus thinkdeep [PROMPT]
 
 Arguments:
   PROMPT                    Investigation question or task [required]
@@ -585,7 +585,7 @@ Options:
   -o, --output PATH        Save results to JSON file
   -v, --verbose            Show detailed execution info
 
-modelchorus thinkdeep-status [THREAD_ID]
+model-chorus thinkdeep-status [THREAD_ID]
 
 Arguments:
   THREAD_ID                Investigation thread to inspect [required]
@@ -598,7 +598,7 @@ Options:
 
 ### CONSENSUS Command
 ```
-modelchorus consensus [PROMPT]
+model-chorus consensus [PROMPT]
 
 Arguments:
   PROMPT                    Question or task for all models [required]
@@ -616,7 +616,7 @@ Options:
 
 ### ARGUMENT Command
 ```
-modelchorus argument [PROMPT]
+model-chorus argument [PROMPT]
 
 Arguments:
   PROMPT                    Claim or argument to analyze [required]
@@ -634,7 +634,7 @@ Options:
 
 ### IDEATE Command
 ```
-modelchorus ideate [PROMPT]
+model-chorus ideate [PROMPT]
 
 Arguments:
   PROMPT                    Topic or problem for brainstorming [required]
@@ -656,13 +656,13 @@ Options:
 
 ```bash
 # Start code review
-modelchorus chat "Review this authentication function" \
+model-chorus chat "Review this authentication function" \
   -f src/auth.py -p claude
 # Returns: Thread ID: abc-123
 
 # Follow-up questions
-modelchorus chat "How would you refactor the token validation?" --continue abc-123
-modelchorus chat "Add error handling examples" --continue abc-123
+model-chorus chat "How would you refactor the token validation?" --continue abc-123
+model-chorus chat "Add error handling examples" --continue abc-123
 ```
 
 **Result:** Multi-turn conversation with full context of previous messages.
@@ -671,16 +671,16 @@ modelchorus chat "Add error handling examples" --continue abc-123
 
 ```bash
 # Start investigation
-modelchorus thinkdeep "Users report intermittent 500 errors" \
+model-chorus thinkdeep "Users report intermittent 500 errors" \
   -f src/api/users.py -f logs/error.log \
   -p claude -e gemini
 # Returns: Thread ID: def-456
 
 # Continue with findings
-modelchorus thinkdeep "Found race condition in async handler" --continue def-456
+model-chorus thinkdeep "Found race condition in async handler" --continue def-456
 
 # Check investigation progress
-modelchorus thinkdeep-status def-456 --steps --files
+model-chorus thinkdeep-status def-456 --steps --files
 ```
 
 **Result:** Systematic investigation with hypothesis tracking and confidence progression.
@@ -688,7 +688,7 @@ modelchorus thinkdeep-status def-456 --steps --files
 ### Example 3: Architecture Decision (CONSENSUS)
 
 ```bash
-modelchorus consensus \
+model-chorus consensus \
   "Should we use REST or GraphQL for our API?" \
   -p claude -p gemini -p codex \
   -s synthesize \
@@ -745,8 +745,8 @@ claude-model-chorus/
 ├── skills/                  # Skill definitions
 │   └── consensus/
 │       └── SKILL.md         # Consensus skill documentation
-└── modelchorus/            # Python package
-    ├── src/modelchorus/
+└── model_chorus/            # Python package
+    ├── src/model_chorus/
     │   ├── core/           # Base workflow abstractions
     │   ├── providers/      # AI provider implementations
     │   ├── workflows/      # Consensus workflow
@@ -761,7 +761,7 @@ claude-model-chorus/
 ### Running Tests
 
 ```bash
-cd modelchorus/
+cd model_chorus/
 pytest
 ```
 
@@ -775,7 +775,7 @@ black .
 ruff check .
 
 # Type check
-mypy modelchorus
+mypy model_chorus
 ```
 
 ### Local Plugin Development
@@ -785,12 +785,12 @@ mypy modelchorus
 /plugin add /path/to/claude-model-chorus
 
 # Test the skill
-Use Skill(model-chorus:consensus): modelchorus consensus "test prompt" -p claude -p gemini
+Use Skill(model-chorus:consensus): model-chorus consensus "test prompt" -p claude -p gemini
 ```
 
 ## Python Package
 
-For detailed Python API documentation, see [`modelchorus/README.md`](modelchorus/README.md).
+For detailed Python API documentation, see [`model_chorus/README.md`](model_chorus/README.md).
 
 The package provides:
 - **Workflow abstractions** - Base classes for building workflows
@@ -832,7 +832,7 @@ Contributions welcome! Please:
 - Restart Claude Code
 
 **Consensus skill not working?**
-- Ensure Python package is installed: `cd ~/.claude/plugins/model-chorus/modelchorus && pip install -e .`
+- Ensure Python package is installed: `cd ~/.claude/plugins/model-chorus/model_chorus && pip install -e .`
 - Check provider CLI tools are installed
 - Verify API keys are configured
 
@@ -846,7 +846,7 @@ Contributions welcome! Please:
 
 - **GitHub**: https://github.com/tylerburleigh/claude-model-chorus
 - **Issues**: https://github.com/tylerburleigh/claude-model-chorus/issues
-- **Python Package Docs**: [`modelchorus/README.md`](modelchorus/README.md)
+- **Python Package Docs**: [`model_chorus/README.md`](model_chorus/README.md)
 
 ## License
 

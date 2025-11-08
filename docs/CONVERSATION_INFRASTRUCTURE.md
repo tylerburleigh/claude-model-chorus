@@ -30,7 +30,7 @@ ModelChorus provides robust conversation infrastructure that enables:
 - **Automatic cleanup** of expired conversations
 - **Custom workflow state** preservation
 
-**Storage Location:** `~/.modelchorus/conversations/`
+**Storage Location:** `~/.model-chorus/conversations/`
 
 **File Format:** JSON with file locking
 
@@ -46,20 +46,20 @@ Thread-safe conversation storage with file-based persistence.
 
 **Import:**
 ```python
-from modelchorus.core.conversation import ConversationMemory
+from model_chorus.core.conversation import ConversationMemory
 ```
 
 **Constructor:**
 ```python
 memory = ConversationMemory(
-    conversations_dir=None,  # Optional: defaults to ~/.modelchorus/conversations
+    conversations_dir=None,  # Optional: defaults to ~/.model-chorus/conversations
     ttl_hours=72,           # Optional: time-to-live for threads
     max_messages=100        # Optional: max messages per thread before truncation
 )
 ```
 
 **Parameters:**
-- `conversations_dir` (Path, optional): Directory for conversation storage. Defaults to `~/.modelchorus/conversations/`
+- `conversations_dir` (Path, optional): Directory for conversation storage. Defaults to `~/.model-chorus/conversations/`
 - `ttl_hours` (int, optional): Hours until thread expires. Default: 72
 - `max_messages` (int, optional): Maximum messages per thread. Default: 100
 
@@ -160,7 +160,7 @@ memory.add_message(
 
 **Example:**
 ```python
-from modelchorus.core.models import ConversationMessage
+from model_chorus.core.models import ConversationMessage
 
 message = ConversationMessage(
     role="user",
@@ -365,7 +365,7 @@ Complete conversation context for a thread.
 
 **Import:**
 ```python
-from modelchorus.core.models import ConversationThread
+from model_chorus.core.models import ConversationThread
 ```
 
 **Attributes:**
@@ -415,7 +415,7 @@ Single message in a conversation thread.
 
 **Import:**
 ```python
-from modelchorus.core.models import ConversationMessage
+from model_chorus.core.models import ConversationMessage
 ```
 
 **Attributes:**
@@ -434,7 +434,7 @@ class ConversationMessage:
 
 **Example:**
 ```python
-from modelchorus.core.models import ConversationMessage
+from model_chorus.core.models import ConversationMessage
 from datetime import datetime, timezone
 
 # User message
@@ -470,7 +470,7 @@ Generic state container for workflow-specific data.
 
 **Import:**
 ```python
-from modelchorus.core.models import ConversationState
+from model_chorus.core.models import ConversationState
 ```
 
 **Attributes:**
@@ -486,7 +486,7 @@ class ConversationState:
 
 **Example:**
 ```python
-from modelchorus.core.models import ConversationState
+from model_chorus.core.models import ConversationState
 from datetime import datetime, timezone
 
 # Create state for ThinkDeep workflow
@@ -526,8 +526,8 @@ Workflows can maintain custom state across conversation turns using the `Convers
 **Pattern:**
 
 ```python
-from modelchorus.core.base_workflow import BaseWorkflow
-from modelchorus.core.models import ConversationState
+from model_chorus.core.base_workflow import BaseWorkflow
+from model_chorus.core.models import ConversationState
 from datetime import datetime, timezone
 
 class MyWorkflow(BaseWorkflow):
@@ -637,10 +637,10 @@ if thread.state and thread.state.schema_version != "2.0":
 Complete example of integrating conversation infrastructure:
 
 ```python
-from modelchorus.core.base_workflow import BaseWorkflow, WorkflowResult, WorkflowStep
-from modelchorus.core.conversation import ConversationMemory
-from modelchorus.core.models import ConversationMessage, ConversationState
-from modelchorus.providers import GenerationRequest
+from model_chorus.core.base_workflow import BaseWorkflow, WorkflowResult, WorkflowStep
+from model_chorus.core.conversation import ConversationMemory
+from model_chorus.core.models import ConversationMessage, ConversationState
+from model_chorus.providers import GenerationRequest
 from datetime import datetime, timezone
 from typing import Optional, Dict, Any
 import uuid
@@ -827,7 +827,7 @@ class CustomAnalysisWorkflow(BaseWorkflow):
 
 # Usage
 async def main():
-    from modelchorus.providers import ClaudeProvider
+    from model_chorus.providers import ClaudeProvider
 
     provider = ClaudeProvider()
     memory = ConversationMemory()

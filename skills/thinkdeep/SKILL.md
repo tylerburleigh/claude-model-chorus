@@ -258,18 +258,18 @@ THINKDEEP supports multi-turn investigations where you can pause, resume, and bu
 
 Step 1 - Initial investigation:
 ```bash
-modelchorus thinkdeep --step "Investigate authentication failures in production" --step-number 1 --total-steps 3 --next-step-required true --findings "Examining auth service logs..." --confidence exploring
+model-chorus thinkdeep --step "Investigate authentication failures in production" --step-number 1 --total-steps 3 --next-step-required true --findings "Examining auth service logs..." --confidence exploring
 ```
 Returns: `session_id = "auth-inv-abc123"`
 
 Step 2 - Continue with same thread:
 ```bash
-modelchorus thinkdeep --session-id "auth-inv-abc123" --step "Check token validation logic based on log findings" --step-number 2 --total-steps 3 --next-step-required true --findings "Found race condition in async token validation" --confidence medium
+model-chorus thinkdeep --session-id "auth-inv-abc123" --step "Check token validation logic based on log findings" --step-number 2 --total-steps 3 --next-step-required true --findings "Found race condition in async token validation" --confidence medium
 ```
 
 Step 3 - Final analysis:
 ```bash
-modelchorus thinkdeep --session-id "auth-inv-abc123" --step "Verify race condition hypothesis with code analysis" --step-number 3 --total-steps 3 --next-step-required false --findings "Confirmed: missing await in auth middleware" --confidence high
+model-chorus thinkdeep --session-id "auth-inv-abc123" --step "Verify race condition hypothesis with code analysis" --step-number 3 --total-steps 3 --next-step-required false --findings "Confirmed: missing await in auth middleware" --confidence high
 ```
 
 **Pattern 2: Investigation Branching**
@@ -278,25 +278,25 @@ Start a new investigation branch while preserving original:
 
 Original investigation continues:
 ```bash
-modelchorus thinkdeep --session-id "original-thread-xyz" --step "Continue original investigation..." --step-number 4 --total-steps 5 --next-step-required true --findings "..." --confidence medium
+model-chorus thinkdeep --session-id "original-thread-xyz" --step "Continue original investigation..." --step-number 4 --total-steps 5 --next-step-required true --findings "..." --confidence medium
 ```
 
 New branch (omit continuation-id to start fresh):
 ```bash
-modelchorus thinkdeep --step "Explore alternative: network latency causing timeouts" --step-number 1 --total-steps 2 --next-step-required true --findings "Investigating network layer..." --confidence low
+model-chorus thinkdeep --step "Explore alternative: network latency causing timeouts" --step-number 1 --total-steps 2 --next-step-required true --findings "Investigating network layer..." --confidence low
 ```
 
 **Pattern 3: Cross-Session Resume**
 
 Day 1 - Original session:
 ```bash
-modelchorus thinkdeep --step "Analyze memory leak in service" --step-number 1 --total-steps 3 --next-step-required true --findings "Found increasing heap usage over 24h" --confidence medium
+model-chorus thinkdeep --step "Analyze memory leak in service" --step-number 1 --total-steps 3 --next-step-required true --findings "Found increasing heap usage over 24h" --confidence medium
 ```
 Returns: `session_id = "mem-leak-xyz789"`
 
 Day 2 - Resume with preserved context:
 ```bash
-modelchorus thinkdeep --session-id "mem-leak-xyz789" --step "Trace heap allocations to identify source" --step-number 2 --total-steps 3 --next-step-required true --findings "Identified unclosed database connections" --confidence high
+model-chorus thinkdeep --session-id "mem-leak-xyz789" --step "Trace heap allocations to identify source" --step-number 2 --total-steps 3 --next-step-required true --findings "Identified unclosed database connections" --confidence high
 ```
 
 ### State Inspection
@@ -343,41 +343,41 @@ When starting a new investigation (no session_id):
 
 Step 1 - Initial symptoms:
 ```bash
-modelchorus thinkdeep --step "Users report intermittent 401 errors" --step-number 1 --total-steps 4 --next-step-required true --findings "Error rate: 5% of requests, no pattern found in logs" --confidence exploring --hypothesis "Unknown cause - investigate auth flow"
+model-chorus thinkdeep --step "Users report intermittent 401 errors" --step-number 1 --total-steps 4 --next-step-required true --findings "Error rate: 5% of requests, no pattern found in logs" --confidence exploring --hypothesis "Unknown cause - investigate auth flow"
 ```
 Returns: `session_id = "auth-race-001"`
 
 Step 2 - Investigate auth flow:
 ```bash
-modelchorus thinkdeep --session-id "auth-race-001" --step "Examine token validation sequence" --step-number 2 --total-steps 4 --next-step-required true --findings "Token checked before async validation completes" --confidence medium --hypothesis "Race condition in token validation"
+model-chorus thinkdeep --session-id "auth-race-001" --step "Examine token validation sequence" --step-number 2 --total-steps 4 --next-step-required true --findings "Token checked before async validation completes" --confidence medium --hypothesis "Race condition in token validation"
 ```
 
 Step 3 - Verify hypothesis:
 ```bash
-modelchorus thinkdeep --session-id "auth-race-001" --step "Trace async execution order" --step-number 3 --total-steps 4 --next-step-required true --findings "Missing await causes request to proceed before validation" --confidence high --hypothesis "Confirmed: race condition due to missing await"
+model-chorus thinkdeep --session-id "auth-race-001" --step "Trace async execution order" --step-number 3 --total-steps 4 --next-step-required true --findings "Missing await causes request to proceed before validation" --confidence high --hypothesis "Confirmed: race condition due to missing await"
 ```
 
 Step 4 - Verify fix:
 ```bash
-modelchorus thinkdeep --session-id "auth-race-001" --step "Verify adding await resolves issue" --step-number 4 --total-steps 4 --next-step-required false --findings "With await added, validation completes before auth check" --confidence very_high --hypothesis "Root cause: missing await in middleware"
+model-chorus thinkdeep --session-id "auth-race-001" --step "Verify adding await resolves issue" --step-number 4 --total-steps 4 --next-step-required false --findings "With await added, validation completes before auth check" --confidence very_high --hypothesis "Root cause: missing await in middleware"
 ```
 
 **Example 2: Architecture Decision**
 
 Step 1 - Analyze requirements:
 ```bash
-modelchorus thinkdeep --step "Should we use microservices or monolith?" --step-number 1 --total-steps 3 --next-step-required true --findings "Team size: 5 devs, expected scale: 10k users" --confidence exploring --hypothesis "Need to evaluate tradeoffs"
+model-chorus thinkdeep --step "Should we use microservices or monolith?" --step-number 1 --total-steps 3 --next-step-required true --findings "Team size: 5 devs, expected scale: 10k users" --confidence exploring --hypothesis "Need to evaluate tradeoffs"
 ```
 Returns: `session_id = "arch-decision-002"`
 
 Step 2 - Continue analysis:
 ```bash
-modelchorus thinkdeep --session-id "arch-decision-002" --step "Evaluate team experience and deployment complexity" --step-number 2 --total-steps 3 --next-step-required true --findings "Team has limited k8s experience, deployment simplicity important" --confidence medium --hypothesis "Monolith may be better fit for team/scale"
+model-chorus thinkdeep --session-id "arch-decision-002" --step "Evaluate team experience and deployment complexity" --step-number 2 --total-steps 3 --next-step-required true --findings "Team has limited k8s experience, deployment simplicity important" --confidence medium --hypothesis "Monolith may be better fit for team/scale"
 ```
 
 Step 3 - Final recommendation:
 ```bash
-modelchorus thinkdeep --session-id "arch-decision-002" --step "Consider future scaling and migration path" --step-number 3 --total-steps 3 --next-step-required false --findings "Can start monolith, extract services later if needed" --confidence high --hypothesis "Monolith is optimal: simpler ops, team fit, migration path exists"
+model-chorus thinkdeep --session-id "arch-decision-002" --step "Consider future scaling and migration path" --step-number 3 --total-steps 3 --next-step-required false --findings "Can start monolith, extract services later if needed" --confidence high --hypothesis "Monolith is optimal: simpler ops, team fit, migration path exists"
 ```
 
 ## Basic Usage
@@ -387,7 +387,7 @@ modelchorus thinkdeep --session-id "arch-decision-002" --step "Consider future s
 Basic investigation with single step:
 
 ```bash
-modelchorus thinkdeep --step "Investigate why API latency increased from 100ms to 2s" --step-number 1 --total-steps 1 --next-step-required false --findings "Need to analyze recent deployment changes" --confidence exploring
+model-chorus thinkdeep --step "Investigate why API latency increased from 100ms to 2s" --step-number 1 --total-steps 1 --next-step-required false --findings "Need to analyze recent deployment changes" --confidence exploring
 ```
 
 ### Common Options
@@ -499,7 +499,7 @@ The THINKDEEP workflow returns a JSON object with the following structure:
 Specify which AI model to use for the investigation:
 
 ```bash
-modelchorus thinkdeep --step "Analyze security vulnerability in auth flow" --step-number 1 --total-steps 3 --next-step-required true --findings "Reviewing authentication middleware" --confidence exploring
+model-chorus thinkdeep --step "Analyze security vulnerability in auth flow" --step-number 1 --total-steps 3 --next-step-required true --findings "Reviewing authentication middleware" --confidence exploring
 ```
 
 ### With File Context
@@ -507,7 +507,7 @@ modelchorus thinkdeep --step "Analyze security vulnerability in auth flow" --ste
 Include specific files relevant to the investigation:
 
 ```bash
-modelchorus thinkdeep --step "Debug race condition in token validation" --step-number 2 --total-steps 3 --next-step-required true --findings "Found async timing issue" --confidence medium --files-checked "src/auth/middleware.ts,src/services/token.ts"
+model-chorus thinkdeep --step "Debug race condition in token validation" --step-number 2 --total-steps 3 --next-step-required true --findings "Found async timing issue" --confidence medium --files-checked "src/auth/middleware.ts,src/services/token.ts"
 ```
 
 ### Multi-Step Investigation
@@ -515,13 +515,13 @@ modelchorus thinkdeep --step "Debug race condition in token validation" --step-n
 Conduct systematic multi-step investigation with continuation:
 
 ```bash
-modelchorus thinkdeep --step "Initial analysis of memory leak" --step-number 1 --total-steps 4 --next-step-required true --findings "Heap growing 50MB/hour" --confidence exploring
+model-chorus thinkdeep --step "Initial analysis of memory leak" --step-number 1 --total-steps 4 --next-step-required true --findings "Heap growing 50MB/hour" --confidence exploring
 ```
 
 Then continue:
 
 ```bash
-modelchorus thinkdeep --session-id "RETURNED_ID" --step "Trace allocation sources" --step-number 2 --total-steps 4 --next-step-required true --findings "Database connection pool not releasing" --confidence medium
+model-chorus thinkdeep --session-id "RETURNED_ID" --step "Trace allocation sources" --step-number 2 --total-steps 4 --next-step-required true --findings "Database connection pool not releasing" --confidence medium
 ```
 
 ### Adjusting Reasoning Depth
@@ -529,7 +529,7 @@ modelchorus thinkdeep --session-id "RETURNED_ID" --step "Trace allocation source
 Control how deeply the model thinks about the problem:
 
 ```bash
-modelchorus thinkdeep --step "Complex architectural decision" --step-number 1 --total-steps 1 --next-step-required false --findings "Need thorough analysis" --confidence exploring --thinking-mode max
+model-chorus thinkdeep --step "Complex architectural decision" --step-number 1 --total-steps 1 --next-step-required false --findings "Need thorough analysis" --confidence exploring --thinking-mode max
 ```
 
 Options: `minimal`, `low`, `medium` (default), `high`, `max`
@@ -539,7 +539,7 @@ Options: `minimal`, `low`, `medium` (default), `high`, `max`
 Get independent expert review of investigation findings:
 
 ```bash
-modelchorus thinkdeep --step "Final hypothesis verification" --step-number 3 --total-steps 3 --next-step-required false --findings "Root cause identified" --confidence high --use-assistant-model true
+model-chorus thinkdeep --step "Final hypothesis verification" --step-number 3 --total-steps 3 --next-step-required false --findings "Root cause identified" --confidence high --use-assistant-model true
 ```
 
 ## Best Practices
@@ -616,7 +616,7 @@ modelchorus thinkdeep --step "Final hypothesis verification" --step-number 3 --t
 Problem: Users seeing 500 errors on checkout
 
 ```bash
-modelchorus thinkdeep --step "Investigate 500 errors in checkout flow" --step-number 1 --total-steps 1 --next-step-required false --findings "Error: 'payment_processor timeout'. Third-party API latency spike to 30s." --confidence high --hypothesis "Payment provider experiencing outage, not our bug"
+model-chorus thinkdeep --step "Investigate 500 errors in checkout flow" --step-number 1 --total-steps 1 --next-step-required false --findings "Error: 'payment_processor timeout'. Third-party API latency spike to 30s." --confidence high --hypothesis "Payment provider experiencing outage, not our bug"
 ```
 
 Single-step investigation, clear finding, high confidence → done.
@@ -625,17 +625,17 @@ Single-step investigation, clear finding, high confidence → done.
 
 Step 1 - Initial analysis:
 ```bash
-modelchorus thinkdeep --step "API latency increased from 100ms to 2s after deployment" --step-number 1 --total-steps 3 --next-step-required true --findings "Latency affects all endpoints equally, started at 3pm deployment" --confidence low --hypothesis "Deployment introduced performance regression"
+model-chorus thinkdeep --step "API latency increased from 100ms to 2s after deployment" --step-number 1 --total-steps 3 --next-step-required true --findings "Latency affects all endpoints equally, started at 3pm deployment" --confidence low --hypothesis "Deployment introduced performance regression"
 ```
 
 Step 2 - Narrow down cause:
 ```bash
-modelchorus thinkdeep --session-id "perf-inv-001" --step "Examine deployment changes" --step-number 2 --total-steps 3 --next-step-required true --findings "New logging middleware added, logs every request body. Bodies average 50KB." --confidence medium --hypothesis "Excessive logging causing I/O bottleneck"
+model-chorus thinkdeep --session-id "perf-inv-001" --step "Examine deployment changes" --step-number 2 --total-steps 3 --next-step-required true --findings "New logging middleware added, logs every request body. Bodies average 50KB." --confidence medium --hypothesis "Excessive logging causing I/O bottleneck"
 ```
 
 Step 3 - Verify:
 ```bash
-modelchorus thinkdeep --session-id "perf-inv-001" --step "Test hypothesis by disabling verbose logging" --step-number 3 --total-steps 3 --next-step-required false --findings "Latency drops to 120ms with logging disabled" --confidence very_high --hypothesis "Confirmed: verbose body logging causing 20x slowdown"
+model-chorus thinkdeep --session-id "perf-inv-001" --step "Test hypothesis by disabling verbose logging" --step-number 3 --total-steps 3 --next-step-required false --findings "Latency drops to 120ms with logging disabled" --confidence very_high --hypothesis "Confirmed: verbose body logging causing 20x slowdown"
 ```
 
 ### Example 3: Security Audit
@@ -643,12 +643,12 @@ modelchorus thinkdeep --session-id "perf-inv-001" --step "Test hypothesis by dis
 Investigation with expert validation:
 
 ```bash
-modelchorus thinkdeep --step "Audit authentication flow for bypass vulnerabilities" --step-number 1 --total-steps 2 --next-step-required true --findings "Token validation occurs before permission check. JWT expiry not verified in middleware." --confidence medium --hypothesis "Potential bypass: expired tokens may pass through"
+model-chorus thinkdeep --step "Audit authentication flow for bypass vulnerabilities" --step-number 1 --total-steps 2 --next-step-required true --findings "Token validation occurs before permission check. JWT expiry not verified in middleware." --confidence medium --hypothesis "Potential bypass: expired tokens may pass through"
 ```
 
 Then verify with expert:
 ```bash
-modelchorus thinkdeep --session-id "sec-audit-001" --step "Verify vulnerability hypothesis" --step-number 2 --total-steps 2 --next-step-required false --findings "Confirmed: expired tokens accepted if permission check passes. Critical vulnerability." --confidence very_high --use-assistant-model true
+model-chorus thinkdeep --session-id "sec-audit-001" --step "Verify vulnerability hypothesis" --step-number 2 --total-steps 2 --next-step-required false --findings "Confirmed: expired tokens accepted if permission check passes. Critical vulnerability." --confidence very_high --use-assistant-model true
 ```
 
 ## Troubleshooting

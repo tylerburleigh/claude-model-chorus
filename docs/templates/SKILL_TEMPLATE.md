@@ -53,7 +53,7 @@ Avoid this workflow when:
 ### Simple Example
 
 ```bash
-modelchorus [workflow-name] "[prompt text here]"
+model-chorus [workflow-name] "[prompt text here]"
 ```
 
 **Expected Output:**
@@ -79,7 +79,7 @@ modelchorus [workflow-name] "[prompt text here]"
 
 ```bash
 # Use specific provider
-modelchorus [workflow-name] "[prompt]" -p gemini
+model-chorus [workflow-name] "[prompt]" -p gemini
 
 # [Additional provider-specific notes if relevant]
 ```
@@ -88,10 +88,10 @@ modelchorus [workflow-name] "[prompt]" -p gemini
 
 ```bash
 # Include single file
-modelchorus [workflow-name] "[prompt]" -f path/to/file.txt
+model-chorus [workflow-name] "[prompt]" -f path/to/file.txt
 
 # Include multiple files
-modelchorus [workflow-name] "[prompt]" -f file1.txt -f file2.md -f config.json
+model-chorus [workflow-name] "[prompt]" -f file1.txt -f file2.md -f config.json
 ```
 
 **File Handling:**
@@ -105,11 +105,11 @@ modelchorus [workflow-name] "[prompt]" -f file1.txt -f file2.md -f config.json
 
 ```bash
 # Start new conversation
-modelchorus [workflow-name] "[initial prompt]"
+model-chorus [workflow-name] "[initial prompt]"
 # Output includes: Thread ID: thread-xxx-xxx-xxx
 
 # Continue conversation
-modelchorus [workflow-name] "[follow-up prompt]" --continue thread-xxx-xxx-xxx
+model-chorus [workflow-name] "[follow-up prompt]" --continue thread-xxx-xxx-xxx
 ```
 
 **Threading Notes:**
@@ -125,20 +125,20 @@ modelchorus [workflow-name] "[follow-up prompt]" --continue thread-xxx-xxx-xxx
 
 ```bash
 # Lower temperature for factual/precise output
-modelchorus [workflow-name] "[prompt]" --temperature 0.3
+model-chorus [workflow-name] "[prompt]" --temperature 0.3
 
 # Higher temperature for creative output
-modelchorus [workflow-name] "[prompt]" --temperature 0.9
+model-chorus [workflow-name] "[prompt]" --temperature 0.9
 
 # Default balanced setting
-modelchorus [workflow-name] "[prompt]" --temperature [default value]
+model-chorus [workflow-name] "[prompt]" --temperature [default value]
 ```
 
 ### Saving Results
 
 ```bash
 # Save output to JSON file
-modelchorus [workflow-name] "[prompt]" --output results.json
+model-chorus [workflow-name] "[prompt]" --output results.json
 
 # Output file contains:
 # - Prompt
@@ -223,7 +223,7 @@ When using `--verbose` flag:
 | Error | Cause | Solution |
 |-------|-------|----------|
 | File not found | Invalid file path in `-f` | Verify file paths exist |
-| Provider initialization failed | Invalid provider name | Check available providers with `modelchorus list-providers` |
+| Provider initialization failed | Invalid provider name | Check available providers with `model-chorus list-providers` |
 | [Workflow-specific error] | [Cause] | [Solution] |
 
 ## Best Practices
@@ -246,7 +246,7 @@ When using `--verbose` flag:
 
 **Command:**
 ```bash
-modelchorus [workflow-name] "[specific prompt]" [relevant options]
+model-chorus [workflow-name] "[specific prompt]" [relevant options]
 ```
 
 **Expected Outcome:** [What the command accomplishes]
@@ -259,7 +259,7 @@ modelchorus [workflow-name] "[specific prompt]" [relevant options]
 
 **Command:**
 ```bash
-modelchorus [workflow-name] "[specific prompt]" [relevant options]
+model-chorus [workflow-name] "[specific prompt]" [relevant options]
 ```
 
 **Expected Outcome:** [What the command accomplishes]
@@ -272,7 +272,7 @@ modelchorus [workflow-name] "[specific prompt]" [relevant options]
 
 **Command:**
 ```bash
-modelchorus [workflow-name] "[specific prompt]" [relevant options]
+model-chorus [workflow-name] "[specific prompt]" [relevant options]
 ```
 
 **Expected Outcome:** [What the command accomplishes]
@@ -315,8 +315,8 @@ modelchorus [workflow-name] "[specific prompt]" [relevant options]
 
 **See Also:**
 - ModelChorus Documentation: `/docs/workflows/[WORKFLOW_NAME].md`
-- Provider Information: `modelchorus list-providers`
-- General CLI Help: `modelchorus --help`
+- Provider Information: `model-chorus list-providers`
+- General CLI Help: `model-chorus --help`
 ```
 
 ---
@@ -326,7 +326,7 @@ modelchorus [workflow-name] "[specific prompt]" [relevant options]
 ### DO:
 
 1. **Write for AI Agents** - Assume the reader is an AI that will execute commands, not a human user
-2. **Focus on CLI** - All examples should be command-line invocations of `modelchorus`
+2. **Focus on CLI** - All examples should be command-line invocations of `model-chorus`
 3. **Be Specific** - Use concrete examples with real parameters
 4. **Document Defaults** - Always specify default values clearly
 5. **Include Decision Trees** - Help AI agents choose the right options
