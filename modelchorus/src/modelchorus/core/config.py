@@ -21,10 +21,13 @@ except ImportError:
 class GenerationDefaults(BaseModel):
     """Default generation parameters."""
 
-    temperature: Optional[float] = Field(None, ge=0.0, le=2.0)
-    max_tokens: Optional[int] = Field(None, gt=0)
     timeout: Optional[float] = Field(None, gt=0)
-    system_prompt: Optional[str] = None
+
+
+class ProviderConfig(BaseModel):
+    """Configuration for a specific provider."""
+
+    model: Optional[str] = None
 
 
 class WorkflowConfig(BaseModel):
@@ -32,10 +35,8 @@ class WorkflowConfig(BaseModel):
 
     provider: Optional[str] = None
     providers: Optional[List[str]] = None
-    temperature: Optional[float] = Field(None, ge=0.0, le=2.0)
-    max_tokens: Optional[int] = Field(None, gt=0)
+    fallback_providers: Optional[List[str]] = None
     timeout: Optional[float] = Field(None, gt=0)
-    system_prompt: Optional[str] = None
 
     # Consensus-specific
     strategy: Optional[str] = Field(None, pattern=r"^(all_responses|synthesize|vote)$")
@@ -70,6 +71,7 @@ class ModelChorusConfig(BaseModel):
     """Root configuration model for ModelChorus."""
 
     default_provider: Optional[str] = None
+    providers: Optional[Dict[str, ProviderConfig]] = None
     generation: Optional[GenerationDefaults] = None
     workflows: Optional[Dict[str, WorkflowConfig]] = None
 
@@ -79,6 +81,16 @@ class ModelChorusConfig(BaseModel):
         if v and v.lower() not in ['claude', 'gemini', 'codex', 'cursor-agent']:
             raise ValueError(f"Invalid default_provider: {v}. Must be one of: claude, gemini, codex, cursor-agent")
         return v.lower() if v else None
+
+    @field_validator('providers')
+    def validate_provider_names(cls, v):
+        """Validate provider names in providers config."""
+        if v:
+            valid_providers = ['claude', 'gemini', 'codex', 'cursor-agent']
+            for provider_name in v.keys():
+                if provider_name.lower() not in valid_providers:
+                    raise ValueError(f"Invalid provider: {provider_name}. Must be one of: {', '.join(valid_providers)}")
+        return v
 
     @field_validator('workflows')
     def validate_workflow_names(cls, v):
@@ -282,6 +294,45 @@ class ConfigLoader:
             workflow_config = config.workflows[workflow]
             if workflow_config.providers:
                 return workflow_config.providers
+
+        return fallback
+
+    def get_fallback_providers(self, workflow: str) -> Optional[List[str]]:
+        """Get fallback providers for a workflow.
+
+        Args:
+            workflow: Workflow name
+
+        Returns:
+            List of fallback provider names, or None if not configured
+        """
+        config = self.get_config()
+
+        # Check workflow-specific fallback providers
+        if config.workflows and workflow in config.workflows:
+            workflow_config = config.workflows[workflow]
+            if workflow_config.fallback_providers:
+                return workflow_config.fallback_providers
+
+        return None
+
+    def get_provider_model(self, provider: str, fallback: Optional[str] = None) -> Optional[str]:
+        """Get the configured model for a specific provider.
+
+        Args:
+            provider: Provider name (claude, gemini, codex, cursor-agent)
+            fallback: Fallback model if not configured
+
+        Returns:
+            Configured model name, or fallback if not configured
+        """
+        config = self.get_config()
+
+        # Check provider-specific model configuration
+        if config.providers and provider in config.providers:
+            provider_config = config.providers[provider]
+            if provider_config.model:
+                return provider_config.model
 
         return fallback
 

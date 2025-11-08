@@ -4,11 +4,21 @@ Setup helper commands for ModelChorus.
 Provides commands for /modelchorus-setup slash command.
 """
 
+import asyncio
 import json
 import subprocess
 import sys
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
+
+
+# Default models for each provider
+DEFAULT_MODELS = {
+    'claude': 'sonnet',
+    'gemini': 'gemini-2.5-pro',
+    'codex': 'gpt-5-codex',
+    'cursor-agent': 'composer-1'
+}
 
 
 def check_package_installed() -> Dict[str, Any]:
@@ -94,6 +104,153 @@ def install_package(dev_mode: bool = False) -> Dict[str, Any]:
         }
 
 
+def check_version_compatibility() -> Dict[str, Any]:
+    """Check if installed package version matches plugin version.
+
+    Compares the version from .claude-plugin/plugin.json with the installed
+    package version. If package version is lower, recommends reinstall.
+
+    Returns:
+        Dict with compatibility status and version details
+    """
+    try:
+        # Get plugin version from .claude-plugin/plugin.json
+        plugin_json_path = Path.cwd() / '.claude-plugin' / 'plugin.json'
+        plugin_version = None
+
+        if plugin_json_path.exists():
+            with open(plugin_json_path, 'r') as f:
+                plugin_data = json.load(f)
+                plugin_version = plugin_data.get('version', 'unknown')
+        else:
+            return {
+                "compatible": True,
+                "message": "Plugin manifest not found, skipping version check"
+            }
+
+        # Get installed package version
+        package_info = check_package_installed()
+
+        if not package_info.get('installed'):
+            return {
+                "compatible": True,
+                "message": "Package not installed yet"
+            }
+
+        package_version = package_info.get('version', 'unknown')
+
+        # Compare versions (simple string comparison for now)
+        # For semantic versioning, we'd use packaging.version
+        if package_version == 'unknown' or plugin_version == 'unknown':
+            return {
+                "compatible": True,
+                "plugin_version": plugin_version,
+                "package_version": package_version,
+                "message": "Cannot determine version compatibility"
+            }
+
+        # Parse versions for comparison
+        def parse_version(v: str) -> tuple:
+            """Parse version string into comparable tuple."""
+            try:
+                return tuple(map(int, v.split('.')))
+            except:
+                return (0, 0, 0)
+
+        plugin_ver_tuple = parse_version(plugin_version)
+        package_ver_tuple = parse_version(package_version)
+
+        if package_ver_tuple < plugin_ver_tuple:
+            return {
+                "compatible": False,
+                "plugin_version": plugin_version,
+                "package_version": package_version,
+                "message": f"Package version ({package_version}) is older than plugin version ({plugin_version})",
+                "recommendation": "reinstall"
+            }
+        elif package_ver_tuple == plugin_ver_tuple:
+            return {
+                "compatible": True,
+                "plugin_version": plugin_version,
+                "package_version": package_version,
+                "message": f"Versions match ({package_version})"
+            }
+        else:
+            return {
+                "compatible": True,
+                "plugin_version": plugin_version,
+                "package_version": package_version,
+                "message": f"Package version ({package_version}) is newer than plugin version ({plugin_version})",
+                "warning": "Plugin may need updating"
+            }
+
+    except Exception as e:
+        return {
+            "compatible": True,
+            "error": str(e),
+            "message": "Error checking version compatibility"
+        }
+
+
+def check_available_providers() -> Dict[str, Any]:
+    """Check which CLI providers are available on the system.
+
+    Returns:
+        Dict with available provider names and details
+    """
+    try:
+        # Import providers
+        from ..providers.claude_provider import ClaudeProvider
+        from ..providers.gemini_provider import GeminiProvider
+        from ..providers.codex_provider import CodexProvider
+        from ..providers.cursor_agent_provider import CursorAgentProvider
+
+        providers = {
+            "claude": ClaudeProvider(),
+            "gemini": GeminiProvider(),
+            "codex": CodexProvider(),
+            "cursor-agent": CursorAgentProvider(),
+        }
+
+        available = []
+        unavailable = []
+
+        async def check_all():
+            """Check all providers concurrently."""
+            tasks = []
+            for name, provider in providers.items():
+                tasks.append(check_provider(name, provider))
+            return await asyncio.gather(*tasks)
+
+        async def check_provider(name: str, provider):
+            """Check a single provider."""
+            is_available, error = await provider.check_availability()
+            return (name, is_available, error)
+
+        # Run checks
+        results = asyncio.run(check_all())
+
+        for name, is_available, error in results:
+            if is_available:
+                available.append(name)
+            else:
+                unavailable.append({"name": name, "error": error})
+
+        return {
+            "available": available,
+            "unavailable": unavailable,
+            "count": len(available)
+        }
+
+    except Exception as e:
+        return {
+            "available": [],
+            "unavailable": [],
+            "count": 0,
+            "error": str(e)
+        }
+
+
 def check_config_exists(project_root: Optional[Path] = None) -> Dict[str, Any]:
     """Check if .modelchorusrc config file exists.
 
@@ -131,9 +288,8 @@ def check_config_exists(project_root: Optional[Path] = None) -> Dict[str, Any]:
 def create_config_file(
     project_root: Optional[Path] = None,
     default_provider: str = "claude",
-    temperature: float = 0.7,
-    max_tokens: Optional[int] = None,
-    timeout: float = 120.0,
+    timeout: float = 600.0,
+    available_providers: Optional[List[str]] = None,
     workflows: Optional[Dict[str, Any]] = None
 ) -> Dict[str, Any]:
     """Create .modelchorusrc configuration file.
@@ -141,9 +297,8 @@ def create_config_file(
     Args:
         project_root: Project root directory (defaults to cwd)
         default_provider: Default AI provider
-        temperature: Default temperature
-        max_tokens: Default max tokens (optional)
         timeout: Default timeout in seconds
+        available_providers: List of available providers for model config
         workflows: Workflow-specific configurations (optional)
 
     Returns:
@@ -162,17 +317,25 @@ def create_config_file(
             "path": str(config_path)
         }
 
+    # Build provider model configuration
+    providers_config = {}
+    if available_providers:
+        for provider_name in available_providers:
+            if provider_name in DEFAULT_MODELS:
+                providers_config[provider_name] = {
+                    "model": DEFAULT_MODELS[provider_name]
+                }
+
     # Build config structure
     config = {
         "default_provider": default_provider,
         "generation": {
-            "temperature": temperature,
             "timeout": timeout
         }
     }
 
-    if max_tokens is not None:
-        config["generation"]["max_tokens"] = max_tokens
+    if providers_config:
+        config["providers"] = providers_config
 
     if workflows:
         config["workflows"] = workflows
@@ -184,15 +347,21 @@ def create_config_file(
 # Default provider for all workflows
 default_provider: {default_provider}
 
-# Global generation parameters
-generation:
-  temperature: {temperature}
 """
 
-    if max_tokens is not None:
-        yaml_content += f"  max_tokens: {max_tokens}\n"
+    # Add provider model configuration
+    if providers_config:
+        yaml_content += "# Provider-specific model configuration\nproviders:\n"
+        for provider_name, provider_config in providers_config.items():
+            yaml_content += f"  {provider_name}:\n"
+            yaml_content += f"    model: {provider_config['model']}\n"
+        yaml_content += "\n"
 
-    yaml_content += f"  timeout: {timeout}\n"
+    # Add generation parameters
+    yaml_content += f"""# Global generation parameters
+generation:
+  timeout: {timeout}
+"""
 
     if workflows:
         yaml_content += "\n# Workflow-specific overrides\nworkflows:\n"
@@ -223,13 +392,106 @@ generation:
         }
 
 
+def create_express_config(
+    project_root: Optional[Path] = None
+) -> Dict[str, Any]:
+    """Create Express (zero-question) .modelchorusrc configuration.
+
+    Auto-detects available providers and configures with smart defaults:
+    - Primary provider: first available (claude → gemini → codex → cursor-agent)
+    - Fallbacks: all other available providers
+    - Default models: configured for each available provider
+    - Timeout: 120s (standard)
+    - All workflows configured with balanced settings
+
+    Args:
+        project_root: Project root directory (defaults to cwd)
+
+    Returns:
+        Dict with creation result
+    """
+    if project_root is None:
+        project_root = Path.cwd()
+
+    # Check available providers
+    provider_check = check_available_providers()
+    available_providers = provider_check.get("available", [])
+
+    if not available_providers:
+        return {
+            "success": False,
+            "error": "No providers available. Please install at least one provider CLI.",
+            "suggestion": "Install Claude CLI, Gemini CLI, Codex CLI, or Cursor Agent"
+        }
+
+    # Select primary provider (first available in priority order)
+    priority_order = ['claude', 'gemini', 'codex', 'cursor-agent']
+    primary_provider = None
+    for provider in priority_order:
+        if provider in available_providers:
+            primary_provider = provider
+            break
+
+    if not primary_provider:
+        primary_provider = available_providers[0]
+
+    # Compute fallback providers
+    fallback_providers = [p for p in available_providers if p != primary_provider]
+
+    # Build workflows configuration
+    workflows = {}
+
+    # Add base workflows with fallback providers (all tiers)
+    if fallback_providers:
+        # Chat workflow
+        workflows["chat"] = {
+            "fallback_providers": fallback_providers
+        }
+
+        # Argument workflow
+        workflows["argument"] = {
+            "fallback_providers": fallback_providers
+        }
+
+        # ThinkDeep workflow
+        workflows["thinkdeep"] = {
+            "thinking_mode": "medium",
+            "fallback_providers": fallback_providers
+        }
+
+        # Research workflow
+        workflows["research"] = {
+            "citation_style": "informal",
+            "depth": "thorough",
+            "fallback_providers": fallback_providers
+        }
+
+        # Ideate workflow
+        workflows["ideate"] = {
+            "fallback_providers": fallback_providers
+        }
+
+    # Consensus workflow (use first 2-3 available providers)
+    if len(available_providers) >= 2:
+        workflows["consensus"] = {
+            "providers": available_providers[:3],  # Use up to 3 providers
+            "strategy": "all_responses"
+        }
+
+    # Use the existing create_config_file function with workflows
+    return create_config_file(
+        project_root=project_root,
+        default_provider=primary_provider,
+        timeout=600.0,
+        available_providers=available_providers,
+        workflows=workflows if workflows else None
+    )
+
+
 def create_tiered_config(
     project_root: Optional[Path] = None,
     tier: str = "quick",
     default_provider: str = "claude",
-    temperature: float = 0.7,
-    max_tokens: Optional[int] = None,
-    timeout: float = 120.0,
     # Standard tier options
     consensus_providers: Optional[list] = None,
     consensus_strategy: str = "all_responses",
@@ -238,7 +500,6 @@ def create_tiered_config(
     thinkdeep_thinking_mode: str = "medium",
     ideate_providers: Optional[list] = None,
     # Advanced tier options
-    system_prompt: Optional[str] = None,
     workflow_overrides: Optional[Dict[str, Dict[str, Any]]] = None
 ) -> Dict[str, Any]:
     """Create tiered .modelchorusrc configuration file.
@@ -247,16 +508,12 @@ def create_tiered_config(
         project_root: Project root directory (defaults to cwd)
         tier: Configuration tier (quick, standard, advanced)
         default_provider: Default AI provider
-        temperature: Default temperature
-        max_tokens: Default max tokens (optional)
-        timeout: Default timeout in seconds
         consensus_providers: Providers for consensus workflow (standard+)
         consensus_strategy: Strategy for consensus workflow (standard+)
         research_depth: Research depth setting (standard+)
         research_citation_style: Citation style for research (standard+)
         thinkdeep_thinking_mode: Thinking mode for thinkdeep (standard+)
         ideate_providers: Providers for ideate workflow (standard+)
-        system_prompt: Global system prompt (advanced)
         workflow_overrides: Additional workflow overrides (advanced)
 
     Returns:
@@ -275,11 +532,30 @@ def create_tiered_config(
             "path": str(config_path)
         }
 
+    # Check available providers and compute fallbacks
+    provider_check = check_available_providers()
+    available_providers = provider_check.get("available", [])
+
+    # Compute fallback providers: all available except the primary
+    fallback_providers = [p for p in available_providers if p != default_provider]
+
     # Build workflows config based on tier
     workflows = {}
 
+    # Add base workflows with fallback providers (all tiers)
+    if fallback_providers:
+        # Chat workflow
+        workflows["chat"] = {
+            "fallback_providers": fallback_providers
+        }
+
+        # Argument workflow
+        workflows["argument"] = {
+            "fallback_providers": fallback_providers
+        }
+
     if tier in ["standard", "advanced"]:
-        # Add consensus workflow
+        # Add consensus workflow (multi-provider, no fallback)
         if consensus_providers:
             workflows["consensus"] = {
                 "providers": consensus_providers,
@@ -292,17 +568,29 @@ def create_tiered_config(
             "depth": research_depth
         }
         if consensus_providers:
+            # Multi-provider research, no fallback
             workflows["research"]["providers"] = consensus_providers
+        elif fallback_providers:
+            # Single-provider research, add fallback
+            workflows["research"]["fallback_providers"] = fallback_providers
 
-        # Add thinkdeep workflow
+        # Add thinkdeep workflow (single-provider)
         workflows["thinkdeep"] = {
             "thinking_mode": thinkdeep_thinking_mode
         }
+        if fallback_providers:
+            workflows["thinkdeep"]["fallback_providers"] = fallback_providers
 
         # Add ideate workflow
         if ideate_providers:
+            # Multi-provider ideate, no fallback
             workflows["ideate"] = {
                 "providers": ideate_providers
+            }
+        elif fallback_providers:
+            # Single-provider ideate, add fallback
+            workflows["ideate"] = {
+                "fallback_providers": fallback_providers
             }
 
     if tier == "advanced" and workflow_overrides:
@@ -317,9 +605,8 @@ def create_tiered_config(
     return create_config_file(
         project_root=project_root,
         default_provider=default_provider,
-        temperature=temperature,
-        max_tokens=max_tokens,
-        timeout=timeout,
+        timeout=600.0,
+        available_providers=available_providers,
         workflows=workflows if workflows else None
     )
 
@@ -570,6 +857,12 @@ def main():
     # check-install command
     subparsers.add_parser('check-install', help='Check if modelchorus is installed')
 
+    # check-version command
+    subparsers.add_parser('check-version', help='Check version compatibility')
+
+    # check-available-providers command
+    subparsers.add_parser('check-available-providers', help='Check which CLI providers are available')
+
     # install command
     install_parser = subparsers.add_parser('install', help='Install modelchorus')
     install_parser.add_argument('--dev', action='store_true', help='Install in development mode')
@@ -582,17 +875,16 @@ def main():
     create_parser = subparsers.add_parser('create-config', help='Create config file')
     create_parser.add_argument('--project', default=None, help='Project root directory')
     create_parser.add_argument('--provider', default='claude', help='Default provider')
-    create_parser.add_argument('--temperature', type=float, default=0.7, help='Default temperature')
-    create_parser.add_argument('--timeout', type=float, default=120.0, help='Default timeout')
+
+    # create-express-config command
+    express_parser = subparsers.add_parser('create-express-config', help='Create Express (zero-question) config')
+    express_parser.add_argument('--project', default=None, help='Project root directory')
 
     # create-tiered-config command
     tiered_parser = subparsers.add_parser('create-tiered-config', help='Create tiered config file')
     tiered_parser.add_argument('--project', default=None, help='Project root directory')
     tiered_parser.add_argument('--tier', default='quick', choices=['quick', 'standard', 'advanced'], help='Configuration tier')
     tiered_parser.add_argument('--provider', default='claude', help='Default provider')
-    tiered_parser.add_argument('--temperature', type=float, default=0.7, help='Default temperature')
-    tiered_parser.add_argument('--max-tokens', type=int, default=None, help='Default max tokens')
-    tiered_parser.add_argument('--timeout', type=float, default=120.0, help='Default timeout')
     # Standard tier options
     tiered_parser.add_argument('--consensus-providers', nargs='+', help='Providers for consensus workflow')
     tiered_parser.add_argument('--consensus-strategy', default='all_responses', help='Consensus strategy')
@@ -628,6 +920,10 @@ def main():
     # Execute command
     if args.command == 'check-install':
         result = check_package_installed()
+    elif args.command == 'check-version':
+        result = check_version_compatibility()
+    elif args.command == 'check-available-providers':
+        result = check_available_providers()
     elif args.command == 'install':
         result = install_package(dev_mode=args.dev)
     elif args.command == 'check-config':
@@ -635,18 +931,15 @@ def main():
     elif args.command == 'create-config':
         result = create_config_file(
             project,
-            default_provider=args.provider,
-            temperature=args.temperature,
-            timeout=args.timeout
+            default_provider=args.provider
         )
+    elif args.command == 'create-express-config':
+        result = create_express_config(project)
     elif args.command == 'create-tiered-config':
         result = create_tiered_config(
             project,
             tier=args.tier,
             default_provider=args.provider,
-            temperature=args.temperature,
-            max_tokens=args.max_tokens,
-            timeout=args.timeout,
             consensus_providers=args.consensus_providers,
             consensus_strategy=args.consensus_strategy,
             research_depth=args.research_depth,
@@ -678,6 +971,8 @@ def main():
         sys.exit(0 if result['installed'] else 1)
     elif 'configured' in result:
         sys.exit(0 if result['configured'] else 1)
+    elif 'compatible' in result:
+        sys.exit(0 if result['compatible'] else 1)
     else:
         sys.exit(0)
 

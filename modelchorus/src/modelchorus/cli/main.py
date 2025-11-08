@@ -26,6 +26,8 @@ from ..providers.cli_provider import ProviderUnavailableError
 from ..workflows import ArgumentWorkflow, ChatWorkflow, ConsensusWorkflow, ConsensusStrategy, IdeateWorkflow, ResearchWorkflow, ThinkDeepWorkflow
 from ..core.conversation import ConversationMemory
 from ..core.config import get_config_loader
+from ..core.progress import set_progress_enabled
+from modelchorus import __version__
 
 app = typer.Typer(
     name="modelchorus",
@@ -1888,7 +1890,7 @@ def list_providers(
 def version():
     """Show version information."""
     console.print("[bold]ModelChorus[/bold] - Multi-Model AI Workflow Orchestration")
-    console.print("Version: 0.1.0")
+    console.print(f"Version: {__version__}")
     console.print("\nProviders:")
     console.print("  - Claude (Anthropic)")
     console.print("  - Codex (OpenAI)")

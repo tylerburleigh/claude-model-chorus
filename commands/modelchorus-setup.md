@@ -10,10 +10,15 @@ This command performs first-time setup for ModelChorus in your project.
 ## What This Does
 
 1. Checks if the `modelchorus` Python package is installed
-2. Interactively prompts for configuration preferences
-3. Creates `.modelchorusrc` configuration file
-4. Configures `.claude/settings.local.json` with necessary permissions for ModelChorus CLI
-5. Validates the configuration
+2. Checks version compatibility between package and plugin
+3. Checks which CLI providers are available on your system
+4. Offers setup modes: Express (0 questions), Quick (2), Standard (4), or Advanced (6)
+5. Creates `.modelchorusrc` configuration file with:
+   - Default provider models (sonnet, gemini-2.5-pro, gpt-5-codex, composer-1)
+   - Automatic fallback provider configuration
+   - Workflow-specific settings
+6. Validates the configuration
+7. Configures `.claude/settings.local.json` with necessary permissions for ModelChorus CLI
 
 ## Workflow
 
@@ -53,7 +58,104 @@ Display message:
 
 Then proceed to Step 2.
 
-### Step 2: Check Configuration File
+### Step 2: Check Version Compatibility
+
+Check if the installed package version matches the plugin version:
+
+```bash
+python -m modelchorus.cli.setup check-version
+```
+
+The script will return JSON with a `compatible` field and version details.
+
+**If `compatible: true` and versions match:**
+
+Display message:
+```
+✅ Version check passed: Package and plugin both at version X.X.X
+```
+
+Then proceed to Step 3.
+
+**If `compatible: true` but package is newer than plugin:**
+
+Display warning:
+```
+⚠️  Package version (X.X.X) is newer than plugin version (Y.Y.Y)
+
+This is okay but the plugin may need updating.
+You can continue setup.
+```
+
+Then proceed to Step 3.
+
+**If `compatible: false` (package version is lower than plugin version):**
+
+Display message:
+```
+⚠️  Package version mismatch detected!
+
+  Plugin version: X.X.X
+  Package version: Y.Y.Y (older)
+
+Upgrading package to match plugin version...
+```
+
+Then automatically reinstall the package:
+
+```bash
+pip install --upgrade modelchorus
+```
+
+After reinstallation, verify the new version:
+
+```bash
+python -m modelchorus.cli.setup check-install
+```
+
+Display message:
+```
+✅ Package upgraded to version X.X.X
+```
+
+Then proceed to Step 3.
+
+**If version check fails with error:**
+
+Display message:
+```
+⚠️  Could not verify version compatibility
+
+Error: <error_message>
+
+Continuing with setup anyway...
+```
+
+Then proceed to Step 3.
+
+### Step 3: Check Available Providers
+
+Check which CLI providers are available on the system:
+
+```bash
+python -m modelchorus.cli.setup check-available-providers
+```
+
+The script will return JSON with `available` (list of available provider names) and `unavailable` (list of unavailable providers with error details).
+
+**Display the results:**
+
+```
+✅ Found X available provider(s): <provider1>, <provider2>, ...
+
+Unavailable providers: <provider_name> (<error>)
+```
+
+**IMPORTANT:** Store the list of available providers to use in Step 5 when asking the user which provider to select. Only show available providers as options.
+
+Then proceed to Step 4.
+
+### Step 4: Check Configuration File
 
 Check if `.modelchorusrc` configuration file already exists:
 
@@ -75,97 +177,121 @@ You can:
   • Edit manually: <path>
 ```
 
-Then skip to Step 3.
+Then skip to Step 6.
 
 **If `exists: false`:**
 
-Proceed to create configuration by gathering user preferences.
+Proceed to Step 5 to create configuration by gathering user preferences.
 
-#### Gather Configuration Preferences
+### Step 5: Choose Setup Mode
 
-**IMPORTANT:** Use a tiered approach to configuration. First ask which tier, then ask questions based on that tier.
+**IMPORTANT:** This is the key decision point. The Express mode requires ZERO questions and auto-configures everything based on detected providers.
 
-##### Tier Selection
+Use AskUserQuestion tool to ask about setup mode:
 
-Use AskUserQuestion tool to ask about setup tier:
-
-**Question 1 - Setup Tier:**
-- **Header**: "Setup Tier"
-- **Question**: "How much configuration do you want to set up now?"
+**Question - Setup Mode:**
+- **Header**: "Setup Mode"
+- **Question**: "How would you like to set up ModelChorus?"
 - **Options**:
-  1. Quick Setup - Just the essentials (provider, temperature, timeout, max_tokens)
-  2. Standard Setup - Common workflows configured (Quick + consensus, research, thinkdeep)
-  3. Advanced Setup - Full configuration (Standard + all 6 workflows with detailed options)
+  1. **Express (Recommended)** - Auto-configure with smart defaults [0 questions]
+  2. **Quick** - Choose provider only [1 question]
+  3. **Standard** - Configure common workflows [3 questions]
+  4. **Advanced** - Full configuration control [5 questions]
 
-Based on the tier chosen, proceed with the appropriate question set below.
+Based on the mode chosen, proceed with the appropriate setup flow below.
 
 ---
 
-##### QUICK TIER Questions
+### Step 5.1: EXPRESS MODE (Zero Questions)
 
-If user chose "Quick Setup", ask these 4 questions:
+If user chose "Express", run the express config creation:
+
+```bash
+python -m modelchorus.cli.setup create-express-config --project .
+```
+
+The script will:
+- Auto-select primary provider (claude → gemini → codex → cursor-agent)
+- Configure all other available providers as fallbacks
+- Set default models for each provider:
+  - Claude: sonnet
+  - Gemini: gemini-2.5-pro
+  - Codex: gpt-5-codex
+  - Cursor-agent: composer-1
+- Use standard timeout (600s / 10 minutes)
+- Configure all workflows with balanced defaults
+
+**On success:**
+```
+✅ Express setup complete!
+
+Configuration:
+  • Default provider: <primary_provider>
+  • Fallback providers: <other_providers>
+  • Models: <configured_models>
+  • Timeout: 600s (10 minutes)
+
+All workflows configured with smart defaults.
+```
+
+Then proceed to Step 6 (Validate Configuration).
+
+---
+
+### Step 5.2: QUICK/STANDARD/ADVANCED MODES
+
+If user chose Quick, Standard, or Advanced, gather configuration through questions.
+
+**All provider selection questions should ONLY show providers that are available (from Step 3).** The setup script will automatically configure the other available providers as fallbacks.
+
+---
+
+##### QUICK MODE Questions
+
+If user chose "Quick", ask this 1 question:
 
 **Question 1:**
 - **Header**: "Provider"
 - **Question**: "Which AI provider should be the default for all workflows?"
-- **Options**:
-  1. Claude (Anthropic) - Recommended for most tasks
-  2. Gemini (Google) - Good for creative tasks
-  3. Codex (OpenAI) - Alternative option
-  4. Cursor Agent - For cursor integration
-
-**Question 2:**
-- **Header**: "Temperature"
-- **Question**: "What temperature should be used for generation (creativity level)?"
-- **Options**:
-  1. Conservative (0.5) - More focused and deterministic
-  2. Balanced (0.7) - Recommended default
-  3. Creative (0.9) - More varied and creative
-
-**Question 3:**
-- **Header**: "Timeout"
-- **Question**: "What timeout (in seconds) should be used for provider requests?"
-- **Options**:
-  1. Fast (60s) - For quick responses
-  2. Standard (120s) - Recommended default
-  3. Extended (180s) - For complex tasks
-
-**Question 4:**
-- **Header**: "Max Tokens"
-- **Question**: "What should be the maximum response length?"
-- **Options**:
-  1. Short (1000) - For brief responses
-  2. Medium (2000) - Recommended default
-  3. Long (4000) - For detailed responses
+- **Options**: ONLY include providers that are available from Step 3
+  - If "claude" is available: Claude (Anthropic) - Recommended for most tasks
+  - If "gemini" is available: Gemini (Google) - Good for creative tasks
+  - If "codex" is available: Codex (OpenAI) - Alternative option
+  - If "cursor-agent" is available: Cursor Agent - For cursor integration
+- **Note**: The other available providers will be automatically configured as fallbacks
+- **Note**: Default models will be configured automatically:
+  - Claude: sonnet
+  - Gemini: gemini-2.5-pro
+  - Codex: gpt-5-codex
+  - Cursor-agent: composer-1
+- **Note**: Standard timeout of 600s (10 minutes) will be used
 
 Then create config:
 ```bash
 python -m modelchorus.cli.setup create-tiered-config --project . \
   --tier quick \
-  --provider <chosen_provider> \
-  --temperature <chosen_temperature> \
-  --timeout <chosen_timeout> \
-  --max-tokens <chosen_max_tokens>
+  --provider <chosen_provider>
 ```
 
 ---
 
-##### STANDARD TIER Questions
+##### STANDARD MODE Questions
 
-If user chose "Standard Setup", ask Quick tier questions PLUS these additional questions:
+If user chose "Standard", ask Quick question PLUS these 2 additional questions (3 total):
 
-**Questions 1-4:** Same as Quick tier
+**Question 1:** Same as Quick mode (Provider)
 
-**Question 5:**
+**Question 2:**
 - **Header**: "Multi-Model"
 - **Question**: "Which providers should be used for multi-model workflows (consensus, research)?"
 - **multiSelect**: true
-- **Options**:
-  1. Claude (Anthropic) - Best for reasoning and analysis
-  2. Gemini (Google) - Good for creative tasks
-  3. Codex (OpenAI) - Alternative perspective
+- **Options**: ONLY include providers that are available from Step 3
+  - If "claude" is available: Claude (Anthropic) - Best for reasoning and analysis
+  - If "gemini" is available: Gemini (Google) - Good for creative tasks
+  - If "codex" is available: Codex (OpenAI) - Alternative perspective
+  - If "cursor-agent" is available: Cursor Agent - For cursor integration
 
-**Question 6:**
+**Question 4:**
 - **Header**: "Consensus"
 - **Question**: "How should consensus workflow combine multiple model responses?"
 - **Options**:
@@ -173,24 +299,38 @@ If user chose "Standard Setup", ask Quick tier questions PLUS these additional q
   2. Synthesize - Combine responses into one unified answer
   3. Vote - Use majority opinion for binary questions
 
-**Question 7:**
-- **Header**: "Research"
-- **Question**: "What citation style should research workflow use?"
-- **Options**:
-  1. Informal - Simple mentions without formal citations
-  2. Academic - Formal academic style with references
-  3. APA - APA citation format
-  4. MLA - MLA citation format
+**Note**: Research and ThinkDeep workflows will be configured with balanced defaults:
+- Research: informal citations, thorough depth
+- ThinkDeep: medium reasoning mode
 
-**Question 8:**
-- **Header**: "Research"
-- **Question**: "How thorough should the research workflow be?"
-- **Options**:
-  1. Quick - Fast overview of the topic
-  2. Thorough - Balanced depth and speed (recommended)
-  3. Comprehensive - Deep dive with extensive sources
+Then create config:
+```bash
+python -m modelchorus.cli.setup create-tiered-config --project . \
+  --tier standard \
+  --provider <chosen_provider> \
+  --timeout <chosen_timeout> \
+  --consensus-providers <space_separated_providers> \
+  --consensus-strategy <chosen_strategy>
+```
 
-**Question 9:**
+---
+
+##### ADVANCED MODE Questions
+
+If user chose "Advanced", ask Standard questions PLUS these 2 additional questions (6 total):
+
+**Questions 1-4:** Same as Standard mode (Provider, Timeout, Multi-Model providers, Consensus strategy)
+
+**Question 5:**
+- **Header**: "Research"
+- **Question**: "Configure research workflow settings"
+- **Options**: Combine citation style and depth:
+  1. Quick + Informal - Fast overview with simple mentions
+  2. Thorough + Academic - Balanced depth with formal citations (recommended)
+  3. Comprehensive + APA - Deep dive with APA citations
+  4. Comprehensive + MLA - Deep dive with MLA citations
+
+**Question 6:**
 - **Header**: "ThinkDeep"
 - **Question**: "What reasoning depth should thinkdeep workflow use?"
 - **Options**:
@@ -198,14 +338,14 @@ If user chose "Standard Setup", ask Quick tier questions PLUS these additional q
   2. Medium - Balanced reasoning (recommended)
   3. High - Deep reasoning with extensive analysis
 
+**Note**: Ideate workflow will use the same providers as consensus.
+
 Then create config:
 ```bash
 python -m modelchorus.cli.setup create-tiered-config --project . \
-  --tier standard \
+  --tier advanced \
   --provider <chosen_provider> \
-  --temperature <chosen_temperature> \
   --timeout <chosen_timeout> \
-  --max-tokens <chosen_max_tokens> \
   --consensus-providers <space_separated_providers> \
   --consensus-strategy <chosen_strategy> \
   --research-citation <chosen_citation> \
@@ -215,57 +355,14 @@ python -m modelchorus.cli.setup create-tiered-config --project . \
 
 ---
 
-##### ADVANCED TIER Questions
-
-If user chose "Advanced Setup", ask Standard tier questions PLUS:
-
-**Questions 1-9:** Same as Standard tier
-
-**Question 10:**
-- **Header**: "Ideate"
-- **Question**: "Which providers should be used for ideate workflow (creative brainstorming)?"
-- **multiSelect**: true
-- **Options**:
-  1. Claude (Anthropic) - Structured creative thinking
-  2. Gemini (Google) - Highly creative ideas
-  3. Codex (OpenAI) - Alternative perspective
-
-Then create config (same command as Standard, with additional --ideate-providers):
-```bash
-python -m modelchorus.cli.setup create-tiered-config --project . \
-  --tier advanced \
-  --provider <chosen_provider> \
-  --temperature <chosen_temperature> \
-  --timeout <chosen_timeout> \
-  --max-tokens <chosen_max_tokens> \
-  --consensus-providers <space_separated_providers> \
-  --consensus-strategy <chosen_strategy> \
-  --research-citation <chosen_citation> \
-  --research-depth <chosen_depth> \
-  --thinkdeep-mode <chosen_mode> \
-  --ideate-providers <space_separated_providers>
-```
-
----
-
 ##### Value Mappings
 
 Use these mappings when constructing the CLI command:
-
-**Temperature mapping:**
-- Conservative → 0.5
-- Balanced → 0.7
-- Creative → 0.9
 
 **Timeout mapping:**
 - Fast → 60.0
 - Standard → 120.0
 - Extended → 180.0
-
-**Max tokens mapping:**
-- Short → 1000
-- Medium → 2000
-- Long → 4000
 
 **Provider mapping:**
 - Claude (Anthropic) → claude
@@ -278,16 +375,11 @@ Use these mappings when constructing the CLI command:
 - Synthesize → synthesize
 - Vote → vote
 
-**Research citation mapping:**
-- Informal → informal
-- Academic → academic
-- APA → apa
-- MLA → mla
-
-**Research depth mapping:**
-- Quick → quick
-- Thorough → thorough
-- Comprehensive → comprehensive
+**Research citation mapping (Advanced mode):**
+- Quick + Informal → citation=informal, depth=quick
+- Thorough + Academic → citation=academic, depth=thorough
+- Comprehensive + APA → citation=apa, depth=comprehensive
+- Comprehensive + MLA → citation=mla, depth=comprehensive
 
 **ThinkDeep mode mapping:**
 - Low → low
@@ -302,9 +394,8 @@ The script will create the `.modelchorusrc` file and return JSON with `success: 
 
 Your settings:
   • Default provider: <provider>
-  • Temperature: <temperature>
   • Timeout: <timeout>s
-  • Max tokens: <max_tokens> (if configured)
+  • Provider models: <configured_models>
   • Tier: <tier>
 ```
 
@@ -334,9 +425,9 @@ This will add `.modelchorusrc` and its variants to the project's `.gitignore` fi
 
 If the entries are already present, the command will report that and continue gracefully.
 
-Then proceed to Step 3.
+Then proceed to Step 6.
 
-### Step 3: Validate Configuration
+### Step 6: Validate Configuration
 
 Validate the configuration file:
 
@@ -358,9 +449,9 @@ python -m modelchorus.cli.setup validate-config --project .
 Please fix the configuration file and run validation again.
 ```
 
-Then proceed to Step 4.
+Then proceed to Step 7.
 
-### Step 4: Check Permissions
+### Step 7: Check Permissions
 
 Check if Claude Code permissions are configured:
 
@@ -377,7 +468,7 @@ Display message:
 ✅ ModelChorus permissions are already configured!
 ```
 
-Then proceed to Step 5.
+Then proceed to Step 8.
 
 **If `configured: false`:**
 
@@ -418,9 +509,9 @@ To add permissions later, run:
   python -m modelchorus.cli.setup add-permissions --project .
 ```
 
-Then proceed to Step 5.
+Then proceed to Step 8.
 
-### Step 5: Show Success & Next Steps
+### Step 8: Show Success & Next Steps
 
 After successful configuration, display a summary:
 
@@ -455,21 +546,40 @@ The setup creates a `.modelchorusrc` file in YAML format with:
 
 **Global Settings:**
 - `default_provider` - Default AI provider (claude, gemini, codex, cursor-agent)
-- `generation.temperature` - Default temperature (0.0-1.0)
+- `providers.<name>.model` - Default model for each provider
 - `generation.timeout` - Default timeout in seconds
-- `generation.max_tokens` - Optional max tokens limit
+- `workflows.<name>.*` - Workflow-specific configurations
 
-**Example configuration:**
+**Example configuration (Express mode):**
 ```yaml
 # ModelChorus Configuration
 default_provider: claude
 
+providers:
+  claude:
+    model: sonnet
+  gemini:
+    model: gemini-2.5-pro
+  codex:
+    model: gpt-5-codex
+
 generation:
-  temperature: 0.7
   timeout: 120.0
+
+workflows:
+  chat:
+    fallback_providers:
+      - gemini
+      - codex
+  consensus:
+    providers:
+      - claude
+      - gemini
+      - codex
+    strategy: all_responses
 ```
 
-You can manually edit this file later or use `modelchorus config init` to regenerate.
+You can manually edit this file later or view it with `modelchorus config show`.
 
 ### Permissions (`.claude/settings.local.json`)
 

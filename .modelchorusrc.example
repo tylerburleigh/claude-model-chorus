@@ -17,12 +17,21 @@
 # Options: claude, gemini, codex, cursor-agent
 default_provider: claude
 
+# Provider-specific model configuration
+# Each provider can have a default model specified
+providers:
+  claude:
+    model: sonnet              # Options: opus, sonnet, haiku
+  gemini:
+    model: gemini-2.5-pro      # Gemini Pro model
+  codex:
+    model: gpt-5-codex         # GPT-5 Codex model
+  cursor-agent:
+    model: composer-1          # Options: default, fast, premium, composer-1
+
 # Global generation parameters (apply to all workflows unless overridden)
 generation:
-  temperature: 0.7        # 0.0-2.0, higher = more creative
-  max_tokens: 2000        # Maximum tokens in response
-  timeout: 120.0          # Timeout in seconds per provider
-  system_prompt: null     # Optional global system prompt
+  timeout: 600.0               # Timeout in seconds per provider (10 minutes)
 
 # ============================================================================
 # Workflow-Specific Configuration
@@ -35,65 +44,54 @@ workflows:
   # CHAT - Interactive conversation with a single model
   chat:
     provider: claude
-    fallback_providers:     # Fallback chain if primary fails (tries in order)
+    fallback_providers:        # Fallback chain if primary fails (tries in order)
       - gemini
       - codex
       - cursor-agent
-    temperature: 0.7
-    max_tokens: 2000
 
   # CONSENSUS - Get responses from multiple models
   consensus:
-    providers:              # List of providers for multi-model consensus
+    providers:                 # List of providers for multi-model consensus
       - claude
       - gemini
       - codex
-    strategy: all_responses # Options: all_responses, synthesize, vote
-    temperature: 0.7
-    timeout: 180.0
+    strategy: all_responses    # Options: all_responses, synthesize, vote
+    timeout: 180.0             # Longer timeout for multiple providers
 
   # THINKDEEP - Extended reasoning with chain-of-thought
   thinkdeep:
     provider: claude
-    fallback_providers:     # Fallback chain if primary fails (tries in order)
+    fallback_providers:        # Fallback chain if primary fails (tries in order)
       - gemini
       - codex
       - cursor-agent
-    thinking_mode: medium   # Options: low, medium, high
-    temperature: 0.6        # Lower temp for more focused reasoning
-    max_tokens: 4000        # Higher token limit for detailed reasoning
+    thinking_mode: medium      # Options: low, medium, high
 
   # ARGUMENT - Generate arguments for/against a position
   argument:
     provider: claude
-    fallback_providers:     # Fallback chain if primary fails (tries in order)
+    fallback_providers:        # Fallback chain if primary fails (tries in order)
       - gemini
       - codex
       - cursor-agent
-    temperature: 0.8        # Slightly higher for diverse arguments
-    max_tokens: 2000
 
   # IDEATE - Creative ideation and brainstorming
   ideate:
     provider: claude
-    fallback_providers:     # Fallback chain if primary fails (tries in order)
+    fallback_providers:        # Fallback chain if primary fails (tries in order)
       - gemini
       - codex
       - cursor-agent
-    temperature: 0.9        # Higher temp for more creativity
-    max_tokens: 2000
 
   # RESEARCH - Multi-source research with citations
   research:
     provider: claude
-    fallback_providers:     # Fallback chain if primary fails (tries in order)
+    fallback_providers:        # Fallback chain if primary fails (tries in order)
       - gemini
       - codex
       - cursor-agent
-    citation_style: academic  # Options: informal, academic, apa, mla
-    depth: thorough           # Options: quick, thorough, comprehensive
-    temperature: 0.5          # Lower temp for factual accuracy
-    max_tokens: 3000
+    citation_style: academic   # Options: informal, academic, apa, mla
+    depth: thorough            # Options: quick, thorough, comprehensive
 
 # ============================================================================
 # Example Configurations for Different Use Cases
@@ -102,40 +100,31 @@ workflows:
 # Example 1: Prefer Gemini by default
 # ---
 # default_provider: gemini
-# generation:
-#   temperature: 0.8
+# providers:
+#   gemini:
+#     model: gemini-2.5-pro
 
-# Example 2: Conservative/Precise configuration
+# Example 2: Multi-provider consensus with specific models
 # ---
-# default_provider: claude
-# generation:
-#   temperature: 0.3
-#   max_tokens: 1500
+# providers:
+#   claude:
+#     model: opus
+#   gemini:
+#     model: gemini-2.5-pro
+#   codex:
+#     model: gpt-5-codex
 # workflows:
-#   research:
-#     citation_style: academic
-#     depth: comprehensive
-
-# Example 3: Creative/Exploratory configuration
-# ---
-# default_provider: claude
-# generation:
-#   temperature: 1.0
-# workflows:
-#   ideate:
-#     temperature: 1.2
+#   consensus:
 #     providers: [claude, gemini, codex]
-#   argument:
-#     temperature: 1.0
+#     strategy: synthesize
 
-# Example 4: Fast/Efficient configuration
+# Example 3: Fast timeout for quick responses
 # ---
 # generation:
 #   timeout: 60.0
-#   max_tokens: 1000
 # workflows:
-#   research:
-#     depth: quick
+#   chat:
+#     timeout: 30.0
 
 # ============================================================================
 # Provider Fallback
@@ -151,3 +140,30 @@ workflows:
 #
 # To disable provider checking (faster startup):
 #   modelchorus research "topic" --skip-provider-check
+
+# ============================================================================
+# Provider Models
+# ============================================================================
+# Each provider supports different models:
+#
+# Claude:
+#   - opus: Most capable, best for complex tasks
+#   - sonnet: Balanced performance and speed (default)
+#   - haiku: Fastest, good for simple tasks
+#
+# Gemini:
+#   - gemini-2.5-pro: Latest Gemini Pro model (default)
+#   - gemini-pro: Standard Gemini Pro
+#
+# Codex:
+#   - gpt-5-codex: GPT-5 optimized for code (default)
+#   - gpt-5-pro: GPT-5 Pro model
+#   - gpt-5: Standard GPT-5 model
+#
+# Cursor Agent:
+#   - composer-1: Advanced composer model (default)
+#   - default: Standard cursor model
+#   - fast: Faster responses
+#   - premium: Highest quality
+#
+# Models are configured in the providers section above.

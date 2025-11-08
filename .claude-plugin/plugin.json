@@ -1,7 +1,7 @@
 {
   "name": "model-chorus",
   "description": "Multi-model consensus building through CLI-based AI provider orchestration. Coordinates responses from Claude, Gemini, Codex, and Cursor Agent to build robust, well-reasoned answers.",
-  "version": "0.1.0",
+  "version": "0.4.0",
   "author": {
     "name": "ModelChorus Contributors"
   },

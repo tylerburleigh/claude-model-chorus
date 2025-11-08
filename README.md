@@ -1,6 +1,6 @@
 # ModelChorus - Multi-Model Consensus
 
-Multi-model AI consensus building for Claude Code. Orchestrate responses from multiple AI providers (Claude, Gemini, Codex, Cursor Agent) to get robust, well-reasoned answers.
+Multi-model AI consensus building. Orchestrate responses from multiple AI providers (Claude, Gemini, Codex, Cursor Agent) to get robust, well-reasoned answers.
 
 ## Overview
 
