@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-08T23:02:27.946430Z",
+    "generated_at": "2025-11-08T23:03:48.583458Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 96,
-    "total_lines": 41313,
-    "total_classes": 227,
+    "total_files": 97,
+    "total_lines": 41929,
+    "total_classes": 235,
     "total_functions": 174,
     "avg_complexity": 4.76,
     "max_complexity": 43,
@@ -24,9 +24,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 96,
-        "lines": 41313,
-        "classes": 227,
+        "files": 97,
+        "lines": 41929,
+        "classes": 235,
         "functions": 174,
         "avg_complexity": 4.76
       }
@@ -2025,6 +2025,39 @@
       ],
       "exports": [],
       "lines": 210
+    },
+    {
+      "name": "test_personas",
+      "file": "model_chorus/tests/workflows/study/test_personas.py",
+      "language": "python",
+      "docstring": "Tests for persona system in STUDY workflow.\n\nTests verify that:\n- Persona dataclasses work correctly (Persona, PersonaResponse)\n- PersonaRegistry manages personas properly\n- Individual persona implementations work as expected\n- Persona factory functions create correctly configured instances\n- Default registry is properly initialized",
+      "classes": [
+        "TestPersonaResponse",
+        "TestPersona",
+        "TestPersonaRegistry",
+        "TestResearcherPersona",
+        "TestCriticPersona",
+        "TestPlannerPersona",
+        "TestPersonaFactories",
+        "TestPersonaIntegration"
+      ],
+      "functions": [],
+      "imports": [
+        "pytest",
+        "model_chorus.workflows.study.persona_base.Persona",
+        "model_chorus.workflows.study.persona_base.PersonaResponse",
+        "model_chorus.workflows.study.persona_base.PersonaRegistry",
+        "model_chorus.workflows.study.personas.ResearcherPersona",
+        "model_chorus.workflows.study.personas.CriticPersona",
+        "model_chorus.workflows.study.personas.PlannerPersona",
+        "model_chorus.workflows.study.personas.create_researcher",
+        "model_chorus.workflows.study.personas.create_critic",
+        "model_chorus.workflows.study.personas.create_planner",
+        "model_chorus.workflows.study.personas.get_default_registry",
+        "model_chorus.workflows.study.personas.create_default_personas"
+      ],
+      "exports": [],
+      "lines": 616
     },
     {
       "name": "test_routing",
@@ -12643,10 +12676,55 @@
             "ResearcherPersona",
             "invoke"
           ]
+        },
+        {
+          "instantiator": "test_persona_response_init",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 35,
+          "context": [
+            "TestPersonaResponse",
+            "test_persona_response_init"
+          ]
+        },
+        {
+          "instantiator": "test_persona_response_with_findings",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 44,
+          "context": [
+            "TestPersonaResponse",
+            "test_persona_response_with_findings"
+          ]
+        },
+        {
+          "instantiator": "test_persona_response_with_confidence_update",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 51,
+          "context": [
+            "TestPersonaResponse",
+            "test_persona_response_with_confidence_update"
+          ]
+        },
+        {
+          "instantiator": "test_persona_response_with_metadata",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 58,
+          "context": [
+            "TestPersonaResponse",
+            "test_persona_response_with_metadata"
+          ]
+        },
+        {
+          "instantiator": "test_persona_response_full_initialization",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 69,
+          "context": [
+            "TestPersonaResponse",
+            "test_persona_response_full_initialization"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 4
+      "instantiation_count": 9
     },
     {
       "name": "Persona",
@@ -12661,8 +12739,163 @@
       "properties": [],
       "is_exported": false,
       "is_public": true,
-      "instantiated_by": [],
-      "imported_by": []
+      "instantiated_by": [
+        {
+          "instantiator": "test_persona_init",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 85,
+          "context": [
+            "TestPersona",
+            "test_persona_init"
+          ]
+        },
+        {
+          "instantiator": "test_persona_init_custom_temperature",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 97,
+          "context": [
+            "TestPersona",
+            "test_persona_init_custom_temperature"
+          ]
+        },
+        {
+          "instantiator": "test_persona_init_custom_max_tokens",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 107,
+          "context": [
+            "TestPersona",
+            "test_persona_init_custom_max_tokens"
+          ]
+        },
+        {
+          "instantiator": "test_persona_invoke_returns_response",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 117,
+          "context": [
+            "TestPersona",
+            "test_persona_invoke_returns_response"
+          ]
+        },
+        {
+          "instantiator": "test_persona_invoke_with_context",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 128,
+          "context": [
+            "TestPersona",
+            "test_persona_invoke_with_context"
+          ]
+        },
+        {
+          "instantiator": "test_persona_invoke_includes_metadata",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 141,
+          "context": [
+            "TestPersona",
+            "test_persona_invoke_includes_metadata"
+          ]
+        },
+        {
+          "instantiator": "test_registry_register_persona",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 164,
+          "context": [
+            "TestPersonaRegistry",
+            "test_registry_register_persona"
+          ]
+        },
+        {
+          "instantiator": "test_registry_register_multiple_personas",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 177,
+          "context": [
+            "TestPersonaRegistry",
+            "test_registry_register_multiple_personas"
+          ]
+        },
+        {
+          "instantiator": "test_registry_register_multiple_personas",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 178,
+          "context": [
+            "TestPersonaRegistry",
+            "test_registry_register_multiple_personas"
+          ]
+        },
+        {
+          "instantiator": "test_registry_register_multiple_personas",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 179,
+          "context": [
+            "TestPersonaRegistry",
+            "test_registry_register_multiple_personas"
+          ]
+        },
+        {
+          "instantiator": "test_registry_register_duplicate_raises_error",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 190,
+          "context": [
+            "TestPersonaRegistry",
+            "test_registry_register_duplicate_raises_error"
+          ]
+        },
+        {
+          "instantiator": "test_registry_register_duplicate_raises_error",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 191,
+          "context": [
+            "TestPersonaRegistry",
+            "test_registry_register_duplicate_raises_error"
+          ]
+        },
+        {
+          "instantiator": "test_registry_get_persona",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 201,
+          "context": [
+            "TestPersonaRegistry",
+            "test_registry_get_persona"
+          ]
+        },
+        {
+          "instantiator": "test_registry_list_all",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 222,
+          "context": [
+            "TestPersonaRegistry",
+            "test_registry_list_all"
+          ]
+        },
+        {
+          "instantiator": "test_registry_list_all",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 223,
+          "context": [
+            "TestPersonaRegistry",
+            "test_registry_list_all"
+          ]
+        },
+        {
+          "instantiator": "test_persona_max_tokens_configuration",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 604,
+          "context": [
+            "TestPersonaIntegration",
+            "test_persona_max_tokens_configuration"
+          ]
+        },
+        {
+          "instantiator": "test_persona_max_tokens_configuration",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 609,
+          "context": [
+            "TestPersonaIntegration",
+            "test_persona_max_tokens_configuration"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 17
     },
     {
       "name": "PersonaRegistry",
@@ -12688,10 +12921,73 @@
           "context": [
             "get_default_registry"
           ]
+        },
+        {
+          "instantiator": "test_registry_init",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 157,
+          "context": [
+            "TestPersonaRegistry",
+            "test_registry_init"
+          ]
+        },
+        {
+          "instantiator": "test_registry_register_persona",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 163,
+          "context": [
+            "TestPersonaRegistry",
+            "test_registry_register_persona"
+          ]
+        },
+        {
+          "instantiator": "test_registry_register_multiple_personas",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 175,
+          "context": [
+            "TestPersonaRegistry",
+            "test_registry_register_multiple_personas"
+          ]
+        },
+        {
+          "instantiator": "test_registry_register_duplicate_raises_error",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 189,
+          "context": [
+            "TestPersonaRegistry",
+            "test_registry_register_duplicate_raises_error"
+          ]
+        },
+        {
+          "instantiator": "test_registry_get_persona",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 200,
+          "context": [
+            "TestPersonaRegistry",
+            "test_registry_get_persona"
+          ]
+        },
+        {
+          "instantiator": "test_registry_get_nonexistent_persona",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 212,
+          "context": [
+            "TestPersonaRegistry",
+            "test_registry_get_nonexistent_persona"
+          ]
+        },
+        {
+          "instantiator": "test_registry_list_all",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 220,
+          "context": [
+            "TestPersonaRegistry",
+            "test_registry_list_all"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 1
+      "instantiation_count": 8
     },
     {
       "name": "RoutingDecision",
@@ -12898,10 +13194,64 @@
           "context": [
             "create_critic"
           ]
+        },
+        {
+          "instantiator": "test_critic_init",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 342,
+          "context": [
+            "TestCriticPersona",
+            "test_critic_init"
+          ]
+        },
+        {
+          "instantiator": "test_critic_init_custom_temperature",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 350,
+          "context": [
+            "TestCriticPersona",
+            "test_critic_init_custom_temperature"
+          ]
+        },
+        {
+          "instantiator": "test_critic_prompt_template",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 356,
+          "context": [
+            "TestCriticPersona",
+            "test_critic_prompt_template"
+          ]
+        },
+        {
+          "instantiator": "test_critic_invoke_returns_response",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 364,
+          "context": [
+            "TestCriticPersona",
+            "test_critic_invoke_returns_response"
+          ]
+        },
+        {
+          "instantiator": "test_critic_invoke_includes_findings",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 373,
+          "context": [
+            "TestCriticPersona",
+            "test_critic_invoke_includes_findings"
+          ]
+        },
+        {
+          "instantiator": "test_critic_invoke_metadata",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 384,
+          "context": [
+            "TestCriticPersona",
+            "test_critic_invoke_metadata"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 1
+      "instantiation_count": 7
     },
     {
       "name": "PlannerPersona",
@@ -12927,10 +13277,55 @@
           "context": [
             "create_planner"
           ]
+        },
+        {
+          "instantiator": "test_planner_init",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 412,
+          "context": [
+            "TestPlannerPersona",
+            "test_planner_init"
+          ]
+        },
+        {
+          "instantiator": "test_planner_init_custom_temperature",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 420,
+          "context": [
+            "TestPlannerPersona",
+            "test_planner_init_custom_temperature"
+          ]
+        },
+        {
+          "instantiator": "test_planner_prompt_template",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 426,
+          "context": [
+            "TestPlannerPersona",
+            "test_planner_prompt_template"
+          ]
+        },
+        {
+          "instantiator": "test_planner_invoke_returns_response",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 433,
+          "context": [
+            "TestPlannerPersona",
+            "test_planner_invoke_returns_response"
+          ]
+        },
+        {
+          "instantiator": "test_planner_invoke_includes_findings",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 442,
+          "context": [
+            "TestPlannerPersona",
+            "test_planner_invoke_includes_findings"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 1
+      "instantiation_count": 6
     },
     {
       "name": "ResearcherPersona",
@@ -12956,10 +13351,109 @@
           "context": [
             "create_researcher"
           ]
+        },
+        {
+          "instantiator": "test_researcher_init",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 241,
+          "context": [
+            "TestResearcherPersona",
+            "test_researcher_init"
+          ]
+        },
+        {
+          "instantiator": "test_researcher_init_custom_temperature",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 249,
+          "context": [
+            "TestResearcherPersona",
+            "test_researcher_init_custom_temperature"
+          ]
+        },
+        {
+          "instantiator": "test_researcher_prompt_template",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 255,
+          "context": [
+            "TestResearcherPersona",
+            "test_researcher_prompt_template"
+          ]
+        },
+        {
+          "instantiator": "test_researcher_invoke_returns_response",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 263,
+          "context": [
+            "TestResearcherPersona",
+            "test_researcher_invoke_returns_response"
+          ]
+        },
+        {
+          "instantiator": "test_researcher_invoke_includes_findings",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 272,
+          "context": [
+            "TestResearcherPersona",
+            "test_researcher_invoke_includes_findings"
+          ]
+        },
+        {
+          "instantiator": "test_researcher_invoke_discovery_phase",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 283,
+          "context": [
+            "TestResearcherPersona",
+            "test_researcher_invoke_discovery_phase"
+          ]
+        },
+        {
+          "instantiator": "test_researcher_invoke_validation_phase",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 292,
+          "context": [
+            "TestResearcherPersona",
+            "test_researcher_invoke_validation_phase"
+          ]
+        },
+        {
+          "instantiator": "test_researcher_invoke_metadata",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 301,
+          "context": [
+            "TestResearcherPersona",
+            "test_researcher_invoke_metadata"
+          ]
+        },
+        {
+          "instantiator": "test_researcher_invoke_includes_prompt_in_findings",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 313,
+          "context": [
+            "TestResearcherPersona",
+            "test_researcher_invoke_includes_prompt_in_findings"
+          ]
+        },
+        {
+          "instantiator": "test_persona_temperature_affects_generation",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 595,
+          "context": [
+            "TestPersonaIntegration",
+            "test_persona_temperature_affects_generation"
+          ]
+        },
+        {
+          "instantiator": "test_persona_temperature_affects_generation",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 596,
+          "context": [
+            "TestPersonaIntegration",
+            "test_persona_temperature_affects_generation"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 1
+      "instantiation_count": 12
     },
     {
       "name": "InvestigationStateMachine",
@@ -14876,6 +15370,183 @@
         "test_hypothesis_lifecycle",
         "test_investigation_progression",
         "test_multiple_hypothesis_tracking"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestPersonaResponse",
+      "file": "model_chorus/tests/workflows/study/test_personas.py",
+      "line": 30,
+      "language": "python",
+      "docstring": "Test suite for PersonaResponse dataclass.",
+      "bases": [],
+      "methods": [
+        "test_persona_response_init",
+        "test_persona_response_with_findings",
+        "test_persona_response_with_confidence_update",
+        "test_persona_response_with_metadata",
+        "test_persona_response_full_initialization"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestPersona",
+      "file": "model_chorus/tests/workflows/study/test_personas.py",
+      "line": 80,
+      "language": "python",
+      "docstring": "Test suite for Persona base class.",
+      "bases": [],
+      "methods": [
+        "test_persona_init",
+        "test_persona_init_custom_temperature",
+        "test_persona_init_custom_max_tokens",
+        "test_persona_invoke_returns_response",
+        "test_persona_invoke_with_context",
+        "test_persona_invoke_includes_metadata"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestPersonaRegistry",
+      "file": "model_chorus/tests/workflows/study/test_personas.py",
+      "line": 152,
+      "language": "python",
+      "docstring": "Test suite for PersonaRegistry.",
+      "bases": [],
+      "methods": [
+        "test_registry_init",
+        "test_registry_register_persona",
+        "test_registry_register_multiple_personas",
+        "test_registry_register_duplicate_raises_error",
+        "test_registry_get_persona",
+        "test_registry_get_nonexistent_persona",
+        "test_registry_list_all"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestResearcherPersona",
+      "file": "model_chorus/tests/workflows/study/test_personas.py",
+      "line": 236,
+      "language": "python",
+      "docstring": "Test suite for ResearcherPersona.",
+      "bases": [],
+      "methods": [
+        "test_researcher_init",
+        "test_researcher_init_custom_temperature",
+        "test_researcher_prompt_template",
+        "test_researcher_invoke_returns_response",
+        "test_researcher_invoke_includes_findings",
+        "test_researcher_invoke_discovery_phase",
+        "test_researcher_invoke_validation_phase",
+        "test_researcher_invoke_metadata",
+        "test_researcher_invoke_includes_prompt_in_findings",
+        "test_create_researcher_factory",
+        "test_create_researcher_factory_with_params"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestCriticPersona",
+      "file": "model_chorus/tests/workflows/study/test_personas.py",
+      "line": 337,
+      "language": "python",
+      "docstring": "Test suite for CriticPersona.",
+      "bases": [],
+      "methods": [
+        "test_critic_init",
+        "test_critic_init_custom_temperature",
+        "test_critic_prompt_template",
+        "test_critic_invoke_returns_response",
+        "test_critic_invoke_includes_findings",
+        "test_critic_invoke_metadata",
+        "test_create_critic_factory",
+        "test_create_critic_factory_with_params"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestPlannerPersona",
+      "file": "model_chorus/tests/workflows/study/test_personas.py",
+      "line": 407,
+      "language": "python",
+      "docstring": "Test suite for PlannerPersona.",
+      "bases": [],
+      "methods": [
+        "test_planner_init",
+        "test_planner_init_custom_temperature",
+        "test_planner_prompt_template",
+        "test_planner_invoke_returns_response",
+        "test_planner_invoke_includes_findings",
+        "test_create_planner_factory",
+        "test_create_planner_factory_with_params"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestPersonaFactories",
+      "file": "model_chorus/tests/workflows/study/test_personas.py",
+      "line": 466,
+      "language": "python",
+      "docstring": "Test suite for persona factory functions.",
+      "bases": [],
+      "methods": [
+        "test_create_default_personas",
+        "test_create_default_personas_types",
+        "test_create_default_personas_independent",
+        "test_get_default_registry",
+        "test_get_default_registry_has_researcher",
+        "test_get_default_registry_has_critic",
+        "test_get_default_registry_has_planner",
+        "test_get_default_registry_independent"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestPersonaIntegration",
+      "file": "model_chorus/tests/workflows/study/test_personas.py",
+      "line": 537,
+      "language": "python",
+      "docstring": "Integration tests for persona system.",
+      "bases": [],
+      "methods": [
+        "test_registry_with_all_personas",
+        "test_persona_responses_structure",
+        "test_different_personas_different_findings",
+        "test_persona_temperature_affects_generation",
+        "test_persona_max_tokens_configuration"
       ],
       "properties": [],
       "is_exported": false,
@@ -33027,6 +33698,30 @@
           "file": "model_chorus/src/model_chorus/workflows/study/personas/__init__.py",
           "line": 47,
           "call_type": "function_call"
+        },
+        {
+          "name": "test_create_default_personas",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 471,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_create_default_personas_types",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 480,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_create_default_personas_independent",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 488,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_create_default_personas_independent",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 489,
+          "call_type": "function_call"
         }
       ],
       "calls": [
@@ -33049,7 +33744,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 1
+      "call_count": 5
     },
     {
       "name": "get_default_registry",
@@ -33069,6 +33764,54 @@
           "name": "__init__",
           "file": "model_chorus/src/model_chorus/workflows/study/study_workflow.py",
           "line": 130,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_get_default_registry",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 498,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_get_default_registry_has_researcher",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 505,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_get_default_registry_has_critic",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 513,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_get_default_registry_has_planner",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 521,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_get_default_registry_independent",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 529,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_get_default_registry_independent",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 530,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_registry_with_all_personas",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 542,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_persona_responses_structure",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 560,
           "call_type": "function_call"
         },
         {
@@ -33146,7 +33889,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 11
+      "call_count": 19
     },
     {
       "name": "create_critic",
@@ -33178,10 +33921,28 @@
           "file": "model_chorus/src/model_chorus/workflows/study/personas/__init__.py",
           "line": 34,
           "call_type": "function_call"
+        },
+        {
+          "name": "test_create_critic_factory",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 394,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_create_critic_factory_with_params",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 401,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_different_personas_different_findings",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 574,
+          "call_type": "function_call"
         }
       ],
       "calls": [],
-      "call_count": 1
+      "call_count": 4
     },
     {
       "name": "create_planner",
@@ -33213,10 +33974,28 @@
           "file": "model_chorus/src/model_chorus/workflows/study/personas/__init__.py",
           "line": 35,
           "call_type": "function_call"
+        },
+        {
+          "name": "test_create_planner_factory",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 453,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_create_planner_factory_with_params",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 460,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_different_personas_different_findings",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 575,
+          "call_type": "function_call"
         }
       ],
       "calls": [],
-      "call_count": 1
+      "call_count": 4
     },
     {
       "name": "create_researcher",
@@ -33248,10 +34027,28 @@
           "file": "model_chorus/src/model_chorus/workflows/study/personas/__init__.py",
           "line": 33,
           "call_type": "function_call"
+        },
+        {
+          "name": "test_create_researcher_factory",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 324,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_create_researcher_factory_with_params",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 331,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_different_personas_different_findings",
+          "file": "model_chorus/tests/workflows/study/test_personas.py",
+          "line": 573,
+          "call_type": "function_call"
         }
       ],
       "calls": [],
-      "call_count": 1
+      "call_count": 4
     },
     {
       "name": "mock_claude_response",
@@ -35775,6 +36572,20 @@
       "model_chorus.workflows.study.memory.MemoryQuery",
       "model_chorus.workflows.study.memory.MemoryType",
       "model_chorus.workflows.study.memory.LongTermStorage"
+    ],
+    "model_chorus/tests/workflows/study/test_personas.py": [
+      "pytest",
+      "model_chorus.workflows.study.persona_base.Persona",
+      "model_chorus.workflows.study.persona_base.PersonaResponse",
+      "model_chorus.workflows.study.persona_base.PersonaRegistry",
+      "model_chorus.workflows.study.personas.ResearcherPersona",
+      "model_chorus.workflows.study.personas.CriticPersona",
+      "model_chorus.workflows.study.personas.PlannerPersona",
+      "model_chorus.workflows.study.personas.create_researcher",
+      "model_chorus.workflows.study.personas.create_critic",
+      "model_chorus.workflows.study.personas.create_planner",
+      "model_chorus.workflows.study.personas.get_default_registry",
+      "model_chorus.workflows.study.personas.create_default_personas"
     ],
     "model_chorus/tests/workflows/study/test_routing.py": [
       "pytest",

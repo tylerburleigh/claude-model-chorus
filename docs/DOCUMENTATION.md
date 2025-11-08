@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-08 18:02:27
+**Generated:** 2025-11-08 18:03:48
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 96
-- **Total Lines:** 41313
-- **Total Classes:** 227
+- **Total Files:** 97
+- **Total Lines:** 41929
+- **Total Classes:** 235
 - **Total Functions:** 174
 - **Avg Complexity:** 4.76
 - **Max Complexity:** 43
@@ -3617,6 +3617,26 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 
 ---
 
+### `TestCriticPersona`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/workflows/study/test_personas.py:337`
+
+**Description:**
+> Test suite for CriticPersona.
+
+**Methods:**
+- `test_critic_init()`
+- `test_critic_init_custom_temperature()`
+- `test_critic_prompt_template()`
+- `test_critic_invoke_returns_response()`
+- `test_critic_invoke_includes_findings()`
+- `test_critic_invoke_metadata()`
+- `test_create_critic_factory()`
+- `test_create_critic_factory_with_params()`
+
+---
+
 ### `TestDuplicateDetection`
 
 **Language:** python
@@ -4410,6 +4430,116 @@ with long-running conversations with many messages.
 
 ---
 
+### `TestPersona`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/workflows/study/test_personas.py:80`
+
+**Description:**
+> Test suite for Persona base class.
+
+**Methods:**
+- `test_persona_init()`
+- `test_persona_init_custom_temperature()`
+- `test_persona_init_custom_max_tokens()`
+- `test_persona_invoke_returns_response()`
+- `test_persona_invoke_with_context()`
+- `test_persona_invoke_includes_metadata()`
+
+---
+
+### `TestPersonaFactories`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/workflows/study/test_personas.py:466`
+
+**Description:**
+> Test suite for persona factory functions.
+
+**Methods:**
+- `test_create_default_personas()`
+- `test_create_default_personas_types()`
+- `test_create_default_personas_independent()`
+- `test_get_default_registry()`
+- `test_get_default_registry_has_researcher()`
+- `test_get_default_registry_has_critic()`
+- `test_get_default_registry_has_planner()`
+- `test_get_default_registry_independent()`
+
+---
+
+### `TestPersonaIntegration`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/workflows/study/test_personas.py:537`
+
+**Description:**
+> Integration tests for persona system.
+
+**Methods:**
+- `test_registry_with_all_personas()`
+- `test_persona_responses_structure()`
+- `test_different_personas_different_findings()`
+- `test_persona_temperature_affects_generation()`
+- `test_persona_max_tokens_configuration()`
+
+---
+
+### `TestPersonaRegistry`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/workflows/study/test_personas.py:152`
+
+**Description:**
+> Test suite for PersonaRegistry.
+
+**Methods:**
+- `test_registry_init()`
+- `test_registry_register_persona()`
+- `test_registry_register_multiple_personas()`
+- `test_registry_register_duplicate_raises_error()`
+- `test_registry_get_persona()`
+- `test_registry_get_nonexistent_persona()`
+- `test_registry_list_all()`
+
+---
+
+### `TestPersonaResponse`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/workflows/study/test_personas.py:30`
+
+**Description:**
+> Test suite for PersonaResponse dataclass.
+
+**Methods:**
+- `test_persona_response_init()`
+- `test_persona_response_with_findings()`
+- `test_persona_response_with_confidence_update()`
+- `test_persona_response_with_metadata()`
+- `test_persona_response_full_initialization()`
+
+---
+
+### `TestPlannerPersona`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/workflows/study/test_personas.py:407`
+
+**Description:**
+> Test suite for PlannerPersona.
+
+**Methods:**
+- `test_planner_init()`
+- `test_planner_init_custom_temperature()`
+- `test_planner_prompt_template()`
+- `test_planner_invoke_returns_response()`
+- `test_planner_invoke_includes_findings()`
+- `test_create_planner_factory()`
+- `test_create_planner_factory_with_params()`
+
+---
+
 ### `TestPolarityOpposition`
 
 **Language:** python
@@ -4482,6 +4612,29 @@ with long-running conversations with many messages.
 - `test_major_suggestion_mentions_context()`
 - `test_moderate_suggestion_mentions_differences()`
 - `test_minor_no_suggestion()`
+
+---
+
+### `TestResearcherPersona`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/workflows/study/test_personas.py:236`
+
+**Description:**
+> Test suite for ResearcherPersona.
+
+**Methods:**
+- `test_researcher_init()`
+- `test_researcher_init_custom_temperature()`
+- `test_researcher_prompt_template()`
+- `test_researcher_invoke_returns_response()`
+- `test_researcher_invoke_includes_findings()`
+- `test_researcher_invoke_discovery_phase()`
+- `test_researcher_invoke_validation_phase()`
+- `test_researcher_invoke_metadata()`
+- `test_researcher_invoke_includes_prompt_in_findings()`
+- `test_create_researcher_factory()`
+- `test_create_researcher_factory_with_params()`
 
 ---
 
@@ -9844,6 +9997,21 @@ Returns:
 - `pathlib.Path`
 - `pytest`
 - `tempfile`
+
+### `model_chorus/tests/workflows/study/test_personas.py`
+
+- `model_chorus.workflows.study.persona_base.Persona`
+- `model_chorus.workflows.study.persona_base.PersonaRegistry`
+- `model_chorus.workflows.study.persona_base.PersonaResponse`
+- `model_chorus.workflows.study.personas.CriticPersona`
+- `model_chorus.workflows.study.personas.PlannerPersona`
+- `model_chorus.workflows.study.personas.ResearcherPersona`
+- `model_chorus.workflows.study.personas.create_critic`
+- `model_chorus.workflows.study.personas.create_default_personas`
+- `model_chorus.workflows.study.personas.create_planner`
+- `model_chorus.workflows.study.personas.create_researcher`
+- `model_chorus.workflows.study.personas.get_default_registry`
+- `pytest`
 
 ### `model_chorus/tests/workflows/study/test_routing.py`
 
