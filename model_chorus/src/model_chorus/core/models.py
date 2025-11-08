@@ -40,6 +40,27 @@ class ConfidenceLevel(str, Enum):
     CERTAIN = "certain"
 
 
+class InvestigationPhase(str, Enum):
+    """
+    Investigation phase enum for persona-based research workflows.
+
+    Used in Study workflow to track the current phase of collaborative
+    investigation. Phases progress from initial discovery through to
+    completion with systematic exploration and validation.
+
+    Values:
+        DISCOVERY: Initial exploration phase where personas gather information
+        VALIDATION: Critical examination phase where findings are validated
+        PLANNING: Synthesis phase where insights are organized into actionable plans
+        COMPLETE: Investigation concluded with comprehensive findings
+    """
+
+    DISCOVERY = "discovery"
+    VALIDATION = "validation"
+    PLANNING = "planning"
+    COMPLETE = "complete"
+
+
 class WorkflowRequest(BaseModel):
     """
     Request model for workflow execution.
