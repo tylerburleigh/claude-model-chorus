@@ -17,6 +17,7 @@ from ..providers import (
     GenerationRequest,
     GenerationResponse,
 )
+from ..core.progress import emit_workflow_start, emit_provider_start, emit_provider_complete, emit_workflow_complete
 
 logger = logging.getLogger(__name__)
 
@@ -152,6 +153,7 @@ class ConsensusWorkflow:
 
         try:
             logger.info(f"Executing provider: {provider_name}")
+            emit_provider_start(provider_name)
 
             # Execute with timeout
             response = await asyncio.wait_for(
@@ -163,6 +165,7 @@ class ConsensusWorkflow:
                 f"Provider {provider_name} completed successfully: "
                 f"{len(response.content)} chars"
             )
+            emit_provider_complete(provider_name)
             return provider_name, response, None
 
         except asyncio.TimeoutError:
@@ -197,6 +200,9 @@ class ConsensusWorkflow:
             f"Starting consensus workflow with {len(self.provider_configs)} providers, "
             f"strategy: {strategy.value}"
         )
+
+        # Emit workflow start
+        emit_workflow_start("consensus", "10-30s")
 
         # Execute all providers in parallel
         tasks = [
@@ -244,6 +250,9 @@ class ConsensusWorkflow:
             f"Consensus workflow completed: {len(all_responses)}/{len(self.provider_configs)} "
             f"providers succeeded"
         )
+
+        # Emit workflow complete
+        emit_workflow_complete("consensus")
 
         return result
 

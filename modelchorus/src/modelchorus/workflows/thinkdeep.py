@@ -20,6 +20,7 @@ from ..core.models import (
     InvestigationStep,
     ConfidenceLevel,
 )
+from ..core.progress import emit_workflow_start, emit_workflow_complete
 
 logger = logging.getLogger(__name__)
 
@@ -274,6 +275,10 @@ class ThinkDeepWorkflow(BaseWorkflow):
 
             logger.info(f"Sending investigation request to provider: {self.provider.provider_name}")
 
+            # Emit workflow start (for step 1) or progress update
+            if step_number == 1:
+                emit_workflow_start("thinkdeep")
+
             # Generate response from provider with fallback
             response, used_provider, failed = await self._execute_with_fallback(
                 request, self.provider, self.fallback_providers
@@ -394,6 +399,10 @@ class ThinkDeepWorkflow(BaseWorkflow):
             })
 
             logger.info(f"ThinkDeep investigation step {step_number}/{total_steps} completed for thread: {thread_id}")
+
+            # Emit workflow complete (for final step)
+            if not next_step_required or step_number == total_steps:
+                emit_workflow_complete("thinkdeep")
 
         except Exception as e:
             logger.error(f"ThinkDeep investigation failed: {e}", exc_info=True)

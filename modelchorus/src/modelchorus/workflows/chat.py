@@ -14,6 +14,7 @@ from ..core.base_workflow import BaseWorkflow, WorkflowResult, WorkflowStep
 from ..core.conversation import ConversationMemory
 from ..providers import ModelProvider, GenerationRequest, GenerationResponse
 from ..core.models import ConversationMessage
+from ..core.progress import emit_workflow_start, emit_workflow_complete
 
 logger = logging.getLogger(__name__)
 
@@ -208,6 +209,9 @@ class ChatWorkflow(BaseWorkflow):
 
             logger.info(f"Sending request to provider: {self.provider.provider_name}")
 
+            # Emit workflow start
+            emit_workflow_start("chat")
+
             # Generate response from provider with fallback
             response, used_provider, failed = await self._execute_with_fallback(
                 request, self.provider, self.fallback_providers
@@ -263,6 +267,9 @@ class ChatWorkflow(BaseWorkflow):
             })
 
             logger.info(f"Chat workflow completed successfully for thread: {thread_id}")
+
+            # Emit workflow complete
+            emit_workflow_complete("chat")
 
         except Exception as e:
             logger.error(f"Chat workflow failed: {e}", exc_info=True)

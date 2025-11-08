@@ -21,6 +21,7 @@ from ...core.role_orchestration import (
 )
 from ...providers import ModelProvider, GenerationRequest, GenerationResponse
 from ...core.models import ConversationMessage
+from ...core.progress import emit_workflow_start, emit_workflow_complete
 
 logger = logging.getLogger(__name__)
 
@@ -258,6 +259,10 @@ class IdeateWorkflow(BaseWorkflow):
             )
 
             logger.info(f"Ideation completed successfully. Thread: {thread_id}")
+
+            # Emit workflow complete
+            emit_workflow_complete("ideate")
+
             return result
 
         except Exception as e:
@@ -1500,6 +1505,9 @@ Use the requested format exactly."""
             raise ValueError("Provider map cannot be empty")
 
         logger.info("Starting complete ideation workflow (divergent + convergent)")
+
+        # Emit workflow start
+        emit_workflow_start("ideate", "20-45s")
 
         # Step 1: Divergent brainstorming with multiple perspectives
         logger.info("Phase 1: Divergent brainstorming")

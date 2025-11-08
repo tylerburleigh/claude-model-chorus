@@ -16,6 +16,7 @@ from ...core.base_workflow import BaseWorkflow, WorkflowResult, WorkflowStep
 from ...core.conversation import ConversationMemory
 from ...core.registry import WorkflowRegistry
 from ...providers import ModelProvider, GenerationRequest, GenerationResponse
+from ...core.progress import emit_workflow_start, emit_workflow_complete
 
 logger = logging.getLogger(__name__)
 
@@ -271,6 +272,9 @@ class ResearchWorkflow(BaseWorkflow):
 
         logger.info(f"Starting research workflow: {prompt[:100]}...")
 
+        # Emit workflow start
+        emit_workflow_start("research", "30-60s")
+
         # Check provider availability
         if not skip_provider_check:
             has_available, available, unavailable = await self.check_provider_availability(
@@ -343,6 +347,10 @@ class ResearchWorkflow(BaseWorkflow):
         )
 
         logger.info(f"Research workflow completed: {len(steps)} steps")
+
+        # Emit workflow complete
+        emit_workflow_complete("research")
+
         return result
 
     async def _formulate_questions(

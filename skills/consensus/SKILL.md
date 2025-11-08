@@ -536,6 +536,21 @@ modelchorus consensus "Your prompt" -p claude -p gemini -s all_responses
 # For complex responses, synthesize or all_responses work best
 ```
 
+## Progress Reporting
+
+The CONSENSUS workflow automatically displays progress updates to stderr as it executes. You will see messages like:
+
+```
+Starting consensus workflow (estimated: 10-30s)...
+[claude] Executing...
+[gemini] Executing...
+[claude] Complete
+[gemini] Complete
+✓ consensus workflow complete
+```
+
+**Important:** Progress updates are emitted automatically - do NOT use `BashOutput` to poll for progress. Simply invoke the command and wait for completion. All progress information streams automatically to stderr without interfering with stdout.
+
 ## Related Workflows
 
 - **CHAT** - When you only need a single model's perspective with conversation threading

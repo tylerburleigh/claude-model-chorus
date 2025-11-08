@@ -601,6 +601,17 @@ modelchorus list-providers
 modelchorus research "Your topic" --provider claude
 ```
 
+## Progress Reporting
+
+The RESEARCH workflow automatically displays progress updates to stderr as it executes. You will see messages like:
+
+```
+Starting research workflow (estimated: 30-60s)...
+✓ research workflow complete
+```
+
+**Important:** Progress updates are emitted automatically - do NOT use `BashOutput` to poll for progress. Simply invoke the command and wait for completion. All progress information streams automatically to stderr without interfering with stdout.
+
 ## Related Workflows
 
 - **CHAT** - When you need simple conversational queries without structured findings or citation management

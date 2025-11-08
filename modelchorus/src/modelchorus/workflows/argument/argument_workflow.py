@@ -21,6 +21,7 @@ from ...core.role_orchestration import (
 )
 from ...providers import ModelProvider, GenerationRequest, GenerationResponse
 from ...core.models import ConversationMessage, ArgumentMap, ArgumentPerspective
+from ...core.progress import emit_workflow_start, emit_stage, emit_workflow_complete
 
 logger = logging.getLogger(__name__)
 
@@ -461,7 +462,11 @@ class ArgumentWorkflow(BaseWorkflow):
 
             logger.info("Executing ARGUMENT workflow with Creator → Skeptic → Moderator roles...")
 
+            # Emit workflow start
+            emit_workflow_start("argument", "15-30s")
+
             # Execute orchestration (Creator generates thesis, Skeptic rebuts, Moderator synthesizes)
+            emit_stage("Creator")
             orchestration_result: OrchestrationResult = await orchestrator.execute(
                 base_prompt=full_prompt,
                 context=None,  # No prior context for first step
@@ -570,6 +575,9 @@ class ArgumentWorkflow(BaseWorkflow):
             logger.info(f"Creator role: {len(creator_response.content)} chars thesis")
             logger.info(f"Skeptic role: {len(skeptic_response.content)} chars rebuttal")
             logger.info(f"Moderator role: {len(moderator_response.content)} chars synthesis")
+
+            # Emit workflow complete
+            emit_workflow_complete("argument")
 
         except Exception as e:
             logger.error(f"Argument workflow failed: {e}", exc_info=True)

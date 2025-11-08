@@ -327,6 +327,17 @@ modelchorus list-providers
 modelchorus chat "Your prompt" -p claude
 ```
 
+## Progress Reporting
+
+The CHAT workflow automatically displays progress updates to stderr as it executes. You will see messages like:
+
+```
+Starting chat workflow...
+✓ chat workflow complete
+```
+
+**Important for Claude Code:** Progress updates are emitted automatically - do NOT use `BashOutput` to poll for progress. Simply invoke the command and wait for completion. All progress information streams automatically to stderr without interfering with stdout.
+
 ## Related Workflows
 
 - **CONSENSUS** - When you need multiple AI perspectives on the same question instead of a single model's view

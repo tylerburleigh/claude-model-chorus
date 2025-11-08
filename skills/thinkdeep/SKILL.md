@@ -720,6 +720,17 @@ modelchorus thinkdeep --session-id "sec-audit-001" --step "Verify vulnerability 
 - Consider if need different approach (experiments, monitoring, etc.)
 - Set confidence threshold for "good enough" conclusion
 
+## Progress Reporting
+
+The THINKDEEP workflow automatically displays progress updates to stderr as it executes. You will see messages like:
+
+```
+Starting thinkdeep workflow...
+✓ thinkdeep workflow complete
+```
+
+**Important:** Progress updates are emitted automatically - do NOT use `BashOutput` to poll for progress. Simply invoke the command and wait for completion. All progress information streams automatically to stderr without interfering with stdout.
+
 ## Related Workflows
 
 **For single-turn analysis:** Use **CHAT** - Simple conversational queries don't need multi-step investigation state.
