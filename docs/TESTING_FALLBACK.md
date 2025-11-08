@@ -167,7 +167,6 @@ model-chorus thinkdeep \
   --step "Investigate problem" \
   --step-number 1 \
   --total-steps 1 \
-  --next-step-required false \
   --findings "Initial analysis" \
   --verbose
 ```

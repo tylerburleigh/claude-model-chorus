@@ -47,7 +47,7 @@ class GeminiProvider(CLIProvider):
 
     # Model capability mappings
     VISION_MODELS = {"pro", "ultra", "flash"}  # All Gemini models support vision
-    THINKING_MODELS = {"pro", "ultra"}  # Models that support extended thinking
+    # Note: THINKING_MODELS removed - Gemini CLI doesn't support thinking_mode parameter
 
     def __init__(
         self,
@@ -87,7 +87,7 @@ class GeminiProvider(CLIProvider):
                     ModelCapability.TEXT_GENERATION,
                     ModelCapability.VISION,
                     ModelCapability.FUNCTION_CALLING,
-                    ModelCapability.THINKING,
+                    # Note: THINKING removed - Gemini CLI doesn't support thinking_mode via CLI args
                 ],
                 metadata={"family": "gemini-2.0", "size": "large"},
             ),
@@ -108,12 +108,55 @@ class GeminiProvider(CLIProvider):
                     ModelCapability.TEXT_GENERATION,
                     ModelCapability.VISION,
                     ModelCapability.FUNCTION_CALLING,
-                    ModelCapability.THINKING,
+                    # Note: THINKING removed - Gemini CLI doesn't support thinking_mode via CLI args
                 ],
                 metadata={"family": "gemini-ultra", "size": "xlarge"},
             ),
         ]
         self.set_model_list(models)
+
+    async def check_availability(self) -> tuple[bool, Optional[str]]:
+        """
+        Check if Gemini CLI is available and working.
+
+        Override parent implementation to use --help instead of --version,
+        which is faster and more reliable for Gemini CLI.
+
+        Returns:
+            Tuple of (is_available, error_message)
+            - is_available: True if CLI is available and working
+            - error_message: None if available, otherwise description of the issue
+        """
+        import asyncio
+
+        try:
+            # Try running --help with shorter timeout (gemini --version can be slow)
+            process = await asyncio.create_subprocess_exec(
+                self.cli_command,
+                "--help",
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+
+            try:
+                # Use shorter timeout for Gemini (2 seconds instead of 5)
+                await asyncio.wait_for(process.communicate(), timeout=2.0)
+                return (True, None)
+            except asyncio.TimeoutError:
+                # Kill the process if it times out
+                try:
+                    process.kill()
+                    await process.wait()
+                except:
+                    pass
+                return (False, f"CLI command '{self.cli_command}' timed out during availability check")
+
+        except FileNotFoundError:
+            return (False, f"CLI command '{self.cli_command}' not found in PATH")
+        except PermissionError:
+            return (False, f"Permission denied to execute '{self.cli_command}'")
+        except Exception as e:
+            return (False, f"Failed to check '{self.cli_command}' availability: {str(e)}")
 
     def build_command(self, request: GenerationRequest) -> List[str]:
         """
@@ -127,7 +170,34 @@ class GeminiProvider(CLIProvider):
 
         Returns:
             List of command parts for subprocess execution
+
+        Raises:
+            ValueError: If unsupported parameters are provided
         """
+        # Validate parameters - Gemini CLI has limited parameter support
+        unsupported_params = []
+
+        if request.temperature is not None:
+            unsupported_params.append(f"temperature={request.temperature}")
+
+        if request.max_tokens is not None:
+            unsupported_params.append(f"max_tokens={request.max_tokens}")
+
+        if request.system_prompt is not None:
+            # System prompt gets merged into prompt but not as a separate parameter
+            # We'll allow this with a warning since we handle it by concatenation
+            logger.info("System prompt will be merged with user prompt (Gemini CLI limitation)")
+
+        thinking_mode = request.metadata.get('thinking_mode') if request.metadata else None
+        if thinking_mode and thinking_mode != 'medium':  # medium is default, so it's ok
+            unsupported_params.append(f"thinking_mode={thinking_mode}")
+
+        if unsupported_params:
+            raise ValueError(
+                f"Gemini CLI provider does not support the following parameters: {', '.join(unsupported_params)}. "
+                f"Please remove these parameters or use a different provider (claude, codex) that supports them."
+            )
+
         command = [self.cli_command]
 
         # Build full prompt (system + user prompt)
@@ -150,11 +220,6 @@ class GeminiProvider(CLIProvider):
         # This provides safe operation when used by ModelChorus workflows
 
         logger.debug(f"Built Gemini command: {' '.join(command)}")
-        logger.warning(
-            "Note: Gemini CLI does not support temperature, max_tokens, system_prompt, "
-            "thinking mode, or images via command-line arguments. "
-            "These features require Gemini CLI configuration or are not supported."
-        )
         return command
 
     def parse_response(self, stdout: str, stderr: str, returncode: int) -> GenerationResponse:

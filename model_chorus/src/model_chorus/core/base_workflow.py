@@ -270,7 +270,17 @@ class BaseWorkflow(ABC):
             ...     logger.warning(f"Some providers unavailable: {unavailable}")
         """
         fallback_providers = fallback_providers or []
-        all_providers = [primary_provider] + fallback_providers
+
+        # Deduplicate providers by name to avoid checking the same provider twice
+        # This can happen when --model flag specifies a provider that's also in fallback list
+        seen_names = set()
+        unique_providers = []
+        for provider in [primary_provider] + fallback_providers:
+            if provider.provider_name not in seen_names:
+                seen_names.add(provider.provider_name)
+                unique_providers.append(provider)
+
+        all_providers = unique_providers
 
         available = []
         unavailable = []
