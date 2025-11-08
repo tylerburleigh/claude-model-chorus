@@ -425,7 +425,8 @@ def create_express_config(
         }
 
     # Select primary provider (first available in priority order)
-    priority_order = ['claude', 'gemini', 'codex', 'cursor-agent']
+    # Deprioritize Claude since users are typically running from Claude Code
+    priority_order = ['gemini', 'codex', 'cursor-agent', 'claude']
     primary_provider = None
     for provider in priority_order:
         if provider in available_providers:
@@ -459,13 +460,6 @@ def create_express_config(
             "fallback_providers": fallback_providers
         }
 
-        # Research workflow
-        workflows["research"] = {
-            "citation_style": "informal",
-            "depth": "thorough",
-            "fallback_providers": fallback_providers
-        }
-
         # Ideate workflow
         workflows["ideate"] = {
             "fallback_providers": fallback_providers
@@ -495,8 +489,6 @@ def create_tiered_config(
     # Standard tier options
     consensus_providers: Optional[list] = None,
     consensus_strategy: str = "all_responses",
-    research_depth: str = "thorough",
-    research_citation_style: str = "academic",
     thinkdeep_thinking_mode: str = "medium",
     ideate_providers: Optional[list] = None,
     # Advanced tier options
@@ -510,8 +502,6 @@ def create_tiered_config(
         default_provider: Default AI provider
         consensus_providers: Providers for consensus workflow (standard+)
         consensus_strategy: Strategy for consensus workflow (standard+)
-        research_depth: Research depth setting (standard+)
-        research_citation_style: Citation style for research (standard+)
         thinkdeep_thinking_mode: Thinking mode for thinkdeep (standard+)
         ideate_providers: Providers for ideate workflow (standard+)
         workflow_overrides: Additional workflow overrides (advanced)
@@ -561,18 +551,6 @@ def create_tiered_config(
                 "providers": consensus_providers,
                 "strategy": consensus_strategy
             }
-
-        # Add research workflow
-        workflows["research"] = {
-            "citation_style": research_citation_style,
-            "depth": research_depth
-        }
-        if consensus_providers:
-            # Multi-provider research, no fallback
-            workflows["research"]["providers"] = consensus_providers
-        elif fallback_providers:
-            # Single-provider research, add fallback
-            workflows["research"]["fallback_providers"] = fallback_providers
 
         # Add thinkdeep workflow (single-provider)
         workflows["thinkdeep"] = {
@@ -791,6 +769,7 @@ def add_permissions(
     # Define permissions to add
     permissions_to_add = [
         "Bash(modelchorus:*)",
+        "Skill(model-chorus:*)",
     ]
 
     # Create .claude directory if needed
@@ -888,8 +867,6 @@ def main():
     # Standard tier options
     tiered_parser.add_argument('--consensus-providers', nargs='+', help='Providers for consensus workflow')
     tiered_parser.add_argument('--consensus-strategy', default='all_responses', help='Consensus strategy')
-    tiered_parser.add_argument('--research-depth', default='thorough', help='Research depth')
-    tiered_parser.add_argument('--research-citation', default='academic', help='Research citation style')
     tiered_parser.add_argument('--thinkdeep-mode', default='medium', help='ThinkDeep thinking mode')
     tiered_parser.add_argument('--ideate-providers', nargs='+', help='Providers for ideate workflow')
 
@@ -942,8 +919,6 @@ def main():
             default_provider=args.provider,
             consensus_providers=args.consensus_providers,
             consensus_strategy=args.consensus_strategy,
-            research_depth=args.research_depth,
-            research_citation_style=args.research_citation,
             thinkdeep_thinking_mode=args.thinkdeep_mode,
             ideate_providers=args.ideate_providers
         )
