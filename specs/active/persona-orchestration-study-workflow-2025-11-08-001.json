@@ -1,7 +1,7 @@
 {
   "spec_id": "persona-orchestration-study-workflow-2025-11-08-001",
   "generated": "2025-11-08T14:00:00Z",
-  "last_updated": "2025-11-08T19:30:19.183445Z",
+  "last_updated": "2025-11-08T19:33:20.739423Z",
   "metadata": {
     "title": "Persona Orchestration - STUDY Workflow",
     "description": "Implement persona-based investigation workflow with multi-perspective reasoning, temporal memory, and LLM-based routing",
@@ -16,7 +16,7 @@
       "history": []
     },
     "activated_date": "2025-11-08T14:53:02.145575Z",
-    "progress_percentage": 42,
+    "progress_percentage": 44,
     "current_phase": "phase-3"
   },
   "objectives": [
@@ -41,7 +41,7 @@
         "phase-6"
       ],
       "total_tasks": 70,
-      "completed_tasks": 30,
+      "completed_tasks": 31,
       "metadata": {
         "description": "Complete implementation of STUDY workflow with personas, memory, and routing"
       }
@@ -989,7 +989,7 @@
         "depends": []
       },
       "total_tasks": 10,
-      "completed_tasks": 4,
+      "completed_tasks": 5,
       "metadata": {
         "purpose": "Implement intelligent persona routing using LLM-based skill analysis",
         "risk_level": "medium",
@@ -1007,7 +1007,7 @@
         "task-3-3"
       ],
       "total_tasks": 7,
-      "completed_tasks": 4,
+      "completed_tasks": 5,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1128,7 +1128,7 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/workflows/study/routing.py",
         "task_category": "implementation",
@@ -1161,7 +1161,7 @@
     "task-3-2-2": {
       "type": "subtask",
       "title": "Add routing decision tracking and logging",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-3-2",
       "children": [],
       "dependencies": {
@@ -1170,9 +1170,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "details": "Store routing history: timestamp, context, decision, reasoning"
+        "details": "Store routing history: timestamp, context, decision, reasoning",
+        "started_at": "2025-11-08T19:30:44.942423Z",
+        "completed_at": "2025-11-08T19:33:20.714594Z",
+        "needs_journaling": false,
+        "actual_hours": 0.043,
+        "journaled_at": "2025-11-08T19:33:20.730855Z"
       }
     },
     "task-3-2-3": {
@@ -2657,6 +2662,15 @@
       "content": "Successfully created PersonaRouter class with skill invocation integration. Implemented:\n- PersonaRouter class that integrates context analysis skill with PersonaRegistry\n- RoutingDecision dataclass with complete routing information (persona instance, reasoning, confidence, guidance)\n- route_next_persona() method that:\n  \u2022 Extracts investigation context from StudyState\n  \u2022 Invokes analyze_context() skill with current phase, confidence, findings, and questions\n  \u2022 Retrieves selected persona from registry\n  \u2022 Returns comprehensive routing decision\n  \u2022 Handles \"None\" case for completed investigations\n  \u2022 Includes proper error handling for unknown personas\n- get_available_personas() helper method\n- Comprehensive logging for routing decisions\n\nFile created:\n- model_chorus/src/model_chorus/workflows/study/persona_router.py (178 lines)\n\nAll 8 test scenarios passing:\n\u2713 Discovery phase routing (initial and after Researcher)\n\u2713 Validation phase routing (no prior and after Critic)\n\u2713 Planning phase routing\n\u2713 Complete phase handling (returns None)\n\u2713 Available personas retrieval\n\u2713 RoutingDecision structure validation\n\nThe PersonaRouter successfully integrates the context analysis skill with the persona registry, providing intelligent persona selection based on investigation state.",
       "metadata": {},
       "task_id": "task-3-2-1"
+    },
+    {
+      "timestamp": "2025-11-08T19:33:20.730823Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add routing decision tracking and logging",
+      "author": "claude-code",
+      "content": "Successfully added routing decision tracking and logging. Implemented:\n- RoutingHistoryEntry dataclass to store routing decision history with:\n  \u2022 timestamp (ISO format)\n  \u2022 investigation_id\n  \u2022 phase and confidence at time of routing\n  \u2022 findings_count and questions_count\n  \u2022 prior_persona and selected_persona\n  \u2022 reasoning and context_summary\n- Added timestamp field to RoutingDecision (auto-generated)\n- Modified PersonaRouter to:\n  \u2022 Maintain routing_history list\n  \u2022 Automatically record each routing decision\n  \u2022 Log routing decisions with history count\n- Added history management methods:\n  \u2022 get_routing_history(investigation_id, limit) - Query history with filtering\n  \u2022 clear_routing_history(investigation_id) - Clear history selectively or completely\n\nAll 8 test scenarios passing:\n\u2713 Initial state (empty history)\n\u2713 First decision recorded with timestamp\n\u2713 Multiple decisions tracked chronologically\n\u2713 Filtering by investigation ID\n\u2713 Limiting results (most recent first)\n\u2713 History entry structure validation\n\u2713 Selective clearing by investigation\n\u2713 Complete history clearing\n\nThe routing history provides full traceability of persona selection decisions over time, useful for debugging and analyzing investigation patterns.",
+      "metadata": {},
+      "task_id": "task-3-2-2"
     }
   ]
 }

@@ -7,7 +7,8 @@ to consult next based on current investigation state using the context analysis 
 
 import logging
 from typing import Optional, List, Dict, Any, Tuple
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from datetime import datetime
 
 from ...core.models import StudyState
 from .persona_base import Persona, PersonaRegistry
@@ -32,6 +33,7 @@ class RoutingDecision:
         guidance: Specific guidance or focus areas for the persona
         context_summary: Summary of the investigation context
         metadata: Additional routing metadata
+        timestamp: When this routing decision was made (ISO format)
     """
 
     persona: Optional[Persona]
@@ -41,6 +43,39 @@ class RoutingDecision:
     guidance: List[str]
     context_summary: str
     metadata: Dict[str, Any]
+    timestamp: str = field(default_factory=lambda: datetime.utcnow().isoformat())
+
+
+@dataclass
+class RoutingHistoryEntry:
+    """
+    Historical record of a routing decision.
+
+    Tracks routing decisions over time for analysis and debugging.
+
+    Attributes:
+        timestamp: When the routing decision was made (ISO format)
+        investigation_id: Investigation this routing was for
+        phase: Investigation phase at time of routing
+        confidence: Confidence level at time of routing
+        findings_count: Number of findings at time of routing
+        questions_count: Number of unresolved questions
+        prior_persona: Previously consulted persona (if any)
+        selected_persona: Persona selected by routing decision
+        reasoning: Reasoning for the selection
+        context_summary: Summary of investigation context
+    """
+
+    timestamp: str
+    investigation_id: str
+    phase: str
+    confidence: str
+    findings_count: int
+    questions_count: int
+    prior_persona: Optional[str]
+    selected_persona: str
+    reasoning: str
+    context_summary: str
 
 
 class PersonaRouter:
@@ -55,6 +90,7 @@ class PersonaRouter:
 
     Attributes:
         registry: PersonaRegistry containing available personas
+        routing_history: List of historical routing decisions for analysis
     """
 
     def __init__(self, registry: PersonaRegistry):
@@ -65,6 +101,7 @@ class PersonaRouter:
             registry: PersonaRegistry containing available personas
         """
         self.registry = registry
+        self.routing_history: List[RoutingHistoryEntry] = []
         logger.info("PersonaRouter initialized")
 
     def route_next_persona(
@@ -162,7 +199,7 @@ class PersonaRouter:
 
         logger.info(f"Persona '{persona_name}' retrieved from registry")
 
-        return RoutingDecision(
+        decision = RoutingDecision(
             persona=persona,
             persona_name=persona_name,
             reasoning=analysis_result.reasoning,
@@ -172,6 +209,27 @@ class PersonaRouter:
             metadata=analysis_result.metadata
         )
 
+        # Record routing decision in history
+        history_entry = RoutingHistoryEntry(
+            timestamp=decision.timestamp,
+            investigation_id=state.investigation_id,
+            phase=current_phase,
+            confidence=confidence,
+            findings_count=len(findings),
+            questions_count=len(questions),
+            prior_persona=prior_persona,
+            selected_persona=persona_name,
+            reasoning=analysis_result.reasoning,
+            context_summary=analysis_result.context_summary
+        )
+        self.routing_history.append(history_entry)
+
+        logger.info(
+            f"Routing decision recorded: {persona_name} (history: {len(self.routing_history)} entries)"
+        )
+
+        return decision
+
     def get_available_personas(self) -> List[str]:
         """
         Get list of all available persona names in the registry.
@@ -180,3 +238,60 @@ class PersonaRouter:
             List of persona names
         """
         return [persona.name for persona in self.registry.list_all()]
+
+    def get_routing_history(
+        self,
+        investigation_id: Optional[str] = None,
+        limit: Optional[int] = None
+    ) -> List[RoutingHistoryEntry]:
+        """
+        Get routing history, optionally filtered by investigation.
+
+        Args:
+            investigation_id: Filter by specific investigation (None for all)
+            limit: Maximum number of entries to return (most recent first)
+
+        Returns:
+            List of RoutingHistoryEntry records
+        """
+        history = self.routing_history
+
+        # Filter by investigation if specified
+        if investigation_id:
+            history = [
+                entry for entry in history
+                if entry.investigation_id == investigation_id
+            ]
+
+        # Reverse to get most recent first
+        history = list(reversed(history))
+
+        # Apply limit if specified
+        if limit:
+            history = history[:limit]
+
+        return history
+
+    def clear_routing_history(self, investigation_id: Optional[str] = None) -> int:
+        """
+        Clear routing history, optionally for a specific investigation.
+
+        Args:
+            investigation_id: Clear only this investigation (None for all)
+
+        Returns:
+            Number of entries cleared
+        """
+        if investigation_id:
+            initial_count = len(self.routing_history)
+            self.routing_history = [
+                entry for entry in self.routing_history
+                if entry.investigation_id != investigation_id
+            ]
+            cleared = initial_count - len(self.routing_history)
+        else:
+            cleared = len(self.routing_history)
+            self.routing_history = []
+
+        logger.info(f"Cleared {cleared} routing history entries")
+        return cleared
