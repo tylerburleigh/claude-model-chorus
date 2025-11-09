@@ -293,7 +293,7 @@ model-chorus chat "API latency went from 100ms to 2s after deployment. What coul
 
 **THINKDEEP Approach:**
 ```bash
-model-chorus thinkdeep --step "API latency increased 20x after deployment" --step-number 1 --total-steps 3 --next-step-required true --findings "Affects all endpoints equally, started at 3pm deployment" --confidence low
+model-chorus thinkdeep --step "API latency increased 20x after deployment" --step-number 1 --total-steps 3 --next-step-required --findings "Affects all endpoints equally, started at 3pm deployment" --confidence low
 ```
 - **Result:** Systematic investigation with hypothesis testing
 - **Pros:** Methodical, builds confidence, finds root cause

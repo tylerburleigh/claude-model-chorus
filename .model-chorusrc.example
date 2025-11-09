@@ -37,7 +37,7 @@ generation:
 # Workflow-Specific Configuration
 # ============================================================================
 # Override global defaults for specific workflows
-# Available workflows: chat, consensus, thinkdeep, argument, ideate, research
+# Available workflows: chat, consensus, thinkdeep, argument, ideate
 
 workflows:
 
@@ -83,16 +83,6 @@ workflows:
       - codex
       - cursor-agent
 
-  # RESEARCH - Multi-source research with citations
-  research:
-    provider: claude
-    fallback_providers:        # Fallback chain if primary fails (tries in order)
-      - gemini
-      - codex
-      - cursor-agent
-    citation_style: academic   # Options: informal, academic, apa, mla
-    depth: thorough            # Options: quick, thorough, comprehensive
-
 # ============================================================================
 # Example Configurations for Different Use Cases
 # ============================================================================
@@ -137,9 +127,6 @@ workflows:
 #   - Useful for resilience and reliability
 #
 # Example: If claude CLI is not installed, will automatically use gemini
-#
-# To disable provider checking (faster startup):
-#   modelchorus research "topic" --skip-provider-check
 
 # ============================================================================
 # Provider Models

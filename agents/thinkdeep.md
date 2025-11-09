@@ -112,7 +112,6 @@ Skill(model-chorus:thinkdeep) with prompt:
 --step 'Investigate 500 errors in checkout flow'
 --step-number 1
 --total-steps 1
---next-step-required false
 --findings 'Error: payment_processor timeout. Third-party API latency spike to 30s'
 --confidence high
 --hypothesis 'Payment provider experiencing outage, not our bug'"
@@ -129,7 +128,7 @@ Skill(model-chorus:thinkdeep) with prompt:
 --step 'API latency increased from 100ms to 2s after deployment'
 --step-number 1
 --total-steps 3
---next-step-required true
+--next-step-required
 --findings 'Latency affects all endpoints equally, started at 3pm deployment'
 --confidence low
 --hypothesis 'Deployment introduced performance regression'
@@ -149,7 +148,7 @@ Skill(model-chorus:thinkdeep) with prompt:
 --step 'Examine deployment changes'
 --step-number 2
 --total-steps 3
---next-step-required true
+--next-step-required
 --findings 'New logging middleware added, logs every request body'
 --confidence medium
 --hypothesis 'Excessive logging causing I/O bottleneck'"

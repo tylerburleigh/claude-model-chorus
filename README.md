@@ -7,7 +7,7 @@ Multi-model AI consensus building. Orchestrate responses from multiple AI provid
 ModelChorus is both a **Python package** for multi-model AI orchestration and a **Claude Code plugin** for seamless consensus building within your development workflow.
 
 **Key Features:**
-- **Five Powerful Workflows** - CHAT, CONSENSUS, THINKDEEP, ARGUMENT, and IDEATE for different use cases
+- **Six Powerful Workflows** - CHAT, CONSENSUS, THINKDEEP, ARGUMENT, IDEATE, and STUDY for different use cases
 - **Multi-Provider Support** - Coordinate Claude, Gemini, OpenAI Codex, and Cursor Agent
 - **Provider Fallback & Resilience** - Automatic fallback to alternative providers when primary fails
 - **Conversation Continuity** - Multi-turn conversations with state persistence
@@ -260,6 +260,77 @@ result = await workflow.run("Ways to improve user onboarding")
 
 ---
 
+### STUDY - Persona-Based Collaborative Research
+
+**Multi-persona investigation with role-based orchestration**
+
+Complex research, codebase analysis, and collaborative exploration with specialized personas.
+
+**CLI Example:**
+```bash
+# Start new investigation
+model-chorus study start --scenario "Explore authentication system patterns"
+
+# Continue investigation
+model-chorus study start --scenario "Deep dive into OAuth 2.0" --continue thread-id-123
+
+# Include files for context
+model-chorus study start --scenario "Analyze this codebase" \
+  -f src/auth.py -f tests/test_auth.py
+
+# Use specific personas
+model-chorus study start --scenario "Security analysis" \
+  --persona SecurityExpert --persona Architect
+
+# Continue existing investigation
+model-chorus study next --investigation thread-id-123
+
+# View investigation memory
+model-chorus study view --investigation thread-id-123 --show-all
+```
+
+**Python Example:**
+```python
+from model_chorus.workflows import StudyWorkflow
+from model_chorus.providers import ClaudeProvider
+from model_chorus.core.conversation import ConversationMemory
+
+provider = ClaudeProvider()
+memory = ConversationMemory()
+workflow = StudyWorkflow(
+    provider,
+    conversation_memory=memory,
+    config={'personas': [
+        {'name': 'Researcher', 'role': 'investigator'},
+        {'name': 'Architect', 'role': 'investigator'}
+    ]}
+)
+
+# Start investigation
+result = await workflow.run(
+    prompt="Explore authentication patterns in codebase",
+    files=["src/auth.py", "src/middleware/auth.ts"]
+)
+thread_id = result.metadata.get('thread_id')
+
+# Continue investigation
+result2 = await workflow.run(
+    prompt="Analyze OAuth 2.0 implementation",
+    continuation_id=thread_id
+)
+```
+
+**Key Features:**
+- Multi-persona collaborative investigation
+- Role-based orchestration with specialized expertise
+- Conversation continuity across investigation steps
+- File context integration
+- Memory viewing for investigation review
+
+**When to use:** Complex research, codebase analysis, multi-perspective investigation, collaborative exploration
+
+---
+
 **See [docs/workflows/](docs/workflows/) for detailed workflow guides:**
 - [ARGUMENT.md](docs/workflows/ARGUMENT.md) - Dialectical reasoning
 - [IDEATE.md](docs/workflows/IDEATE.md) - Collaborative brainstorming
@@ -335,6 +406,18 @@ model-chorus argument "Universal healthcare should be implemented" -p claude
 **IDEATE - Collaborative brainstorming:**
 ```bash
 model-chorus ideate "Ways to improve user onboarding" -p claude -p gemini
+```
+
+**STUDY - Persona-based research:**
+```bash
+# Start new investigation
+model-chorus study start --scenario "Explore authentication patterns"
+
+# Continue investigation
+model-chorus study next --investigation thread-id-123
+
+# View investigation memory
+model-chorus study view --investigation thread-id-123
 ```
 
 ### Via Python API

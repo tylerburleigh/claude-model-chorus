@@ -316,6 +316,36 @@ class ConfigLoader:
 
         return None
 
+    def get_fallback_providers_excluding(self, workflow: str, exclude_provider: str) -> Optional[List[str]]:
+        """Get fallback providers for a workflow, excluding a specific provider.
+
+        This is useful when the primary provider is specified via CLI and should not
+        also appear in the fallback list, preventing duplicate provider checks.
+
+        Args:
+            workflow: Workflow name
+            exclude_provider: Provider name to exclude from fallback list
+
+        Returns:
+            List of fallback provider names (excluding the specified provider),
+            or None if no fallback providers configured
+
+        Example:
+            >>> config = Config()
+            >>> # If fallback_providers = ['gemini', 'claude', 'codex']
+            >>> config.get_fallback_providers_excluding('thinkdeep', 'gemini')
+            ['claude', 'codex']
+        """
+        fallbacks = self.get_fallback_providers(workflow)
+        if fallbacks is None:
+            return None
+
+        # Filter out the excluded provider
+        filtered = [p for p in fallbacks if p != exclude_provider]
+
+        # Return None if list is now empty, otherwise return filtered list
+        return filtered if filtered else None
+
     def get_provider_model(self, provider: str, fallback: Optional[str] = None) -> Optional[str]:
         """Get the configured model for a specific provider.
 

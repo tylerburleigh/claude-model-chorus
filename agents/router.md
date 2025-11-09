@@ -286,7 +286,7 @@ Skill(model-chorus:thinkdeep) with prompt:
 --step 'Database queries are slow - potential causes: indexes, query design, connection pooling'
 --step-number 1
 --total-steps 3
---next-step-required true
+--next-step-required
 --confidence exploring"
 
 Required Information for thinkdeep-subagent:

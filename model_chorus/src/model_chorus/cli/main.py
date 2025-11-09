@@ -28,6 +28,7 @@ from ..core.conversation import ConversationMemory
 from ..core.config import get_config_loader
 from ..core.progress import set_progress_enabled
 from model_chorus import __version__
+from .study_commands import study_app
 
 app = typer.Typer(
     name="model-chorus",
@@ -35,6 +36,9 @@ app = typer.Typer(
     add_completion=False,
 )
 console = Console()
+
+# Register study command group
+app.add_typer(study_app, name='study')
 
 # Initialize config loader
 _config_loader = None
@@ -947,7 +951,11 @@ def thinkdeep(
     step: str = typer.Option(..., "--step", help="Investigation step description"),
     step_number: int = typer.Option(..., "--step-number", help="Current step index (starts at 1)"),
     total_steps: int = typer.Option(..., "--total-steps", help="Estimated total investigation steps"),
-    next_step_required: bool = typer.Option(..., "--next-step-required", help="Whether more steps are needed (true/false)"),
+    next_step_required: bool = typer.Option(
+        False,
+        "--next-step-required",
+        help="Continue investigation with another step (omit for final step)",
+    ),
     findings: str = typer.Option(..., "--findings", help="What was discovered in this step"),
     model: Optional[str] = typer.Option(
         None,
@@ -986,8 +994,8 @@ def thinkdeep(
     ),
     use_assistant_model: bool = typer.Option(
         True,
-        "--use-assistant-model",
-        help="Enable expert validation (default: true)",
+        "--use-assistant-model/--no-use-assistant-model",
+        help="Enable expert validation (default: enabled)",
     ),
     output: Optional[Path] = typer.Option(
         None,
@@ -1015,13 +1023,13 @@ def thinkdeep(
 
     Example:
         # Start new investigation
-        model-chorus thinkdeep --step "Investigate why API latency increased" --step-number 1 --total-steps 3 --next-step-required true --findings "Examining deployment logs" --confidence exploring
+        model-chorus thinkdeep --step "Investigate why API latency increased" --step-number 1 --total-steps 3 --next-step-required --findings "Examining deployment logs" --confidence exploring
 
         # Continue investigation
-        model-chorus thinkdeep --continuation-id "thread-123" --step "Check database query performance" --step-number 2 --total-steps 3 --next-step-required true --findings "Found N+1 query pattern" --confidence medium --hypothesis "N+1 queries causing slowdown"
+        model-chorus thinkdeep --continuation-id "thread-123" --step "Check database query performance" --step-number 2 --total-steps 3 --next-step-required --findings "Found N+1 query pattern" --confidence medium --hypothesis "N+1 queries causing slowdown"
 
-        # Final step
-        model-chorus thinkdeep --continuation-id "thread-123" --step "Verify fix resolves issue" --step-number 3 --total-steps 3 --next-step-required false --findings "Latency reduced to baseline" --confidence high --hypothesis "Confirmed: N+1 queries were root cause"
+        # Final step (omit --next-step-required)
+        model-chorus thinkdeep --continuation-id "thread-123" --step "Verify fix resolves issue" --step-number 3 --total-steps 3 --findings "Latency reduced to baseline" --confidence high --hypothesis "Confirmed: N+1 queries were root cause"
     """
     try:
         # Apply config defaults if values not provided
@@ -1057,8 +1065,20 @@ def thinkdeep(
             console.print(f"[red]Failed to initialize {model}: {e}[/red]")
             raise typer.Exit(1)
 
-        # Load fallback providers from config
-        fallback_provider_names = config.get_workflow_default('thinkdeep', 'fallback_providers', [])
+        # Validate provider supports requested parameters
+        if thinking_mode and thinking_mode != 'medium':  # medium is default
+            # Check if provider is gemini (which doesn't support thinking_mode)
+            if model == 'gemini':
+                console.print(f"[yellow]Warning: Gemini provider does not support --thinking-mode parameter[/yellow]")
+                console.print(f"[yellow]The parameter will be ignored. Use --model claude or --model codex for thinking mode support.[/yellow]")
+                if not skip_provider_check:
+                    console.print(f"[yellow]Proceeding anyway... (use Ctrl+C to cancel)[/yellow]")
+                    import time
+                    time.sleep(2)  # Give user time to cancel
+
+        # Load fallback providers from config, excluding the primary provider
+        # to avoid duplicate availability checks when --model matches a fallback
+        fallback_provider_names = config.get_fallback_providers_excluding('thinkdeep', model) or []
         fallback_providers = []
 
         if fallback_provider_names and verbose:
@@ -1618,6 +1638,8 @@ def list_providers(
             console.print()
 
         console.print("[dim]Use --check to verify which providers are actually installed[/dim]\n")
+
+
 
 
 @app.command()
