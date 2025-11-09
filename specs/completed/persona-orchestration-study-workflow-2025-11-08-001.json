@@ -1,7 +1,7 @@
 {
   "spec_id": "persona-orchestration-study-workflow-2025-11-08-001",
   "generated": "2025-11-08T14:00:00Z",
-  "last_updated": "2025-11-08T23:58:12.487096Z",
+  "last_updated": "2025-11-09T00:09:24.134647Z",
   "metadata": {
     "title": "Persona Orchestration - STUDY Workflow",
     "description": "Implement persona-based investigation workflow with multi-perspective reasoning, temporal memory, and LLM-based routing",
@@ -596,7 +596,8 @@
         "expected": "",
         "completed_at": "2025-11-08T16:11:09.138119Z",
         "needs_journaling": false,
-        "journaled_at": "2025-11-08T16:11:09.146374Z"
+        "journaled_at": "2025-11-08T16:11:09.146374Z",
+        "agent": "sdd-fidelity-review"
       }
     },
     "phase-2": {
@@ -967,7 +968,8 @@
         "expected": "",
         "completed_at": "2025-11-08T17:09:44.328383Z",
         "needs_journaling": false,
-        "journaled_at": "2025-11-08T17:09:44.338807Z"
+        "journaled_at": "2025-11-08T17:09:44.338807Z",
+        "agent": "sdd-fidelity-review"
       }
     },
     "phase-3": {
@@ -1332,7 +1334,8 @@
         "expected": "",
         "completed_at": "2025-11-08T20:19:05.547418Z",
         "needs_journaling": false,
-        "journaled_at": "2025-11-08T20:19:05.554876Z"
+        "journaled_at": "2025-11-08T20:19:05.554876Z",
+        "agent": "sdd-fidelity-review"
       }
     },
     "phase-4": {
@@ -1851,7 +1854,8 @@
         "expected": "",
         "completed_at": "2025-11-08T21:00:35.113586Z",
         "needs_journaling": false,
-        "journaled_at": "2025-11-08T21:00:35.121271Z"
+        "journaled_at": "2025-11-08T21:00:35.121271Z",
+        "agent": "sdd-fidelity-review"
       }
     },
     "phase-5": {
@@ -2224,7 +2228,8 @@
         "completed_at": "2025-11-08T22:43:01.300093Z",
         "needs_journaling": false,
         "actual_hours": 0.052,
-        "journaled_at": "2025-11-08T22:43:01.324389Z"
+        "journaled_at": "2025-11-08T22:43:01.324389Z",
+        "agent": "sdd-fidelity-review"
       }
     },
     "phase-6": {
@@ -2543,7 +2548,8 @@
         "expected": "",
         "completed_at": "2025-11-08T23:58:12.474967Z",
         "needs_journaling": false,
-        "journaled_at": "2025-11-08T23:58:12.478912Z"
+        "journaled_at": "2025-11-08T23:58:12.478912Z",
+        "agent": "sdd-fidelity-review"
       }
     }
   },
