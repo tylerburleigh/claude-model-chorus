@@ -396,8 +396,10 @@ model-chorus thinkdeep --step "Investigate why API latency increased from 100ms 
 - `--step`: Investigation step description
 - `--step-number`: Current step index (starts at 1)
 - `--total-steps`: Estimated total investigation steps
-- `--next-step-required`: Whether more steps are needed (true/false)
 - `--findings`: What was discovered in this step
+
+**Required Boolean Flags:**
+- `--next-step-required`: Include this flag if more investigation steps are needed (omit for final step)
 
 **Optional Parameters:**
 - `--provider`: AI provider to use (claude, gemini, codex, cursor-agent; default: claude)
@@ -415,8 +417,10 @@ model-chorus thinkdeep --step "Investigate why API latency increased from 100ms 
 - `--step` (string): Current investigation step description - What you're investigating in this step - Should be clear and focused on specific aspect
 - `--step-number` (integer): Current step index - Starts at 1 - Tracks position in investigation sequence
 - `--total-steps` (integer): Estimated total investigation steps - Can be adjusted as investigation progresses - Helps track overall progress
-- `--next-step-required` (boolean): Whether another step is needed - Set to `true` if investigation continues - Set to `false` when investigation is complete
 - `--findings` (string): Discoveries from this step - Evidence, observations, and insights - Builds investigation knowledge base
+
+**Required Boolean Flags:**
+- `--next-step-required` (flag): Include this flag to indicate more investigation steps are needed - Omit this flag when investigation is complete (final step) - Flag takes no value; its presence means "continue", absence means "stop"
 
 **Optional:**
 - `--provider` (string): AI provider to use for investigation - Valid values: `claude`, `gemini`, `codex`, `cursor-agent` - Default: `claude`
