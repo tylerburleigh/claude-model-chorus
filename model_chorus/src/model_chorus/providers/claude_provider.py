@@ -118,7 +118,7 @@ class ClaudeProvider(CLIProvider):
         Build the CLI command for a Claude generation request.
 
         Constructs a command like:
-            claude --print --output-format json --system-prompt "..." --model sonnet "..."
+            claude --print [prompt] --output-format json --allowed-tools Read Grep ... --system-prompt "..."
 
         Args:
             request: GenerationRequest containing prompt and parameters
@@ -131,17 +131,20 @@ class ClaudeProvider(CLIProvider):
         # Use print mode for non-interactive output
         command.append("--print")
 
+        # Add prompt as positional argument (must come early, before tool restriction flags)
+        command.append(request.prompt)
+
         # Use JSON output format for easier parsing
         command.extend(["--output-format", "json"])
 
         # Add read-only tool restrictions for security
         # Allow only read-only and information-gathering tools
         readonly_tools = ["Read", "Grep", "Glob", "WebSearch", "WebFetch", "Task", "Explore"]
-        command.extend(["--allowedTools", ",".join(readonly_tools)])
+        command.extend(["--allowed-tools"] + readonly_tools)
 
         # Explicitly block write operations
         write_tools = ["Write", "Edit", "Bash"]
-        command.extend(["--disallowedTools", ",".join(write_tools)])
+        command.extend(["--disallowed-tools"] + write_tools)
 
         # Add system prompt if provided
         if request.system_prompt:
@@ -153,9 +156,6 @@ class ClaudeProvider(CLIProvider):
 
         # Note: Claude CLI doesn't support --temperature, --max-tokens flags
         # These would need to be set via config or are model defaults
-
-        # Add prompt as final positional argument
-        command.append(request.prompt)
 
         logger.debug(f"Built Claude command: {' '.join(command)}")
         return command

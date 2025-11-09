@@ -20,7 +20,7 @@ from ..core.models import (
     InvestigationStep,
     ConfidenceLevel,
 )
-from ..core.progress import emit_workflow_start, emit_workflow_complete
+from ..core.progress import emit_workflow_start, emit_workflow_complete, emit_progress
 
 logger = logging.getLogger(__name__)
 
@@ -165,7 +165,7 @@ class ThinkDeepWorkflow(BaseWorkflow):
             thinking_mode: Reasoning depth (minimal, low, medium, high, max)
             skip_provider_check: Skip provider availability check (faster startup)
             **kwargs: Additional parameters passed to provider.generate()
-                     (e.g., temperature, max_tokens, system_prompt)
+                     (e.g., system_prompt)
 
         Returns:
             WorkflowResult containing:
@@ -285,6 +285,8 @@ class ThinkDeepWorkflow(BaseWorkflow):
             )
             if failed:
                 logger.warning(f"Providers failed before success: {', '.join(failed)}")
+                emit_progress(f"Failed providers: {', '.join(failed)}")
+            emit_progress(f"Using provider: {used_provider}")
 
             logger.info(
                 f"Received investigation response from {used_provider}: "

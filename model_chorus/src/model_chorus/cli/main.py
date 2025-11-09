@@ -119,17 +119,6 @@ def chat(
         "--system",
         help="System prompt for context",
     ),
-    temperature: Optional[float] = typer.Option(
-        None,
-        "--temperature",
-        "-t",
-        help="Temperature for generation (0.0-1.0). Defaults to config or 0.7",
-    ),
-    max_tokens: Optional[int] = typer.Option(
-        None,
-        "--max-tokens",
-        help="Maximum tokens to generate",
-    ),
     output: Optional[Path] = typer.Option(
         None,
         "--output",
@@ -166,10 +155,6 @@ def chat(
         config = get_config()
         if provider is None:
             provider = config.get_default_provider('chat', 'claude')
-        if temperature is None:
-            temperature = config.get_workflow_default('chat', 'temperature', 0.7)
-        if max_tokens is None:
-            max_tokens = config.get_workflow_default('chat', 'max_tokens', None)
         if system is None:
             system = config.get_workflow_default('chat', 'system_prompt', None)
 
@@ -250,8 +235,6 @@ def chat(
                 files=files,
                 skip_provider_check=skip_provider_check,
                 system_prompt=system,
-                temperature=temperature,
-                max_tokens=max_tokens,
             )
         )
 
@@ -340,17 +323,6 @@ def argument(
         None,
         "--system",
         help="System prompt for context",
-    ),
-    temperature: float = typer.Option(
-        0.7,
-        "--temperature",
-        "-t",
-        help="Temperature for generation (0.0-1.0)",
-    ),
-    max_tokens: Optional[int] = typer.Option(
-        None,
-        "--max-tokens",
-        help="Maximum tokens to generate",
     ),
     output: Optional[Path] = typer.Option(
         None,
@@ -459,10 +431,6 @@ def argument(
         config = {}
         if system:
             config['system_prompt'] = system
-        if temperature is not None:
-            config['temperature'] = temperature
-        if max_tokens is not None:
-            config['max_tokens'] = max_tokens
 
         # Execute workflow
         result = asyncio.run(
@@ -559,17 +527,6 @@ def ideate(
         None,
         "--system",
         help="System prompt for context",
-    ),
-    temperature: float = typer.Option(
-        0.9,
-        "--temperature",
-        "-t",
-        help="Temperature for generation (0.0-1.0, higher = more creative)",
-    ),
-    max_tokens: Optional[int] = typer.Option(
-        None,
-        "--max-tokens",
-        help="Maximum tokens to generate",
     ),
     output: Optional[Path] = typer.Option(
         None,
@@ -678,12 +635,9 @@ def ideate(
         # Build config
         config = {
             'num_ideas': num_ideas,
-            'temperature': temperature,
         }
         if system:
             config['system_prompt'] = system
-        if max_tokens is not None:
-            config['max_tokens'] = max_tokens
 
         # Execute workflow
         result = asyncio.run(
@@ -766,17 +720,6 @@ def consensus(
         "--system",
         help="System prompt for context",
     ),
-    temperature: Optional[float] = typer.Option(
-        None,
-        "--temperature",
-        "-t",
-        help="Temperature for generation (0.0-1.0). Defaults to config or 0.7",
-    ),
-    max_tokens: Optional[int] = typer.Option(
-        None,
-        "--max-tokens",
-        help="Maximum tokens to generate",
-    ),
     timeout: Optional[float] = typer.Option(
         None,
         "--timeout",
@@ -808,10 +751,6 @@ def consensus(
             providers = config.get_default_providers('consensus', ['claude', 'gemini'])
         if strategy is None:
             strategy = config.get_workflow_default('consensus', 'strategy', 'all_responses')
-        if temperature is None:
-            temperature = config.get_workflow_default('consensus', 'temperature', 0.7)
-        if max_tokens is None:
-            max_tokens = config.get_workflow_default('consensus', 'max_tokens', None)
         if timeout is None:
             timeout = config.get_workflow_default('consensus', 'timeout', 120.0)
         if system is None:
@@ -856,8 +795,6 @@ def consensus(
         request = GenerationRequest(
             prompt=prompt,
             system_prompt=system,
-            temperature=temperature,
-            max_tokens=max_tokens,
         )
 
         # Execute workflow
@@ -982,11 +919,6 @@ def thinkdeep(
         "--files-checked",
         help="Comma-separated list of files examined",
     ),
-    temperature: Optional[float] = typer.Option(
-        None,
-        "--temperature",
-        help="Creativity level (0.0-1.0). Defaults to config or 0.7",
-    ),
     thinking_mode: Optional[str] = typer.Option(
         None,
         "--thinking-mode",
@@ -1036,8 +968,6 @@ def thinkdeep(
         config = get_config()
         if model is None:
             model = config.get_default_provider('thinkdeep', 'claude')
-        if temperature is None:
-            temperature = config.get_workflow_default('thinkdeep', 'temperature', 0.7)
         if thinking_mode is None:
             thinking_mode = config.get_workflow_default('thinkdeep', 'thinking_mode', 'medium')
 
@@ -1150,7 +1080,6 @@ def thinkdeep(
                 continuation_id=continuation_id,
                 files=files_list,
                 skip_provider_check=skip_provider_check,
-                temperature=temperature,
                 thinking_mode=thinking_mode,
             )
         )
