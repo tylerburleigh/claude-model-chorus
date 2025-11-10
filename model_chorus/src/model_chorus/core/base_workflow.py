@@ -361,6 +361,35 @@ class BaseWorkflow(ABC):
         """
         if not self.conversation_memory:
             return False
+
+        if content is None:
+            logger.warning(
+                "Skipping conversation message for workflow '%s' - content is None (role=%s, thread_id=%s)",
+                self.name,
+                role,
+                thread_id,
+            )
+            return False
+
+        if not isinstance(content, str):
+            logger.warning(
+                "Skipping conversation message for workflow '%s' - content has non-string type %s (role=%s, thread_id=%s)",
+                self.name,
+                type(content).__name__,
+                role,
+                thread_id,
+            )
+            return False
+
+        if not content.strip():
+            logger.warning(
+                "Skipping conversation message for workflow '%s' - blank content after stripping (role=%s, thread_id=%s)",
+                self.name,
+                role,
+                thread_id,
+            )
+            return False
+
         return self.conversation_memory.add_message(thread_id, role, content, **kwargs)
 
     def resume_conversation(self, thread_id: str) -> Optional[List[ConversationMessage]]:

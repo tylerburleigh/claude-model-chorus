@@ -55,6 +55,16 @@ model-chorus consensus "Should we use TypeScript or JavaScript?" \
   -p claude -p codex -s majority
 ```
 
+**Provider defaults:** The consensus workflow honors provider-level model preferences defined in `.model-chorusrc`. For example:
+
+```yaml
+providers:
+  gemini:
+    model: gemini-2.5-pro
+```
+
+Running `model-chorus consensus "Explain quantum computing" -p claude -p gemini -v` now prints `Applied model override for gemini: gemini-2.5-pro`, and the underlying Gemini CLI call receives the `-m gemini-2.5-pro` flag automatically. Adjust models permanently in the config file or override them ad hoc with the CLI's `--provider/-p` options when you need a different combination for a single run.
+
 **Strengths:**
 - ✅ Multiple expert perspectives
 - ✅ Reduces model bias

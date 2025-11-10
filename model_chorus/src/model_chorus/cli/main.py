@@ -8,7 +8,7 @@ import asyncio
 import json
 import sys
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Sequence, Tuple, Union
 
 import typer
 from rich.console import Console
@@ -36,6 +36,104 @@ app = typer.Typer(
     add_completion=False,
 )
 console = Console()
+
+
+def _find_project_root(start_path: Path) -> Path:
+    """Traverse upward from the starting path to locate the project root."""
+    for parent in start_path.parents:
+        if (parent / ".git").exists() or (parent / "pyproject.toml").exists():
+            return parent
+    # Fallback: use the top-most parent (filesystem root)
+    return start_path.parents[-1]
+
+
+PROJECT_ROOT = _find_project_root(Path(__file__).resolve())
+
+# Ordered list so that more specific mappings run before broader fallbacks.
+LEGACY_PATH_MAPPINGS: List[Tuple[Path, Path]] = [
+    (Path("src/claude_skills/sdd_toolkit"), Path("model_chorus/src/model_chorus")),
+    (Path("src/claude_skills"), Path("model_chorus/src/model_chorus")),
+]
+
+
+def _format_path_for_display(path: Path) -> str:
+    """Return a repository-relative path when possible for cleaner display."""
+    try:
+        return str(path.relative_to(PROJECT_ROOT))
+    except ValueError:
+        return str(path)
+
+
+def resolve_context_files(
+    files: Optional[Union[str, Sequence[str]]]
+) -> Tuple[List[str], List[str], List[str]]:
+    """Normalize and resolve context file paths with legacy mapping support.
+
+    Args:
+        files: Raw string (comma-separated) or iterable of file paths.
+
+    Returns:
+        Tuple containing:
+            resolved_paths: Paths that exist after normalization/mapping.
+            remapped_notices: Descriptions of legacy paths that were remapped.
+            missing_files: Original entries that could not be resolved.
+    """
+    if not files:
+        return [], [], []
+
+    if isinstance(files, str):
+        entries = [part.strip() for part in files.split(",") if part.strip()]
+    else:
+        entries = [str(item).strip() for item in files if str(item).strip()]
+
+    resolved_paths: List[str] = []
+    remapped_notices: List[str] = []
+    missing_files: List[str] = []
+    cwd = Path.cwd()
+
+    for original in entries:
+        normalized_str = original.strip()
+        normalized_path = Path(normalized_str.replace("\\", "/"))
+        raw_path = Path(normalized_str).expanduser()
+
+        candidate_paths = []
+        remapped_target: Optional[Path] = None
+
+        if raw_path.is_absolute():
+            candidate_paths.append(raw_path.resolve(strict=False))
+        else:
+            candidate_paths.append((PROJECT_ROOT / normalized_path).resolve(strict=False))
+            candidate_paths.append((cwd / normalized_path).resolve(strict=False))
+
+        for legacy_prefix, new_prefix in LEGACY_PATH_MAPPINGS:
+            try:
+                suffix = normalized_path.relative_to(legacy_prefix)
+            except ValueError:
+                continue
+
+            remapped_target = (PROJECT_ROOT / new_prefix / suffix).resolve(strict=False)
+            candidate_paths.insert(0, remapped_target)
+            break
+
+        unique_candidates: List[Path] = []
+        seen = set()
+        for candidate in candidate_paths:
+            key = candidate.as_posix()
+            if key not in seen:
+                seen.add(key)
+                unique_candidates.append(candidate)
+
+        existing_path = next((path for path in unique_candidates if path.exists()), None)
+
+        if existing_path:
+            display_path = _format_path_for_display(existing_path)
+            resolved_paths.append(display_path)
+            if remapped_target and existing_path == remapped_target and original != display_path:
+                remapped_notices.append(f"{original} -> {display_path}")
+        else:
+            missing_files.append(original)
+
+    return resolved_paths, remapped_notices, missing_files
 
 # Register study command group
 app.add_typer(study_app, name='study')
@@ -788,6 +886,20 @@ def consensus(
             default_timeout=timeout,
         )
 
+        # Apply provider-level metadata defaults (e.g., model overrides) from config
+        for provider_config in workflow.provider_configs:
+            provider_key = provider_config.provider.provider_name.lower()
+            override_model = config.get_provider_model(provider_key)
+            if override_model:
+                metadata = dict(provider_config.metadata) if provider_config.metadata else {}
+                if "model" not in metadata:
+                    metadata["model"] = override_model
+                    provider_config.metadata = metadata
+                    if verbose:
+                        console.print(
+                            f"[cyan]Applied model override for {provider_key}: {override_model}[/cyan]"
+                        )
+
         if verbose:
             console.print(f"[cyan]Workflow: {workflow}[/cyan]")
 
@@ -919,6 +1031,11 @@ def thinkdeep(
         "--files-checked",
         help="Comma-separated list of files examined",
     ),
+    relevant_files: Optional[str] = typer.Option(
+        None,
+        "--relevant-files",
+        help="Comma-separated list of files relevant to findings",
+    ),
     thinking_mode: Optional[str] = typer.Option(
         None,
         "--thinking-mode",
@@ -1047,12 +1164,25 @@ def thinkdeep(
         # Parse files_checked if provided
         files_list = None
         if files_checked:
-            files_list = [f.strip() for f in files_checked.split(',') if f.strip()]
-            # Validate files exist
-            for file_path in files_list:
-                if not Path(file_path).exists():
-                    console.print(f"[red]Error: File not found: {file_path}[/red]")
-                    raise typer.Exit(1)
+            resolved_files, remapped_files, missing_files = resolve_context_files(files_checked)
+            if remapped_files:
+                for notice in remapped_files:
+                    console.print(f"[cyan]Remapped legacy file path: {notice}[/cyan]")
+            if missing_files:
+                console.print(f"[yellow]Warning: Skipping missing context file(s): {', '.join(missing_files)}[/yellow]")
+            files_list = resolved_files or None
+
+        # Parse relevant files if provided
+        relevant_files_list = None
+        if relevant_files:
+            resolved_relevant, remapped_relevant, missing_relevant = resolve_context_files(relevant_files)
+            if remapped_relevant:
+                for notice in remapped_relevant:
+                    console.print(f"[cyan]Remapped relevant file path: {notice}[/cyan]")
+            if missing_relevant:
+                console.print(f"[red]Error: Relevant file(s) not found: {', '.join(missing_relevant)}[/red]")
+                raise typer.Exit(1)
+            relevant_files_list = resolved_relevant or None
 
         # Display investigation info
         console.print(f"\n[bold cyan]{'Continuing' if continuation_id else 'Starting'} ThinkDeep Investigation[/bold cyan]")
@@ -1065,6 +1195,8 @@ def thinkdeep(
             console.print(f"Thread ID: {continuation_id}")
         if files_list:
             console.print(f"Files: {', '.join(files_list)}")
+        if relevant_files_list:
+            console.print(f"Relevant files: {', '.join(relevant_files_list)}")
         console.print()
 
         # Run async workflow with multi-step parameters
@@ -1079,6 +1211,7 @@ def thinkdeep(
                 confidence=confidence,
                 continuation_id=continuation_id,
                 files=files_list,
+                relevant_files=relevant_files_list,
                 skip_provider_check=skip_provider_check,
                 thinking_mode=thinking_mode,
             )
@@ -1100,6 +1233,12 @@ def thinkdeep(
             console.print(f"[cyan]Findings:[/cyan] {findings}")
             if files_list:
                 console.print(f"[cyan]Files Examined:[/cyan] {len(files_list)}")
+            relevant_files_this_step = result.metadata.get('relevant_files_this_step') or []
+            if relevant_files_this_step:
+                console.print(f"[cyan]Relevant Files (this step):[/cyan] {', '.join(relevant_files_this_step)}")
+            cumulative_relevant_files = result.metadata.get('relevant_files') or []
+            if cumulative_relevant_files:
+                console.print(f"[cyan]Relevant Files (cumulative):[/cyan] {', '.join(cumulative_relevant_files)}")
             console.print()
 
             # Show response
@@ -1133,6 +1272,11 @@ def thinkdeep(
                 }
                 if files_list:
                     output_data["files"] = files_list
+                if relevant_files_this_step:
+                    output_data["relevant_files_this_step"] = relevant_files_this_step
+                cumulative_relevant_files = result.metadata.get('relevant_files') or []
+                if cumulative_relevant_files:
+                    output_data["relevant_files"] = cumulative_relevant_files
                 if use_assistant_model and len(result.steps) > 1:
                     output_data["expert_validation"] = result.steps[-1].content
 

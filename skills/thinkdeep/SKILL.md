@@ -406,7 +406,7 @@ model-chorus thinkdeep --step "Investigate why API latency increased from 100ms 
 - `--session-id`: Resume previous investigation
 - `--hypothesis`: Current working theory
 - `--confidence`: Confidence level (exploring, low, medium, high, very_high, almost_certain, certain)
-- `--files-checked`: List of files examined
+  - `--files-checked`: List of files examined (legacy `src/claude_skills/...` paths are remapped automatically; missing files emit warnings and are skipped)
 - `--thinking-mode`: Reasoning depth (minimal, low, medium, high, max)
 
 ## Technical Contract
@@ -427,8 +427,8 @@ model-chorus thinkdeep --step "Investigate why API latency increased from 100ms 
 - `--session-id` (string): Session ID to resume previous investigation - Format: `thinkdeep-{uuid}` - Maintains full investigation history
 - `--hypothesis` (string): Current working theory about the problem - Should evolve as evidence accumulates - Can be revised or replaced in subsequent steps
 - `--confidence` (string): Confidence level in current hypothesis - Valid values: `exploring`, `low`, `medium`, `high`, `very_high`, `almost_certain`, `certain` - Default: `exploring` - Should increase as evidence strengthens
-- `--files-checked` (string): Comma-separated list of files examined - Tracks investigation scope - Format: `file1.py,file2.js,file3.go`
-- `--relevant-files` (string): Comma-separated list of files relevant to findings - Files identified as related to the problem - Format: `src/auth.py,tests/test_auth.py`
+  - `--files-checked` (string): Comma-separated list of files examined - Tracks investigation scope - Format: `file1.py,file2.js,file3.go` - Legacy `src/claude_skills/...` paths remap to current locations; unresolved entries issue warnings and are skipped
+- `--relevant-files` (string): Comma-separated list of files relevant to findings - Files identified as related to the problem - Format: `src/auth.py,tests/test_auth.py` - Paths are resolved using the same legacy mapping; unresolved entries cause a CLI error rather than being silently ignored
 - `--relevant-context` (string): Comma-separated list of methods/functions involved - Specific code locations identified - Format: `authenticate,validate_token,check_permissions`
 - `--issues-found` (string): JSON array of issues with severity levels - Format: `[{"severity":"high","description":"..."},...]`
 - `--thinking-mode` (string): Reasoning depth for investigation - Valid values: `minimal`, `low`, `medium`, `high`, `max` - Default: `medium` - Higher modes for complex problems
@@ -483,6 +483,7 @@ The THINKDEEP workflow returns a JSON object with the following structure:
 | `metadata.findings` | string | Cumulative findings and evidence from this step |
 | `metadata.files_checked` | array[string] | List of files examined during investigation |
 | `metadata.relevant_files` | array[string] | Files identified as relevant to the problem |
+| `metadata.relevant_files_this_step` | array[string] | Relevant files supplied for the current step (validated paths) |
 | `metadata.relevant_context` | array[string] | Methods/functions identified as involved in the issue |
 | `metadata.issues_found` | array[object] | Issues discovered with severity levels and descriptions |
 | `metadata.thinking_mode` | string | Reasoning depth used (`minimal`, `low`, `medium`, `high`, `max`) |

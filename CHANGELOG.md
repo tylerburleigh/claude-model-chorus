@@ -5,6 +5,15 @@ All notable changes to ModelChorus will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.1] - 2025-11-10
+
+### Added
+- ThinkDeep workflow now accepts an optional `relevant_files` list, folding explicitly supplied paths into investigation state, prompts, and metadata (`relevant_files_this_step`, `relevant_files`).
+- `model-chorus thinkdeep` surfaces a `--relevant-files` option that validates paths (including legacy remapping) and mirrors the new metadata fields in console output and JSON exports.
+
+### Changed
+- ThinkDeep CLI now remaps known legacy context file paths (e.g. `src/claude_skills/...`) to current locations and skips unresolved files with warnings instead of exiting.
+
 ## [0.5.0] - 2025-11-08
 
 ### Removed
