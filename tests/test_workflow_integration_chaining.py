@@ -8,9 +8,18 @@ demonstrating ModelChorus's orchestration capabilities:
 - Continuation ID management across workflow types
 """
 
-import pytest
-from unittest.mock import AsyncMock, patch
+import sys
 import uuid
+from pathlib import Path
+from unittest.mock import AsyncMock, patch
+
+import pytest
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+SOURCE_ROOT = REPO_ROOT / "model_chorus" / "src"
+source_root_str = str(SOURCE_ROOT)
+if source_root_str not in sys.path:
+    sys.path.insert(0, source_root_str)
 
 from model_chorus.workflows.consensus import ConsensusWorkflow, ConsensusStrategy
 from model_chorus.workflows.thinkdeep import ThinkDeepWorkflow
@@ -35,6 +44,7 @@ class TestConsensusThinkDeepChatChaining:
         provider = AsyncMock()
         provider.provider_name = "test_provider"
         provider.validate_api_key.return_value = True
+        provider.check_availability = AsyncMock(return_value=(True, None))
         return provider
 
     @pytest.fixture
@@ -43,6 +53,7 @@ class TestConsensusThinkDeepChatChaining:
         provider = AsyncMock()
         provider.provider_name = "test_provider_2"
         provider.validate_api_key.return_value = True
+        provider.check_availability = AsyncMock(return_value=(True, None))
         return provider
 
     @pytest.fixture

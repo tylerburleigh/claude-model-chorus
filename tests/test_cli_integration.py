@@ -6,11 +6,24 @@ with various parameters, options, and error conditions.
 """
 
 import json
+import importlib
+import sys
 import pytest
 from pathlib import Path
 from typer.testing import CliRunner
 from unittest.mock import AsyncMock, MagicMock, patch, mock_open
 
+REPO_ROOT = Path(__file__).resolve().parents[1]
+SOURCE_ROOT = REPO_ROOT / "model_chorus" / "src"
+source_root_str = str(SOURCE_ROOT)
+inserted_source_path = False
+if source_root_str not in sys.path:
+    sys.path.insert(0, source_root_str)
+    inserted_source_path = True
+
+cli_main = importlib.import_module("model_chorus.cli.main")
+if inserted_source_path and sys.path[0] == source_root_str:
+    sys.path.pop(0)
 from model_chorus.cli.main import app
 from model_chorus.providers.base_provider import GenerationResponse
 from model_chorus.core.base_workflow import WorkflowResult, WorkflowStep
@@ -62,7 +75,9 @@ def mock_workflow_result():
             "is_continuation": False,
             "conversation_length": 1,
             "model": "test-model",
-            "usage": {"total_tokens": 30}
+            "usage": {"total_tokens": 30},
+            "relevant_files": [],
+            "relevant_files_this_step": []
         },
         error=None,
     )
@@ -499,6 +514,176 @@ class TestIdeateCommand:
 
         assert output_data['success'] is True
         assert 'ideas' in output_data
+
+
+# THINKDEEP command tests
+class TestThinkDeepCommand:
+    """Test suite for 'thinkdeep' CLI command."""
+
+    @patch('model_chorus.cli.main.get_provider_by_name')
+    @patch('model_chorus.cli.main.ThinkDeepWorkflow')
+    def test_thinkdeep_missing_legacy_file_warns_and_continues(
+        self,
+        mock_workflow_class,
+        mock_get_provider,
+        cli_runner,
+        mock_provider,
+        mock_workflow_result
+    ):
+        """Missing legacy path should warn but continue execution."""
+        mock_get_provider.return_value = mock_provider
+        mock_workflow = MagicMock()
+        mock_workflow.run = AsyncMock(return_value=mock_workflow_result)
+        mock_workflow_class.return_value = mock_workflow
+
+        result = cli_runner.invoke(
+            app,
+            [
+                "thinkdeep",
+                "--step", "Investigate legacy path failure",
+                "--step-number", "1",
+                "--total-steps", "1",
+                "--findings", "Reproduced error",
+                "--files-checked", "src/claude_skills/sdd_toolkit/core/options.py",
+                "--skip-provider-check",
+            ],
+        )
+
+        assert result.exit_code == 0
+        assert "Warning: Skipping missing context file(s)" in result.stdout
+        assert "src/claude_skills/sdd_toolkit/core/options.py" in result.stdout
+        call_kwargs = mock_workflow.run.call_args[1]
+        assert call_kwargs['files'] is None
+
+    @patch('model_chorus.cli.main.get_provider_by_name')
+    @patch('model_chorus.cli.main.ThinkDeepWorkflow')
+    def test_thinkdeep_remaps_legacy_file(
+        self,
+        mock_workflow_class,
+        mock_get_provider,
+        cli_runner,
+        mock_provider,
+        mock_workflow_result,
+        tmp_path,
+        monkeypatch
+    ):
+        """Legacy path should be remapped to new location when available."""
+        mock_get_provider.return_value = mock_provider
+        mock_workflow = MagicMock()
+        mock_workflow.run = AsyncMock(return_value=mock_workflow_result)
+        mock_workflow_class.return_value = mock_workflow
+
+        # Prepare remapped file structure inside temporary repo root
+        repo_root = tmp_path
+        target_dir = repo_root / "model_chorus" / "src" / "model_chorus" / "core"
+        target_dir.mkdir(parents=True)
+        target_file = target_dir / "options.py"
+        target_file.write_text("# test file")
+
+        # Point helper to temporary root for this test
+        monkeypatch.setattr(cli_main, "PROJECT_ROOT", repo_root)
+
+        result = cli_runner.invoke(
+            app,
+            [
+                "thinkdeep",
+                "--step", "Investigate remapped path",
+                "--step-number", "1",
+                "--total-steps", "1",
+                "--findings", "Checking remap",
+                "--files-checked", "src/claude_skills/sdd_toolkit/core/options.py",
+                "--skip-provider-check",
+            ],
+        )
+
+        assert result.exit_code == 0
+        assert "Remapped legacy file path" in result.stdout
+        assert "src/claude_skills/sdd_toolkit/core/options.py" in result.stdout
+        assert "model_chorus/src/model_chorus/core/options.py" in result.stdout
+        call_kwargs = mock_workflow.run.call_args[1]
+        assert call_kwargs['files'] == ["model_chorus/src/model_chorus/core/options.py"]
+
+    @patch('model_chorus.cli.main.get_provider_by_name')
+    @patch('model_chorus.cli.main.ThinkDeepWorkflow')
+    def test_thinkdeep_relevant_files_option(
+        self,
+        mock_workflow_class,
+        mock_get_provider,
+        cli_runner,
+        mock_provider,
+        mock_workflow_result,
+        tmp_path,
+        monkeypatch
+    ):
+        """Providing --relevant-files should validate, display, and pass through paths."""
+        mock_get_provider.return_value = mock_provider
+        mock_workflow = MagicMock()
+        mock_workflow.run = AsyncMock(return_value=mock_workflow_result)
+        mock_workflow_class.return_value = mock_workflow
+
+        repo_root = tmp_path
+        relevant_dir = repo_root / "src"
+        relevant_dir.mkdir(parents=True)
+        relevant_file = relevant_dir / "module.py"
+        relevant_file.write_text("# relevant file")
+
+        monkeypatch.setattr(cli_main, "PROJECT_ROOT", repo_root)
+
+        mock_workflow_result.metadata["relevant_files_this_step"] = ["src/module.py"]
+        mock_workflow_result.metadata["relevant_files"] = ["src/module.py"]
+
+        result = cli_runner.invoke(
+            app,
+            [
+                "thinkdeep",
+                "--step", "Investigate regression",
+                "--step-number", "1",
+                "--total-steps", "1",
+                "--findings", "Initial triage",
+                "--relevant-files", "src/module.py",
+                "--skip-provider-check",
+            ],
+        )
+
+        assert result.exit_code == 0
+        assert "Relevant files: src/module.py" in result.stdout
+        assert "Relevant Files (this step): src/module.py" in result.stdout
+        assert "Relevant Files (cumulative): src/module.py" in result.stdout
+        call_kwargs = mock_workflow.run.call_args[1]
+        assert call_kwargs['relevant_files'] == ["src/module.py"]
+
+    @patch('model_chorus.cli.main.get_provider_by_name')
+    @patch('model_chorus.cli.main.ThinkDeepWorkflow')
+    def test_thinkdeep_relevant_files_missing_errors(
+        self,
+        mock_workflow_class,
+        mock_get_provider,
+        cli_runner,
+        mock_provider,
+        mock_workflow_result
+    ):
+        """Missing relevant files should surface an actionable error."""
+        mock_get_provider.return_value = mock_provider
+        mock_workflow = MagicMock()
+        mock_workflow.run = AsyncMock(return_value=mock_workflow_result)
+        mock_workflow_class.return_value = mock_workflow
+
+        result = cli_runner.invoke(
+            app,
+            [
+                "thinkdeep",
+                "--step", "Investigate regression",
+                "--step-number", "1",
+                "--total-steps", "1",
+                "--findings", "Initial triage",
+                "--relevant-files", "missing/file.py",
+                "--skip-provider-check",
+            ],
+        )
+
+        assert result.exit_code == 1
+        assert "Relevant file(s) not found" in result.stdout
+        mock_workflow.run.assert_not_called()
 
 
 # Edge cases and error handling

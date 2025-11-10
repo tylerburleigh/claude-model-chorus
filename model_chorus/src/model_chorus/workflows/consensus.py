@@ -9,7 +9,7 @@ and reliability.
 import asyncio
 import logging
 from typing import List, Dict, Any, Optional
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from enum import Enum
 
 from ..providers import (
@@ -155,9 +155,20 @@ class ConsensusWorkflow:
             logger.info(f"Executing provider: {provider_name}")
             emit_provider_start(provider_name)
 
+            base_metadata = dict(request.metadata) if request.metadata else {}
+            provider_metadata = config.metadata or {}
+            merged_metadata = (
+                {**provider_metadata, **base_metadata}
+                if provider_metadata
+                else base_metadata
+            )
+            # Clone the request per provider so model overrides and future metadata
+            # customizations apply without mutating the shared request object.
+            provider_request = replace(request, metadata=merged_metadata)
+
             # Execute with timeout
             response = await asyncio.wait_for(
-                config.provider.generate(request),
+                config.provider.generate(provider_request),
                 timeout=config.timeout,
             )
 

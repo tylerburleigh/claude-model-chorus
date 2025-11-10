@@ -35,6 +35,7 @@ class TestInvestigationStepExecution:
         provider = AsyncMock()
         provider.provider_name = "test_provider"
         provider.validate_api_key.return_value = True
+        provider.check_availability = AsyncMock(return_value=(True, ""))
         return provider
 
     @pytest.fixture
@@ -43,6 +44,7 @@ class TestInvestigationStepExecution:
         provider = AsyncMock()
         provider.provider_name = "expert_provider"
         provider.validate_api_key.return_value = True
+        provider.check_availability = AsyncMock(return_value=(True, ""))
         return provider
 
     @pytest.fixture
@@ -253,6 +255,84 @@ class TestInvestigationStepExecution:
         # Verify files also tracked in state.relevant_files
         for file_path in files_to_check:
             assert file_path in state.relevant_files
+
+    @pytest.mark.asyncio
+    async def test_relevant_files_merge_into_state_and_metadata(
+        self, mock_provider, conversation_memory
+    ):
+        """Explicitly supplied relevant files should be tracked and deduplicated."""
+        mock_provider.generate.side_effect = [
+            GenerationResponse(
+                content="Initial investigation synthesis.",
+                model="test-model",
+                usage={"input_tokens": 25, "output_tokens": 40},
+                stop_reason="end_turn"
+            ),
+            GenerationResponse(
+                content="Follow-up investigation synthesis.",
+                model="test-model",
+                usage={"input_tokens": 30, "output_tokens": 45},
+                stop_reason="end_turn"
+            ),
+        ]
+
+        workflow = ThinkDeepWorkflow(
+            provider=mock_provider,
+            conversation_memory=conversation_memory
+        )
+
+        # Step 1: Provide relevant files without opening them
+        result1 = await workflow.run(
+            step="Scope regression impact",
+            step_number=1,
+            total_steps=2,
+            next_step_required=True,
+            findings="Identified two modules to review.",
+            confidence="exploring",
+            files=None,
+            relevant_files=[
+                "src/api.py",
+                "tests/test_api.py",
+                "src/api.py",  # duplicate should be removed
+            ],
+        )
+
+        assert result1.success is True
+        assert result1.metadata["relevant_files_this_step"] == ["src/api.py", "tests/test_api.py"]
+
+        first_prompt: GenerationRequest = mock_provider.generate.call_args_list[0][0][0]
+        assert "Additional Relevant Files Referenced This Step" in first_prompt.prompt
+        assert "src/api.py" in first_prompt.prompt
+        assert "tests/test_api.py" in first_prompt.prompt
+
+        thread_id = result1.metadata["thread_id"]
+        state_after_step_1 = workflow.get_investigation_state(thread_id)
+        assert state_after_step_1.relevant_files == ["src/api.py", "tests/test_api.py"]
+
+        # Step 2: Provide overlapping files via both inputs to ensure deduplication
+        result2 = await workflow.run(
+            step="Validate hypothesis with targeted checks",
+            step_number=2,
+            total_steps=2,
+            next_step_required=False,
+            findings="Confirmed impact is isolated.",
+            confidence="medium",
+            continuation_id=thread_id,
+            files=["src/api.py"],
+            relevant_files=["tests/test_api.py", "src/services/auth.py"],
+        )
+
+        assert result2.success is True
+        assert result2.metadata["relevant_files_this_step"] == ["tests/test_api.py", "src/services/auth.py"]
+
+        final_state = workflow.get_investigation_state(thread_id)
+        assert final_state.relevant_files == [
+            "src/api.py",
+            "tests/test_api.py",
+            "src/services/auth.py",
+        ]
+        assert result2.metadata["relevant_files"] == final_state.relevant_files
+        assert result2.metadata["total_files_examined"] == len(final_state.relevant_files)
 
     @pytest.mark.asyncio
     async def test_investigation_step_with_no_files(
@@ -565,6 +645,42 @@ Recommended action: Implement LRU eviction policy with maximum size limit."""
         assert result.success is False
         assert result.error == "API timeout"
         assert "thread_id" in result.metadata
+
+    @pytest.mark.asyncio
+    async def test_empty_provider_response_reports_error(
+        self, mock_provider, conversation_memory
+    ):
+        """Provider empty response should surface error without storing assistant message."""
+        mock_provider.generate.return_value = GenerationResponse(
+            content="",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn"
+        )
+
+        workflow = ThinkDeepWorkflow(
+            provider=mock_provider,
+            conversation_memory=conversation_memory
+        )
+
+        result = await workflow.run(
+            step="Investigate empty response scenario",
+            step_number=1,
+            total_steps=1,
+            next_step_required=False,
+            findings="Initial findings",
+            skip_provider_check=True
+        )
+
+        assert result.success is False
+        assert result.error == "Provider 'test_provider' returned an empty response"
+        assert "thread_id" in result.metadata
+
+        thread = conversation_memory.get_thread(result.metadata["thread_id"])
+        assert thread is not None
+        assert len(thread.messages) == 0
+
+        mock_provider.generate.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_investigation_without_conversation_memory(

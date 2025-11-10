@@ -141,6 +141,7 @@ class ThinkDeepWorkflow(BaseWorkflow):
         confidence: str = "exploring",
         continuation_id: Optional[str] = None,
         files: Optional[List[str]] = None,
+        relevant_files: Optional[List[str]] = None,
         thinking_mode: str = "medium",
         skip_provider_check: bool = False,
         **kwargs
@@ -206,7 +207,8 @@ class ThinkDeepWorkflow(BaseWorkflow):
             f"Starting ThinkDeep investigation step {step_number}/{total_steps} - "
             f"continuation: {continuation_id is not None}, "
             f"confidence: {confidence}, "
-            f"files: {len(files) if files else 0}"
+            f"files: {len(files) if files else 0}, "
+            f"relevant_files: {len(relevant_files) if relevant_files else 0}"
         )
 
         # Check provider availability
@@ -263,6 +265,7 @@ class ThinkDeepWorkflow(BaseWorkflow):
                 thread_id=thread_id,
                 state=state,
                 files=files,
+                relevant_files=relevant_files,
                 thinking_mode=thinking_mode
             )
 
@@ -298,11 +301,12 @@ class ThinkDeepWorkflow(BaseWorkflow):
                 user_message = f"Step {step_number}/{total_steps}: {step}\nFindings: {findings}"
                 if hypothesis:
                     user_message += f"\nHypothesis: {hypothesis}"
+                message_files = self._merge_file_lists(files, relevant_files)
                 self.add_message(
                     thread_id,
                     "user",
                     user_message,
-                    files=files,
+                    files=message_files or None,
                     workflow_name=self.name,
                     model_provider=self.provider.provider_name
                 )
@@ -350,8 +354,9 @@ class ThinkDeepWorkflow(BaseWorkflow):
                     state.hypotheses.append(new_hyp)
 
             # Track files examined
-            if files:
-                for file in files:
+            combined_files = self._merge_file_lists(files, relevant_files)
+            if combined_files:
+                for file in combined_files:
                     if file not in state.relevant_files:
                         state.relevant_files.append(file)
 
@@ -397,7 +402,9 @@ class ThinkDeepWorkflow(BaseWorkflow):
                 'files_examined_this_step': len(files) if files else 0,
                 'total_files_examined': len(state.relevant_files),
                 'total_hypotheses': len(state.hypotheses),
-                'expert_validation_performed': expert_validation is not None
+                'expert_validation_performed': expert_validation is not None,
+                'relevant_files_this_step': self._merge_file_lists(None, relevant_files),
+                'relevant_files': list(state.relevant_files)
             })
 
             logger.info(f"ThinkDeep investigation step {step_number}/{total_steps} completed for thread: {thread_id}")
@@ -461,6 +468,29 @@ class ThinkDeepWorkflow(BaseWorkflow):
         thread.state['thinkdeep'] = state.model_dump()
         self.conversation_memory._save_thread(thread)
 
+    @staticmethod
+    def _merge_file_lists(
+        files: Optional[List[str]],
+        relevant_files: Optional[List[str]]
+    ) -> List[str]:
+        """
+        Merge and deduplicate file paths from the examined files list and the
+        relevant files list while preserving order.
+
+        Args:
+            files: Files directly examined in this step
+            relevant_files: Additional files identified as relevant
+
+        Returns:
+            Combined list of unique file paths
+        """
+        merged: List[str] = []
+        for source_list in (files or []), (relevant_files or []):
+            for file_path in source_list:
+                if file_path and file_path not in merged:
+                    merged.append(file_path)
+        return merged
+
     def _build_investigation_prompt(
         self,
         step: str,
@@ -472,6 +502,7 @@ class ThinkDeepWorkflow(BaseWorkflow):
         thread_id: str,
         state: ThinkDeepState,
         files: Optional[List[str]] = None,
+        relevant_files: Optional[List[str]] = None,
         thinking_mode: str = "medium"
     ) -> str:
         """
@@ -487,6 +518,7 @@ class ThinkDeepWorkflow(BaseWorkflow):
             thread_id: Thread ID to load history from
             state: Current investigation state
             files: Optional list of file paths to include in context
+            relevant_files: Optional list of additional relevant file paths provided
             thinking_mode: Reasoning depth
 
         Returns:
@@ -521,6 +553,16 @@ class ThinkDeepWorkflow(BaseWorkflow):
                 context_parts.append(f" (and {len(state.relevant_files) - 10} more)")
             context_parts.append("\n")
 
+        if relevant_files:
+            additional_files = []
+            for file_path in relevant_files:
+                if file_path not in additional_files:
+                    additional_files.append(file_path)
+            if additional_files:
+                context_parts.append("\n## Additional Relevant Files Referenced This Step\n")
+                context_parts.append(", ".join(additional_files))
+                context_parts.append("\n")
+
         # Add file contents if provided for this step
         if files:
             context_parts.append("\n## Files for Analysis in This Step\n")
@@ -550,6 +592,7 @@ class ThinkDeepWorkflow(BaseWorkflow):
             f"step {step_number}/{total_steps}, "
             f"confidence: {confidence}, "
             f"files: {len(files) if files else 0}, "
+            f"relevant_files: {len(relevant_files) if relevant_files else 0}, "
             f"total length: {len(full_prompt)}"
         )
 
