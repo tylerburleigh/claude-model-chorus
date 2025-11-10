@@ -116,7 +116,7 @@ class CodexProvider(CLIProvider):
         Build the CLI command for a Codex generation request.
 
         Constructs a command like:
-            codex exec --json --model gpt4 --sandbox read-only --ask-for-approval never "..."
+            codex exec --json --model gpt4 --sandbox read-only "..."
 
         Args:
             request: GenerationRequest containing prompt and parameters
@@ -130,10 +130,8 @@ class CodexProvider(CLIProvider):
         command.append("--json")
 
         # Add read-only sandbox mode for security
+        # NOTE: --sandbox read-only in exec mode runs non-interactively without approval prompts
         command.extend(["--sandbox", "read-only"])
-
-        # Disable approval prompts for non-interactive operation
-        command.extend(["--ask-for-approval", "never"])
 
         # Add model from metadata if specified
         if "model" in request.metadata:
