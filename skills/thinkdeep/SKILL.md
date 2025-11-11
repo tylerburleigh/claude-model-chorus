@@ -403,7 +403,7 @@ model-chorus thinkdeep --step "Investigate why API latency increased from 100ms 
 
 **Optional Parameters:**
 - `--provider`: AI provider to use (claude, gemini, codex, cursor-agent; default: claude)
-- `--session-id`: Resume previous investigation
+- `--continuation-id` / `--continue` / `-c` / `--session-id`: Resume previous investigation (all aliases work identically)
 - `--hypothesis`: Current working theory
 - `--confidence`: Confidence level (exploring, low, medium, high, very_high, almost_certain, certain)
   - `--files-checked`: List of files examined (legacy `src/claude_skills/...` paths are remapped automatically; missing files emit warnings and are skipped)
@@ -424,7 +424,7 @@ model-chorus thinkdeep --step "Investigate why API latency increased from 100ms 
 
 **Optional:**
 - `--provider` (string): AI provider to use for investigation - Valid values: `claude`, `gemini`, `codex`, `cursor-agent` - Default: `claude`
-- `--session-id` (string): Session ID to resume previous investigation - Format: `thinkdeep-{uuid}` - Maintains full investigation history
+- `--continuation-id` / `--continue` / `-c` / `--session-id` (string): Session ID to resume previous investigation - All aliases work identically - Format: `thinkdeep-{uuid}` - Maintains full investigation history
 - `--hypothesis` (string): Current working theory about the problem - Should evolve as evidence accumulates - Can be revised or replaced in subsequent steps
 - `--confidence` (string): Confidence level in current hypothesis - Valid values: `exploring`, `low`, `medium`, `high`, `very_high`, `almost_certain`, `certain` - Default: `exploring` - Should increase as evidence strengthens
   - `--files-checked` (string): Comma-separated list of files examined - Tracks investigation scope - Format: `file1.py,file2.js,file3.go` - Legacy `src/claude_skills/...` paths remap to current locations; unresolved entries issue warnings and are skipped
@@ -694,7 +694,7 @@ model-chorus thinkdeep --session-id "sec-audit-001" --step "Verify vulnerability
 - Losing track of what's been examined
 
 **Solutions:**
-- Always use `--session-id` for multi-step investigations
+- Always use `--continuation-id` (or `--continue`/`-c`/`--session-id`) for multi-step investigations
 - Include comprehensive findings in each step
 - Reference earlier findings explicitly: "Building on Step 2's discovery of X..."
 - Use `--files-checked` to track examination history

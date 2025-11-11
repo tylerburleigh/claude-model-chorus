@@ -58,7 +58,7 @@ The command returns a conversational response explaining the topic. The response
 
 | Option | Short | Default | Description |
 |--------|-------|---------|-------------|
-| `--continue` | `-c` | None | Thread ID to continue conversation |
+| `--continue` / `--session-id` | `-c` | None | Thread ID to continue conversation (both aliases work identically) |
 | `--file` | `-f` | None | File paths for context (repeatable) |
 | `--system` | | None | Additional system prompt |
 | `--output` | `-o` | None | Save result to JSON file |
@@ -72,7 +72,7 @@ The command returns a conversational response explaining the topic. The response
 - `prompt` (string): The conversation prompt or question to send to the AI model
 
 **Optional:**
-- `--continue, -c` (string): Thread ID to continue an existing conversation - Format: `thread-{uuid}` - Maintains full conversation history
+- `--continue` / `-c` / `--session-id` (string): Thread ID to continue an existing conversation - All aliases work identically - Format: `thread-{uuid}` - Maintains full conversation history
 - `--file, -f` (string, repeatable): File paths to include as context - Can be specified multiple times - Files must exist before execution
 - `--system` (string): Additional system prompt to customize model behavior
 - `--output, -o` (string): Path to save JSON output file - Creates or overwrites file at specified path

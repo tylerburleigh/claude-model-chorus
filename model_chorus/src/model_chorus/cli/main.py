@@ -173,8 +173,16 @@ def get_install_command(provider: str) -> str:
     return commands.get(provider.lower(), "See provider documentation")
 
 
-def get_provider_by_name(name: str):
-    """Get provider instance by name."""
+def get_provider_by_name(name: str, timeout: int = 120):
+    """Get provider instance by name.
+
+    Args:
+        name: Provider name (claude, gemini, codex, cursor-agent)
+        timeout: Timeout in seconds for provider operations (default: 120)
+
+    Returns:
+        Provider instance
+    """
     providers = {
         "claude": ClaudeProvider,
         "codex": CodexProvider,
@@ -188,7 +196,7 @@ def get_provider_by_name(name: str):
         console.print(f"Available providers: {', '.join(providers.keys())}")
         raise typer.Exit(1)
 
-    return provider_class()
+    return provider_class(timeout=timeout)
 
 
 @app.command()
@@ -204,6 +212,7 @@ def chat(
         None,
         "--continue",
         "-c",
+        "--session-id",
         help="Thread ID to continue an existing conversation",
     ),
     files: Optional[List[str]] = typer.Option(
@@ -256,12 +265,15 @@ def chat(
         if system is None:
             system = config.get_workflow_default('chat', 'system_prompt', None)
 
+        # Read timeout from config
+        timeout = config.get_workflow_default('chat', 'timeout', 120.0)
+
         # Create provider instance
         if verbose:
             console.print(f"[cyan]Initializing provider: {provider}[/cyan]")
 
         try:
-            provider_instance = get_provider_by_name(provider)
+            provider_instance = get_provider_by_name(provider, timeout=int(timeout))
             if verbose:
                 console.print(f"[green]✓ {provider} initialized[/green]")
         except ProviderUnavailableError as e:
@@ -287,7 +299,7 @@ def chat(
 
         for fallback_name in fallback_provider_names:
             try:
-                fallback_instance = get_provider_by_name(fallback_name)
+                fallback_instance = get_provider_by_name(fallback_name, timeout=int(timeout))
                 fallback_providers.append(fallback_instance)
                 if verbose:
                     console.print(f"[green]✓ {fallback_name} initialized (fallback)[/green]")
@@ -409,6 +421,7 @@ def argument(
         None,
         "--continue",
         "-c",
+        "--session-id",
         help="Thread ID to continue an existing conversation",
     ),
     files: Optional[List[str]] = typer.Option(
@@ -462,12 +475,15 @@ def argument(
         if provider is None:
             provider = config.get_default_provider('argument', 'claude')
 
+        # Read timeout from config
+        timeout = config.get_workflow_default('argument', 'timeout', 120.0)
+
         # Create provider instance
         if verbose:
             console.print(f"[cyan]Initializing provider: {provider}[/cyan]")
 
         try:
-            provider_instance = get_provider_by_name(provider)
+            provider_instance = get_provider_by_name(provider, timeout=int(timeout))
             if verbose:
                 console.print(f"[green]✓ {provider} initialized[/green]")
         except ProviderUnavailableError as e:
@@ -493,7 +509,7 @@ def argument(
 
         for fallback_name in fallback_provider_names:
             try:
-                fallback_instance = get_provider_by_name(fallback_name)
+                fallback_instance = get_provider_by_name(fallback_name, timeout=int(timeout))
                 fallback_providers.append(fallback_instance)
                 if verbose:
                     console.print(f"[green]✓ {fallback_name} initialized (fallback)[/green]")
@@ -607,6 +623,7 @@ def ideate(
         None,
         "--continue",
         "-c",
+        "--session-id",
         help="Thread ID to continue an existing ideation session",
     ),
     files: Optional[List[str]] = typer.Option(
@@ -666,12 +683,15 @@ def ideate(
         if provider is None:
             provider = config.get_default_provider('ideate', 'claude')
 
+        # Read timeout from config
+        timeout = config.get_workflow_default('ideate', 'timeout', 120.0)
+
         # Create provider instance
         if verbose:
             console.print(f"[cyan]Initializing provider: {provider}[/cyan]")
 
         try:
-            provider_instance = get_provider_by_name(provider)
+            provider_instance = get_provider_by_name(provider, timeout=int(timeout))
             if verbose:
                 console.print(f"[green]✓ {provider} initialized[/green]")
         except ProviderUnavailableError as e:
@@ -697,7 +717,7 @@ def ideate(
 
         for fallback_name in fallback_provider_names:
             try:
-                fallback_instance = get_provider_by_name(fallback_name)
+                fallback_instance = get_provider_by_name(fallback_name, timeout=int(timeout))
                 fallback_providers.append(fallback_instance)
                 if verbose:
                     console.print(f"[green]✓ {fallback_name} initialized (fallback)[/green]")
@@ -1013,7 +1033,7 @@ def thinkdeep(
     ),
     continuation_id: Optional[str] = typer.Option(
         None,
-        "--continuation-id",
+        "--continuation-id", "--continue", "-c", "--session-id",
         help="Resume previous investigation thread",
     ),
     hypothesis: Optional[str] = typer.Option(
@@ -1088,6 +1108,9 @@ def thinkdeep(
         if thinking_mode is None:
             thinking_mode = config.get_workflow_default('thinkdeep', 'thinking_mode', 'medium')
 
+        # Read timeout from config
+        timeout = config.get_workflow_default('thinkdeep', 'timeout', 120.0)
+
         # Validate confidence level
         valid_confidence_levels = ['exploring', 'low', 'medium', 'high', 'very_high', 'almost_certain', 'certain']
         if confidence not in valid_confidence_levels:
@@ -1105,7 +1128,7 @@ def thinkdeep(
             console.print(f"[cyan]Initializing model: {model}[/cyan]")
 
         try:
-            provider_instance = get_provider_by_name(model)
+            provider_instance = get_provider_by_name(model, timeout=int(timeout))
             if verbose:
                 console.print(f"[green]✓ {model} initialized[/green]")
         except Exception as e:
@@ -1133,7 +1156,7 @@ def thinkdeep(
 
         for fallback_name in fallback_provider_names:
             try:
-                fallback_instance = get_provider_by_name(fallback_name)
+                fallback_instance = get_provider_by_name(fallback_name, timeout=int(timeout))
                 fallback_providers.append(fallback_instance)
                 if verbose:
                     console.print(f"[green]✓ {fallback_name} initialized (fallback)[/green]")

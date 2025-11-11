@@ -71,8 +71,16 @@ def get_install_command(provider: str) -> str:
     return commands.get(provider.lower(), "See provider documentation")
 
 
-def get_provider_by_name(name: str):
-    """Get provider instance by name."""
+def get_provider_by_name(name: str, timeout: int = 120):
+    """Get provider instance by name.
+
+    Args:
+        name: Provider name (claude, gemini, codex, cursor-agent)
+        timeout: Timeout in seconds for provider operations (default: 120)
+
+    Returns:
+        Provider instance
+    """
     providers = {
         "claude": ClaudeProvider,
         "codex": CodexProvider,
@@ -86,7 +94,7 @@ def get_provider_by_name(name: str):
         console.print(f"Available providers: {', '.join(providers.keys())}")
         raise typer.Exit(1)
 
-    return provider_class()
+    return provider_class(timeout=timeout)
 
 
 @study_app.command()
@@ -102,6 +110,7 @@ def start(
         None,
         "--continue",
         "-c",
+        "--session-id",
         help="Thread ID to continue an existing investigation",
     ),
     files: Optional[List[str]] = typer.Option(
@@ -181,12 +190,15 @@ def start(
         if system is None:
             system = config.get_workflow_default('study', 'system_prompt', None)
 
+        # Read timeout from config
+        timeout = config.get_workflow_default('study', 'timeout', 120.0)
+
         # Create provider instance
         if verbose:
             console.print(f"[cyan]Initializing provider: {provider}[/cyan]")
 
         try:
-            provider_instance = get_provider_by_name(provider)
+            provider_instance = get_provider_by_name(provider, timeout=int(timeout))
             if verbose:
                 console.print(f"[green]✓ {provider} initialized[/green]")
         except ProviderUnavailableError as e:
@@ -212,7 +224,7 @@ def start(
 
         for fallback_name in fallback_provider_names:
             try:
-                fallback_instance = get_provider_by_name(fallback_name)
+                fallback_instance = get_provider_by_name(fallback_name, timeout=int(timeout))
                 fallback_providers.append(fallback_instance)
                 if verbose:
                     console.print(f"[green]✓ {fallback_name} initialized (fallback)[/green]")
@@ -426,12 +438,15 @@ def study_next(
         if provider is None:
             provider = config.get_default_provider('study', 'claude')
 
+        # Read timeout from config
+        timeout = config.get_workflow_default('study', 'timeout', 120.0)
+
         # Create provider instance
         if verbose:
             console.print(f"[cyan]Initializing provider: {provider}[/cyan]")
 
         try:
-            provider_instance = get_provider_by_name(provider)
+            provider_instance = get_provider_by_name(provider, timeout=int(timeout))
             if verbose:
                 console.print(f"[green]✓ {provider} initialized[/green]")
         except ProviderUnavailableError as e:
@@ -457,7 +472,7 @@ def study_next(
 
         for fallback_name in fallback_provider_names:
             try:
-                fallback_instance = get_provider_by_name(fallback_name)
+                fallback_instance = get_provider_by_name(fallback_name, timeout=int(timeout))
                 fallback_providers.append(fallback_instance)
                 if verbose:
                     console.print(f"[green]✓ {fallback_name} initialized (fallback)[/green]")

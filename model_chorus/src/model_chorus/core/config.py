@@ -22,6 +22,9 @@ class GenerationDefaults(BaseModel):
     """Default generation parameters."""
 
     timeout: Optional[float] = Field(None, gt=0)
+    temperature: Optional[float] = Field(None, ge=0.0, le=2.0)
+    max_tokens: Optional[int] = Field(None, gt=0)
+    system_prompt: Optional[str] = None
 
 
 class ProviderConfig(BaseModel):
@@ -37,6 +40,9 @@ class WorkflowConfig(BaseModel):
     providers: Optional[List[str]] = None
     fallback_providers: Optional[List[str]] = None
     timeout: Optional[float] = Field(None, gt=0)
+    temperature: Optional[float] = Field(None, ge=0.0, le=2.0)
+    max_tokens: Optional[int] = Field(None, gt=0)
+    system_prompt: Optional[str] = None
 
     # Consensus-specific
     strategy: Optional[str] = Field(None, pattern=r"^(all_responses|synthesize|vote)$")

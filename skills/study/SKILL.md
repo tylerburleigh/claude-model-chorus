@@ -72,7 +72,7 @@ model-chorus study start --scenario "What are the main patterns in authenticatio
 | `--provider` | `-p` | `gemini` | AI provider (`claude`, `gemini`, `codex`, `cursor-agent`) |
 | `--persona` | (none) | `Researcher, Critic` | Specific personas to use (repeatable) |
 | `--file` | `-f` | None | Context files to include (repeatable) |
-| `--continue` | `-c` | None | Thread ID to continue existing investigation |
+| `--continue` / `--session-id` | `-c` | None | Thread ID to continue existing investigation (both aliases work identically) |
 | `--output` | `-o` | None | Save results to JSON file |
 | `--verbose` | `-v` | False | Show detailed execution information |
 
