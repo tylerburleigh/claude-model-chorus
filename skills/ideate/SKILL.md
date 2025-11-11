@@ -362,9 +362,7 @@ The real power comes from combining these parameters strategically.
 
 #### Quick Practical Wins (Low temp + Few ideas)
 ```bash
-model-chorus ideate "Performance optimizations for API" \
-  --temperature 0.5 \
-  --num-ideas 4
+model-chorus ideate "Performance optimizations for API" --temperature 0.5 --num-ideas 4
 ```
 **Result:** 4 practical, implementable optimization ideas
 
@@ -372,9 +370,7 @@ model-chorus ideate "Performance optimizations for API" \
 
 #### Standard Innovation (Medium temp + Medium ideas)
 ```bash
-model-chorus ideate "New features for productivity tool" \
-  --temperature 0.7 \
-  --num-ideas 6
+model-chorus ideate "New features for productivity tool" --temperature 0.7 --num-ideas 6
 ```
 **Result:** 6 balanced ideas mixing practical and innovative
 
@@ -382,9 +378,7 @@ model-chorus ideate "New features for productivity tool" \
 
 #### Creative Exploration (High temp + Many ideas)
 ```bash
-model-chorus ideate "Disruptive marketing campaigns" \
-  --temperature 0.95 \
-  --num-ideas 10
+model-chorus ideate "Disruptive marketing campaigns" --temperature 0.95 --num-ideas 10
 ```
 **Result:** 10 bold, creative campaign concepts
 
@@ -393,15 +387,10 @@ model-chorus ideate "Disruptive marketing campaigns" \
 #### Comprehensive Strategic Planning (Varied)
 ```bash
 # Step 1: Generate many creative ideas
-model-chorus ideate "Product differentiation strategies" \
-  --temperature 0.85 \
-  --num-ideas 12
+model-chorus ideate "Product differentiation strategies" --temperature 0.85 --num-ideas 12
 
 # Step 2: Refine top 3 with practical details
-model-chorus ideate "Expand on ideas #2, #5, and #9 with implementation details" \
-  --continue [session-id] \
-  --temperature 0.6 \
-  --num-ideas 3
+model-chorus ideate "Expand on ideas #2, #5, and #9 with implementation details" --continue [session-id] --temperature 0.6 --num-ideas 3
 ```
 
 ---
@@ -456,19 +445,13 @@ Session ID: ideate-thread-abc123
 **Control both creativity and quantity:**
 ```bash
 # Practical ideas (low creativity, few ideas)
-model-chorus ideate "Database optimization strategies" \
-  --temperature 0.5 \
-  --num-ideas 4
+model-chorus ideate "Database optimization strategies" --temperature 0.5 --num-ideas 4
 
 # Balanced brainstorming (default)
-model-chorus ideate "User engagement strategies" \
-  --temperature 0.7 \
-  --num-ideas 6
+model-chorus ideate "User engagement strategies" --temperature 0.7 --num-ideas 6
 
 # Bold, creative ideas (high creativity, many ideas)
-model-chorus ideate "Disruptive product features" \
-  --temperature 0.95 \
-  --num-ideas 10
+model-chorus ideate "Disruptive product features" --temperature 0.95 --num-ideas 10
 ```
 
 ### With Provider Selection
@@ -488,10 +471,7 @@ model-chorus ideate "Code refactoring approaches" --provider codex
 
 ```bash
 # Add specific constraints
-model-chorus ideate "Revenue streams for startup" \
-  --system "Must be implementable within 6 months, budget under $50k, target individual developers" \
-  --temperature 0.75 \
-  --num-ideas 7
+model-chorus ideate "Revenue streams for startup" --system "Must be implementable within 6 months, budget under $50k, target individual developers" --temperature 0.75 --num-ideas 7
 ```
 
 ### With Continuation
@@ -501,10 +481,7 @@ model-chorus ideate "Revenue streams for startup" \
 model-chorus ideate "Gamification features for learning platform" --num-ideas 7
 
 # Drill into specific idea
-model-chorus ideate "Expand on idea #2 with implementation details" \
-  --continue [session-id] \
-  --temperature 0.6 \
-  --num-ideas 1
+model-chorus ideate "Expand on idea #2 with implementation details" --continue [session-id] --temperature 0.6 --num-ideas 1
 ```
 
 ## Configuration Options
@@ -532,10 +509,7 @@ model-chorus ideate "Expand on idea #2 with implementation details" \
 ### Example 1: Product Features (Balanced)
 
 ```bash
-model-chorus ideate "New features for developer productivity tool" \
-  --num-ideas 7 \
-  --temperature 0.75 \
-  --system "Target: Individual developers and small teams. Must integrate with VS Code and GitHub."
+model-chorus ideate "New features for developer productivity tool" --num-ideas 7 --temperature 0.75 --system "Target: Individual developers and small teams. Must integrate with VS Code and GitHub."
 ```
 
 **Expected output:**
@@ -545,9 +519,7 @@ model-chorus ideate "New features for developer productivity tool" \
 ### Example 2: Marketing Campaigns (High Creativity)
 
 ```bash
-model-chorus ideate "Creative marketing campaigns for sustainable fashion brand" \
-  --num-ideas 8 \
-  --temperature 0.95
+model-chorus ideate "Creative marketing campaigns for sustainable fashion brand" --num-ideas 8 --temperature 0.95
 ```
 
 **Expected output:**
@@ -557,10 +529,7 @@ model-chorus ideate "Creative marketing campaigns for sustainable fashion brand"
 ### Example 3: Performance Optimization (Low Creativity)
 
 ```bash
-model-chorus ideate "Ways to reduce API latency by 50%" \
-  --file docs/current_architecture.md \
-  --num-ideas 6 \
-  --temperature 0.5
+model-chorus ideate "Ways to reduce API latency by 50%" --file docs/current_architecture.md --num-ideas 6 --temperature 0.5
 ```
 
 **Expected output:**
@@ -576,16 +545,10 @@ model-chorus ideate "Ways to reduce API latency by 50%" \
 **Pattern:**
 ```bash
 # Step 1: Generate broad feature ideas
-model-chorus ideate "New features for [product name]" \
-  --num-ideas 8 \
-  --temperature 0.75 \
-  --system "Target users: [user persona]. Current features: [list]. Goals: [objectives]"
+model-chorus ideate "New features for [product name]" --num-ideas 8 --temperature 0.75 --system "Target users: [user persona]. Current features: [list]. Goals: [objectives]"
 
 # Step 2: Refine top 3 ideas with details
-model-chorus ideate "Expand on ideas #2, #5, and #7 with implementation details, user value, and effort estimates" \
-  --continue [session-id] \
-  --temperature 0.6 \
-  --num-ideas 3
+model-chorus ideate "Expand on ideas #2, #5, and #7 with implementation details, user value, and effort estimates" --continue [session-id] --temperature 0.6 --num-ideas 3
 ```
 
 **Why this works:**
@@ -602,18 +565,12 @@ model-chorus ideate "Expand on ideas #2, #5, and #7 with implementation details,
 **Pattern:**
 ```bash
 # Generate solutions with constraints
-model-chorus ideate "Creative solutions for: [problem statement]" \
-  --num-ideas 7 \
-  --temperature 0.8 \
-  --system "Constraints: [list constraints]. Must be [criteria]"
+model-chorus ideate "Creative solutions for: [problem statement]" --num-ideas 7 --temperature 0.8 --system "Constraints: [list constraints]. Must be [criteria]"
 ```
 
 **Example:**
 ```bash
-model-chorus ideate "Creative solutions for: Reducing customer support tickets by 40%" \
-  --num-ideas 7 \
-  --temperature 0.8 \
-  --system "Constraints: Budget $50k, 3-month timeline, no additional headcount. Must improve user experience."
+model-chorus ideate "Creative solutions for: Reducing customer support tickets by 40%" --num-ideas 7 --temperature 0.8 --system "Constraints: Budget $50k, 3-month timeline, no additional headcount. Must improve user experience."
 ```
 
 ---
@@ -625,19 +582,13 @@ model-chorus ideate "Creative solutions for: Reducing customer support tickets b
 **Pattern:**
 ```bash
 # Practical tier
-model-chorus ideate "Proven, practical approaches for [topic]" \
-  --num-ideas 5 \
-  --temperature 0.5
+model-chorus ideate "Proven, practical approaches for [topic]" --num-ideas 5 --temperature 0.5
 
 # Innovative tier
-model-chorus ideate "Innovative but feasible ideas for [topic]" \
-  --num-ideas 6 \
-  --temperature 0.75
+model-chorus ideate "Innovative but feasible ideas for [topic]" --num-ideas 6 --temperature 0.75
 
 # Bold tier
-model-chorus ideate "Bold, unconventional ideas for [topic]" \
-  --num-ideas 5 \
-  --temperature 0.95
+model-chorus ideate "Bold, unconventional ideas for [topic]" --num-ideas 5 --temperature 0.95
 ```
 
 **Why this works:**
@@ -654,21 +605,13 @@ model-chorus ideate "Bold, unconventional ideas for [topic]" \
 **Pattern:**
 ```bash
 # Round 1: Wide exploration
-model-chorus ideate "Ways to improve [area]" \
-  --num-ideas 10 \
-  --temperature 0.8
+model-chorus ideate "Ways to improve [area]" --num-ideas 10 --temperature 0.8
 
 # Round 2: Focus on promising direction
-model-chorus ideate "Drill deeper into idea #4 (mention specific aspect). Generate variations and improvements." \
-  --continue [session-id] \
-  --num-ideas 6 \
-  --temperature 0.75
+model-chorus ideate "Drill deeper into idea #4 (mention specific aspect). Generate variations and improvements." --continue [session-id] --num-ideas 6 --temperature 0.75
 
 # Round 3: Implementation details
-model-chorus ideate "For the most promising variation, provide: implementation steps, required resources, timeline, risks." \
-  --continue [session-id] \
-  --temperature 0.6 \
-  --num-ideas 1
+model-chorus ideate "For the most promising variation, provide: implementation steps, required resources, timeline, risks." --continue [session-id] --temperature 0.6 --num-ideas 1
 ```
 
 ---
@@ -679,18 +622,12 @@ model-chorus ideate "For the most promising variation, provide: implementation s
 
 **Pattern:**
 ```bash
-model-chorus ideate "[topic] ideas" \
-  --num-ideas 7 \
-  --temperature 0.7 \
-  --system "MUST meet these constraints:\n  - Timeline: [timeframe]\n  - Budget: [amount]\n  - Team size: [number]\n  - Tech stack: [technologies]\n  - Must integrate with: [systems]\n  - Success metrics: [KPIs]"
+model-chorus ideate "[topic] ideas" --num-ideas 7 --temperature 0.7 --system "MUST meet these constraints:\n  - Timeline: [timeframe]\n  - Budget: [amount]\n  - Team size: [number]\n  - Tech stack: [technologies]\n  - Must integrate with: [systems]\n  - Success metrics: [KPIs]"
 ```
 
 **Example:**
 ```bash
-model-chorus ideate "Revenue stream ideas for developer tools startup" \
-  --num-ideas 7 \
-  --temperature 0.75 \
-  --system "MUST meet these constraints:\n  - Timeline: Launch within 6 months\n  - Budget: Under $75k\n  - Team: 3 developers\n  - Tech stack: Python, React\n  - Must integrate with: GitHub, VS Code\n  - Success metrics: $10k MRR in first quarter"
+model-chorus ideate "Revenue stream ideas for developer tools startup" --num-ideas 7 --temperature 0.75 --system "MUST meet these constraints:\n  - Timeline: Launch within 6 months\n  - Budget: Under $75k\n  - Team: 3 developers\n  - Tech stack: Python, React\n  - Must integrate with: GitHub, VS Code\n  - Success metrics: $10k MRR in first quarter"
 ```
 
 ---
@@ -701,12 +638,7 @@ model-chorus ideate "Revenue stream ideas for developer tools startup" \
 
 **Pattern:**
 ```bash
-model-chorus ideate "Unique features that differentiate us from [competitors]" \
-  --num-ideas 8 \
-  --temperature 0.85 \
-  --system "Competitors: [list competitors and their key features]. Our strengths: [list]. Target users: [persona]" \
-  --file competitor_analysis.md \
-  --file our_product_strategy.md
+model-chorus ideate "Unique features that differentiate us from [competitors]" --num-ideas 8 --temperature 0.85 --system "Competitors: [list competitors and their key features]. Our strengths: [list]. Target users: [persona]" --file competitor_analysis.md --file our_product_strategy.md
 ```
 
 ---
@@ -718,10 +650,7 @@ model-chorus ideate "Unique features that differentiate us from [competitors]" \
 **Scenario:** Task management mobile app needs new features
 
 ```bash
-model-chorus ideate "Innovative features for personal task management mobile app" \
-  --num-ideas 8 \
-  --temperature 0.8 \
-  --system "Target users: Busy professionals, ages 25-45. Current features: Basic task lists, due dates, notifications. Goals: Increase daily active usage, improve task completion rates."
+model-chorus ideate "Innovative features for personal task management mobile app" --num-ideas 8 --temperature 0.8 --system "Target users: Busy professionals, ages 25-45. Current features: Basic task lists, due dates, notifications. Goals: Increase daily active usage, improve task completion rates."
 ```
 
 **Expected Ideas:**
@@ -774,10 +703,7 @@ model-chorus ideate "Innovative features for personal task management mobile app
 **Scenario:** Code editor needs productivity-boosting features
 
 ```bash
-model-chorus ideate "Innovative productivity features for code editor targeting individual developers" \
-  --num-ideas 10 \
-  --temperature 0.85 \
-  --system "Target: Individual developers and small teams. Must integrate with Git. Current features: Syntax highlighting, IntelliSense, debugging. Budget: $100k. Timeline: 6 months."
+model-chorus ideate "Innovative productivity features for code editor targeting individual developers" --num-ideas 10 --temperature 0.85 --system "Target: Individual developers and small teams. Must integrate with Git. Current features: Syntax highlighting, IntelliSense, debugging. Budget: $100k. Timeline: 6 months."
 ```
 
 **Expected Ideas:**
@@ -799,10 +725,7 @@ model-chorus ideate "Innovative productivity features for code editor targeting 
 **Scenario:** B2B SaaS platform needs engagement features
 
 ```bash
-model-chorus ideate "User engagement and retention features for B2B project management SaaS" \
-  --num-ideas 7 \
-  --temperature 0.75 \
-  --system "Target: Small to medium businesses (10-100 employees). Current MAU: 5k. Goal: Reduce churn from 8% to 4% monthly. Budget: $150k."
+model-chorus ideate "User engagement and retention features for B2B project management SaaS" --num-ideas 7 --temperature 0.75 --system "Target: Small to medium businesses (10-100 employees). Current MAU: 5k. Goal: Reduce churn from 8% to 4% monthly. Budget: $150k."
 ```
 
 **Expected Ideas:**
@@ -821,10 +744,7 @@ model-chorus ideate "User engagement and retention features for B2B project mana
 **Scenario:** Sustainable fashion brand needs creative campaigns
 
 ```bash
-model-chorus ideate "Bold, unconventional marketing campaigns for sustainable fashion brand" \
-  --num-ideas 8 \
-  --temperature 0.95 \
-  --system "Brand values: Sustainability, transparency, quality. Target: Millennials and Gen Z concerned about environment. Budget: $200k for 6-month campaign."
+model-chorus ideate "Bold, unconventional marketing campaigns for sustainable fashion brand" --num-ideas 8 --temperature 0.95 --system "Brand values: Sustainability, transparency, quality. Target: Millennials and Gen Z concerned about environment. Budget: $200k for 6-month campaign."
 ```
 
 **Expected Ideas (High Creativity):**
@@ -970,8 +890,7 @@ model-chorus ideate "Detailed implementation plan for specific feature" --temper
 
 **With constraints (focused, actionable):**
 ```bash
-model-chorus ideate "Feature ideas" \
-  --system "Timeline: 3 months. Budget: $50k. Team: 2 developers. Tech: React, Node.js"
+model-chorus ideate "Feature ideas" --system "Timeline: 3 months. Budget: $50k. Team: 2 developers. Tech: React, Node.js"
 ```
 
 **Without constraints (too broad):**
@@ -1043,16 +962,13 @@ model-chorus ideate "..." --num-ideas 12  # Was: 5
 **Solutions:**
 ```bash
 # Provide more context
-model-chorus ideate "Feature ideas" \
-  --system "Context: Healthcare app for elderly users, iOS only, accessibility focus, 10k users" \
-  --file user_research.md
+model-chorus ideate "Feature ideas" --system "Context: Healthcare app for elderly users, iOS only, accessibility focus, 10k users" --file user_research.md
 
 # Request specific details in prompt
 model-chorus ideate "Detailed feature ideas with implementation approach, user value, and success metrics"
 
 # Use continuation to refine
-model-chorus ideate "Expand idea #4 with specific user stories, technical requirements, and UI mockup descriptions" \
-  --continue [session-id] --temperature 0.6
+model-chorus ideate "Expand idea #4 with specific user stories, technical requirements, and UI mockup descriptions" --continue [session-id] --temperature 0.6
 ```
 
 ---
@@ -1067,8 +983,7 @@ model-chorus ideate "Expand idea #4 with specific user stories, technical requir
 model-chorus ideate "..." --temperature 0.6  # Was: 0.9
 
 # Add practical constraints
-model-chorus ideate "..." \
-  --system "Must be implementable within 3 months with 2 developers and $30k budget. Use existing tech stack."
+model-chorus ideate "..." --system "Must be implementable within 3 months with 2 developers and $30k budget. Use existing tech stack."
 
 # Request explicitly practical ideas
 model-chorus ideate "Practical, immediately implementable ideas for..."
@@ -1101,8 +1016,7 @@ model-chorus ideate "Blue sky thinking for ... (no constraints, maximum creativi
 **Solutions:**
 ```bash
 # Use continuation to synthesize and prioritize
-model-chorus ideate "From the 12 ideas generated, identify the top 3 based on: user value, implementation feasibility, and competitive advantage. Explain reasoning." \
-  --continue [session-id] --num-ideas 1 --temperature 0.6
+model-chorus ideate "From the 12 ideas generated, identify the top 3 based on: user value, implementation feasibility, and competitive advantage. Explain reasoning." --continue [session-id] --num-ideas 1 --temperature 0.6
 
 # Or generate fewer ideas initially
 model-chorus ideate "..." --num-ideas 5  # Was: 12
