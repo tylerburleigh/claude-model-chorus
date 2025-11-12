@@ -12,6 +12,7 @@ from typing import Optional, Dict, Any, List
 
 from ..core.base_workflow import BaseWorkflow, WorkflowResult, WorkflowStep
 from ..core.conversation import ConversationMemory
+from ..core.prompts import prepend_system_constraints
 from ..providers import ModelProvider, GenerationRequest, GenerationResponse
 from ..core.models import ConversationMessage
 from ..core.progress import emit_workflow_start, emit_workflow_complete
@@ -200,11 +201,17 @@ class ChatWorkflow(BaseWorkflow):
             # Build the full prompt with conversation history and file context if available
             full_prompt = self._build_prompt_with_history(prompt, thread_id, files)
 
-            # Create generation request
+            # Prepare system prompt with read-only constraints
+            custom_system_prompt = kwargs.get('system_prompt')
+            final_system_prompt = prepend_system_constraints(custom_system_prompt)
+
+            # Create generation request with read-only constraints prepended
+            request_kwargs = {k: v for k, v in kwargs.items() if k != 'system_prompt'}
             request = GenerationRequest(
                 prompt=full_prompt,
+                system_prompt=final_system_prompt,
                 continuation_id=thread_id,
-                **kwargs
+                **request_kwargs
             )
 
             logger.info(f"Sending request to provider: {self.provider.provider_name}")
