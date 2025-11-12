@@ -1,0 +1,52 @@
+Majority answer:
+Python uses a mechanism that's often called **"pass-by-object-reference"** or **"pass-by-assignment"**. It's neither strictly pass-by-value nor pass-by-reference in the traditional sense.
+
+Here's how it works:
+
+## The Core Concept
+
+When you pass an argument to a function, Python passes a reference to the object, but the behavior depends on whether the object is **mutable** or **immutable**.
+
+## Immutable Objects (int, float, str, tuple)
+
+These behave like **pass-by-value**:
+
+```python
+def modify(x):
+    x = 10  # Creates a new object, doesn't affect original
+    
+a = 5
+modify(a)
+print(a)  # Output: 5 (unchanged)
+```
+
+## Mutable Objects (list, dict, set)
+
+These can be modified in place, behaving like **pass-by-reference**:
+
+```python
+def modify(lst):
+    lst.append(4)  # Modifies the original list
+    
+my_list = [1, 2, 3]
+modify(my_list)
+print(my_list)  # Output: [1, 2, 3, 4] (changed!)
+```
+
+But reassignment still doesn't affect the original:
+
+```python
+def modify(lst):
+    lst = [10, 20]  # Creates new object, doesn't affect original
+    
+my_list = [1, 2, 3]
+modify(my_list)
+print(my_list)  # Output: [1, 2, 3] (unchanged)
+```
+
+## Key Takeaway
+
+Python passes references to objects, but:
+- **Immutable objects** can't be changed in place, so modifications create new objects
+- **Mutable objects** can be modified in place, affecting the original
+- **Reassignment** never affects the original variable, regardless of mutability

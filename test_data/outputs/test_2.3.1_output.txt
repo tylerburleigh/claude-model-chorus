@@ -1,0 +1,59 @@
+
+Starting new chat conversation...
+Prompt: What is the difference between git merge and git rebase?
+Provider: claude
+
+✓ Chat completed
+
+Thread ID: 9d761bf3-84c9-4ac7-bcde-608805e505b0
+Status: New conversation started
+
+Response:
+
+Git merge and git rebase are two different ways to integrate changes from one branch into another:
+
+## Git Merge
+
+- **Creates a new commit** that combines the histories of both branches
+- **Preserves the complete history** including all branch commits
+- Results in a non-linear history with merge commits
+- Safe for public/shared branches
+- Easy to understand and undo
+
+Example:
+```
+# On feature branch
+git merge main
+```
+This creates a merge commit that joins your feature branch with main.
+
+## Git Rebase
+
+- **Rewrites commit history** by moving your commits to a new base
+- **Creates a linear history** as if you branched from the latest commit
+- Replays your commits one by one on top of the target branch
+- **Dangerous for public branches** (rewrites history others may depend on)
+- Results in a cleaner, more readable history
+
+Example:
+```
+# On feature branch
+git rebase main
+```
+This moves your feature commits to start from the latest commit on main.
+
+## When to Use Each
+
+**Use merge when:**
+- Working on public/shared branches
+- You want to preserve the exact history
+- You're merging feature branches into main
+
+**Use rebase when:**
+- Cleaning up local commits before pushing
+- You want a linear project history
+- Updating your feature branch with latest main changes (before merging)
+
+**Golden rule:** Never rebase commits that have been pushed to a shared repository that others might be working from.
+
+To continue this conversation, use: --continue 9d761bf3-84c9-4ac7-bcde-608805e505b0

@@ -1,0 +1,108 @@
+Strategy: all_responses
+Providers succeeded: ['claude', 'gemini']
+
+Result:
+## CLAUDE
+
+Good API design follows several key principles:
+
+## 1. Consistency
+- Use uniform naming conventions, patterns, and behaviors throughout
+- Similar operations should work in similar ways
+- Predictable structure helps users learn and remember the API
+
+## 2. Simplicity
+- Keep the API surface minimal - expose only what's necessary
+- Make common tasks easy and straightforward
+- Avoid unnecessary complexity in both design and implementation
+
+## 3. Clear Documentation
+- Provide comprehensive, accurate documentation with examples
+- Document expected inputs, outputs, and error conditions
+- Include code samples for common use cases
+
+## 4. Intuitive Naming
+- Use clear, descriptive names that reveal intent
+- Follow language/domain conventions (e.g., REST verbs, idiomatic patterns)
+- Avoid abbreviations unless universally understood
+
+## 5. Error Handling
+- Return meaningful error messages that explain what went wrong
+- Use appropriate error codes/types
+- Help users understand how to fix issues
+
+## 6. Versioning
+- Plan for evolution from the start
+- Use semantic versioning to communicate changes
+- Maintain backward compatibility when possible
+
+## 7. Idempotency & Safety
+- Design operations to be safely retryable where appropriate
+- Distinguish between safe (read-only) and unsafe (modifying) operations
+- Ensure predictable outcomes for repeated calls
+
+## 8. Performance Considerations
+- Support pagination for large result sets
+- Allow filtering and field selection to reduce payload size
+- Consider caching strategies
+
+## 9. Security
+- Authenticate and authorize appropriately
+- Validate all inputs
+- Follow principle of least privilege
+
+## 10. Flexibility Without Complexity
+- Support common customization needs
+- Use sensible defaults
+- Don't force users to specify everything
+
+The best APIs feel natural to use, make correct usage easy and incorrect usage hard, and remain stable while allowing for growth.
+
+---
+
+## GEMINI
+
+Good API design is crucial for building scalable, maintainable, and easy-to-use software. Here are the key principles, including overviews of RESTful and GraphQL approaches:
+
+### Core Principles of API Design
+
+These principles apply to any API, regardless of its architecture:
+
+*   **Simplicity and Clarity:** An API should be easy to learn and use. This means having a clear and consistent naming scheme, a logical structure, and predictable behavior. The purpose of each endpoint or query should be self-evident.
+*   **Consistency:** A consistent API is a predictable one. This applies to naming conventions, data formats, error handling, and overall structure. If you have an endpoint `/users`, you should also have `/posts` and `/comments`, not `/get_all_posts` and `/comment-list`.
+*   **Good Documentation:** Comprehensive and clear documentation is essential. It should include examples, tutorials, and a full reference for all endpoints, parameters, and responses.
+*   **Security:** APIs must be secure. This includes using HTTPS, implementing proper authentication and authorization (like OAuth 2.0), and protecting against common vulnerabilities like SQL injection and cross-site scripting (XSS).
+*   **Flexibility and Evolvability:** APIs need to evolve. This means designing them in a way that allows for new features and changes without breaking existing client applications. Versioning is a common strategy for managing this.
+*   **Reliability and Performance:** An API should be reliable and performant. This means having high uptime, low latency, and being able to handle a high volume of requests. Caching, rate limiting, and efficient database queries are important considerations.
+
+### RESTful API Design
+
+REST (Representational State Transfer) is an architectural style that uses a stateless, client-server communication protocol, most commonly HTTP.
+
+*   **Resource-Oriented:** REST is centered around the concept of resources (e.g., a user, a product, an order). Each resource is identified by a unique URI (Uniform Resource Identifier).
+*   **Use of Standard HTTP Methods:** REST leverages standard HTTP methods to perform actions on resources:
+    *   `GET`: Retrieve a resource.
+    *   `POST`: Create a new resource.
+    *   `PUT` / `PATCH`: Update an existing resource.
+    *   `DELETE`: Delete a resource.
+*   **Statelessness:** Each request from a client to a server must contain all the information needed to understand and process the request. The server does not store any client context between requests.
+*   **HATEOAS (Hypermedia as the Engine of Application State):** This principle means that the API response should include links to other related resources, allowing the client to navigate the API without prior knowledge of the URI structure.
+
+### GraphQL API Design
+
+GraphQL is a query language for APIs and a runtime for fulfilling those queries with your existing data.
+
+*   **Client-Driven Queries:** With GraphQL, the client specifies exactly what data it needs, and the server returns only that data. This avoids the over-fetching and under-fetching of data that can happen with REST.
+*   **Single Endpoint:** Unlike REST, which has multiple endpoints for different resources, a GraphQL API typically has a single endpoint that handles all queries.
+*   **Strongly Typed Schema:** A GraphQL API is defined by a schema, which is a contract between the client and the server. This schema defines the types of data that can be queried and the relationships between them.
+*   **Hierarchical Data:** GraphQL naturally follows the relationships between objects in your data, allowing you to query for nested data in a single request.
+
+### Key Differences
+
+| Feature | REST | GraphQL |
+| :--- | :--- | :--- |
+| **Data Fetching** | Fixed data structure per endpoint | Flexible, client-specified data |
+| **Endpoints** | Multiple endpoints for different resources | Typically a single endpoint |
+| **Data Structure** | Determined by the server | Determined by the client's query |
+| **Over/Under-fetching** | Common issue | Solved by client-driven queries |
+| **Schema** | No formal schema definition | Strongly typed schema |

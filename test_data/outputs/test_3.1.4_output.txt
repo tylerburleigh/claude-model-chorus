@@ -1,0 +1,41 @@
+Most comprehensive:
+The CAP theorem (also known as Brewer's theorem) is a fundamental principle in distributed systems that states you can only guarantee **two out of three** properties simultaneously:
+
+## The Three Properties
+
+**Consistency (C)**
+- All nodes see the same data at the same time
+- Every read receives the most recent write or an error
+- Think: "Everyone sees the same truth"
+
+**Availability (A)**
+- Every request receives a (non-error) response, without guarantee that it contains the most recent write
+- The system remains operational even when nodes fail
+- Think: "The system always responds"
+
+**Partition Tolerance (P)**
+- The system continues to operate despite network partitions (communication breakdowns between nodes)
+- Think: "Works even when network fails"
+
+## The Trade-off
+
+In distributed systems, **network partitions are inevitable** in real-world scenarios, so P is essentially required. This means you must choose between:
+
+**CP Systems** (Consistency + Partition Tolerance)
+- Sacrifice availability during partitions
+- Better for systems requiring strong consistency
+- Examples: HBase, MongoDB (with strong consistency settings), Redis (single-master)
+
+**AP Systems** (Availability + Partition Tolerance)
+- Sacrifice consistency during partitions (eventual consistency)
+- Better for systems requiring high availability
+- Examples: Cassandra, DynamoDB, Couchbase
+
+**CA Systems** (Consistency + Availability)
+- Only possible without network partitions
+- Traditional relational databases in single-node setups
+- Not realistic for distributed systems
+
+## Real-World Impact
+
+Modern systems often use **eventual consistency** models, choosing availability over immediate consistency, and reconciling conflicts later. This is why you might see stale data briefly in systems like DNS, CDNs, or social media platforms.

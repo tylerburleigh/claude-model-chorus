@@ -1,0 +1,109 @@
+
+Continuing chat conversation...
+Prompt: Show me a practical use case
+Provider: claude
+Thread ID: be991f1b-6bbf-4364-9c4f-c0fa5f0b7461
+
+✓ Chat completed
+
+Thread ID: be991f1b-6bbf-4364-9c4f-c0fa5f0b7461
+Status: Continued (4 messages in thread)
+
+Response:
+
+Here's a practical use case: **Processing large log files without loading them entirely into memory**.
+
+## Scenario: Analyzing Server Logs
+
+```python
+def parse_log_file(filename):
+    """Generator that yields parsed log entries one at a time"""
+    with open(filename, 'r') as file:
+        for line in file:
+            # Parse each line
+            parts = line.strip().split(' - ')
+            if len(parts) >= 3:
+                yield {
+                    'timestamp': parts[0],
+                    'level': parts[1],
+                    'message': parts[2]
+                }
+
+def filter_errors(log_entries):
+    """Generator that filters for error-level logs"""
+    for entry in log_entries:
+        if entry['level'] == 'ERROR':
+            yield entry
+
+def extract_error_messages(error_entries):
+    """Generator that extracts just the message"""
+    for entry in error_entries:
+        yield entry['message']
+
+# Chain generators together - pipeline pattern
+log_entries = parse_log_file('server.log')
+errors = filter_errors(log_entries)
+error_messages = extract_error_messages(errors)
+
+# Process errors one at a time
+for message in error_messages:
+    print(f"Found error: {message}")
+    # Could send alerts, write to database, etc.
+```
+
+## Why This is Better
+
+**Without generators** (loading entire file):
+```python
+# ❌ Bad: Loads entire 10GB file into memory
+with open('server.log', 'r') as f:
+    all_lines = f.readlines()  # Could crash with OutOfMemory
+    errors = 
+```
+
+**With generators**:
+- Only one log line in memory at a time
+- Can process 10GB+ files with minimal memory
+- Can stop early if you find what you need
+- Easy to chain multiple transformations
+
+## Another Example: Data Pipeline
+
+```python
+def read_csv_rows(filename):
+    """Read CSV rows one at a time"""
+    with open(filename) as f:
+        header = f.readline().strip().split(',')
+        for line in f:
+            values = line.strip().split(',')
+            yield dict(zip(header, values))
+
+def filter_by_country(rows, country):
+    """Filter rows by country"""
+    for row in rows:
+        if row.get('country') == country:
+            yield row
+
+def calculate_totals(rows):
+    """Calculate running totals"""
+    total = 0
+    for row in rows:
+        total += float(row.get('amount', 0))
+        yield total
+
+# Process millions of rows with constant memory usage
+rows = read_csv_rows('sales_data.csv')
+us_sales = filter_by_country(rows, 'USA')
+running_totals = calculate_totals(us_sales)
+
+# Get first 10 running totals without processing entire file
+for i, total in enumerate(running_totals):
+    if i >= 10:
+        break
+    print(f"Running total: ${total:,.2f}")
+```
+
+This pipeline pattern is extremely powerful for ETL (Extract, Transform, Load) operations and data processing tasks where memory 
+efficiency matters.
+
+To continue this conversation, use: --continue be991f1b-6bbf-4364-9c4f-c0fa5f0b7461

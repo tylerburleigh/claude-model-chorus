@@ -1,0 +1,62 @@
+
+Executing consensus workflow...
+Prompt: What are SOLID principles?
+Providers: 2
+Strategy: all_responses
+
+✓ Workflow completed
+
+            Consensus Results             
+┏━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━┓
+┃ Provider ┃ Status    ┃ Response Length ┃
+┡━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━┩
+│ claude   │ ✓ Success │      1377 chars │
+│ gemini   │ ✓ Success │      1142 chars │
+└──────────┴───────────┴─────────────────┘
+
+Consensus Response:
+
+## CLAUDE
+
+SOLID is an acronym for five object-oriented design principles that help create more maintainable, flexible, and scalable software:
+
+**S - Single Responsibility Principle (SRP)**
+A class should have only one reason to change, meaning it should have only one job or responsibility.
+
+**O - Open/Closed Principle (OCP)**
+Software entities should be open for extension but closed for modification. You should be able to add new functionality without 
+changing existing code.
+
+**L - Liskov Substitution Principle (LSP)**
+Objects of a superclass should be replaceable with objects of its subclasses without breaking the application. Derived classes must be
+substitutable for their base classes.
+
+**I - Interface Segregation Principle (ISP)**
+Clients should not be forced to depend on interfaces they don't use. It's better to have many specific interfaces than one 
+general-purpose interface.
+
+**D - Dependency Inversion Principle (DIP)**
+High-level modules should not depend on low-level modules. Both should depend on abstractions. Abstractions should not depend on 
+details; details should depend on abstractions.
+
+These principles, introduced by Robert C. Martin (Uncle Bob), help reduce coupling, increase cohesion, and make code easier to 
+understand, test, and maintain. They're particularly relevant in object-oriented programming languages like Java, C#, Python, and 
+TypeScript.
+
+---
+
+## GEMINI
+
+The SOLID principles are a set of five design principles in object-oriented programming, intended to make software designs more 
+understandable, flexible, and maintainable. Coined by Robert C. Martin, the acronym stands for:
+
+*   **S - Single Responsibility Principle (SRP):** A class should have only one reason to change, meaning it should have a single, 
+well-defined responsibility.
+*   **O - Open/Closed Principle (OCP):** Software entities should be open for extension but closed for modification. New functionality
+should be added without altering existing code.
+*   **L - Liskov Substitution Principle (LSP):** Objects of a superclass should be replaceable with objects of its subclasses without 
+affecting the correctness of the program.
+*   **I - Interface Segregation Principle (ISP):** Clients should not be forced to depend on interfaces they do not use. This 
+encourages smaller, more specific interfaces.
+*   **D - Dependency Inversion Principle (DIP):** High-level modules should not depend on low-level modules; both should depend on 
+abstractions. Abstractions should not depend on details; details should depend on abstractions.

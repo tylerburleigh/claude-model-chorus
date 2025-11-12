@@ -131,9 +131,6 @@ class ClaudeProvider(CLIProvider):
         # Use print mode for non-interactive output
         command.append("--print")
 
-        # Add prompt as positional argument (must come early, before tool restriction flags)
-        command.append(request.prompt)
-
         # Use JSON output format for easier parsing
         command.extend(["--output-format", "json"])
 
@@ -156,6 +153,9 @@ class ClaudeProvider(CLIProvider):
 
         # Note: Claude CLI doesn't support --temperature, --max-tokens flags
         # These would need to be set via config or are model defaults
+
+        # Add prompt as a flag
+        command.extend(["--prompt", request.prompt])
 
         logger.debug(f"Built Claude command: {' '.join(command)}")
         return command

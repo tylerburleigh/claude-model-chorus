@@ -151,6 +151,9 @@ class ChatWorkflow(BaseWorkflow):
             ...     files=["/path/to/file.py"]
             ... )
         """
+        if not prompt or not prompt.strip():
+            raise ValueError("Prompt cannot be empty.")
+
         logger.info(
             f"Starting chat workflow - prompt length: {len(prompt)}, "
             f"continuation: {continuation_id is not None}, "

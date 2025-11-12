@@ -205,8 +205,8 @@ class GeminiProvider(CLIProvider):
         if request.system_prompt:
             full_prompt = f"{request.system_prompt}\n\n{request.prompt}"
 
-        # Add prompt as positional argument
-        command.append(full_prompt)
+        # Add prompt using the -p flag for non-interactive mode
+        command.extend(["-p", full_prompt])
 
         # Add model from metadata if specified
         if "model" in request.metadata:
