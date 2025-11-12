@@ -12,6 +12,7 @@ from typing import Optional, Dict, Any, List
 
 from ...core.base_workflow import BaseWorkflow, WorkflowResult, WorkflowStep
 from ...core.conversation import ConversationMemory
+from ...core.prompts import prepend_system_constraints
 from ...core.registry import WorkflowRegistry
 from ...core.role_orchestration import (
     RoleOrchestrator,
@@ -157,7 +158,7 @@ class ArgumentWorkflow(BaseWorkflow):
                 "evidence, logical reasoning, and anticipate potential objections. Be persuasive "
                 "and thorough in building your case."
             ),
-            system_prompt=(
+            system_prompt=prepend_system_constraints(
                 "You are an expert at constructing compelling arguments. Focus on:\n"
                 "1. Clearly stating the core thesis\n"
                 "2. Providing strong supporting evidence and reasoning\n"
@@ -202,7 +203,7 @@ class ArgumentWorkflow(BaseWorkflow):
                 "present counter-evidence, and articulate the strongest possible case AGAINST "
                 "the position. Be rigorous and thorough in your critique."
             ),
-            system_prompt=(
+            system_prompt=prepend_system_constraints(
                 "You are an expert at critical analysis and identifying argument weaknesses. Focus on:\n"
                 "1. Challenging the core thesis and its underlying assumptions\n"
                 "2. Identifying logical fallacies or gaps in reasoning\n"
@@ -249,7 +250,7 @@ class ArgumentWorkflow(BaseWorkflow):
                 "disagreement, and provide nuanced insights. Be fair, thorough, and intellectually "
                 "honest in your synthesis."
             ),
-            system_prompt=(
+            system_prompt=prepend_system_constraints(
                 "You are an expert at synthesizing diverse perspectives into balanced analysis. Focus on:\n"
                 "1. Summarizing the key points from both the thesis and rebuttal\n"
                 "2. Identifying areas where both perspectives have merit\n"
