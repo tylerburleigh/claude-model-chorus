@@ -48,7 +48,7 @@ class CursorAgentProvider(CLIProvider):
 
     # Model capability mappings
     # Cursor agent is primarily focused on code generation
-    FUNCTION_CALLING_MODELS = {"default", "fast", "premium"}
+    FUNCTION_CALLING_MODELS = {"composer-1", "gpt-5-codex"}
 
     def __init__(
         self,
@@ -82,31 +82,24 @@ class CursorAgentProvider(CLIProvider):
         """Initialize the list of available Cursor agent models with their capabilities."""
         models = [
             ModelConfig(
-                model_id="default",
+                model_id="composer-1",
                 temperature=0.3,
                 capabilities=[
                     ModelCapability.TEXT_GENERATION,
                     ModelCapability.FUNCTION_CALLING,
+                    ModelCapability.STREAMING,
                 ],
-                metadata={"family": "cursor", "focus": "code", "speed": "medium"},
+                metadata={"tier": "default", "speed": "250_tokens_per_sec"},
             ),
             ModelConfig(
-                model_id="fast",
+                model_id="gpt-5-codex",
                 temperature=0.3,
                 capabilities=[
                     ModelCapability.TEXT_GENERATION,
                     ModelCapability.FUNCTION_CALLING,
+                    ModelCapability.STREAMING,
                 ],
-                metadata={"family": "cursor", "focus": "code", "speed": "fast"},
-            ),
-            ModelConfig(
-                model_id="premium",
-                temperature=0.3,
-                capabilities=[
-                    ModelCapability.TEXT_GENERATION,
-                    ModelCapability.FUNCTION_CALLING,
-                ],
-                metadata={"family": "cursor", "focus": "code", "speed": "slow", "quality": "high"},
+                metadata={"tier": "codex"},
             ),
         ]
         self.set_model_list(models)
@@ -116,7 +109,7 @@ class CursorAgentProvider(CLIProvider):
         Build the CLI command for a Cursor Agent generation request.
 
         Constructs a command like:
-            cursor-agent chat --prompt "..." --model default --temperature 0.3
+            cursor-agent -p --output-format json --model default "prompt text"
 
         Args:
             request: GenerationRequest containing prompt and parameters
@@ -124,37 +117,30 @@ class CursorAgentProvider(CLIProvider):
         Returns:
             List of command parts for subprocess execution
         """
-        command = [self.cli_command, "chat"]
+        command = [self.cli_command]
 
-        # Add prompt
-        command.extend(["--prompt", request.prompt])
+        # Add print flag for non-interactive mode
+        command.append("-p")
 
-        # Add system prompt if provided
-        if request.system_prompt:
-            command.extend(["--system", request.system_prompt])
+        # Add JSON output format for easier parsing
+        command.extend(["--output-format", "json"])
 
         # Add model from metadata if specified
         if "model" in request.metadata:
             command.extend(["--model", request.metadata["model"]])
 
-        # Add temperature (default to 0.3 for code generation)
-        temperature = request.temperature if request.temperature is not None else 0.3
-        command.extend(["--temperature", str(temperature)])
-
-        # Add max tokens if specified
-        if request.max_tokens:
-            command.extend(["--max-tokens", str(request.max_tokens)])
-
-        # Add working directory if specified (for context-aware code generation)
-        if "working_directory" in request.metadata:
-            command.extend(["--working-directory", request.metadata["working_directory"]])
-
-        # Add JSON output format for easier parsing
-        command.append("--json")
-
         # SECURITY: We intentionally do NOT add --force flag here
         # Without --force, Cursor Agent operates in propose-only mode (read-only)
         # Changes are suggested but not applied, providing safe operation
+
+        # Add prompt as positional argument at the end
+        # Combine system prompt and user prompt if both provided
+        if request.system_prompt:
+            full_prompt = f"{request.system_prompt}\n\n{request.prompt}"
+        else:
+            full_prompt = request.prompt
+
+        command.append(full_prompt)
 
         logger.debug(f"Built Cursor Agent command: {' '.join(command)}")
         return command
@@ -163,12 +149,16 @@ class CursorAgentProvider(CLIProvider):
         """
         Parse CLI output into a GenerationResponse.
 
-        The `cursor-agent` CLI returns JSON output with --json flag:
+        The `cursor-agent` CLI returns JSON output with --output-format json:
         {
-            "content": "...",
-            "model": "cursor-default",
-            "usage": {"input_tokens": 10, "output_tokens": 50},
-            "finish_reason": "stop"
+            "type": "result",
+            "subtype": "success",
+            "is_error": false,
+            "duration_ms": 1696,
+            "duration_api_ms": 1696,
+            "result": "...",
+            "session_id": "...",
+            "request_id": "..."
         }
 
         Args:
@@ -194,21 +184,32 @@ class CursorAgentProvider(CLIProvider):
         try:
             data = json.loads(stdout)
 
+            # Extract content from the "result" field
+            content = data.get("result", "")
+
+            # Check if this is an error response
+            if data.get("is_error", False):
+                error_msg = f"Cursor Agent returned error: {content}"
+                logger.error(error_msg)
+                raise ValueError(error_msg)
+
             response = GenerationResponse(
-                content=data.get("content", ""),
-                model=data.get("model", "unknown"),
+                content=content,
+                model=data.get("model", "cursor-agent"),
                 usage=data.get("usage", {}),
-                stop_reason=data.get("finish_reason"),
+                stop_reason=data.get("subtype"),
                 metadata={
-                    "code_blocks": data.get("code_blocks"),
-                    "language": data.get("language"),
+                    "session_id": data.get("session_id"),
+                    "request_id": data.get("request_id"),
+                    "duration_ms": data.get("duration_ms"),
+                    "duration_api_ms": data.get("duration_api_ms"),
                     "raw_response": data,
                 },
             )
 
             logger.info(
                 f"Successfully parsed Cursor Agent response: {len(response.content)} chars, "
-                f"model={response.model}, stop_reason={response.stop_reason}"
+                f"session_id={data.get('session_id')}"
             )
             return response
 
