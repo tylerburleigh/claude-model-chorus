@@ -212,12 +212,14 @@ class CursorAgentProvider(CLIProvider):
                 model=data.get("model", "cursor-agent"),
                 usage=token_usage,
                 stop_reason=data.get("subtype"),
+                thread_id=session_id,
+                provider="cursor-agent",
+                stderr=stderr,
+                duration_ms=data.get("duration_ms"),
+                raw_response=data,
                 metadata={
-                    "session_id": data.get("session_id"),
                     "request_id": data.get("request_id"),
-                    "duration_ms": data.get("duration_ms"),
                     "duration_api_ms": data.get("duration_api_ms"),
-                    "raw_response": data,
                 },
             )
 
