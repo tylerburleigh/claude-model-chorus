@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-13T18:25:21.884794Z",
+    "generated_at": "2025-11-13T18:26:16.769577Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 100,
-    "total_lines": 43005,
+    "total_lines": 43015,
     "total_classes": 237,
     "total_functions": 196,
     "avg_complexity": 4.52,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 100,
-        "lines": 43005,
+        "lines": 43015,
         "classes": 237,
         "functions": 196,
         "avg_complexity": 4.52
@@ -858,7 +858,7 @@
         "base_provider.TokenUsage"
       ],
       "exports": [],
-      "lines": 265
+      "lines": 275
     },
     {
       "name": "cursor_agent_provider",
@@ -9185,7 +9185,7 @@
         {
           "instantiator": "parse_response",
           "file": "model_chorus/src/model_chorus/providers/codex_provider.py",
-          "line": 213,
+          "line": 223,
           "context": [
             "CodexProvider",
             "parse_response"
@@ -9228,7 +9228,7 @@
         {
           "instantiator": "parse_response",
           "file": "model_chorus/src/model_chorus/providers/codex_provider.py",
-          "line": 221,
+          "line": 231,
           "context": [
             "CodexProvider",
             "parse_response"
