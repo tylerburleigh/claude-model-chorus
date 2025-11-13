@@ -1,14 +1,14 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-13 13:58:22
+**Generated:** 2025-11-13 14:04:13
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 103
-- **Total Lines:** 43345
+- **Total Files:** 104
+- **Total Lines:** 43502
 - **Total Classes:** 237
 - **Total Functions:** 196
 - **Avg Complexity:** 4.52
@@ -10544,6 +10544,11 @@ Returns:
 - `sys`
 
 ### `test_codex_parse.py`
+
+- `json`
+- `sys`
+
+### `test_codex_parsing.py`
 
 - `json`
 - `sys`

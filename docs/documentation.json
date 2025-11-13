@@ -2,15 +2,15 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-13T18:58:22.825665Z",
+    "generated_at": "2025-11-13T19:04:13.052275Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 103,
-    "total_lines": 43345,
+    "total_files": 104,
+    "total_lines": 43502,
     "total_classes": 237,
     "total_functions": 196,
     "avg_complexity": 4.52,
@@ -24,8 +24,8 @@
     ],
     "by_language": {
       "python": {
-        "files": 103,
-        "lines": 43345,
+        "files": 104,
+        "lines": 43502,
         "classes": 237,
         "functions": 196,
         "avg_complexity": 4.52
@@ -2229,6 +2229,20 @@
       ],
       "exports": [],
       "lines": 111
+    },
+    {
+      "name": "test_codex_parsing",
+      "file": "test_codex_parsing.py",
+      "language": "python",
+      "docstring": "Test script to verify CodexProvider.parse_response() implementation\nUses mock JSONL data based on the documented format",
+      "classes": [],
+      "functions": [],
+      "imports": [
+        "json",
+        "sys"
+      ],
+      "exports": [],
+      "lines": 157
     },
     {
       "name": "test_parse_response",
@@ -11332,6 +11346,12 @@
           ]
         },
         {
+          "instantiator": "<module>",
+          "file": "test_codex_parsing.py",
+          "line": 25,
+          "context": []
+        },
+        {
           "instantiator": "providers",
           "file": "tests/test_providers/test_cli_interface.py",
           "line": 35,
@@ -11342,7 +11362,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 22
+      "instantiation_count": 23
     },
     {
       "name": "CursorAgentProvider",
@@ -38072,6 +38092,10 @@
       "sys"
     ],
     "test_codex_parse.py": [
+      "json",
+      "sys"
+    ],
+    "test_codex_parsing.py": [
       "json",
       "sys"
     ],
