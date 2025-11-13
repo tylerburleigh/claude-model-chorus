@@ -1,14 +1,14 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-13 13:08:20
+**Generated:** 2025-11-13 13:09:05
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 100
-- **Total Lines:** 42963
+- **Total Lines:** 42974
 - **Total Classes:** 237
 - **Total Functions:** 196
 - **Avg Complexity:** 4.52

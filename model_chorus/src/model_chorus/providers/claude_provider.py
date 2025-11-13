@@ -196,6 +196,9 @@ class ClaudeProvider(CLIProvider):
             model_usage = data.get("modelUsage", {})
             model = list(model_usage.keys())[0] if model_usage else "unknown"
 
+            # Extract session_id from CLI response
+            session_id = data.get("session_id")
+
             # Extract usage info and create TokenUsage object
             usage_dict = data.get("usage", {})
             token_usage = TokenUsage(
