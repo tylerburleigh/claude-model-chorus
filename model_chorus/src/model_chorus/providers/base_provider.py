@@ -55,6 +55,9 @@ class TokenUsage:
     across different AI providers, with support for caching and provider-
     specific metadata.
 
+    Supports both attribute access (usage.input_tokens) and dict-like access
+    (usage['input_tokens']) for backward compatibility.
+
     Attributes:
         input_tokens: Number of tokens in the input prompt/context.
         output_tokens: Number of tokens in the generated response.
@@ -71,6 +74,75 @@ class TokenUsage:
     cached_input_tokens: int = 0
     total_tokens: int = 0
     metadata: Dict[str, Any] = field(default_factory=dict)
+
+    def __getitem__(self, key: str) -> Any:
+        """Support dict-like read access: usage['input_tokens'].
+
+        Args:
+            key: Field name to access.
+
+        Returns:
+            Value of the requested field.
+
+        Raises:
+            KeyError: If key is not a valid TokenUsage field.
+        """
+        if hasattr(self, key):
+            return getattr(self, key)
+        raise KeyError(f"'{key}' is not a valid TokenUsage field")
+
+    def __setitem__(self, key: str, value: Any) -> None:
+        """Support dict-like write access: usage['input_tokens'] = 100.
+
+        Args:
+            key: Field name to set.
+            value: Value to assign to the field.
+
+        Raises:
+            KeyError: If key is not a valid TokenUsage field.
+        """
+        if hasattr(self, key):
+            setattr(self, key, value)
+        else:
+            raise KeyError(f"'{key}' is not a valid TokenUsage field")
+
+    def get(self, key: str, default: Any = None) -> Any:
+        """Support dict-like get with default: usage.get('input_tokens', 0).
+
+        Args:
+            key: Field name to retrieve.
+            default: Default value if field doesn't exist.
+
+        Returns:
+            Field value if it exists, otherwise default.
+        """
+        return getattr(self, key, default)
+
+    def keys(self) -> List[str]:
+        """Return field names like dict.keys().
+
+        Returns:
+            List of field names in the TokenUsage dataclass.
+        """
+        return ['input_tokens', 'output_tokens', 'cached_input_tokens',
+                'total_tokens', 'metadata']
+
+    def values(self) -> List[Any]:
+        """Return field values like dict.values().
+
+        Returns:
+            List of current field values.
+        """
+        return [self.input_tokens, self.output_tokens,
+                self.cached_input_tokens, self.total_tokens, self.metadata]
+
+    def items(self) -> zip:
+        """Return (key, value) pairs like dict.items().
+
+        Returns:
+            Zip iterator of (field_name, field_value) tuples.
+        """
+        return zip(self.keys(), self.values())
 
 
 @dataclass
