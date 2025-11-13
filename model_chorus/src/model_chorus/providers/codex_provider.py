@@ -187,6 +187,7 @@ class CodexProvider(CLIProvider):
             content = ""
             token_usage = None
             thread_id = None
+            events = []
 
             # Process each line as a JSON event
             for line in stdout.strip().split('\n'):
@@ -194,6 +195,7 @@ class CodexProvider(CLIProvider):
                     continue
 
                 event = json.loads(line)
+                events.append(event)  # Collect all events for raw_response
                 event_type = event.get("type")
 
                 if event_type == "thread.started":
@@ -222,6 +224,9 @@ class CodexProvider(CLIProvider):
                 usage=token_usage,
                 stop_reason="completed",
                 thread_id=thread_id,
+                provider="codex",
+                stderr=stderr,
+                raw_response={"events": events},
                 metadata={},
             )
 

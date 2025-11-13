@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-13T18:23:33.991788Z",
+    "generated_at": "2025-11-13T18:24:16.940536Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 100,
-    "total_lines": 43001,
+    "total_lines": 43000,
     "total_classes": 237,
     "total_functions": 196,
     "avg_complexity": 4.52,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 100,
-        "lines": 43001,
+        "lines": 43000,
         "classes": 237,
         "functions": 196,
         "avg_complexity": 4.52
@@ -858,7 +858,7 @@
         "base_provider.TokenUsage"
       ],
       "exports": [],
-      "lines": 261
+      "lines": 260
     },
     {
       "name": "cursor_agent_provider",
