@@ -1,12 +1,12 @@
 {
   "spec_id": "standardize-provider-responses-2025-01-12-001",
   "generated": "2025-01-12T10:00:00Z",
-  "last_updated": "2025-11-12T20:18:43.975646Z",
+  "last_updated": "2025-11-13T16:00:37.585680Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
       "title": "Standardize Provider JSON Responses with Thread ID Support",
-      "status": "pending",
+      "status": "in_progress",
       "parent": null,
       "children": [
         "phase-1",
@@ -17,7 +17,7 @@
         "phase-6"
       ],
       "total_tasks": 38,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "description": "Standardize all provider responses to use structured dataclasses (TokenUsage, enhanced GenerationResponse) with thread_id field for conversation continuation. Extract CLI-native session/thread IDs from Claude, Codex, and Cursor Agent.",
         "scope": "Extract and store thread IDs only. CLI continuation (--resume flag usage) deferred to future spec.",
@@ -32,14 +32,14 @@
     "phase-1": {
       "type": "phase",
       "title": "Core Data Structures with Thread ID Support",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "spec-root",
       "children": [
         "phase-1-files",
         "phase-1-verify"
       ],
       "total_tasks": 6,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "purpose": "Create foundational dataclasses with thread_id field",
         "risk_level": "low"
@@ -56,13 +56,13 @@
     "phase-1-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-1",
       "children": [
         "task-1-1"
       ],
       "total_tasks": 5,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -73,7 +73,7 @@
     "task-1-1": {
       "type": "task",
       "title": "model_chorus/src/model_chorus/providers/base_provider.py",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-1-files",
       "children": [
         "task-1-1-1",
@@ -88,7 +88,7 @@
         "depends": []
       },
       "total_tasks": 5,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/providers/base_provider.py",
         "task_category": "implementation",
@@ -98,7 +98,7 @@
     "task-1-1-1": {
       "type": "subtask",
       "title": "Create TokenUsage dataclass with explicit token fields",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-1-1",
       "children": [],
       "dependencies": {
@@ -110,9 +110,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "details": "Add @dataclass with fields: input_tokens, output_tokens, cached_input_tokens, total_tokens (all int=0), metadata (Dict[str,Any])"
+        "details": "Add @dataclass with fields: input_tokens, output_tokens, cached_input_tokens, total_tokens (all int=0), metadata (Dict[str,Any])",
+        "started_at": "2025-11-13T15:59:18.912240Z",
+        "completed_at": "2025-11-13T16:00:37.581674Z",
+        "needs_journaling": false,
+        "actual_hours": 0.022,
+        "journaled_at": "2025-11-13T16:00:37.584623Z"
       }
     },
     "task-1-1-2": {
@@ -1304,5 +1309,22 @@
         "agent": "sdd-fidelity-review"
       }
     }
-  }
+  },
+  "metadata": {
+    "status": "active",
+    "activated_date": "2025-11-13T15:53:43.490176Z",
+    "progress_percentage": 2,
+    "current_phase": "phase-1"
+  },
+  "journal": [
+    {
+      "timestamp": "2025-11-13T16:00:37.584619Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Create TokenUsage dataclass with explicit token fields",
+      "author": "claude-code",
+      "content": "Successfully created TokenUsage dataclass in base_provider.py with all required fields (input_tokens, output_tokens, cached_input_tokens, total_tokens, metadata). Added comprehensive docstring explaining each field's purpose. Verified import and instantiation work correctly with multiple test cases including default values, explicit values, and metadata. The dataclass follows existing code style and is positioned logically between GenerationRequest and GenerationResponse. All success criteria met.",
+      "metadata": {},
+      "task_id": "task-1-1-1"
+    }
+  ]
 }

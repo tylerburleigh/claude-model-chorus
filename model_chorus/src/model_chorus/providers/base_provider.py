@@ -48,6 +48,32 @@ class GenerationRequest:
 
 
 @dataclass
+class TokenUsage:
+    """Token usage information with explicit fields for type safety.
+
+    This dataclass provides a standardized way to track token consumption
+    across different AI providers, with support for caching and provider-
+    specific metadata.
+
+    Attributes:
+        input_tokens: Number of tokens in the input prompt/context.
+        output_tokens: Number of tokens in the generated response.
+        cached_input_tokens: Number of input tokens retrieved from cache
+            (provider-dependent, e.g., OpenAI prompt caching).
+        total_tokens: Total token count, typically input + output tokens.
+            May or may not include cached tokens depending on provider.
+        metadata: Provider-specific additional usage information (e.g.,
+            cost, rate limits, model-specific metrics).
+    """
+
+    input_tokens: int = 0
+    output_tokens: int = 0
+    cached_input_tokens: int = 0
+    total_tokens: int = 0
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass
 class GenerationResponse:
     """Response from text generation."""
 
