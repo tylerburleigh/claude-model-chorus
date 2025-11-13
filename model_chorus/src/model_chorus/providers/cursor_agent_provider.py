@@ -188,6 +188,9 @@ class CursorAgentProvider(CLIProvider):
             # Extract content from the "result" field
             content = data.get("result", "")
 
+            # Extract session_id from CLI response
+            session_id = data.get("session_id")
+
             # Check if this is an error response
             if data.get("is_error", False):
                 error_msg = f"Cursor Agent returned error: {content}"

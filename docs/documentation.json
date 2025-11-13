@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-13T18:40:46.767271Z",
+    "generated_at": "2025-11-13T18:41:51.095135Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 100,
-    "total_lines": 43016,
+    "total_lines": 43026,
     "total_classes": 237,
     "total_functions": 196,
     "avg_complexity": 4.52,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 100,
-        "lines": 43016,
+        "lines": 43026,
         "classes": 237,
         "functions": 196,
         "avg_complexity": 4.52
@@ -884,7 +884,7 @@
         "base_provider.TokenUsage"
       ],
       "exports": [],
-      "lines": 246
+      "lines": 256
     },
     {
       "name": "gemini_provider",
@@ -9191,10 +9191,19 @@
             "CodexProvider",
             "parse_response"
           ]
+        },
+        {
+          "instantiator": "parse_response",
+          "file": "model_chorus/src/model_chorus/providers/cursor_agent_provider.py",
+          "line": 199,
+          "context": [
+            "CursorAgentProvider",
+            "parse_response"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 2
+      "instantiation_count": 3
     },
     {
       "name": "GenerationResponse",
@@ -9238,7 +9247,7 @@
         {
           "instantiator": "parse_response",
           "file": "model_chorus/src/model_chorus/providers/cursor_agent_provider.py",
-          "line": 197,
+          "line": 207,
           "context": [
             "CursorAgentProvider",
             "parse_response"
