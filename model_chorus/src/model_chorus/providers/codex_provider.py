@@ -221,9 +221,8 @@ class CodexProvider(CLIProvider):
                 model="gpt-5-codex",  # Default model from help output
                 usage=token_usage,
                 stop_reason="completed",
-                metadata={
-                    "thread_id": thread_id,
-                },
+                thread_id=thread_id,
+                metadata={},
             )
 
             logger.info(
