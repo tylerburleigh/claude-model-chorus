@@ -218,9 +218,12 @@ class ClaudeProvider(CLIProvider):
                 model=model,
                 usage=token_usage,
                 stop_reason=data.get("subtype"),  # "success" or error type
+                thread_id=session_id,
+                provider="claude",
+                stderr=stderr,
+                duration_ms=data.get("duration_ms"),
+                raw_response=data,
                 metadata={
-                    "raw_response": data,
-                    "duration_ms": data.get("duration_ms"),
                     "total_cost_usd": data.get("total_cost_usd"),
                 },
             )
