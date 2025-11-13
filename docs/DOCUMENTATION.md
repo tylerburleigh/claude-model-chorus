@@ -1,14 +1,14 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-13 11:38:09
+**Generated:** 2025-11-13 11:44:26
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 100
-- **Total Lines:** 42890
+- **Total Lines:** 42895
 - **Total Classes:** 237
 - **Total Functions:** 196
 - **Avg Complexity:** 4.52
@@ -1823,7 +1823,7 @@ Values:
 
 **Language:** python
 **Inherits from:** `ABC`
-**Defined in:** `src/model_chorus/providers/base_provider.py:159`
+**Defined in:** `src/model_chorus/providers/base_provider.py:164`
 
 **Description:**
 > Abstract base class for all model providers.

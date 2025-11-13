@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-13T16:38:09.761724Z",
+    "generated_at": "2025-11-13T16:44:26.419599Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 100,
-    "total_lines": 42890,
+    "total_lines": 42895,
     "total_classes": 237,
     "total_functions": 196,
     "avg_complexity": 4.52,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 100,
-        "lines": 42890,
+        "lines": 42895,
         "classes": 237,
         "functions": 196,
         "avg_complexity": 4.52
@@ -779,7 +779,7 @@
         "enum.Enum"
       ],
       "exports": [],
-      "lines": 273
+      "lines": 278
     },
     {
       "name": "claude_provider",
@@ -10501,7 +10501,7 @@
     {
       "name": "ModelProvider",
       "file": "src/model_chorus/providers/base_provider.py",
-      "line": 159,
+      "line": 164,
       "language": "python",
       "docstring": "Abstract base class for all model providers.\n\nAll provider implementations (Anthropic, OpenAI, Google, etc.) must inherit\nfrom this class and implement the required methods.\n\nAttributes:\n    provider_name: Name of the provider (e.g., \"anthropic\", \"openai\")\n    api_key: API key for authentication\n    config: Provider-specific configuration",
       "bases": [
