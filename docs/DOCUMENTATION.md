@@ -1,17 +1,17 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-13 14:04:13
+**Generated:** 2025-11-13 14:06:33
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 104
-- **Total Lines:** 43502
+- **Total Files:** 105
+- **Total Lines:** 43633
 - **Total Classes:** 237
-- **Total Functions:** 196
-- **Avg Complexity:** 4.52
+- **Total Functions:** 198
+- **Avg Complexity:** 4.48
 - **Max Complexity:** 56
 - **High Complexity Functions:**
   - thinkdeep (56)
@@ -8495,6 +8495,34 @@ showing how hypotheses are formed, tested, and confidence evolves across steps.
 
 ---
 
+### `new_workflow_pattern(response) -> None`
+
+**Language:** python
+**Defined in:** `test_backward_compatibility.py:24`
+**Complexity:** 1
+
+**Description:**
+> New pattern: access usage as attributes.
+
+**Parameters:**
+- `response`: None
+
+---
+
+### `old_workflow_pattern(response) -> None`
+
+**Language:** python
+**Defined in:** `test_backward_compatibility.py:10`
+**Complexity:** 1
+
+**Description:**
+> Simulates existing workflow code using dict access.
+
+**Parameters:**
+- `response`: None
+
+---
+
 ### `prepend_system_constraints(custom_prompt) -> str`
 
 **Language:** python
@@ -10541,6 +10569,10 @@ Returns:
 ### `test_backward_compat.py`
 
 - `json`
+- `sys`
+
+### `test_backward_compatibility.py`
+
 - `sys`
 
 ### `test_codex_parse.py`

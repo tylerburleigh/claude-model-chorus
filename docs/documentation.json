@@ -2,18 +2,18 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-13T19:04:13.052275Z",
+    "generated_at": "2025-11-13T19:06:33.973420Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 104,
-    "total_lines": 43502,
+    "total_files": 105,
+    "total_lines": 43633,
     "total_classes": 237,
-    "total_functions": 196,
-    "avg_complexity": 4.52,
+    "total_functions": 198,
+    "avg_complexity": 4.48,
     "max_complexity": 56,
     "high_complexity_functions": [
       "thinkdeep (56)",
@@ -24,11 +24,11 @@
     ],
     "by_language": {
       "python": {
-        "files": 104,
-        "lines": 43502,
+        "files": 105,
+        "lines": 43633,
         "classes": 237,
-        "functions": 196,
-        "avg_complexity": 4.52
+        "functions": 198,
+        "avg_complexity": 4.48
       }
     }
   },
@@ -2215,6 +2215,22 @@
       ],
       "exports": [],
       "lines": 104
+    },
+    {
+      "name": "test_backward_compatibility",
+      "file": "test_backward_compatibility.py",
+      "language": "python",
+      "docstring": "Test backward compatibility - verify existing code patterns still work\nTests both attribute access (new) and dict-like access (backward compat)",
+      "classes": [],
+      "functions": [
+        "old_workflow_pattern",
+        "new_workflow_pattern"
+      ],
+      "imports": [
+        "sys"
+      ],
+      "exports": [],
+      "lines": 131
     },
     {
       "name": "test_codex_parse",
@@ -11409,6 +11425,12 @@
         },
         {
           "instantiator": "<module>",
+          "file": "test_backward_compatibility.py",
+          "line": 38,
+          "context": []
+        },
+        {
+          "instantiator": "<module>",
           "file": "test_codex_parse.py",
           "line": 39,
           "context": []
@@ -11430,7 +11452,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 6
+      "instantiation_count": 7
     },
     {
       "name": "GeminiProvider",
@@ -36183,6 +36205,66 @@
       ]
     },
     {
+      "name": "old_workflow_pattern",
+      "file": "test_backward_compatibility.py",
+      "line": 10,
+      "language": "python",
+      "docstring": "Simulates existing workflow code using dict access.",
+      "parameters": [
+        {
+          "name": "response",
+          "type": null,
+          "default": null
+        }
+      ],
+      "return_type": null,
+      "complexity": 1,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "<module>",
+          "file": "test_backward_compatibility.py",
+          "line": 51,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [],
+      "call_count": 1
+    },
+    {
+      "name": "new_workflow_pattern",
+      "file": "test_backward_compatibility.py",
+      "line": 24,
+      "language": "python",
+      "docstring": "New pattern: access usage as attributes.",
+      "parameters": [
+        {
+          "name": "response",
+          "type": null,
+          "default": null
+        }
+      ],
+      "return_type": null,
+      "complexity": 1,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "<module>",
+          "file": "test_backward_compatibility.py",
+          "line": 58,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [],
+      "call_count": 1
+    },
+    {
       "name": "mock_provider",
       "file": "tests/test_argument_workflow.py",
       "line": 22,
@@ -38089,6 +38171,9 @@
     ],
     "test_backward_compat.py": [
       "json",
+      "sys"
+    ],
+    "test_backward_compatibility.py": [
       "sys"
     ],
     "test_codex_parse.py": [
