@@ -159,8 +159,20 @@ class CursorAgentProvider(CLIProvider):
             "duration_api_ms": 1696,
             "result": "...",
             "session_id": "...",
-            "request_id": "..."
+            "request_id": "...",
+            "usage": {"input_tokens": 10, "output_tokens": 50, "cached_input_tokens": 0}
         }
+
+        Returns GenerationResponse with standardized fields:
+        - content: The response text from "result" field
+        - model: Model identifier (from response or default "cursor-agent")
+        - usage: TokenUsage object with explicit token counts
+        - thread_id: Session ID for conversation continuity
+        - provider: Provider name ("cursor-agent")
+        - stderr: Standard error output from CLI
+        - duration_ms: Response generation time
+        - raw_response: Complete raw response data
+        - metadata: Provider-specific fields (request_id, duration_api_ms)
 
         Args:
             stdout: Standard output from CLI command
@@ -168,7 +180,7 @@ class CursorAgentProvider(CLIProvider):
             returncode: Process exit code
 
         Returns:
-            GenerationResponse with parsed content
+            GenerationResponse with parsed content and standardized fields
 
         Raises:
             ValueError: If output cannot be parsed or command failed
