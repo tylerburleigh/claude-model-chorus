@@ -14,6 +14,7 @@ from .base_provider import (
     GenerationResponse,
     ModelConfig,
     ModelCapability,
+    TokenUsage,
 )
 
 logger = logging.getLogger(__name__)
