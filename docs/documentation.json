@@ -2,18 +2,18 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-13T19:06:33.973420Z",
+    "generated_at": "2025-11-13T19:07:45.697271Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 105,
-    "total_lines": 43633,
+    "total_files": 106,
+    "total_lines": 43720,
     "total_classes": 237,
-    "total_functions": 198,
-    "avg_complexity": 4.48,
+    "total_functions": 200,
+    "avg_complexity": 4.46,
     "max_complexity": 56,
     "high_complexity_functions": [
       "thinkdeep (56)",
@@ -24,11 +24,11 @@
     ],
     "by_language": {
       "python": {
-        "files": 105,
-        "lines": 43633,
+        "files": 106,
+        "lines": 43720,
         "classes": 237,
-        "functions": 198,
-        "avg_complexity": 4.48
+        "functions": 200,
+        "avg_complexity": 4.46
       }
     }
   },
@@ -2269,6 +2269,22 @@
       "functions": [],
       "imports": [
         "json",
+        "sys"
+      ],
+      "exports": [],
+      "lines": 87
+    },
+    {
+      "name": "test_thread_id_extraction",
+      "file": "test_thread_id_extraction.py",
+      "language": "python",
+      "docstring": "Comprehensive test for thread_id extraction across all providers\nVerifies that each provider correctly extracts and maps thread_id",
+      "classes": [],
+      "functions": [
+        "test_cursor_agent_thread_id",
+        "test_codex_thread_id"
+      ],
+      "imports": [
         "sys"
       ],
       "exports": [],
@@ -11368,6 +11384,14 @@
           "context": []
         },
         {
+          "instantiator": "test_codex_thread_id",
+          "file": "test_thread_id_extraction.py",
+          "line": 34,
+          "context": [
+            "test_codex_thread_id"
+          ]
+        },
+        {
           "instantiator": "providers",
           "file": "tests/test_providers/test_cli_interface.py",
           "line": 35,
@@ -11378,7 +11402,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 23
+      "instantiation_count": 24
     },
     {
       "name": "CursorAgentProvider",
@@ -11442,6 +11466,14 @@
           "context": []
         },
         {
+          "instantiator": "test_cursor_agent_thread_id",
+          "file": "test_thread_id_extraction.py",
+          "line": 15,
+          "context": [
+            "test_cursor_agent_thread_id"
+          ]
+        },
+        {
           "instantiator": "providers",
           "file": "tests/test_providers/test_cli_interface.py",
           "line": 37,
@@ -11452,7 +11484,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 7
+      "instantiation_count": 8
     },
     {
       "name": "GeminiProvider",
@@ -36265,6 +36297,68 @@
       "call_count": 1
     },
     {
+      "name": "test_cursor_agent_thread_id",
+      "file": "test_thread_id_extraction.py",
+      "line": 9,
+      "language": "python",
+      "docstring": "Test Cursor Agent: session_id \u2192 thread_id",
+      "parameters": [],
+      "return_type": null,
+      "complexity": 2,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "<module>",
+          "file": "test_thread_id_extraction.py",
+          "line": 53,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "parse_response",
+          "file": "unknown",
+          "line": 16,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "test_codex_thread_id",
+      "file": "test_thread_id_extraction.py",
+      "line": 25,
+      "language": "python",
+      "docstring": "Test Codex: thread_id \u2192 thread_id",
+      "parameters": [],
+      "return_type": null,
+      "complexity": 2,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "<module>",
+          "file": "test_thread_id_extraction.py",
+          "line": 56,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "parse_response",
+          "file": "unknown",
+          "line": 35,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
       "name": "mock_provider",
       "file": "tests/test_argument_workflow.py",
       "line": 22,
@@ -38186,6 +38280,9 @@
     ],
     "test_parse_response.py": [
       "json",
+      "sys"
+    ],
+    "test_thread_id_extraction.py": [
       "sys"
     ],
     "tests/test_argument_workflow.py": [

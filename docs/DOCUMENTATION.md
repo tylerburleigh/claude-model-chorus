@@ -1,17 +1,17 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-13 14:06:33
+**Generated:** 2025-11-13 14:07:45
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 105
-- **Total Lines:** 43633
+- **Total Files:** 106
+- **Total Lines:** 43720
 - **Total Classes:** 237
-- **Total Functions:** 198
-- **Avg Complexity:** 4.48
+- **Total Functions:** 200
+- **Avg Complexity:** 4.46
 - **Max Complexity:** 56
 - **High Complexity Functions:**
   - thinkdeep (56)
@@ -9118,6 +9118,17 @@ Example:
 
 ---
 
+### `test_codex_thread_id() -> None`
+
+**Language:** python
+**Defined in:** `test_thread_id_extraction.py:25`
+**Complexity:** 2
+
+**Description:**
+> Test Codex: thread_id → thread_id
+
+---
+
 ### `async test_consensus_applies_provider_model_override_without_mutation() -> None`
 
 **Language:** python
@@ -9128,6 +9139,17 @@ Example:
 
 **Description:**
 > Ensure provider-specific metadata adds model override and preserves shared metadata.
+
+---
+
+### `test_cursor_agent_thread_id() -> None`
+
+**Language:** python
+**Defined in:** `test_thread_id_extraction.py:9`
+**Complexity:** 2
+
+**Description:**
+> Test Cursor Agent: session_id → thread_id
 
 ---
 
@@ -10588,6 +10610,10 @@ Returns:
 ### `test_parse_response.py`
 
 - `json`
+- `sys`
+
+### `test_thread_id_extraction.py`
+
 - `sys`
 
 ### `tests/test_argument_workflow.py`
