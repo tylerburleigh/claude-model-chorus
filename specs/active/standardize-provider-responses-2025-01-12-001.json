@@ -1,7 +1,7 @@
 {
   "spec_id": "standardize-provider-responses-2025-01-12-001",
   "generated": "2025-01-12T10:00:00Z",
-  "last_updated": "2025-11-13T16:35:27.854070Z",
+  "last_updated": "2025-11-13T16:43:47.030516Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -17,7 +17,7 @@
         "phase-6"
       ],
       "total_tasks": 38,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {
         "description": "Standardize all provider responses to use structured dataclasses (TokenUsage, enhanced GenerationResponse) with thread_id field for conversation continuation. Extract CLI-native session/thread IDs from Claude, Codex, and Cursor Agent.",
         "scope": "Extract and store thread IDs only. CLI continuation (--resume flag usage) deferred to future spec.",
@@ -39,7 +39,7 @@
         "phase-1-verify"
       ],
       "total_tasks": 6,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {
         "purpose": "Create foundational dataclasses with thread_id field",
         "risk_level": "low"
@@ -62,7 +62,7 @@
         "task-1-1"
       ],
       "total_tasks": 5,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -88,7 +88,7 @@
         "depends": []
       },
       "total_tasks": 5,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/providers/base_provider.py",
         "task_category": "implementation",
@@ -175,7 +175,7 @@
     "task-1-1-4": {
       "type": "subtask",
       "title": "Add new fields to GenerationResponse",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-1-1",
       "children": [],
       "dependencies": {
@@ -188,10 +188,15 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "details": "Add: thread_id: Optional[str] = None, provider: Optional[str] = None, stderr: Optional[str] = None, duration_ms: Optional[int] = None, raw_response: Optional[Dict[str, Any]] = None",
-        "task_category": "implementation"
+        "task_category": "implementation",
+        "started_at": "2025-11-13T16:42:42.626788Z",
+        "completed_at": "2025-11-13T16:43:47.026312Z",
+        "needs_journaling": false,
+        "actual_hours": 0.018,
+        "journaled_at": "2025-11-13T16:43:47.029220Z"
       }
     },
     "task-1-1-5": {
@@ -1323,7 +1328,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-13T15:53:43.490176Z",
-    "progress_percentage": 7,
+    "progress_percentage": 10,
     "current_phase": "phase-1"
   },
   "journal": [
@@ -1353,6 +1358,15 @@
       "content": "Successfully updated GenerationResponse to use TokenUsage instead of Dict[str, int]. Changed usage field from 'usage: Dict[str, int] = field(default_factory=dict)' to 'usage: TokenUsage = field(default_factory=TokenUsage)'. Verified with comprehensive tests including: default instance creation (usage is TokenUsage), explicit TokenUsage assignment, attribute access, dict-style read/write access, mixed access patterns, get() method with defaults, and iteration methods (keys/values/items). Full backward compatibility confirmed - existing provider code using dict syntax will work without modification. All success criteria met.",
       "metadata": {},
       "task_id": "task-1-1-3"
+    },
+    {
+      "timestamp": "2025-11-13T16:43:47.029215Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add new fields to GenerationResponse",
+      "author": "claude-code",
+      "content": "Successfully added five new fields to GenerationResponse: thread_id (Optional[str]), provider (Optional[str]), stderr (Optional[str]), duration_ms (Optional[int]), and raw_response (Optional[Dict[str, Any]]). All fields default to None and integrate seamlessly with existing fields. Verified with comprehensive tests including: default None values, explicit field setting, partial field setting, integration with TokenUsage, dict-like access compatibility, and typical provider response scenarios. The new fields enable conversation continuation (thread_id), provider identification, debugging support (stderr, raw_response), and performance tracking (duration_ms). All success criteria met.",
+      "metadata": {},
+      "task_id": "task-1-1-4"
     }
   ]
 }

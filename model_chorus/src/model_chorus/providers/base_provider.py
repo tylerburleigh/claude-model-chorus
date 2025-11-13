@@ -154,6 +154,11 @@ class GenerationResponse:
     usage: TokenUsage = field(default_factory=TokenUsage)
     stop_reason: Optional[str] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
+    thread_id: Optional[str] = None
+    provider: Optional[str] = None
+    stderr: Optional[str] = None
+    duration_ms: Optional[int] = None
+    raw_response: Optional[Dict[str, Any]] = None
 
 
 class ModelProvider(ABC):
