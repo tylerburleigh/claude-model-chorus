@@ -2,15 +2,15 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-13T18:52:27.253972Z",
+    "generated_at": "2025-11-13T18:58:22.825665Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 100,
-    "total_lines": 43043,
+    "total_files": 103,
+    "total_lines": 43345,
     "total_classes": 237,
     "total_functions": 196,
     "avg_complexity": 4.52,
@@ -24,8 +24,8 @@
     ],
     "by_language": {
       "python": {
-        "files": 100,
-        "lines": 43043,
+        "files": 103,
+        "lines": 43345,
         "classes": 237,
         "functions": 196,
         "avg_complexity": 4.52
@@ -2201,6 +2201,48 @@
       ],
       "exports": [],
       "lines": 674
+    },
+    {
+      "name": "test_backward_compat",
+      "file": "test_backward_compat.py",
+      "language": "python",
+      "docstring": "Test backward compatibility and different response formats",
+      "classes": [],
+      "functions": [],
+      "imports": [
+        "json",
+        "sys"
+      ],
+      "exports": [],
+      "lines": 104
+    },
+    {
+      "name": "test_codex_parse",
+      "file": "test_codex_parse.py",
+      "language": "python",
+      "docstring": "Test that code_blocks and language metadata are preserved in raw_response",
+      "classes": [],
+      "functions": [],
+      "imports": [
+        "json",
+        "sys"
+      ],
+      "exports": [],
+      "lines": 111
+    },
+    {
+      "name": "test_parse_response",
+      "file": "test_parse_response.py",
+      "language": "python",
+      "docstring": "Test script to verify CursorAgentProvider.parse_response() implementation",
+      "classes": [],
+      "functions": [],
+      "imports": [
+        "json",
+        "sys"
+      ],
+      "exports": [],
+      "lines": 87
     },
     {
       "name": "__init__",
@@ -11340,6 +11382,24 @@
           ]
         },
         {
+          "instantiator": "<module>",
+          "file": "test_backward_compat.py",
+          "line": 41,
+          "context": []
+        },
+        {
+          "instantiator": "<module>",
+          "file": "test_codex_parse.py",
+          "line": 39,
+          "context": []
+        },
+        {
+          "instantiator": "<module>",
+          "file": "test_parse_response.py",
+          "line": 17,
+          "context": []
+        },
+        {
           "instantiator": "providers",
           "file": "tests/test_providers/test_cli_interface.py",
           "line": 37,
@@ -11350,7 +11410,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 3
+      "instantiation_count": 6
     },
     {
       "name": "GeminiProvider",
@@ -38006,6 +38066,18 @@
       "model_chorus.core.base_workflow.WorkflowStep",
       "model_chorus.core.conversation.ConversationMemory",
       "model_chorus.core.models.ConversationMessage"
+    ],
+    "test_backward_compat.py": [
+      "json",
+      "sys"
+    ],
+    "test_codex_parse.py": [
+      "json",
+      "sys"
+    ],
+    "test_parse_response.py": [
+      "json",
+      "sys"
     ],
     "tests/test_argument_workflow.py": [
       "pytest",

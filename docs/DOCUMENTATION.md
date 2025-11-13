@@ -1,14 +1,14 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-13 13:52:27
+**Generated:** 2025-11-13 13:58:22
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 100
-- **Total Lines:** 43043
+- **Total Files:** 103
+- **Total Lines:** 43345
 - **Total Classes:** 237
 - **Total Functions:** 196
 - **Avg Complexity:** 4.52
@@ -10537,6 +10537,21 @@ Returns:
 - `unittest.mock.MagicMock`
 - `unittest.mock.Mock`
 - `unittest.mock.patch`
+
+### `test_backward_compat.py`
+
+- `json`
+- `sys`
+
+### `test_codex_parse.py`
+
+- `json`
+- `sys`
+
+### `test_parse_response.py`
+
+- `json`
+- `sys`
 
 ### `tests/test_argument_workflow.py`
 
