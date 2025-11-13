@@ -161,10 +161,24 @@ class ClaudeProvider(CLIProvider):
             "type": "result",
             "subtype": "success",
             "result": "...",  # The actual response content
+            "session_id": "...",  # Thread/conversation ID
             "usage": {"input_tokens": 10, "output_tokens": 50, ...},
             "modelUsage": {"claude-sonnet-4-5-20250929": {...}},
+            "duration_ms": 1234,
+            "total_cost_usd": 0.05,
             ...
         }
+
+        Returns GenerationResponse with standardized fields:
+        - content: The response text
+        - model: Model identifier
+        - usage: TokenUsage object with explicit token counts and metadata
+        - thread_id: Session/conversation ID for continuity
+        - provider: Provider name ("claude")
+        - stderr: Standard error output
+        - duration_ms: Response generation time
+        - raw_response: Complete raw response data
+        - metadata: Provider-agnostic additional data
 
         Args:
             stdout: Standard output from CLI command
@@ -172,7 +186,7 @@ class ClaudeProvider(CLIProvider):
             returncode: Process exit code
 
         Returns:
-            GenerationResponse with parsed content
+            GenerationResponse with parsed content and standardized fields
 
         Raises:
             ValueError: If output cannot be parsed or command failed
