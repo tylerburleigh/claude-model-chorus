@@ -196,13 +196,24 @@ class ClaudeProvider(CLIProvider):
             model_usage = data.get("modelUsage", {})
             model = list(model_usage.keys())[0] if model_usage else "unknown"
 
-            # Extract usage info
-            usage = data.get("usage", {})
+            # Extract usage info and create TokenUsage object
+            usage_dict = data.get("usage", {})
+            token_usage = TokenUsage(
+                input_tokens=usage_dict.get("input_tokens", 0),
+                output_tokens=usage_dict.get("output_tokens", 0),
+                cached_input_tokens=usage_dict.get("cached_input_tokens", 0),
+                total_tokens=usage_dict.get("input_tokens", 0) + usage_dict.get("output_tokens", 0),
+                metadata={
+                    "model_usage": data.get("modelUsage", {}),
+                    "duration_ms": data.get("duration_ms"),
+                    "total_cost_usd": data.get("total_cost_usd"),
+                },
+            )
 
             response = GenerationResponse(
                 content=content,
                 model=model,
-                usage=usage,
+                usage=token_usage,
                 stop_reason=data.get("subtype"),  # "success" or error type
                 metadata={
                     "raw_response": data,
