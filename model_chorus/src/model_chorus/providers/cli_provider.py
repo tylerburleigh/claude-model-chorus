@@ -84,6 +84,7 @@ class CLIProvider(ModelProvider):
         self.cli_command = cli_command
         self.timeout = timeout
         self.retry_limit = retry_limit
+        self.input_data: Optional[str] = None
 
     async def check_availability(self) -> tuple[bool, Optional[str]]:
         """
@@ -216,16 +217,23 @@ class CLIProvider(ModelProvider):
         logger.debug(f"Executing command: {' '.join(command)}")
 
         try:
+            stdin_pipe = asyncio.subprocess.PIPE if self.input_data else None
+            input_bytes = self.input_data.encode('utf-8') if self.input_data else None
+
             process = await asyncio.create_subprocess_exec(
                 *command,
+                stdin=stdin_pipe,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
 
             stdout, stderr = await asyncio.wait_for(
-                process.communicate(),
+                process.communicate(input=input_bytes),
                 timeout=self.timeout,
             )
+
+            # Reset input_data after use
+            self.input_data = None
 
             stdout_str = stdout.decode("utf-8", errors="replace")
             stderr_str = stderr.decode("utf-8", errors="replace")

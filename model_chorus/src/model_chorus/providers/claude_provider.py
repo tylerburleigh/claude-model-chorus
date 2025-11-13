@@ -45,8 +45,8 @@ class ClaudeProvider(CLIProvider):
     """
 
     # Model capability mappings
-    VISION_MODELS = {"opus", "sonnet"}  # Models that support vision
-    THINKING_MODELS = {"opus", "sonnet"}  # Models that support thinking mode
+    VISION_MODELS = {"sonnet", "haiku"}  # Models that support vision
+    THINKING_MODELS = {"sonnet", "haiku"}  # Models that support thinking mode (extended thinking)
 
     def __init__(
         self,
@@ -80,35 +80,26 @@ class ClaudeProvider(CLIProvider):
         """Initialize the list of available Claude models with their capabilities."""
         models = [
             ModelConfig(
-                model_id="opus",
-                temperature=0.7,
-                capabilities=[
-                    ModelCapability.TEXT_GENERATION,
-                    ModelCapability.VISION,
-                    ModelCapability.FUNCTION_CALLING,
-                    ModelCapability.THINKING,
-                ],
-                metadata={"family": "claude-3", "size": "large"},
-            ),
-            ModelConfig(
                 model_id="sonnet",
                 temperature=0.7,
                 capabilities=[
                     ModelCapability.TEXT_GENERATION,
                     ModelCapability.VISION,
-                    ModelCapability.FUNCTION_CALLING,
                     ModelCapability.THINKING,
+                    ModelCapability.STREAMING,
                 ],
-                metadata={"family": "claude-3.5", "size": "medium"},
+                metadata={"family": "sonnet-4.5", "tier": "default", "description": "Smartest model for daily use"},
             ),
             ModelConfig(
                 model_id="haiku",
                 temperature=0.7,
                 capabilities=[
                     ModelCapability.TEXT_GENERATION,
-                    ModelCapability.FUNCTION_CALLING,
+                    ModelCapability.VISION,
+                    ModelCapability.THINKING,
+                    ModelCapability.STREAMING,
                 ],
-                metadata={"family": "claude-3", "size": "small"},
+                metadata={"family": "haiku-4.5", "tier": "fast", "description": "Fastest model for simple tasks"},
             ),
         ]
         self.set_model_list(models)
@@ -130,9 +121,6 @@ class ClaudeProvider(CLIProvider):
 
         # Use print mode for non-interactive output
         command.append("--print")
-
-        # Add prompt as positional argument (must come early, before tool restriction flags)
-        command.append(request.prompt)
 
         # Use JSON output format for easier parsing
         command.extend(["--output-format", "json"])
@@ -156,6 +144,9 @@ class ClaudeProvider(CLIProvider):
 
         # Note: Claude CLI doesn't support --temperature, --max-tokens flags
         # These would need to be set via config or are model defaults
+
+        # Add prompt as a flag
+        command.extend(["--prompt", request.prompt])
 
         logger.debug(f"Built Claude command: {' '.join(command)}")
         return command

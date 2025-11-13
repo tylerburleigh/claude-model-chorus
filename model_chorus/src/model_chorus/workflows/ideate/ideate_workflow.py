@@ -198,6 +198,13 @@ class IdeateWorkflow(BaseWorkflow):
         # Prepare user message with ideation framing
         user_message = self._frame_ideation_prompt(prompt, is_continuation=bool(history))
 
+        # Prepend conversation history if it exists
+        if history:
+            history_str = "\n".join(
+                [f"{msg.role.upper()}: {msg.content}" for msg in history]
+            )
+            user_message = f"Previous conversation:\n{history_str}\n\n{user_message}"
+
         # Create generation request
         request = GenerationRequest(
             prompt=user_message,

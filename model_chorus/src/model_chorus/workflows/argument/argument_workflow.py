@@ -129,13 +129,16 @@ class ArgumentWorkflow(BaseWorkflow):
 
         logger.info(f"ArgumentWorkflow initialized with provider: {provider.provider_name}")
 
-    def _create_creator_role(self) -> ModelRole:
+    def _create_creator_role(self, temperature: Optional[float] = 0.7) -> ModelRole:
         """
         Create Creator role for thesis generation (Step 1 of ARGUMENT workflow).
 
         The Creator role is responsible for generating a strong initial thesis
         with supporting arguments. This role advocates FOR the position, establishing
         the foundation for the Skeptic's counter-arguments.
+
+        Args:
+            temperature: The temperature to use for the model
 
         Returns:
             ModelRole configured for Creator with "for" stance
@@ -163,7 +166,7 @@ class ArgumentWorkflow(BaseWorkflow):
                 "4. Anticipating and addressing potential counter-arguments\n"
                 "5. Maintaining intellectual rigor while being persuasive"
             ),
-            temperature=0.7,  # Balanced creativity and coherence
+            temperature=temperature,
             metadata={
                 "step": 1,
                 "step_name": "Thesis Generation",
@@ -171,13 +174,16 @@ class ArgumentWorkflow(BaseWorkflow):
             },
         )
 
-    def _create_skeptic_role(self) -> ModelRole:
+    def _create_skeptic_role(self, temperature: Optional[float] = 0.7) -> ModelRole:
         """
         Create Skeptic role for critical rebuttal (Step 2 of ARGUMENT workflow).
 
         The Skeptic role is responsible for providing critical analysis and
         counter-arguments to the Creator's thesis. This role advocates AGAINST
         the position, identifying weaknesses, flaws, and alternative perspectives.
+
+        Args:
+            temperature: The temperature to use for the model
 
         Returns:
             ModelRole configured for Skeptic with "against" stance
@@ -205,7 +211,7 @@ class ArgumentWorkflow(BaseWorkflow):
                 "4. Highlighting potential negative consequences or risks\n"
                 "5. Articulating the strongest counter-arguments with intellectual rigor"
             ),
-            temperature=0.7,  # Balanced creativity and coherence
+            temperature=temperature,
             metadata={
                 "step": 2,
                 "step_name": "Critical Rebuttal",
@@ -213,7 +219,7 @@ class ArgumentWorkflow(BaseWorkflow):
             },
         )
 
-    def _create_moderator_role(self) -> ModelRole:
+    def _create_moderator_role(self, temperature: Optional[float] = 0.7) -> ModelRole:
         """
         Create Moderator role for balanced synthesis (Step 3 of ARGUMENT workflow).
 
@@ -221,6 +227,9 @@ class ArgumentWorkflow(BaseWorkflow):
         and the Skeptic's rebuttal into a balanced, nuanced analysis. This role
         takes a NEUTRAL stance, weighing both perspectives fairly and producing
         a comprehensive assessment that acknowledges strengths and weaknesses.
+
+        Args:
+            temperature: The temperature to use for the model
 
         Returns:
             ModelRole configured for Moderator with "neutral" stance
@@ -250,7 +259,7 @@ class ArgumentWorkflow(BaseWorkflow):
                 "5. Offering actionable insights or recommendations where appropriate\n"
                 "6. Maintaining intellectual rigor while being accessible and clear"
             ),
-            temperature=0.7,  # Balanced creativity and coherence
+            temperature=temperature,
             metadata={
                 "step": 3,
                 "step_name": "Balanced Synthesis",
@@ -444,10 +453,15 @@ class ArgumentWorkflow(BaseWorkflow):
             # Build the full prompt with conversation history and file context if available
             full_prompt = self._build_prompt_with_history(prompt, thread_id, files)
 
+            # Get temperature from kwargs, with a default value
+            temperature = kwargs.get("temperature", 0.7)
+            if self.provider.provider_name == "gemini":
+                temperature = None
+
             # Create roles for ARGUMENT workflow
-            creator_role = self._create_creator_role()  # Step 1: Thesis generation
-            skeptic_role = self._create_skeptic_role()  # Step 2: Critical rebuttal
-            moderator_role = self._create_moderator_role()  # Step 3: Balanced synthesis
+            creator_role = self._create_creator_role(temperature=temperature)  # Step 1: Thesis generation
+            skeptic_role = self._create_skeptic_role(temperature=temperature)  # Step 2: Critical rebuttal
+            moderator_role = self._create_moderator_role(temperature=temperature)  # Step 3: Balanced synthesis
 
             # Set up provider map for orchestrator
             provider_map = {

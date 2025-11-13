@@ -45,8 +45,7 @@ class CodexProvider(CLIProvider):
     """
 
     # Model capability mappings
-    VISION_MODELS = {"gpt4", "gpt4-turbo"}  # Models that support vision
-    FUNCTION_CALLING_MODELS = {"gpt4", "gpt4-turbo", "gpt35-turbo"}  # Models with function calling
+    FUNCTION_CALLING_MODELS = {"gpt-5-codex", "gpt-5-codex-mini", "gpt-5"}  # Models with function calling
 
     def __init__(
         self,
@@ -80,33 +79,34 @@ class CodexProvider(CLIProvider):
         """Initialize the list of available Codex/GPT models with their capabilities."""
         models = [
             ModelConfig(
-                model_id="gpt4",
+                model_id="gpt-5-codex",
                 temperature=0.7,
                 capabilities=[
                     ModelCapability.TEXT_GENERATION,
-                    ModelCapability.VISION,
                     ModelCapability.FUNCTION_CALLING,
+                    ModelCapability.STREAMING,
                 ],
-                metadata={"family": "gpt-4", "size": "large"},
+                metadata={"tier": "primary", "optimized_for": "codex"},
             ),
             ModelConfig(
-                model_id="gpt4-turbo",
+                model_id="gpt-5-codex-mini",
                 temperature=0.7,
                 capabilities=[
                     ModelCapability.TEXT_GENERATION,
-                    ModelCapability.VISION,
                     ModelCapability.FUNCTION_CALLING,
+                    ModelCapability.STREAMING,
                 ],
-                metadata={"family": "gpt-4-turbo", "size": "large"},
+                metadata={"tier": "fast", "optimized_for": "codex"},
             ),
             ModelConfig(
-                model_id="gpt35-turbo",
+                model_id="gpt-5",
                 temperature=0.7,
                 capabilities=[
                     ModelCapability.TEXT_GENERATION,
                     ModelCapability.FUNCTION_CALLING,
+                    ModelCapability.STREAMING,
                 ],
-                metadata={"family": "gpt-3.5-turbo", "size": "medium"},
+                metadata={"tier": "general"},
             ),
         ]
         self.set_model_list(models)
@@ -146,8 +146,8 @@ class CodexProvider(CLIProvider):
             for image_path in request.images:
                 command.extend(["--image", image_path])
 
-        # Add prompt as final positional argument
-        command.append(request.prompt)
+        # Add prompt as a flag
+        command.extend(["--prompt", request.prompt])
 
         logger.debug(f"Built Codex command: {' '.join(command)}")
         return command
@@ -234,12 +234,12 @@ class CodexProvider(CLIProvider):
         Check if a specific Codex/GPT model supports vision capabilities.
 
         Args:
-            model_id: The model identifier (e.g., "gpt4", "gpt4-turbo", "gpt35-turbo")
+            model_id: The model identifier
 
         Returns:
-            True if the model supports vision, False otherwise
+            False - Codex models don't support vision
         """
-        return model_id in self.VISION_MODELS
+        return False
 
     def supports_function_calling(self, model_id: str) -> bool:
         """

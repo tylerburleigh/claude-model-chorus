@@ -46,8 +46,8 @@ class GeminiProvider(CLIProvider):
     """
 
     # Model capability mappings
-    VISION_MODELS = {"pro", "ultra", "flash"}  # All Gemini models support vision
-    # Note: THINKING_MODELS removed - Gemini CLI doesn't support thinking_mode parameter
+    VISION_MODELS = {"gemini-2.5-pro", "gemini-2.5-flash"}  # All Gemini models support vision
+    THINKING_MODELS = {"gemini-2.5-pro", "gemini-2.5-flash"}  # Pro has Deep Think, Flash has hybrid reasoning
 
     def __init__(
         self,
@@ -81,36 +81,26 @@ class GeminiProvider(CLIProvider):
         """Initialize the list of available Gemini models with their capabilities."""
         models = [
             ModelConfig(
-                model_id="pro",
+                model_id="gemini-2.5-pro",
                 temperature=0.7,
                 capabilities=[
                     ModelCapability.TEXT_GENERATION,
                     ModelCapability.VISION,
-                    ModelCapability.FUNCTION_CALLING,
-                    # Note: THINKING removed - Gemini CLI doesn't support thinking_mode via CLI args
+                    ModelCapability.STREAMING,
+                    ModelCapability.THINKING,
                 ],
-                metadata={"family": "gemini-2.0", "size": "large"},
+                metadata={"tier": "pro", "context_window": "1M", "thinking": "deep_think"},
             ),
             ModelConfig(
-                model_id="flash",
+                model_id="gemini-2.5-flash",
                 temperature=0.7,
                 capabilities=[
                     ModelCapability.TEXT_GENERATION,
                     ModelCapability.VISION,
-                    ModelCapability.FUNCTION_CALLING,
+                    ModelCapability.STREAMING,
+                    ModelCapability.THINKING,
                 ],
-                metadata={"family": "gemini-2.0", "size": "medium"},
-            ),
-            ModelConfig(
-                model_id="ultra",
-                temperature=0.7,
-                capabilities=[
-                    ModelCapability.TEXT_GENERATION,
-                    ModelCapability.VISION,
-                    ModelCapability.FUNCTION_CALLING,
-                    # Note: THINKING removed - Gemini CLI doesn't support thinking_mode via CLI args
-                ],
-                metadata={"family": "gemini-ultra", "size": "xlarge"},
+                metadata={"tier": "flash", "thinking": "hybrid_reasoning"},
             ),
         ]
         self.set_model_list(models)
@@ -205,8 +195,8 @@ class GeminiProvider(CLIProvider):
         if request.system_prompt:
             full_prompt = f"{request.system_prompt}\n\n{request.prompt}"
 
-        # Add prompt as positional argument
-        command.append(full_prompt)
+        # Add prompt using the -p flag for non-interactive mode
+        command.extend(["-p", full_prompt])
 
         # Add model from metadata if specified
         if "model" in request.metadata:
@@ -324,6 +314,6 @@ class GeminiProvider(CLIProvider):
             model_id: The model identifier
 
         Returns:
-            True if the model supports thinking mode, False otherwise
+            True if the model supports thinking mode (Deep Think for Pro, hybrid reasoning for Flash)
         """
         return model_id in self.THINKING_MODELS

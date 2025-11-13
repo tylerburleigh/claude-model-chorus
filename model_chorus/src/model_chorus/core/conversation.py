@@ -265,8 +265,19 @@ class ConversationMemory:
         """
         thread = self.get_thread(thread_id)
         if not thread:
-            logger.error(f"Cannot add message: thread {thread_id} not found")
-            return False
+            # If thread doesn't exist, create it
+            now = datetime.now(timezone.utc).isoformat()
+            thread = ConversationThread(
+                thread_id=thread_id,
+                created_at=now,
+                last_updated_at=now,
+                workflow_name=workflow_name or "unknown",
+                messages=[],
+                state={},
+                initial_context={},
+                status="active"
+            )
+            logger.info(f"Created new thread {thread_id} implicitly from add_message")
 
         # Create message
         message = ConversationMessage(

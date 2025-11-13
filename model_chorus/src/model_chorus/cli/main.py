@@ -201,7 +201,7 @@ def get_provider_by_name(name: str, timeout: int = 120):
 
 @app.command()
 def chat(
-    prompt: str = typer.Argument(..., help="Message to send to the AI model"),
+    prompt: str = typer.Option(..., "--prompt", "-P", help="Message to send to the AI model"),
     provider: Optional[str] = typer.Option(
         None,
         "--provider",
@@ -320,12 +320,7 @@ def chat(
         if verbose:
             console.print(f"[cyan]Workflow: {workflow}[/cyan]")
 
-        # Validate files exist
-        if files:
-            for file_path in files:
-                if not Path(file_path).exists():
-                    console.print(f"[red]Error: File not found: {file_path}[/red]")
-                    raise typer.Exit(1)
+        final_prompt = construct_prompt_with_files(prompt, files)
 
         # Display conversation info
         console.print(f"\n[bold cyan]{'Continuing' if continuation_id else 'Starting new'} chat conversation...[/bold cyan]")
@@ -340,7 +335,7 @@ def chat(
         # Run async workflow
         result = asyncio.run(
             workflow.run(
-                prompt=prompt,
+                prompt=final_prompt,
                 continuation_id=continuation_id,
                 files=files,
                 skip_provider_check=skip_provider_check,
@@ -410,7 +405,7 @@ def chat(
 
 @app.command()
 def argument(
-    prompt: str = typer.Argument(..., help="Argument, claim, or question to analyze"),
+    prompt: str = typer.Option(..., "--prompt", "-P", help="Argument, claim, or question to analyze"),
     provider: Optional[str] = typer.Option(
         None,
         "--provider",
@@ -530,12 +525,7 @@ def argument(
         if verbose:
             console.print(f"[cyan]Workflow: {workflow}[/cyan]")
 
-        # Validate files exist
-        if files:
-            for file_path in files:
-                if not Path(file_path).exists():
-                    console.print(f"[red]Error: File not found: {file_path}[/red]")
-                    raise typer.Exit(1)
+        final_prompt = construct_prompt_with_files(prompt, files)
 
         # Display analysis info
         console.print(f"\n[bold cyan]Analyzing argument through dialectical reasoning...[/bold cyan]")
@@ -549,7 +539,7 @@ def argument(
         # Execute workflow
         result = asyncio.run(
             workflow.run(
-                prompt=prompt,
+                prompt=final_prompt,
                 continuation_id=continuation_id,
                 files=files,
                 skip_provider_check=skip_provider_check,
@@ -612,7 +602,7 @@ def argument(
 
 @app.command()
 def ideate(
-    prompt: str = typer.Argument(..., help="Topic or problem to brainstorm ideas for"),
+    prompt: str = typer.Option(..., "--prompt", "-P", help="Topic or problem to brainstorm ideas for"),
     provider: Optional[str] = typer.Option(
         None,
         "--provider",
@@ -738,12 +728,7 @@ def ideate(
         if verbose:
             console.print(f"[cyan]Workflow: {workflow}[/cyan]")
 
-        # Validate files exist
-        if files:
-            for file_path in files:
-                if not Path(file_path).exists():
-                    console.print(f"[red]Error: File not found: {file_path}[/red]")
-                    raise typer.Exit(1)
+        final_prompt = construct_prompt_with_files(prompt, files)
 
         # Display ideation info
         console.print(f"\n[bold cyan]Generating creative ideas...[/bold cyan]")
@@ -760,7 +745,7 @@ def ideate(
         # Execute workflow
         result = asyncio.run(
             workflow.run(
-                prompt=prompt,
+                prompt=final_prompt,
                 continuation_id=continuation_id,
                 files=files,
                 skip_provider_check=skip_provider_check,
@@ -818,9 +803,25 @@ def ideate(
             console.print(f"\n[red]{traceback.format_exc()}[/red]")
         raise typer.Exit(1)
 
+def construct_prompt_with_files(prompt: str, files: Optional[List[str]]) -> str:
+    """Construct a prompt by prepending the content of files."""
+    if not files:
+        return prompt
+
+    file_content = "The user has provided the following file(s) for context:\n\n"
+    for file_path in files:
+        if not Path(file_path).exists():
+            console.print(f"[red]Error: File not found: {file_path}[/red]")
+            raise typer.Exit(1)
+        with open(file_path, "r") as f:
+            file_content += f"--- {file_path} ---\n{f.read()}\n\n"
+    
+    return f"{prompt}\n\n{file_content}"
+
+
 @app.command()
 def consensus(
-    prompt: str = typer.Argument(..., help="Prompt to send to all models"),
+    prompt: str = typer.Option(..., "--prompt", "-P", help="Prompt to send to all models"),
     providers: Optional[List[str]] = typer.Option(
         None,
         "--provider",
@@ -832,6 +833,12 @@ def consensus(
         "--strategy",
         "-s",
         help="Consensus strategy: all_responses, first_valid, majority, weighted, synthesize. Defaults to config or 'all_responses'",
+    ),
+    files: Optional[List[str]] = typer.Option(
+        None,
+        "--file",
+        "-f",
+        help="File paths to include in conversation context (can specify multiple times)",
     ),
     system: Optional[str] = typer.Option(
         None,
@@ -884,6 +891,8 @@ def consensus(
             )
             raise typer.Exit(1)
 
+        final_prompt = construct_prompt_with_files(prompt, files)
+
         # Create provider instances
         if verbose:
             console.print(f"[cyan]Creating providers: {', '.join(providers)}[/cyan]")
@@ -925,7 +934,7 @@ def consensus(
 
         # Create request
         request = GenerationRequest(
-            prompt=prompt,
+            prompt=final_prompt,
             system_prompt=system,
         )
 
@@ -967,7 +976,10 @@ def consensus(
 
         # Show consensus response
         if result.consensus_response:
-            console.print("[bold]Consensus Response:[/bold]\n")
+            if result.strategy_used == ConsensusStrategy.ALL_RESPONSES:
+                console.print("[bold]Individual Provider Responses:[/bold]\n")
+            else:
+                console.print("[bold]Consensus Response:[/bold]\n")
             console.print(result.consensus_response)
         else:
             console.print("[yellow]No consensus response generated[/yellow]")
