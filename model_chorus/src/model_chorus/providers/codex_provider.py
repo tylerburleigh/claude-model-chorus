@@ -161,7 +161,17 @@ class CodexProvider(CLIProvider):
         {"type":"thread.started","thread_id":"..."}
         {"type":"turn.started"}
         {"type":"item.completed","item":{"id":"item_1","type":"agent_message","text":"..."}}
-        {"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":50}}
+        {"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":50,"cached_input_tokens":0}}
+
+        Returns GenerationResponse with standardized fields:
+        - content: The response text extracted from agent_message items
+        - model: Model identifier (default: "gpt-5-codex")
+        - usage: TokenUsage object with explicit token counts from turn.completed
+        - thread_id: Thread ID from thread.started event for conversation continuity
+        - provider: Provider name ("codex")
+        - stderr: Standard error output from CLI
+        - raw_response: Complete JSONL events in {"events": [...]} format
+        - metadata: Provider-agnostic additional data
 
         Args:
             stdout: Standard output from CLI command (JSONL format)
@@ -169,7 +179,7 @@ class CodexProvider(CLIProvider):
             returncode: Process exit code
 
         Returns:
-            GenerationResponse with parsed content
+            GenerationResponse with parsed content and standardized fields
 
         Raises:
             ValueError: If output cannot be parsed or command failed
