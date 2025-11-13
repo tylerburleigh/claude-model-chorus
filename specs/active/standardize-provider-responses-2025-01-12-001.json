@@ -1,7 +1,7 @@
 {
   "spec_id": "standardize-provider-responses-2025-01-12-001",
   "generated": "2025-01-12T10:00:00Z",
-  "last_updated": "2025-11-13T16:10:44.843732Z",
+  "last_updated": "2025-11-13T16:35:27.854070Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -17,7 +17,7 @@
         "phase-6"
       ],
       "total_tasks": 38,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "description": "Standardize all provider responses to use structured dataclasses (TokenUsage, enhanced GenerationResponse) with thread_id field for conversation continuation. Extract CLI-native session/thread IDs from Claude, Codex, and Cursor Agent.",
         "scope": "Extract and store thread IDs only. CLI continuation (--resume flag usage) deferred to future spec.",
@@ -39,7 +39,7 @@
         "phase-1-verify"
       ],
       "total_tasks": 6,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "purpose": "Create foundational dataclasses with thread_id field",
         "risk_level": "low"
@@ -62,7 +62,7 @@
         "task-1-1"
       ],
       "total_tasks": 5,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -88,7 +88,7 @@
         "depends": []
       },
       "total_tasks": 5,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/providers/base_provider.py",
         "task_category": "implementation",
@@ -148,7 +148,7 @@
     "task-1-1-3": {
       "type": "subtask",
       "title": "Update GenerationResponse to use TokenUsage instead of Dict",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-1-1",
       "children": [],
       "dependencies": {
@@ -161,10 +161,15 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "details": "Replace 'usage: Dict[str, int]' with 'usage: TokenUsage = field(default_factory=TokenUsage)'",
-        "task_category": "implementation"
+        "task_category": "implementation",
+        "started_at": "2025-11-13T16:34:15.891135Z",
+        "completed_at": "2025-11-13T16:35:27.849922Z",
+        "needs_journaling": false,
+        "actual_hours": 0.02,
+        "journaled_at": "2025-11-13T16:35:27.852963Z"
       }
     },
     "task-1-1-4": {
@@ -1318,7 +1323,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-13T15:53:43.490176Z",
-    "progress_percentage": 5,
+    "progress_percentage": 7,
     "current_phase": "phase-1"
   },
   "journal": [
@@ -1339,6 +1344,15 @@
       "content": "Successfully added dict-like access methods to TokenUsage dataclass for backward compatibility. Implemented __getitem__, __setitem__, get(), keys(), values(), and items() methods. All methods include comprehensive docstrings and proper error handling (KeyError for invalid fields). Verified with extensive tests including: dict-like read/write access, get() with defaults, iteration methods, error handling, and mixed access patterns (both attribute and dict-style simultaneously). Backward compatibility is fully confirmed - existing code using dict syntax will work seamlessly alongside new attribute access. All success criteria met.",
       "metadata": {},
       "task_id": "task-1-1-2"
+    },
+    {
+      "timestamp": "2025-11-13T16:35:27.852959Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Update GenerationResponse to use TokenUsage instead of Dict",
+      "author": "claude-code",
+      "content": "Successfully updated GenerationResponse to use TokenUsage instead of Dict[str, int]. Changed usage field from 'usage: Dict[str, int] = field(default_factory=dict)' to 'usage: TokenUsage = field(default_factory=TokenUsage)'. Verified with comprehensive tests including: default instance creation (usage is TokenUsage), explicit TokenUsage assignment, attribute access, dict-style read/write access, mixed access patterns, get() method with defaults, and iteration methods (keys/values/items). Full backward compatibility confirmed - existing provider code using dict syntax will work without modification. All success criteria met.",
+      "metadata": {},
+      "task_id": "task-1-1-3"
     }
   ]
 }

@@ -1,14 +1,14 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-13 11:05:17
+**Generated:** 2025-11-13 11:30:55
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 100
-- **Total Lines:** 42818
+- **Total Lines:** 42890
 - **Total Classes:** 237
 - **Total Functions:** 196
 - **Avg Complexity:** 4.52
@@ -1166,7 +1166,7 @@ Example:
 ### `GenerationResponse`
 
 **Language:** python
-**Defined in:** `src/model_chorus/providers/base_provider.py:77`
+**Defined in:** `src/model_chorus/providers/base_provider.py:149`
 
 **Description:**
 > Response from text generation.
@@ -1823,7 +1823,7 @@ Values:
 
 **Language:** python
 **Inherits from:** `ABC`
-**Defined in:** `src/model_chorus/providers/base_provider.py:87`
+**Defined in:** `src/model_chorus/providers/base_provider.py:159`
 
 **Description:**
 > Abstract base class for all model providers.
@@ -5289,6 +5289,9 @@ This dataclass provides a standardized way to track token consumption
 across different AI providers, with support for caching and provider-
 specific metadata.
 
+Supports both attribute access (usage.input_tokens) and dict-like access
+(usage['input_tokens']) for backward compatibility.
+
 Attributes:
     input_tokens: Number of tokens in the input prompt/context.
     output_tokens: Number of tokens in the generated response.
@@ -5298,6 +5301,14 @@ Attributes:
         May or may not include cached tokens depending on provider.
     metadata: Provider-specific additional usage information (e.g.,
         cost, rate limits, model-specific metrics).
+
+**Methods:**
+- `__getitem__()`
+- `__setitem__()`
+- `get()`
+- `keys()`
+- `values()`
+- `items()`
 
 ---
 

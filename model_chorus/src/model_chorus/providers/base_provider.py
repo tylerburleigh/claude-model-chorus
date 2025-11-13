@@ -151,7 +151,7 @@ class GenerationResponse:
 
     content: str
     model: str
-    usage: Dict[str, int] = field(default_factory=dict)
+    usage: TokenUsage = field(default_factory=TokenUsage)
     stop_reason: Optional[str] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
 

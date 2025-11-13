@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-13T16:05:17.007302Z",
+    "generated_at": "2025-11-13T16:30:55.008835Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 100,
-    "total_lines": 42818,
+    "total_lines": 42890,
     "total_classes": 237,
     "total_functions": 196,
     "avg_complexity": 4.52,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 100,
-        "lines": 42818,
+        "lines": 42890,
         "classes": 237,
         "functions": 196,
         "avg_complexity": 4.52
@@ -779,7 +779,7 @@
         "enum.Enum"
       ],
       "exports": [],
-      "lines": 201
+      "lines": 273
     },
     {
       "name": "claude_provider",
@@ -9157,9 +9157,16 @@
       "file": "src/model_chorus/providers/base_provider.py",
       "line": 51,
       "language": "python",
-      "docstring": "Token usage information with explicit fields for type safety.\n\nThis dataclass provides a standardized way to track token consumption\nacross different AI providers, with support for caching and provider-\nspecific metadata.\n\nAttributes:\n    input_tokens: Number of tokens in the input prompt/context.\n    output_tokens: Number of tokens in the generated response.\n    cached_input_tokens: Number of input tokens retrieved from cache\n        (provider-dependent, e.g., OpenAI prompt caching).\n    total_tokens: Total token count, typically input + output tokens.\n        May or may not include cached tokens depending on provider.\n    metadata: Provider-specific additional usage information (e.g.,\n        cost, rate limits, model-specific metrics).",
+      "docstring": "Token usage information with explicit fields for type safety.\n\nThis dataclass provides a standardized way to track token consumption\nacross different AI providers, with support for caching and provider-\nspecific metadata.\n\nSupports both attribute access (usage.input_tokens) and dict-like access\n(usage['input_tokens']) for backward compatibility.\n\nAttributes:\n    input_tokens: Number of tokens in the input prompt/context.\n    output_tokens: Number of tokens in the generated response.\n    cached_input_tokens: Number of input tokens retrieved from cache\n        (provider-dependent, e.g., OpenAI prompt caching).\n    total_tokens: Total token count, typically input + output tokens.\n        May or may not include cached tokens depending on provider.\n    metadata: Provider-specific additional usage information (e.g.,\n        cost, rate limits, model-specific metrics).",
       "bases": [],
-      "methods": [],
+      "methods": [
+        "__getitem__",
+        "__setitem__",
+        "get",
+        "keys",
+        "values",
+        "items"
+      ],
       "properties": [],
       "is_exported": false,
       "is_public": true,
@@ -9169,7 +9176,7 @@
     {
       "name": "GenerationResponse",
       "file": "src/model_chorus/providers/base_provider.py",
-      "line": 77,
+      "line": 149,
       "language": "python",
       "docstring": "Response from text generation.",
       "bases": [],
@@ -10494,7 +10501,7 @@
     {
       "name": "ModelProvider",
       "file": "src/model_chorus/providers/base_provider.py",
-      "line": 87,
+      "line": 159,
       "language": "python",
       "docstring": "Abstract base class for all model providers.\n\nAll provider implementations (Anthropic, OpenAI, Google, etc.) must inherit\nfrom this class and implement the required methods.\n\nAttributes:\n    provider_name: Name of the provider (e.g., \"anthropic\", \"openai\")\n    api_key: API key for authentication\n    config: Provider-specific configuration",
       "bases": [
