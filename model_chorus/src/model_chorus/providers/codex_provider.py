@@ -185,7 +185,7 @@ class CodexProvider(CLIProvider):
         # Parse JSONL output
         try:
             content = ""
-            usage = {}
+            token_usage = None
             thread_id = None
 
             # Process each line as a JSON event
@@ -204,16 +204,22 @@ class CodexProvider(CLIProvider):
                         content = item.get("text", "")
                 elif event_type == "turn.completed":
                     usage_data = event.get("usage", {})
-                    usage = {
-                        "input_tokens": usage_data.get("input_tokens", 0),
-                        "output_tokens": usage_data.get("output_tokens", 0),
-                        "cached_input_tokens": usage_data.get("cached_input_tokens", 0),
-                    }
+                    input_tokens = usage_data.get("input_tokens", 0)
+                    output_tokens = usage_data.get("output_tokens", 0)
+                    cached_input_tokens = usage_data.get("cached_input_tokens", 0)
+
+                    token_usage = TokenUsage(
+                        input_tokens=input_tokens,
+                        output_tokens=output_tokens,
+                        cached_input_tokens=cached_input_tokens,
+                        total_tokens=input_tokens + output_tokens,
+                        metadata={},
+                    )
 
             response = GenerationResponse(
                 content=content,
                 model="gpt-5-codex",  # Default model from help output
-                usage=usage,
+                usage=token_usage,
                 stop_reason="completed",
                 metadata={
                     "thread_id": thread_id,
