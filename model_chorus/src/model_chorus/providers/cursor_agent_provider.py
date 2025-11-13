@@ -194,10 +194,20 @@ class CursorAgentProvider(CLIProvider):
                 logger.error(error_msg)
                 raise ValueError(error_msg)
 
+            # Extract usage data and create TokenUsage object
+            usage_dict = data.get("usage", {})
+            token_usage = TokenUsage(
+                input_tokens=usage_dict.get("input_tokens", 0),
+                output_tokens=usage_dict.get("output_tokens", 0),
+                cached_input_tokens=usage_dict.get("cached_input_tokens", 0),
+                total_tokens=usage_dict.get("input_tokens", 0) + usage_dict.get("output_tokens", 0),
+                metadata={},
+            )
+
             response = GenerationResponse(
                 content=content,
                 model=data.get("model", "cursor-agent"),
-                usage=data.get("usage", {}),
+                usage=token_usage,
                 stop_reason=data.get("subtype"),
                 metadata={
                     "session_id": data.get("session_id"),

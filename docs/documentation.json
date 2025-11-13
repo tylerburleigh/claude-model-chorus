@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-13T18:26:16.769577Z",
+    "generated_at": "2025-11-13T18:40:46.767271Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 100,
-    "total_lines": 43015,
+    "total_lines": 43016,
     "total_classes": 237,
     "total_functions": 196,
     "avg_complexity": 4.52,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 100,
-        "lines": 43015,
+        "lines": 43016,
         "classes": 237,
         "functions": 196,
         "avg_complexity": 4.52
@@ -880,10 +880,11 @@
         "base_provider.GenerationRequest",
         "base_provider.GenerationResponse",
         "base_provider.ModelConfig",
-        "base_provider.ModelCapability"
+        "base_provider.ModelCapability",
+        "base_provider.TokenUsage"
       ],
       "exports": [],
-      "lines": 245
+      "lines": 246
     },
     {
       "name": "gemini_provider",
@@ -8736,7 +8737,7 @@
         {
           "instantiator": "_initialize_models",
           "file": "model_chorus/src/model_chorus/providers/cursor_agent_provider.py",
-          "line": 84,
+          "line": 85,
           "context": [
             "CursorAgentProvider",
             "_initialize_models"
@@ -8745,7 +8746,7 @@
         {
           "instantiator": "_initialize_models",
           "file": "model_chorus/src/model_chorus/providers/cursor_agent_provider.py",
-          "line": 94,
+          "line": 95,
           "context": [
             "CursorAgentProvider",
             "_initialize_models"
@@ -9237,7 +9238,7 @@
         {
           "instantiator": "parse_response",
           "file": "model_chorus/src/model_chorus/providers/cursor_agent_provider.py",
-          "line": 196,
+          "line": 197,
           "context": [
             "CursorAgentProvider",
             "parse_response"
@@ -11295,7 +11296,7 @@
     {
       "name": "CursorAgentProvider",
       "file": "model_chorus/src/model_chorus/providers/cursor_agent_provider.py",
-      "line": 22,
+      "line": 23,
       "language": "python",
       "docstring": "Provider for Cursor's AI agent via the `cursor-agent` CLI tool.\n\nThis provider wraps the `cursor-agent` command-line interface to enable\ncode-focused AI interactions with Cursor's agent models.\n\nSupported features:\n- Code generation and completion\n- Natural language to code conversion\n- Code explanation and documentation\n- System prompts for context\n- Temperature control\n- Working directory support for context-aware code generation\n\nExample:\n    >>> provider = CursorAgentProvider()\n    >>> request = GenerationRequest(\n    ...     prompt=\"Write a function to validate email addresses\",\n    ...     temperature=0.3,\n    ...     max_tokens=500,\n    ...     metadata={\"working_directory\": \"/path/to/project\"}\n    ... )\n    >>> response = await provider.generate(request)\n    >>> print(response.content)",
       "bases": [
@@ -37418,7 +37419,8 @@
       "base_provider.GenerationRequest",
       "base_provider.GenerationResponse",
       "base_provider.ModelConfig",
-      "base_provider.ModelCapability"
+      "base_provider.ModelCapability",
+      "base_provider.TokenUsage"
     ],
     "model_chorus/src/model_chorus/providers/gemini_provider.py": [
       "json",

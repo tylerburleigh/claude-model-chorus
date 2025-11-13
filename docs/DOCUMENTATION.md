@@ -1,14 +1,14 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-13 13:26:16
+**Generated:** 2025-11-13 13:40:46
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 100
-- **Total Lines:** 43015
+- **Total Lines:** 43016
 - **Total Classes:** 237
 - **Total Functions:** 196
 - **Avg Complexity:** 4.52
@@ -909,7 +909,7 @@ seeking to strengthen findings by identifying weaknesses and alternatives.
 
 **Language:** python
 **Inherits from:** `CLIProvider`
-**Defined in:** `model_chorus/src/model_chorus/providers/cursor_agent_provider.py:22`
+**Defined in:** `model_chorus/src/model_chorus/providers/cursor_agent_provider.py:23`
 
 **Description:**
 > Provider for Cursor's AI agent via the `cursor-agent` CLI tool.
@@ -9904,6 +9904,7 @@ Returns:
 - `base_provider.GenerationResponse`
 - `base_provider.ModelCapability`
 - `base_provider.ModelConfig`
+- `base_provider.TokenUsage`
 - `cli_provider.CLIProvider`
 - `json`
 - `logging`
