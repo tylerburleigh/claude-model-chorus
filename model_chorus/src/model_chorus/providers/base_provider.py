@@ -48,14 +48,184 @@ class GenerationRequest:
 
 
 @dataclass
+class TokenUsage:
+    """Token usage information with explicit fields for type safety.
+
+    This dataclass provides a standardized way to track token consumption
+    across different AI providers, with support for caching and provider-
+    specific metadata.
+
+    Supports both attribute access (usage.input_tokens) and dict-like access
+    (usage['input_tokens']) for backward compatibility.
+
+    Attributes:
+        input_tokens: Number of tokens in the input prompt/context.
+        output_tokens: Number of tokens in the generated response.
+        cached_input_tokens: Number of input tokens retrieved from cache
+            (provider-dependent, e.g., OpenAI prompt caching).
+        total_tokens: Total token count, typically input + output tokens.
+            May or may not include cached tokens depending on provider.
+        metadata: Provider-specific additional usage information (e.g.,
+            cost, rate limits, model-specific metrics).
+    """
+
+    input_tokens: int = 0
+    output_tokens: int = 0
+    cached_input_tokens: int = 0
+    total_tokens: int = 0
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+    def __getitem__(self, key: str) -> Any:
+        """Support dict-like read access: usage['input_tokens'].
+
+        Args:
+            key: Field name to access.
+
+        Returns:
+            Value of the requested field.
+
+        Raises:
+            KeyError: If key is not a valid TokenUsage field.
+        """
+        if hasattr(self, key):
+            return getattr(self, key)
+        raise KeyError(f"'{key}' is not a valid TokenUsage field")
+
+    def __setitem__(self, key: str, value: Any) -> None:
+        """Support dict-like write access: usage['input_tokens'] = 100.
+
+        Args:
+            key: Field name to set.
+            value: Value to assign to the field.
+
+        Raises:
+            KeyError: If key is not a valid TokenUsage field.
+        """
+        if hasattr(self, key):
+            setattr(self, key, value)
+        else:
+            raise KeyError(f"'{key}' is not a valid TokenUsage field")
+
+    def get(self, key: str, default: Any = None) -> Any:
+        """Support dict-like get with default: usage.get('input_tokens', 0).
+
+        Args:
+            key: Field name to retrieve.
+            default: Default value if field doesn't exist.
+
+        Returns:
+            Field value if it exists, otherwise default.
+        """
+        return getattr(self, key, default)
+
+    def keys(self) -> List[str]:
+        """Return field names like dict.keys().
+
+        Returns:
+            List of field names in the TokenUsage dataclass.
+        """
+        return ['input_tokens', 'output_tokens', 'cached_input_tokens',
+                'total_tokens', 'metadata']
+
+    def values(self) -> List[Any]:
+        """Return field values like dict.values().
+
+        Returns:
+            List of current field values.
+        """
+        return [self.input_tokens, self.output_tokens,
+                self.cached_input_tokens, self.total_tokens, self.metadata]
+
+    def items(self) -> zip:
+        """Return (key, value) pairs like dict.items().
+
+        Returns:
+            Zip iterator of (field_name, field_value) tuples.
+        """
+        return zip(self.keys(), self.values())
+
+
+@dataclass
 class GenerationResponse:
-    """Response from text generation."""
+    """Response from text generation with standardized structure across providers.
+
+    This dataclass provides a unified response format for all AI providers (Claude,
+    Gemini, OpenAI Codex, etc.), supporting conversation continuation via thread_id,
+    token usage tracking, and debugging capabilities.
+
+    Attributes:
+        content: The generated text content from the model.
+        model: Model identifier that generated this response (e.g., "claude-3-opus",
+            "gemini-pro", "gpt-4").
+        usage: Token usage information as a TokenUsage dataclass. Supports both
+            attribute access (usage.input_tokens) and dict-like access
+            (usage['input_tokens']) for backward compatibility.
+        stop_reason: Reason generation stopped (e.g., "end_turn", "max_tokens",
+            "stop_sequence"). Provider-specific values, may be None.
+        metadata: Provider-specific additional metadata (e.g., safety ratings,
+            citations, model version details).
+        thread_id: Conversation continuation identifier for multi-turn interactions.
+            Provider-specific mapping:
+            - Claude: Maps from CLI response 'session_id' field
+            - Cursor: Maps from CLI response 'session_id' field
+            - Codex (OpenAI): Maps from CLI response 'thread_id' field
+            - Gemini: Always None (does not support conversation continuation)
+            Used to maintain context across multiple generation requests.
+        provider: Name of the provider that generated this response. Valid values:
+            "claude", "gemini", "codex", "cursor". Useful for multi-provider
+            workflows and debugging.
+        stderr: Standard error output captured from CLI-based providers. Contains
+            warning messages, debug output, or error details. Empty string if no
+            errors, None if not captured. Only populated for CLI providers (Claude,
+            Gemini, Codex).
+        duration_ms: Request duration in milliseconds, measured from request start
+            to response completion. Useful for performance monitoring, latency
+            analysis, and cost optimization. None if not measured.
+        raw_response: Complete raw response from the provider as returned by the
+            CLI or API. Useful for debugging, testing provider-specific features,
+            and understanding response structure. May contain sensitive data.
+            None if not captured.
+
+    Example:
+        Basic usage::
+
+            response = GenerationResponse(
+                content="Hello, world!",
+                model="claude-3-opus-20240229",
+                provider="claude"
+            )
+            response.usage['input_tokens'] = 10
+            response.usage['output_tokens'] = 5
+
+        With conversation continuation::
+
+            # First turn
+            resp1 = GenerationResponse(
+                content="Initial response",
+                model="gpt-4",
+                thread_id="thread_abc123",
+                provider="codex"
+            )
+
+            # Follow-up turn using same thread_id
+            resp2 = GenerationResponse(
+                content="Follow-up response",
+                model="gpt-4",
+                thread_id="thread_abc123",  # Same ID for continuation
+                provider="codex"
+            )
+    """
 
     content: str
     model: str
-    usage: Dict[str, int] = field(default_factory=dict)
+    usage: TokenUsage = field(default_factory=TokenUsage)
     stop_reason: Optional[str] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
+    thread_id: Optional[str] = None
+    provider: Optional[str] = None
+    stderr: Optional[str] = None
+    duration_ms: Optional[int] = None
+    raw_response: Optional[Dict[str, Any]] = None
 
 
 class ModelProvider(ABC):

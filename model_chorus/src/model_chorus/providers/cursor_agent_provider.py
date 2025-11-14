@@ -14,6 +14,7 @@ from .base_provider import (
     GenerationResponse,
     ModelConfig,
     ModelCapability,
+    TokenUsage,
 )
 
 logger = logging.getLogger(__name__)
@@ -158,8 +159,20 @@ class CursorAgentProvider(CLIProvider):
             "duration_api_ms": 1696,
             "result": "...",
             "session_id": "...",
-            "request_id": "..."
+            "request_id": "...",
+            "usage": {"input_tokens": 10, "output_tokens": 50, "cached_input_tokens": 0}
         }
+
+        Returns GenerationResponse with standardized fields:
+        - content: The response text from "result" field
+        - model: Model identifier (from response or default "cursor-agent")
+        - usage: TokenUsage object with explicit token counts
+        - thread_id: Session ID for conversation continuity
+        - provider: Provider name ("cursor-agent")
+        - stderr: Standard error output from CLI
+        - duration_ms: Response generation time
+        - raw_response: Complete raw response data
+        - metadata: Provider-specific fields (request_id, duration_api_ms)
 
         Args:
             stdout: Standard output from CLI command
@@ -167,7 +180,7 @@ class CursorAgentProvider(CLIProvider):
             returncode: Process exit code
 
         Returns:
-            GenerationResponse with parsed content
+            GenerationResponse with parsed content and standardized fields
 
         Raises:
             ValueError: If output cannot be parsed or command failed
@@ -187,23 +200,38 @@ class CursorAgentProvider(CLIProvider):
             # Extract content from the "result" field
             content = data.get("result", "")
 
+            # Extract session_id from CLI response
+            session_id = data.get("session_id")
+
             # Check if this is an error response
             if data.get("is_error", False):
                 error_msg = f"Cursor Agent returned error: {content}"
                 logger.error(error_msg)
                 raise ValueError(error_msg)
 
+            # Extract usage data and create TokenUsage object
+            usage_dict = data.get("usage", {})
+            token_usage = TokenUsage(
+                input_tokens=usage_dict.get("input_tokens", 0),
+                output_tokens=usage_dict.get("output_tokens", 0),
+                cached_input_tokens=usage_dict.get("cached_input_tokens", 0),
+                total_tokens=usage_dict.get("input_tokens", 0) + usage_dict.get("output_tokens", 0),
+                metadata={},
+            )
+
             response = GenerationResponse(
                 content=content,
                 model=data.get("model", "cursor-agent"),
-                usage=data.get("usage", {}),
+                usage=token_usage,
                 stop_reason=data.get("subtype"),
+                thread_id=session_id,
+                provider="cursor-agent",
+                stderr=stderr,
+                duration_ms=data.get("duration_ms"),
+                raw_response=data,
                 metadata={
-                    "session_id": data.get("session_id"),
                     "request_id": data.get("request_id"),
-                    "duration_ms": data.get("duration_ms"),
                     "duration_api_ms": data.get("duration_api_ms"),
-                    "raw_response": data,
                 },
             )
 

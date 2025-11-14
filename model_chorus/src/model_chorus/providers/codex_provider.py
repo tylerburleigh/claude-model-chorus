@@ -14,6 +14,7 @@ from .base_provider import (
     GenerationResponse,
     ModelConfig,
     ModelCapability,
+    TokenUsage,
 )
 
 logger = logging.getLogger(__name__)
@@ -160,7 +161,17 @@ class CodexProvider(CLIProvider):
         {"type":"thread.started","thread_id":"..."}
         {"type":"turn.started"}
         {"type":"item.completed","item":{"id":"item_1","type":"agent_message","text":"..."}}
-        {"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":50}}
+        {"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":50,"cached_input_tokens":0}}
+
+        Returns GenerationResponse with standardized fields:
+        - content: The response text extracted from agent_message items
+        - model: Model identifier (default: "gpt-5-codex")
+        - usage: TokenUsage object with explicit token counts from turn.completed
+        - thread_id: Thread ID from thread.started event for conversation continuity
+        - provider: Provider name ("codex")
+        - stderr: Standard error output from CLI
+        - raw_response: Complete JSONL events in {"events": [...]} format
+        - metadata: Provider-agnostic additional data
 
         Args:
             stdout: Standard output from CLI command (JSONL format)
@@ -168,7 +179,7 @@ class CodexProvider(CLIProvider):
             returncode: Process exit code
 
         Returns:
-            GenerationResponse with parsed content
+            GenerationResponse with parsed content and standardized fields
 
         Raises:
             ValueError: If output cannot be parsed or command failed
@@ -184,8 +195,9 @@ class CodexProvider(CLIProvider):
         # Parse JSONL output
         try:
             content = ""
-            usage = {}
+            token_usage = None
             thread_id = None
+            events = []
 
             # Process each line as a JSON event
             for line in stdout.strip().split('\n'):
@@ -193,6 +205,7 @@ class CodexProvider(CLIProvider):
                     continue
 
                 event = json.loads(line)
+                events.append(event)  # Collect all events for raw_response
                 event_type = event.get("type")
 
                 if event_type == "thread.started":
@@ -203,20 +216,28 @@ class CodexProvider(CLIProvider):
                         content = item.get("text", "")
                 elif event_type == "turn.completed":
                     usage_data = event.get("usage", {})
-                    usage = {
-                        "input_tokens": usage_data.get("input_tokens", 0),
-                        "output_tokens": usage_data.get("output_tokens", 0),
-                        "cached_input_tokens": usage_data.get("cached_input_tokens", 0),
-                    }
+                    input_tokens = usage_data.get("input_tokens", 0)
+                    output_tokens = usage_data.get("output_tokens", 0)
+                    cached_input_tokens = usage_data.get("cached_input_tokens", 0)
+
+                    token_usage = TokenUsage(
+                        input_tokens=input_tokens,
+                        output_tokens=output_tokens,
+                        cached_input_tokens=cached_input_tokens,
+                        total_tokens=input_tokens + output_tokens,
+                        metadata={},
+                    )
 
             response = GenerationResponse(
                 content=content,
                 model="gpt-5-codex",  # Default model from help output
-                usage=usage,
+                usage=token_usage,
                 stop_reason="completed",
-                metadata={
-                    "thread_id": thread_id,
-                },
+                thread_id=thread_id,
+                provider="codex",
+                stderr=stderr,
+                raw_response={"events": events},
+                metadata={},
             )
 
             logger.info(

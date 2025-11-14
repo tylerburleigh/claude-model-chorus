@@ -10,52 +10,92 @@ import os
 from pathlib import Path
 
 from model_chorus.workflows import ChatWorkflow
-from model_chorus.providers import ClaudeProvider, GeminiProvider, CodexProvider
+from model_chorus.providers import ClaudeProvider, GeminiProvider, CodexProvider, CursorAgentProvider
 from model_chorus.core.conversation import ConversationMemory
 
-
-# Skip all tests if providers are not configured
-def is_provider_available(provider_class):
-    """Check if a provider is available (API key configured)."""
-    try:
-        provider = provider_class()
-        return provider.validate_api_key()
-    except Exception:
-        return False
+# Import provider availability flags from shared test helpers
+from test_helpers import ANY_PROVIDER_AVAILABLE
 
 
-# Provider availability flags
-CLAUDE_AVAILABLE = is_provider_available(ClaudeProvider)
-GEMINI_AVAILABLE = is_provider_available(GeminiProvider)
-CODEX_AVAILABLE = is_provider_available(CodexProvider)
-ANY_PROVIDER_AVAILABLE = CLAUDE_AVAILABLE or GEMINI_AVAILABLE or CODEX_AVAILABLE
+def get_run_kwargs(provider_name: str, prompt: str, **kwargs):
+    """
+    Get kwargs for chat_workflow.run() that are compatible with the provider.
 
+    Filters out unsupported parameters (e.g., temperature for Gemini).
+    Note: Fast models are automatically injected by the provider fixture.
+    """
+    run_kwargs = {"prompt": prompt, **kwargs}
 
-@pytest.fixture
-def conversation_memory():
-    """Create ConversationMemory instance for testing."""
-    return ConversationMemory()
+    # Gemini doesn't support temperature, max_tokens, or other generation params
+    if provider_name == "gemini":
+        unsupported_params = ["temperature", "max_tokens"]
+        for param in unsupported_params:
+            run_kwargs.pop(param, None)
 
-
-@pytest.fixture(params=[
-    pytest.param("claude", marks=pytest.mark.skipif(not CLAUDE_AVAILABLE, reason="Claude API not configured")),
-    pytest.param("gemini", marks=pytest.mark.skipif(not GEMINI_AVAILABLE, reason="Gemini API not configured")),
-    pytest.param("codex", marks=pytest.mark.skipif(not CODEX_AVAILABLE, reason="Codex API not configured")),
-])
-def provider_name(request):
-    """Parameterized fixture for provider names."""
-    return request.param
+    return run_kwargs
 
 
 @pytest.fixture
-def provider(provider_name):
-    """Create provider instance based on provider name."""
-    providers = {
-        "claude": ClaudeProvider,
-        "gemini": GeminiProvider,
-        "codex": CodexProvider,
+def conversation_memory(tmp_path):
+    """Create ConversationMemory instance for testing.
+
+    Uses a temporary directory for each test to ensure isolation.
+    Uses a high max_messages limit (100) to allow long conversation tests
+    to run without hitting the truncation limit.
+    """
+    return ConversationMemory(
+        conversations_dir=tmp_path / "conversations",
+        max_messages=100
+    )
+
+
+@pytest.fixture
+def provider(provider_name, mock_claude_provider_full, mock_gemini_provider_full, mock_codex_provider_full, mock_cursor_agent_provider_full):
+    """Create provider instance based on provider name.
+
+    Uses mock providers if USE_MOCK_PROVIDERS=true, otherwise uses real CLI providers.
+    Automatically configures the fastest model for each provider to minimize test time and cost.
+    """
+    import os
+    USE_MOCK_PROVIDERS = os.getenv("USE_MOCK_PROVIDERS", "false").lower() == "true"
+
+    # Fast models for each provider (mini/flash/haiku variants)
+    fast_models = {
+        "claude": "haiku",
+        "gemini": "gemini-2.5-flash",
+        "codex": "gpt-5-codex-mini",
+        "cursor-agent": "composer-1",
     }
-    return providers[provider_name]()
+
+    if USE_MOCK_PROVIDERS:
+        mock_providers = {
+            "claude": mock_claude_provider_full,
+            "gemini": mock_gemini_provider_full,
+            "codex": mock_codex_provider_full,
+            "cursor-agent": mock_cursor_agent_provider_full,
+        }
+        return mock_providers[provider_name]
+    else:
+        real_providers = {
+            "claude": ClaudeProvider,
+            "gemini": GeminiProvider,
+            "codex": CodexProvider,
+            "cursor-agent": CursorAgentProvider,
+        }
+        provider_instance = real_providers[provider_name]()
+
+        # Wrap the generate method to inject the fast model into all requests
+        original_generate = provider_instance.generate
+        fast_model = fast_models[provider_name]
+
+        async def generate_with_fast_model(request):
+            # Inject fast model into request metadata if not already specified
+            if "model" not in request.metadata:
+                request.metadata["model"] = fast_model
+            return await original_generate(request)
+
+        provider_instance.generate = generate_with_fast_model
+        return provider_instance
 
 
 @pytest.fixture
@@ -75,8 +115,7 @@ class TestMultiProviderChat:
     async def test_basic_conversation(self, chat_workflow, provider_name):
         """Test basic single-turn conversation works with each provider."""
         result = await chat_workflow.run(
-            prompt="What is 2+2? Answer with just the number.",
-            temperature=0.0,
+            **get_run_kwargs(provider_name, "What is 2+2? Answer with just the number.", temperature=0.0)
         )
 
         assert result.success is True, f"Chat failed with {provider_name}: {result.error}"
@@ -90,8 +129,7 @@ class TestMultiProviderChat:
         """Test multi-turn conversation continuity with each provider."""
         # First turn
         result1 = await chat_workflow.run(
-            prompt="I'm thinking of a number between 1 and 10. Guess what it is.",
-            temperature=0.7,
+            **get_run_kwargs(provider_name, "I'm thinking of a number between 1 and 10. Guess what it is.", temperature=0.7)
         )
 
         assert result1.success is True, f"First turn failed with {provider_name}"
@@ -100,9 +138,7 @@ class TestMultiProviderChat:
 
         # Second turn - continue conversation
         result2 = await chat_workflow.run(
-            prompt="No, try again with a different guess.",
-            continuation_id=thread_id,
-            temperature=0.7,
+            **get_run_kwargs(provider_name, "No, try again with a different guess.", continuation_id=thread_id, temperature=0.7)
         )
 
         assert result2.success is True, f"Second turn failed with {provider_name}"
@@ -112,9 +148,7 @@ class TestMultiProviderChat:
 
         # Third turn - verify conversation history is maintained
         result3 = await chat_workflow.run(
-            prompt="What was my original question?",
-            continuation_id=thread_id,
-            temperature=0.7,
+            **get_run_kwargs(provider_name, "What was my original question?", continuation_id=thread_id, temperature=0.7)
         )
 
         assert result3.success is True, f"Third turn failed with {provider_name}"
@@ -137,9 +171,7 @@ def multiply(a, b):
 """)
 
         result = await chat_workflow.run(
-            prompt="What functions are defined in this file?",
-            files=[str(test_file)],
-            temperature=0.0,
+            **get_run_kwargs(provider_name, "What functions are defined in this file?", files=[str(test_file)], temperature=0.0)
         )
 
         assert result.success is True, f"File context chat failed with {provider_name}"
@@ -152,8 +184,7 @@ def multiply(a, b):
         """Test that conversation state persists correctly."""
         # Start conversation
         result1 = await chat_workflow.run(
-            prompt="Remember this: my favorite color is blue.",
-            temperature=0.0,
+            **get_run_kwargs(provider_name, "Remember this: my favorite color is blue.", temperature=0.0)
         )
 
         assert result1.success is True
@@ -167,9 +198,7 @@ def multiply(a, b):
 
         # Continue and ask about remembered info
         result2 = await chat_workflow.run(
-            prompt="What is my favorite color?",
-            continuation_id=thread_id,
-            temperature=0.0,
+            **get_run_kwargs(provider_name, "What is my favorite color?", continuation_id=thread_id, temperature=0.0)
         )
 
         assert result2.success is True
@@ -185,9 +214,7 @@ class TestChatErrorHandling:
         """Test handling of invalid continuation ID."""
         # Try to continue with non-existent thread ID
         result = await chat_workflow.run(
-            prompt="Continue this conversation.",
-            continuation_id="non-existent-thread-id",
-            temperature=0.0,
+            **get_run_kwargs(provider_name, "Continue this conversation.", continuation_id="non-existent-thread-id", temperature=0.0)
         )
 
         # Should create new conversation instead of failing
@@ -198,8 +225,7 @@ class TestChatErrorHandling:
     async def test_empty_prompt(self, chat_workflow, provider_name):
         """Test handling of empty prompt."""
         result = await chat_workflow.run(
-            prompt="",
-            temperature=0.0,
+            **get_run_kwargs(provider_name, "", temperature=0.0)
         )
 
         # Should handle gracefully (may succeed with empty response or fail gracefully)
@@ -214,9 +240,7 @@ class TestChatErrorHandling:
         # Create a conversation with 5 turns
         for i in range(5):
             result = await chat_workflow.run(
-                prompt=f"This is message number {i+1}. Acknowledge it.",
-                continuation_id=thread_id,
-                temperature=0.0,
+                **get_run_kwargs(provider_name, f"This is message number {i+1}. Acknowledge it.", continuation_id=thread_id, temperature=0.0)
             )
 
             assert result.success is True, f"Turn {i+1} failed"
@@ -239,9 +263,15 @@ class TestChatThreadManagement:
         """Test managing multiple concurrent conversation threads."""
         workflow = ChatWorkflow(provider=provider, conversation_memory=conversation_memory)
 
+        # Gemini CLI has a bug with "My name is X" prompts. Use third-person instead.
+        # See GEMINI_FAILURE_ANALYSIS.md for details.
+        is_gemini = isinstance(provider, GeminiProvider)
+        prompt1 = "The user is Alice." if is_gemini else "My name is Alice."
+        prompt2 = "The user is Bob." if is_gemini else "My name is Bob."
+
         # Create two separate conversations
-        result1 = await workflow.run(prompt="My name is Alice.")
-        result2 = await workflow.run(prompt="My name is Bob.")
+        result1 = await workflow.run(prompt=prompt1)
+        result2 = await workflow.run(prompt=prompt2)
 
         assert result1.success and result2.success
         thread_id1 = result1.metadata["thread_id"]
@@ -284,206 +314,3 @@ class TestChatThreadManagement:
         assert thread.messages[1].role == "assistant"
 
 
-@pytest.mark.skipif(not ANY_PROVIDER_AVAILABLE, reason="No providers configured")
-class TestLongConversations:
-    """Test handling of long multi-turn conversations (20+ turns)."""
-
-    @pytest.mark.asyncio
-    async def test_20_turn_conversation(self, chat_workflow, provider_name):
-        """Test conversation with 20 turns maintains context and stability."""
-        thread_id = None
-        conversation_topics = []
-
-        # Create 20-turn conversation with varied topics
-        for turn in range(20):
-            # Vary the prompts to test different conversation patterns
-            if turn == 0:
-                prompt = "Let's count together. I'll say 1."
-                conversation_topics.append("counting")
-            elif turn < 5:
-                prompt = f"Now you say {turn + 1}."
-            elif turn == 5:
-                prompt = "Good! Now let's switch to colors. My favorite is red."
-                conversation_topics.append("colors")
-            elif turn < 10:
-                colors = ["blue", "green", "yellow", "purple"]
-                prompt = f"What about {colors[turn - 6]}?"
-            elif turn == 10:
-                prompt = "Great! Let's talk about animals now. I like cats."
-                conversation_topics.append("animals")
-            elif turn < 15:
-                animals = ["dogs", "birds", "fish", "rabbits"]
-                prompt = f"What do you think about {animals[turn - 11]}?"
-            else:
-                prompt = f"This is turn {turn + 1}. Are you still following our conversation?"
-
-            result = await chat_workflow.run(
-                prompt=prompt,
-                continuation_id=thread_id,
-                temperature=0.7,
-            )
-
-            # Verify each turn succeeds
-            assert result.success is True, f"Turn {turn + 1} failed with {provider_name}"
-
-            if turn == 0:
-                thread_id = result.metadata["thread_id"]
-                assert result.metadata["is_continuation"] is False
-            else:
-                assert result.metadata["thread_id"] == thread_id
-                assert result.metadata["is_continuation"] is True
-
-            # Verify conversation length grows correctly
-            expected_length = (turn + 1) * 2
-            assert result.metadata["conversation_length"] == expected_length
-
-        # After 20 turns, verify we can still reference early conversation
-        result_final = await chat_workflow.run(
-            prompt="What number did we start counting with at the very beginning?",
-            continuation_id=thread_id,
-            temperature=0.0,
-        )
-
-        assert result_final.success
-        assert "1" in result_final.synthesis or "one" in result_final.synthesis.lower()
-
-    @pytest.mark.asyncio
-    async def test_25_turn_conversation_with_context_retention(self, chat_workflow, provider_name):
-        """Test 25-turn conversation maintains context across topic changes."""
-        thread_id = None
-
-        # Initial context establishment
-        result_0 = await chat_workflow.run(
-            prompt="Remember this important fact: my birthday is July 15th.",
-            temperature=0.0,
-        )
-
-        assert result_0.success
-        thread_id = result_0.metadata["thread_id"]
-
-        # Have a long conversation about other topics (23 turns)
-        for turn in range(1, 24):
-            if turn % 3 == 0:
-                prompt = f"Tell me about topic number {turn}."
-            elif turn % 3 == 1:
-                prompt = f"Interesting! What else about that?"
-            else:
-                prompt = f"Got it. Let's move to something different."
-
-            result = await chat_workflow.run(
-                prompt=prompt,
-                continuation_id=thread_id,
-                temperature=0.7,
-            )
-
-            assert result.success, f"Turn {turn + 1} failed"
-
-        # On turn 25, ask about the initial fact
-        result_final = await chat_workflow.run(
-            prompt="What is my birthday that I told you at the very start?",
-            continuation_id=thread_id,
-            temperature=0.0,
-        )
-
-        assert result_final.success
-        # Should remember the birthday despite 23 intervening turns
-        assert "july" in result_final.synthesis.lower() or "7" in result_final.synthesis
-        assert "15" in result_final.synthesis
-
-    @pytest.mark.asyncio
-    async def test_conversation_length_tracking(self, chat_workflow, provider_name):
-        """Test that conversation length is accurately tracked over many turns."""
-        thread_id = None
-        expected_lengths = []
-
-        # Create 22 turns
-        for turn in range(22):
-            result = await chat_workflow.run(
-                prompt=f"Message {turn + 1}",
-                continuation_id=thread_id,
-                temperature=0.0,
-            )
-
-            assert result.success
-
-            if turn == 0:
-                thread_id = result.metadata["thread_id"]
-
-            # Each turn adds 2 messages (user + assistant)
-            expected_length = (turn + 1) * 2
-            expected_lengths.append(expected_length)
-
-            assert result.metadata["conversation_length"] == expected_length, \
-                f"Turn {turn + 1}: expected {expected_length}, got {result.metadata['conversation_length']}"
-
-        # Verify thread state
-        thread = chat_workflow.get_thread(thread_id)
-        assert len(thread.messages) == 44  # 22 turns * 2 messages
-
-    @pytest.mark.asyncio
-    async def test_long_conversation_with_file_references(self, chat_workflow, provider_name, tmp_path):
-        """Test long conversation with file context referenced across turns."""
-        # Create test file
-        test_file = tmp_path / "config.txt"
-        test_file.write_text("SECRET_KEY=abc123\nDEBUG=true\n")
-
-        # Start with file context
-        result_0 = await chat_workflow.run(
-            prompt="What is the SECRET_KEY in this file?",
-            files=[str(test_file)],
-            temperature=0.0,
-        )
-
-        assert result_0.success
-        thread_id = result_0.metadata["thread_id"]
-        assert "abc123" in result_0.synthesis
-
-        # Continue for 20 more turns without the file
-        for turn in range(1, 21):
-            result = await chat_workflow.run(
-                prompt=f"Conversation turn {turn + 1}. Just acknowledge this.",
-                continuation_id=thread_id,
-                temperature=0.7,
-            )
-
-            assert result.success
-
-        # On turn 21, ask about the file content again
-        result_final = await chat_workflow.run(
-            prompt="What was that SECRET_KEY from the file I showed you earlier?",
-            continuation_id=thread_id,
-            temperature=0.0,
-        )
-
-        assert result_final.success
-        # Should still remember the file content
-        assert "abc123" in result_final.synthesis.lower()
-
-    @pytest.mark.asyncio
-    async def test_conversation_stability_under_load(self, chat_workflow, provider_name):
-        """Test that conversation remains stable over 30 rapid turns."""
-        thread_id = None
-
-        # Rapid-fire 30 turns
-        for turn in range(30):
-            result = await chat_workflow.run(
-                prompt=f"Turn {turn + 1}",
-                continuation_id=thread_id,
-                temperature=0.0,
-            )
-
-            # Every turn should succeed
-            assert result.success, f"Failed at turn {turn + 1}"
-
-            if turn == 0:
-                thread_id = result.metadata["thread_id"]
-
-            # Metadata should be consistent
-            assert "thread_id" in result.metadata
-            assert "conversation_length" in result.metadata
-            assert result.metadata["conversation_length"] == (turn + 1) * 2
-
-        # Verify final state
-        thread = chat_workflow.get_thread(thread_id)
-        assert thread is not None
-        assert len(thread.messages) == 60  # 30 turns * 2 messages

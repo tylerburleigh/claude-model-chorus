@@ -14,6 +14,7 @@ from .base_provider import (
     GenerationResponse,
     ModelConfig,
     ModelCapability,
+    TokenUsage,
 )
 
 logger = logging.getLogger(__name__)
@@ -160,10 +161,24 @@ class ClaudeProvider(CLIProvider):
             "type": "result",
             "subtype": "success",
             "result": "...",  # The actual response content
+            "session_id": "...",  # Thread/conversation ID
             "usage": {"input_tokens": 10, "output_tokens": 50, ...},
             "modelUsage": {"claude-sonnet-4-5-20250929": {...}},
+            "duration_ms": 1234,
+            "total_cost_usd": 0.05,
             ...
         }
+
+        Returns GenerationResponse with standardized fields:
+        - content: The response text
+        - model: Model identifier
+        - usage: TokenUsage object with explicit token counts and metadata
+        - thread_id: Session/conversation ID for continuity
+        - provider: Provider name ("claude")
+        - stderr: Standard error output
+        - duration_ms: Response generation time
+        - raw_response: Complete raw response data
+        - metadata: Provider-agnostic additional data
 
         Args:
             stdout: Standard output from CLI command
@@ -171,7 +186,7 @@ class ClaudeProvider(CLIProvider):
             returncode: Process exit code
 
         Returns:
-            GenerationResponse with parsed content
+            GenerationResponse with parsed content and standardized fields
 
         Raises:
             ValueError: If output cannot be parsed or command failed
@@ -195,17 +210,34 @@ class ClaudeProvider(CLIProvider):
             model_usage = data.get("modelUsage", {})
             model = list(model_usage.keys())[0] if model_usage else "unknown"
 
-            # Extract usage info
-            usage = data.get("usage", {})
+            # Extract session_id from CLI response
+            session_id = data.get("session_id")
+
+            # Extract usage info and create TokenUsage object
+            usage_dict = data.get("usage", {})
+            token_usage = TokenUsage(
+                input_tokens=usage_dict.get("input_tokens", 0),
+                output_tokens=usage_dict.get("output_tokens", 0),
+                cached_input_tokens=usage_dict.get("cached_input_tokens", 0),
+                total_tokens=usage_dict.get("input_tokens", 0) + usage_dict.get("output_tokens", 0),
+                metadata={
+                    "model_usage": data.get("modelUsage", {}),
+                    "duration_ms": data.get("duration_ms"),
+                    "total_cost_usd": data.get("total_cost_usd"),
+                },
+            )
 
             response = GenerationResponse(
                 content=content,
                 model=model,
-                usage=usage,
+                usage=token_usage,
                 stop_reason=data.get("subtype"),  # "success" or error type
+                thread_id=session_id,
+                provider="claude",
+                stderr=stderr,
+                duration_ms=data.get("duration_ms"),
+                raw_response=data,
                 metadata={
-                    "raw_response": data,
-                    "duration_ms": data.get("duration_ms"),
                     "total_cost_usd": data.get("total_cost_usd"),
                 },
             )
