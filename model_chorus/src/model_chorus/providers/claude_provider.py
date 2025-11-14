@@ -12,11 +12,8 @@ from .base_provider import (
     GenerationRequest,
     GenerationResponse,
     ModelCapability,
-<<<<<<< Updated upstream
-=======
     ModelConfig,
     TokenUsage,
->>>>>>> Stashed changes
 )
 from .cli_provider import CLIProvider
 
