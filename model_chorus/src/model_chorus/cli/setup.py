@@ -465,10 +465,11 @@ def create_express_config(
             "fallback_providers": fallback_providers
         }
 
-    # Consensus workflow (use first 2-3 available providers)
+    # Consensus workflow (priority-based selection with fallback)
     if len(available_providers) >= 2:
         workflows["consensus"] = {
-            "providers": available_providers[:3],  # Use up to 3 providers
+            "provider_priority": available_providers,  # All providers in priority order
+            "num_to_consult": min(2, len(available_providers)),  # Consult 2 by default
             "strategy": "all_responses"
         }
 
@@ -545,10 +546,11 @@ def create_tiered_config(
         }
 
     if tier in ["standard", "advanced"]:
-        # Add consensus workflow (multi-provider, no fallback)
+        # Add consensus workflow (priority-based with fallback)
         if consensus_providers:
             workflows["consensus"] = {
-                "providers": consensus_providers,
+                "provider_priority": consensus_providers,
+                "num_to_consult": min(2, len(consensus_providers)),
                 "strategy": consensus_strategy
             }
 
@@ -587,6 +589,187 @@ def create_tiered_config(
         available_providers=available_providers,
         workflows=workflows if workflows else None
     )
+
+
+def create_claude_config(
+    project_root: Optional[Path] = None,
+    enabled_providers: Optional[List[str]] = None,
+    auto_detect: bool = True
+) -> Dict[str, Any]:
+    """Create .claude/model_chorus_config.yaml configuration file.
+
+    Args:
+        project_root: Project root directory (defaults to cwd)
+        enabled_providers: List of providers to enable (if None and auto_detect=False, all disabled)
+        auto_detect: If True, auto-detect available providers and enable them
+
+    Returns:
+        Dict with creation result
+    """
+    if project_root is None:
+        project_root = Path.cwd()
+
+    # Create .claude directory if it doesn't exist
+    claude_dir = project_root / '.claude'
+    claude_dir.mkdir(parents=True, exist_ok=True)
+
+    config_path = claude_dir / 'model_chorus_config.yaml'
+
+    # Check if file already exists
+    if config_path.exists():
+        return {
+            "success": False,
+            "message": f"Config file already exists: {config_path}",
+            "path": str(config_path)
+        }
+
+    # Find template file from the package installation
+    # Try multiple locations: plugin directory, package directory, current directory
+    template_file = None
+    template_locations = [
+        # Plugin directory (when installed as Claude plugin)
+        Path(__file__).parent.parent / 'templates' / 'model_chorus_config.example.yaml',
+        # Development/source directory
+        Path(__file__).parent.parent.parent.parent / 'templates' / 'model_chorus_config.example.yaml',
+    ]
+
+    for location in template_locations:
+        if location.exists():
+            template_file = location
+            break
+
+    # Determine which providers to enable
+    providers_to_enable = enabled_providers or []
+
+    if auto_detect and not enabled_providers:
+        # Auto-detect available providers
+        provider_check = check_available_providers()
+        providers_to_enable = provider_check.get("available", [])
+
+    # If template exists, use it as base and customize
+    if template_file:
+        try:
+            with open(template_file, 'r') as f:
+                yaml_content = f.read()
+
+            # Customize the template based on enabled providers
+            # Replace enabled values for each provider
+            all_providers = ['claude', 'gemini', 'codex', 'cursor-agent']
+            for provider_name in all_providers:
+                is_enabled = provider_name in providers_to_enable
+                # Replace the enabled status in the template
+                # Match pattern like "  provider_name:\n    enabled: true/false"
+                import re
+                pattern = f"({provider_name}:\\s+enabled:)\\s+(true|false)"
+                replacement = f"\\1 {str(is_enabled).lower()}"
+                yaml_content = re.sub(pattern, replacement, yaml_content)
+
+            # Customize workflow defaults if needed
+            if providers_to_enable:
+                default_provider = providers_to_enable[0]
+                # Update default_provider in workflows
+                yaml_content = re.sub(
+                    r'(default_provider:)\s+\w+',
+                    f'\\1 {default_provider}',
+                    yaml_content
+                )
+
+        except Exception as e:
+            # If template read fails, fall back to generated content
+            template_file = None
+
+    # If no template or template read failed, generate from scratch
+    if not template_file:
+        # Build providers configuration
+        all_providers = ['claude', 'gemini', 'codex', 'cursor-agent']
+        providers_config = {}
+
+        for provider_name in all_providers:
+            is_enabled = provider_name in providers_to_enable
+            config = {"enabled": is_enabled}
+
+            # Add default model if available
+            if provider_name in DEFAULT_MODELS:
+                config["default_model"] = DEFAULT_MODELS[provider_name]
+
+            providers_config[provider_name] = config
+
+        # Build workflows configuration with enabled providers
+        workflows_config = {}
+
+        if providers_to_enable:
+            # Pick first enabled provider as default
+            default_provider = providers_to_enable[0]
+            fallback_providers = providers_to_enable[1:] if len(providers_to_enable) > 1 else []
+
+            # Chat workflow
+            workflows_config["chat"] = {
+                "default_provider": default_provider
+            }
+            if fallback_providers:
+                workflows_config["chat"]["fallback_providers"] = fallback_providers
+
+            # Consensus workflow (priority-based with fallback)
+            if len(providers_to_enable) >= 2:
+                workflows_config["consensus"] = {
+                    "provider_priority": providers_to_enable,  # All providers in priority order
+                    "num_to_consult": min(2, len(providers_to_enable))  # Consult 2 by default
+                }
+
+            # ThinkDeep workflow
+            workflows_config["thinkdeep"] = {
+                "default_provider": default_provider
+            }
+            if fallback_providers:
+                workflows_config["thinkdeep"]["fallback_providers"] = fallback_providers
+
+        # Create YAML content
+        yaml_content = """# ModelChorus Configuration
+# Provider enable/disable and default model configuration
+
+providers:
+"""
+
+        for provider_name, provider_config in providers_config.items():
+            enabled = provider_config["enabled"]
+            default_model = provider_config.get("default_model")
+
+            yaml_content += f"  {provider_name}:\n"
+            yaml_content += f"    enabled: {str(enabled).lower()}\n"
+            if default_model:
+                yaml_content += f"    default_model: {default_model}\n"
+            yaml_content += "\n"
+
+        # Add workflows configuration if any
+        if workflows_config:
+            yaml_content += "\n# Workflow-specific configuration\nworkflows:\n"
+            for workflow_name, workflow_config in workflows_config.items():
+                yaml_content += f"  {workflow_name}:\n"
+                for key, value in workflow_config.items():
+                    if isinstance(value, list):
+                        yaml_content += f"    {key}:\n"
+                        for item in value:
+                            yaml_content += f"      - {item}\n"
+                    else:
+                        yaml_content += f"    {key}: {value}\n"
+                yaml_content += "\n"
+
+    try:
+        with open(config_path, 'w') as f:
+            f.write(yaml_content)
+
+        return {
+            "success": True,
+            "message": f"Created config file: {config_path}",
+            "path": str(config_path),
+            "enabled_providers": providers_to_enable,
+            "template_used": str(template_file) if template_file else "generated"
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e)
+        }
 
 
 def validate_config(project_root: Optional[Path] = None) -> Dict[str, Any]:
@@ -870,6 +1053,12 @@ def main():
     tiered_parser.add_argument('--thinkdeep-mode', default='medium', help='ThinkDeep thinking mode')
     tiered_parser.add_argument('--ideate-providers', nargs='+', help='Providers for ideate workflow')
 
+    # create-claude-config command
+    claude_config_parser = subparsers.add_parser('create-claude-config', help='Create .claude/model_chorus_config.yaml file')
+    claude_config_parser.add_argument('--project', default=None, help='Project root directory')
+    claude_config_parser.add_argument('--enabled-providers', nargs='+', help='Providers to enable (space-separated)')
+    claude_config_parser.add_argument('--no-auto-detect', action='store_true', help='Disable auto-detection of available providers')
+
     # validate-config command
     validate_parser = subparsers.add_parser('validate-config', help='Validate config file')
     validate_parser.add_argument('--project', default=None, help='Project root directory')
@@ -921,6 +1110,12 @@ def main():
             consensus_strategy=args.consensus_strategy,
             thinkdeep_thinking_mode=args.thinkdeep_mode,
             ideate_providers=args.ideate_providers
+        )
+    elif args.command == 'create-claude-config':
+        result = create_claude_config(
+            project,
+            enabled_providers=args.enabled_providers,
+            auto_detect=not args.no_auto_detect
         )
     elif args.command == 'validate-config':
         result = validate_config(project)

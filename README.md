@@ -566,16 +566,88 @@ export OPENAI_API_KEY="your-key"
 # Cursor CLI (usually installed with Cursor IDE)
 ```
 
-### Provider Fallback & Resilience
+## Configuration
 
-ModelChorus workflows automatically fallback to alternative providers if the primary fails:
+ModelChorus uses `.claude/model_chorus_config.yaml` to manage provider availability and workflow defaults.
+
+### Creating Configuration
+
+**Auto-detect available providers (recommended):**
+```bash
+python -m model_chorus.cli.setup create-claude-config
+```
+
+**Manual provider selection:**
+```bash
+python -m model_chorus.cli.setup create-claude-config \
+  --enabled-providers claude gemini --no-auto-detect
+```
+
+### Configuration File Structure
 
 ```yaml
-# .model-chorusrc configuration
+# .claude/model_chorus_config.yaml
+providers:
+  claude:
+    enabled: true
+    default_model: sonnet
+
+  gemini:
+    enabled: true
+    default_model: gemini-2.5-flash
+
+  codex:
+    enabled: false
+    default_model: gpt-5-codex
+
+  cursor-agent:
+    enabled: false
+    default_model: composer-1
+
 workflows:
   chat:
-    provider: claude
-    fallback_providers:  # Tries in order if primary fails
+    default_provider: claude
+    fallback_providers:
+      - gemini
+
+  consensus:
+    providers:
+      - claude
+      - gemini
+
+  thinkdeep:
+    default_provider: claude
+    fallback_providers:
+      - gemini
+```
+
+### Enabling/Disabling Providers
+
+Edit `.claude/model_chorus_config.yaml` and set `enabled: true/false`:
+
+```yaml
+providers:
+  claude:
+    enabled: true  # ✓ Enabled
+  gemini:
+    enabled: false  # ✗ Disabled - won't be used in workflows
+```
+
+Disabled providers are automatically skipped by all workflows. This is useful when:
+- A provider's API key is unavailable
+- You want to reduce API costs
+- Testing specific provider combinations
+- A provider CLI is not installed
+
+### Provider Fallback & Resilience
+
+ModelChorus workflows automatically fallback to alternative providers if the primary fails. Only **enabled** providers are used in fallback chains:
+
+```yaml
+workflows:
+  chat:
+    default_provider: claude
+    fallback_providers:  # Tries in order if primary fails (only if enabled)
       - gemini
       - codex
       - cursor-agent

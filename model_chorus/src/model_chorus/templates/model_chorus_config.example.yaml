@@ -1,0 +1,68 @@
+# ModelChorus Configuration
+# Provider enable/disable and default model configuration
+#
+# This file controls which AI providers are available to ModelChorus workflows.
+# Place this file in your project's .claude/ directory as model_chorus_config.yaml
+
+providers:
+  claude:
+    enabled: true
+    default_model: sonnet
+
+  gemini:
+    enabled: true
+    default_model: gemini-2.5-flash
+
+  codex:
+    enabled: false
+    default_model: gpt-5-codex
+
+  cursor-agent:
+    enabled: true
+    default_model: composer-1
+
+# Workflow-specific configuration
+# These settings configure provider selection for each workflow type
+
+workflows:
+  chat:
+    default_provider: gemini
+    fallback_providers:
+      - cursor-agent
+      - gemini
+      - claude
+      - codex
+
+  consensus:
+    # Priority-ordered list of providers to try (with automatic fallback)
+    provider_priority:
+      - gemini
+      - cursor-agent
+      - claude
+      - codex
+    # Number of successful responses required
+    num_to_consult: 2
+
+  thinkdeep:
+    default_provider: gemini
+    fallback_providers:
+      - cursor-agent
+      - gemini
+      - claude
+      - codex
+
+  argument:
+    default_provider: gemini
+    fallback_providers:
+      - cursor-agent
+      - gemini
+      - claude
+      - codex
+
+  ideate:
+    default_provider: gemini
+    fallback_providers:
+      - cursor-agent
+      - gemini
+      - claude
+      - codex

@@ -94,14 +94,16 @@ class ConsensusWorkflow:
         providers: List[ModelProvider],
         strategy: ConsensusStrategy = ConsensusStrategy.ALL_RESPONSES,
         default_timeout: float = 120.0,
+        num_to_consult: Optional[int] = None,
     ):
         """
         Initialize the consensus workflow.
 
         Args:
-            providers: List of ModelProvider instances to use
+            providers: List of ModelProvider instances in priority order
             strategy: Strategy for reaching consensus (default: ALL_RESPONSES)
             default_timeout: Default timeout per provider in seconds (default: 120)
+            num_to_consult: Number of successful responses required (default: use all providers)
         """
         if not providers:
             raise ValueError("At least one provider must be specified")
@@ -112,6 +114,7 @@ class ConsensusWorkflow:
         ]
         self.strategy = strategy
         self.default_timeout = default_timeout
+        self.num_to_consult = num_to_consult if num_to_consult is not None else len(providers)
 
     def add_provider(
         self,
@@ -196,44 +199,82 @@ class ConsensusWorkflow:
         strategy: Optional[ConsensusStrategy] = None,
     ) -> ConsensusResult:
         """
-        Execute the consensus workflow across all providers.
+        Execute the consensus workflow with dynamic fallback.
+
+        Tries providers in priority order until num_to_consult successful responses
+        are obtained. If a provider fails, automatically tries the next provider
+        in the priority list.
 
         Args:
-            request: GenerationRequest to send to all providers
+            request: GenerationRequest to send to providers
             strategy: Override the default consensus strategy (optional)
 
         Returns:
             ConsensusResult with consensus response and individual results
+
+        Raises:
+            RuntimeError: If unable to obtain num_to_consult successful responses
         """
         strategy = strategy or self.strategy
 
         logger.info(
-            f"Starting consensus workflow with {len(self.provider_configs)} providers, "
-            f"strategy: {strategy.value}"
+            f"Starting consensus workflow: need {self.num_to_consult} successful responses "
+            f"from {len(self.provider_configs)} available providers, strategy: {strategy.value}"
         )
 
         # Emit workflow start
         emit_workflow_start("consensus", "10-30s")
 
-        # Execute all providers in parallel
-        tasks = [
-            self._execute_provider(config, request)
-            for config in self.provider_configs
-        ]
-
-        results = await asyncio.gather(*tasks)
-
-        # Separate successful and failed results
+        # Track successful and failed providers
         provider_results = {}
         all_responses = []
         failed_providers = []
+        provider_index = 0
 
-        for provider_name, response, error in results:
-            if response is not None:
-                provider_results[provider_name] = response
-                all_responses.append(response)
-            else:
-                failed_providers.append(provider_name)
+        # Try providers until we have enough successful responses or run out
+        while len(all_responses) < self.num_to_consult and provider_index < len(self.provider_configs):
+            # Calculate how many more we need
+            needed = self.num_to_consult - len(all_responses)
+            # Calculate how many providers we can try in this batch
+            available = len(self.provider_configs) - provider_index
+            batch_size = min(needed, available)
+
+            # Get the next batch of providers to try
+            batch_configs = self.provider_configs[provider_index:provider_index + batch_size]
+
+            logger.info(
+                f"Trying batch of {batch_size} providers (already have {len(all_responses)}/{self.num_to_consult})"
+            )
+
+            # Execute batch in parallel
+            tasks = [
+                self._execute_provider(config, request)
+                for config in batch_configs
+            ]
+
+            results = await asyncio.gather(*tasks)
+
+            # Process results
+            for provider_name, response, error in results:
+                if response is not None:
+                    provider_results[provider_name] = response
+                    all_responses.append(response)
+                    logger.info(f"Provider {provider_name} succeeded ({len(all_responses)}/{self.num_to_consult})")
+                else:
+                    failed_providers.append(provider_name)
+                    logger.warning(f"Provider {provider_name} failed, will try fallback if available")
+
+            provider_index += batch_size
+
+        # Check if we got enough successful responses
+        if len(all_responses) < self.num_to_consult:
+            error_msg = (
+                f"Consensus workflow failed: only {len(all_responses)}/{self.num_to_consult} "
+                f"providers succeeded. Tried {len(self.provider_configs)} providers total."
+            )
+            logger.error(error_msg)
+            emit_workflow_complete("consensus")
+            raise RuntimeError(error_msg)
 
         # Apply consensus strategy
         consensus_response = self._apply_strategy(
@@ -243,8 +284,10 @@ class ConsensusWorkflow:
         # Build metadata
         metadata = {
             "total_providers": len(self.provider_configs),
+            "providers_tried": provider_index,
             "successful_providers": len(all_responses),
             "failed_providers": len(failed_providers),
+            "num_to_consult": self.num_to_consult,
             "strategy": strategy.value,
         }
 
@@ -258,8 +301,8 @@ class ConsensusWorkflow:
         )
 
         logger.info(
-            f"Consensus workflow completed: {len(all_responses)}/{len(self.provider_configs)} "
-            f"providers succeeded"
+            f"Consensus workflow completed: {len(all_responses)}/{self.num_to_consult} "
+            f"providers succeeded (tried {provider_index} total)"
         )
 
         # Emit workflow complete

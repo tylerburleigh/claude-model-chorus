@@ -25,10 +25,15 @@ from ..providers import (
 from ..providers.cli_provider import ProviderUnavailableError
 from ..workflows import ArgumentWorkflow, ChatWorkflow, ConsensusWorkflow, ConsensusStrategy, IdeateWorkflow, ThinkDeepWorkflow
 from ..core.conversation import ConversationMemory
-from ..core.config import get_config_loader
+from ..core.config import get_claude_config_loader
 from ..core.progress import set_progress_enabled
 from model_chorus import __version__
 from .study_commands import study_app
+
+
+class ProviderDisabledError(Exception):
+    """Raised when attempting to use a disabled provider."""
+    pass
 
 app = typer.Typer(
     name="model-chorus",
@@ -146,7 +151,7 @@ def get_config():
     """Get the config loader instance, initializing if needed."""
     global _config_loader
     if _config_loader is None:
-        _config_loader = get_config_loader()
+        _config_loader = get_claude_config_loader()
         try:
             _config_loader.load_config()
         except Exception:
@@ -182,6 +187,10 @@ def get_provider_by_name(name: str, timeout: int = 120):
 
     Returns:
         Provider instance
+
+    Raises:
+        ProviderDisabledError: If provider is disabled in config
+        typer.Exit: If provider is unknown
     """
     providers = {
         "claude": ClaudeProvider,
@@ -195,6 +204,14 @@ def get_provider_by_name(name: str, timeout: int = 120):
         console.print(f"[red]Error: Unknown provider '{name}'[/red]")
         console.print(f"Available providers: {', '.join(providers.keys())}")
         raise typer.Exit(1)
+
+    # Check if provider is enabled in config
+    config = get_config()
+    if not config.is_provider_enabled(name.lower()):
+        raise ProviderDisabledError(
+            f"Provider '{name}' is disabled in .claude/model_chorus_config.yaml. "
+            f"Enable it in the config file or run setup to reconfigure."
+        )
 
     return provider_class(timeout=timeout)
 
@@ -276,6 +293,11 @@ def chat(
             provider_instance = get_provider_by_name(provider, timeout=int(timeout))
             if verbose:
                 console.print(f"[green]✓ {provider} initialized[/green]")
+        except ProviderDisabledError as e:
+            # Provider disabled in config
+            console.print(f"[red]Error: {e}[/red]")
+            console.print(f"\n[yellow]To fix this, edit .claude/model_chorus_config.yaml and set '{provider}: enabled: true'[/yellow]")
+            raise typer.Exit(1)
         except ProviderUnavailableError as e:
             # Provider CLI not available - show helpful error message
             console.print(f"[red]Error: {e.reason}[/red]\n")
@@ -290,10 +312,10 @@ def chat(
             console.print(f"[red]Failed to initialize {provider}: {e}[/red]")
             raise typer.Exit(1)
 
-        # Load fallback providers from config
-        fallback_provider_names = config.get_workflow_default('chat', 'fallback_providers', [])
-        fallback_providers = []
+        # Load fallback providers from config and filter by enabled status
+        fallback_provider_names = config.get_workflow_fallback_providers('chat', exclude_provider=provider)
 
+        fallback_providers = []
         if fallback_provider_names and verbose:
             console.print(f"[cyan]Initializing fallback providers: {', '.join(fallback_provider_names)}[/cyan]")
 
@@ -303,6 +325,9 @@ def chat(
                 fallback_providers.append(fallback_instance)
                 if verbose:
                     console.print(f"[green]✓ {fallback_name} initialized (fallback)[/green]")
+            except ProviderDisabledError:
+                if verbose:
+                    console.print(f"[yellow]⚠ Skipping disabled fallback provider {fallback_name}[/yellow]")
             except Exception as e:
                 if verbose:
                     console.print(f"[yellow]⚠ Could not initialize fallback {fallback_name}: {e}[/yellow]")
@@ -481,6 +506,11 @@ def argument(
             provider_instance = get_provider_by_name(provider, timeout=int(timeout))
             if verbose:
                 console.print(f"[green]✓ {provider} initialized[/green]")
+        except ProviderDisabledError as e:
+            # Provider disabled in config
+            console.print(f"[red]Error: {e}[/red]")
+            console.print(f"\n[yellow]To fix this, edit .claude/model_chorus_config.yaml and set '{provider}: enabled: true'[/yellow]")
+            raise typer.Exit(1)
         except ProviderUnavailableError as e:
             # Provider CLI not available - show helpful error message
             console.print(f"[red]Error: {e.reason}[/red]\n")
@@ -495,10 +525,10 @@ def argument(
             console.print(f"[red]Failed to initialize {provider}: {e}[/red]")
             raise typer.Exit(1)
 
-        # Load fallback providers from config
-        fallback_provider_names = config.get_workflow_default('argument', 'fallback_providers', [])
-        fallback_providers = []
+        # Load fallback providers from config and filter by enabled status
+        fallback_provider_names = config.get_workflow_fallback_providers('argument', exclude_provider=provider)
 
+        fallback_providers = []
         if fallback_provider_names and verbose:
             console.print(f"[cyan]Initializing fallback providers: {', '.join(fallback_provider_names)}[/cyan]")
 
@@ -508,6 +538,9 @@ def argument(
                 fallback_providers.append(fallback_instance)
                 if verbose:
                     console.print(f"[green]✓ {fallback_name} initialized (fallback)[/green]")
+            except ProviderDisabledError:
+                if verbose:
+                    console.print(f"[yellow]⚠ Skipping disabled fallback provider {fallback_name}[/yellow]")
             except Exception as e:
                 if verbose:
                     console.print(f"[yellow]⚠ Could not initialize fallback {fallback_name}: {e}[/yellow]")
@@ -684,6 +717,11 @@ def ideate(
             provider_instance = get_provider_by_name(provider, timeout=int(timeout))
             if verbose:
                 console.print(f"[green]✓ {provider} initialized[/green]")
+        except ProviderDisabledError as e:
+            # Provider disabled in config
+            console.print(f"[red]Error: {e}[/red]")
+            console.print(f"\n[yellow]To fix this, edit .claude/model_chorus_config.yaml and set '{provider}: enabled: true'[/yellow]")
+            raise typer.Exit(1)
         except ProviderUnavailableError as e:
             # Provider CLI not available - show helpful error message
             console.print(f"[red]Error: {e.reason}[/red]\n")
@@ -698,10 +736,10 @@ def ideate(
             console.print(f"[red]Failed to initialize {provider}: {e}[/red]")
             raise typer.Exit(1)
 
-        # Load fallback providers from config
-        fallback_provider_names = config.get_workflow_default('ideate', 'fallback_providers', [])
-        fallback_providers = []
+        # Load fallback providers from config and filter by enabled status
+        fallback_provider_names = config.get_workflow_fallback_providers('ideate', exclude_provider=provider)
 
+        fallback_providers = []
         if fallback_provider_names and verbose:
             console.print(f"[cyan]Initializing fallback providers: {', '.join(fallback_provider_names)}[/cyan]")
 
@@ -711,6 +749,9 @@ def ideate(
                 fallback_providers.append(fallback_instance)
                 if verbose:
                     console.print(f"[green]✓ {fallback_name} initialized (fallback)[/green]")
+            except ProviderDisabledError:
+                if verbose:
+                    console.print(f"[yellow]⚠ Skipping disabled fallback provider {fallback_name}[/yellow]")
             except Exception as e:
                 if verbose:
                     console.print(f"[yellow]⚠ Could not initialize fallback {fallback_name}: {e}[/yellow]")
@@ -822,11 +863,11 @@ def construct_prompt_with_files(prompt: str, files: Optional[List[str]]) -> str:
 @app.command()
 def consensus(
     prompt: str = typer.Option(..., "--prompt", "-P", help="Prompt to send to all models"),
-    providers: Optional[List[str]] = typer.Option(
+    num_to_consult: Optional[int] = typer.Option(
         None,
-        "--provider",
-        "-p",
-        help="Providers to use (can specify multiple times). Defaults to config or ['claude', 'gemini']",
+        "--num-to-consult",
+        "-n",
+        help="Number of successful responses required. Defaults to config or 2",
     ),
     strategy: Optional[str] = typer.Option(
         None,
@@ -864,16 +905,26 @@ def consensus(
     ),
 ):
     """
-    Run consensus workflow across multiple AI models.
+    Run consensus workflow with priority-based provider selection.
+
+    Tries providers in priority order until num_to_consult successful responses
+    are obtained. If a provider fails, automatically falls back to the next
+    provider in the priority list.
 
     Example:
-        model-chorus consensus "Explain quantum computing" -p claude -p gemini -s synthesize
+        model-chorus consensus --prompt "Explain quantum computing" --num-to-consult 2
     """
     try:
         # Apply config defaults if values not provided
         config = get_config()
-        if providers is None or len(providers) == 0:
-            providers = config.get_default_providers('consensus', ['claude', 'gemini'])
+
+        # Get priority list from config
+        provider_priority = config.get_workflow_provider_priority('consensus')
+
+        # Get num_to_consult from CLI or config
+        if num_to_consult is None:
+            num_to_consult = config.get_workflow_num_to_consult('consensus', fallback=2)
+
         if strategy is None:
             strategy = config.get_workflow_default('consensus', 'strategy', 'all_responses')
         if timeout is None:
@@ -893,26 +944,45 @@ def consensus(
 
         final_prompt = construct_prompt_with_files(prompt, files)
 
-        # Create provider instances
+        # Validate we have enough providers
+        if not provider_priority:
+            console.print("[red]Error: No providers configured for consensus workflow[/red]")
+            console.print("[yellow]Please configure provider_priority in .claude/model_chorus_config.yaml[/yellow]")
+            raise typer.Exit(1)
+
+        if len(provider_priority) < num_to_consult:
+            console.print(
+                f"[red]Error: Not enough providers available. Need {num_to_consult} but only "
+                f"{len(provider_priority)} enabled: {', '.join(provider_priority)}[/red]"
+            )
+            console.print("[yellow]Please enable more providers or reduce num_to_consult[/yellow]")
+            raise typer.Exit(1)
+
+        # Create provider instances for ALL providers in priority list (for fallback)
         if verbose:
-            console.print(f"[cyan]Creating providers: {', '.join(providers)}[/cyan]")
+            console.print(f"[cyan]Provider priority order: {', '.join(provider_priority)}[/cyan]")
+            console.print(f"[cyan]Will consult {num_to_consult} providers (with automatic fallback)[/cyan]\n")
 
         provider_instances = []
-        for provider_name in providers:
+        for provider_name in provider_priority:
             try:
                 provider = get_provider_by_name(provider_name)
                 provider_instances.append(provider)
                 if verbose:
                     console.print(f"[green]✓ {provider_name} initialized[/green]")
+            except ProviderDisabledError as e:
+                # This shouldn't happen since we filtered above, but handle it anyway
+                console.print(f"[yellow]Skipping disabled provider {provider_name}[/yellow]")
             except Exception as e:
                 console.print(f"[red]Failed to initialize {provider_name}: {e}[/red]")
                 raise typer.Exit(1)
 
-        # Create workflow
+        # Create workflow with dynamic fallback support
         workflow = ConsensusWorkflow(
             providers=provider_instances,
             strategy=strategy_enum,
             default_timeout=timeout,
+            num_to_consult=num_to_consult,
         )
 
         # Apply provider-level metadata defaults (e.g., model overrides) from config
@@ -941,7 +1011,7 @@ def consensus(
         # Execute workflow
         console.print(f"\n[bold cyan]Executing consensus workflow...[/bold cyan]")
         console.print(f"Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
-        console.print(f"Providers: {len(provider_instances)}")
+        console.print(f"Providers: {len(provider_priority)} available (need {num_to_consult} successful)")
         console.print(f"Strategy: {strategy_enum.value}\n")
 
         # Run async workflow
@@ -956,7 +1026,9 @@ def consensus(
         table.add_column("Status", style="green")
         table.add_column("Response Length", justify="right")
 
-        for provider_name in providers:
+        # Show all providers that were tried (successful and failed)
+        tried_providers = list(result.provider_results.keys()) + result.failed_providers
+        for provider_name in tried_providers:
             if provider_name in result.provider_results:
                 response = result.provider_results[provider_name]
                 table.add_row(
@@ -1143,6 +1215,11 @@ def thinkdeep(
             provider_instance = get_provider_by_name(model, timeout=int(timeout))
             if verbose:
                 console.print(f"[green]✓ {model} initialized[/green]")
+        except ProviderDisabledError as e:
+            # Provider disabled in config
+            console.print(f"[red]Error: {e}[/red]")
+            console.print(f"\n[yellow]To fix this, edit .claude/model_chorus_config.yaml and set '{model}: enabled: true'[/yellow]")
+            raise typer.Exit(1)
         except Exception as e:
             console.print(f"[red]Failed to initialize {model}: {e}[/red]")
             raise typer.Exit(1)
@@ -1158,11 +1235,10 @@ def thinkdeep(
                     import time
                     time.sleep(2)  # Give user time to cancel
 
-        # Load fallback providers from config, excluding the primary provider
-        # to avoid duplicate availability checks when --model matches a fallback
-        fallback_provider_names = config.get_fallback_providers_excluding('thinkdeep', model) or []
-        fallback_providers = []
+        # Load fallback providers from config and filter by enabled status
+        fallback_provider_names = config.get_workflow_fallback_providers('thinkdeep', exclude_provider=model)
 
+        fallback_providers = []
         if fallback_provider_names and verbose:
             console.print(f"[cyan]Initializing fallback providers: {', '.join(fallback_provider_names)}[/cyan]")
 
@@ -1172,6 +1248,9 @@ def thinkdeep(
                 fallback_providers.append(fallback_instance)
                 if verbose:
                     console.print(f"[green]✓ {fallback_name} initialized (fallback)[/green]")
+            except ProviderDisabledError:
+                if verbose:
+                    console.print(f"[yellow]⚠ Skipping disabled fallback provider {fallback_name}[/yellow]")
             except Exception as e:
                 if verbose:
                     console.print(f"[yellow]⚠ Could not initialize fallback {fallback_name}: {e}[/yellow]")
