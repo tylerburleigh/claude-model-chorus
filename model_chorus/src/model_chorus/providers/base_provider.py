@@ -147,13 +147,85 @@ class TokenUsage:
 
 @dataclass
 class GenerationResponse:
-    """Response from text generation."""
+    """Response from text generation with standardized structure across providers.
+
+    This dataclass provides a unified response format for all AI providers (Claude,
+    Gemini, OpenAI Codex, etc.), supporting conversation continuation via thread_id,
+    token usage tracking, and debugging capabilities.
+
+    Attributes:
+        content: The generated text content from the model.
+        model: Model identifier that generated this response (e.g., "claude-3-opus",
+            "gemini-pro", "gpt-4").
+        usage: Token usage information as a TokenUsage dataclass. Supports both
+            attribute access (usage.input_tokens) and dict-like access
+            (usage['input_tokens']) for backward compatibility.
+        stop_reason: Reason generation stopped (e.g., "end_turn", "max_tokens",
+            "stop_sequence"). Provider-specific values, may be None.
+        metadata: Provider-specific additional metadata (e.g., safety ratings,
+            citations, model version details).
+        thread_id: Conversation continuation identifier for multi-turn interactions.
+            Provider-specific mapping:
+            - Claude: Maps from CLI response 'session_id' field
+            - Cursor: Maps from CLI response 'session_id' field
+            - Codex (OpenAI): Maps from CLI response 'thread_id' field
+            - Gemini: Always None (does not support conversation continuation)
+            Used to maintain context across multiple generation requests.
+        provider: Name of the provider that generated this response. Valid values:
+            "claude", "gemini", "codex", "cursor". Useful for multi-provider
+            workflows and debugging.
+        stderr: Standard error output captured from CLI-based providers. Contains
+            warning messages, debug output, or error details. Empty string if no
+            errors, None if not captured. Only populated for CLI providers (Claude,
+            Gemini, Codex).
+        duration_ms: Request duration in milliseconds, measured from request start
+            to response completion. Useful for performance monitoring, latency
+            analysis, and cost optimization. None if not measured.
+        raw_response: Complete raw response from the provider as returned by the
+            CLI or API. Useful for debugging, testing provider-specific features,
+            and understanding response structure. May contain sensitive data.
+            None if not captured.
+
+    Example:
+        Basic usage::
+
+            response = GenerationResponse(
+                content="Hello, world!",
+                model="claude-3-opus-20240229",
+                provider="claude"
+            )
+            response.usage['input_tokens'] = 10
+            response.usage['output_tokens'] = 5
+
+        With conversation continuation::
+
+            # First turn
+            resp1 = GenerationResponse(
+                content="Initial response",
+                model="gpt-4",
+                thread_id="thread_abc123",
+                provider="codex"
+            )
+
+            # Follow-up turn using same thread_id
+            resp2 = GenerationResponse(
+                content="Follow-up response",
+                model="gpt-4",
+                thread_id="thread_abc123",  # Same ID for continuation
+                provider="codex"
+            )
+    """
 
     content: str
     model: str
     usage: TokenUsage = field(default_factory=TokenUsage)
     stop_reason: Optional[str] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
+    thread_id: Optional[str] = None
+    provider: Optional[str] = None
+    stderr: Optional[str] = None
+    duration_ms: Optional[int] = None
+    raw_response: Optional[Dict[str, Any]] = None
 
 
 class ModelProvider(ABC):
