@@ -9,22 +9,40 @@ import subprocess
 from model_chorus.providers.gemini_provider import GeminiProvider
 from model_chorus.providers.base_provider import GenerationRequest
 
+# Import provider availability from shared test helpers
+from test_helpers import GEMINI_AVAILABLE
 
+
+@pytest.mark.requires_gemini
+@pytest.mark.skipif(not GEMINI_AVAILABLE, reason="Gemini not available (config disabled or CLI not found)")
 class TestGeminiIntegration:
     """Integration tests for Gemini provider."""
 
     @pytest.fixture
     def provider(self):
-        """Create a Gemini provider instance."""
-        return GeminiProvider(timeout=30, retry_limit=1)
+        """Create a Gemini provider instance.
+
+        Automatically configured to use the fastest model (flash) for tests.
+        """
+        provider_instance = GeminiProvider(timeout=30, retry_limit=1)
+
+        # Wrap the generate method to inject the fast model
+        original_generate = provider_instance.generate
+
+        async def generate_with_fast_model(request):
+            # Use gemini-2.5-flash (fastest) if no model specified
+            if "model" not in request.metadata:
+                request.metadata["model"] = "gemini-2.5-flash"
+            return await original_generate(request)
+
+        provider_instance.generate = generate_with_fast_model
+        return provider_instance
 
     @pytest.fixture
     def simple_request(self):
         """Create a simple generation request."""
         return GenerationRequest(
             prompt="What is 2+2? Answer with just the number.",
-            temperature=0.7,
-            max_tokens=10,
         )
 
     def test_gemini_cli_available(self):
@@ -51,14 +69,21 @@ class TestGeminiIntegration:
         assert "--temperature" not in command, "Gemini CLI doesn't support --temperature"
 
         # Should not include --json (uses --output-format instead)
-        assert "--json" not in command, "Gemini CLI uses -o json, not --json"
+        assert "--json" not in command, "Gemini CLI uses --output-format json, not --json"
 
-        # Should include -o json
-        assert "-o" in command and "json" in command, "Should use -o json for JSON output"
+        # Should include --output-format json
+        assert "--output-format" in command and "json" in command, "Should use --output-format json for JSON output"
 
-        # Prompt should be positional (not --prompt)
-        assert simple_request.prompt in command, "Prompt should be in command"
-        assert "--prompt" not in command, "Should use positional prompt, not --prompt"
+        # Prompt is passed as positional argument (after all flags)
+        # The -p flag only works with shell=True, not with subprocess.exec
+        assert simple_request.prompt in command, "Prompt should be in command as positional argument"
+        assert command[-1] == simple_request.prompt, "Prompt should be the last argument (after flags)"
+        assert "-p" not in command, "Should not use -p flag (use positional arg instead)"
+
+        # Verify input_data is NOT set (we use positional args, not stdin)
+        command_result = provider.build_command(simple_request)  # Reset state
+        assert not hasattr(provider, 'input_data') or provider.input_data is None, \
+            "Provider should not use input_data (positional args used instead)"
 
     def test_build_command_with_model(self, provider):
         """Test command building with model metadata."""
@@ -137,12 +162,16 @@ class TestGeminiIntegration:
 
     def test_supports_vision(self, provider):
         """Test vision capability detection."""
-        assert provider.supports_vision("pro") is True
-        assert provider.supports_vision("flash") is True
-        assert provider.supports_vision("ultra") is True
+        # Gemini models support vision
+        assert provider.supports_vision("gemini-2.5-pro") is True
+        assert provider.supports_vision("gemini-2.5-flash") is True
+        # Models not in VISION_MODELS don't support vision
+        assert provider.supports_vision("other-model") is False
 
     def test_supports_thinking(self, provider):
         """Test thinking mode capability detection."""
-        assert provider.supports_thinking("pro") is True
-        assert provider.supports_thinking("ultra") is True
-        assert provider.supports_thinking("flash") is False
+        # Pro and Flash support thinking mode
+        assert provider.supports_thinking("gemini-2.5-pro") is True
+        assert provider.supports_thinking("gemini-2.5-flash") is True
+        # Models not in THINKING_MODELS don't support thinking
+        assert provider.supports_thinking("other-model") is False

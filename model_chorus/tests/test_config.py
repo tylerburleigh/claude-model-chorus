@@ -236,8 +236,10 @@ workflows:
         # Other workflows should use global default
         assert loader.get_default_provider('thinkdeep', 'fallback') == 'gemini'
 
-    def test_get_default_provider_fallback(self, tmp_path):
+    def test_get_default_provider_fallback(self, tmp_path, monkeypatch):
         """Test getting fallback provider when no config exists."""
+        # Change to tmp directory to avoid loading project config
+        monkeypatch.chdir(tmp_path)
         loader = ConfigLoader()
         loader.load_config()  # No config file
 

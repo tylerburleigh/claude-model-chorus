@@ -6,6 +6,13 @@ import json
 import pytest
 from pathlib import Path
 
+# Skip all tests in this module if the review JSON file doesn't exist
+REVIEW_JSON_PATH = Path(__file__).parent.parent / "review_provider_standardization.json"
+pytestmark = pytest.mark.skipif(
+    not REVIEW_JSON_PATH.exists(),
+    reason="Review JSON file not found - these tests validate a specific review output file"
+)
+
 
 @pytest.fixture
 def review_json_path():

@@ -8,13 +8,17 @@ import json
 import logging
 from typing import Any, Dict, List, Optional
 
-from .cli_provider import CLIProvider
 from .base_provider import (
     GenerationRequest,
     GenerationResponse,
-    ModelConfig,
     ModelCapability,
+<<<<<<< Updated upstream
+=======
+    ModelConfig,
+    TokenUsage,
+>>>>>>> Stashed changes
 )
+from .cli_provider import CLIProvider
 
 logger = logging.getLogger(__name__)
 
@@ -88,7 +92,11 @@ class ClaudeProvider(CLIProvider):
                     ModelCapability.THINKING,
                     ModelCapability.STREAMING,
                 ],
-                metadata={"family": "sonnet-4.5", "tier": "default", "description": "Smartest model for daily use"},
+                metadata={
+                    "family": "sonnet-4.5",
+                    "tier": "default",
+                    "description": "Smartest model for daily use",
+                },
             ),
             ModelConfig(
                 model_id="haiku",
@@ -99,7 +107,11 @@ class ClaudeProvider(CLIProvider):
                     ModelCapability.THINKING,
                     ModelCapability.STREAMING,
                 ],
-                metadata={"family": "haiku-4.5", "tier": "fast", "description": "Fastest model for simple tasks"},
+                metadata={
+                    "family": "haiku-4.5",
+                    "tier": "fast",
+                    "description": "Fastest model for simple tasks",
+                },
             ),
         ]
         self.set_model_list(models)
@@ -145,8 +157,8 @@ class ClaudeProvider(CLIProvider):
         # Note: Claude CLI doesn't support --temperature, --max-tokens flags
         # These would need to be set via config or are model defaults
 
-        # Add prompt as a flag
-        command.extend(["--prompt", request.prompt])
+        # Set input_data for stdin piping (--print mode expects input via stdin)
+        self.input_data = request.prompt
 
         logger.debug(f"Built Claude command: {' '.join(command)}")
         return command

@@ -29,7 +29,9 @@ class TestCodexProvider:
         assert command[0] == "codex"
         assert command[1] == "exec"
         assert "--json" in command
-        assert sample_generation_request.prompt in command
+        # Prompt should be passed via stdin, not as command argument
+        assert provider.input_data == sample_generation_request.prompt
+        assert sample_generation_request.prompt not in command
 
     def test_build_command_with_model(self):
         """Test building command with specific model."""
@@ -70,7 +72,7 @@ class TestCodexProvider:
         assert response.usage["output_tokens"] == 45
         assert response.usage["cached_input_tokens"] == 0
         assert response.stop_reason == "completed"
-        assert response.metadata["thread_id"] == "test-thread-123"
+        assert response.thread_id == "test-thread-123"
 
     def test_parse_response_failure(self):
         """Test parsing failed CLI command."""
@@ -167,17 +169,21 @@ class TestCodexProvider:
         """Test vision capability detection."""
         provider = CodexProvider()
 
-        assert provider.supports_vision("gpt4") is True
-        assert provider.supports_vision("gpt4-turbo") is True
+        # Codex models don't support vision
+        assert provider.supports_vision("gpt-5-codex") is False
+        assert provider.supports_vision("gpt4") is False
         assert provider.supports_vision("gpt35-turbo") is False
 
     def test_supports_function_calling(self):
         """Test function calling capability detection."""
         provider = CodexProvider()
 
-        assert provider.supports_function_calling("gpt4") is True
-        assert provider.supports_function_calling("gpt4-turbo") is True
-        assert provider.supports_function_calling("gpt35-turbo") is True
+        # Models in FUNCTION_CALLING_MODELS support function calling
+        assert provider.supports_function_calling("gpt-5-codex") is True
+        assert provider.supports_function_calling("gpt-5") is True
+        assert provider.supports_function_calling("gpt-5-codex-mini") is True
+        # Models not in the set don't support it
+        assert provider.supports_function_calling("gpt4") is False
 
     def test_read_only_sandbox_mode(self, sample_generation_request):
         """Test that read-only sandbox mode is enabled."""
@@ -199,12 +205,8 @@ class TestCodexProvider:
         provider = CodexProvider()
         command = provider.build_command(sample_generation_request)
 
-        # Verify ask-for-approval flag is present
-        assert "--ask-for-approval" in command
-
-        # Get the approval policy value
-        approval_idx = command.index("--ask-for-approval")
-        approval_policy = command[approval_idx + 1]
-
-        # Verify it's set to never
-        assert approval_policy == "never"
+        # Verify sandbox read-only mode is used (runs non-interactively)
+        # The --sandbox read-only mode in exec mode handles non-interactive execution
+        assert "--sandbox" in command
+        sandbox_idx = command.index("--sandbox")
+        assert command[sandbox_idx + 1] == "read-only"

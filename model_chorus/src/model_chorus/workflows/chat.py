@@ -152,8 +152,14 @@ class ChatWorkflow(BaseWorkflow):
             ...     files=["/path/to/file.py"]
             ... )
         """
+        # Handle empty prompt gracefully
         if not prompt or not prompt.strip():
-            raise ValueError("Prompt cannot be empty.")
+            logger.warning("Empty prompt provided to chat workflow")
+            return WorkflowResult(
+                success=False,
+                error="Prompt cannot be empty.",
+                metadata={"error_type": "validation_error"}
+            )
 
         logger.info(
             f"Starting chat workflow - prompt length: {len(prompt)}, "
@@ -186,8 +192,29 @@ class ChatWorkflow(BaseWorkflow):
                 logger.info(f"Will use available providers: {available}")
 
         # Generate or use thread ID
+        # Track whether this is truly a continuation (valid existing thread)
+        is_valid_continuation = False
+
+        # Validate continuation_id if provided
         if continuation_id:
-            thread_id = continuation_id
+            # Check if the thread actually exists in conversation memory
+            if self.conversation_memory:
+                existing_thread = self.get_thread(continuation_id)
+                if existing_thread:
+                    thread_id = continuation_id
+                    is_valid_continuation = True
+                else:
+                    # Thread doesn't exist, create a new one instead
+                    logger.warning(
+                        f"Continuation ID '{continuation_id}' not found in conversation memory. "
+                        f"Creating new conversation instead."
+                    )
+                    thread_id = self.conversation_memory.create_thread(workflow_name=self.name)
+                    is_valid_continuation = False
+            else:
+                # No conversation memory, just use the provided ID
+                thread_id = continuation_id
+                is_valid_continuation = True  # Assume valid if no memory to check
         else:
             # Create new thread if conversation memory available
             if self.conversation_memory:
@@ -272,7 +299,7 @@ class ChatWorkflow(BaseWorkflow):
                 'model': response.model,
                 'usage': response.usage,
                 'stop_reason': response.stop_reason,
-                'is_continuation': continuation_id is not None,
+                'is_continuation': is_valid_continuation,
                 'conversation_length': self._get_conversation_length(thread_id)
             })
 

@@ -31,6 +31,12 @@ def mock_provider():
         )
 
     provider.generate = AsyncMock(side_effect=mock_generate)
+
+    # Mock async check_availability method
+    async def mock_check_availability():
+        return (True, None)  # is_available=True, error=None
+
+    provider.check_availability = AsyncMock(side_effect=mock_check_availability)
     return provider
 
 
@@ -360,6 +366,12 @@ class TestErrorHandling:
             raise Exception("Provider error")
 
         error_provider.generate = AsyncMock(side_effect=mock_generate_error)
+
+        # Mock async check_availability method
+        async def mock_check_availability():
+            return (True, None)  # is_available=True, error=None
+
+        error_provider.check_availability = AsyncMock(side_effect=mock_check_availability)
 
         workflow = ChatWorkflow(
             provider=error_provider,

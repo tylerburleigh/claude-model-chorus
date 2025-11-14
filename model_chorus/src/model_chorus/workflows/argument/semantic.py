@@ -36,7 +36,11 @@ def _get_model(model_name: str = _DEFAULT_MODEL) -> SentenceTransformer:
     """
     global _model
     if _model is None:
-        _model = SentenceTransformer(model_name)
+        # Initialize with tokenizer kwargs to suppress FutureWarning
+        _model = SentenceTransformer(
+            model_name,
+            tokenizer_kwargs={"clean_up_tokenization_spaces": True}
+        )
     return _model
 
 

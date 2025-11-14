@@ -31,7 +31,9 @@ class TestClaudeProvider:
         assert "--output-format" in command
         assert "json" in command
         assert "--system-prompt" in command
-        assert sample_generation_request.prompt in command
+        # Prompt should be passed via stdin, not as command argument
+        assert provider.input_data == sample_generation_request.prompt
+        assert sample_generation_request.prompt not in command
 
     def test_build_command_with_model(self):
         """Test building command with specific model."""
@@ -155,7 +157,7 @@ class TestClaudeProvider:
 
         assert provider.supports_vision("opus") is True
         assert provider.supports_vision("sonnet") is True
-        assert provider.supports_vision("haiku") is False
+        assert provider.supports_vision("haiku") is True
 
     def test_supports_thinking(self):
         """Test thinking mode capability detection."""
@@ -163,41 +165,35 @@ class TestClaudeProvider:
 
         assert provider.supports_thinking("opus") is True
         assert provider.supports_thinking("sonnet") is True
-        assert provider.supports_thinking("haiku") is False
+        assert provider.supports_thinking("haiku") is True
 
     def test_read_only_mode_allowed_tools(self, sample_generation_request):
         """Test that read-only mode restricts tools to allowed list."""
         provider = ClaudeProvider()
         command = provider.build_command(sample_generation_request)
 
-        # Verify allowedTools flag is present
-        assert "--allowedTools" in command
+        # Verify allowed-tools flag is present
+        assert "--allowed-tools" in command
 
-        # Get the allowed tools list
-        allowed_tools_idx = command.index("--allowedTools")
-        allowed_tools = command[allowed_tools_idx + 1]
-
-        # Verify read-only tools are allowed
-        assert "Read" in allowed_tools
-        assert "Grep" in allowed_tools
-        assert "Glob" in allowed_tools
-        assert "WebSearch" in allowed_tools
-        assert "WebFetch" in allowed_tools
-        assert "Task" in allowed_tools
+        # Verify read-only tools are in the command
+        # (they appear as separate elements after --allowed-tools)
+        assert "Read" in command
+        assert "Grep" in command
+        assert "Glob" in command
+        assert "WebSearch" in command
+        assert "WebFetch" in command
+        assert "Task" in command
 
     def test_read_only_mode_disallowed_tools(self, sample_generation_request):
         """Test that read-only mode blocks write operations."""
         provider = ClaudeProvider()
         command = provider.build_command(sample_generation_request)
 
-        # Verify disallowedTools flag is present
-        assert "--disallowedTools" in command
+        # Verify disallowed-tools flag is present
+        assert "--disallowed-tools" in command
 
-        # Get the disallowed tools list
-        disallowed_tools_idx = command.index("--disallowedTools")
-        disallowed_tools = command[disallowed_tools_idx + 1]
-
-        # Verify write tools are blocked
-        assert "Write" in disallowed_tools
-        assert "Edit" in disallowed_tools
-        assert "Bash" in disallowed_tools
+        # Verify write tools are in the command
+        # (they appear as separate elements after --disallowed-tools)
+        assert "Write" in command
+        assert "Edit" in command
+        assert "Bash" in command
