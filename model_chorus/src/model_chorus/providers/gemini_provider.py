@@ -129,8 +129,8 @@ class GeminiProvider(CLIProvider):
             )
 
             try:
-                # Use longer timeout for Gemini (10 seconds) due to slower CLI initialization
-                await asyncio.wait_for(process.communicate(), timeout=10.0)
+                # Use longer timeout for Gemini (15 seconds) due to slower CLI initialization
+                await asyncio.wait_for(process.communicate(), timeout=15.0)
                 return (True, None)
             except asyncio.TimeoutError:
                 # Kill the process if it times out
