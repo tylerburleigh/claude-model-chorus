@@ -218,11 +218,10 @@ def get_provider_by_name(name: str, timeout: int = 120):
 
 @app.command()
 def chat(
-    prompt: str = typer.Option(..., "--prompt", "-P", help="Message to send to the AI model"),
+    prompt: str = typer.Option(..., "--prompt", help="Message to send to the AI model"),
     provider: Optional[str] = typer.Option(
         None,
         "--provider",
-        "-p",
         help="Provider to use (claude, gemini, codex, cursor-agent). Defaults to config or 'claude'",
     ),
     continuation_id: Optional[str] = typer.Option(
@@ -242,6 +241,11 @@ def chat(
         None,
         "--system",
         help="System prompt for context",
+    ),
+    timeout: Optional[float] = typer.Option(
+        None,
+        "--timeout",
+        help="Timeout per provider in seconds. Defaults to config or 120.0",
     ),
     output: Optional[Path] = typer.Option(
         None,
@@ -281,9 +285,8 @@ def chat(
             provider = config.get_default_provider('chat', 'claude')
         if system is None:
             system = config.get_workflow_default('chat', 'system_prompt', None)
-
-        # Read timeout from config
-        timeout = config.get_workflow_default('chat', 'timeout', 120.0)
+        if timeout is None:
+            timeout = config.get_workflow_default('chat', 'timeout', 120.0)
 
         # Create provider instance
         if verbose:
@@ -430,11 +433,10 @@ def chat(
 
 @app.command()
 def argument(
-    prompt: str = typer.Option(..., "--prompt", "-P", help="Argument, claim, or question to analyze"),
+    prompt: str = typer.Option(..., "--prompt", help="Argument, claim, or question to analyze"),
     provider: Optional[str] = typer.Option(
         None,
         "--provider",
-        "-p",
         help="Provider to use (claude, gemini, codex, cursor-agent). Defaults to config or 'claude'",
     ),
     continuation_id: Optional[str] = typer.Option(
@@ -454,6 +456,11 @@ def argument(
         None,
         "--system",
         help="System prompt for context",
+    ),
+    timeout: Optional[float] = typer.Option(
+        None,
+        "--timeout",
+        help="Timeout per provider in seconds. Defaults to config or 120.0",
     ),
     output: Optional[Path] = typer.Option(
         None,
@@ -494,9 +501,8 @@ def argument(
         config = get_config()
         if provider is None:
             provider = config.get_default_provider('argument', 'claude')
-
-        # Read timeout from config
-        timeout = config.get_workflow_default('argument', 'timeout', 120.0)
+        if timeout is None:
+            timeout = config.get_workflow_default('argument', 'timeout', 120.0)
 
         # Create provider instance
         if verbose:
@@ -635,11 +641,10 @@ def argument(
 
 @app.command()
 def ideate(
-    prompt: str = typer.Option(..., "--prompt", "-P", help="Topic or problem to brainstorm ideas for"),
+    prompt: str = typer.Option(..., "--prompt", help="Topic or problem to brainstorm ideas for"),
     provider: Optional[str] = typer.Option(
         None,
         "--provider",
-        "-p",
         help="Provider to use (claude, gemini, codex, cursor-agent). Defaults to config or 'claude'",
     ),
     continuation_id: Optional[str] = typer.Option(
@@ -665,6 +670,11 @@ def ideate(
         None,
         "--system",
         help="System prompt for context",
+    ),
+    timeout: Optional[float] = typer.Option(
+        None,
+        "--timeout",
+        help="Timeout per provider in seconds. Defaults to config or 120.0",
     ),
     output: Optional[Path] = typer.Option(
         None,
@@ -705,9 +715,8 @@ def ideate(
         config = get_config()
         if provider is None:
             provider = config.get_default_provider('ideate', 'claude')
-
-        # Read timeout from config
-        timeout = config.get_workflow_default('ideate', 'timeout', 120.0)
+        if timeout is None:
+            timeout = config.get_workflow_default('ideate', 'timeout', 120.0)
 
         # Create provider instance
         if verbose:
@@ -862,12 +871,12 @@ def construct_prompt_with_files(prompt: str, files: Optional[List[str]]) -> str:
 
 @app.command()
 def consensus(
-    prompt: str = typer.Option(..., "--prompt", "-P", help="Prompt to send to all models"),
+    prompt: str = typer.Option(..., "--prompt", help="Prompt to send to all models"),
     num_to_consult: Optional[int] = typer.Option(
         None,
         "--num-to-consult",
-        "-n",
-        help="Number of successful responses required. Defaults to config or 2",
+        "-m",
+        help="Number of successful responses required (models to consult). Defaults to config or 2",
     ),
     strategy: Optional[str] = typer.Option(
         None,
@@ -902,6 +911,11 @@ def consensus(
         "--verbose",
         "-v",
         help="Show detailed execution information",
+    ),
+    skip_provider_check: bool = typer.Option(
+        False,
+        "--skip-provider-check",
+        help="Skip provider availability check (faster startup)",
     ),
 ):
     """
@@ -1110,10 +1124,10 @@ def thinkdeep(
         help="Continue investigation with another step (omit for final step)",
     ),
     findings: str = typer.Option(..., "--findings", help="What was discovered in this step"),
-    model: Optional[str] = typer.Option(
+    provider: Optional[str] = typer.Option(
         None,
-        "--model",
-        help="AI model to use (claude, gemini, codex, cursor-agent). Defaults to config or 'claude'",
+        "--provider",
+        help="Provider to use (claude, gemini, codex, cursor-agent). Defaults to config or 'claude'",
     ),
     continuation_id: Optional[str] = typer.Option(
         None,
@@ -1187,8 +1201,8 @@ def thinkdeep(
     try:
         # Apply config defaults if values not provided
         config = get_config()
-        if model is None:
-            model = config.get_default_provider('thinkdeep', 'claude')
+        if provider is None:
+            provider = config.get_default_provider('thinkdeep', 'claude')
         if thinking_mode is None:
             thinking_mode = config.get_workflow_default('thinkdeep', 'thinking_mode', 'medium')
 
@@ -1209,34 +1223,34 @@ def thinkdeep(
 
         # Create primary provider instance
         if verbose:
-            console.print(f"[cyan]Initializing model: {model}[/cyan]")
+            console.print(f"[cyan]Initializing provider: {provider}[/cyan]")
 
         try:
-            provider_instance = get_provider_by_name(model, timeout=int(timeout))
+            provider_instance = get_provider_by_name(provider, timeout=int(timeout))
             if verbose:
-                console.print(f"[green]✓ {model} initialized[/green]")
+                console.print(f"[green]✓ {provider} initialized[/green]")
         except ProviderDisabledError as e:
             # Provider disabled in config
             console.print(f"[red]Error: {e}[/red]")
-            console.print(f"\n[yellow]To fix this, edit .claude/model_chorus_config.yaml and set '{model}: enabled: true'[/yellow]")
+            console.print(f"\n[yellow]To fix this, edit .claude/model_chorus_config.yaml and set '{provider}: enabled: true'[/yellow]")
             raise typer.Exit(1)
         except Exception as e:
-            console.print(f"[red]Failed to initialize {model}: {e}[/red]")
+            console.print(f"[red]Failed to initialize {provider}: {e}[/red]")
             raise typer.Exit(1)
 
         # Validate provider supports requested parameters
         if thinking_mode and thinking_mode != 'medium':  # medium is default
             # Check if provider is gemini (which doesn't support thinking_mode)
-            if model == 'gemini':
+            if provider == 'gemini':
                 console.print(f"[yellow]Warning: Gemini provider does not support --thinking-mode parameter[/yellow]")
-                console.print(f"[yellow]The parameter will be ignored. Use --model claude or --model codex for thinking mode support.[/yellow]")
+                console.print(f"[yellow]The parameter will be ignored. Use --provider claude or --provider codex for thinking mode support.[/yellow]")
                 if not skip_provider_check:
                     console.print(f"[yellow]Proceeding anyway... (use Ctrl+C to cancel)[/yellow]")
                     import time
                     time.sleep(2)  # Give user time to cancel
 
         # Load fallback providers from config and filter by enabled status
-        fallback_provider_names = config.get_workflow_fallback_providers('thinkdeep', exclude_provider=model)
+        fallback_provider_names = config.get_workflow_fallback_providers('thinkdeep', exclude_provider=provider)
 
         fallback_providers = []
         if fallback_provider_names and verbose:
@@ -1301,7 +1315,7 @@ def thinkdeep(
         # Display investigation info
         console.print(f"\n[bold cyan]{'Continuing' if continuation_id else 'Starting'} ThinkDeep Investigation[/bold cyan]")
         console.print(f"Step {step_number}/{total_steps}: {step}")
-        console.print(f"Model: {model}")
+        console.print(f"Provider: {provider}")
         console.print(f"Confidence: {confidence}")
         if hypothesis:
             console.print(f"Hypothesis: {hypothesis}")
@@ -1379,7 +1393,7 @@ def thinkdeep(
                     "findings": findings,
                     "hypothesis": hypothesis,
                     "confidence": confidence,
-                    "model": model,
+                    "provider": provider,
                     "continuation_id": returned_continuation_id,
                     "response": result.synthesis,
                     "usage": usage,
