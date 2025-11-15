@@ -406,10 +406,119 @@ model-chorus thinkdeep --step "Investigate why API latency increased from 100ms 
 - `--continuation-id` / `--continue` / `-c` / `--session-id`: Resume previous investigation (all aliases work identically)
 - `--hypothesis`: Current working theory
 - `--confidence`: Confidence level (exploring, low, medium, high, very_high, almost_certain, certain)
-  - `--files-checked`: List of files examined (legacy `src/claude_skills/...` paths are remapped automatically; missing files emit warnings and are skipped)
+  - `--files-checked`: List of files examined (file contents are read and included in AI prompt; missing files emit warnings and are skipped)
 - `--thinking-mode`: Reasoning depth (minimal, low, medium, high, max)
 
 ## Technical Contract
+
+### Context Provided to the AI
+
+When `modelchorus thinkdeep` is invoked via CLI, it's critical to understand what context is actually available to the AI model. **The AI only sees what you explicitly provide via CLI parameters** - there is no automatic repository awareness or environment context.
+
+#### What the AI SEES
+
+The AI receives a structured prompt containing:
+
+1. **Investigation Context (from CLI parameters):**
+   - Step description (`--step`)
+   - Current findings (`--findings`)
+   - Hypothesis (`--hypothesis`, if provided)
+   - Confidence level (`--confidence`)
+   - Thinking mode (`--thinking-mode`)
+   - Step number and total steps
+
+2. **File Contents (ONLY if explicitly provided):**
+   - Files listed in `--files-checked` are READ from disk and their FULL CONTENT is included in the prompt
+   - Format: Each file appears as:
+     ```
+     --- File: path/to/file.py ---
+     [complete file contents here]
+     --- End of path/to/file.py ---
+     ```
+   - If files cannot be read, errors are logged and they are skipped
+
+3. **File References (names only):**
+   - Files listed in `--relevant-files` appear as a simple list of filenames
+   - **NO content is included** - only the paths are mentioned
+   - These serve as references but don't provide the AI with any actual code/content
+
+4. **Investigation History (when continuing):**
+   - Previous investigation steps (last 3 steps shown)
+   - Previous findings (truncated to 150 characters per step)
+   - Previous confidence levels
+   - Files examined previously (up to 10 filenames listed)
+
+5. **Conversation History (when continuing):**
+   - Full conversation thread from previous steps via `--session-id`
+   - All previous messages and responses in the investigation
+
+#### What the AI DOES NOT SEE
+
+The AI has **NO access** to:
+
+- ❌ Current working directory or file system structure
+- ❌ Git repository status, branches, or commit history
+- ❌ Environment variables or system configuration
+- ❌ Directory listings or file trees
+- ❌ Any files not explicitly provided via `--files-checked`
+- ❌ Contents of files mentioned in `--relevant-files` (only filenames)
+- ❌ Implicit project context or repository metadata
+
+#### Critical Guidance for AI Agents
+
+**When invoking `modelchorus thinkdeep`, you MUST:**
+
+1. **Provide ALL necessary context explicitly** via CLI parameters
+   - Don't assume the AI "knows" about your repository structure
+   - Don't assume the AI can "see" files you've examined
+   - Everything must be passed as explicit parameters
+
+2. **Use `--files-checked` to provide file contents:**
+   - This is the ONLY way to give the AI actual code/content to analyze
+   - Files are read from disk and included in full in the prompt
+   - Example: `--files-checked "src/auth.py,src/models/user.py"`
+
+3. **Understand that `--relevant-files` provides names only:**
+   - This parameter lists filenames but does NOT include their contents
+   - Use it to track which files are relevant to the investigation
+   - If you want the AI to analyze a file, use `--files-checked` instead
+
+4. **File paths must be valid and readable:**
+   - Paths are resolved relative to the current working directory
+   - Invalid paths will cause errors and those files will be skipped
+
+5. **Previous context may be truncated:**
+   - Only last 3 investigation steps are included
+   - Findings from old steps are truncated to 150 characters
+   - Re-state important context if it might have been lost
+
+#### Example: What the AI Actually Sees
+
+When you run:
+```bash
+model-chorus thinkdeep \
+  --step "Analyze authentication flow" \
+  --findings "Found token validation in auth.py" \
+  --hypothesis "Token expiration logic may have race condition" \
+  --confidence medium \
+  --files-checked "src/auth.py" \
+  --relevant-files "tests/test_auth.py"
+```
+
+**The AI receives:**
+- Text: "Analyze authentication flow"
+- Text: "Found token validation in auth.py"
+- Text: "Token expiration logic may have race condition"
+- Text: "medium"
+- **Full content of `src/auth.py`** (read from disk)
+- Text: "tests/test_auth.py" (filename only, NO content)
+
+**The AI does NOT receive:**
+- Your current directory path
+- Git status or branch information
+- Contents of `tests/test_auth.py` (only the filename is mentioned)
+- Any other files in the repository
+- Directory structure or project layout
 
 ### Parameters
 
@@ -427,8 +536,8 @@ model-chorus thinkdeep --step "Investigate why API latency increased from 100ms 
 - `--continuation-id` / `--continue` / `-c` / `--session-id` (string): Session ID to resume previous investigation - All aliases work identically - Format: `thinkdeep-{uuid}` - Maintains full investigation history
 - `--hypothesis` (string): Current working theory about the problem - Should evolve as evidence accumulates - Can be revised or replaced in subsequent steps
 - `--confidence` (string): Confidence level in current hypothesis - Valid values: `exploring`, `low`, `medium`, `high`, `very_high`, `almost_certain`, `certain` - Default: `exploring` - Should increase as evidence strengthens
-  - `--files-checked` (string): Comma-separated list of files examined - Tracks investigation scope - Format: `file1.py,file2.js,file3.go` - Legacy `src/claude_skills/...` paths remap to current locations; unresolved entries issue warnings and are skipped
-- `--relevant-files` (string): Comma-separated list of files relevant to findings - Files identified as related to the problem - Format: `src/auth.py,tests/test_auth.py` - Paths are resolved using the same legacy mapping; unresolved entries cause a CLI error rather than being silently ignored
+  - `--files-checked` (string): Comma-separated list of files to read and include in AI prompt - **File contents are read from disk and included in full** - This is the ONLY way to provide file contents to the AI - Format: `file1.py,file2.js,file3.go` - Invalid paths generate warnings and are skipped
+- `--relevant-files` (string): Comma-separated list of files relevant to findings - **Only filenames are included, NOT file contents** - Use this to track related files without including their content - To provide content to the AI, use `--files-checked` instead - Format: `src/auth.py,tests/test_auth.py` - Invalid paths cause a CLI error
 - `--relevant-context` (string): Comma-separated list of methods/functions involved - Specific code locations identified - Format: `authenticate,validate_token,check_permissions`
 - `--issues-found` (string): JSON array of issues with severity levels - Format: `[{"severity":"high","description":"..."},...]`
 - `--thinking-mode` (string): Reasoning depth for investigation - Valid values: `minimal`, `low`, `medium`, `high`, `max` - Default: `medium` - Higher modes for complex problems

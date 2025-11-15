@@ -182,7 +182,11 @@ def start(
         # Apply config defaults if values not provided
         config = get_config()
         if provider is None:
-            provider = config.get_default_provider('study', 'claude')
+            provider = config.get_workflow_default_provider('study', 'claude')
+            if provider is None:
+                console.print("[red]Error: Default provider for 'study' workflow is disabled.[/red]")
+                console.print("[yellow]Enable it in .claude/model_chorus_config.yaml or specify --provider[/yellow]")
+                raise typer.Exit(1)
         if temperature is None:
             temperature = config.get_workflow_default('study', 'temperature', 0.7)
         if max_tokens is None:
@@ -436,7 +440,11 @@ def study_next(
         # Apply config defaults if values not provided
         config = get_config()
         if provider is None:
-            provider = config.get_default_provider('study', 'claude')
+            provider = config.get_workflow_default_provider('study', 'claude')
+            if provider is None:
+                console.print("[red]Error: Default provider for 'study' workflow is disabled.[/red]")
+                console.print("[yellow]Enable it in .claude/model_chorus_config.yaml or specify --provider[/yellow]")
+                raise typer.Exit(1)
 
         # Read timeout from config
         timeout = config.get_workflow_default('study', 'timeout', 120.0)

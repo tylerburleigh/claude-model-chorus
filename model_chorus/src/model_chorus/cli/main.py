@@ -282,7 +282,11 @@ def chat(
         # Apply config defaults if values not provided
         config = get_config()
         if provider is None:
-            provider = config.get_default_provider('chat', 'claude')
+            provider = config.get_workflow_default_provider('chat', 'claude')
+            if provider is None:
+                console.print("[red]Error: Default provider for 'chat' workflow is disabled.[/red]")
+                console.print("[yellow]Enable it in .claude/model_chorus_config.yaml or specify --provider[/yellow]")
+                raise typer.Exit(1)
         if system is None:
             system = config.get_workflow_default('chat', 'system_prompt', None)
         if timeout is None:
@@ -500,7 +504,11 @@ def argument(
         # Apply config defaults if values not provided
         config = get_config()
         if provider is None:
-            provider = config.get_default_provider('argument', 'claude')
+            provider = config.get_workflow_default_provider('argument', 'claude')
+            if provider is None:
+                console.print("[red]Error: Default provider for 'argument' workflow is disabled.[/red]")
+                console.print("[yellow]Enable it in .claude/model_chorus_config.yaml or specify --provider[/yellow]")
+                raise typer.Exit(1)
         if timeout is None:
             timeout = config.get_workflow_default('argument', 'timeout', 120.0)
 
@@ -714,7 +722,11 @@ def ideate(
         # Apply config defaults if values not provided
         config = get_config()
         if provider is None:
-            provider = config.get_default_provider('ideate', 'claude')
+            provider = config.get_workflow_default_provider('ideate', 'claude')
+            if provider is None:
+                console.print("[red]Error: Default provider for 'ideate' workflow is disabled.[/red]")
+                console.print("[yellow]Enable it in .claude/model_chorus_config.yaml or specify --provider[/yellow]")
+                raise typer.Exit(1)
         if timeout is None:
             timeout = config.get_workflow_default('ideate', 'timeout', 120.0)
 
@@ -1202,7 +1214,11 @@ def thinkdeep(
         # Apply config defaults if values not provided
         config = get_config()
         if provider is None:
-            provider = config.get_default_provider('thinkdeep', 'claude')
+            provider = config.get_workflow_default_provider('thinkdeep', 'claude')
+            if provider is None:
+                console.print("[red]Error: Default provider for 'thinkdeep' workflow is disabled.[/red]")
+                console.print("[yellow]Enable it in .claude/model_chorus_config.yaml or specify --provider[/yellow]")
+                raise typer.Exit(1)
         if thinking_mode is None:
             thinking_mode = config.get_workflow_default('thinkdeep', 'thinking_mode', 'medium')
 
@@ -1659,8 +1675,8 @@ def _config_show(verbose: bool):
                 providers = loader.get_default_providers(workflow, ['claude', 'gemini'])
                 console.print(f"    providers: {', '.join(providers)}")
             else:
-                provider = loader.get_default_provider(workflow, 'claude')
-                console.print(f"    provider: {provider}")
+                provider = loader.get_workflow_default_provider(workflow, 'claude')
+                console.print(f"    provider: {provider if provider else '[disabled]'}")
             temp = loader.get_workflow_default(workflow, 'temperature', 0.7)
             console.print(f"    temperature: {temp}")
 
