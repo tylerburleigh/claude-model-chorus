@@ -798,15 +798,17 @@ model-chorus ideate "Bold, unconventional marketing campaigns for sustainable fa
 - `prompt` (string): The topic or problem for which to generate creative ideas
 
 **Optional:**
-- `--provider, -p` (string): AI provider to use for idea generation - Valid values: `claude`, `gemini`, `codex`, `cursor-agent` - Default: `claude`
+- `--provider` (string): AI provider to use for idea generation - Valid values: `claude`, `gemini`, `codex`, `cursor-agent` - Default: `claude`
 - `--num-ideas, -n` (integer): Number of distinct ideas to generate - Range: 1-20 - Default: 5 - Recommended: 5-7 for balanced exploration
 - `--continue` / `-c` / `--session-id` (string): Session ID to continue previous ideation session - All aliases work identically - Format: `ideate-thread-{uuid}` - Maintains conversation history for iterative refinement
 - `--file, -f` (string, repeatable): File paths to include as context for ideation - Can be specified multiple times - Files must exist before execution - Helps ground ideas in existing constraints or context
 - `--system` (string): Additional system prompt to set constraints or criteria - Useful for specifying budget, timeline, technical constraints, or target audience - Applied to all generated ideas
+- `--timeout` (float): Timeout per provider in seconds - Default: 120.0 - Prevents hanging on slow providers
 - `--temperature, -t` (float): Creativity level for idea generation - Range: 0.0-1.0 - Default: 0.7 - Lower (0.3-0.5) for practical/proven ideas - Medium (0.6-0.8) for balanced innovation - Higher (0.8-1.0) for bold/disruptive ideas
 - `--max-tokens` (integer): Maximum response length in tokens - Provider-specific limits apply - Affects detail level of generated ideas
 - `--output, -o` (string): Path to save JSON output file - Creates or overwrites file at specified path
 - `--verbose, -v` (boolean): Enable detailed execution information - Default: false - Shows provider details and timing
+- `--skip-provider-check` (boolean): Skip provider availability check for faster startup - Default: false
 
 ### Return Format
 
@@ -927,10 +929,10 @@ model-chorus argument "GraphQL approach (idea #3) is the best choice for our use
 **IDEATE → CONSENSUS Pattern:**
 ```bash
 # Step 1: Generate ideas with single model
-model-chorus ideate "Database migration strategies" --num-ideas 5
+model-chorus ideate --prompt "Database migration strategies" --num-ideas 5
 
 # Step 2: Validate top approach with multiple models
-model-chorus consensus "Evaluate zero-downtime migration approach" -p claude -p gemini -s synthesize
+model-chorus consensus --prompt "Evaluate zero-downtime migration approach" -m 2 -s synthesize
 ```
 
 ---

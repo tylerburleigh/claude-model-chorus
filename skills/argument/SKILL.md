@@ -352,12 +352,14 @@ model-chorus argument "Should we adopt Kubernetes?" --system "Our team has 5 dev
 - `prompt` (string): The argument, claim, or proposal to analyze through three-role dialectical reasoning
 
 **Optional:**
-- `--provider, -p` (string): AI provider to use for all three roles - Valid values: `claude`, `gemini`, `codex`, `cursor-agent` - Default: `claude`
+- `--provider` (string): AI provider to use for all three roles - Valid values: `claude`, `gemini`, `codex`, `cursor-agent` - Default: `claude`
 - `--continue` / `-c` / `--session-id` (string): Session ID to continue previous argument analysis - All aliases work identically - Format: `argument-thread-{uuid}` - Maintains full conversation history across all three roles
 - `--file, -f` (string, repeatable): File paths to include as context for analysis - Can be specified multiple times - Files must exist before execution - Provided to all three roles (Creator, Skeptic, Moderator)
 - `--system` (string): Additional system prompt to customize analysis context - Applied to all three roles - Useful for providing constraints, background, or specific focus areas
+- `--timeout` (float): Timeout per provider in seconds - Default: 120.0 - Prevents hanging on slow providers
 - `--output, -o` (string): Path to save JSON output file - Creates or overwrites file at specified path
 - `--verbose, -v` (boolean): Enable detailed execution information - Default: false - Shows per-role timing and execution details
+- `--skip-provider-check` (boolean): Skip provider availability check for faster startup - Default: false
 
 ### Return Format
 

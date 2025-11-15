@@ -192,11 +192,11 @@ Need fastest response with fallback? � first_valid
 ### Simple Example
 
 ```bash
-model-chorus consensus "What is quantum computing?"
+model-chorus consensus --prompt "What is quantum computing?"
 ```
 
 **Expected Output:**
-The command executes on default providers (Claude and Gemini) in parallel using the `all_responses` strategy. Returns responses from both models with clear provider labels.
+The command tries providers from the configured `provider_priority` list until the required number of successful responses is obtained (default: 2). Returns responses with clear provider labels using the configured strategy (default: `all_responses`).
 
 **Note:** CONSENSUS does NOT support conversation threading (`--continue`). Each invocation is stateless.
 
@@ -204,7 +204,7 @@ The command executes on default providers (Claude and Gemini) in parallel using 
 
 | Option | Short | Default | Description |
 |--------|-------|---------|-------------|
-| `--provider` | `-p` | `["claude", "gemini"]` | AI providers to use (repeatable for multiple) |
+| `--prompt` | | Required | Question or statement to send to models |
 | `--strategy` | `-s` | `all_responses` | Consensus strategy (`all_responses`, `synthesize`, `majority`, `weighted`, `first_valid`) |
 | `--file` | `-f` | None | File paths for context (repeatable) |
 | `--system` | | None | Additional system prompt |
@@ -219,16 +219,20 @@ The command executes on default providers (Claude and Gemini) in parallel using 
 ### Parameters
 
 **Required:**
-- `prompt` (string): The question or statement to send to all selected AI models
+- `--prompt` (string): The question or statement to send to all selected AI models
 
 **Optional:**
-- `--provider, -p` (string, repeatable): AI providers to query - Valid values: `claude`, `gemini`, `codex`, `cursor-agent` - Default: `["claude", "gemini"]` - Can be specified multiple times to query additional providers
+- `--num-to-consult, -m` (integer): Number of successful responses required - Default: 2 - Consensus tries providers in priority order until this many succeed
 - `--strategy, -s` (string): Consensus synthesis strategy - Valid values: `all_responses`, `synthesize`, `majority`, `weighted`, `first_valid` - Default: `all_responses`
 - `--file, -f` (string, repeatable): File paths to include as context for all models - Can be specified multiple times - Files must exist before execution
 - `--system` (string): Additional system prompt to customize model behavior across all providers
 - `--timeout` (float): Timeout per provider in seconds - Default: 120.0 - Prevents hanging on slow providers
 - `--output, -o` (string): Path to save JSON output file - Creates or overwrites file at specified path
 - `--verbose, -v` (boolean): Enable detailed execution information - Default: false - Shows per-provider timing and status
+- `--skip-provider-check` (boolean): Skip provider availability check for faster startup - Default: false
+
+**Provider Selection:**
+Providers are selected via configuration file (`.claude/model_chorus_config.yaml`) using the `provider_priority` list. The consensus workflow tries providers in order until `num_to_consult` successful responses are obtained.
 
 ### Return Format
 
@@ -282,22 +286,23 @@ The CONSENSUS workflow returns a JSON object with the following structure:
 
 ## Advanced Usage
 
-### With Provider Selection
+### With Custom Number of Providers
 
 ```bash
-# Use two specific providers
-model-chorus consensus "Explain neural networks" -p claude -p gemini
+# Consult 2 providers (default)
+model-chorus consensus --prompt "Explain neural networks"
 
-# Use three providers for more perspectives
-model-chorus consensus "Review this architecture" -p claude -p gemini -p codex
+# Consult 3 providers for more perspectives
+model-chorus consensus --prompt "Review this architecture" --num-to-consult 3
 
-# Use all available providers
-model-chorus consensus "Fact-check this claim" -p claude -p gemini -p codex -p cursor-agent
+# Consult all available providers
+model-chorus consensus --prompt "Fact-check this claim" -m 4
 ```
 
-**Provider Selection Tips:**
-- **Multiple providers required:** Specify at least 2 providers with multiple `-p` flags
-- **Order doesn't matter:** All providers execute in parallel simultaneously
+**Provider Selection:**
+- Providers are configured in `.claude/model_chorus_config.yaml` under `workflows.consensus.provider_priority`
+- The workflow tries providers in priority order until `num_to-consult` successful responses are obtained
+- If a provider fails, it automatically falls back to the next provider in the list
 - **Failures handled gracefully:** If one provider fails, others continue
 - **Provider names:** `claude`, `gemini`, `codex`, `cursor-agent`
 
@@ -458,7 +463,7 @@ model-chorus consensus "Your prompt" --timeout 240
 model-chorus list-providers
 
 # Try with single provider to isolate issue
-model-chorus chat "Your prompt" -p claude
+model-chorus chat --prompt "Your prompt" --provider claude
 ```
 
 ---
@@ -472,10 +477,10 @@ model-chorus chat "Your prompt" -p claude
 **Solution:**
 ```bash
 # Increase timeout for that specific use case
-model-chorus consensus "Your prompt" -p claude -p gemini --timeout 180
+model-chorus consensus --prompt "Your prompt" --timeout 180
 
-# Or exclude the problematic provider
-model-chorus consensus "Your prompt" -p claude -p codex
+# Or adjust provider priority in .claude/model_chorus_config.yaml
+# to exclude problematic providers from the priority list
 ```
 
 ---
@@ -502,7 +507,7 @@ model-chorus consensus "Your prompt" -p claude -p codex
 **Solution:**
 ```bash
 # Use all_responses or synthesize to see raw responses first
-model-chorus consensus "Your prompt" -p claude -p gemini -s all_responses
+model-chorus consensus --prompt "Your prompt" -s all_responses
 
 # Then manually evaluate which strategy is appropriate
 # For complex responses, synthesize or all_responses work best
