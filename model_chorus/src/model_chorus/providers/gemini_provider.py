@@ -6,6 +6,9 @@ This module provides integration with Google's Gemini models via the `gemini` CL
 
 import json
 import logging
+import os
+import shutil
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from .cli_provider import CLIProvider
@@ -76,6 +79,7 @@ class GeminiProvider(CLIProvider):
 
         # Initialize available models
         self._initialize_models()
+        self._configure_cli_environment()
 
     def _initialize_models(self) -> None:
         """Initialize the list of available Gemini models with their capabilities."""
@@ -129,8 +133,8 @@ class GeminiProvider(CLIProvider):
             )
 
             try:
-                # Use longer timeout for Gemini (15 seconds) due to slower CLI initialization
-                await asyncio.wait_for(process.communicate(), timeout=15.0)
+                # Use longer timeout for Gemini (20 seconds) due to slower CLI initialization
+                await asyncio.wait_for(process.communicate(), timeout=20.0)
                 return (True, None)
             except asyncio.TimeoutError:
                 # Kill the process if it times out
@@ -325,3 +329,96 @@ class GeminiProvider(CLIProvider):
             True if the model supports thinking mode (Deep Think for Pro, hybrid reasoning for Flash)
         """
         return model_id in self.THINKING_MODELS
+
+    def _configure_cli_environment(self) -> None:
+        """
+        Configure environment overrides so the Gemini CLI can persist data in
+        a writable location even when the real HOME directory is read-only.
+        """
+        original_home = Path.home()
+        forced_home = self._get_forced_cli_home()
+
+        if forced_home:
+            self._prepare_cli_home(Path(forced_home), copy_existing=False, original_home=original_home)
+            return
+
+        if self._is_home_writable(original_home):
+            return
+
+        fallback_home = Path.cwd() / "tmp" / "gemini_cli_home"
+        self._prepare_cli_home(fallback_home, copy_existing=True, original_home=original_home)
+        logger.warning(
+            "Gemini CLI home %s is not writable. Using sandboxed home at %s",
+            original_home,
+            fallback_home,
+        )
+
+    def _get_forced_cli_home(self) -> Optional[str]:
+        """Check config/env for a user-specified CLI HOME override."""
+        env_override = os.getenv("MODEL_CHORUS_GEMINI_HOME")
+        if env_override:
+            return env_override
+
+        config_override = (self.config or {}).get("gemini_cli_home")
+        return config_override
+
+    def _is_home_writable(self, home_path: Path) -> bool:
+        """Return True if we can create files inside home/.gemini."""
+        test_dir = home_path / ".gemini" / "tmp"
+        test_file = test_dir / ".write_test"
+        try:
+            test_dir.mkdir(parents=True, exist_ok=True)
+            with open(test_file, "w", encoding="utf-8") as handle:
+                handle.write("test")
+            test_file.unlink(missing_ok=True)
+            return True
+        except PermissionError as exc:
+            logger.debug("Gemini CLI home %s is not writable: %s", home_path, exc)
+        except OSError as exc:
+            logger.debug("Gemini CLI home %s is not writable: %s", home_path, exc)
+        return False
+
+    def _prepare_cli_home(self, home_path: Path, *, copy_existing: bool, original_home: Path) -> None:
+        """Ensure the CLI home exists and update environment overrides."""
+        try:
+            home_path.mkdir(parents=True, exist_ok=True)
+        except Exception as exc:
+            logger.error("Failed to create Gemini CLI sandbox home %s: %s", home_path, exc)
+            return
+
+        if copy_existing:
+            self._copy_existing_gemini_data(original_home, home_path)
+
+        gemini_dir = home_path / ".gemini"
+        gemini_dir.mkdir(parents=True, exist_ok=True)
+
+        env = dict(self.env_overrides)
+        env["HOME"] = str(home_path)
+        self.set_env_overrides(env)
+        logger.debug("Configured Gemini CLI to use HOME=%s", home_path)
+
+    def _copy_existing_gemini_data(self, source_home: Path, target_home: Path) -> None:
+        """Copy ~/.gemini data so CLI keeps existing configuration when possible."""
+        source_dir = source_home / ".gemini"
+        target_dir = target_home / ".gemini"
+
+        if not source_dir.exists() or not source_dir.is_dir():
+            return
+
+        try:
+            if target_dir.exists() and any(target_dir.iterdir()):
+                return
+        except OSError:
+            # If target_dir isn't readable yet, we'll still attempt to copy.
+            pass
+
+        try:
+            shutil.copytree(source_dir, target_dir, dirs_exist_ok=True)
+            logger.debug("Copied Gemini CLI data from %s to %s", source_dir, target_dir)
+        except Exception as exc:
+            logger.warning(
+                "Failed to copy Gemini CLI data from %s to %s: %s",
+                source_dir,
+                target_dir,
+                exc,
+            )

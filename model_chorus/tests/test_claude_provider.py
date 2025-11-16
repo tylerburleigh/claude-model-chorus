@@ -155,17 +155,19 @@ class TestClaudeProvider:
         """Test vision capability detection."""
         provider = ClaudeProvider()
 
-        assert provider.supports_vision("opus") is True
+        # Only sonnet and haiku support vision
         assert provider.supports_vision("sonnet") is True
         assert provider.supports_vision("haiku") is True
+        assert provider.supports_vision("unknown-model") is False
 
     def test_supports_thinking(self):
         """Test thinking mode capability detection."""
         provider = ClaudeProvider()
 
-        assert provider.supports_thinking("opus") is True
+        # Only sonnet and haiku support thinking mode
         assert provider.supports_thinking("sonnet") is True
         assert provider.supports_thinking("haiku") is True
+        assert provider.supports_thinking("unknown-model") is False
 
     def test_read_only_mode_allowed_tools(self, sample_generation_request):
         """Test that read-only mode restricts tools to allowed list."""

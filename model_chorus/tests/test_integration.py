@@ -93,11 +93,10 @@ class TestIntegration:
             mock_exec.return_value = mock_proc
 
             request = GenerationRequest(prompt="Test prompt")
-            result = await workflow.execute(request)
 
-            # Should handle error gracefully
-            assert len(result.failed_providers) == 1
-            assert "claude" in result.failed_providers
+            # Should raise RuntimeError when all providers fail
+            with pytest.raises(RuntimeError, match="only 0/1 providers succeeded"):
+                await workflow.execute(request)
 
     @pytest.mark.asyncio
     async def test_multiple_strategy_comparison(self, mock_claude_response, mock_codex_response):

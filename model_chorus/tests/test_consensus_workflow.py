@@ -86,7 +86,7 @@ class TestConsensusWorkflow:
             usage={},
         )
 
-        workflow = ConsensusWorkflow([mock_claude, mock_codex], strategy=ConsensusStrategy.FIRST_VALID)
+        workflow = ConsensusWorkflow([mock_claude, mock_codex], strategy=ConsensusStrategy.FIRST_VALID, num_to_consult=1)
 
         request = GenerationRequest(prompt="Test prompt")
         result = await workflow.execute(request)
@@ -135,8 +135,7 @@ class TestConsensusWorkflow:
         workflow = ConsensusWorkflow([mock_provider])
 
         request = GenerationRequest(prompt="Test prompt")
-        result = await workflow.execute(request)
 
-        assert result.consensus_response is None
-        assert len(result.failed_providers) == 1
-        assert "claude" in result.failed_providers
+        # Should raise RuntimeError when all providers fail
+        with pytest.raises(RuntimeError, match="only 0/1 providers succeeded"):
+            await workflow.execute(request)

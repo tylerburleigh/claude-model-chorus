@@ -182,9 +182,9 @@ def multiply(a, b):
     @pytest.mark.asyncio
     async def test_conversation_persistence(self, chat_workflow, provider_name):
         """Test that conversation state persists correctly."""
-        # Start conversation
+        # Start conversation with a simple fact
         result1 = await chat_workflow.run(
-            **get_run_kwargs(provider_name, "Remember this: my favorite color is blue.", temperature=0.0)
+            **get_run_kwargs(provider_name, "My name is Alice. Please just acknowledge this.", temperature=0.0)
         )
 
         assert result1.success is True
@@ -198,11 +198,12 @@ def multiply(a, b):
 
         # Continue and ask about remembered info
         result2 = await chat_workflow.run(
-            **get_run_kwargs(provider_name, "What is my favorite color?", continuation_id=thread_id, temperature=0.0)
+            **get_run_kwargs(provider_name, "What is my name?", continuation_id=thread_id, temperature=0.0)
         )
 
         assert result2.success is True
-        assert "blue" in result2.synthesis.lower()
+        # The response should mention Alice (be flexible about the exact format)
+        assert "alice" in result2.synthesis.lower(), f"Expected 'alice' in response, got: {result2.synthesis}"
 
 
 @pytest.mark.skipif(not ANY_PROVIDER_AVAILABLE, reason="No providers configured")

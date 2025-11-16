@@ -8,6 +8,7 @@ via command-line interface tools (e.g., claude CLI, gemini CLI, codex CLI).
 import asyncio
 import json
 import logging
+import os
 from abc import abstractmethod
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -85,6 +86,16 @@ class CLIProvider(ModelProvider):
         self.timeout = timeout
         self.retry_limit = retry_limit
         self.input_data: Optional[str] = None
+        self.env_overrides: Dict[str, str] = {}
+
+    def set_env_overrides(self, env: Optional[Dict[str, str]]) -> None:
+        """
+        Configure environment variable overrides for CLI executions.
+
+        Args:
+            env: Dictionary of environment variables to apply when invoking the CLI.
+        """
+        self.env_overrides = env or {}
 
     async def check_availability(self) -> tuple[bool, Optional[str]]:
         """
@@ -225,6 +236,7 @@ class CLIProvider(ModelProvider):
                 stdin=stdin_pipe,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
+                env=self._build_subprocess_env(),
             )
 
             stdout, stderr = await asyncio.wait_for(
@@ -277,6 +289,13 @@ class CLIProvider(ModelProvider):
         except Exception as e:
             logger.error(f"Error executing command: {e}")
             raise
+
+    def _build_subprocess_env(self) -> Dict[str, str]:
+        """Build the environment for CLI subprocess execution."""
+        env = os.environ.copy()
+        if self.env_overrides:
+            env.update(self.env_overrides)
+        return env
 
     def _is_retryable_error(self, error: Exception) -> bool:
         """

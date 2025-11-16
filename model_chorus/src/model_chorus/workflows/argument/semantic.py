@@ -403,6 +403,7 @@ def cluster_claims_kmeans(
     n_clusters: int = 3,
     model_name: str = _DEFAULT_MODEL,
     random_state: int = 42,
+    max_iterations: int = 50,
 ) -> List[List[CitationMap]]:
     """
     Cluster claims using K-means algorithm on semantic embeddings.
@@ -415,6 +416,7 @@ def cluster_claims_kmeans(
         n_clusters: Number of clusters to create (default: 3)
         model_name: Sentence transformer model to use
         random_state: Random seed for reproducibility
+        max_iterations: Maximum iterations for centroid refinement
 
     Returns:
         List of clusters, where each cluster is a list of CitationMaps
@@ -432,8 +434,6 @@ def cluster_claims_kmeans(
         Cluster 0: 3 claims
         Cluster 1: 2 claims
     """
-    from sklearn.cluster import KMeans
-
     if len(citation_maps) == 0:
         return []
 
@@ -447,9 +447,51 @@ def cluster_claims_kmeans(
     claims = [cm.claim_text for cm in citation_maps]
     embeddings = np.array([compute_embedding(claim, model_name=model_name) for claim in claims])
 
-    # Run K-means clustering
-    kmeans = KMeans(n_clusters=n_clusters, random_state=random_state, n_init=10)
-    labels = kmeans.fit_predict(embeddings)
+    rng = np.random.default_rng(random_state)
+
+    # Initialize centroids with simple k-means++ style seeding for stability
+    centroids = np.empty((n_clusters, embeddings.shape[1]), dtype=embeddings.dtype)
+    indices = rng.choice(len(embeddings))
+    centroids[0] = embeddings[indices]
+
+    distances = np.linalg.norm(embeddings - centroids[0], axis=1) ** 2
+    for i in range(1, n_clusters):
+        if distances.sum() == 0:
+            centroids[i] = embeddings[rng.integers(len(embeddings))]
+        else:
+            probs = distances / distances.sum()
+            cumulative = np.cumsum(probs)
+            r = rng.random()
+            next_idx = np.searchsorted(cumulative, r)
+            centroids[i] = embeddings[next_idx]
+            distances = np.minimum(distances, np.linalg.norm(embeddings - centroids[i], axis=1) ** 2)
+
+    labels = np.zeros(len(embeddings), dtype=int)
+
+    for _ in range(max_iterations):
+        # Assign points to nearest centroid
+        diff = embeddings[:, None, :] - centroids[None, :, :]
+        distances = np.sum(diff * diff, axis=2)
+        new_labels = np.argmin(distances, axis=1)
+
+        if np.array_equal(labels, new_labels):
+            break
+        labels = new_labels
+
+        # Recompute centroids
+        new_centroids = np.copy(centroids)
+        for cluster_idx in range(n_clusters):
+            members = embeddings[labels == cluster_idx]
+            if len(members) == 0:
+                new_centroids[cluster_idx] = embeddings[rng.integers(len(embeddings))]
+            else:
+                new_centroids[cluster_idx] = members.mean(axis=0)
+
+        # Convergence check
+        if np.allclose(new_centroids, centroids, atol=1e-6):
+            centroids = new_centroids
+            break
+        centroids = new_centroids
 
     # Group citation maps by cluster
     clusters: List[List[CitationMap]] = [[] for _ in range(n_clusters)]

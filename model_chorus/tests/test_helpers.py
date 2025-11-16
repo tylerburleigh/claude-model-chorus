@@ -5,7 +5,6 @@ This module provides helper functions and flags that are used by both
 conftest.py and individual test files.
 """
 
-import os
 import shutil
 import subprocess
 import yaml
@@ -102,7 +101,6 @@ def is_provider_available(provider_name: str, cli_command: str, model_chorus_con
     """
     config_enabled = is_provider_enabled_in_config(provider_name, model_chorus_config)
     cli_available = is_cli_available(cli_command)
-
     return config_enabled and cli_available
 
 
