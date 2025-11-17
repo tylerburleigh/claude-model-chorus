@@ -218,7 +218,8 @@ def get_provider_by_name(name: str, timeout: int = 120):
 
 @app.command()
 def chat(
-    prompt: str = typer.Option(..., "--prompt", help="Message to send to the AI model"),
+    prompt_arg: Optional[str] = typer.Argument(None, help="Message to send to the AI model"),
+    prompt_flag: Optional[str] = typer.Option(None, "--prompt", help="Message to send to the AI model (alternative to positional)"),
     provider: Optional[str] = typer.Option(
         None,
         "--provider",
@@ -269,8 +270,11 @@ def chat(
     Chat with a single AI model with conversation continuity.
 
     Example:
-        # Start new conversation
-        model-chorus chat "What is quantum computing?" -p claude
+        # Start new conversation (positional prompt)
+        model-chorus chat "What is quantum computing?" --provider claude
+
+        # Start new conversation (flag prompt)
+        model-chorus chat --prompt "What is quantum computing?" --provider claude
 
         # Continue conversation
         model-chorus chat "Give me an example" --continue thread-id-123
@@ -279,6 +283,15 @@ def chat(
         model-chorus chat "Review this code" -f src/main.py -f tests/test_main.py
     """
     try:
+        # Validate prompt input
+        if prompt_arg is None and prompt_flag is None:
+            console.print("[red]Error: Prompt is required (provide as positional argument or use --prompt)[/red]")
+            raise typer.Exit(1)
+        if prompt_arg is not None and prompt_flag is not None:
+            console.print("[red]Error: Cannot specify prompt both as positional argument and --prompt flag[/red]")
+            raise typer.Exit(1)
+
+        prompt = prompt_arg or prompt_flag
         # Apply config defaults if values not provided
         config = get_config()
         if provider is None:
@@ -437,7 +450,8 @@ def chat(
 
 @app.command()
 def argument(
-    prompt: str = typer.Option(..., "--prompt", help="Argument, claim, or question to analyze"),
+    prompt_arg: Optional[str] = typer.Argument(None, help="Argument, claim, or question to analyze"),
+    prompt_flag: Optional[str] = typer.Option(None, "--prompt", help="Argument, claim, or question to analyze (alternative to positional)"),
     provider: Optional[str] = typer.Option(
         None,
         "--provider",
@@ -491,8 +505,11 @@ def argument(
     multiple perspectives: Creator (thesis), Skeptic (critique), and Moderator (synthesis).
 
     Example:
-        # Analyze an argument
+        # Analyze an argument (positional prompt)
         model-chorus argument "Universal basic income would reduce poverty"
+
+        # Analyze an argument (flag prompt)
+        model-chorus argument --prompt "Universal basic income would reduce poverty"
 
         # Continue analysis
         model-chorus argument "What about inflation?" --continue thread-id-123
@@ -501,6 +518,15 @@ def argument(
         model-chorus argument "Review this proposal" -f proposal.md -f data.csv
     """
     try:
+        # Validate prompt input
+        if prompt_arg is None and prompt_flag is None:
+            console.print("[red]Error: Prompt is required (provide as positional argument or use --prompt)[/red]")
+            raise typer.Exit(1)
+        if prompt_arg is not None and prompt_flag is not None:
+            console.print("[red]Error: Cannot specify prompt both as positional argument and --prompt flag[/red]")
+            raise typer.Exit(1)
+
+        prompt = prompt_arg or prompt_flag
         # Apply config defaults if values not provided
         config = get_config()
         if provider is None:
@@ -649,7 +675,8 @@ def argument(
 
 @app.command()
 def ideate(
-    prompt: str = typer.Option(..., "--prompt", help="Topic or problem to brainstorm ideas for"),
+    prompt_arg: Optional[str] = typer.Argument(None, help="Topic or problem to brainstorm ideas for"),
+    prompt_flag: Optional[str] = typer.Option(None, "--prompt", help="Topic or problem to brainstorm ideas for (alternative to positional)"),
     provider: Optional[str] = typer.Option(
         None,
         "--provider",
@@ -709,16 +736,28 @@ def ideate(
     and innovative ideas for any topic or problem.
 
     Example:
-        # Generate ideas
+        # Generate ideas (positional prompt)
         model-chorus ideate "New features for a task management app"
 
+        # Generate ideas (flag prompt)
+        model-chorus ideate --prompt "New features for a task management app"
+
         # Control creativity and quantity
-        model-chorus ideate "Marketing campaign ideas" -n 10 -t 1.0
+        model-chorus ideate "Marketing campaign ideas" -n 10
 
         # Continue brainstorming
         model-chorus ideate "Refine the third idea" --continue thread-id-123
     """
     try:
+        # Validate prompt input
+        if prompt_arg is None and prompt_flag is None:
+            console.print("[red]Error: Prompt is required (provide as positional argument or use --prompt)[/red]")
+            raise typer.Exit(1)
+        if prompt_arg is not None and prompt_flag is not None:
+            console.print("[red]Error: Cannot specify prompt both as positional argument and --prompt flag[/red]")
+            raise typer.Exit(1)
+
+        prompt = prompt_arg or prompt_flag
         # Apply config defaults if values not provided
         config = get_config()
         if provider is None:
@@ -883,7 +922,8 @@ def construct_prompt_with_files(prompt: str, files: Optional[List[str]]) -> str:
 
 @app.command()
 def consensus(
-    prompt: str = typer.Option(..., "--prompt", help="Prompt to send to all models"),
+    prompt_arg: Optional[str] = typer.Argument(None, help="Prompt to send to all models"),
+    prompt_flag: Optional[str] = typer.Option(None, "--prompt", help="Prompt to send to all models (alternative to positional)"),
     num_to_consult: Optional[int] = typer.Option(
         None,
         "--num-to-consult",
@@ -938,9 +978,22 @@ def consensus(
     provider in the priority list.
 
     Example:
+        # Positional prompt
+        model-chorus consensus "Explain quantum computing" --num-to-consult 2
+
+        # Flag prompt
         model-chorus consensus --prompt "Explain quantum computing" --num-to-consult 2
     """
     try:
+        # Validate prompt input
+        if prompt_arg is None and prompt_flag is None:
+            console.print("[red]Error: Prompt is required (provide as positional argument or use --prompt)[/red]")
+            raise typer.Exit(1)
+        if prompt_arg is not None and prompt_flag is not None:
+            console.print("[red]Error: Cannot specify prompt both as positional argument and --prompt flag[/red]")
+            raise typer.Exit(1)
+
+        prompt = prompt_arg or prompt_flag
         # Apply config defaults if values not provided
         config = get_config()
 
