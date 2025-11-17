@@ -1307,17 +1307,6 @@ def thinkdeep(
             console.print(f"[red]Failed to initialize {provider}: {e}[/red]")
             raise typer.Exit(1)
 
-        # Validate provider supports requested parameters
-        if thinking_mode and thinking_mode != 'medium':  # medium is default
-            # Check if provider is gemini (which doesn't support thinking_mode)
-            if provider == 'gemini':
-                console.print(f"[yellow]Warning: Gemini provider does not support --thinking-mode parameter[/yellow]")
-                console.print(f"[yellow]The parameter will be ignored. Use --provider claude or --provider codex for thinking mode support.[/yellow]")
-                if not skip_provider_check:
-                    console.print(f"[yellow]Proceeding anyway... (use Ctrl+C to cancel)[/yellow]")
-                    import time
-                    time.sleep(2)  # Give user time to cancel
-
         # Load fallback providers from config and filter by enabled status
         fallback_provider_names = config.get_workflow_fallback_providers('thinkdeep', exclude_provider=provider)
 
