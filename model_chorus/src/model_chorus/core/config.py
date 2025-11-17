@@ -418,11 +418,20 @@ def get_config() -> ModelChorusConfig:
 # =============================================================================
 
 
+class GenerationDefaultsV2(BaseModel):
+    """Default generation parameters for .claude/model_chorus_config.yaml."""
+
+    timeout: Optional[float] = Field(None, gt=0)
+    temperature: Optional[float] = Field(None, ge=0.0, le=2.0)
+    max_tokens: Optional[int] = Field(None, gt=0)
+
+
 class ProviderConfigV2(BaseModel):
     """Configuration for a provider in .claude/model_chorus_config.yaml."""
 
     enabled: bool = True
     default_model: Optional[str] = None
+    timeout: Optional[float] = Field(None, gt=0)
 
 
 class WorkflowConfigV2(BaseModel):
@@ -430,6 +439,7 @@ class WorkflowConfigV2(BaseModel):
 
     default_provider: Optional[str] = None
     fallback_providers: Optional[List[str]] = None
+    timeout: Optional[float] = Field(None, gt=0)
 
     # Priority-based provider selection for consensus workflow
     provider_priority: Optional[List[str]] = None  # Ordered list of providers to try
@@ -458,6 +468,7 @@ class ModelChorusConfigV2(BaseModel):
     """Root configuration for .claude/model_chorus_config.yaml."""
 
     providers: Dict[str, ProviderConfigV2] = Field(default_factory=dict)
+    generation: Optional[GenerationDefaultsV2] = None
     workflows: Optional[Dict[str, WorkflowConfigV2]] = None
 
     @field_validator('providers')
@@ -706,8 +717,7 @@ class ClaudeConfigLoader:
     def get_workflow_default(self, workflow: str, key: str, fallback: Any = None) -> Any:
         """Get a default value for a specific workflow.
 
-        For compatibility with ConfigLoader. Currently only supports workflow-specific
-        configuration, not global generation defaults.
+        Precedence: workflow-specific > global generation defaults > fallback
 
         Args:
             workflow: Workflow name (chat, consensus, etc.)
@@ -719,14 +729,20 @@ class ClaudeConfigLoader:
         """
         config = self.get_config()
 
-        # Check workflow-specific config
+        # Check workflow-specific config first
         if config.workflows and workflow in config.workflows:
             workflow_config = config.workflows[workflow]
             value = getattr(workflow_config, key, None)
             if value is not None:
                 return value
 
-        # Return fallback (note: ClaudeConfigLoader doesn't have generation defaults)
+        # Check global generation defaults
+        if config.generation and hasattr(config.generation, key):
+            value = getattr(config.generation, key)
+            if value is not None:
+                return value
+
+        # Return fallback
         return fallback
 
     def get_workflow_default_provider(self, workflow: str, fallback: str = "claude") -> Optional[str]:

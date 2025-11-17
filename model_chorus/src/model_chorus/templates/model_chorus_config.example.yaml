@@ -8,6 +8,7 @@ providers:
   claude:
     enabled: true
     default_model: sonnet
+    # timeout: 150.0  # Optional: provider-specific timeout override
 
   gemini:
     enabled: true
@@ -21,12 +22,22 @@ providers:
     enabled: true
     default_model: composer-1
 
+# Global generation defaults
+# These settings apply to all workflows unless overridden by workflow-specific settings
+generation:
+  timeout: 180.0 # Default timeout in seconds (3 minutes)
+  temperature: 0.7 # Default temperature for generation
+  max_tokens: 2000 # Default maximum tokens
+
 # Workflow-specific configuration
 # These settings configure provider selection for each workflow type
+# Timeout precedence: workflow-specific > global generation > CLI default (120s)
+# Note: Timeout applies per provider call/step, not to the entire workflow
 
 workflows:
   chat:
     default_provider: gemini
+    timeout: 300.0 # 5 minutes per provider call
     fallback_providers:
       - cursor-agent
       - gemini
@@ -42,9 +53,11 @@ workflows:
       - codex
     # Number of successful responses required
     num_to_consult: 2
+    timeout: 300.0 # 5 minutes per provider call
 
   thinkdeep:
     default_provider: gemini
+    timeout: 300.0 # 5 minutes per provider call
     fallback_providers:
       - cursor-agent
       - gemini
@@ -53,6 +66,7 @@ workflows:
 
   argument:
     default_provider: gemini
+    timeout: 300.0 # 5 minutes per provider call
     fallback_providers:
       - cursor-agent
       - gemini
@@ -61,6 +75,7 @@ workflows:
 
   ideate:
     default_provider: gemini
+    timeout: 300.0 # 5 minutes per provider call
     fallback_providers:
       - cursor-agent
       - gemini
