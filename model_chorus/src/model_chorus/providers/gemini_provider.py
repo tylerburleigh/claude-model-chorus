@@ -49,7 +49,7 @@ class GeminiProvider(CLIProvider):
     """
 
     # Model capability mappings
-    VISION_MODELS = {"gemini-2.5-pro", "gemini-2.5-flash"}  # All Gemini models support vision
+    VISION_MODELS = {"gemini-2.5-pro", "gemini-2.5-flash", "pro"}  # All Gemini models support vision
     THINKING_MODELS = {"gemini-2.5-pro", "gemini-2.5-flash"}  # Pro has Deep Think, Flash has hybrid reasoning
 
     def __init__(
@@ -105,6 +105,16 @@ class GeminiProvider(CLIProvider):
                     ModelCapability.THINKING,
                 ],
                 metadata={"tier": "flash", "thinking": "hybrid_reasoning"},
+            ),
+            ModelConfig(
+                model_id="pro",
+                temperature=0.7,
+                capabilities=[
+                    ModelCapability.TEXT_GENERATION,
+                    ModelCapability.VISION,
+                    ModelCapability.STREAMING,
+                ],
+                metadata={"tier": "pro", "context_window": "2M"},
             ),
         ]
         self.set_model_list(models)

@@ -15,7 +15,7 @@ from typing import Optional, Dict, Any, List
 # Default models for each provider
 DEFAULT_MODELS = {
     'claude': 'sonnet',
-    'gemini': 'gemini-2.5-pro',
+    'gemini': 'pro',
     'codex': 'gpt-5-codex',
     'cursor-agent': 'composer-1'
 }
