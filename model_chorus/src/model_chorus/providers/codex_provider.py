@@ -147,8 +147,8 @@ class CodexProvider(CLIProvider):
             for image_path in request.images:
                 command.extend(["--image", image_path])
 
-        # Set input_data for stdin piping (exec mode expects input via stdin)
-        self.input_data = request.prompt
+        # Pass prompt as a positional argument
+        command.append(request.prompt)
 
         logger.debug(f"Built Codex command: {' '.join(command)}")
         return command
