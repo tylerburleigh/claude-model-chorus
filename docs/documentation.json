@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-20T20:58:07.639234Z",
+    "generated_at": "2025-11-20T21:00:50.957745Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 102,
-    "total_lines": 44565,
+    "total_lines": 44529,
     "total_classes": 244,
     "total_functions": 206,
     "avg_complexity": 4.94,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 102,
-        "lines": 44565,
+        "lines": 44529,
         "classes": 244,
         "functions": 206,
         "avg_complexity": 4.94
@@ -1690,7 +1690,7 @@
         "test_helpers"
       ],
       "exports": [],
-      "lines": 337
+      "lines": 332
     },
     {
       "name": "test_argument_workflow",
@@ -1885,8 +1885,6 @@
       ],
       "imports": [
         "json",
-        "importlib",
-        "sys",
         "pytest",
         "pathlib.Path",
         "typer.testing.CliRunner",
@@ -1900,7 +1898,7 @@
         "model_chorus.core.base_workflow.WorkflowStep"
       ],
       "exports": [],
-      "lines": 834
+      "lines": 821
     },
     {
       "name": "test_clustering",
@@ -2010,7 +2008,6 @@
         "test_shared_request_model_overrides_provider_metadata"
       ],
       "imports": [
-        "sys",
         "pathlib.Path",
         "unittest.mock.AsyncMock",
         "pytest",
@@ -2019,7 +2016,7 @@
         "model_chorus.workflows.consensus.ConsensusWorkflow"
       ],
       "exports": [],
-      "lines": 90
+      "lines": 83
     },
     {
       "name": "test_consensus_workflow",
@@ -2328,7 +2325,6 @@
       ],
       "functions": [],
       "imports": [
-        "sys",
         "pathlib.Path",
         "pytest",
         "model_chorus.providers.ModelProvider",
@@ -2340,7 +2336,7 @@
         "model_chorus.providers.GenerationRequest"
       ],
       "exports": [],
-      "lines": 175
+      "lines": 171
     },
     {
       "name": "test_review_response",
@@ -2616,7 +2612,6 @@
       ],
       "functions": [],
       "imports": [
-        "sys",
         "uuid",
         "pathlib.Path",
         "unittest.mock.AsyncMock",
@@ -2631,7 +2626,7 @@
         "model_chorus.core.conversation.ConversationMemory"
       ],
       "exports": [],
-      "lines": 352
+      "lines": 345
     },
     {
       "name": "__init__",
@@ -2987,7 +2982,7 @@
         {
           "instantiator": "mock_workflow_result",
           "file": "tests/test_cli_integration.py",
-          "line": 48,
+          "line": 35,
           "context": [
             "mock_workflow_result"
           ]
@@ -2995,7 +2990,7 @@
         {
           "instantiator": "test_argument_with_continuation",
           "file": "tests/test_cli_integration.py",
-          "line": 155,
+          "line": 142,
           "context": [
             "TestArgumentCommand",
             "test_argument_with_continuation"
@@ -3004,7 +2999,7 @@
         {
           "instantiator": "test_ideate_with_continuation",
           "file": "tests/test_cli_integration.py",
-          "line": 423,
+          "line": 410,
           "context": [
             "TestIdeateCommand",
             "test_ideate_with_continuation"
@@ -3298,7 +3293,7 @@
         {
           "instantiator": "mock_workflow_result",
           "file": "tests/test_cli_integration.py",
-          "line": 44,
+          "line": 31,
           "context": [
             "mock_workflow_result"
           ]
@@ -3306,7 +3301,7 @@
         {
           "instantiator": "test_argument_with_continuation",
           "file": "tests/test_cli_integration.py",
-          "line": 151,
+          "line": 138,
           "context": [
             "TestArgumentCommand",
             "test_argument_with_continuation"
@@ -3315,7 +3310,7 @@
         {
           "instantiator": "test_ideate_with_continuation",
           "file": "tests/test_cli_integration.py",
-          "line": 419,
+          "line": 406,
           "context": [
             "TestIdeateCommand",
             "test_ideate_with_continuation"
@@ -4576,7 +4571,7 @@
         {
           "instantiator": "conversation_memory",
           "file": "tests/conftest.py",
-          "line": 337,
+          "line": 332,
           "context": [
             "conversation_memory"
           ]
@@ -4835,7 +4830,7 @@
         {
           "instantiator": "conversation_memory",
           "file": "tests/test_workflow_integration_chaining.py",
-          "line": 62,
+          "line": 55,
           "context": [
             "TestConsensusThinkDeepChatChaining",
             "conversation_memory"
@@ -5199,7 +5194,7 @@
         {
           "instantiator": "mock_workflow_result",
           "file": "tests/test_cli_integration.py",
-          "line": 48,
+          "line": 35,
           "context": [
             "mock_workflow_result"
           ]
@@ -5207,7 +5202,7 @@
         {
           "instantiator": "test_argument_with_continuation",
           "file": "tests/test_cli_integration.py",
-          "line": 155,
+          "line": 142,
           "context": [
             "TestArgumentCommand",
             "test_argument_with_continuation"
@@ -5216,7 +5211,7 @@
         {
           "instantiator": "test_ideate_with_continuation",
           "file": "tests/test_cli_integration.py",
-          "line": 423,
+          "line": 410,
           "context": [
             "TestIdeateCommand",
             "test_ideate_with_continuation"
@@ -9224,7 +9219,7 @@
         {
           "instantiator": "sample_generation_request",
           "file": "tests/conftest.py",
-          "line": 156,
+          "line": 151,
           "context": [
             "sample_generation_request"
           ]
@@ -9322,7 +9317,7 @@
         {
           "instantiator": "test_consensus_applies_provider_model_override_without_mutation",
           "file": "tests/test_consensus_provider_models.py",
-          "line": 47,
+          "line": 40,
           "context": [
             "test_consensus_applies_provider_model_override_without_mutation"
           ]
@@ -9330,7 +9325,7 @@
         {
           "instantiator": "test_shared_request_model_overrides_provider_metadata",
           "file": "tests/test_consensus_provider_models.py",
-          "line": 79,
+          "line": 72,
           "context": [
             "test_shared_request_model_overrides_provider_metadata"
           ]
@@ -9491,7 +9486,7 @@
         {
           "instantiator": "test_build_command_returns_list",
           "file": "tests/test_providers/test_cli_interface.py",
-          "line": 143,
+          "line": 139,
           "context": [
             "TestCLIProvidersImplementInterface",
             "test_build_command_returns_list"
@@ -9500,7 +9495,7 @@
         {
           "instantiator": "test_build_command_includes_cli_command",
           "file": "tests/test_providers/test_cli_interface.py",
-          "line": 159,
+          "line": 155,
           "context": [
             "TestCLIProvidersImplementInterface",
             "test_build_command_includes_cli_command"
@@ -9509,7 +9504,7 @@
         {
           "instantiator": "test_consensus_to_thinkdeep_to_chat_workflow",
           "file": "tests/test_workflow_integration_chaining.py",
-          "line": 109,
+          "line": 102,
           "context": [
             "TestConsensusThinkDeepChatChaining",
             "test_consensus_to_thinkdeep_to_chat_workflow"
@@ -9518,7 +9513,7 @@
         {
           "instantiator": "test_consensus_without_continuation_support",
           "file": "tests/test_workflow_integration_chaining.py",
-          "line": 336,
+          "line": 329,
           "context": [
             "TestConsensusThinkDeepChatChaining",
             "test_consensus_without_continuation_support"
@@ -9656,7 +9651,7 @@
         {
           "instantiator": "mock_generate",
           "file": "tests/conftest.py",
-          "line": 254,
+          "line": 249,
           "context": [
             "_create_smart_mock_provider",
             "mock_generate"
@@ -9665,7 +9660,7 @@
         {
           "instantiator": "mock_generate",
           "file": "tests/conftest.py",
-          "line": 312,
+          "line": 307,
           "context": [
             "mock_provider",
             "mock_generate"
@@ -9838,7 +9833,7 @@
         {
           "instantiator": "_generate",
           "file": "tests/test_consensus_provider_models.py",
-          "line": 26,
+          "line": 19,
           "context": [
             "_make_provider",
             "_generate"
@@ -10848,7 +10843,7 @@
         {
           "instantiator": "test_consensus_to_thinkdeep_to_chat_workflow",
           "file": "tests/test_workflow_integration_chaining.py",
-          "line": 83,
+          "line": 76,
           "context": [
             "TestConsensusThinkDeepChatChaining",
             "test_consensus_to_thinkdeep_to_chat_workflow"
@@ -10857,7 +10852,7 @@
         {
           "instantiator": "test_consensus_to_thinkdeep_to_chat_workflow",
           "file": "tests/test_workflow_integration_chaining.py",
-          "line": 93,
+          "line": 86,
           "context": [
             "TestConsensusThinkDeepChatChaining",
             "test_consensus_to_thinkdeep_to_chat_workflow"
@@ -10866,7 +10861,7 @@
         {
           "instantiator": "test_consensus_to_thinkdeep_to_chat_workflow",
           "file": "tests/test_workflow_integration_chaining.py",
-          "line": 129,
+          "line": 122,
           "context": [
             "TestConsensusThinkDeepChatChaining",
             "test_consensus_to_thinkdeep_to_chat_workflow"
@@ -10875,7 +10870,7 @@
         {
           "instantiator": "test_consensus_to_thinkdeep_to_chat_workflow",
           "file": "tests/test_workflow_integration_chaining.py",
-          "line": 168,
+          "line": 161,
           "context": [
             "TestConsensusThinkDeepChatChaining",
             "test_consensus_to_thinkdeep_to_chat_workflow"
@@ -10884,7 +10879,7 @@
         {
           "instantiator": "test_workflow_chain_context_isolation",
           "file": "tests/test_workflow_integration_chaining.py",
-          "line": 237,
+          "line": 230,
           "context": [
             "TestConsensusThinkDeepChatChaining",
             "test_workflow_chain_context_isolation"
@@ -10893,7 +10888,7 @@
         {
           "instantiator": "test_consensus_without_continuation_support",
           "file": "tests/test_workflow_integration_chaining.py",
-          "line": 314,
+          "line": 307,
           "context": [
             "TestConsensusThinkDeepChatChaining",
             "test_consensus_without_continuation_support"
@@ -10902,7 +10897,7 @@
         {
           "instantiator": "test_consensus_without_continuation_support",
           "file": "tests/test_workflow_integration_chaining.py",
-          "line": 321,
+          "line": 314,
           "context": [
             "TestConsensusThinkDeepChatChaining",
             "test_consensus_without_continuation_support"
@@ -11325,7 +11320,7 @@
         {
           "instantiator": "providers",
           "file": "tests/test_providers/test_cli_interface.py",
-          "line": 34,
+          "line": 30,
           "context": [
             "TestCLIProvidersImplementInterface",
             "providers"
@@ -11685,7 +11680,7 @@
         {
           "instantiator": "providers",
           "file": "tests/test_providers/test_cli_interface.py",
-          "line": 35,
+          "line": 31,
           "context": [
             "TestCLIProvidersImplementInterface",
             "providers"
@@ -11879,7 +11874,7 @@
         {
           "instantiator": "providers",
           "file": "tests/test_providers/test_cli_interface.py",
-          "line": 37,
+          "line": 33,
           "context": [
             "TestCLIProvidersImplementInterface",
             "providers"
@@ -11960,7 +11955,7 @@
         {
           "instantiator": "providers",
           "file": "tests/test_providers/test_cli_interface.py",
-          "line": 36,
+          "line": 32,
           "context": [
             "TestCLIProvidersImplementInterface",
             "providers"
@@ -12335,7 +12330,7 @@
         {
           "instantiator": "test_consensus_to_thinkdeep_to_chat_workflow",
           "file": "tests/test_workflow_integration_chaining.py",
-          "line": 180,
+          "line": 173,
           "context": [
             "TestConsensusThinkDeepChatChaining",
             "test_consensus_to_thinkdeep_to_chat_workflow"
@@ -12344,7 +12339,7 @@
         {
           "instantiator": "test_workflow_chain_context_isolation",
           "file": "tests/test_workflow_integration_chaining.py",
-          "line": 280,
+          "line": 273,
           "context": [
             "TestConsensusThinkDeepChatChaining",
             "test_workflow_chain_context_isolation"
@@ -12462,7 +12457,7 @@
         {
           "instantiator": "test_consensus_applies_provider_model_override_without_mutation",
           "file": "tests/test_consensus_provider_models.py",
-          "line": 42,
+          "line": 35,
           "context": [
             "test_consensus_applies_provider_model_override_without_mutation"
           ]
@@ -12470,7 +12465,7 @@
         {
           "instantiator": "test_shared_request_model_overrides_provider_metadata",
           "file": "tests/test_consensus_provider_models.py",
-          "line": 76,
+          "line": 69,
           "context": [
             "test_shared_request_model_overrides_provider_metadata"
           ]
@@ -12586,7 +12581,7 @@
         {
           "instantiator": "test_consensus_to_thinkdeep_to_chat_workflow",
           "file": "tests/test_workflow_integration_chaining.py",
-          "line": 104,
+          "line": 97,
           "context": [
             "TestConsensusThinkDeepChatChaining",
             "test_consensus_to_thinkdeep_to_chat_workflow"
@@ -12595,7 +12590,7 @@
         {
           "instantiator": "test_consensus_without_continuation_support",
           "file": "tests/test_workflow_integration_chaining.py",
-          "line": 329,
+          "line": 322,
           "context": [
             "TestConsensusThinkDeepChatChaining",
             "test_consensus_without_continuation_support"
@@ -15082,7 +15077,7 @@
         {
           "instantiator": "test_consensus_to_thinkdeep_to_chat_workflow",
           "file": "tests/test_workflow_integration_chaining.py",
-          "line": 141,
+          "line": 134,
           "context": [
             "TestConsensusThinkDeepChatChaining",
             "test_consensus_to_thinkdeep_to_chat_workflow"
@@ -15091,7 +15086,7 @@
         {
           "instantiator": "test_workflow_chain_context_isolation",
           "file": "tests/test_workflow_integration_chaining.py",
-          "line": 245,
+          "line": 238,
           "context": [
             "TestConsensusThinkDeepChatChaining",
             "test_workflow_chain_context_isolation"
@@ -15100,7 +15095,7 @@
         {
           "instantiator": "test_workflow_chain_context_isolation",
           "file": "tests/test_workflow_integration_chaining.py",
-          "line": 250,
+          "line": 243,
           "context": [
             "TestConsensusThinkDeepChatChaining",
             "test_workflow_chain_context_isolation"
@@ -15615,7 +15610,7 @@
     {
       "name": "TestArgumentCommand",
       "file": "tests/test_cli_integration.py",
-      "line": 83,
+      "line": 70,
       "language": "python",
       "docstring": "Test suite for 'argument' CLI command.",
       "bases": [],
@@ -15639,7 +15634,7 @@
     {
       "name": "TestIdeateCommand",
       "file": "tests/test_cli_integration.py",
-      "line": 328,
+      "line": 315,
       "language": "python",
       "docstring": "Test suite for 'ideate' CLI command.",
       "bases": [],
@@ -15660,7 +15655,7 @@
     {
       "name": "TestThinkDeepCommand",
       "file": "tests/test_cli_integration.py",
-      "line": 502,
+      "line": 489,
       "language": "python",
       "docstring": "Test suite for 'thinkdeep' CLI command.",
       "bases": [],
@@ -15679,7 +15674,7 @@
     {
       "name": "TestErrorHandling",
       "file": "tests/test_cli_integration.py",
-      "line": 672,
+      "line": 659,
       "language": "python",
       "docstring": "Test suite for error handling and edge cases.",
       "bases": [],
@@ -15699,7 +15694,7 @@
     {
       "name": "TestCommandIntegration",
       "file": "tests/test_cli_integration.py",
-      "line": 769,
+      "line": 756,
       "language": "python",
       "docstring": "Test suite for cross-command integration.",
       "bases": [],
@@ -16689,7 +16684,7 @@
     {
       "name": "TestCLIProvidersImplementInterface",
       "file": "tests/test_providers/test_cli_interface.py",
-      "line": 27,
+      "line": 23,
       "language": "python",
       "docstring": "Test that all CLI providers implement the ModelProvider interface.",
       "bases": [],
@@ -17728,7 +17723,7 @@
     {
       "name": "TestConsensusThinkDeepChatChaining",
       "file": "tests/test_workflow_integration_chaining.py",
-      "line": 31,
+      "line": 24,
       "language": "python",
       "docstring": "Test suite for consensus \u2192 thinkdeep \u2192 chat workflow integration.\n\nThis pattern demonstrates using multiple orchestration strategies in sequence:\n1. Consensus: Gather multi-model opinions on a decision\n2. ThinkDeep: Investigate specific concerns raised\n3. Chat: Refine understanding and get practical recommendations",
       "bases": [],
@@ -24095,7 +24090,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 918,
           "call_type": "method_call"
         }
@@ -27523,7 +27518,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 653,
           "call_type": "method_call"
         },
@@ -27874,7 +27869,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 889,
           "call_type": "method_call"
         },
@@ -36642,7 +36637,7 @@
     {
       "name": "pytest_configure",
       "file": "tests/conftest.py",
-      "line": 41,
+      "line": 36,
       "language": "python",
       "docstring": "Register custom markers for provider-specific tests.",
       "parameters": [
@@ -36663,31 +36658,31 @@
         {
           "name": "addinivalue_line",
           "file": "unknown",
-          "line": 43,
+          "line": 38,
           "call_type": "method_call"
         },
         {
           "name": "addinivalue_line",
           "file": "unknown",
-          "line": 47,
+          "line": 42,
           "call_type": "method_call"
         },
         {
           "name": "addinivalue_line",
           "file": "unknown",
-          "line": 51,
+          "line": 46,
           "call_type": "method_call"
         },
         {
           "name": "addinivalue_line",
           "file": "unknown",
-          "line": 55,
+          "line": 50,
           "call_type": "method_call"
         },
         {
           "name": "addinivalue_line",
           "file": "unknown",
-          "line": 59,
+          "line": 54,
           "call_type": "method_call"
         }
       ]
@@ -36695,7 +36690,7 @@
     {
       "name": "provider_name",
       "file": "tests/conftest.py",
-      "line": 75,
+      "line": 70,
       "language": "python",
       "docstring": "Parameterized fixture for provider names with auto-skipping.\n\nTests using this fixture will be automatically run once for each available provider.\nProviders that are disabled in ai_config.yaml or don't have their CLI installed\nwill be automatically skipped.",
       "parameters": [
@@ -36718,55 +36713,55 @@
         {
           "name": "fixture",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/pytest/__init__.py",
-          "line": 69,
+          "line": 64,
           "call_type": "method_call"
         },
         {
           "name": "param",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/pytest/__init__.py",
-          "line": 70,
+          "line": 65,
           "call_type": "method_call"
         },
         {
           "name": "skipif",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/_pytest/mark/structures.py",
-          "line": 70,
+          "line": 65,
           "call_type": "method_call"
         },
         {
           "name": "param",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/pytest/__init__.py",
-          "line": 71,
+          "line": 66,
           "call_type": "method_call"
         },
         {
           "name": "skipif",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/_pytest/mark/structures.py",
-          "line": 71,
+          "line": 66,
           "call_type": "method_call"
         },
         {
           "name": "param",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/pytest/__init__.py",
-          "line": 72,
+          "line": 67,
           "call_type": "method_call"
         },
         {
           "name": "skipif",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/_pytest/mark/structures.py",
-          "line": 72,
+          "line": 67,
           "call_type": "method_call"
         },
         {
           "name": "param",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/pytest/__init__.py",
-          "line": 73,
+          "line": 68,
           "call_type": "method_call"
         },
         {
           "name": "skipif",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/_pytest/mark/structures.py",
-          "line": 73,
+          "line": 68,
           "call_type": "method_call"
         }
       ]
@@ -36774,7 +36769,7 @@
     {
       "name": "mock_claude_response",
       "file": "tests/conftest.py",
-      "line": 87,
+      "line": 82,
       "language": "python",
       "docstring": "Mock response from Claude CLI --output-format json.",
       "parameters": [],
@@ -36792,7 +36787,7 @@
     {
       "name": "mock_codex_response",
       "file": "tests/conftest.py",
-      "line": 112,
+      "line": 107,
       "language": "python",
       "docstring": "Mock JSONL response from Codex CLI --json.",
       "parameters": [],
@@ -36810,7 +36805,7 @@
     {
       "name": "mock_cursor_agent_response",
       "file": "tests/conftest.py",
-      "line": 122,
+      "line": 117,
       "language": "python",
       "docstring": "Mock JSON response from Cursor Agent CLI --output-format json.",
       "parameters": [],
@@ -36828,7 +36823,7 @@
     {
       "name": "mock_subprocess_run",
       "file": "tests/conftest.py",
-      "line": 142,
+      "line": 137,
       "language": "python",
       "docstring": "Mock subprocess.run for CLI command execution.",
       "parameters": [],
@@ -36846,7 +36841,7 @@
     {
       "name": "sample_generation_request",
       "file": "tests/conftest.py",
-      "line": 152,
+      "line": 147,
       "language": "python",
       "docstring": "Sample GenerationRequest for testing.",
       "parameters": [],
@@ -36864,7 +36859,7 @@
     {
       "name": "_create_smart_mock_provider",
       "file": "tests/conftest.py",
-      "line": 166,
+      "line": 161,
       "language": "python",
       "docstring": "Create a smart mock provider that understands conversation context and file contents.\n\nThis mock provider can:\n- Extract and echo back information from the prompt\n- Detect and respond to file contents in the prompt\n- Generate contextually appropriate responses for common test queries",
       "parameters": [
@@ -36894,25 +36889,25 @@
         {
           "name": "mock_claude_provider_full",
           "file": "tests/conftest.py",
-          "line": 272,
+          "line": 267,
           "call_type": "function_call"
         },
         {
           "name": "mock_gemini_provider_full",
           "file": "tests/conftest.py",
-          "line": 278,
+          "line": 273,
           "call_type": "function_call"
         },
         {
           "name": "mock_codex_provider_full",
           "file": "tests/conftest.py",
-          "line": 284,
+          "line": 279,
           "call_type": "function_call"
         },
         {
           "name": "mock_cursor_agent_provider_full",
           "file": "tests/conftest.py",
-          "line": 290,
+          "line": 285,
           "call_type": "function_call"
         }
       ],
@@ -36922,7 +36917,7 @@
     {
       "name": "mock_claude_provider_full",
       "file": "tests/conftest.py",
-      "line": 270,
+      "line": 265,
       "language": "python",
       "docstring": "Create fully mocked Claude provider for integration tests.",
       "parameters": [],
@@ -36939,7 +36934,7 @@
         {
           "name": "_create_smart_mock_provider",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/tests/conftest.py",
-          "line": 272,
+          "line": 267,
           "call_type": "function_call"
         }
       ]
@@ -36947,7 +36942,7 @@
     {
       "name": "mock_gemini_provider_full",
       "file": "tests/conftest.py",
-      "line": 276,
+      "line": 271,
       "language": "python",
       "docstring": "Create fully mocked Gemini provider for integration tests.",
       "parameters": [],
@@ -36964,7 +36959,7 @@
         {
           "name": "_create_smart_mock_provider",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/tests/conftest.py",
-          "line": 278,
+          "line": 273,
           "call_type": "function_call"
         }
       ]
@@ -36972,7 +36967,7 @@
     {
       "name": "mock_codex_provider_full",
       "file": "tests/conftest.py",
-      "line": 282,
+      "line": 277,
       "language": "python",
       "docstring": "Create fully mocked Codex provider for integration tests.",
       "parameters": [],
@@ -36989,7 +36984,7 @@
         {
           "name": "_create_smart_mock_provider",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/tests/conftest.py",
-          "line": 284,
+          "line": 279,
           "call_type": "function_call"
         }
       ]
@@ -36997,7 +36992,7 @@
     {
       "name": "mock_cursor_agent_provider_full",
       "file": "tests/conftest.py",
-      "line": 288,
+      "line": 283,
       "language": "python",
       "docstring": "Create fully mocked Cursor Agent provider for integration tests.",
       "parameters": [],
@@ -37014,7 +37009,7 @@
         {
           "name": "_create_smart_mock_provider",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/tests/conftest.py",
-          "line": 290,
+          "line": 285,
           "call_type": "function_call"
         }
       ]
@@ -37022,7 +37017,7 @@
     {
       "name": "mock_provider",
       "file": "tests/conftest.py",
-      "line": 298,
+      "line": 293,
       "language": "python",
       "docstring": "Generic mock ModelProvider for testing.\n\nProvides a simple mock provider suitable for most unit tests.\nFor integration tests with smart context handling, use the\nprovider-specific fixtures above (mock_claude_provider_full, etc.).",
       "parameters": [],
@@ -37040,7 +37035,7 @@
     {
       "name": "conversation_memory",
       "file": "tests/conftest.py",
-      "line": 330,
+      "line": 325,
       "language": "python",
       "docstring": "Create ConversationMemory instance for testing.\n\nProvides a fresh conversation memory instance for each test.",
       "parameters": [],
@@ -37441,7 +37436,7 @@
     {
       "name": "cli_runner",
       "file": "tests/test_cli_integration.py",
-      "line": 36,
+      "line": 23,
       "language": "python",
       "docstring": "Create Typer CLI runner for testing.",
       "parameters": [],
@@ -37459,7 +37454,7 @@
     {
       "name": "mock_workflow_result",
       "file": "tests/test_cli_integration.py",
-      "line": 42,
+      "line": 29,
       "language": "python",
       "docstring": "Mock workflow result for CLI testing.",
       "parameters": [],
@@ -37477,7 +37472,7 @@
     {
       "name": "temp_test_file",
       "file": "tests/test_cli_integration.py",
-      "line": 69,
+      "line": 56,
       "language": "python",
       "docstring": "Create temporary test file for file input tests.",
       "parameters": [
@@ -37500,7 +37495,7 @@
         {
           "name": "write_text",
           "file": "/opt/anaconda3/lib/python3.13/pathlib/_local.py",
-          "line": 72,
+          "line": 59,
           "call_type": "method_call"
         }
       ]
@@ -37508,7 +37503,7 @@
     {
       "name": "temp_output_file",
       "file": "tests/test_cli_integration.py",
-      "line": 77,
+      "line": 64,
       "language": "python",
       "docstring": "Create temporary output file path.",
       "parameters": [
@@ -37556,7 +37551,7 @@
     {
       "name": "_make_provider",
       "file": "tests/test_consensus_provider_models.py",
-      "line": 21,
+      "line": 14,
       "language": "python",
       "docstring": null,
       "parameters": [
@@ -37581,19 +37576,19 @@
         {
           "name": "test_consensus_applies_provider_model_override_without_mutation",
           "file": "tests/test_consensus_provider_models.py",
-          "line": 39,
+          "line": 32,
           "call_type": "function_call"
         },
         {
           "name": "test_consensus_applies_provider_model_override_without_mutation",
           "file": "tests/test_consensus_provider_models.py",
-          "line": 40,
+          "line": 33,
           "call_type": "function_call"
         },
         {
           "name": "test_shared_request_model_overrides_provider_metadata",
           "file": "tests/test_consensus_provider_models.py",
-          "line": 74,
+          "line": 67,
           "call_type": "function_call"
         }
       ],
@@ -37603,7 +37598,7 @@
     {
       "name": "test_consensus_applies_provider_model_override_without_mutation",
       "file": "tests/test_consensus_provider_models.py",
-      "line": 37,
+      "line": 30,
       "language": "python",
       "docstring": "Ensure provider-specific metadata adds model override and preserves shared metadata.",
       "parameters": [],
@@ -37620,19 +37615,19 @@
         {
           "name": "_make_provider",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/tests/test_consensus_provider_models.py",
-          "line": 39,
+          "line": 32,
           "call_type": "function_call"
         },
         {
           "name": "_make_provider",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/tests/test_consensus_provider_models.py",
-          "line": 40,
+          "line": 33,
           "call_type": "function_call"
         },
         {
           "name": "execute",
           "file": "unknown",
-          "line": 52,
+          "line": 45,
           "call_type": "method_call"
         }
       ]
@@ -37640,7 +37635,7 @@
     {
       "name": "test_shared_request_model_overrides_provider_metadata",
       "file": "tests/test_consensus_provider_models.py",
-      "line": 72,
+      "line": 65,
       "language": "python",
       "docstring": "Shared request metadata should take precedence over provider-level overrides.",
       "parameters": [],
@@ -37657,13 +37652,13 @@
         {
           "name": "_make_provider",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/tests/test_consensus_provider_models.py",
-          "line": 74,
+          "line": 67,
           "call_type": "function_call"
         },
         {
           "name": "execute",
           "file": "unknown",
-          "line": 84,
+          "line": 77,
           "call_type": "method_call"
         }
       ]
@@ -40137,8 +40132,6 @@
     ],
     "tests/test_cli_integration.py": [
       "json",
-      "importlib",
-      "sys",
       "pytest",
       "pathlib.Path",
       "typer.testing.CliRunner",
@@ -40194,7 +40187,6 @@
       "model_chorus.core.config.get_config_loader"
     ],
     "tests/test_consensus_provider_models.py": [
-      "sys",
       "pathlib.Path",
       "unittest.mock.AsyncMock",
       "pytest",
@@ -40318,7 +40310,6 @@
       "model_chorus.core.conversation.ConversationMemory"
     ],
     "tests/test_providers/test_cli_interface.py": [
-      "sys",
       "pathlib.Path",
       "pytest",
       "model_chorus.providers.ModelProvider",
@@ -40441,7 +40432,6 @@
       "model_chorus.core.models.ThinkDeepState"
     ],
     "tests/test_workflow_integration_chaining.py": [
-      "sys",
       "uuid",
       "pathlib.Path",
       "unittest.mock.AsyncMock",

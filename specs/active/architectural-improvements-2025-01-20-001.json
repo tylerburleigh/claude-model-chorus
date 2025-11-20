@@ -2,7 +2,7 @@
   "spec_id": "architectural-improvements-2025-01-20-001",
   "title": "Model-Chorus Architectural Improvements",
   "generated": "2025-01-20T20:30:00Z",
-  "last_updated": "2025-11-20T21:00:04.970740Z",
+  "last_updated": "2025-11-20T21:00:59.594130Z",
   "description": "Comprehensive architectural refactoring to eliminate code duplication, improve maintainability, enhance reliability, and establish scalable foundations for future development.",
   "hierarchy": {
     "spec-root": {
@@ -17,7 +17,7 @@
         "phase-4"
       ],
       "total_tasks": 69,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {
         "objectives": [
           "Reduce code duplication by 30-40% through shared primitives",
@@ -44,7 +44,7 @@
         "phase-1-verify"
       ],
       "total_tasks": 18,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {
         "purpose": "Establish code quality infrastructure and shared context handling",
         "risk_level": "low",
@@ -74,7 +74,7 @@
         "task-1-8"
       ],
       "total_tasks": 13,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -193,7 +193,7 @@
     "task-1-2": {
       "type": "task",
       "title": "pyproject.toml",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-1-files",
       "children": [
         "task-1-2-1",
@@ -210,7 +210,7 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "pyproject.toml",
         "task_category": "implementation",
@@ -221,7 +221,7 @@
     "task-1-2-1": {
       "type": "subtask",
       "title": "Add [tool.black] configuration (line-length=100, target-version py311)",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-1-2",
       "children": [],
       "dependencies": {
@@ -230,11 +230,16 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "pyproject.toml",
         "task_category": "implementation",
-        "estimated_hours": 0.25
+        "estimated_hours": 0.25,
+        "started_at": "2025-11-20T21:00:35.409096Z",
+        "completed_at": "2025-11-20T21:00:59.586378Z",
+        "needs_journaling": false,
+        "actual_hours": 0.007,
+        "journaled_at": "2025-11-20T21:00:59.591804Z"
       }
     },
     "task-1-2-2": {
@@ -2160,7 +2165,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-20T20:38:01.399125Z",
-    "progress_percentage": 4,
+    "progress_percentage": 5,
     "current_phase": "phase-1"
   },
   "journal": [
@@ -2190,6 +2195,15 @@
       "content": "Successfully removed all sys.path manipulation hacks from test files. Updated 5 test files: conftest.py (changed absolute import to relative import for test_helpers), test_cli_integration.py (removed complex sys.path insertion/removal around importlib), test_consensus_provider_models.py (removed sys.path.insert for SOURCE_ROOT), test_workflow_integration_chaining.py (removed sys.path.insert for SOURCE_ROOT), test_providers/test_cli_interface.py (removed sys.path.insert for model-chorus/src). All imports now use proper package-relative paths. Tests can now rely on proper Python package structure instead of path hacks.",
       "metadata": {},
       "task_id": "task-1-1-3"
+    },
+    {
+      "timestamp": "2025-11-20T21:00:59.591642Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add [tool.black] configuration (line-length=100, target-version py311)",
+      "author": "claude-code",
+      "content": "Updated [tool.black] configuration in pyproject.toml. Changed target-version from [\"py39\", \"py310\", \"py311\", \"py312\"] to [\"py311\"]. Line-length was already set to 100. Configuration now targets Python 3.11 specifically as requested.",
+      "metadata": {},
+      "task_id": "task-1-2-1"
     }
   ]
 }

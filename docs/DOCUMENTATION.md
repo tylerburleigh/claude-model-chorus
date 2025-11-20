@@ -1,14 +1,14 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-20 15:58:07
+**Generated:** 2025-11-20 16:00:50
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 102
-- **Total Lines:** 44565
+- **Total Lines:** 44529
 - **Total Classes:** 244
 - **Total Functions:** 206
 - **Avg Complexity:** 4.94
@@ -2800,7 +2800,7 @@ Example:
 ### `TestArgumentCommand`
 
 **Language:** python
-**Defined in:** `tests/test_cli_integration.py:83`
+**Defined in:** `tests/test_cli_integration.py:70`
 
 **Description:**
 > Test suite for 'argument' CLI command.
@@ -2931,7 +2931,7 @@ Example:
 ### `TestCLIProvidersImplementInterface`
 
 **Language:** python
-**Defined in:** `tests/test_providers/test_cli_interface.py:27`
+**Defined in:** `tests/test_providers/test_cli_interface.py:23`
 
 **Description:**
 > Test that all CLI providers implement the ModelProvider interface.
@@ -3329,7 +3329,7 @@ Example:
 ### `TestCommandIntegration`
 
 **Language:** python
-**Defined in:** `tests/test_cli_integration.py:769`
+**Defined in:** `tests/test_cli_integration.py:756`
 
 **Description:**
 > Test suite for cross-command integration.
@@ -3544,7 +3544,7 @@ scenarios with proper thread isolation and performance.
 ### `TestConsensusThinkDeepChatChaining`
 
 **Language:** python
-**Defined in:** `tests/test_workflow_integration_chaining.py:31`
+**Defined in:** `tests/test_workflow_integration_chaining.py:24`
 
 **Description:**
 > Test suite for consensus → thinkdeep → chat workflow integration.
@@ -3943,7 +3943,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestErrorHandling`
 
 **Language:** python
-**Defined in:** `tests/test_cli_integration.py:672`
+**Defined in:** `tests/test_cli_integration.py:659`
 
 **Description:**
 > Test suite for error handling and edge cases.
@@ -4273,7 +4273,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestIdeateCommand`
 
 **Language:** python
-**Defined in:** `tests/test_cli_integration.py:328`
+**Defined in:** `tests/test_cli_integration.py:315`
 
 **Description:**
 > Test suite for 'ideate' CLI command.
@@ -5276,7 +5276,7 @@ with long-running conversations with many messages.
 ### `TestThinkDeepCommand`
 
 **Language:** python
-**Defined in:** `tests/test_cli_integration.py:502`
+**Defined in:** `tests/test_cli_integration.py:489`
 
 **Description:**
 > Test suite for 'thinkdeep' CLI command.
@@ -5730,7 +5730,7 @@ Returns:
 ### `_create_smart_mock_provider(provider_name, model_name, stop_reason) -> None`
 
 **Language:** python
-**Defined in:** `tests/conftest.py:166`
+**Defined in:** `tests/conftest.py:161`
 ⚠️ **Complexity:** 37 (High)
 
 **Description:**
@@ -5901,7 +5901,7 @@ Returns:
 ### `_make_provider(name, response_text) -> AsyncMock`
 
 **Language:** python
-**Defined in:** `tests/test_consensus_provider_models.py:21`
+**Defined in:** `tests/test_consensus_provider_models.py:14`
 **Complexity:** 1
 
 **Parameters:**
@@ -6529,7 +6529,7 @@ Returns:
 ### `cli_runner() -> None`
 
 **Language:** python
-**Defined in:** `tests/test_cli_integration.py:36`
+**Defined in:** `tests/test_cli_integration.py:23`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -6877,7 +6877,7 @@ Example:
 ### `conversation_memory() -> None`
 
 **Language:** python
-**Defined in:** `tests/conftest.py:330`
+**Defined in:** `tests/conftest.py:325`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -8645,7 +8645,7 @@ Returns:
 ### `mock_claude_provider_full() -> None`
 
 **Language:** python
-**Defined in:** `tests/conftest.py:270`
+**Defined in:** `tests/conftest.py:265`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -8658,7 +8658,7 @@ Returns:
 ### `mock_claude_response() -> None`
 
 **Language:** python
-**Defined in:** `tests/conftest.py:87`
+**Defined in:** `tests/conftest.py:82`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -8671,7 +8671,7 @@ Returns:
 ### `mock_codex_provider_full() -> None`
 
 **Language:** python
-**Defined in:** `tests/conftest.py:282`
+**Defined in:** `tests/conftest.py:277`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -8684,7 +8684,7 @@ Returns:
 ### `mock_codex_response() -> None`
 
 **Language:** python
-**Defined in:** `tests/conftest.py:112`
+**Defined in:** `tests/conftest.py:107`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -8697,7 +8697,7 @@ Returns:
 ### `mock_cursor_agent_provider_full() -> None`
 
 **Language:** python
-**Defined in:** `tests/conftest.py:288`
+**Defined in:** `tests/conftest.py:283`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -8710,7 +8710,7 @@ Returns:
 ### `mock_cursor_agent_response() -> None`
 
 **Language:** python
-**Defined in:** `tests/conftest.py:122`
+**Defined in:** `tests/conftest.py:117`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -8723,7 +8723,7 @@ Returns:
 ### `mock_gemini_provider_full() -> None`
 
 **Language:** python
-**Defined in:** `tests/conftest.py:276`
+**Defined in:** `tests/conftest.py:271`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -8736,7 +8736,7 @@ Returns:
 ### `mock_provider() -> None`
 
 **Language:** python
-**Defined in:** `tests/conftest.py:298`
+**Defined in:** `tests/conftest.py:293`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -8779,7 +8779,7 @@ provider-specific fixtures above (mock_claude_provider_full, etc.).
 ### `mock_subprocess_run() -> None`
 
 **Language:** python
-**Defined in:** `tests/conftest.py:142`
+**Defined in:** `tests/conftest.py:137`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -8792,7 +8792,7 @@ provider-specific fixtures above (mock_claude_provider_full, etc.).
 ### `mock_workflow_result() -> None`
 
 **Language:** python
-**Defined in:** `tests/test_cli_integration.py:42`
+**Defined in:** `tests/test_cli_integration.py:29`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -8883,7 +8883,7 @@ Automatically configures the fastest model for each provider to minimize test ti
 ### `provider_name(request) -> None`
 
 **Language:** python
-**Defined in:** `tests/conftest.py:75`
+**Defined in:** `tests/conftest.py:70`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture(params=[pytest.param('claude', marks=pytest.mark.skipif(not CLAUDE_AVAILABLE, reason='Claude not available (config disabled or CLI not found)')), pytest.param('gemini', marks=pytest.mark.skipif(not GEMINI_AVAILABLE, reason='Gemini not available (config disabled or CLI not found)')), pytest.param('codex', marks=pytest.mark.skipif(not CODEX_AVAILABLE, reason='Codex not available (config disabled or CLI not found)')), pytest.param('cursor-agent', marks=pytest.mark.skipif(not CURSOR_AGENT_AVAILABLE, reason='Cursor Agent not available (config disabled or CLI not found)'))])`
@@ -8903,7 +8903,7 @@ will be automatically skipped.
 ### `pytest_configure(config) -> None`
 
 **Language:** python
-**Defined in:** `tests/conftest.py:41`
+**Defined in:** `tests/conftest.py:36`
 **Complexity:** 1
 
 **Description:**
@@ -8994,7 +8994,7 @@ Returns:
 ### `sample_generation_request() -> None`
 
 **Language:** python
-**Defined in:** `tests/conftest.py:152`
+**Defined in:** `tests/conftest.py:147`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -9320,7 +9320,7 @@ Example:
 ### `temp_output_file(tmp_path) -> None`
 
 **Language:** python
-**Defined in:** `tests/test_cli_integration.py:77`
+**Defined in:** `tests/test_cli_integration.py:64`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -9336,7 +9336,7 @@ Example:
 ### `temp_test_file(tmp_path) -> None`
 
 **Language:** python
-**Defined in:** `tests/test_cli_integration.py:69`
+**Defined in:** `tests/test_cli_integration.py:56`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -9450,7 +9450,7 @@ Example:
 ### `async test_consensus_applies_provider_model_override_without_mutation() -> None`
 
 **Language:** python
-**Defined in:** `tests/test_consensus_provider_models.py:37`
+**Defined in:** `tests/test_consensus_provider_models.py:30`
 **Complexity:** 3
 
 **Decorators:** `@pytest.mark.asyncio`
@@ -9715,7 +9715,7 @@ Example:
 ### `async test_shared_request_model_overrides_provider_metadata() -> None`
 
 **Language:** python
-**Defined in:** `tests/test_consensus_provider_models.py:72`
+**Defined in:** `tests/test_consensus_provider_models.py:65`
 **Complexity:** 1
 
 **Decorators:** `@pytest.mark.asyncio`
@@ -10747,7 +10747,6 @@ Returns:
 
 ### `tests/test_cli_integration.py`
 
-- `importlib`
 - `json`
 - `model_chorus.cli.main.app`
 - `model_chorus.core.base_workflow.WorkflowResult`
@@ -10755,7 +10754,6 @@ Returns:
 - `model_chorus.providers.base_provider.GenerationResponse`
 - `pathlib.Path`
 - `pytest`
-- `sys`
 - `typer.testing.CliRunner`
 - `unittest.mock.AsyncMock`
 - `unittest.mock.MagicMock`
@@ -10815,7 +10813,6 @@ Returns:
 - `model_chorus.workflows.consensus.ConsensusWorkflow`
 - `pathlib.Path`
 - `pytest`
-- `sys`
 - `unittest.mock.AsyncMock`
 
 ### `tests/test_consensus_workflow.py`
@@ -10955,7 +10952,6 @@ Returns:
 - `model_chorus.providers.ModelProvider`
 - `pathlib.Path`
 - `pytest`
-- `sys`
 
 ### `tests/test_review_response.py`
 
@@ -11088,7 +11084,6 @@ Returns:
 - `model_chorus.workflows.thinkdeep.ThinkDeepWorkflow`
 - `pathlib.Path`
 - `pytest`
-- `sys`
 - `unittest.mock.AsyncMock`
 - `unittest.mock.patch`
 - `uuid`
