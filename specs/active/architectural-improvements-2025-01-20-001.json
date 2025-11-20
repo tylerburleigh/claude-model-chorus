@@ -1,0 +1,2167 @@
+{
+  "spec_id": "architectural-improvements-2025-01-20-001",
+  "title": "Model-Chorus Architectural Improvements",
+  "generated": "2025-01-20T20:30:00Z",
+  "last_updated": "2025-11-20T20:47:12.003035Z",
+  "description": "Comprehensive architectural refactoring to eliminate code duplication, improve maintainability, enhance reliability, and establish scalable foundations for future development.",
+  "hierarchy": {
+    "spec-root": {
+      "type": "spec",
+      "title": "Model-Chorus Architectural Improvements",
+      "status": "in_progress",
+      "parent": null,
+      "children": [
+        "phase-1",
+        "phase-2",
+        "phase-3",
+        "phase-4"
+      ],
+      "total_tasks": 69,
+      "completed_tasks": 1,
+      "metadata": {
+        "objectives": [
+          "Reduce code duplication by 30-40% through shared primitives",
+          "Improve reliability through provider middleware and circuit breakers",
+          "Enhance maintainability via consolidated testing and code quality checks",
+          "Enable scalability through SQLite-based persistence",
+          "Accelerate development by reducing new workflow implementation time by 75%"
+        ],
+        "success_criteria": [
+          "All phases validated with comprehensive verification",
+          "No regressions in existing functionality",
+          "Backward compatibility maintained during transitions",
+          "Documentation and tests updated throughout"
+        ]
+      }
+    },
+    "phase-1": {
+      "type": "phase",
+      "title": "Foundation & Quick Wins",
+      "status": "in_progress",
+      "parent": "spec-root",
+      "children": [
+        "phase-1-files",
+        "phase-1-verify"
+      ],
+      "total_tasks": 18,
+      "completed_tasks": 1,
+      "metadata": {
+        "purpose": "Establish code quality infrastructure and shared context handling",
+        "risk_level": "low",
+        "estimated_duration": "1-2 weeks"
+      },
+      "dependencies": {
+        "blocks": [
+          "phase-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "phase-1-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "in_progress",
+      "parent": "phase-1",
+      "children": [
+        "task-1-1",
+        "task-1-2",
+        "task-1-3",
+        "task-1-4",
+        "task-1-5",
+        "task-1-6",
+        "task-1-7",
+        "task-1-8"
+      ],
+      "total_tasks": 13,
+      "completed_tasks": 1,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-1-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-1-1": {
+      "type": "task",
+      "title": "Consolidate test directories",
+      "status": "in_progress",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-1-1",
+        "task-1-1-2",
+        "task-1-1-3"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-1-2",
+          "task-1-4"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 1,
+      "metadata": {
+        "task_category": "refactoring",
+        "estimated_hours": 4,
+        "description": "Merge tests/ into model_chorus/tests/, consolidate fixtures, remove sys.path hacks",
+        "file_path": "task-1-1.md"
+      }
+    },
+    "task-1-1-1": {
+      "type": "subtask",
+      "title": "Move root tests/ directory to model_chorus/tests/",
+      "status": "completed",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-1-1-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "task_category": "refactoring",
+        "command": "git mv tests/* model_chorus/tests/",
+        "estimated_hours": 1,
+        "started_at": "2025-11-20T20:38:31.274696Z",
+        "completed_at": "2025-11-20T20:47:11.995608Z",
+        "needs_journaling": false,
+        "actual_hours": 0.145,
+        "journaled_at": "2025-11-20T20:47:12.000942Z"
+      }
+    },
+    "task-1-1-2": {
+      "type": "subtask",
+      "title": "Merge conftest.py files and deduplicate fixtures",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-1-1-3"
+        ],
+        "blocked_by": [
+          "task-1-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/tests/conftest.py",
+        "task_category": "refactoring",
+        "estimated_hours": 2
+      }
+    },
+    "task-1-1-3": {
+      "type": "subtask",
+      "title": "Update imports to use package-relative paths, remove sys.path hacks",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "refactoring",
+        "estimated_hours": 1
+      }
+    },
+    "task-1-2": {
+      "type": "task",
+      "title": "pyproject.toml",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-2-1",
+        "task-1-2-2"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-1-3",
+          "task-1-8"
+        ],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "pyproject.toml",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "description": "Add black, ruff, mypy configuration"
+      }
+    },
+    "task-1-2-1": {
+      "type": "subtask",
+      "title": "Add [tool.black] configuration (line-length=100, target-version py311)",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "pyproject.toml",
+        "task_category": "implementation",
+        "estimated_hours": 0.25
+      }
+    },
+    "task-1-2-2": {
+      "type": "subtask",
+      "title": "Add [tool.ruff] and [tool.mypy] configurations",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "pyproject.toml",
+        "task_category": "implementation",
+        "estimated_hours": 0.75
+      }
+    },
+    "task-1-3": {
+      "type": "task",
+      "title": ".github/workflows/code-quality.yml",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": ".github/workflows/code-quality.yml",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "description": "Create CI job for formatting, linting, type-checking"
+      }
+    },
+    "task-1-4": {
+      "type": "task",
+      "title": ".github/workflows/tests.yml",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": ".github/workflows/tests.yml",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "description": "Create/update CI job for running tests with mock providers"
+      }
+    },
+    "task-1-5": {
+      "type": "task",
+      "title": "model_chorus/core/context_ingestion.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-5-1",
+        "task-1-5-2",
+        "task-1-5-3"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-1-6",
+          "task-1-7"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/core/context_ingestion.py",
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "description": "Create shared context ingestion service"
+      }
+    },
+    "task-1-5-1": {
+      "type": "subtask",
+      "title": "Implement ContextIngestionService class with file size limits",
+      "status": "pending",
+      "parent": "task-1-5",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-1-5-2",
+          "task-1-5-3"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/core/context_ingestion.py",
+        "task_category": "implementation",
+        "estimated_hours": 2
+      }
+    },
+    "task-1-5-2": {
+      "type": "subtask",
+      "title": "Add chunking strategy for large files",
+      "status": "pending",
+      "parent": "task-1-5",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-5-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/core/context_ingestion.py",
+        "task_category": "implementation",
+        "estimated_hours": 1
+      }
+    },
+    "task-1-5-3": {
+      "type": "subtask",
+      "title": "Add consistent error handling and validation",
+      "status": "pending",
+      "parent": "task-1-5",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-5-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/core/context_ingestion.py",
+        "task_category": "implementation",
+        "estimated_hours": 1
+      }
+    },
+    "task-1-6": {
+      "type": "task",
+      "title": "model_chorus/cli/main.py - integrate context ingestion",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-5"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/cli/main.py",
+        "task_category": "refactoring",
+        "estimated_hours": 2,
+        "description": "Replace construct_prompt_with_files() calls with ContextIngestionService"
+      }
+    },
+    "task-1-7": {
+      "type": "task",
+      "title": "model_chorus/tests/test_context_ingestion.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-5"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/tests/test_context_ingestion.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "description": "Create tests for context ingestion service"
+      }
+    },
+    "task-1-8": {
+      "type": "task",
+      "title": "Run black formatter on entire codebase",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "refactoring",
+        "estimated_hours": 0.5,
+        "description": "Format entire codebase once with black",
+        "command": "black .",
+        "file_path": "task-1-8.md"
+      }
+    },
+    "phase-1-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "verify-1-1",
+        "verify-1-2",
+        "verify-1-3",
+        "verify-1-4",
+        "verify-1-5"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-1-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-1-1": {
+      "type": "verify",
+      "title": "All tests pass after consolidation",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "agent": "run-tests",
+        "command": "pytest model_chorus/tests/",
+        "expected": "All tests pass with consolidated structure"
+      }
+    },
+    "verify-1-2": {
+      "type": "verify",
+      "title": "Code quality checks pass",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "black --check . && ruff check . && mypy model_chorus/src/",
+        "expected": "No formatting, linting, or type errors"
+      }
+    },
+    "verify-1-3": {
+      "type": "verify",
+      "title": "CI/CD pipeline runs successfully",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "GitHub Actions workflows complete successfully",
+        "command": ""
+      }
+    },
+    "verify-1-4": {
+      "type": "verify",
+      "title": "Context ingestion handles large files correctly",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "agent": "run-tests",
+        "command": "pytest model_chorus/tests/test_context_ingestion.py",
+        "expected": "Context ingestion tests pass"
+      }
+    },
+    "verify-1-5": {
+      "type": "verify",
+      "title": "Phase 1 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "agent": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-1",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        }
+      }
+    },
+    "phase-2": {
+      "type": "phase",
+      "title": "CLI Architecture Refactoring",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-2-investigation",
+        "phase-2-files",
+        "phase-2-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-3"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 17,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Break down monolithic main.py into reusable command primitives",
+        "risk_level": "medium-high",
+        "estimated_duration": "2-3 weeks"
+      }
+    },
+    "phase-2-investigation": {
+      "type": "group",
+      "title": "Investigation",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "task-2-1"
+      ],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-2-files"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-2-1": {
+      "type": "task",
+      "title": "Analyze main.py duplication patterns",
+      "status": "pending",
+      "parent": "phase-2-investigation",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "phase-2-files"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "investigation",
+        "estimated_hours": 3,
+        "description": "Identify provider resolution, memory setup, and output formatting patterns across commands",
+        "file_path": "task-2-1.md"
+      }
+    },
+    "phase-2-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "task-2-2",
+        "task-2-3",
+        "task-2-4",
+        "task-2-5",
+        "task-2-6",
+        "task-2-7",
+        "task-2-8",
+        "task-2-9",
+        "task-2-10"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-2-verify"
+        ],
+        "blocked_by": [
+          "phase-2-investigation",
+          "task-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 11,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-2": {
+      "type": "task",
+      "title": "model_chorus/cli/primitives.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-2-1",
+        "task-2-2-2",
+        "task-2-2-3"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-2-3",
+          "task-2-4",
+          "task-2-5",
+          "task-2-10"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/cli/primitives.py",
+        "task_category": "implementation",
+        "estimated_hours": 6,
+        "description": "Create reusable CLI primitives"
+      }
+    },
+    "task-2-2-1": {
+      "type": "subtask",
+      "title": "Implement ProviderResolver class",
+      "status": "pending",
+      "parent": "task-2-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/cli/primitives.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "description": "Extract provider resolution logic from main.py"
+      }
+    },
+    "task-2-2-2": {
+      "type": "subtask",
+      "title": "Implement WorkflowContext class",
+      "status": "pending",
+      "parent": "task-2-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/cli/primitives.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "description": "Extract memory initialization and thread management"
+      }
+    },
+    "task-2-2-3": {
+      "type": "subtask",
+      "title": "Implement OutputFormatter class",
+      "status": "pending",
+      "parent": "task-2-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/cli/primitives.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "description": "Extract JSON and console output formatting"
+      }
+    },
+    "task-2-3": {
+      "type": "task",
+      "title": "model_chorus/config/models.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-3-1"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-2-4"
+        ],
+        "blocked_by": [
+          "task-2-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/config/models.py",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "description": "Enhance typed configuration objects"
+      }
+    },
+    "task-2-3-1": {
+      "type": "subtask",
+      "title": "Add comprehensive Pydantic models for all config sections",
+      "status": "pending",
+      "parent": "task-2-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/config/models.py",
+        "task_category": "implementation",
+        "estimated_hours": 3
+      }
+    },
+    "task-2-4": {
+      "type": "task",
+      "title": "model_chorus/config/loader.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-2-5"
+        ],
+        "blocked_by": [
+          "task-2-3",
+          "task-2-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/config/loader.py",
+        "task_category": "refactoring",
+        "estimated_hours": 2,
+        "description": "Update ConfigLoader to use typed models"
+      }
+    },
+    "task-2-5": {
+      "type": "task",
+      "title": "model_chorus/cli/main.py - chat command refactor",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-2-6",
+          "task-2-7",
+          "task-2-8",
+          "task-2-9"
+        ],
+        "blocked_by": [
+          "task-2-2",
+          "task-2-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/cli/main.py",
+        "task_category": "refactoring",
+        "estimated_hours": 2,
+        "description": "Migrate chat command to use primitives"
+      }
+    },
+    "task-2-6": {
+      "type": "task",
+      "title": "model_chorus/cli/main.py - consensus command refactor",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-5"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/cli/main.py",
+        "task_category": "refactoring",
+        "estimated_hours": 2,
+        "description": "Migrate consensus command to use primitives"
+      }
+    },
+    "task-2-7": {
+      "type": "task",
+      "title": "model_chorus/cli/main.py - argument command refactor",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-5"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/cli/main.py",
+        "task_category": "refactoring",
+        "estimated_hours": 2,
+        "description": "Migrate argument command to use primitives"
+      }
+    },
+    "task-2-8": {
+      "type": "task",
+      "title": "model_chorus/cli/main.py - thinkdeep command refactor",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-5"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/cli/main.py",
+        "task_category": "refactoring",
+        "estimated_hours": 2,
+        "description": "Migrate thinkdeep command to use primitives"
+      }
+    },
+    "task-2-9": {
+      "type": "task",
+      "title": "model_chorus/cli/main.py - ideate command refactor",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-5"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/cli/main.py",
+        "task_category": "refactoring",
+        "estimated_hours": 2,
+        "description": "Migrate ideate command to use primitives"
+      }
+    },
+    "task-2-10": {
+      "type": "task",
+      "title": "model_chorus/tests/test_cli_primitives.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/tests/test_cli_primitives.py",
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "description": "Create comprehensive tests for CLI primitives"
+      }
+    },
+    "phase-2-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "verify-2-1",
+        "verify-2-2",
+        "verify-2-3",
+        "verify-2-4",
+        "verify-2-5"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-2-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-2-1": {
+      "type": "verify",
+      "title": "All CLI commands work identically to before",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Test each command (chat, consensus, argument, thinkdeep, ideate) manually",
+        "command": ""
+      }
+    },
+    "verify-2-2": {
+      "type": "verify",
+      "title": "CLI primitive tests pass",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "agent": "run-tests",
+        "command": "pytest model_chorus/tests/test_cli_primitives.py",
+        "expected": "All primitive tests pass"
+      }
+    },
+    "verify-2-3": {
+      "type": "verify",
+      "title": "Integration tests pass",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "agent": "run-tests",
+        "command": "pytest model_chorus/tests/test_cli_integration.py",
+        "expected": "CLI integration tests pass"
+      }
+    },
+    "verify-2-4": {
+      "type": "verify",
+      "title": "Line count reduction verified",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "main.py reduced by ~800 lines (from 1922 to ~1100)",
+        "command": ""
+      }
+    },
+    "verify-2-5": {
+      "type": "verify",
+      "title": "Phase 2 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "agent": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-2",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        }
+      }
+    },
+    "phase-3": {
+      "type": "phase",
+      "title": "Provider Platform & Resilience",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-3-files",
+        "phase-3-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-4"
+        ],
+        "blocked_by": [
+          "phase-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 16,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Add provider middleware, token budgeting, and workflow runner abstraction",
+        "risk_level": "medium",
+        "estimated_duration": "2-3 weeks"
+      }
+    },
+    "phase-3-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "task-3-1",
+        "task-3-2",
+        "task-3-3",
+        "task-3-4",
+        "task-3-5",
+        "task-3-6",
+        "task-3-7"
+      ],
+      "total_tasks": 11,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-3-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-3-1": {
+      "type": "task",
+      "title": "model_chorus/providers/middleware.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-1-1",
+        "task-3-1-2",
+        "task-3-1-3"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-3-3",
+          "task-3-6"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/providers/middleware.py",
+        "task_category": "implementation",
+        "estimated_hours": 6,
+        "description": "Create provider middleware for resilience"
+      }
+    },
+    "task-3-1-1": {
+      "type": "subtask",
+      "title": "Implement RetryMiddleware with exponential backoff",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/providers/middleware.py",
+        "task_category": "implementation",
+        "estimated_hours": 2
+      }
+    },
+    "task-3-1-2": {
+      "type": "subtask",
+      "title": "Implement CircuitBreakerMiddleware",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/providers/middleware.py",
+        "task_category": "implementation",
+        "estimated_hours": 3
+      }
+    },
+    "task-3-1-3": {
+      "type": "subtask",
+      "title": "Add structured error types (ProviderError, ConfigError, etc.)",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/providers/middleware.py",
+        "task_category": "implementation",
+        "estimated_hours": 1
+      }
+    },
+    "task-3-2": {
+      "type": "task",
+      "title": "model_chorus/core/workflow_runner.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-2-1",
+        "task-3-2-2"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-3-3"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/core/workflow_runner.py",
+        "task_category": "implementation",
+        "estimated_hours": 6,
+        "description": "Create workflow runner abstraction"
+      }
+    },
+    "task-3-2-1": {
+      "type": "subtask",
+      "title": "Implement WorkflowRunner class wrapping _execute_with_fallback",
+      "status": "pending",
+      "parent": "task-3-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-3-2-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/core/workflow_runner.py",
+        "task_category": "implementation",
+        "estimated_hours": 4
+      }
+    },
+    "task-3-2-2": {
+      "type": "subtask",
+      "title": "Add basic telemetry/metrics collection hooks",
+      "status": "pending",
+      "parent": "task-3-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-3-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/core/workflow_runner.py",
+        "task_category": "implementation",
+        "estimated_hours": 2
+      }
+    },
+    "task-3-3": {
+      "type": "task",
+      "title": "model_chorus/workflows/base.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-3-4"
+        ],
+        "blocked_by": [
+          "task-3-1",
+          "task-3-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/core/base_workflow.py",
+        "task_category": "refactoring",
+        "estimated_hours": 3,
+        "description": "Integrate middleware and runner into BaseWorkflow"
+      }
+    },
+    "task-3-4": {
+      "type": "task",
+      "title": "model_chorus/core/conversation.py - token budgeting",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-4-1",
+        "task-3-4-2"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-3-5",
+          "task-3-7"
+        ],
+        "blocked_by": [
+          "task-3-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/core/conversation.py",
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "description": "Add token budgeting to ConversationMemory"
+      }
+    },
+    "task-3-4-1": {
+      "type": "subtask",
+      "title": "Enhance build_conversation_history with max_tokens parameter",
+      "status": "pending",
+      "parent": "task-3-4",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-3-4-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/core/conversation.py",
+        "task_category": "implementation",
+        "estimated_hours": 2
+      }
+    },
+    "task-3-4-2": {
+      "type": "subtask",
+      "title": "Add smart compaction strategy (preserve recent + important messages)",
+      "status": "pending",
+      "parent": "task-3-4",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-3-4-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/core/conversation.py",
+        "task_category": "implementation",
+        "estimated_hours": 2
+      }
+    },
+    "task-3-5": {
+      "type": "task",
+      "title": "Update all workflows to use token budgeting",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-3-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "refactoring",
+        "estimated_hours": 3,
+        "description": "Update ChatWorkflow, ArgumentWorkflow, ThinkDeepWorkflow to use token budgeting",
+        "file_path": "task-3-5.md"
+      }
+    },
+    "task-3-6": {
+      "type": "task",
+      "title": "model_chorus/tests/test_middleware.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-3-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/tests/test_middleware.py",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "description": "Create tests for middleware (retry, circuit breaker)"
+      }
+    },
+    "task-3-7": {
+      "type": "task",
+      "title": "model_chorus/tests/test_token_budgeting.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-3-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/tests/test_token_budgeting.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "description": "Create tests for token budgeting and compaction"
+      }
+    },
+    "phase-3-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "verify-3-1",
+        "verify-3-2",
+        "verify-3-3",
+        "verify-3-4",
+        "verify-3-5"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-3-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-3-1": {
+      "type": "verify",
+      "title": "Middleware tests pass",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "agent": "run-tests",
+        "command": "pytest model_chorus/tests/test_middleware.py",
+        "expected": "All middleware tests pass"
+      }
+    },
+    "verify-3-2": {
+      "type": "verify",
+      "title": "Token budgeting tests pass",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "agent": "run-tests",
+        "command": "pytest model_chorus/tests/test_token_budgeting.py",
+        "expected": "Token budgeting tests pass"
+      }
+    },
+    "verify-3-3": {
+      "type": "verify",
+      "title": "Retry logic works with transient errors",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Test retry behavior by simulating network errors",
+        "command": ""
+      }
+    },
+    "verify-3-4": {
+      "type": "verify",
+      "title": "Circuit breaker prevents repeated failures",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Verify circuit breaker opens after threshold failures",
+        "command": ""
+      }
+    },
+    "verify-3-5": {
+      "type": "verify",
+      "title": "Phase 3 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "agent": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-3",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        }
+      }
+    },
+    "phase-4": {
+      "type": "phase",
+      "title": "Data Layer & Extensibility",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-4-files",
+        "phase-4-verify"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 18,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Replace JSON persistence with SQLite and enhance workflow registry",
+        "risk_level": "medium-high",
+        "estimated_duration": "2-3 weeks"
+      }
+    },
+    "phase-4-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "task-4-1",
+        "task-4-2",
+        "task-4-3",
+        "task-4-4",
+        "task-4-5",
+        "task-4-6",
+        "task-4-7",
+        "task-4-8"
+      ],
+      "total_tasks": 13,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-4-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-4-1": {
+      "type": "task",
+      "title": "model_chorus/core/conversation_db.py",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-1-1",
+        "task-4-1-2",
+        "task-4-1-3"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-4-2",
+          "task-4-3",
+          "task-4-7"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/core/conversation_db.py",
+        "task_category": "implementation",
+        "estimated_hours": 6,
+        "description": "Create SQLite-based conversation storage"
+      }
+    },
+    "task-4-1-1": {
+      "type": "subtask",
+      "title": "Implement ConversationDatabase class with WAL mode",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-4-1-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/core/conversation_db.py",
+        "task_category": "implementation",
+        "estimated_hours": 3
+      }
+    },
+    "task-4-1-2": {
+      "type": "subtask",
+      "title": "Create schema with threads, messages, and metadata tables",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-4-1-3"
+        ],
+        "blocked_by": [
+          "task-4-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/core/conversation_db.py",
+        "task_category": "implementation",
+        "estimated_hours": 2
+      }
+    },
+    "task-4-1-3": {
+      "type": "subtask",
+      "title": "Add query methods (query_recent_investigations, query_by_workflow)",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-4-1-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/core/conversation_db.py",
+        "task_category": "implementation",
+        "estimated_hours": 1
+      }
+    },
+    "task-4-2": {
+      "type": "task",
+      "title": "model_chorus/migrations/migrate_json_to_sqlite.py",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-2-1",
+        "task-4-2-2"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-4-3"
+        ],
+        "blocked_by": [
+          "task-4-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py",
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "description": "Create migration script from JSON to SQLite"
+      }
+    },
+    "task-4-2-1": {
+      "type": "subtask",
+      "title": "Implement JSON file reading and validation",
+      "status": "pending",
+      "parent": "task-4-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-4-2-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py",
+        "task_category": "implementation",
+        "estimated_hours": 2
+      }
+    },
+    "task-4-2-2": {
+      "type": "subtask",
+      "title": "Add backup and rollback capabilities",
+      "status": "pending",
+      "parent": "task-4-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-4-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py",
+        "task_category": "implementation",
+        "estimated_hours": 2
+      }
+    },
+    "task-4-3": {
+      "type": "task",
+      "title": "model_chorus/core/conversation.py - dual storage support",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-3-1",
+        "task-4-3-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-4-1",
+          "task-4-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/core/conversation.py",
+        "task_category": "refactoring",
+        "estimated_hours": 4,
+        "description": "Add feature flag for JSON vs SQLite storage"
+      }
+    },
+    "task-4-3-1": {
+      "type": "subtask",
+      "title": "Add storage_backend config option and feature flag",
+      "status": "pending",
+      "parent": "task-4-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-4-3-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/core/conversation.py",
+        "task_category": "refactoring",
+        "estimated_hours": 2
+      }
+    },
+    "task-4-3-2": {
+      "type": "subtask",
+      "title": "Update ConversationMemory to delegate to appropriate backend",
+      "status": "pending",
+      "parent": "task-4-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-4-3-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/core/conversation.py",
+        "task_category": "refactoring",
+        "estimated_hours": 2
+      }
+    },
+    "task-4-4": {
+      "type": "task",
+      "title": "model_chorus/core/registry.py",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-4-1",
+        "task-4-4-2"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-4-5",
+          "task-4-6",
+          "task-4-8"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/core/registry.py",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "description": "Enhance WorkflowRegistry with metadata and discovery"
+      }
+    },
+    "task-4-4-1": {
+      "type": "subtask",
+      "title": "Add WorkflowMetadata model (name, description, version, author)",
+      "status": "pending",
+      "parent": "task-4-4",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-4-4-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/core/registry.py",
+        "task_category": "implementation",
+        "estimated_hours": 1
+      }
+    },
+    "task-4-4-2": {
+      "type": "subtask",
+      "title": "Add list_workflows() and get_workflow_info() methods",
+      "status": "pending",
+      "parent": "task-4-4",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-4-4-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/core/registry.py",
+        "task_category": "implementation",
+        "estimated_hours": 2
+      }
+    },
+    "task-4-5": {
+      "type": "task",
+      "title": "model_chorus/cli/main.py - list-workflows command",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-4-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/src/model_chorus/cli/main.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "description": "Add list-workflows CLI command"
+      }
+    },
+    "task-4-6": {
+      "type": "task",
+      "title": "Update all workflow classes with metadata",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-4-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "refactoring",
+        "estimated_hours": 2,
+        "description": "Add metadata to ChatWorkflow, ConsensusWorkflow, ArgumentWorkflow, ThinkDeepWorkflow, IdeateWorkflow",
+        "file_path": "task-4-6.md"
+      }
+    },
+    "task-4-7": {
+      "type": "task",
+      "title": "model_chorus/tests/test_conversation_db.py",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-4-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/tests/test_conversation_db.py",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "description": "Create tests for SQLite conversation storage"
+      }
+    },
+    "task-4-8": {
+      "type": "task",
+      "title": "model_chorus/tests/test_workflow_registry.py",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-4-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "model_chorus/tests/test_workflow_registry.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "description": "Create tests for enhanced workflow registry"
+      }
+    },
+    "phase-4-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "verify-4-1",
+        "verify-4-2",
+        "verify-4-3",
+        "verify-4-4",
+        "verify-4-5"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-4-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-4-1": {
+      "type": "verify",
+      "title": "Migration script successfully migrates test data",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Run migration script on backup of production data, verify integrity",
+        "command": ""
+      }
+    },
+    "verify-4-2": {
+      "type": "verify",
+      "title": "SQLite conversation storage tests pass",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "agent": "run-tests",
+        "command": "pytest model_chorus/tests/test_conversation_db.py",
+        "expected": "All conversation DB tests pass"
+      }
+    },
+    "verify-4-3": {
+      "type": "verify",
+      "title": "Query capabilities work correctly",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Test query_recent_investigations and query_by_workflow methods",
+        "command": ""
+      }
+    },
+    "verify-4-4": {
+      "type": "verify",
+      "title": "list-workflows command shows all workflows",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Run model-chorus list-workflows and verify output",
+        "command": "model-chorus list-workflows"
+      }
+    },
+    "verify-4-5": {
+      "type": "verify",
+      "title": "Phase 4 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "agent": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-4",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        }
+      }
+    }
+  },
+  "metadata": {
+    "status": "active",
+    "activated_date": "2025-11-20T20:38:01.399125Z",
+    "progress_percentage": 1,
+    "current_phase": "phase-1"
+  },
+  "journal": [
+    {
+      "timestamp": "2025-11-20T20:47:12.000933Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Move root tests/ directory to model_chorus/tests/",
+      "author": "claude-code",
+      "content": "Successfully moved all test files from root tests/ directory to model_chorus/tests/. Moved 13 non-conflicting test files directly. Renamed 2 conflicting test files (test_citation.py -> test_citation_integration.py, test_ideate_workflow.py -> test_ideate_workflow_integration.py) to preserve both versions. Moved test_providers/ subdirectory and merged workflows/study/memory/test_cache.py into existing workflows structure. Removed empty root tests/ directory. All changes staged in git. Ready for next task (merging conftest.py files).",
+      "metadata": {},
+      "task_id": "task-1-1-1"
+    }
+  ]
+}
