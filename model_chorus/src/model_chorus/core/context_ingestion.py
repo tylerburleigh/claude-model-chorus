@@ -194,3 +194,126 @@ class ContextIngestionService:
             return True, None
         except (FileNotFoundError, ValueError, PermissionError) as e:
             return False, str(e)
+
+    def read_file_chunked(
+        self,
+        file_path: str | Path,
+        chunk_size_kb: int = 50,
+        max_chunks: Optional[int] = None,
+    ) -> List[str]:
+        """
+        Read file in chunks for processing large files.
+
+        Args:
+            file_path: Path to the file to read
+            chunk_size_kb: Size of each chunk in KB (default: 50)
+            max_chunks: Maximum number of chunks to return (None for all)
+
+        Returns:
+            List of file chunks as strings
+
+        Raises:
+            FileNotFoundError: If file doesn't exist
+            BinaryFileError: If file appears to be binary
+            PermissionError: If file cannot be accessed
+            ValueError: If path is invalid or chunk_size_kb <= 0
+
+        Examples:
+            >>> service = ContextIngestionService(max_file_size_kb=200)
+            >>> chunks = service.read_file_chunked("large_file.txt", chunk_size_kb=50)
+            >>> for i, chunk in enumerate(chunks):
+            ...     print(f"Processing chunk {i+1}/{len(chunks)}")
+            ...     process_chunk(chunk)
+        """
+        if chunk_size_kb <= 0:
+            raise ValueError("chunk_size_kb must be positive")
+
+        # Normalize and validate path
+        path = Path(file_path).resolve()
+
+        if not path.exists():
+            raise FileNotFoundError(f"File not found: {path}")
+
+        if not path.is_file():
+            raise ValueError(f"Path is not a file: {path}")
+
+        # Detect encoding
+        try:
+            with open(path, "rb") as f:
+                raw_data = f.read(8192)
+
+            detection = chardet.detect(raw_data)
+            encoding = detection.get("encoding")
+            confidence = detection.get("confidence", 0)
+
+            if encoding is None or confidence < 0.7:
+                raise BinaryFileError(f"File appears to be binary: {path}")
+
+        except (IOError, OSError) as e:
+            raise PermissionError(f"Cannot access file {path}: {e}")
+
+        # Read file in chunks
+        chunks = []
+        chunk_size_bytes = chunk_size_kb * 1024
+
+        try:
+            with open(path, "r", encoding=encoding) as f:
+                while True:
+                    if max_chunks is not None and len(chunks) >= max_chunks:
+                        break
+
+                    chunk = f.read(chunk_size_bytes)
+                    if not chunk:
+                        break
+
+                    chunks.append(chunk)
+
+            return chunks
+
+        except UnicodeDecodeError as e:
+            raise BinaryFileError(f"Failed to decode file {path}: {e}")
+
+    def read_file_lines(
+        self,
+        file_path: str | Path,
+        max_lines: Optional[int] = None,
+        skip_empty: bool = False,
+    ) -> List[str]:
+        """
+        Read file line by line with optional line limit.
+
+        Useful for processing large files incrementally or reading
+        only the first N lines for preview purposes.
+
+        Args:
+            file_path: Path to the file to read
+            max_lines: Maximum number of lines to read (None for all)
+            skip_empty: Whether to skip empty lines
+
+        Returns:
+            List of lines (without newline characters)
+
+        Raises:
+            FileNotFoundError: If file doesn't exist
+            FileTooLargeError: If file exceeds size limit
+            BinaryFileError: If file appears to be binary
+            PermissionError: If file cannot be accessed
+            ValueError: If path is invalid
+
+        Examples:
+            >>> service = ContextIngestionService()
+            >>> # Read first 100 lines for preview
+            >>> lines = service.read_file_lines("large_log.txt", max_lines=100)
+            >>> print(f"Preview: {len(lines)} lines")
+        """
+        # Use read_file but with line processing
+        content = self.read_file(file_path)
+        lines = content.splitlines()
+
+        if skip_empty:
+            lines = [line for line in lines if line.strip()]
+
+        if max_lines is not None:
+            lines = lines[:max_lines]
+
+        return lines
