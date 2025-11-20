@@ -312,3 +312,89 @@ class WorkflowContext:
             Final prompt with file contents prepended (if files provided)
         """
         return self.construct_prompt_with_files_fn(prompt, files)
+
+
+class OutputFormatter:
+    """
+    Standardizes console output formatting for workflow commands.
+
+    Extracts common patterns for:
+    1. Displaying workflow start/continuation messages
+    2. Showing execution parameters (prompt, provider, files, etc.)
+    3. Consistent formatting and truncation
+    """
+
+    @staticmethod
+    def display_workflow_start(
+        workflow_name: str,
+        prompt: str,
+        provider: str | None = None,
+        continuation_id: str | None = None,
+        files: list[str] | None = None,
+        **kwargs,
+    ):
+        """
+        Display standardized workflow start information.
+
+        Args:
+            workflow_name: Name of workflow being executed
+            prompt: The prompt being sent
+            provider: Provider name (optional)
+            continuation_id: Thread/session ID for continuation (optional)
+            files: List of file paths included (optional)
+            **kwargs: Additional parameters to display (e.g., num_to_consult, strategy)
+        """
+        # Display header
+        if continuation_id:
+            console.print(
+                f"\n[bold cyan]Continuing {workflow_name} workflow...[/bold cyan]"
+            )
+        else:
+            console.print(
+                f"\n[bold cyan]Starting new {workflow_name} workflow...[/bold cyan]"
+            )
+
+        # Display prompt (truncated if too long)
+        truncated_prompt = prompt[:100] + "..." if len(prompt) > 100 else prompt
+        console.print(f"Prompt: {truncated_prompt}")
+
+        # Display provider if provided
+        if provider:
+            console.print(f"Provider: {provider}")
+
+        # Display continuation ID if provided
+        if continuation_id:
+            console.print(f"Thread ID: {continuation_id}")
+
+        # Display files if provided
+        if files:
+            console.print(f"Files: {', '.join(files)}")
+
+        # Display any additional parameters
+        for key, value in kwargs.items():
+            if value is not None:
+                # Convert key from snake_case to Title Case for display
+                display_key = key.replace("_", " ").title()
+                console.print(f"{display_key}: {value}")
+
+        console.print()
+
+    @staticmethod
+    def write_json_output(output_path, result_data: dict):
+        """
+        Write workflow result to JSON file.
+
+        Args:
+            output_path: Path object or string path to output file
+            result_data: Dictionary of result data to write
+        """
+        import json
+        from pathlib import Path
+
+        output_file = Path(output_path)
+        output_file.parent.mkdir(parents=True, exist_ok=True)
+
+        with output_file.open("w") as f:
+            json.dump(result_data, f, indent=2, default=str)
+
+        console.print(f"\n[green]✓ Results saved to {output_file}[/green]")

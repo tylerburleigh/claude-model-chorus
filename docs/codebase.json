@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-20T23:51:42.779803Z",
+    "generated_at": "2025-11-20T23:53:12.884991Z",
     "languages": [
       "python"
     ],
@@ -10,8 +10,8 @@
   },
   "statistics": {
     "total_files": 106,
-    "total_lines": 47085,
-    "total_classes": 256,
+    "total_lines": 47232,
+    "total_classes": 257,
     "total_functions": 210,
     "avg_complexity": 4.92,
     "max_complexity": 55,
@@ -25,8 +25,8 @@
     "by_language": {
       "python": {
         "files": 106,
-        "lines": 47085,
-        "classes": 256,
+        "lines": 47232,
+        "classes": 257,
         "functions": 210,
         "avg_complexity": 4.92
       }
@@ -284,7 +284,8 @@
       "language": "python",
       "docstring": "CLI primitive classes for ModelChorus command-line interface.\n\nThis module provides reusable components that extract common patterns from\nCLI command implementations, reducing duplication and improving maintainability.",
       "classes": [
-        "ProviderResolver"
+        "ProviderResolver",
+        "WorkflowContext"
       ],
       "functions": [],
       "imports": [
@@ -292,7 +293,7 @@
         "rich.console.Console"
       ],
       "exports": [],
-      "lines": 167
+      "lines": 314
     },
     {
       "name": "setup",
@@ -2747,6 +2748,26 @@
       "imported_by": []
     },
     {
+      "name": "WorkflowContext",
+      "file": "model_chorus/src/model_chorus/cli/primitives.py",
+      "line": 170,
+      "language": "python",
+      "docstring": "Manages workflow execution context including config, prompt validation, and memory setup.\n\nExtracts common patterns of:\n1. Prompt validation (arg vs flag)\n2. Config resolution with workflow defaults\n3. Conversation memory initialization\n4. File context ingestion",
+      "bases": [],
+      "methods": [
+        "__init__",
+        "validate_and_get_prompt",
+        "resolve_config_defaults",
+        "create_memory",
+        "prepare_prompt_with_files"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
       "name": "WorkflowStep",
       "file": "model_chorus/src/model_chorus/core/base_workflow.py",
       "line": 25,
@@ -4816,6 +4837,15 @@
           ]
         },
         {
+          "instantiator": "create_memory",
+          "file": "model_chorus/src/model_chorus/cli/primitives.py",
+          "line": 299,
+          "context": [
+            "WorkflowContext",
+            "create_memory"
+          ]
+        },
+        {
           "instantiator": "start",
           "file": "model_chorus/src/model_chorus/cli/study_commands.py",
           "line": 267,
@@ -5136,7 +5166,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 61
+      "instantiation_count": 62
     },
     {
       "name": "GapType",
@@ -28025,7 +28055,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 342,
           "call_type": "method_call"
         },
@@ -28331,7 +28361,7 @@
         },
         {
           "name": "read",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 596,
           "call_type": "method_call"
         },
@@ -28433,7 +28463,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 703,
           "call_type": "method_call"
         },
@@ -28682,7 +28712,7 @@
         },
         {
           "name": "read",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 815,
           "call_type": "method_call"
         },
@@ -28718,25 +28748,25 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 837,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 840,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 842,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 844,
           "call_type": "method_call"
         },
@@ -28845,7 +28875,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 908,
           "call_type": "method_call"
         },

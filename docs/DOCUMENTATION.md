@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-20 18:51:42
+**Generated:** 2025-11-20 18:53:12
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 106
-- **Total Lines:** 47085
-- **Total Classes:** 256
+- **Total Lines:** 47232
+- **Total Classes:** 257
 - **Total Functions:** 210
 - **Avg Complexity:** 4.92
 - **Max Complexity:** 55
@@ -5709,6 +5709,29 @@ Attributes:
 **Methods:**
 - `validate_provider()`
 - `validate_providers()`
+
+---
+
+### `WorkflowContext`
+
+**Language:** python
+**Defined in:** `model_chorus/src/model_chorus/cli/primitives.py:170`
+
+**Description:**
+> Manages workflow execution context including config, prompt validation, and memory setup.
+
+Extracts common patterns of:
+1. Prompt validation (arg vs flag)
+2. Config resolution with workflow defaults
+3. Conversation memory initialization
+4. File context ingestion
+
+**Methods:**
+- `__init__()`
+- `validate_and_get_prompt()`
+- `resolve_config_defaults()`
+- `create_memory()`
+- `prepare_prompt_with_files()`
 
 ---
 
