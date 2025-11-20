@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-20T23:50:24.167582Z",
+    "generated_at": "2025-11-20T23:51:42.779803Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 105,
-    "total_lines": 46918,
-    "total_classes": 255,
+    "total_files": 106,
+    "total_lines": 47085,
+    "total_classes": 256,
     "total_functions": 210,
     "avg_complexity": 4.92,
     "max_complexity": 55,
@@ -24,9 +24,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 105,
-        "lines": 46918,
-        "classes": 255,
+        "files": 106,
+        "lines": 47085,
+        "classes": 256,
         "functions": 210,
         "avg_complexity": 4.92
       }
@@ -277,6 +277,22 @@
       ],
       "exports": [],
       "lines": 2243
+    },
+    {
+      "name": "primitives",
+      "file": "model_chorus/src/model_chorus/cli/primitives.py",
+      "language": "python",
+      "docstring": "CLI primitive classes for ModelChorus command-line interface.\n\nThis module provides reusable components that extract common patterns from\nCLI command implementations, reducing duplication and improving maintainability.",
+      "classes": [
+        "ProviderResolver"
+      ],
+      "functions": [],
+      "imports": [
+        "typing.TYPE_CHECKING",
+        "rich.console.Console"
+      ],
+      "exports": [],
+      "lines": 167
     },
     {
       "name": "setup",
@@ -2711,6 +2727,24 @@
       ],
       "imported_by": [],
       "instantiation_count": 1
+    },
+    {
+      "name": "ProviderResolver",
+      "file": "model_chorus/src/model_chorus/cli/primitives.py",
+      "line": 19,
+      "language": "python",
+      "docstring": "Handles provider initialization and fallback provider setup.\n\nExtracts the common pattern of:\n1. Initializing primary provider with error handling\n2. Loading and initializing fallback providers from config\n3. Providing helpful error messages for disabled/unavailable providers",
+      "bases": [],
+      "methods": [
+        "__init__",
+        "resolve_provider",
+        "resolve_fallback_providers"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
     },
     {
       "name": "WorkflowStep",
@@ -28297,7 +28331,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 596,
           "call_type": "method_call"
         },
@@ -28648,7 +28682,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 815,
           "call_type": "method_call"
         },
@@ -31680,7 +31714,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 189,
           "call_type": "method_call"
         },
@@ -31722,7 +31756,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 606,
           "call_type": "method_call"
         },
@@ -40177,6 +40211,10 @@
       "workflows.IdeateWorkflow",
       "workflows.ThinkDeepWorkflow",
       "study_commands.study_app"
+    ],
+    "model_chorus/src/model_chorus/cli/primitives.py": [
+      "typing.TYPE_CHECKING",
+      "rich.console.Console"
     ],
     "model_chorus/src/model_chorus/cli/setup.py": [
       "asyncio",

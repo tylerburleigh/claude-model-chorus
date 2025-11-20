@@ -2,7 +2,7 @@
   "spec_id": "architectural-improvements-2025-01-20-001",
   "title": "Model-Chorus Architectural Improvements",
   "generated": "2025-01-20T20:30:00Z",
-  "last_updated": "2025-11-20T23:50:53.223900Z",
+  "last_updated": "2025-11-20T23:52:19.969470Z",
   "description": "Comprehensive architectural refactoring to eliminate code duplication, improve maintainability, enhance reliability, and establish scalable foundations for future development.",
   "hierarchy": {
     "spec-root": {
@@ -17,7 +17,7 @@
         "phase-4"
       ],
       "total_tasks": 69,
-      "completed_tasks": 19,
+      "completed_tasks": 20,
       "metadata": {
         "objectives": [
           "Reduce code duplication by 30-40% through shared primitives",
@@ -687,7 +687,7 @@
         "depends": []
       },
       "total_tasks": 17,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "purpose": "Break down monolithic main.py into reusable command primitives",
         "risk_level": "medium-high",
@@ -772,7 +772,7 @@
         "depends": []
       },
       "total_tasks": 11,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {}
     },
     "task-2-2": {
@@ -796,7 +796,7 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/cli/primitives.py",
         "task_category": "implementation",
@@ -833,7 +833,7 @@
     "task-2-2-2": {
       "type": "subtask",
       "title": "Implement WorkflowContext class",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-2",
       "children": [],
       "dependencies": {
@@ -842,12 +842,18 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/cli/primitives.py",
         "task_category": "implementation",
         "estimated_hours": 2,
-        "description": "Extract memory initialization and thread management"
+        "description": "Extract memory initialization and thread management",
+        "started_at": "2025-11-20T23:51:29.561326Z",
+        "status_note": "Implementing WorkflowContext class",
+        "completed_at": "2025-11-20T23:52:19.961123Z",
+        "needs_journaling": false,
+        "actual_hours": 0.014,
+        "journaled_at": "2025-11-20T23:52:19.967452Z"
       }
     },
     "task-2-2-3": {
@@ -2259,7 +2265,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-20T20:38:01.399125Z",
-    "progress_percentage": 27,
+    "progress_percentage": 28,
     "current_phase": "phase-1"
   },
   "journal": [
@@ -2451,6 +2457,15 @@
       "content": "Implemented ProviderResolver class in model_chorus/src/model_chorus/cli/primitives.py.\n\nCLASS FEATURES:\n- resolve_provider(): Initializes primary provider with comprehensive error handling for ProviderDisabledError, ProviderUnavailableError, and generic exceptions\n- resolve_fallback_providers(): Loads and initializes fallback providers from config with graceful error handling\n- Verbose logging support for initialization steps\n- Helpful error messages with installation commands and configuration guidance\n\nEXTRACTED PATTERNS:\n- Provider initialization logic (~35 lines from each command)\n- Fallback provider setup (~30 lines from each command)\n- Error handling and user messaging\n\nFILES CREATED:\n- model_chorus/src/model_chorus/cli/primitives.py (165 lines)\n\nThis class eliminates ~140 lines of duplicated provider initialization code across 4 commands.",
       "metadata": {},
       "task_id": "task-2-2-1"
+    },
+    {
+      "timestamp": "2025-11-20T23:52:19.967440Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Implement WorkflowContext class",
+      "author": "claude-code",
+      "content": "Implemented WorkflowContext class in model_chorus/src/model_chorus/cli/primitives.py.\n\nCLASS FEATURES:\n- validate_and_get_prompt(): Validates prompt_arg vs prompt_flag, returns final prompt\n- resolve_config_defaults(): Resolves provider, system_prompt, and timeout from config with CLI overrides\n- create_memory(): Creates ConversationMemory instance for workflow\n- prepare_prompt_with_files(): Integrates file contents into prompt using ContextIngestionService\n\nEXTRACTED PATTERNS:\n- Prompt validation logic (~15 lines from each command)\n- Config resolution logic (~15-20 lines from each command)\n- Memory setup (~1 line from each command)\n- File context ingestion (~1 line from each command)\n\nFILES MODIFIED:\n- model_chorus/src/model_chorus/cli/primitives.py (now 315 lines total, added 145 lines)\n\nThis class eliminates ~150 lines of duplicated context/config code across 5 commands.",
+      "metadata": {},
+      "task_id": "task-2-2-2"
     }
   ]
 }

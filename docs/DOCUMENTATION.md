@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-20 18:50:24
+**Generated:** 2025-11-20 18:51:42
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 105
-- **Total Lines:** 46918
-- **Total Classes:** 255
+- **Total Files:** 106
+- **Total Lines:** 47085
+- **Total Classes:** 256
 - **Total Functions:** 210
 - **Avg Complexity:** 4.92
 - **Max Complexity:** 55
@@ -2341,6 +2341,26 @@ focusing on turning knowledge into actionable strategies.
 
 **Description:**
 > Raised when attempting to use a disabled provider.
+
+---
+
+### `ProviderResolver`
+
+**Language:** python
+**Defined in:** `model_chorus/src/model_chorus/cli/primitives.py:19`
+
+**Description:**
+> Handles provider initialization and fallback provider setup.
+
+Extracts the common pattern of:
+1. Initializing primary provider with error handling
+2. Loading and initializing fallback providers from config
+3. Providing helpful error messages for disabled/unavailable providers
+
+**Methods:**
+- `__init__()`
+- `resolve_provider()`
+- `resolve_fallback_providers()`
 
 ---
 
@@ -10200,6 +10220,11 @@ Returns:
 - `workflows.ConsensusWorkflow`
 - `workflows.IdeateWorkflow`
 - `workflows.ThinkDeepWorkflow`
+
+### `model_chorus/src/model_chorus/cli/primitives.py`
+
+- `rich.console.Console`
+- `typing.TYPE_CHECKING`
 
 ### `model_chorus/src/model_chorus/cli/setup.py`
 

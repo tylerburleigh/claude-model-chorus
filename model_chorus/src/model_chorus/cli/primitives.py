@@ -165,3 +165,150 @@ class ProviderResolver:
                     )
 
         return fallback_providers
+
+
+class WorkflowContext:
+    """
+    Manages workflow execution context including config, prompt validation, and memory setup.
+
+    Extracts common patterns of:
+    1. Prompt validation (arg vs flag)
+    2. Config resolution with workflow defaults
+    3. Conversation memory initialization
+    4. File context ingestion
+    """
+
+    def __init__(
+        self,
+        workflow_name: str,
+        config: "ModelChorusConfig",
+        construct_prompt_with_files_fn,
+    ):
+        """
+        Initialize WorkflowContext.
+
+        Args:
+            workflow_name: Name of workflow (e.g., "chat", "consensus")
+            config: ModelChorus configuration object
+            construct_prompt_with_files_fn: Function to construct prompts with files
+                (signature: construct_prompt_with_files(prompt: str, files: list[str] | None))
+        """
+        self.workflow_name = workflow_name
+        self.config = config
+        self.construct_prompt_with_files_fn = construct_prompt_with_files_fn
+
+    def validate_and_get_prompt(
+        self, prompt_arg: str | None, prompt_flag: str | None
+    ) -> str:
+        """
+        Validate prompt arguments and return the final prompt string.
+
+        Args:
+            prompt_arg: Positional prompt argument
+            prompt_flag: --prompt flag value
+
+        Returns:
+            The validated prompt string
+
+        Raises:
+            SystemExit: If prompt validation fails (via typer.Exit)
+        """
+        import typer
+
+        if prompt_arg is None and prompt_flag is None:
+            console.print(
+                "[red]Error: Prompt is required (provide as positional argument or use --prompt)[/red]"
+            )
+            raise typer.Exit(1)
+
+        if prompt_arg is not None and prompt_flag is not None:
+            console.print(
+                "[red]Error: Cannot specify prompt both as positional argument and --prompt flag[/red]"
+            )
+            raise typer.Exit(1)
+
+        prompt = prompt_arg or prompt_flag
+        assert prompt is not None  # Validated above
+        return prompt
+
+    def resolve_config_defaults(
+        self,
+        provider: str | None = None,
+        system: str | None = None,
+        timeout: float | None = None,
+        default_provider: str = "claude",
+    ) -> dict[str, str | float | None]:
+        """
+        Resolve configuration defaults for provider, system prompt, and timeout.
+
+        Args:
+            provider: CLI-provided provider name (overrides config)
+            system: CLI-provided system prompt (overrides config)
+            timeout: CLI-provided timeout (overrides config)
+            default_provider: Fallback provider if not in config
+
+        Returns:
+            Dictionary with resolved 'provider', 'system', and 'timeout' values
+
+        Raises:
+            SystemExit: If default provider is disabled (via typer.Exit)
+        """
+        import typer
+
+        resolved_provider = provider
+        if resolved_provider is None:
+            resolved_provider = self.config.get_workflow_default_provider(
+                self.workflow_name, default_provider
+            )
+            if resolved_provider is None:
+                console.print(
+                    f"[red]Error: Default provider for '{self.workflow_name}' workflow is disabled.[/red]"
+                )
+                console.print(
+                    "[yellow]Enable it in .claude/model_chorus_config.yaml or specify --provider[/yellow]"
+                )
+                raise typer.Exit(1)
+
+        resolved_system = system
+        if resolved_system is None:
+            resolved_system = self.config.get_workflow_default(
+                self.workflow_name, "system_prompt", None
+            )
+
+        resolved_timeout = timeout
+        if resolved_timeout is None:
+            resolved_timeout = self.config.get_workflow_default(
+                self.workflow_name, "timeout", 120.0
+            )
+
+        return {
+            "provider": resolved_provider,
+            "system": resolved_system,
+            "timeout": resolved_timeout,
+        }
+
+    def create_memory(self):
+        """
+        Create and return a new ConversationMemory instance.
+
+        Returns:
+            ConversationMemory instance for workflow use
+        """
+        from ..core.conversation import ConversationMemory
+
+        return ConversationMemory()
+
+    def prepare_prompt_with_files(
+        self, prompt: str, files: list[str] | None
+    ) -> str:
+        """
+        Prepare final prompt by ingesting file contents if provided.
+
+        Args:
+            prompt: Base prompt string
+            files: Optional list of file paths to include in context
+
+        Returns:
+            Final prompt with file contents prepended (if files provided)
+        """
+        return self.construct_prompt_with_files_fn(prompt, files)
