@@ -27,6 +27,7 @@ from ..workflows import ArgumentWorkflow, ChatWorkflow, ConsensusWorkflow, Conse
 from ..core.conversation import ConversationMemory
 from ..core.config import get_claude_config_loader
 from ..core.progress import set_progress_enabled
+from ..core.context_ingestion import ContextIngestionService, FileTooLargeError, BinaryFileError
 from model_chorus import __version__
 from .study_commands import study_app
 
@@ -905,18 +906,48 @@ def ideate(
         raise typer.Exit(1)
 
 def construct_prompt_with_files(prompt: str, files: Optional[List[str]]) -> str:
-    """Construct a prompt by prepending the content of files."""
+    """Construct a prompt by prepending the content of files using ContextIngestionService."""
     if not files:
         return prompt
 
+    # Create context ingestion service with default limits
+    service = ContextIngestionService()
+
     file_content = "The user has provided the following file(s) for context:\n\n"
+
     for file_path in files:
-        if not Path(file_path).exists():
+        try:
+            # Check if file can be read before attempting
+            can_read, reason = service.can_read_file(file_path)
+
+            if not can_read:
+                console.print(f"[red]Error: Cannot read {file_path}: {reason}[/red]")
+                raise typer.Exit(1)
+
+            # Get file info to warn about large files
+            info = service.get_file_info(file_path)
+            if info["exceeds_warn"]:
+                console.print(f"[yellow]Warning: {file_path} ({info['size_kb']:.1f} KB) is large and may consume significant context[/yellow]")
+
+            # Read the file using the service
+            content = service.read_file(file_path)
+            file_content += f"--- {file_path} ---\n{content}\n\n"
+
+        except FileNotFoundError:
             console.print(f"[red]Error: File not found: {file_path}[/red]")
             raise typer.Exit(1)
-        with open(file_path, "r") as f:
-            file_content += f"--- {file_path} ---\n{f.read()}\n\n"
-    
+        except FileTooLargeError as e:
+            console.print(f"[red]Error: {e}[/red]")
+            console.print(f"[yellow]Hint: File exceeds {service.max_file_size_kb} KB limit. Consider using a smaller file or splitting the content.[/yellow]")
+            raise typer.Exit(1)
+        except BinaryFileError as e:
+            console.print(f"[red]Error: {e}[/red]")
+            console.print(f"[yellow]Hint: Only text files are supported for context injection.[/yellow]")
+            raise typer.Exit(1)
+        except PermissionError as e:
+            console.print(f"[red]Error: {e}[/red]")
+            raise typer.Exit(1)
+
     return f"{prompt}\n\n{file_content}"
 
 

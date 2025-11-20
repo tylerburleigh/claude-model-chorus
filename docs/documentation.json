@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-20T21:10:24.696689Z",
+    "generated_at": "2025-11-20T21:15:05.733578Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 103,
-    "total_lines": 44848,
+    "total_lines": 44866,
     "total_classes": 247,
     "total_functions": 206,
     "avg_complexity": 4.94,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 103,
-        "lines": 44848,
+        "lines": 44866,
         "classes": 247,
         "functions": 206,
         "avg_complexity": 4.94
@@ -499,7 +499,7 @@
         "chardet"
       ],
       "exports": [],
-      "lines": 319
+      "lines": 337
     },
     {
       "name": "contradiction",
@@ -4265,7 +4265,7 @@
         {
           "instantiator": "read_file",
           "file": "model_chorus/src/model_chorus/core/context_ingestion.py",
-          "line": 103,
+          "line": 160,
           "context": [
             "ContextIngestionService",
             "read_file"
@@ -4290,18 +4290,18 @@
       "is_public": true,
       "instantiated_by": [
         {
-          "instantiator": "read_file",
+          "instantiator": "_detect_encoding",
           "file": "model_chorus/src/model_chorus/core/context_ingestion.py",
-          "line": 124,
+          "line": 126,
           "context": [
             "ContextIngestionService",
-            "read_file"
+            "_detect_encoding"
           ]
         },
         {
           "instantiator": "read_file",
           "file": "model_chorus/src/model_chorus/core/context_ingestion.py",
-          "line": 136,
+          "line": 181,
           "context": [
             "ContextIngestionService",
             "read_file"
@@ -4310,16 +4310,7 @@
         {
           "instantiator": "read_file_chunked",
           "file": "model_chorus/src/model_chorus/core/context_ingestion.py",
-          "line": 250,
-          "context": [
-            "ContextIngestionService",
-            "read_file_chunked"
-          ]
-        },
-        {
-          "instantiator": "read_file_chunked",
-          "file": "model_chorus/src/model_chorus/core/context_ingestion.py",
-          "line": 274,
+          "line": 292,
           "context": [
             "ContextIngestionService",
             "read_file_chunked"
@@ -4327,7 +4318,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 4
+      "instantiation_count": 3
     },
     {
       "name": "ContextIngestionService",
@@ -4338,6 +4329,8 @@
       "bases": [],
       "methods": [
         "__init__",
+        "_validate_path",
+        "_detect_encoding",
         "read_file",
         "get_file_info",
         "can_read_file",
