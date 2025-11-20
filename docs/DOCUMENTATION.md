@@ -1,14 +1,14 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-20 18:11:06
+**Generated:** 2025-11-20 18:39:22
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 105
-- **Total Lines:** 46939
+- **Total Lines:** 46912
 - **Total Classes:** 255
 - **Total Functions:** 210
 - **Avg Complexity:** 4.92
@@ -217,7 +217,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `Exception`
-**Defined in:** `model_chorus/src/model_chorus/core/context_ingestion.py:35`
+**Defined in:** `model_chorus/src/model_chorus/core/context_ingestion.py:34`
 
 **Description:**
 > Raised when attempting to read a binary file as text.
@@ -430,7 +430,7 @@ Example:
 ### `ClaudeConfigLoader`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/core/config.py:546`
+**Defined in:** `model_chorus/src/model_chorus/core/config.py:544`
 
 **Description:**
 > Loads and manages configuration from .claude/model_chorus_config.yaml.
@@ -583,7 +583,7 @@ Values:
 ### `ConfigLoader`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/core/config.py:131`
+**Defined in:** `model_chorus/src/model_chorus/core/config.py:129`
 
 **Description:**
 > Loads and manages ModelChorus configuration.
@@ -753,7 +753,7 @@ Attributes:
 ### `ContextIngestionService`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/core/context_ingestion.py:41`
+**Defined in:** `model_chorus/src/model_chorus/core/context_ingestion.py:40`
 
 **Description:**
 > Manages safe file reading for context injection.
@@ -1064,7 +1064,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `ModelProvider`
-**Defined in:** `model_chorus/examples/provider_integration.py:18`
+**Defined in:** `model_chorus/examples/provider_integration.py:19`
 
 **Description:**
 > Example provider implementation.
@@ -1084,7 +1084,7 @@ with an actual AI provider's API.
 
 **Language:** python
 **Inherits from:** `BaseWorkflow`
-**Defined in:** `model_chorus/examples/basic_workflow.py:19`
+**Defined in:** `model_chorus/examples/basic_workflow.py:20`
 
 **Description:**
 > Example workflow that demonstrates basic workflow structure.
@@ -1101,7 +1101,7 @@ needed to create a working workflow.
 
 **Language:** python
 **Inherits from:** `Exception`
-**Defined in:** `model_chorus/src/model_chorus/core/context_ingestion.py:29`
+**Defined in:** `model_chorus/src/model_chorus/core/context_ingestion.py:28`
 
 **Description:**
 > Raised when a file exceeds the maximum size limit.
@@ -1242,7 +1242,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `model_chorus/src/model_chorus/core/config.py:456`
+**Defined in:** `model_chorus/src/model_chorus/core/config.py:454`
 
 **Description:**
 > Default generation parameters for .claude/model_chorus_config.yaml.
@@ -1623,7 +1623,7 @@ Attributes:
 ### `InvestigationStateMachine`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/workflows/study/state_machine.py:16`
+**Defined in:** `model_chorus/src/model_chorus/workflows/study/state_machine.py:15`
 
 **Description:**
 > State machine for managing investigation phase transitions.
@@ -1744,7 +1744,7 @@ Example:
 ### `MemoryController`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/workflows/study/memory/controller.py:25`
+**Defined in:** `model_chorus/src/model_chorus/workflows/study/memory/controller.py:24`
 
 **Description:**
 > Unified controller for memory system operations.
@@ -1910,7 +1910,7 @@ Values:
 ### `MockGenerationRequest`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_role_orchestration.py:31`
+**Defined in:** `model_chorus/tests/test_role_orchestration.py:30`
 
 **Description:**
 > Mock GenerationRequest for testing.
@@ -1920,7 +1920,7 @@ Values:
 ### `MockGenerationResponse`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_role_orchestration.py:41`
+**Defined in:** `model_chorus/tests/test_role_orchestration.py:40`
 
 **Description:**
 > Mock GenerationResponse for testing.
@@ -1933,7 +1933,7 @@ Values:
 ### `MockProvider`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_role_orchestration.py:53`
+**Defined in:** `model_chorus/tests/test_role_orchestration.py:52`
 
 **Description:**
 > Mock provider for testing orchestration.
@@ -1959,7 +1959,7 @@ Values:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `model_chorus/src/model_chorus/core/config.py:82`
+**Defined in:** `model_chorus/src/model_chorus/core/config.py:80`
 
 **Description:**
 > Root configuration model for ModelChorus.
@@ -1975,7 +1975,7 @@ Values:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `model_chorus/src/model_chorus/core/config.py:508`
+**Defined in:** `model_chorus/src/model_chorus/core/config.py:506`
 
 **Description:**
 > Root configuration for .claude/model_chorus_config.yaml.
@@ -2326,7 +2326,7 @@ focusing on turning knowledge into actionable strategies.
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `model_chorus/src/model_chorus/core/config.py:464`
+**Defined in:** `model_chorus/src/model_chorus/core/config.py:462`
 
 **Description:**
 > Configuration for a provider in .claude/model_chorus_config.yaml.
@@ -2337,7 +2337,7 @@ focusing on turning knowledge into actionable strategies.
 
 **Language:** python
 **Inherits from:** `Exception`
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:45`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:46`
 
 **Description:**
 > Raised when attempting to use a disabled provider.
@@ -2534,7 +2534,7 @@ Example:
 ### `ShortTermCache`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/workflows/study/memory/cache.py:24`
+**Defined in:** `model_chorus/src/model_chorus/workflows/study/memory/cache.py:23`
 
 **Description:**
 > LRU-based in-memory cache for memory entries.
@@ -2833,7 +2833,7 @@ Example:
 ### `TestArchitecturalDecisionScenarios`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_thinkdeep_complex.py:26`
+**Defined in:** `model_chorus/tests/test_thinkdeep_complex.py:23`
 
 **Description:**
 > Test suite for architectural decision making scenarios.
@@ -2849,7 +2849,7 @@ Example:
 ### `TestArgumentCommand`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_cli_integration.py:71`
+**Defined in:** `model_chorus/tests/test_cli_integration.py:69`
 
 **Description:**
 > Test suite for 'argument' CLI command.
@@ -2870,7 +2870,7 @@ Example:
 ### `TestArgumentMapGeneration`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_argument_workflow.py:114`
+**Defined in:** `model_chorus/tests/test_argument_workflow.py:113`
 
 **Description:**
 > Test ArgumentMap generation.
@@ -2886,7 +2886,7 @@ Example:
 ### `TestArgumentWorkflowExecution`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_argument_workflow.py:244`
+**Defined in:** `model_chorus/tests/test_argument_workflow.py:243`
 
 **Description:**
 > Test ArgumentWorkflow execution.
@@ -2900,7 +2900,7 @@ Example:
 ### `TestArgumentWorkflowInitialization`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_argument_workflow.py:35`
+**Defined in:** `model_chorus/tests/test_argument_workflow.py:34`
 
 **Description:**
 > Test ArgumentWorkflow initialization.
@@ -2917,7 +2917,7 @@ Example:
 ### `TestBasicIdeation`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_ideate_workflow_integration.py:192`
+**Defined in:** `model_chorus/tests/test_ideate_workflow_integration.py:185`
 
 **Description:**
 > Test basic ideation methods.
@@ -2934,7 +2934,7 @@ Example:
 ### `TestBatchContradictionDetection`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_contradiction.py:352`
+**Defined in:** `model_chorus/tests/test_contradiction.py:353`
 
 **Description:**
 > Test batch contradiction detection.
@@ -2964,7 +2964,7 @@ Example:
 ### `TestBugInvestigationScenarios`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_thinkdeep_complex.py:281`
+**Defined in:** `model_chorus/tests/test_thinkdeep_complex.py:278`
 
 **Description:**
 > Test suite for systematic bug investigation scenarios.
@@ -2980,7 +2980,7 @@ Example:
 ### `TestCLIProvidersImplementInterface`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_providers/test_cli_interface.py:23`
+**Defined in:** `model_chorus/tests/test_providers/test_cli_interface.py:22`
 
 **Description:**
 > Test that all CLI providers implement the ModelProvider interface.
@@ -3006,7 +3006,7 @@ Example:
 ### `TestCanReadFile`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_context_ingestion.py:214`
+**Defined in:** `model_chorus/tests/test_context_ingestion.py:216`
 
 **Description:**
 > Test file readability checks.
@@ -3021,7 +3021,7 @@ Example:
 ### `TestChatErrorHandling`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_chat_integration.py:266`
+**Defined in:** `model_chorus/tests/test_chat_integration.py:265`
 
 **Description:**
 > Test error handling in chat workflow.
@@ -3036,7 +3036,7 @@ Example:
 ### `TestChatThreadManagement`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_chat_integration.py:325`
+**Defined in:** `model_chorus/tests/test_chat_integration.py:324`
 
 **Description:**
 > Test conversation thread management.
@@ -3050,7 +3050,7 @@ Example:
 ### `TestChatWorkflowInitialization`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_chat_workflow.py:28`
+**Defined in:** `model_chorus/tests/test_chat_workflow.py:25`
 
 **Description:**
 > Test ChatWorkflow initialization.
@@ -3067,7 +3067,7 @@ Example:
 ### `TestCitation`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_citation.py:19`
+**Defined in:** `model_chorus/tests/test_citation.py:20`
 
 **Description:**
 > Test suite for Citation model.
@@ -3131,7 +3131,7 @@ Example:
 ### `TestCitationIntegration`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_citation.py:459`
+**Defined in:** `model_chorus/tests/test_citation.py:460`
 
 **Description:**
 > Test integration scenarios for citation tracking.
@@ -3163,7 +3163,7 @@ Example:
 ### `TestCitationMap`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_citation.py:209`
+**Defined in:** `model_chorus/tests/test_citation.py:210`
 
 **Description:**
 > Test suite for CitationMap model.
@@ -3269,7 +3269,7 @@ Example:
 ### `TestClaudeProvider`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_claude_provider.py:13`
+**Defined in:** `model_chorus/tests/test_claude_provider.py:14`
 
 **Description:**
 > Test suite for ClaudeProvider.
@@ -3310,7 +3310,7 @@ Example:
 ### `TestClusterResult`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_clustering.py:34`
+**Defined in:** `model_chorus/tests/test_clustering.py:35`
 
 **Description:**
 > Test suite for ClusterResult dataclass.
@@ -3339,7 +3339,7 @@ Example:
 ### `TestClusteringIntegration`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_clustering.py:454`
+**Defined in:** `model_chorus/tests/test_clustering.py:455`
 
 **Description:**
 > Integration tests that verify clustering with real sentence-transformers (if available).
@@ -3393,7 +3393,7 @@ Example:
 ### `TestCommandIntegration`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_cli_integration.py:723`
+**Defined in:** `model_chorus/tests/test_cli_integration.py:721`
 
 **Description:**
 > Test suite for cross-command integration.
@@ -3408,7 +3408,7 @@ Example:
 ### `TestCompleteIdeation`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_ideate_workflow.py:353`
+**Defined in:** `model_chorus/tests/test_ideate_workflow.py:352`
 
 **Description:**
 > Test complete ideation workflow (divergent + convergent).
@@ -3422,7 +3422,7 @@ Example:
 ### `TestCompleteIdeation`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_ideate_workflow_integration.py:720`
+**Defined in:** `model_chorus/tests/test_ideate_workflow_integration.py:713`
 
 **Description:**
 > Test complete ideation workflow.
@@ -3451,7 +3451,7 @@ Example:
 ### `TestComplexMultiStepReasoning`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_thinkdeep_complex.py:678`
+**Defined in:** `model_chorus/tests/test_thinkdeep_complex.py:675`
 
 **Description:**
 > Test suite for complex multi-step reasoning scenarios.
@@ -3467,7 +3467,7 @@ Example:
 ### `TestComprehensiveGapDetection`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_gap_analysis.py:360`
+**Defined in:** `model_chorus/tests/test_gap_analysis.py:361`
 
 **Description:**
 > Test comprehensive gap detection combining all types.
@@ -3482,7 +3482,7 @@ Example:
 ### `TestConcurrentConversationHandling`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_concurrent_conversations.py:26`
+**Defined in:** `model_chorus/tests/test_concurrent_conversations.py:24`
 
 **Description:**
 > Test suite for concurrent conversation handling.
@@ -3503,7 +3503,7 @@ scenarios with proper thread isolation and performance.
 ### `TestConfidenceLevel`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_thinkdeep_models.py:25`
+**Defined in:** `model_chorus/tests/test_thinkdeep_models.py:26`
 
 **Description:**
 > Test suite for ConfidenceLevel enum.
@@ -3519,7 +3519,7 @@ scenarios with proper thread isolation and performance.
 ### `TestConfidenceLevelProgression`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/workflows/study/test_state_machine.py:265`
+**Defined in:** `model_chorus/tests/workflows/study/test_state_machine.py:266`
 
 **Description:**
 > Test suite for confidence level progression logic.
@@ -3545,7 +3545,7 @@ scenarios with proper thread isolation and performance.
 ### `TestConfidenceProgression`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_thinkdeep_workflow.py:1359`
+**Defined in:** `model_chorus/tests/test_thinkdeep_workflow.py:1357`
 
 **Description:**
 > Test suite for confidence level progression in ThinkDeepWorkflow.
@@ -3608,7 +3608,7 @@ scenarios with proper thread isolation and performance.
 ### `TestConsensusThinkDeepChatChaining`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_workflow_integration_chaining.py:24`
+**Defined in:** `model_chorus/tests/test_workflow_integration_chaining.py:22`
 
 **Description:**
 > Test suite for consensus → thinkdeep → chat workflow integration.
@@ -3631,7 +3631,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestConsensusWorkflow`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_consensus_workflow.py:12`
+**Defined in:** `model_chorus/tests/test_consensus_workflow.py:13`
 
 **Description:**
 > Test suite for ConsensusWorkflow.
@@ -3650,7 +3650,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestContextIngestionServiceInitialization`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_context_ingestion.py:20`
+**Defined in:** `model_chorus/tests/test_context_ingestion.py:22`
 
 **Description:**
 > Test service initialization and configuration.
@@ -3667,7 +3667,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestContradictionDetection`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_contradiction.py:290`
+**Defined in:** `model_chorus/tests/test_contradiction.py:291`
 
 **Description:**
 > Test end-to-end contradiction detection.
@@ -3682,7 +3682,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestContradictionExplanation`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_contradiction.py:120`
+**Defined in:** `model_chorus/tests/test_contradiction.py:121`
 
 **Description:**
 > Test contradiction explanation generation.
@@ -3698,7 +3698,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestContradictionModel`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_contradiction.py:204`
+**Defined in:** `model_chorus/tests/test_contradiction.py:205`
 
 **Description:**
 > Test Contradiction Pydantic model.
@@ -3715,7 +3715,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestConvergentAnalysis`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_ideate_workflow.py:192`
+**Defined in:** `model_chorus/tests/test_ideate_workflow.py:191`
 
 **Description:**
 > Test convergent analysis functionality.
@@ -3731,7 +3731,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestConvergentAnalysis`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_ideate_workflow_integration.py:361`
+**Defined in:** `model_chorus/tests/test_ideate_workflow_integration.py:354`
 
 **Description:**
 > Test convergent analysis functionality.
@@ -3749,7 +3749,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestConversationContinuation`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_chat_workflow.py:123`
+**Defined in:** `model_chorus/tests/test_chat_workflow.py:120`
 
 **Description:**
 > Test conversation continuation functionality.
@@ -3765,7 +3765,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestConversationInitiation`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_chat_workflow.py:67`
+**Defined in:** `model_chorus/tests/test_chat_workflow.py:64`
 
 **Description:**
 > Test conversation creation and initiation.
@@ -3781,7 +3781,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestConversationMemory`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_conversation.py:22`
+**Defined in:** `model_chorus/tests/test_conversation.py:18`
 
 **Description:**
 > Test suite for ConversationMemory class.
@@ -3805,7 +3805,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestConversationThreading`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_argument_workflow.py:376`
+**Defined in:** `model_chorus/tests/test_argument_workflow.py:375`
 
 **Description:**
 > Test conversation threading and continuation.
@@ -3819,7 +3819,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestConversationTracking`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_chat_workflow.py:294`
+**Defined in:** `model_chorus/tests/test_chat_workflow.py:291`
 
 **Description:**
 > Test conversation history and tracking.
@@ -3851,7 +3851,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestCriticPersona`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/workflows/study/test_personas.py:319`
+**Defined in:** `model_chorus/tests/workflows/study/test_personas.py:320`
 
 **Description:**
 > Test suite for CriticPersona.
@@ -3871,7 +3871,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestCursorAgentProvider`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_cursor_agent_provider.py:13`
+**Defined in:** `model_chorus/tests/test_cursor_agent_provider.py:14`
 
 **Description:**
 > Test suite for CursorAgentProvider.
@@ -3899,7 +3899,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestCustomSizeLimits`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_context_ingestion.py:452`
+**Defined in:** `model_chorus/tests/test_context_ingestion.py:454`
 
 **Description:**
 > Test service with custom size limits.
@@ -3946,7 +3946,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestElaboration`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_ideate_workflow_integration.py:619`
+**Defined in:** `model_chorus/tests/test_ideate_workflow_integration.py:612`
 
 **Description:**
 > Test elaboration functionality.
@@ -3980,7 +3980,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestEndToEndIntegration`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_thinkdeep_workflow.py:1917`
+**Defined in:** `model_chorus/tests/test_thinkdeep_workflow.py:1915`
 
 **Description:**
 > End-to-end integration tests for complete investigation scenarios.
@@ -3996,7 +3996,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestEnums`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_role_orchestration.py:753`
+**Defined in:** `model_chorus/tests/test_role_orchestration.py:752`
 
 **Description:**
 > Test suite for enum classes.
@@ -4010,7 +4010,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestErrorHandling`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_argument_workflow.py:456`
+**Defined in:** `model_chorus/tests/test_argument_workflow.py:455`
 
 **Description:**
 > Test error handling.
@@ -4024,7 +4024,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestErrorHandling`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_chat_workflow.py:339`
+**Defined in:** `model_chorus/tests/test_chat_workflow.py:336`
 
 **Description:**
 > Test error handling in ChatWorkflow.
@@ -4038,7 +4038,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestErrorHandling`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_cli_integration.py:647`
+**Defined in:** `model_chorus/tests/test_cli_integration.py:645`
 
 **Description:**
 > Test suite for error handling and edge cases.
@@ -4055,7 +4055,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestErrorHandling`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_ideate_workflow_integration.py:793`
+**Defined in:** `model_chorus/tests/test_ideate_workflow_integration.py:786`
 
 **Description:**
 > Test error handling and edge cases.
@@ -4071,7 +4071,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestExpertProviderIntegration`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_thinkdeep_expert_validation.py:27`
+**Defined in:** `model_chorus/tests/test_thinkdeep_expert_validation.py:24`
 
 **Description:**
 > Test suite for expert provider integration in ThinkDeepWorkflow.
@@ -4090,7 +4090,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestExpertValidationErrorHandling`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_thinkdeep_expert_validation.py:495`
+**Defined in:** `model_chorus/tests/test_thinkdeep_expert_validation.py:492`
 
 **Description:**
 > Test suite for error handling in expert validation.
@@ -4108,7 +4108,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestExpertValidationResultHandling`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_thinkdeep_expert_validation.py:357`
+**Defined in:** `model_chorus/tests/test_thinkdeep_expert_validation.py:354`
 
 **Description:**
 > Test suite for handling expert validation results.
@@ -4125,7 +4125,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestExpertValidationTriggering`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_thinkdeep_expert_validation.py:117`
+**Defined in:** `model_chorus/tests/test_thinkdeep_expert_validation.py:114`
 
 **Description:**
 > Test suite for expert validation triggering logic.
@@ -4144,7 +4144,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestExpertValidationWithHypotheses`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_thinkdeep_expert_validation.py:678`
+**Defined in:** `model_chorus/tests/test_thinkdeep_expert_validation.py:672`
 
 **Description:**
 > Test suite for expert validation interaction with hypotheses.
@@ -4161,7 +4161,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestFallbackRouting`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/workflows/study/test_routing.py:158`
+**Defined in:** `model_chorus/tests/workflows/study/test_routing.py:159`
 
 **Description:**
 > Test fallback routing when context analysis fails.
@@ -4176,7 +4176,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestFileContext`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_chat_workflow.py:205`
+**Defined in:** `model_chorus/tests/test_chat_workflow.py:202`
 
 **Description:**
 > Test file context handling.
@@ -4210,7 +4210,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestGapModel`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_gap_analysis.py:22`
+**Defined in:** `model_chorus/tests/test_gap_analysis.py:23`
 
 **Description:**
 > Test Gap Pydantic model.
@@ -4226,7 +4226,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestGapRecommendations`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_gap_analysis.py:157`
+**Defined in:** `model_chorus/tests/test_gap_analysis.py:158`
 
 **Description:**
 > Test gap recommendation generation.
@@ -4243,7 +4243,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestGeminiIntegration`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_gemini_integration.py:21`
+**Defined in:** `model_chorus/tests/test_gemini_integration.py:23`
 
 **Description:**
 > Integration tests for Gemini provider.
@@ -4265,7 +4265,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestGetFileInfo`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_context_ingestion.py:169`
+**Defined in:** `model_chorus/tests/test_context_ingestion.py:171`
 
 **Description:**
 > Test file metadata retrieval.
@@ -4297,7 +4297,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestHypothesis`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_thinkdeep_models.py:74`
+**Defined in:** `model_chorus/tests/test_thinkdeep_models.py:75`
 
 **Description:**
 > Test suite for Hypothesis model.
@@ -4318,7 +4318,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestHypothesisEvolution`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_thinkdeep_workflow.py:784`
+**Defined in:** `model_chorus/tests/test_thinkdeep_workflow.py:782`
 
 **Description:**
 > Test suite for hypothesis evolution in ThinkDeepWorkflow.
@@ -4343,7 +4343,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestIdeaClustering`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_ideate_workflow.py:294`
+**Defined in:** `model_chorus/tests/test_ideate_workflow.py:293`
 
 **Description:**
 > Test idea clustering functionality.
@@ -4356,7 +4356,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestIdeaExtraction`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_ideate_workflow.py:259`
+**Defined in:** `model_chorus/tests/test_ideate_workflow.py:258`
 
 **Description:**
 > Test idea extraction from brainstorming results.
@@ -4370,7 +4370,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestIdeaScoring`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_ideate_workflow.py:321`
+**Defined in:** `model_chorus/tests/test_ideate_workflow.py:320`
 
 **Description:**
 > Test idea scoring functionality.
@@ -4383,7 +4383,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestIdeateCommand`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_cli_integration.py:295`
+**Defined in:** `model_chorus/tests/test_cli_integration.py:293`
 
 **Description:**
 > Test suite for 'ideate' CLI command.
@@ -4401,7 +4401,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestIdeateWorkflowInitialization`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_ideate_workflow.py:167`
+**Defined in:** `model_chorus/tests/test_ideate_workflow.py:166`
 
 **Description:**
 > Test IdeateWorkflow initialization.
@@ -4417,7 +4417,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestIdeateWorkflowInitialization`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_ideate_workflow_integration.py:155`
+**Defined in:** `model_chorus/tests/test_ideate_workflow_integration.py:148`
 
 **Description:**
 > Test IdeateWorkflow initialization.
@@ -4434,7 +4434,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestIntegration`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_integration.py:17`
+**Defined in:** `model_chorus/tests/test_integration.py:18`
 
 **Description:**
 > Integration test suite.
@@ -4451,7 +4451,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestInteractiveSelection`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_ideate_workflow_integration.py:529`
+**Defined in:** `model_chorus/tests/test_ideate_workflow_integration.py:522`
 
 **Description:**
 > Test interactive selection functionality.
@@ -4471,7 +4471,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestInvestigationStateMachineTransitions`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/workflows/study/test_state_machine.py:13`
+**Defined in:** `model_chorus/tests/workflows/study/test_state_machine.py:14`
 
 **Description:**
 > Test suite for state machine phase transitions.
@@ -4500,7 +4500,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestInvestigationStep`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_thinkdeep_models.py:181`
+**Defined in:** `model_chorus/tests/test_thinkdeep_models.py:182`
 
 **Description:**
 > Test suite for InvestigationStep model.
@@ -4520,7 +4520,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestInvestigationStepExecution`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_thinkdeep_workflow.py:29`
+**Defined in:** `model_chorus/tests/test_thinkdeep_workflow.py:27`
 
 **Description:**
 > Test suite for investigation step execution in ThinkDeepWorkflow.
@@ -4567,7 +4567,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestLogicalGapDetection`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_gap_analysis.py:260`
+**Defined in:** `model_chorus/tests/test_gap_analysis.py:261`
 
 **Description:**
 > Test detection of logical gaps.
@@ -4583,7 +4583,7 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 ### `TestMemoryManagement`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_memory_management.py:23`
+**Defined in:** `model_chorus/tests/test_memory_management.py:21`
 
 **Description:**
 > Test suite for memory management with long conversations.
@@ -4604,7 +4604,7 @@ with long-running conversations with many messages.
 ### `TestMissingEvidenceDetection`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_gap_analysis.py:202`
+**Defined in:** `model_chorus/tests/test_gap_analysis.py:203`
 
 **Description:**
 > Test detection of missing evidence gaps.
@@ -4620,7 +4620,7 @@ with long-running conversations with many messages.
 ### `TestModelIntegration`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_thinkdeep_models.py:552`
+**Defined in:** `model_chorus/tests/test_thinkdeep_models.py:553`
 
 **Description:**
 > Test integration scenarios using multiple models together.
@@ -4635,7 +4635,7 @@ with long-running conversations with many messages.
 ### `TestModelRole`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_role_orchestration.py:101`
+**Defined in:** `model_chorus/tests/test_role_orchestration.py:100`
 
 **Description:**
 > Test suite for ModelRole class.
@@ -4661,7 +4661,7 @@ with long-running conversations with many messages.
 ### `TestMultiProviderChat`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_chat_integration.py:122`
+**Defined in:** `model_chorus/tests/test_chat_integration.py:121`
 
 **Description:**
 > Test chat functionality across multiple providers.
@@ -4677,7 +4677,7 @@ with long-running conversations with many messages.
 ### `TestOrchestrationResult`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_role_orchestration.py:246`
+**Defined in:** `model_chorus/tests/test_role_orchestration.py:245`
 
 **Description:**
 > Test suite for OrchestrationResult dataclass.
@@ -4691,7 +4691,7 @@ with long-running conversations with many messages.
 ### `TestParallelBrainstorming`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_ideate_workflow_integration.py:284`
+**Defined in:** `model_chorus/tests/test_ideate_workflow_integration.py:277`
 
 **Description:**
 > Test parallel brainstorming functionality.
@@ -4706,7 +4706,7 @@ with long-running conversations with many messages.
 ### `TestPathValidation`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_context_ingestion.py:422`
+**Defined in:** `model_chorus/tests/test_context_ingestion.py:424`
 
 **Description:**
 > Test path validation and normalization.
@@ -4720,7 +4720,7 @@ with long-running conversations with many messages.
 ### `TestPersona`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/workflows/study/test_personas.py:78`
+**Defined in:** `model_chorus/tests/workflows/study/test_personas.py:79`
 
 **Description:**
 > Test suite for Persona base class.
@@ -4738,7 +4738,7 @@ with long-running conversations with many messages.
 ### `TestPersonaFactories`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/workflows/study/test_personas.py:451`
+**Defined in:** `model_chorus/tests/workflows/study/test_personas.py:452`
 
 **Description:**
 > Test suite for persona factory functions.
@@ -4758,7 +4758,7 @@ with long-running conversations with many messages.
 ### `TestPersonaIntegration`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/workflows/study/test_personas.py:528`
+**Defined in:** `model_chorus/tests/workflows/study/test_personas.py:529`
 
 **Description:**
 > Integration tests for persona system.
@@ -4775,7 +4775,7 @@ with long-running conversations with many messages.
 ### `TestPersonaRegistry`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/workflows/study/test_personas.py:134`
+**Defined in:** `model_chorus/tests/workflows/study/test_personas.py:135`
 
 **Description:**
 > Test suite for PersonaRegistry.
@@ -4794,7 +4794,7 @@ with long-running conversations with many messages.
 ### `TestPersonaResponse`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/workflows/study/test_personas.py:30`
+**Defined in:** `model_chorus/tests/workflows/study/test_personas.py:31`
 
 **Description:**
 > Test suite for PersonaResponse dataclass.
@@ -4811,7 +4811,7 @@ with long-running conversations with many messages.
 ### `TestPlannerPersona`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/workflows/study/test_personas.py:392`
+**Defined in:** `model_chorus/tests/workflows/study/test_personas.py:393`
 
 **Description:**
 > Test suite for PlannerPersona.
@@ -4830,7 +4830,7 @@ with long-running conversations with many messages.
 ### `TestPolarityOpposition`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_contradiction.py:21`
+**Defined in:** `model_chorus/tests/test_contradiction.py:22`
 
 **Description:**
 > Test polarity opposition detection.
@@ -4846,7 +4846,7 @@ with long-running conversations with many messages.
 ### `TestPromptFraming`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_ideate_workflow_integration.py:899`
+**Defined in:** `model_chorus/tests/test_ideate_workflow_integration.py:892`
 
 **Description:**
 > Test prompt framing methods.
@@ -4860,7 +4860,7 @@ with long-running conversations with many messages.
 ### `TestReadFile`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_context_ingestion.py:53`
+**Defined in:** `model_chorus/tests/test_context_ingestion.py:55`
 
 **Description:**
 > Test basic file reading functionality.
@@ -4880,7 +4880,7 @@ with long-running conversations with many messages.
 ### `TestReadFileChunked`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_context_ingestion.py:253`
+**Defined in:** `model_chorus/tests/test_context_ingestion.py:255`
 
 **Description:**
 > Test chunked file reading.
@@ -4897,7 +4897,7 @@ with long-running conversations with many messages.
 ### `TestReadFileLines`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_context_ingestion.py:338`
+**Defined in:** `model_chorus/tests/test_context_ingestion.py:340`
 
 **Description:**
 > Test line-by-line file reading.
@@ -4914,7 +4914,7 @@ with long-running conversations with many messages.
 ### `TestRealisticScenarios`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_contradiction.py:401`
+**Defined in:** `model_chorus/tests/test_contradiction.py:402`
 
 **Description:**
 > Test realistic contradiction scenarios.
@@ -4928,7 +4928,7 @@ with long-running conversations with many messages.
 ### `TestRealisticScenarios`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_gap_analysis.py:450`
+**Defined in:** `model_chorus/tests/test_gap_analysis.py:451`
 
 **Description:**
 > Test realistic gap detection scenarios.
@@ -4943,7 +4943,7 @@ with long-running conversations with many messages.
 ### `TestReconciliationSuggestions`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_contradiction.py:173`
+**Defined in:** `model_chorus/tests/test_contradiction.py:174`
 
 **Description:**
 > Test reconciliation suggestion generation.
@@ -4959,7 +4959,7 @@ with long-running conversations with many messages.
 ### `TestResearcherPersona`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/workflows/study/test_personas.py:215`
+**Defined in:** `model_chorus/tests/workflows/study/test_personas.py:216`
 
 **Description:**
 > Test suite for ResearcherPersona.
@@ -4982,7 +4982,7 @@ with long-running conversations with many messages.
 ### `TestRoleCreation`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_argument_workflow.py:74`
+**Defined in:** `model_chorus/tests/test_argument_workflow.py:73`
 
 **Description:**
 > Test role creation methods.
@@ -4997,7 +4997,7 @@ with long-running conversations with many messages.
 ### `TestRoleCreation`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_ideate_workflow_integration.py:252`
+**Defined in:** `model_chorus/tests/test_ideate_workflow_integration.py:245`
 
 **Description:**
 > Test brainstormer role creation.
@@ -5012,7 +5012,7 @@ with long-running conversations with many messages.
 ### `TestRoleOrchestrator`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_role_orchestration.py:287`
+**Defined in:** `model_chorus/tests/test_role_orchestration.py:286`
 
 **Description:**
 > Test suite for RoleOrchestrator class.
@@ -5051,7 +5051,7 @@ with long-running conversations with many messages.
 ### `TestRoutingHistory`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/workflows/study/test_routing.py:269`
+**Defined in:** `model_chorus/tests/workflows/study/test_routing.py:270`
 
 **Description:**
 > Test routing history tracking.
@@ -5066,7 +5066,7 @@ with long-running conversations with many messages.
 ### `TestRoutingSkillInvocation`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/workflows/study/test_routing.py:19`
+**Defined in:** `model_chorus/tests/workflows/study/test_routing.py:20`
 
 **Description:**
 > Test routing skill invocation and JSON output.
@@ -5082,7 +5082,7 @@ with long-running conversations with many messages.
 ### `TestSemanticClustering`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_clustering.py:74`
+**Defined in:** `model_chorus/tests/test_clustering.py:75`
 
 **Description:**
 > Test suite for SemanticClustering class.
@@ -5123,7 +5123,7 @@ with long-running conversations with many messages.
 ### `TestSeverityAssessment`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_contradiction.py:66`
+**Defined in:** `model_chorus/tests/test_contradiction.py:67`
 
 **Description:**
 > Test contradiction severity assessment.
@@ -5140,7 +5140,7 @@ with long-running conversations with many messages.
 ### `TestSeverityAssessment`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_gap_analysis.py:91`
+**Defined in:** `model_chorus/tests/test_gap_analysis.py:92`
 
 **Description:**
 > Test gap severity assessment logic.
@@ -5171,7 +5171,7 @@ with long-running conversations with many messages.
 ### `TestStateManager`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_state.py:23`
+**Defined in:** `model_chorus/tests/test_state.py:22`
 
 **Description:**
 > Test suite for StateManager class.
@@ -5212,7 +5212,7 @@ with long-running conversations with many messages.
 ### `TestStateManagerExportImportRoundtrip`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_state.py:600`
+**Defined in:** `model_chorus/tests/test_state.py:599`
 
 **Description:**
 > Test complete export/import workflow.
@@ -5225,7 +5225,7 @@ with long-running conversations with many messages.
 ### `TestStateManagerFileRecovery`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_state.py:635`
+**Defined in:** `model_chorus/tests/test_state.py:634`
 
 **Description:**
 > Test state recovery after simulated process restart.
@@ -5238,7 +5238,7 @@ with long-running conversations with many messages.
 ### `TestStateTransitionIntegration`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/workflows/study/test_state_machine.py:377`
+**Defined in:** `model_chorus/tests/workflows/study/test_state_machine.py:378`
 
 **Description:**
 > Integration tests for state transitions with confidence.
@@ -5307,7 +5307,7 @@ with long-running conversations with many messages.
 ### `TestStudyWorkflowIntegration`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/workflows/study/test_routing.py:344`
+**Defined in:** `model_chorus/tests/workflows/study/test_routing.py:345`
 
 **Description:**
 > Test PersonaRouter integration with StudyWorkflow.
@@ -5437,7 +5437,7 @@ with long-running conversations with many messages.
 ### `TestSystemPrompts`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_ideate_workflow_integration.py:857`
+**Defined in:** `model_chorus/tests/test_ideate_workflow_integration.py:850`
 
 **Description:**
 > Test system prompt generation.
@@ -5454,7 +5454,7 @@ with long-running conversations with many messages.
 ### `TestThinkDeepCommand`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_cli_integration.py:457`
+**Defined in:** `model_chorus/tests/test_cli_integration.py:455`
 
 **Description:**
 > Test suite for 'thinkdeep' CLI command.
@@ -5470,7 +5470,7 @@ with long-running conversations with many messages.
 ### `TestThinkDeepState`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_thinkdeep_models.py:299`
+**Defined in:** `model_chorus/tests/test_thinkdeep_models.py:300`
 
 **Description:**
 > Test suite for ThinkDeepState model.
@@ -5491,7 +5491,7 @@ with long-running conversations with many messages.
 ### `TestUnsupportedClaimsDetection`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_gap_analysis.py:314`
+**Defined in:** `model_chorus/tests/test_gap_analysis.py:315`
 
 **Description:**
 > Test batch detection of unsupported claims.
@@ -5681,7 +5681,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `model_chorus/src/model_chorus/core/config.py:472`
+**Defined in:** `model_chorus/src/model_chorus/core/config.py:470`
 
 **Description:**
 > Workflow configuration for .claude/model_chorus_config.yaml.
@@ -5826,7 +5826,7 @@ Attributes:
 ### `_check_sentence_transformers_available() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_clustering.py:24`
+**Defined in:** `model_chorus/tests/test_clustering.py:25`
 **Complexity:** 2
 
 **Description:**
@@ -5866,7 +5866,7 @@ Returns:
 ### `_config_init(verbose) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:2059`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:2066`
 **Complexity:** 4
 
 **Description:**
@@ -5880,7 +5880,7 @@ Returns:
 ### `_config_show(verbose) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1963`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1970`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -5894,7 +5894,7 @@ Returns:
 ### `_config_validate(verbose) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:2026`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:2033`
 **Complexity:** 4
 
 **Description:**
@@ -5908,7 +5908,7 @@ Returns:
 ### `_create_smart_mock_provider(provider_name, model_name, stop_reason) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/conftest.py:186`
+**Defined in:** `model_chorus/tests/conftest.py:183`
 ⚠️ **Complexity:** 37 (High)
 
 **Description:**
@@ -5929,7 +5929,7 @@ This mock provider can:
 ### `_find_project_root(start_path) -> Path`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:59`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:60`
 **Complexity:** 4
 
 **Description:**
@@ -6009,7 +6009,7 @@ Returns:
 ### `_format_path_for_display(path) -> str`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:77`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:78`
 **Complexity:** 2
 
 **Description:**
@@ -6079,7 +6079,7 @@ Returns:
 ### `_make_provider(name, response_text) -> AsyncMock`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_consensus_provider_models.py:14`
+**Defined in:** `model_chorus/tests/test_consensus_provider_models.py:13`
 **Complexity:** 1
 
 **Parameters:**
@@ -6108,7 +6108,7 @@ Returns:
 
 ---
 
-### `_select_persona_by_phase_and_state(phase, findings_count, has_questions, prior_persona) -> tuple[str, str, List[str]]`
+### `_select_persona_by_phase_and_state(phase, findings_count, has_questions, prior_persona) -> tuple[str, str, list[str]]`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/workflows/study/context_analysis.py:197`
@@ -6136,11 +6136,11 @@ Returns:
 - `phase`: str
 - `findings_count`: int
 - `has_questions`: bool
-- `prior_persona`: Optional[str]
+- `prior_persona`: str | None
 
 ---
 
-### `add_permissions(project_root) -> Dict[str, Any]`
+### `add_permissions(project_root) -> dict[str, Any]`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/cli/setup.py:856`
@@ -6156,7 +6156,7 @@ Returns:
     Dict with result
 
 **Parameters:**
-- `project_root`: Optional[Path]
+- `project_root`: Path | None
 
 ---
 
@@ -6200,7 +6200,7 @@ Example:
 
 ---
 
-### `add_to_gitignore(project_root) -> Dict[str, Any]`
+### `add_to_gitignore(project_root) -> dict[str, Any]`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/cli/setup.py:789`
@@ -6216,7 +6216,7 @@ Returns:
     Dict with result
 
 **Parameters:**
-- `project_root`: Optional[Path]
+- `project_root`: Path | None
 
 ---
 
@@ -6259,7 +6259,7 @@ Returns:
 ### `argument(prompt_arg, prompt_flag, provider, continuation_id, files, system, timeout, output, verbose, skip_provider_check) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:516`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:525`
 ⚠️ **Complexity:** 35 (High)
 
 **Decorators:** `@app.command()`
@@ -6284,14 +6284,14 @@ Example:
     model-chorus argument "Review this proposal" -f proposal.md -f data.csv
 
 **Parameters:**
-- `prompt_arg`: Optional[str]
-- `prompt_flag`: Optional[str]
-- `provider`: Optional[str]
-- `continuation_id`: Optional[str]
-- `files`: Optional[List[str]]
-- `system`: Optional[str]
-- `timeout`: Optional[float]
-- `output`: Optional[Path]
+- `prompt_arg`: str | None
+- `prompt_flag`: str | None
+- `provider`: str | None
+- `continuation_id`: str | None
+- `files`: list[str] | None
+- `system`: str | None
+- `timeout`: float | None
+- `output`: Path | None
 - `verbose`: bool
 - `skip_provider_check`: bool
 
@@ -6300,7 +6300,7 @@ Example:
 ### `argument_workflow(mock_provider, conversation_memory) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_argument_workflow.py:27`
+**Defined in:** `model_chorus/tests/test_argument_workflow.py:26`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -6414,7 +6414,7 @@ Example:
 ### `async basic_investigation_example() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/examples/thinkdeep_example.py:27`
+**Defined in:** `model_chorus/examples/thinkdeep_example.py:24`
 **Complexity:** 2
 
 **Description:**
@@ -6425,7 +6425,7 @@ Example:
 ### `cache() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/workflows/study/memory/test_cache.py:19`
+**Defined in:** `model_chorus/tests/workflows/study/memory/test_cache.py:18`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -6435,7 +6435,7 @@ Example:
 
 ---
 
-### `calculate_citation_confidence(citation) -> Dict[str, Any]`
+### `calculate_citation_confidence(citation) -> dict[str, Any]`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/utils/citation_formatter.py:285`
@@ -6472,7 +6472,7 @@ Example:
 
 ---
 
-### `calculate_citation_map_confidence(citation_map) -> Dict[str, Any]`
+### `calculate_citation_map_confidence(citation_map) -> dict[str, Any]`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/utils/citation_formatter.py:377`
@@ -6509,7 +6509,7 @@ Example:
 ### `chat(prompt_arg, prompt_flag, provider, continuation_id, files, system, timeout, output, verbose, skip_provider_check) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:242`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:251`
 ⚠️ **Complexity:** 37 (High)
 
 **Decorators:** `@app.command()`
@@ -6531,14 +6531,14 @@ Example:
     model-chorus chat "Review this code" -f src/main.py -f tests/test_main.py
 
 **Parameters:**
-- `prompt_arg`: Optional[str]
-- `prompt_flag`: Optional[str]
-- `provider`: Optional[str]
-- `continuation_id`: Optional[str]
-- `files`: Optional[List[str]]
-- `system`: Optional[str]
-- `timeout`: Optional[float]
-- `output`: Optional[Path]
+- `prompt_arg`: str | None
+- `prompt_flag`: str | None
+- `provider`: str | None
+- `continuation_id`: str | None
+- `files`: list[str] | None
+- `system`: str | None
+- `timeout`: float | None
+- `output`: Path | None
 - `verbose`: bool
 - `skip_provider_check`: bool
 
@@ -6558,7 +6558,7 @@ Example:
 ### `chat_workflow(provider, conversation_memory) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_chat_integration.py:113`
+**Defined in:** `model_chorus/tests/test_chat_integration.py:112`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -6575,7 +6575,7 @@ Example:
 ### `chat_workflow(mock_provider, conversation_memory) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_chat_workflow.py:20`
+**Defined in:** `model_chorus/tests/test_chat_workflow.py:17`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -6589,7 +6589,7 @@ Example:
 
 ---
 
-### `check_available_providers() -> Dict[str, Any]`
+### `check_available_providers() -> dict[str, Any]`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/cli/setup.py:174`
@@ -6603,7 +6603,7 @@ Returns:
 
 ---
 
-### `check_config_exists(project_root) -> Dict[str, Any]`
+### `check_config_exists(project_root) -> dict[str, Any]`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/cli/setup.py:228`
@@ -6619,11 +6619,11 @@ Returns:
     Dict with config file status
 
 **Parameters:**
-- `project_root`: Optional[Path]
+- `project_root`: Path | None
 
 ---
 
-### `check_package_installed() -> Dict[str, Any]`
+### `check_package_installed() -> dict[str, Any]`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/cli/setup.py:23`
@@ -6637,7 +6637,7 @@ Returns:
 
 ---
 
-### `check_permissions(project_root) -> Dict[str, Any]`
+### `check_permissions(project_root) -> dict[str, Any]`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/cli/setup.py:751`
@@ -6653,11 +6653,11 @@ Returns:
     Dict with permissions status
 
 **Parameters:**
-- `project_root`: Optional[Path]
+- `project_root`: Path | None
 
 ---
 
-### `check_version_compatibility() -> Dict[str, Any]`
+### `check_version_compatibility() -> dict[str, Any]`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/cli/setup.py:89`
@@ -6707,7 +6707,7 @@ Returns:
 ### `cli_runner() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_cli_integration.py:24`
+**Defined in:** `model_chorus/tests/test_cli_integration.py:22`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -6717,7 +6717,7 @@ Returns:
 
 ---
 
-### `cluster_claims_hierarchical(citation_maps, n_clusters, model_name, linkage_method) -> List[List[CitationMap]]`
+### `cluster_claims_hierarchical(citation_maps, n_clusters, model_name, linkage_method) -> list[list[CitationMap]]`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/workflows/argument/semantic.py:506`
@@ -6752,14 +6752,14 @@ Example:
     Found 2 clusters
 
 **Parameters:**
-- `citation_maps`: List[CitationMap]
+- `citation_maps`: list[CitationMap]
 - `n_clusters`: int
 - `model_name`: str
 - `linkage_method`: str
 
 ---
 
-### `cluster_claims_kmeans(citation_maps, n_clusters, model_name, random_state, max_iterations) -> List[List[CitationMap]]`
+### `cluster_claims_kmeans(citation_maps, n_clusters, model_name, random_state, max_iterations) -> list[list[CitationMap]]`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/workflows/argument/semantic.py:399`
@@ -6795,7 +6795,7 @@ Example:
     Cluster 1: 2 claims
 
 **Parameters:**
-- `citation_maps`: List[CitationMap]
+- `citation_maps`: list[CitationMap]
 - `n_clusters`: int
 - `model_name`: str
 - `random_state`: int
@@ -6884,12 +6884,12 @@ Example:
     Similarity[0,1]: 0.847
 
 **Parameters:**
-- `claims`: List[str]
+- `claims`: list[str]
 - `model_name`: str
 
 ---
 
-### `compute_cluster_statistics(clusters, model_name) -> Dict[str, Any]`
+### `compute_cluster_statistics(clusters, model_name) -> dict[str, Any]`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/workflows/argument/semantic.py:721`
@@ -6920,7 +6920,7 @@ Example:
     >>> print(f"Representatives: {stats['representatives']}")
 
 **Parameters:**
-- `clusters`: List[List[CitationMap]]
+- `clusters`: list[list[CitationMap]]
 - `model_name`: str
 
 ---
@@ -6963,7 +6963,7 @@ Example:
 ### `async confidence_progression_example() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/examples/thinkdeep_example.py:384`
+**Defined in:** `model_chorus/examples/thinkdeep_example.py:381`
 **Complexity:** 5
 
 **Description:**
@@ -6977,7 +6977,7 @@ and hypotheses are validated.
 ### `config_cmd(subcommand, verbose) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1916`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1923`
 **Complexity:** 7
 
 **Decorators:** `@app.command(name='config')`
@@ -7004,7 +7004,7 @@ Examples:
 ### `consensus(prompt_arg, prompt_flag, num_to_consult, strategy, files, system, timeout, output, verbose, skip_provider_check) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1105`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1114`
 ⚠️ **Complexity:** 33 (High)
 
 **Decorators:** `@app.command()`
@@ -7024,14 +7024,14 @@ Example:
     model-chorus consensus --prompt "Explain quantum computing" --num-to-consult 2
 
 **Parameters:**
-- `prompt_arg`: Optional[str]
-- `prompt_flag`: Optional[str]
-- `num_to_consult`: Optional[int]
-- `strategy`: Optional[str]
-- `files`: Optional[List[str]]
-- `system`: Optional[str]
-- `timeout`: Optional[float]
-- `output`: Optional[Path]
+- `prompt_arg`: str | None
+- `prompt_flag`: str | None
+- `num_to_consult`: int | None
+- `strategy`: str | None
+- `files`: list[str] | None
+- `system`: str | None
+- `timeout`: float | None
+- `output`: Path | None
 - `verbose`: bool
 - `skip_provider_check`: bool
 
@@ -7040,7 +7040,7 @@ Example:
 ### `construct_prompt_with_files(prompt, files) -> str`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1052`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1061`
 **Complexity:** 9
 
 **Description:**
@@ -7048,14 +7048,14 @@ Example:
 
 **Parameters:**
 - `prompt`: str
-- `files`: Optional[List[str]]
+- `files`: list[str] | None
 
 ---
 
 ### `conversation_memory() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/conftest.py:357`
+**Defined in:** `model_chorus/tests/conftest.py:354`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -7132,7 +7132,7 @@ Example:
 
 ---
 
-### `create_claude_config(project_root, enabled_providers, auto_detect) -> Dict[str, Any]`
+### `create_claude_config(project_root, enabled_providers, auto_detect) -> dict[str, Any]`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/cli/setup.py:535`
@@ -7150,13 +7150,13 @@ Returns:
     Dict with creation result
 
 **Parameters:**
-- `project_root`: Optional[Path]
-- `enabled_providers`: Optional[List[str]]
+- `project_root`: Path | None
+- `enabled_providers`: list[str] | None
 - `auto_detect`: bool
 
 ---
 
-### `create_config_file(project_root, default_provider, timeout, available_providers, workflows) -> Dict[str, Any]`
+### `create_config_file(project_root, default_provider, timeout, available_providers, workflows) -> dict[str, Any]`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/cli/setup.py:255`
@@ -7176,11 +7176,11 @@ Returns:
     Dict with creation result
 
 **Parameters:**
-- `project_root`: Optional[Path]
+- `project_root`: Path | None
 - `default_provider`: str
 - `timeout`: float
-- `available_providers`: Optional[List[str]]
-- `workflows`: Optional[Dict[str, Any]]
+- `available_providers`: list[str] | None
+- `workflows`: dict[str, Any] | None
 
 ---
 
@@ -7220,7 +7220,7 @@ Returns:
 
 ---
 
-### `create_express_config(project_root) -> Dict[str, Any]`
+### `create_express_config(project_root) -> dict[str, Any]`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/cli/setup.py:354`
@@ -7243,7 +7243,7 @@ Returns:
     Dict with creation result
 
 **Parameters:**
-- `project_root`: Optional[Path]
+- `project_root`: Path | None
 
 ---
 
@@ -7291,7 +7291,7 @@ Returns:
 
 ---
 
-### `create_tiered_config(project_root, tier, default_provider, consensus_providers, consensus_strategy, thinkdeep_thinking_mode, ideate_providers, workflow_overrides) -> Dict[str, Any]`
+### `create_tiered_config(project_root, tier, default_provider, consensus_providers, consensus_strategy, thinkdeep_thinking_mode, ideate_providers, workflow_overrides) -> dict[str, Any]`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/cli/setup.py:437`
@@ -7314,18 +7314,18 @@ Returns:
     Dict with creation result
 
 **Parameters:**
-- `project_root`: Optional[Path]
+- `project_root`: Path | None
 - `tier`: str
 - `default_provider`: str
-- `consensus_providers`: Optional[list]
+- `consensus_providers`: list | None
 - `consensus_strategy`: str
 - `thinkdeep_thinking_mode`: str
-- `ideate_providers`: Optional[list]
-- `workflow_overrides`: Optional[Dict[str, Dict[str, Any]]]
+- `ideate_providers`: list | None
+- `workflow_overrides`: dict[str, dict[str, Any]] | None
 
 ---
 
-### `detect_contradiction(claim_1_id, claim_1_text, claim_2_id, claim_2_text, similarity_threshold, model_name) -> Optional[Contradiction]`
+### `detect_contradiction(claim_1_id, claim_1_text, claim_2_id, claim_2_text, similarity_threshold, model_name) -> Contradiction | None`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/core/contradiction.py:506`
@@ -7378,7 +7378,7 @@ Example:
 
 ---
 
-### `detect_contradictions_batch(claims, similarity_threshold, model_name) -> List[Contradiction]`
+### `detect_contradictions_batch(claims, similarity_threshold, model_name) -> list[Contradiction]`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/core/contradiction.py:612`
@@ -7409,13 +7409,13 @@ Example:
     Found 1 contradictions
 
 **Parameters:**
-- `claims`: List[Tuple[str, str]]
+- `claims`: list[tuple[str, str]]
 - `similarity_threshold`: float
 - `model_name`: str
 
 ---
 
-### `detect_gaps(claims, min_citations_per_claim) -> List[Gap]`
+### `detect_gaps(claims, min_citations_per_claim) -> list[Gap]`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/core/gap_analysis.py:540`
@@ -7452,12 +7452,12 @@ Example:
     ...     print(f"{gap.gap_type}: {gap.description}")
 
 **Parameters:**
-- `claims`: List[Dict[str, Any]]
+- `claims`: list[dict[str, Any]]
 - `min_citations_per_claim`: int
 
 ---
 
-### `detect_logical_gaps(claim_id, claim_text, supporting_claims) -> Optional[Gap]`
+### `detect_logical_gaps(claim_id, claim_text, supporting_claims) -> Gap | None`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/core/gap_analysis.py:416`
@@ -7489,11 +7489,11 @@ Example:
 **Parameters:**
 - `claim_id`: str
 - `claim_text`: str
-- `supporting_claims`: Optional[List[str]]
+- `supporting_claims`: list[str] | None
 
 ---
 
-### `detect_missing_evidence(claim_id, claim_text, citations, expected_citation_count) -> Optional[Gap]`
+### `detect_missing_evidence(claim_id, claim_text, citations, expected_citation_count) -> Gap | None`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/core/gap_analysis.py:332`
@@ -7527,12 +7527,12 @@ Example:
 **Parameters:**
 - `claim_id`: str
 - `claim_text`: str
-- `citations`: Optional[List[Any]]
+- `citations`: list[Any] | None
 - `expected_citation_count`: int
 
 ---
 
-### `detect_polarity_opposition(claim_text_1, claim_text_2) -> Tuple[bool, float]`
+### `detect_polarity_opposition(claim_text_1, claim_text_2) -> tuple[bool, float]`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/core/contradiction.py:285`
@@ -7567,7 +7567,7 @@ Example:
 
 ---
 
-### `detect_unsupported_claims(claims, min_citations_per_claim) -> List[Gap]`
+### `detect_unsupported_claims(claims, min_citations_per_claim) -> list[Gap]`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/core/gap_analysis.py:500`
@@ -7594,7 +7594,7 @@ Example:
     >>> print(f"Found {len(gaps)} unsupported claims")
 
 **Parameters:**
-- `claims`: List[tuple[str, str, Optional[List[Any]]]]
+- `claims`: list[tuple[str, str, list[Any] | None]]
 - `min_citations_per_claim`: int
 
 ---
@@ -7615,7 +7615,7 @@ Example:
 ### `emit_progress(message, prefix, style) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/core/progress.py:36`
+**Defined in:** `model_chorus/src/model_chorus/core/progress.py:35`
 **Complexity:** 3
 
 **Description:**
@@ -7638,7 +7638,7 @@ Example:
 
 **Parameters:**
 - `message`: str
-- `prefix`: Optional[str]
+- `prefix`: str | None
 - `style`: str
 
 ---
@@ -7646,7 +7646,7 @@ Example:
 ### `emit_provider_complete(provider, duration) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/core/progress.py:96`
+**Defined in:** `model_chorus/src/model_chorus/core/progress.py:93`
 **Complexity:** 2
 
 **Description:**
@@ -7662,14 +7662,14 @@ Example:
 
 **Parameters:**
 - `provider`: str
-- `duration`: Optional[float]
+- `duration`: float | None
 
 ---
 
 ### `emit_provider_start(provider) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/core/progress.py:82`
+**Defined in:** `model_chorus/src/model_chorus/core/progress.py:79`
 **Complexity:** 1
 
 **Description:**
@@ -7690,7 +7690,7 @@ Example:
 ### `emit_stage(stage) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/core/progress.py:68`
+**Defined in:** `model_chorus/src/model_chorus/core/progress.py:65`
 **Complexity:** 1
 
 **Description:**
@@ -7711,7 +7711,7 @@ Example:
 ### `emit_workflow_complete(workflow) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/core/progress.py:138`
+**Defined in:** `model_chorus/src/model_chorus/core/progress.py:133`
 **Complexity:** 1
 
 **Description:**
@@ -7732,7 +7732,7 @@ Example:
 ### `emit_workflow_start(workflow, estimated_duration) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/core/progress.py:116`
+**Defined in:** `model_chorus/src/model_chorus/core/progress.py:113`
 **Complexity:** 2
 
 **Description:**
@@ -7748,14 +7748,14 @@ Example:
 
 **Parameters:**
 - `workflow`: str
-- `estimated_duration`: Optional[str]
+- `estimated_duration`: str | None
 
 ---
 
 ### `async example_argument_basic() -> None`
 
 **Language:** python
-**Defined in:** `examples/workflow_examples.py:38`
+**Defined in:** `examples/workflow_examples.py:37`
 **Complexity:** 4
 
 **Description:**
@@ -7769,7 +7769,7 @@ through dialectical reasoning (Creator → Skeptic → Moderator).
 ### `async example_argument_continuation() -> None`
 
 **Language:** python
-**Defined in:** `examples/workflow_examples.py:135`
+**Defined in:** `examples/workflow_examples.py:134`
 **Complexity:** 3
 
 **Description:**
@@ -7783,7 +7783,7 @@ a previous analysis with follow-up questions or new angles.
 ### `async example_argument_custom_config() -> None`
 
 **Language:** python
-**Defined in:** `examples/workflow_examples.py:177`
+**Defined in:** `examples/workflow_examples.py:176`
 **Complexity:** 2
 
 **Description:**
@@ -7797,7 +7797,7 @@ parameters like temperature, max_tokens, and system prompts.
 ### `async example_argument_with_files() -> None`
 
 **Language:** python
-**Defined in:** `examples/workflow_examples.py:86`
+**Defined in:** `examples/workflow_examples.py:85`
 **Complexity:** 2
 
 **Description:**
@@ -7811,7 +7811,7 @@ the argument analysis with specific data or background information.
 ### `async example_error_handling() -> None`
 
 **Language:** python
-**Defined in:** `examples/workflow_examples.py:362`
+**Defined in:** `examples/workflow_examples.py:361`
 **Complexity:** 3
 
 **Description:**
@@ -7824,7 +7824,7 @@ Demonstrates best practices for handling workflow failures.
 ### `async example_ideate_basic() -> None`
 
 **Language:** python
-**Defined in:** `examples/workflow_examples.py:213`
+**Defined in:** `examples/workflow_examples.py:212`
 **Complexity:** 4
 
 **Description:**
@@ -7837,7 +7837,7 @@ Demonstrates simple creative idea generation with default parameters.
 ### `async example_ideate_high_creativity() -> None`
 
 **Language:** python
-**Defined in:** `examples/workflow_examples.py:251`
+**Defined in:** `examples/workflow_examples.py:250`
 **Complexity:** 2
 
 **Description:**
@@ -7850,7 +7850,7 @@ Uses maximum temperature for highly creative, unconventional ideas.
 ### `async example_ideate_refine() -> None`
 
 **Language:** python
-**Defined in:** `examples/workflow_examples.py:316`
+**Defined in:** `examples/workflow_examples.py:315`
 **Complexity:** 3
 
 **Description:**
@@ -7864,7 +7864,7 @@ and develop them further.
 ### `async example_ideate_with_constraints() -> None`
 
 **Language:** python
-**Defined in:** `examples/workflow_examples.py:279`
+**Defined in:** `examples/workflow_examples.py:278`
 **Complexity:** 2
 
 **Description:**
@@ -7878,7 +7878,7 @@ or requirements via system prompts.
 ### `async example_output_management() -> None`
 
 **Language:** python
-**Defined in:** `examples/workflow_examples.py:402`
+**Defined in:** `examples/workflow_examples.py:401`
 **Complexity:** 2
 
 **Description:**
@@ -7891,7 +7891,7 @@ Shows how to save, load, and process workflow results.
 ### `async example_provider_comparison() -> None`
 
 **Language:** python
-**Defined in:** `examples/workflow_examples.py:454`
+**Defined in:** `examples/workflow_examples.py:453`
 **Complexity:** 4
 
 **Description:**
@@ -7915,7 +7915,7 @@ to compare outputs.
 
 ---
 
-### `find_duplicate_claims(citation_maps, threshold, model_name) -> List[List[CitationMap]]`
+### `find_duplicate_claims(citation_maps, threshold, model_name) -> list[list[CitationMap]]`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/workflows/argument/semantic.py:331`
@@ -7947,13 +7947,13 @@ Example:
       - Artificial intelligence enhances precision
 
 **Parameters:**
-- `citation_maps`: List[CitationMap]
+- `citation_maps`: list[CitationMap]
 - `threshold`: float
 - `model_name`: str
 
 ---
 
-### `find_similar_claims(query_claim, citation_maps, threshold, top_k, model_name) -> List[Tuple[CitationMap, float]]`
+### `find_similar_claims(query_claim, citation_maps, threshold, top_k, model_name) -> list[tuple[CitationMap, float]]`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/workflows/argument/semantic.py:177`
@@ -7993,9 +7993,9 @@ Example:
 
 **Parameters:**
 - `query_claim`: str
-- `citation_maps`: List[CitationMap]
+- `citation_maps`: list[CitationMap]
 - `threshold`: float
-- `top_k`: Optional[int]
+- `top_k`: int | None
 - `model_name`: str
 
 ---
@@ -8003,7 +8003,7 @@ Example:
 ### `fix_multiline_call(content) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/fix_thinkdeep_calls.py:45`
+**Defined in:** `model_chorus/fix_thinkdeep_calls.py:44`
 **Complexity:** 4
 
 **Description:**
@@ -8017,7 +8017,7 @@ Example:
 ### `fix_simple_call(match) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/fix_thinkdeep_calls.py:24`
+**Defined in:** `model_chorus/fix_thinkdeep_calls.py:23`
 **Complexity:** 1
 
 **Description:**
@@ -8121,7 +8121,7 @@ Example:
     AI Quality Improvement
 
 **Parameters:**
-- `cluster`: List[CitationMap]
+- `cluster`: list[CitationMap]
 - `model_name`: str
 - `max_words`: int
 
@@ -8202,7 +8202,7 @@ Example:
 
 ---
 
-### `generate_reconciliation_suggestion(severity) -> Optional[str]`
+### `generate_reconciliation_suggestion(severity) -> str | None`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/core/contradiction.py:469`
@@ -8233,7 +8233,7 @@ Example:
 ### `get_claude_config() -> ModelChorusConfigV2`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/core/config.py:897`
+**Defined in:** `model_chorus/src/model_chorus/core/config.py:895`
 **Complexity:** 1
 
 **Description:**
@@ -8247,7 +8247,7 @@ Returns:
 ### `get_claude_config_loader() -> ClaudeConfigLoader`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/core/config.py:889`
+**Defined in:** `model_chorus/src/model_chorus/core/config.py:887`
 **Complexity:** 2
 
 **Description:**
@@ -8280,7 +8280,7 @@ Example:
     >>> print(f"Representative claim: {representative.claim_text}")
 
 **Parameters:**
-- `cluster`: List[CitationMap]
+- `cluster`: list[CitationMap]
 - `model_name`: str
 
 ---
@@ -8288,7 +8288,7 @@ Example:
 ### `get_config() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:172`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:173`
 **Complexity:** 3
 
 **Description:**
@@ -8310,7 +8310,7 @@ Example:
 ### `get_config() -> ModelChorusConfig`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/core/config.py:441`
+**Defined in:** `model_chorus/src/model_chorus/core/config.py:439`
 **Complexity:** 1
 
 **Description:**
@@ -8324,7 +8324,7 @@ Returns:
 ### `get_config_loader() -> ConfigLoader`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/core/config.py:420`
+**Defined in:** `model_chorus/src/model_chorus/core/config.py:418`
 **Complexity:** 2
 
 **Description:**
@@ -8368,7 +8368,7 @@ Example:
 ### `get_install_command(provider) -> str`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:185`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:186`
 **Complexity:** 1
 
 **Description:**
@@ -8405,10 +8405,10 @@ Returns:
 
 ---
 
-### `get_provider_by_name(name, timeout) -> CLIProvider`
+### `get_provider_by_name(name, timeout) -> ClaudeProvider | CodexProvider | GeminiProvider | CursorAgentProvider`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:203`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:204`
 **Complexity:** 3
 
 **Description:**
@@ -8431,7 +8431,7 @@ Raises:
 
 ---
 
-### `get_provider_by_name(name, timeout) -> CLIProvider`
+### `get_provider_by_name(name, timeout) -> ClaudeProvider | CodexProvider | GeminiProvider | CursorAgentProvider`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/cli/study_commands.py:73`
@@ -8456,7 +8456,7 @@ Returns:
 ### `get_read_only_system_prompt() -> str`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/core/prompts.py:11`
+**Defined in:** `model_chorus/src/model_chorus/core/prompts.py:9`
 **Complexity:** 1
 
 **Description:**
@@ -8496,7 +8496,7 @@ Note: Fast models are automatically injected by the provider fixture.
 ### `async hypothesis_management_example() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/examples/thinkdeep_example.py:293`
+**Defined in:** `model_chorus/examples/thinkdeep_example.py:290`
 **Complexity:** 6
 
 **Description:**
@@ -8510,7 +8510,7 @@ during an investigation.
 ### `ideate(prompt_arg, prompt_flag, provider, continuation_id, files, num_ideas, system, timeout, output, verbose, skip_provider_check) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:781`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:790`
 ⚠️ **Complexity:** 35 (High)
 
 **Decorators:** `@app.command()`
@@ -8535,15 +8535,15 @@ Example:
     model-chorus ideate "Refine the third idea" --continue thread-id-123
 
 **Parameters:**
-- `prompt_arg`: Optional[str]
-- `prompt_flag`: Optional[str]
-- `provider`: Optional[str]
-- `continuation_id`: Optional[str]
-- `files`: Optional[List[str]]
+- `prompt_arg`: str | None
+- `prompt_flag`: str | None
+- `provider`: str | None
+- `continuation_id`: str | None
+- `files`: list[str] | None
 - `num_ideas`: int
-- `system`: Optional[str]
-- `timeout`: Optional[float]
-- `output`: Optional[Path]
+- `system`: str | None
+- `timeout`: float | None
+- `output`: Path | None
 - `verbose`: bool
 - `skip_provider_check`: bool
 
@@ -8552,7 +8552,7 @@ Example:
 ### `ideate_workflow(mock_provider) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_ideate_workflow.py:124`
+**Defined in:** `model_chorus/tests/test_ideate_workflow.py:123`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -8568,7 +8568,7 @@ Example:
 ### `ideate_workflow(mock_provider, conversation_memory) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_ideate_workflow_integration.py:147`
+**Defined in:** `model_chorus/tests/test_ideate_workflow_integration.py:140`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -8582,7 +8582,7 @@ Example:
 
 ---
 
-### `install_package(dev_mode) -> Dict[str, Any]`
+### `install_package(dev_mode) -> dict[str, Any]`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/cli/setup.py:54`
@@ -8605,7 +8605,7 @@ Returns:
 ### `async investigation_with_expert_validation() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/examples/thinkdeep_example.py:205`
+**Defined in:** `model_chorus/examples/thinkdeep_example.py:202`
 **Complexity:** 4
 
 **Description:**
@@ -8619,7 +8619,7 @@ and additional insights when confidence hasn't reached "certain" level.
 ### `is_cli_available(cli_command) -> bool`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_helpers.py:63`
+**Defined in:** `model_chorus/tests/test_helpers.py:64`
 **Complexity:** 4
 
 **Description:**
@@ -8639,7 +8639,7 @@ Returns:
 ### `is_progress_enabled() -> bool`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/core/progress.py:31`
+**Defined in:** `model_chorus/src/model_chorus/core/progress.py:30`
 **Complexity:** 1
 
 **Description:**
@@ -8650,7 +8650,7 @@ Returns:
 ### `is_provider_available(provider_name, cli_command, model_chorus_config) -> bool`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_helpers.py:89`
+**Defined in:** `model_chorus/tests/test_helpers.py:90`
 **Complexity:** 2
 
 **Description:**
@@ -8674,7 +8674,7 @@ Returns:
 ### `is_provider_enabled_in_config(provider_name, model_chorus_config) -> bool`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_helpers.py:41`
+**Defined in:** `model_chorus/tests/test_helpers.py:42`
 **Complexity:** 2
 
 **Description:**
@@ -8696,7 +8696,7 @@ Returns:
 ### `list_providers(check) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:2128`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:2135`
 **Complexity:** 8
 
 **Decorators:** `@app.command()`
@@ -8714,7 +8714,7 @@ Use --check to verify which providers are actually installed and working.
 ### `load_config(config_path) -> ModelChorusConfig`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/core/config.py:428`
+**Defined in:** `model_chorus/src/model_chorus/core/config.py:426`
 **Complexity:** 1
 
 **Description:**
@@ -8727,14 +8727,14 @@ Returns:
     Loaded configuration
 
 **Parameters:**
-- `config_path`: Optional[Path]
+- `config_path`: Path | None
 
 ---
 
 ### `load_model_chorus_config() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_helpers.py:14`
+**Defined in:** `model_chorus/tests/test_helpers.py:15`
 **Complexity:** 4
 
 **Description:**
@@ -8748,7 +8748,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `examples/workflow_examples.py:563`
+**Defined in:** `examples/workflow_examples.py:562`
 **Complexity:** 2
 
 **Description:**
@@ -8759,7 +8759,7 @@ Returns:
 ### `async main() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/examples/basic_workflow.py:57`
+**Defined in:** `model_chorus/examples/basic_workflow.py:58`
 **Complexity:** 2
 
 **Description:**
@@ -8781,7 +8781,7 @@ Returns:
 ### `async main() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/examples/provider_integration.py:98`
+**Defined in:** `model_chorus/examples/provider_integration.py:99`
 **Complexity:** 2
 
 **Description:**
@@ -8792,7 +8792,7 @@ Returns:
 ### `async main() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/examples/thinkdeep_example.py:461`
+**Defined in:** `model_chorus/examples/thinkdeep_example.py:458`
 **Complexity:** 1
 
 **Description:**
@@ -8803,7 +8803,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/fix_thinkdeep_calls.py:111`
+**Defined in:** `model_chorus/fix_thinkdeep_calls.py:110`
 **Complexity:** 4
 
 **Description:**
@@ -8814,7 +8814,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:2224`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:2231`
 **Complexity:** 1
 
 **Description:**
@@ -8849,7 +8849,7 @@ Returns:
 ### `mock_brainstorming_result() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_ideate_workflow.py:130`
+**Defined in:** `model_chorus/tests/test_ideate_workflow.py:129`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -8862,7 +8862,7 @@ Returns:
 ### `mock_claude_provider_full() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/conftest.py:296`
+**Defined in:** `model_chorus/tests/conftest.py:293`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -8875,7 +8875,7 @@ Returns:
 ### `mock_claude_response() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/conftest.py:111`
+**Defined in:** `model_chorus/tests/conftest.py:108`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -8888,7 +8888,7 @@ Returns:
 ### `mock_codex_provider_full() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/conftest.py:308`
+**Defined in:** `model_chorus/tests/conftest.py:305`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -8901,7 +8901,7 @@ Returns:
 ### `mock_codex_response() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/conftest.py:136`
+**Defined in:** `model_chorus/tests/conftest.py:133`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -8914,7 +8914,7 @@ Returns:
 ### `mock_cursor_agent_provider_full() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/conftest.py:314`
+**Defined in:** `model_chorus/tests/conftest.py:311`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -8927,7 +8927,7 @@ Returns:
 ### `mock_cursor_agent_response() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/conftest.py:146`
+**Defined in:** `model_chorus/tests/conftest.py:143`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -8940,7 +8940,7 @@ Returns:
 ### `mock_gemini_provider_full() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/conftest.py:302`
+**Defined in:** `model_chorus/tests/conftest.py:299`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -8953,7 +8953,7 @@ Returns:
 ### `mock_provider() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/conftest.py:325`
+**Defined in:** `model_chorus/tests/conftest.py:322`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -8970,7 +8970,7 @@ provider-specific fixtures above (mock_claude_provider_full, etc.).
 ### `mock_provider() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_ideate_workflow.py:18`
+**Defined in:** `model_chorus/tests/test_ideate_workflow.py:17`
 **Complexity:** 8
 
 **Decorators:** `@pytest.fixture`
@@ -8983,7 +8983,7 @@ provider-specific fixtures above (mock_claude_provider_full, etc.).
 ### `mock_provider() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_ideate_workflow_integration.py:25`
+**Defined in:** `model_chorus/tests/test_ideate_workflow_integration.py:18`
 **Complexity:** 7
 
 **Decorators:** `@pytest.fixture`
@@ -8996,7 +8996,7 @@ provider-specific fixtures above (mock_claude_provider_full, etc.).
 ### `mock_subprocess_run() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/conftest.py:162`
+**Defined in:** `model_chorus/tests/conftest.py:159`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -9009,7 +9009,7 @@ provider-specific fixtures above (mock_claude_provider_full, etc.).
 ### `mock_workflow_result() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_cli_integration.py:30`
+**Defined in:** `model_chorus/tests/test_cli_integration.py:28`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -9022,7 +9022,7 @@ provider-specific fixtures above (mock_claude_provider_full, etc.).
 ### `async multi_step_investigation_example() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/examples/thinkdeep_example.py:64`
+**Defined in:** `model_chorus/examples/thinkdeep_example.py:61`
 **Complexity:** 10
 
 **Description:**
@@ -9047,7 +9047,7 @@ showing how hypotheses are formed, tested, and confidence evolves across steps.
 ### `prepend_system_constraints(custom_prompt) -> str`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/core/prompts.py:51`
+**Defined in:** `model_chorus/src/model_chorus/core/prompts.py:49`
 **Complexity:** 2
 
 **Description:**
@@ -9070,14 +9070,14 @@ Example:
     >>> # Returns constraints + ideation prompt
 
 **Parameters:**
-- `custom_prompt`: Optional[str]
+- `custom_prompt`: str | None
 
 ---
 
 ### `process_file(filepath) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/fix_thinkdeep_calls.py:82`
+**Defined in:** `model_chorus/fix_thinkdeep_calls.py:81`
 **Complexity:** 2
 
 **Description:**
@@ -9114,7 +9114,7 @@ Automatically configures the fastest model for each provider to minimize test ti
 ### `provider_name(request) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/conftest.py:99`
+**Defined in:** `model_chorus/tests/conftest.py:96`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture(params=[pytest.param('claude', marks=pytest.mark.skipif(not CLAUDE_AVAILABLE, reason='Claude not available (config disabled or CLI not found)')), pytest.param('gemini', marks=pytest.mark.skipif(not GEMINI_AVAILABLE, reason='Gemini not available (config disabled or CLI not found)')), pytest.param('codex', marks=pytest.mark.skipif(not CODEX_AVAILABLE, reason='Codex not available (config disabled or CLI not found)')), pytest.param('cursor-agent', marks=pytest.mark.skipif(not CURSOR_AGENT_AVAILABLE, reason='Cursor Agent not available (config disabled or CLI not found)'))])`
@@ -9134,7 +9134,7 @@ will be automatically skipped.
 ### `pytest_configure(config) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/conftest.py:38`
+**Defined in:** `model_chorus/tests/conftest.py:35`
 **Complexity:** 1
 
 **Description:**
@@ -9145,10 +9145,10 @@ will be automatically skipped.
 
 ---
 
-### `resolve_context_files(files) -> Tuple[List[str], List[str], List[str]]`
+### `resolve_context_files(files) -> tuple[list[str], list[str], list[str]]`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:85`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:86`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -9164,14 +9164,14 @@ Returns:
         missing_files: Original entries that could not be resolved.
 
 **Parameters:**
-- `files`: Optional[Union[str, Sequence[str]]]
+- `files`: str | Sequence[str] | None
 
 ---
 
 ### `review_json_data(review_json_path) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_review_response.py:27`
+**Defined in:** `model_chorus/tests/test_review_response.py:28`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -9187,7 +9187,7 @@ Returns:
 ### `review_json_path() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_review_response.py:18`
+**Defined in:** `model_chorus/tests/test_review_response.py:19`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -9200,7 +9200,7 @@ Returns:
 ### `async run_all_examples() -> None`
 
 **Language:** python
-**Defined in:** `examples/workflow_examples.py:499`
+**Defined in:** `examples/workflow_examples.py:498`
 **Complexity:** 4
 
 **Description:**
@@ -9211,7 +9211,7 @@ Returns:
 ### `async run_specific_example(example_name) -> None`
 
 **Language:** python
-**Defined in:** `examples/workflow_examples.py:538`
+**Defined in:** `examples/workflow_examples.py:537`
 **Complexity:** 2
 
 **Description:**
@@ -9225,7 +9225,7 @@ Returns:
 ### `sample_generation_request() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/conftest.py:172`
+**Defined in:** `model_chorus/tests/conftest.py:169`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -9265,7 +9265,7 @@ Example:
     Coherence: 0.847
 
 **Parameters:**
-- `cluster`: List[CitationMap]
+- `cluster`: list[CitationMap]
 - `model_name`: str
 
 ---
@@ -9300,12 +9300,12 @@ Example:
     Separation: 0.723
 
 **Parameters:**
-- `clusters`: List[List[CitationMap]]
+- `clusters`: list[list[CitationMap]]
 - `model_name`: str
 
 ---
 
-### `score_clustering_quality(clusters, model_name) -> Dict[str, Any]`
+### `score_clustering_quality(clusters, model_name) -> dict[str, Any]`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/workflows/argument/semantic.py:922`
@@ -9344,7 +9344,7 @@ Example:
     Separation: 0.723
 
 **Parameters:**
-- `clusters`: List[List[CitationMap]]
+- `clusters`: list[list[CitationMap]]
 - `model_name`: str
 
 ---
@@ -9352,7 +9352,7 @@ Example:
 ### `set_progress_enabled(enabled) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/core/progress.py:20`
+**Defined in:** `model_chorus/src/model_chorus/core/progress.py:19`
 **Complexity:** 1
 
 **Description:**
@@ -9369,7 +9369,7 @@ Args:
 ### `start(scenario, provider, continuation_id, files, personas, system, temperature, max_tokens, output, verbose, skip_provider_check) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/study_commands.py:100`
+**Defined in:** `model_chorus/src/model_chorus/cli/study_commands.py:108`
 ⚠️ **Complexity:** 44 (High)
 
 **Decorators:** `@study_app.command()`
@@ -9396,14 +9396,14 @@ Example:
 
 **Parameters:**
 - `scenario`: str
-- `provider`: Optional[str]
-- `continuation_id`: Optional[str]
-- `files`: Optional[List[str]]
-- `personas`: Optional[List[str]]
-- `system`: Optional[str]
-- `temperature`: Optional[float]
-- `max_tokens`: Optional[int]
-- `output`: Optional[Path]
+- `provider`: str | None
+- `continuation_id`: str | None
+- `files`: list[str] | None
+- `personas`: list[str] | None
+- `system`: str | None
+- `temperature`: float | None
+- `max_tokens`: int | None
+- `output`: Path | None
 - `verbose`: bool
 - `skip_provider_check`: bool
 
@@ -9428,7 +9428,7 @@ Example:
 ### `study_next(investigation, provider, files, max_tokens, output, verbose, skip_provider_check) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/study_commands.py:419`
+**Defined in:** `model_chorus/src/model_chorus/cli/study_commands.py:427`
 ⚠️ **Complexity:** 35 (High)
 
 **Decorators:** `@study_app.command(name='next')`
@@ -9455,10 +9455,10 @@ Example:
 
 **Parameters:**
 - `investigation`: str
-- `provider`: Optional[str]
-- `files`: Optional[List[str]]
-- `max_tokens`: Optional[int]
-- `output`: Optional[Path]
+- `provider`: str | None
+- `files`: list[str] | None
+- `max_tokens`: int | None
+- `output`: Path | None
 - `verbose`: bool
 - `skip_provider_check`: bool
 
@@ -9467,7 +9467,7 @@ Example:
 ### `study_view(investigation, persona, show_all, format_json, verbose) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/study_commands.py:699`
+**Defined in:** `model_chorus/src/model_chorus/cli/study_commands.py:707`
 ⚠️ **Complexity:** 31 (High)
 
 **Decorators:** `@study_app.command(name='view')`
@@ -9494,7 +9494,7 @@ Example:
 
 **Parameters:**
 - `investigation`: str
-- `persona`: Optional[str]
+- `persona`: str | None
 - `show_all`: bool
 - `format_json`: bool
 - `verbose`: bool
@@ -9529,7 +9529,7 @@ Example:
     All claims discuss machine learning enhancing accuracy.
 
 **Parameters:**
-- `cluster`: List[CitationMap]
+- `cluster`: list[CitationMap]
 - `model_name`: str
 - `max_length`: int
 
@@ -9551,7 +9551,7 @@ Example:
 ### `temp_output_file(tmp_path) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_cli_integration.py:65`
+**Defined in:** `model_chorus/tests/test_cli_integration.py:63`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -9567,7 +9567,7 @@ Example:
 ### `temp_test_file(tmp_path) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_cli_integration.py:57`
+**Defined in:** `model_chorus/tests/test_cli_integration.py:55`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -9583,7 +9583,7 @@ Example:
 ### `test_cache_clear(cache) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/workflows/study/memory/test_cache.py:184`
+**Defined in:** `model_chorus/tests/workflows/study/memory/test_cache.py:183`
 **Complexity:** 2
 
 **Description:**
@@ -9597,7 +9597,7 @@ Example:
 ### `test_cache_delete(cache) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/workflows/study/memory/test_cache.py:130`
+**Defined in:** `model_chorus/tests/workflows/study/memory/test_cache.py:129`
 **Complexity:** 1
 
 **Description:**
@@ -9611,7 +9611,7 @@ Example:
 ### `test_cache_eviction_metric(cache) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/workflows/study/memory/test_cache.py:85`
+**Defined in:** `model_chorus/tests/workflows/study/memory/test_cache.py:84`
 **Complexity:** 2
 
 **Description:**
@@ -9625,7 +9625,7 @@ Example:
 ### `test_cache_metadata(cache) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/workflows/study/memory/test_cache.py:204`
+**Defined in:** `model_chorus/tests/workflows/study/memory/test_cache.py:203`
 **Complexity:** 2
 
 **Description:**
@@ -9639,7 +9639,7 @@ Example:
 ### `test_cache_metrics_hits_and_misses(cache) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/workflows/study/memory/test_cache.py:62`
+**Defined in:** `model_chorus/tests/workflows/study/memory/test_cache.py:61`
 **Complexity:** 1
 
 **Description:**
@@ -9653,7 +9653,7 @@ Example:
 ### `test_cache_query(cache) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/workflows/study/memory/test_cache.py:152`
+**Defined in:** `model_chorus/tests/workflows/study/memory/test_cache.py:151`
 **Complexity:** 2
 
 **Description:**
@@ -9667,7 +9667,7 @@ Example:
 ### `test_cache_update_existing(cache) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/workflows/study/memory/test_cache.py:102`
+**Defined in:** `model_chorus/tests/workflows/study/memory/test_cache.py:101`
 **Complexity:** 1
 
 **Description:**
@@ -9681,7 +9681,7 @@ Example:
 ### `async test_consensus_applies_provider_model_override_without_mutation() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_consensus_provider_models.py:30`
+**Defined in:** `model_chorus/tests/test_consensus_provider_models.py:29`
 **Complexity:** 3
 
 **Decorators:** `@pytest.mark.asyncio`
@@ -9708,7 +9708,7 @@ Example:
 ### `test_dimension_scores_structure(review_json_data) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_review_response.py:77`
+**Defined in:** `model_chorus/tests/test_review_response.py:78`
 **Complexity:** 2
 
 **Description:**
@@ -9736,7 +9736,7 @@ Example:
 ### `test_issues_have_locations(review_json_data) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_review_response.py:146`
+**Defined in:** `model_chorus/tests/test_review_response.py:147`
 **Complexity:** 4
 
 **Description:**
@@ -9750,7 +9750,7 @@ Example:
 ### `test_issues_structure(review_json_data) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_review_response.py:88`
+**Defined in:** `model_chorus/tests/test_review_response.py:89`
 **Complexity:** 3
 
 **Description:**
@@ -9764,7 +9764,7 @@ Example:
 ### `test_lru_eviction(cache) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/workflows/study/memory/test_cache.py:24`
+**Defined in:** `model_chorus/tests/workflows/study/memory/test_cache.py:23`
 **Complexity:** 2
 
 **Description:**
@@ -9792,7 +9792,7 @@ Example:
 ### `test_overall_score_valid(review_json_data) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_review_response.py:60`
+**Defined in:** `model_chorus/tests/test_review_response.py:61`
 **Complexity:** 1
 
 **Description:**
@@ -9848,7 +9848,7 @@ Example:
 ### `test_recommendation_valid(review_json_data) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_review_response.py:67`
+**Defined in:** `model_chorus/tests/test_review_response.py:68`
 **Complexity:** 1
 
 **Description:**
@@ -9862,7 +9862,7 @@ Example:
 ### `test_review_json_exists(review_json_path) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_review_response.py:33`
+**Defined in:** `model_chorus/tests/test_review_response.py:34`
 **Complexity:** 1
 
 **Description:**
@@ -9876,7 +9876,7 @@ Example:
 ### `test_review_json_has_required_fields(review_json_data) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_review_response.py:47`
+**Defined in:** `model_chorus/tests/test_review_response.py:48`
 **Complexity:** 2
 
 **Description:**
@@ -9890,7 +9890,7 @@ Example:
 ### `test_review_json_valid_json(review_json_path) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_review_response.py:40`
+**Defined in:** `model_chorus/tests/test_review_response.py:41`
 **Complexity:** 1
 
 **Description:**
@@ -9904,7 +9904,7 @@ Example:
 ### `test_review_response_completeness(review_json_data) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_review_response.py:163`
+**Defined in:** `model_chorus/tests/test_review_response.py:164`
 **Complexity:** 2
 
 **Description:**
@@ -9918,7 +9918,7 @@ Example:
 ### `test_review_response_consistency(review_json_data) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_review_response.py:129`
+**Defined in:** `model_chorus/tests/test_review_response.py:130`
 **Complexity:** 3
 
 **Description:**
@@ -9946,7 +9946,7 @@ Example:
 ### `async test_shared_request_model_overrides_provider_metadata() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_consensus_provider_models.py:65`
+**Defined in:** `model_chorus/tests/test_consensus_provider_models.py:64`
 **Complexity:** 1
 
 **Decorators:** `@pytest.mark.asyncio`
@@ -9959,7 +9959,7 @@ Example:
 ### `test_strengths_structure(review_json_data) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/tests/test_review_response.py:112`
+**Defined in:** `model_chorus/tests/test_review_response.py:113`
 **Complexity:** 2
 
 **Description:**
@@ -9973,7 +9973,7 @@ Example:
 ### `thinkdeep(step, step_number, total_steps, next_step_required, findings, provider, continuation_id, hypothesis, confidence, files_checked, relevant_files, thinking_mode, use_assistant_model, output, verbose, skip_provider_check) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1393`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1400`
 ⚠️ **Complexity:** 55 (High)
 
 **Decorators:** `@app.command()`
@@ -10000,15 +10000,15 @@ Example:
 - `total_steps`: int
 - `next_step_required`: bool
 - `findings`: str
-- `provider`: Optional[str]
-- `continuation_id`: Optional[str]
-- `hypothesis`: Optional[str]
+- `provider`: str | None
+- `continuation_id`: str | None
+- `hypothesis`: str | None
 - `confidence`: str
-- `files_checked`: Optional[str]
-- `relevant_files`: Optional[str]
-- `thinking_mode`: Optional[str]
+- `files_checked`: str | None
+- `relevant_files`: str | None
+- `thinking_mode`: str | None
 - `use_assistant_model`: bool
-- `output`: Optional[Path]
+- `output`: Path | None
 - `verbose`: bool
 - `skip_provider_check`: bool
 
@@ -10017,7 +10017,7 @@ Example:
 ### `thinkdeep_status(thread_id, show_steps, show_files, verbose) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1770`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1777`
 ⚠️ **Complexity:** 18 (High)
 
 **Decorators:** `@app.command(name='thinkdeep-status')`
@@ -10046,7 +10046,7 @@ Example:
 
 ---
 
-### `validate_citation(citation) -> Tuple[bool, List[str]]`
+### `validate_citation(citation) -> tuple[bool, list[str]]`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/utils/citation_formatter.py:233`
@@ -10073,7 +10073,7 @@ Example:
 
 ---
 
-### `validate_config(project_root) -> Dict[str, Any]`
+### `validate_config(project_root) -> dict[str, Any]`
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/cli/setup.py:716`
@@ -10089,14 +10089,14 @@ Returns:
     Dict with validation result
 
 **Parameters:**
-- `project_root`: Optional[Path]
+- `project_root`: Path | None
 
 ---
 
 ### `version() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:2213`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:2220`
 **Complexity:** 1
 
 **Decorators:** `@app.command()`
@@ -10119,7 +10119,6 @@ Returns:
 - `model_chorus.workflows.IdeateWorkflow`
 - `pathlib.Path`
 - `sys`
-- `typing.Optional`
 
 ### `model_chorus/examples/basic_workflow.py`
 
@@ -10153,9 +10152,6 @@ Returns:
 - `model_chorus.providers.ClaudeProvider`
 - `model_chorus.providers.GeminiProvider`
 - `model_chorus.workflows.ConfidenceLevel`
-- `model_chorus.workflows.Hypothesis`
-- `model_chorus.workflows.InvestigationStep`
-- `model_chorus.workflows.ThinkDeepState`
 - `model_chorus.workflows.ThinkDeepWorkflow`
 - `pathlib.Path`
 
@@ -10163,7 +10159,6 @@ Returns:
 
 - `pathlib.Path`
 - `re`
-- `sys`
 
 ### `model_chorus/src/model_chorus/cli/__init__.py`
 
@@ -10173,6 +10168,7 @@ Returns:
 ### `model_chorus/src/model_chorus/cli/main.py`
 
 - `asyncio`
+- `collections.abc.Sequence`
 - `core.config.get_claude_config_loader`
 - `core.context_ingestion.BinaryFileError`
 - `core.context_ingestion.ContextIngestionService`
@@ -10187,17 +10183,11 @@ Returns:
 - `providers.GeminiProvider`
 - `providers.GenerationRequest`
 - `providers.base_provider.ModelProvider`
-- `providers.cli_provider.CLIProvider`
 - `providers.cli_provider.ProviderUnavailableError`
 - `rich.console.Console`
 - `rich.table.Table`
 - `study_commands.study_app`
 - `typer`
-- `typing.List`
-- `typing.Optional`
-- `typing.Sequence`
-- `typing.Tuple`
-- `typing.Union`
 - `typing.cast`
 - `workflows.ArgumentWorkflow`
 - `workflows.ChatWorkflow`
@@ -10214,9 +10204,6 @@ Returns:
 - `subprocess`
 - `sys`
 - `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
 
 ### `model_chorus/src/model_chorus/cli/study_commands.py`
 
@@ -10230,12 +10217,10 @@ Returns:
 - `providers.CursorAgentProvider`
 - `providers.GeminiProvider`
 - `providers.base_provider.ModelProvider`
-- `providers.cli_provider.CLIProvider`
 - `providers.cli_provider.ProviderUnavailableError`
 - `rich.console.Console`
 - `typer`
-- `typing.List`
-- `typing.Optional`
+- `typing.Any`
 - `workflows.study.StudyWorkflow`
 
 ### `model_chorus/src/model_chorus/core/__init__.py`
@@ -10291,9 +10276,7 @@ Returns:
 - `models.ConversationMessage`
 - `models.ConversationThread`
 - `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
+- `typing.Literal`
 - `typing.TYPE_CHECKING`
 
 ### `model_chorus/src/model_chorus/core/clustering.py`
@@ -10302,10 +10285,6 @@ Returns:
 - `dataclasses.field`
 - `numpy`
 - `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
-- `typing.Tuple`
 
 ### `model_chorus/src/model_chorus/core/config.py`
 
@@ -10315,18 +10294,12 @@ Returns:
 - `pydantic.Field`
 - `pydantic.field_validator`
 - `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
 
 ### `model_chorus/src/model_chorus/core/context_ingestion.py`
 
 - `chardet`
 - `logging`
 - `pathlib.Path`
-- `typing.List`
-- `typing.Optional`
-- `typing.Tuple`
 
 ### `model_chorus/src/model_chorus/core/contradiction.py`
 
@@ -10337,16 +10310,12 @@ Returns:
 - `pydantic.field_validator`
 - `re`
 - `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
-- `typing.Tuple`
 
 ### `model_chorus/src/model_chorus/core/conversation.py`
 
+- `datetime.UTC`
 - `datetime.datetime`
 - `datetime.timedelta`
-- `datetime.timezone`
 - `filelock`
 - `json`
 - `logging`
@@ -10354,11 +10323,7 @@ Returns:
 - `models.ConversationThread`
 - `pathlib.Path`
 - `typing.Any`
-- `typing.Dict`
-- `typing.List`
 - `typing.Literal`
-- `typing.Optional`
-- `typing.Tuple`
 - `uuid`
 
 ### `model_chorus/src/model_chorus/core/gap_analysis.py`
@@ -10369,9 +10334,6 @@ Returns:
 - `pydantic.Field`
 - `pydantic.field_validator`
 - `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
 
 ### `model_chorus/src/model_chorus/core/models.py`
 
@@ -10380,28 +10342,18 @@ Returns:
 - `pydantic.ConfigDict`
 - `pydantic.Field`
 - `typing.Any`
-- `typing.Dict`
-- `typing.List`
 - `typing.Literal`
-- `typing.Optional`
 
 ### `model_chorus/src/model_chorus/core/progress.py`
 
 - `rich.console.Console`
 - `sys`
-- `typing.Optional`
-
-### `model_chorus/src/model_chorus/core/prompts.py`
-
-- `typing.Optional`
 
 ### `model_chorus/src/model_chorus/core/registry.py`
 
 - `base_workflow.BaseWorkflow`
+- `collections.abc.Callable`
 - `inspect`
-- `typing.Callable`
-- `typing.Dict`
-- `typing.Type`
 
 ### `model_chorus/src/model_chorus/core/role_orchestration.py`
 
@@ -10415,21 +10367,16 @@ Returns:
 - `pydantic.Field`
 - `pydantic.field_validator`
 - `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
 
 ### `model_chorus/src/model_chorus/core/state.py`
 
+- `datetime.UTC`
 - `datetime.datetime`
-- `datetime.timezone`
 - `logging`
 - `models.ConversationState`
 - `pathlib.Path`
 - `threading`
 - `typing.Any`
-- `typing.Dict`
-- `typing.Optional`
 
 ### `model_chorus/src/model_chorus/providers/__init__.py`
 
@@ -10452,9 +10399,6 @@ Returns:
 - `dataclasses.field`
 - `enum.Enum`
 - `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
 
 ### `model_chorus/src/model_chorus/providers/claude_provider.py`
 
@@ -10467,9 +10411,6 @@ Returns:
 - `json`
 - `logging`
 - `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
 
 ### `model_chorus/src/model_chorus/providers/cli_provider.py`
 
@@ -10483,9 +10424,6 @@ Returns:
 - `os`
 - `pathlib.Path`
 - `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
 
 ### `model_chorus/src/model_chorus/providers/codex_provider.py`
 
@@ -10498,9 +10436,6 @@ Returns:
 - `json`
 - `logging`
 - `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
 
 ### `model_chorus/src/model_chorus/providers/cursor_agent_provider.py`
 
@@ -10513,9 +10448,6 @@ Returns:
 - `json`
 - `logging`
 - `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
 
 ### `model_chorus/src/model_chorus/providers/gemini_provider.py`
 
@@ -10531,9 +10463,6 @@ Returns:
 - `pathlib.Path`
 - `shutil`
 - `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
 
 ### `model_chorus/src/model_chorus/utils/__init__.py`
 
@@ -10548,9 +10477,6 @@ Returns:
 
 - `enum.Enum`
 - `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Tuple`
 
 ### `model_chorus/src/model_chorus/workflows/__init__.py`
 
@@ -10601,9 +10527,6 @@ Returns:
 - `logging`
 - `providers.ModelProvider`
 - `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
 - `uuid`
 
 ### `model_chorus/src/model_chorus/workflows/argument/semantic.py`
@@ -10615,10 +10538,6 @@ Returns:
 - `numpy`
 - `sentence_transformers.SentenceTransformer`
 - `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
-- `typing.Tuple`
 
 ### `model_chorus/src/model_chorus/workflows/chat.py`
 
@@ -10632,9 +10551,6 @@ Returns:
 - `providers.GenerationRequest`
 - `providers.ModelProvider`
 - `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
 - `uuid`
 
 ### `model_chorus/src/model_chorus/workflows/consensus.py`
@@ -10653,9 +10569,6 @@ Returns:
 - `providers.GenerationResponse`
 - `providers.ModelProvider`
 - `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
 
 ### `model_chorus/src/model_chorus/workflows/ideate/__init__.py`
 
@@ -10678,9 +10591,6 @@ Returns:
 - `providers.GenerationRequest`
 - `providers.ModelProvider`
 - `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
 - `uuid`
 
 ### `model_chorus/src/model_chorus/workflows/study/__init__.py`
@@ -10692,9 +10602,6 @@ Returns:
 - `dataclasses.dataclass`
 - `dataclasses.field`
 - `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
 
 ### `model_chorus/src/model_chorus/workflows/study/context_analysis.py`
 
@@ -10708,9 +10615,6 @@ Returns:
 - `pydantic.Field`
 - `pydantic.field_validator`
 - `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
 
 ### `model_chorus/src/model_chorus/workflows/study/memory/__init__.py`
 
@@ -10730,9 +10634,6 @@ Returns:
 - `models.MemoryMetadata`
 - `models.MemoryQuery`
 - `threading`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
 
 ### `model_chorus/src/model_chorus/workflows/study/memory/controller.py`
 
@@ -10742,27 +10643,22 @@ Returns:
 - `models.MemoryMetadata`
 - `models.MemoryQuery`
 - `persistence.LongTermStorage`
-- `typing.List`
-- `typing.Optional`
 - `uuid`
 
 ### `model_chorus/src/model_chorus/workflows/study/memory/models.py`
 
+- `datetime.UTC`
 - `datetime.datetime`
-- `datetime.timezone`
 - `enum.Enum`
 - `pydantic.BaseModel`
 - `pydantic.ConfigDict`
 - `pydantic.Field`
 - `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
 
 ### `model_chorus/src/model_chorus/workflows/study/memory/persistence.py`
 
+- `datetime.UTC`
 - `datetime.datetime`
-- `datetime.timezone`
 - `json`
 - `logging`
 - `models.MemoryEntry`
@@ -10772,17 +10668,12 @@ Returns:
 - `pathlib.Path`
 - `sqlite3`
 - `typing.Any`
-- `typing.List`
-- `typing.Optional`
 
 ### `model_chorus/src/model_chorus/workflows/study/persona_base.py`
 
 - `dataclasses.dataclass`
 - `dataclasses.field`
 - `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
 
 ### `model_chorus/src/model_chorus/workflows/study/persona_router.py`
 
@@ -10797,10 +10688,6 @@ Returns:
 - `persona_base.Persona`
 - `persona_base.PersonaRegistry`
 - `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
-- `typing.Tuple`
 
 ### `model_chorus/src/model_chorus/workflows/study/personas/__init__.py`
 
@@ -10817,21 +10704,18 @@ Returns:
 - `persona_base.Persona`
 - `persona_base.PersonaResponse`
 - `typing.Any`
-- `typing.Dict`
 
 ### `model_chorus/src/model_chorus/workflows/study/personas/planner.py`
 
 - `persona_base.Persona`
 - `persona_base.PersonaResponse`
 - `typing.Any`
-- `typing.Dict`
 
 ### `model_chorus/src/model_chorus/workflows/study/personas/researcher.py`
 
 - `persona_base.Persona`
 - `persona_base.PersonaResponse`
 - `typing.Any`
-- `typing.Dict`
 
 ### `model_chorus/src/model_chorus/workflows/study/state_machine.py`
 
@@ -10839,9 +10723,6 @@ Returns:
 - `core.models.InvestigationPhase`
 - `core.models.StudyState`
 - `logging`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
 
 ### `model_chorus/src/model_chorus/workflows/study/study_workflow.py`
 
@@ -10853,16 +10734,13 @@ Returns:
 - `core.progress.emit_workflow_complete`
 - `core.progress.emit_workflow_start`
 - `core.registry.WorkflowRegistry`
+- `datetime.UTC`
 - `datetime.datetime`
-- `datetime.timezone`
 - `logging`
 - `persona_router.PersonaRouter`
 - `personas.get_default_registry`
 - `providers.ModelProvider`
 - `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
 - `uuid`
 
 ### `model_chorus/src/model_chorus/workflows/thinkdeep.py`
@@ -10882,10 +10760,7 @@ Returns:
 - `providers.GenerationResponse`
 - `providers.ModelProvider`
 - `typing.Any`
-- `typing.Dict`
-- `typing.List`
 - `typing.Literal`
-- `typing.Optional`
 - `typing.cast`
 - `uuid`
 
@@ -10893,30 +10768,20 @@ Returns:
 
 - `model_chorus.providers.base_provider.GenerationResponse`
 - `os`
-- `pathlib.Path`
 - `pytest`
-- `shutil`
-- `subprocess`
-- `sys`
 - `test_helpers`
 - `unittest.mock.AsyncMock`
 - `unittest.mock.MagicMock`
-- `yaml`
 
 ### `model_chorus/tests/test_argument_workflow.py`
 
-- `model_chorus.core.conversation.ConversationMemory`
 - `model_chorus.core.models.ArgumentMap`
-- `model_chorus.core.models.ArgumentPerspective`
 - `model_chorus.core.role_orchestration.OrchestrationPattern`
 - `model_chorus.core.role_orchestration.OrchestrationResult`
-- `model_chorus.providers.base_provider.GenerationRequest`
 - `model_chorus.providers.base_provider.GenerationResponse`
 - `model_chorus.workflows.argument.ArgumentWorkflow`
-- `pathlib.Path`
 - `pytest`
 - `unittest.mock.AsyncMock`
-- `unittest.mock.MagicMock`
 - `unittest.mock.patch`
 - `uuid`
 
@@ -10929,22 +10794,15 @@ Returns:
 - `model_chorus.providers.GeminiProvider`
 - `model_chorus.workflows.ChatWorkflow`
 - `os`
-- `pathlib.Path`
 - `pytest`
 - `test_helpers.ANY_PROVIDER_AVAILABLE`
 
 ### `model_chorus/tests/test_chat_workflow.py`
 
-- `model_chorus.core.conversation.ConversationMemory`
-- `model_chorus.providers.base_provider.GenerationRequest`
-- `model_chorus.providers.base_provider.GenerationResponse`
 - `model_chorus.workflows.ChatWorkflow`
-- `pathlib.Path`
 - `pytest`
 - `unittest.mock.AsyncMock`
 - `unittest.mock.MagicMock`
-- `unittest.mock.patch`
-- `uuid`
 
 ### `model_chorus/tests/test_citation.py`
 
@@ -10972,7 +10830,6 @@ Returns:
 - `model_chorus.providers.base_provider.GenerationRequest`
 - `model_chorus.providers.claude_provider.ClaudeProvider`
 - `pytest`
-- `unittest.mock.AsyncMock`
 - `unittest.mock.patch`
 
 ### `model_chorus/tests/test_cli_integration.py`
@@ -10981,13 +10838,10 @@ Returns:
 - `model_chorus.cli.main.app`
 - `model_chorus.core.base_workflow.WorkflowResult`
 - `model_chorus.core.base_workflow.WorkflowStep`
-- `model_chorus.providers.base_provider.GenerationResponse`
-- `pathlib.Path`
 - `pytest`
 - `typer.testing.CliRunner`
 - `unittest.mock.AsyncMock`
 - `unittest.mock.MagicMock`
-- `unittest.mock.mock_open`
 - `unittest.mock.patch`
 
 ### `model_chorus/tests/test_clustering.py`
@@ -10996,27 +10850,20 @@ Returns:
 - `model_chorus.core.clustering.SemanticClustering`
 - `numpy`
 - `pytest`
-- `unittest.mock.MagicMock`
 - `unittest.mock.Mock`
 - `unittest.mock.patch`
 
 ### `model_chorus/tests/test_codex_provider.py`
 
-- `json`
 - `model_chorus.providers.base_provider.GenerationRequest`
 - `model_chorus.providers.codex_provider.CodexProvider`
 - `pytest`
-- `unittest.mock.AsyncMock`
 - `unittest.mock.patch`
 
 ### `model_chorus/tests/test_concurrent_conversations.py`
 
 - `asyncio`
-- `concurrent.futures.ThreadPoolExecutor`
-- `datetime.datetime`
-- `datetime.timezone`
 - `model_chorus.core.conversation.ConversationMemory`
-- `model_chorus.core.models.ConversationMessage`
 - `model_chorus.providers.base_provider.GenerationResponse`
 - `model_chorus.workflows.chat.ChatWorkflow`
 - `model_chorus.workflows.thinkdeep.ThinkDeepWorkflow`
@@ -11033,7 +10880,6 @@ Returns:
 - `model_chorus.core.config.ModelChorusConfig`
 - `model_chorus.core.config.WorkflowConfig`
 - `model_chorus.core.config.get_config_loader`
-- `pathlib.Path`
 - `pytest`
 
 ### `model_chorus/tests/test_consensus_provider_models.py`
@@ -11041,7 +10887,6 @@ Returns:
 - `model_chorus.providers.base_provider.GenerationRequest`
 - `model_chorus.providers.base_provider.GenerationResponse`
 - `model_chorus.workflows.consensus.ConsensusWorkflow`
-- `pathlib.Path`
 - `pytest`
 - `unittest.mock.AsyncMock`
 
@@ -11079,14 +10924,8 @@ Returns:
 
 ### `model_chorus/tests/test_conversation.py`
 
-- `datetime.datetime`
-- `datetime.timezone`
 - `json`
 - `model_chorus.core.conversation.ConversationMemory`
-- `model_chorus.core.models.ConversationMessage`
-- `model_chorus.core.models.ConversationThread`
-- `pathlib.Path`
-- `pytest`
 - `uuid`
 
 ### `model_chorus/tests/test_cursor_agent_provider.py`
@@ -11095,7 +10934,6 @@ Returns:
 - `model_chorus.providers.base_provider.GenerationRequest`
 - `model_chorus.providers.cursor_agent_provider.CursorAgentProvider`
 - `pytest`
-- `unittest.mock.AsyncMock`
 - `unittest.mock.patch`
 
 ### `model_chorus/tests/test_gap_analysis.py`
@@ -11130,38 +10968,26 @@ Returns:
 
 - `model_chorus.core.base_workflow.WorkflowResult`
 - `model_chorus.core.base_workflow.WorkflowStep`
-- `model_chorus.core.models.ConversationMessage`
 - `model_chorus.providers.base_provider.GenerationRequest`
 - `model_chorus.providers.base_provider.GenerationResponse`
 - `model_chorus.workflows.ideate.ideate_workflow.IdeateWorkflow`
 - `pytest`
-- `typing.Any`
-- `typing.Dict`
 - `unittest.mock.AsyncMock`
 - `unittest.mock.MagicMock`
 
 ### `model_chorus/tests/test_ideate_workflow_integration.py`
 
-- `model_chorus.core.conversation.ConversationMemory`
-- `model_chorus.core.models.Idea`
-- `model_chorus.core.models.IdeaCluster`
-- `model_chorus.core.models.IdeationState`
-- `model_chorus.core.role_orchestration.OrchestrationPattern`
-- `model_chorus.core.role_orchestration.OrchestrationResult`
 - `model_chorus.providers.base_provider.GenerationRequest`
 - `model_chorus.providers.base_provider.GenerationResponse`
 - `model_chorus.workflows.ideate.IdeateWorkflow`
-- `pathlib.Path`
 - `pytest`
 - `unittest.mock.AsyncMock`
 - `unittest.mock.MagicMock`
 - `unittest.mock.patch`
-- `uuid`
 
 ### `model_chorus/tests/test_integration.py`
 
 - `model_chorus.providers.base_provider.GenerationRequest`
-- `model_chorus.providers.base_provider.GenerationResponse`
 - `model_chorus.providers.claude_provider.ClaudeProvider`
 - `model_chorus.providers.codex_provider.CodexProvider`
 - `model_chorus.workflows.consensus.ConsensusStrategy`
@@ -11176,11 +11002,8 @@ Returns:
 - `model_chorus.core.conversation.ConversationMemory`
 - `model_chorus.providers.base_provider.GenerationResponse`
 - `model_chorus.workflows.chat.ChatWorkflow`
-- `model_chorus.workflows.thinkdeep.ThinkDeepWorkflow`
 - `pytest`
-- `sys`
 - `unittest.mock.AsyncMock`
-- `uuid`
 
 ### `model_chorus/tests/test_providers/test_cli_interface.py`
 
@@ -11191,7 +11014,6 @@ Returns:
 - `model_chorus.providers.GeminiProvider`
 - `model_chorus.providers.GenerationRequest`
 - `model_chorus.providers.ModelProvider`
-- `pathlib.Path`
 - `pytest`
 
 ### `model_chorus/tests/test_review_response.py`
@@ -11202,7 +11024,6 @@ Returns:
 
 ### `model_chorus/tests/test_role_orchestration.py`
 
-- `asyncio`
 - `dataclasses.dataclass`
 - `model_chorus.core.role_orchestration.ModelRole`
 - `model_chorus.core.role_orchestration.OrchestrationPattern`
@@ -11210,11 +11031,6 @@ Returns:
 - `model_chorus.core.role_orchestration.RoleOrchestrator`
 - `model_chorus.core.role_orchestration.SynthesisStrategy`
 - `pytest`
-- `typing.Any`
-- `typing.Dict`
-- `typing.Optional`
-- `unittest.mock.AsyncMock`
-- `unittest.mock.Mock`
 - `unittest.mock.patch`
 
 ### `model_chorus/tests/test_semantic_similarity.py`
@@ -11241,17 +11057,13 @@ Returns:
 - `model_chorus.providers.base_provider.TokenUsage`
 - `model_chorus.providers.claude_provider.ClaudeProvider`
 - `model_chorus.providers.gemini_provider.GeminiProvider`
-- `pytest`
 
 ### `model_chorus/tests/test_state.py`
 
-- `datetime.datetime`
-- `datetime.timezone`
 - `json`
 - `model_chorus.core.models.ConversationState`
 - `model_chorus.core.state.StateManager`
 - `model_chorus.core.state.get_default_state_manager`
-- `pathlib.Path`
 - `pytest`
 - `threading`
 - `time`
@@ -11260,33 +11072,19 @@ Returns:
 
 - `model_chorus.core.conversation.ConversationMemory`
 - `model_chorus.core.models.ConfidenceLevel`
-- `model_chorus.core.models.Hypothesis`
-- `model_chorus.core.models.InvestigationStep`
-- `model_chorus.core.models.ThinkDeepState`
-- `model_chorus.providers.base_provider.GenerationRequest`
 - `model_chorus.providers.base_provider.GenerationResponse`
 - `model_chorus.workflows.thinkdeep.ThinkDeepWorkflow`
 - `pytest`
 - `unittest.mock.AsyncMock`
-- `unittest.mock.MagicMock`
-- `unittest.mock.patch`
-- `uuid`
 
 ### `model_chorus/tests/test_thinkdeep_expert_validation.py`
 
 - `model_chorus.core.conversation.ConversationMemory`
 - `model_chorus.core.models.ConfidenceLevel`
-- `model_chorus.core.models.Hypothesis`
-- `model_chorus.core.models.InvestigationStep`
-- `model_chorus.core.models.ThinkDeepState`
-- `model_chorus.providers.base_provider.GenerationRequest`
 - `model_chorus.providers.base_provider.GenerationResponse`
 - `model_chorus.workflows.thinkdeep.ThinkDeepWorkflow`
 - `pytest`
 - `unittest.mock.AsyncMock`
-- `unittest.mock.MagicMock`
-- `unittest.mock.patch`
-- `uuid`
 
 ### `model_chorus/tests/test_thinkdeep_models.py`
 
@@ -11302,17 +11100,12 @@ Returns:
 
 - `model_chorus.core.conversation.ConversationMemory`
 - `model_chorus.core.models.ConfidenceLevel`
-- `model_chorus.core.models.Hypothesis`
 - `model_chorus.core.models.InvestigationStep`
-- `model_chorus.core.models.ThinkDeepState`
 - `model_chorus.providers.base_provider.GenerationRequest`
 - `model_chorus.providers.base_provider.GenerationResponse`
 - `model_chorus.workflows.thinkdeep.ThinkDeepWorkflow`
 - `pytest`
 - `unittest.mock.AsyncMock`
-- `unittest.mock.MagicMock`
-- `unittest.mock.patch`
-- `uuid`
 
 ### `model_chorus/tests/test_workflow_integration_chaining.py`
 
@@ -11323,17 +11116,13 @@ Returns:
 - `model_chorus.workflows.consensus.ConsensusStrategy`
 - `model_chorus.workflows.consensus.ConsensusWorkflow`
 - `model_chorus.workflows.thinkdeep.ThinkDeepWorkflow`
-- `pathlib.Path`
 - `pytest`
 - `unittest.mock.AsyncMock`
-- `unittest.mock.patch`
-- `uuid`
 
 ### `model_chorus/tests/workflows/study/memory/test_cache.py`
 
 - `model_chorus.workflows.study.memory.MemoryEntry`
 - `model_chorus.workflows.study.memory.MemoryQuery`
-- `model_chorus.workflows.study.memory.MemoryType`
 - `model_chorus.workflows.study.memory.ShortTermCache`
 - `pytest`
 
@@ -11344,7 +11133,6 @@ Returns:
 - `model_chorus.workflows.study.memory.MemoryQuery`
 - `model_chorus.workflows.study.memory.MemoryType`
 - `os`
-- `pathlib.Path`
 - `pytest`
 - `tempfile`
 
@@ -11366,13 +11154,10 @@ Returns:
 ### `model_chorus/tests/workflows/study/test_routing.py`
 
 - `model_chorus.core.models.StudyState`
-- `model_chorus.workflows.study.persona_base.Persona`
-- `model_chorus.workflows.study.persona_base.PersonaRegistry`
 - `model_chorus.workflows.study.persona_router.PersonaRouter`
 - `model_chorus.workflows.study.persona_router.RoutingDecision`
 - `model_chorus.workflows.study.personas.get_default_registry`
 - `pytest`
-- `unittest.mock.Mock`
 - `unittest.mock.patch`
 
 ### `model_chorus/tests/workflows/study/test_state_machine.py`
@@ -11386,14 +11171,10 @@ Returns:
 ### `model_chorus/tests/workflows/study/test_study_workflow.py`
 
 - `datetime.datetime`
-- `datetime.timezone`
 - `model_chorus.core.base_workflow.WorkflowResult`
 - `model_chorus.core.base_workflow.WorkflowStep`
 - `model_chorus.core.conversation.ConversationMemory`
-- `model_chorus.core.models.ConversationMessage`
 - `model_chorus.workflows.study.study_workflow.StudyWorkflow`
 - `pytest`
 - `unittest.mock.AsyncMock`
-- `unittest.mock.MagicMock`
 - `unittest.mock.Mock`
-- `unittest.mock.patch`
