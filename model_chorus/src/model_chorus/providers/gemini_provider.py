@@ -17,6 +17,7 @@ from .base_provider import (
     GenerationResponse,
     ModelConfig,
     ModelCapability,
+    TokenUsage,
 )
 
 logger = logging.getLogger(__name__)
@@ -278,7 +279,8 @@ class GeminiProvider(CLIProvider):
 
             # Extract model info from stats if available
             model_name = "unknown"
-            usage = {}
+            token_usage = TokenUsage()
+            
             if "stats" in data and "models" in data["stats"]:
                 # Get the first (and usually only) model from stats
                 models = data["stats"]["models"]
@@ -288,20 +290,24 @@ class GeminiProvider(CLIProvider):
                     # Convert token stats to standard usage format
                     if "tokens" in model_stats:
                         tokens = model_stats["tokens"]
-                        usage = {
-                            "input_tokens": tokens.get("prompt", 0),
-                            "output_tokens": tokens.get("candidates", 0),
-                            "total_tokens": tokens.get("total", 0),
-                        }
+                        token_usage = TokenUsage(
+                            input_tokens=tokens.get("prompt", 0),
+                            output_tokens=tokens.get("candidates", 0),
+                            total_tokens=tokens.get("total", 0),
+                        )
 
             response = GenerationResponse(
                 content=content,
                 model=model_name,
-                usage=usage,
+                usage=token_usage,
                 stop_reason=None,  # Gemini CLI doesn't provide finish_reason
+                thread_id=None,    # Gemini CLI does not support conversation continuation
+                provider="gemini",
+                stderr=stderr,
+                duration_ms=None,
+                raw_response=data,
                 metadata={
                     "stats": data.get("stats"),
-                    "raw_response": data,
                 },
             )
 

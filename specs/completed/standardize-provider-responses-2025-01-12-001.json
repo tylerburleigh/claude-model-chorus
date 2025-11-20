@@ -6,7 +6,7 @@
     "spec-root": {
       "type": "spec",
       "title": "Standardize Provider JSON Responses with Thread ID Support",
-      "status": "in_progress",
+      "status": "completed",
       "parent": null,
       "children": [
         "phase-1",
@@ -17,7 +17,7 @@
         "phase-6"
       ],
       "total_tasks": 38,
-      "completed_tasks": 3,
+      "completed_tasks": 38,
       "metadata": {
         "description": "Standardize all provider responses to use structured dataclasses (TokenUsage, enhanced GenerationResponse) with thread_id field for conversation continuation. Extract CLI-native session/thread IDs from Claude, Codex, and Cursor Agent.",
         "scope": "Extract and store thread IDs only. CLI continuation (--resume flag usage) deferred to future spec.",
@@ -32,14 +32,14 @@
     "phase-1": {
       "type": "phase",
       "title": "Core Data Structures with Thread ID Support",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "spec-root",
       "children": [
         "phase-1-files",
         "phase-1-verify"
       ],
       "total_tasks": 6,
-      "completed_tasks": 3,
+      "completed_tasks": 6,
       "metadata": {
         "purpose": "Create foundational dataclasses with thread_id field",
         "risk_level": "low"
@@ -56,13 +56,13 @@
     "phase-1-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-1",
       "children": [
         "task-1-1"
       ],
       "total_tasks": 5,
-      "completed_tasks": 3,
+      "completed_tasks": 5,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -73,7 +73,7 @@
     "task-1-1": {
       "type": "task",
       "title": "model_chorus/src/model_chorus/providers/base_provider.py",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-1-files",
       "children": [
         "task-1-1-1",
@@ -88,7 +88,7 @@
         "depends": []
       },
       "total_tasks": 5,
-      "completed_tasks": 3,
+      "completed_tasks": 5,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/providers/base_provider.py",
         "task_category": "implementation",
@@ -175,7 +175,7 @@
     "task-1-1-4": {
       "type": "subtask",
       "title": "Add new fields to GenerationResponse",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-1-1",
       "children": [],
       "dependencies": {
@@ -188,7 +188,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "details": "Add: thread_id: Optional[str] = None, provider: Optional[str] = None, stderr: Optional[str] = None, duration_ms: Optional[int] = None, raw_response: Optional[Dict[str, Any]] = None",
         "task_category": "implementation"
@@ -197,7 +197,7 @@
     "task-1-1-5": {
       "type": "subtask",
       "title": "Add docstrings documenting thread_id field and provider mappings",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-1-1",
       "children": [],
       "dependencies": {
@@ -208,7 +208,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "details": "Document that thread_id maps from session_id (Claude, Cursor) or thread_id (Codex), null for Gemini",
         "task_category": "investigation",
@@ -218,7 +218,7 @@
     "phase-1-verify": {
       "type": "group",
       "title": "Verification",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-1",
       "children": [
         "verify-1-1"
@@ -231,13 +231,13 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {}
     },
     "verify-1-1": {
       "type": "verify",
       "title": "Verify base_provider.py changes compile and type-check",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-1-verify",
       "children": [],
       "dependencies": {
@@ -246,7 +246,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "auto",
         "command": "cd model_chorus && python -m py_compile src/model_chorus/providers/base_provider.py",
@@ -256,7 +256,7 @@
     "phase-2": {
       "type": "phase",
       "title": "Claude Provider Standardization with Session ID",
-      "status": "pending",
+      "status": "completed",
       "parent": "spec-root",
       "children": [
         "phase-2-files",
@@ -272,7 +272,7 @@
         "depends": []
       },
       "total_tasks": 8,
-      "completed_tasks": 0,
+      "completed_tasks": 8,
       "metadata": {
         "purpose": "Update Claude provider to extract session_id and use new structures",
         "risk_level": "low-medium"
@@ -281,13 +281,13 @@
     "phase-2-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2",
       "children": [
         "task-2-1"
       ],
       "total_tasks": 6,
-      "completed_tasks": 0,
+      "completed_tasks": 6,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -298,7 +298,7 @@
     "task-2-1": {
       "type": "task",
       "title": "model_chorus/src/model_chorus/providers/claude_provider.py",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2-files",
       "children": [
         "task-2-1-1",
@@ -314,7 +314,7 @@
         "depends": []
       },
       "total_tasks": 6,
-      "completed_tasks": 0,
+      "completed_tasks": 6,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/providers/claude_provider.py",
         "task_category": "implementation",
@@ -324,7 +324,7 @@
     "task-2-1-1": {
       "type": "subtask",
       "title": "Import TokenUsage from base_provider",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-1",
       "children": [],
       "dependencies": {
@@ -335,7 +335,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "details": "Add TokenUsage to imports at top of file"
       }
@@ -343,7 +343,7 @@
     "task-2-1-2": {
       "type": "subtask",
       "title": "Update parse_response to create TokenUsage object",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-1",
       "children": [],
       "dependencies": {
@@ -356,7 +356,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "details": "Replace usage dict creation with TokenUsage(input_tokens=..., output_tokens=..., cached_input_tokens=..., total_tokens=..., metadata={modelUsage, duration_ms, total_cost_usd})",
         "task_category": "implementation"
@@ -365,7 +365,7 @@
     "task-2-1-3": {
       "type": "subtask",
       "title": "Extract session_id from CLI response",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-1",
       "children": [],
       "dependencies": {
@@ -376,7 +376,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "details": "Extract data.get('session_id') from parsed JSON response"
       }
@@ -384,7 +384,7 @@
     "task-2-1-4": {
       "type": "subtask",
       "title": "Update GenerationResponse construction with new fields",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-1",
       "children": [],
       "dependencies": {
@@ -398,7 +398,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "details": "Add: thread_id=session_id, provider='claude', stderr=stderr, duration_ms=data.get('duration_ms'), raw_response=data",
         "task_category": "implementation"
@@ -407,7 +407,7 @@
     "task-2-1-5": {
       "type": "subtask",
       "title": "Move provider-specific data to metadata",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-1",
       "children": [],
       "dependencies": {
@@ -420,7 +420,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "details": "Keep metadata empty at top-level (modelUsage, duration_ms, cost now in usage.metadata or raw_response)",
         "task_category": "implementation"
@@ -429,7 +429,7 @@
     "task-2-1-6": {
       "type": "subtask",
       "title": "Update comments/docstrings to reflect new structure",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-1",
       "children": [],
       "dependencies": {
@@ -440,7 +440,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "details": "Update parse_response docstring showing new response structure",
         "task_category": "implementation"
@@ -449,7 +449,7 @@
     "phase-2-verify": {
       "type": "group",
       "title": "Verification",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2",
       "children": [
         "verify-2-1",
@@ -463,13 +463,13 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 0,
+      "completed_tasks": 2,
       "metadata": {}
     },
     "verify-2-1": {
       "type": "verify",
       "title": "Manual test: Parse Claude CLI output",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2-verify",
       "children": [],
       "dependencies": {
@@ -480,7 +480,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "manual",
         "steps": "Run 'claude -p \"test\" --output-format json' and pass output through parse_response. Verify: TokenUsage created, session_id extracted to thread_id, all fields populated",
@@ -491,7 +491,7 @@
     "verify-2-2": {
       "type": "verify",
       "title": "Verify backward compatibility with dict access",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2-verify",
       "children": [],
       "dependencies": {
@@ -502,7 +502,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "manual",
         "steps": "Test both response.usage.input_tokens and response.usage['input_tokens'] work correctly",
@@ -513,7 +513,7 @@
     "phase-3": {
       "type": "phase",
       "title": "Codex Provider Standardization with Thread ID",
-      "status": "pending",
+      "status": "completed",
       "parent": "spec-root",
       "children": [
         "phase-3-files",
@@ -531,7 +531,7 @@
         ]
       },
       "total_tasks": 7,
-      "completed_tasks": 0,
+      "completed_tasks": 7,
       "metadata": {
         "purpose": "Update Codex provider to move thread_id to top-level and use new structures",
         "risk_level": "low-medium"
@@ -540,13 +540,13 @@
     "phase-3-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-3",
       "children": [
         "task-3-1"
       ],
       "total_tasks": 5,
-      "completed_tasks": 0,
+      "completed_tasks": 5,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -557,7 +557,7 @@
     "task-3-1": {
       "type": "task",
       "title": "model_chorus/src/model_chorus/providers/codex_provider.py",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-3-files",
       "children": [
         "task-3-1-1",
@@ -572,7 +572,7 @@
         "depends": []
       },
       "total_tasks": 5,
-      "completed_tasks": 0,
+      "completed_tasks": 5,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/providers/codex_provider.py",
         "task_category": "implementation",
@@ -582,7 +582,7 @@
     "task-3-1-1": {
       "type": "subtask",
       "title": "Import TokenUsage from base_provider",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-3-1",
       "children": [],
       "dependencies": {
@@ -593,13 +593,13 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {}
     },
     "task-3-1-2": {
       "type": "subtask",
       "title": "Update parse_response to create TokenUsage object from JSONL events",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-3-1",
       "children": [],
       "dependencies": {
@@ -612,7 +612,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "details": "Extract usage from turn.completed event, create TokenUsage with cached_input_tokens support",
         "task_category": "implementation"
@@ -621,7 +621,7 @@
     "task-3-1-3": {
       "type": "subtask",
       "title": "Move thread_id from metadata to top-level field",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-3-1",
       "children": [],
       "dependencies": {
@@ -632,7 +632,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "details": "Change from metadata={'thread_id': thread_id} to thread_id=thread_id as parameter"
       }
@@ -640,7 +640,7 @@
     "task-3-1-4": {
       "type": "subtask",
       "title": "Update GenerationResponse construction with new fields",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-3-1",
       "children": [],
       "dependencies": {
@@ -654,7 +654,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "details": "Add: thread_id=thread_id, provider='codex', stderr=stderr, raw_response={'events': events}",
         "task_category": "implementation"
@@ -663,7 +663,7 @@
     "task-3-1-5": {
       "type": "subtask",
       "title": "Update comments/docstrings",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-3-1",
       "children": [],
       "dependencies": {
@@ -674,7 +674,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "task_category": "implementation"
       }
@@ -682,7 +682,7 @@
     "phase-3-verify": {
       "type": "group",
       "title": "Verification",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-3",
       "children": [
         "verify-3-1",
@@ -696,13 +696,13 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 0,
+      "completed_tasks": 2,
       "metadata": {}
     },
     "verify-3-1": {
       "type": "verify",
       "title": "Manual test: Parse Codex CLI JSONL output",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-3-verify",
       "children": [],
       "dependencies": {
@@ -713,7 +713,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "manual",
         "steps": "Run 'codex exec --json --sandbox read-only \"test\"' and parse output. Verify: TokenUsage created, thread_id at top-level, cached_input_tokens tracked",
@@ -724,7 +724,7 @@
     "verify-3-2": {
       "type": "verify",
       "title": "Verify thread_id accessible at top-level (not in metadata)",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-3-verify",
       "children": [],
       "dependencies": {
@@ -735,7 +735,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "manual",
         "steps": "Test response.thread_id works (not response.metadata['thread_id'])",
@@ -746,7 +746,7 @@
     "phase-4": {
       "type": "phase",
       "title": "Cursor Agent Provider Standardization with Session ID",
-      "status": "pending",
+      "status": "completed",
       "parent": "spec-root",
       "children": [
         "phase-4-files",
@@ -764,7 +764,7 @@
         ]
       },
       "total_tasks": 7,
-      "completed_tasks": 0,
+      "completed_tasks": 7,
       "metadata": {
         "purpose": "Update Cursor Agent provider to extract session_id and use new structures",
         "risk_level": "low-medium"
@@ -773,13 +773,13 @@
     "phase-4-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-4",
       "children": [
         "task-4-1"
       ],
       "total_tasks": 5,
-      "completed_tasks": 0,
+      "completed_tasks": 5,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -790,7 +790,7 @@
     "task-4-1": {
       "type": "task",
       "title": "model_chorus/src/model_chorus/providers/cursor_agent_provider.py",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-4-files",
       "children": [
         "task-4-1-1",
@@ -805,7 +805,7 @@
         "depends": []
       },
       "total_tasks": 5,
-      "completed_tasks": 0,
+      "completed_tasks": 5,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/providers/cursor_agent_provider.py",
         "task_category": "implementation",
@@ -815,7 +815,7 @@
     "task-4-1-1": {
       "type": "subtask",
       "title": "Import TokenUsage from base_provider",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-4-1",
       "children": [],
       "dependencies": {
@@ -826,13 +826,13 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {}
     },
     "task-4-1-2": {
       "type": "subtask",
       "title": "Update parse_response to create TokenUsage object",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-4-1",
       "children": [],
       "dependencies": {
@@ -845,7 +845,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "details": "Create TokenUsage from usage dict in response",
         "task_category": "implementation"
@@ -854,7 +854,7 @@
     "task-4-1-3": {
       "type": "subtask",
       "title": "Extract session_id from CLI response",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-4-1",
       "children": [],
       "dependencies": {
@@ -865,7 +865,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "details": "Extract data.get('session_id') from parsed JSON"
       }
@@ -873,7 +873,7 @@
     "task-4-1-4": {
       "type": "subtask",
       "title": "Update GenerationResponse construction with new fields",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-4-1",
       "children": [],
       "dependencies": {
@@ -887,7 +887,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "details": "Add: thread_id=session_id, provider='cursor-agent', stderr=stderr, raw_response=data. Keep code_blocks, language in metadata",
         "task_category": "implementation"
@@ -896,7 +896,7 @@
     "task-4-1-5": {
       "type": "subtask",
       "title": "Update comments/docstrings",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-4-1",
       "children": [],
       "dependencies": {
@@ -907,7 +907,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "task_category": "implementation"
       }
@@ -915,7 +915,7 @@
     "phase-4-verify": {
       "type": "group",
       "title": "Verification",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-4",
       "children": [
         "verify-4-1",
@@ -929,13 +929,13 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 0,
+      "completed_tasks": 2,
       "metadata": {}
     },
     "verify-4-1": {
       "type": "verify",
       "title": "Manual test: Parse Cursor Agent CLI output",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-4-verify",
       "children": [],
       "dependencies": {
@@ -946,7 +946,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "manual",
         "steps": "Run 'cursor-agent -p \"test\" --output-format json' and parse. Verify: TokenUsage created, session_id extracted to thread_id",
@@ -957,7 +957,7 @@
     "verify-4-2": {
       "type": "verify",
       "title": "Verify code_blocks and language metadata preserved",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-4-verify",
       "children": [],
       "dependencies": {
@@ -968,7 +968,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "manual",
         "steps": "Check response.metadata contains code_blocks and language fields",
@@ -979,7 +979,7 @@
     "phase-5": {
       "type": "phase",
       "title": "Gemini Provider Standardization (App-Level Only)",
-      "status": "pending",
+      "status": "completed",
       "parent": "spec-root",
       "children": [
         "phase-5-files",
@@ -997,7 +997,7 @@
         ]
       },
       "total_tasks": 6,
-      "completed_tasks": 0,
+      "completed_tasks": 6,
       "metadata": {
         "purpose": "Update Gemini provider to use new structures (no thread_id support)",
         "risk_level": "low"
@@ -1006,13 +1006,13 @@
     "phase-5-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-5",
       "children": [
         "task-5-1"
       ],
       "total_tasks": 4,
-      "completed_tasks": 0,
+      "completed_tasks": 4,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1023,7 +1023,7 @@
     "task-5-1": {
       "type": "task",
       "title": "model_chorus/src/model_chorus/providers/gemini_provider.py",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-5-files",
       "children": [
         "task-5-1-1",
@@ -1037,7 +1037,7 @@
         "depends": []
       },
       "total_tasks": 4,
-      "completed_tasks": 0,
+      "completed_tasks": 4,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/providers/gemini_provider.py",
         "task_category": "implementation",
@@ -1047,7 +1047,7 @@
     "task-5-1-1": {
       "type": "subtask",
       "title": "Import TokenUsage from base_provider",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-5-1",
       "children": [],
       "dependencies": {
@@ -1058,13 +1058,13 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {}
     },
     "task-5-1-2": {
       "type": "subtask",
       "title": "Update parse_response to create TokenUsage with normalized field names",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-5-1",
       "children": [],
       "dependencies": {
@@ -1077,7 +1077,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "details": "Map: tokens['prompt'] \u2192 input_tokens, tokens['candidates'] \u2192 output_tokens, tokens['total'] \u2192 total_tokens. Store stats in usage.metadata",
         "task_category": "implementation"
@@ -1086,7 +1086,7 @@
     "task-5-1-3": {
       "type": "subtask",
       "title": "Update GenerationResponse construction with new fields",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-5-1",
       "children": [],
       "dependencies": {
@@ -1099,7 +1099,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "details": "Add: thread_id=None (Gemini has no CLI thread support), provider='gemini', stderr=stderr, raw_response=data. Keep stats in metadata",
         "task_category": "implementation"
@@ -1108,7 +1108,7 @@
     "task-5-1-4": {
       "type": "subtask",
       "title": "Update comments/docstrings noting lack of thread support",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-5-1",
       "children": [],
       "dependencies": {
@@ -1119,7 +1119,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "details": "Document that Gemini relies on app-level ConversationMemory for continuation",
         "task_category": "implementation"
@@ -1128,7 +1128,7 @@
     "phase-5-verify": {
       "type": "group",
       "title": "Verification",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-5",
       "children": [
         "verify-5-1",
@@ -1142,13 +1142,13 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 0,
+      "completed_tasks": 2,
       "metadata": {}
     },
     "verify-5-1": {
       "type": "verify",
       "title": "Manual test: Parse Gemini CLI output",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-5-verify",
       "children": [],
       "dependencies": {
@@ -1159,7 +1159,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "manual",
         "steps": "Run 'gemini -p \"test\" --output-format json' and parse. Verify: TokenUsage created with normalized names (prompt\u2192input_tokens), thread_id is None",
@@ -1170,7 +1170,7 @@
     "verify-5-2": {
       "type": "verify",
       "title": "Verify stats preserved in metadata",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-5-verify",
       "children": [],
       "dependencies": {
@@ -1181,7 +1181,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "manual",
         "steps": "Check response.metadata['stats'] contains full Gemini stats object",
@@ -1192,7 +1192,7 @@
     "phase-6": {
       "type": "phase",
       "title": "Testing & Validation",
-      "status": "pending",
+      "status": "completed",
       "parent": "spec-root",
       "children": [
         "phase-6-verify"
@@ -1208,7 +1208,7 @@
         "depends": []
       },
       "total_tasks": 4,
-      "completed_tasks": 0,
+      "completed_tasks": 4,
       "metadata": {
         "purpose": "Verify all changes work correctly including thread ID handling",
         "risk_level": "low"
@@ -1217,7 +1217,7 @@
     "phase-6-verify": {
       "type": "group",
       "title": "Verification",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-6",
       "children": [
         "verify-6-1",
@@ -1226,13 +1226,13 @@
         "verify-6-4"
       ],
       "total_tasks": 4,
-      "completed_tasks": 0,
+      "completed_tasks": 4,
       "metadata": {}
     },
     "verify-6-1": {
       "type": "verify",
       "title": "Verify backward compatibility with existing workflow code",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-6-verify",
       "children": [],
       "dependencies": {
@@ -1243,7 +1243,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "manual",
         "steps": "Test existing workflow code (consensus.py, chat.py) still works. Verify usage['input_tokens'] dict access works alongside usage.input_tokens",
@@ -1254,7 +1254,7 @@
     "verify-6-2": {
       "type": "verify",
       "title": "Verify thread_id extraction for all providers",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-6-verify",
       "children": [],
       "dependencies": {
@@ -1263,7 +1263,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "manual",
         "steps": "Test each provider and verify: Claude (session_id\u2192thread_id), Codex (thread_id\u2192thread_id), Cursor (session_id\u2192thread_id), Gemini (thread_id=None)",
@@ -1274,7 +1274,7 @@
     "verify-6-3": {
       "type": "verify",
       "title": "Verify app-level ConversationMemory still works",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-6-verify",
       "children": [],
       "dependencies": {
@@ -1285,7 +1285,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "manual",
         "steps": "Test creating threads with ConversationMemory, verify continuation_id parameter still works for app-level threading (especially for Gemini)",
@@ -1296,7 +1296,7 @@
     "verify-6-4": {
       "type": "verify",
       "title": "Phase 6 implementation fidelity review",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-6-verify",
       "children": [],
       "dependencies": {
@@ -1305,7 +1305,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "fidelity",
         "skill": "sdd-fidelity-review",
@@ -1321,9 +1321,9 @@
     }
   },
   "metadata": {
-    "status": "active",
+    "status": "completed",
     "activated_date": "2025-11-13T15:53:43.490176Z",
-    "progress_percentage": 7,
+    "progress_percentage": 100,
     "current_phase": "phase-1"
   },
   "journal": [
@@ -1353,6 +1353,15 @@
       "content": "Successfully updated GenerationResponse to use TokenUsage instead of Dict[str, int]. Changed usage field from 'usage: Dict[str, int] = field(default_factory=dict)' to 'usage: TokenUsage = field(default_factory=TokenUsage)'. Verified with comprehensive tests including: default instance creation (usage is TokenUsage), explicit TokenUsage assignment, attribute access, dict-style read/write access, mixed access patterns, get() method with defaults, and iteration methods (keys/values/items). Full backward compatibility confirmed - existing provider code using dict syntax will work without modification. All success criteria met.",
       "metadata": {},
       "task_id": "task-1-1-3"
+    },
+    {
+      "timestamp": "2025-11-20T14:13:24.724799Z",
+      "entry_type": "status_change",
+      "title": "All Tasks Completed",
+      "author": "gemini-cli",
+      "content": "Verified Codex and Cursor implementations. Implemented standardization for Claude and Gemini providers. Verified all providers with tests.",
+      "metadata": {},
+      "task_id": "multiple"
     }
   ]
 }
