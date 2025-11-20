@@ -26,10 +26,7 @@ class ExampleProvider(ModelProvider):
 
     def __init__(self, api_key: str = None):
         """Initialize the example provider."""
-        super().__init__(
-            provider_name="example",
-            api_key=api_key or "example-key"
-        )
+        super().__init__(provider_name="example", api_key=api_key or "example-key")
 
         # Define available models
         models = [
@@ -40,7 +37,7 @@ class ExampleProvider(ModelProvider):
                 capabilities=[
                     ModelCapability.TEXT_GENERATION,
                     ModelCapability.STREAMING,
-                ]
+                ],
             ),
             ModelConfig(
                 model_id="example-vision",
@@ -50,7 +47,7 @@ class ExampleProvider(ModelProvider):
                     ModelCapability.TEXT_GENERATION,
                     ModelCapability.VISION,
                     ModelCapability.STREAMING,
-                ]
+                ],
             ),
         ]
 
@@ -82,7 +79,7 @@ class ExampleProvider(ModelProvider):
             content=content,
             model="example-basic",
             usage={"prompt_tokens": 10, "completion_tokens": 20},
-            stop_reason="complete"
+            stop_reason="complete",
         )
 
     def supports_vision(self, model_id: str) -> bool:
@@ -121,14 +118,16 @@ async def main():
     print("\nCapability Checks:")
     print(f"  example-basic supports vision: {provider.supports_vision('example-basic')}")
     print(f"  example-vision supports vision: {provider.supports_vision('example-vision')}")
-    print(f"  example-basic supports text: {provider.supports_capability('example-basic', ModelCapability.TEXT_GENERATION)}")
+    print(
+        f"  example-basic supports text: {provider.supports_capability('example-basic', ModelCapability.TEXT_GENERATION)}"
+    )
 
     # Create a generation request
     request = GenerationRequest(
         prompt="Explain the benefits of multi-model workflows",
         system_prompt="You are a helpful AI assistant",
         temperature=0.7,
-        max_tokens=500
+        max_tokens=500,
     )
 
     print("\n" + "=" * 50)

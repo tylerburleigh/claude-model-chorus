@@ -142,8 +142,7 @@ class WorkflowRegistry:
         if name not in cls._workflows:
             available = ", ".join(cls._workflows.keys()) if cls._workflows else "none"
             raise KeyError(
-                f"No workflow registered with name '{name}'. "
-                f"Available workflows: {available}"
+                f"No workflow registered with name '{name}'. " f"Available workflows: {available}"
             )
 
         return cls._workflows[name]

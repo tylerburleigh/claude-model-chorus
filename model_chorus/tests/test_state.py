@@ -34,7 +34,7 @@ class TestStateManager:
         test_data = {
             "current_step": 1,
             "models_consulted": ["claude", "gpt-5"],
-            "consensus_reached": False
+            "consensus_reached": False,
         }
 
         manager.set_state("test_workflow", test_data)
@@ -66,18 +66,11 @@ class TestStateManager:
         manager = StateManager()
 
         # Set initial state
-        initial_data = {
-            "step": 1,
-            "count": 0,
-            "status": "active"
-        }
+        initial_data = {"step": 1, "count": 0, "status": "active"}
         manager.set_state("test_workflow", initial_data)
 
         # Update with new fields
-        updates = {
-            "step": 2,
-            "count": 5
-        }
+        updates = {"step": 2, "count": 5}
         manager.update_state("test_workflow", updates)
 
         # Verify merge
@@ -162,10 +155,7 @@ class TestStateManager:
 
         def write_state(thread_id):
             for i in range(operations_per_thread):
-                manager.set_state(
-                    f"workflow_{thread_id}",
-                    {"thread": thread_id, "iteration": i}
-                )
+                manager.set_state(f"workflow_{thread_id}", {"thread": thread_id, "iteration": i})
 
         threads = []
         for i in range(num_threads):
@@ -206,10 +196,7 @@ class TestStateManager:
 
         def writer(thread_id):
             for i in range(iterations):
-                manager.update_state(
-                    "shared_workflow",
-                    {"counter": thread_id * 1000 + i}
-                )
+                manager.update_state("shared_workflow", {"counter": thread_id * 1000 + i})
                 time.sleep(0.001)
 
         threads = []
@@ -264,11 +251,7 @@ class TestStateManager:
         """Test serializing state to JSON string."""
         manager = StateManager()
 
-        test_data = {
-            "step": 1,
-            "models": ["claude", "gpt-5"],
-            "config": {"temperature": 0.7}
-        }
+        test_data = {"step": 1, "models": ["claude", "gpt-5"], "config": {"temperature": 0.7}}
         manager.set_state("test_workflow", test_data)
 
         json_str = manager.serialize_state("test_workflow")
@@ -311,9 +294,9 @@ class TestStateManager:
             "complex_field": {
                 "nested": {"deeply": ["a", "b", "c"]},
                 "numbers": [1, 2, 3],
-                "boolean": True
+                "boolean": True,
             },
-            "string": "test value"
+            "string": "test value",
         }
 
         manager.set_state("test_workflow", original_data, schema_version="2.5")
@@ -358,7 +341,7 @@ class TestStateManager:
             "data": {"imported": True, "count": 10},
             "schema_version": "1.5",
             "created_at": "2025-11-05T10:00:00Z",
-            "updated_at": "2025-11-05T11:00:00Z"
+            "updated_at": "2025-11-05T11:00:00Z",
         }
 
         import_file = tmp_path / "import_state.json"
@@ -416,7 +399,7 @@ class TestStateManager:
             "data": {"loaded": True, "source": "disk"},
             "schema_version": "1.0",
             "created_at": "2025-11-05T10:00:00Z",
-            "updated_at": "2025-11-05T11:00:00Z"
+            "updated_at": "2025-11-05T11:00:00Z",
         }
 
         state_file = state_dir / "disk_workflow.json"
@@ -446,7 +429,7 @@ class TestStateManager:
                 "data": {"id": i},
                 "schema_version": "1.0",
                 "created_at": "2025-11-05T10:00:00Z",
-                "updated_at": "2025-11-05T11:00:00Z"
+                "updated_at": "2025-11-05T11:00:00Z",
             }
             state_file = state_dir / f"workflow_{i}.json"
             state_file.write_text(json.dumps(state_data))
@@ -617,10 +600,7 @@ class TestStateManagerExportImportRoundtrip:
         original_data = {
             "workflow_state": "completed",
             "models": ["claude", "gpt-5", "gemini"],
-            "results": {
-                "consensus": "Approach A",
-                "confidence": 0.85
-            }
+            "results": {"consensus": "Approach A", "confidence": 0.85},
         }
 
         manager1.set_state("roundtrip_test", original_data, schema_version="2.0")

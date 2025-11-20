@@ -46,7 +46,11 @@ class CodexProvider(CLIProvider):
     """
 
     # Model capability mappings
-    FUNCTION_CALLING_MODELS = {"gpt-5-codex", "gpt-5-codex-mini", "gpt-5"}  # Models with function calling
+    FUNCTION_CALLING_MODELS = {
+        "gpt-5-codex",
+        "gpt-5-codex-mini",
+        "gpt-5",
+    }  # Models with function calling
 
     def __init__(
         self,
@@ -200,7 +204,7 @@ class CodexProvider(CLIProvider):
             events = []
 
             # Process each line as a JSON event
-            for line in stdout.strip().split('\n'):
+            for line in stdout.strip().split("\n"):
                 if not line:
                     continue
 
@@ -240,9 +244,7 @@ class CodexProvider(CLIProvider):
                 metadata={},
             )
 
-            logger.info(
-                f"Successfully parsed Codex response: {len(response.content)} chars"
-            )
+            logger.info(f"Successfully parsed Codex response: {len(response.content)} chars")
             return response
 
         except (json.JSONDecodeError, KeyError) as e:

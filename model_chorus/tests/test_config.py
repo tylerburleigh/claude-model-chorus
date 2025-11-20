@@ -140,10 +140,7 @@ workflows:
         config_file = tmp_path / ".model-chorusrc.json"
         config_data = {
             "default_provider": "codex",
-            "generation": {
-                "temperature": 0.9,
-                "max_tokens": 2500
-            }
+            "generation": {"temperature": 0.9, "max_tokens": 2500},
         }
         config_file.write_text(json.dumps(config_data))
 
@@ -231,10 +228,10 @@ workflows:
         loader.load_config(config_file)
 
         # Chat should use workflow-specific provider
-        assert loader.get_default_provider('chat', 'fallback') == 'claude'
+        assert loader.get_default_provider("chat", "fallback") == "claude"
 
         # Other workflows should use global default
-        assert loader.get_default_provider('thinkdeep', 'fallback') == 'gemini'
+        assert loader.get_default_provider("thinkdeep", "fallback") == "gemini"
 
     def test_get_default_provider_fallback(self, tmp_path, monkeypatch):
         """Test getting fallback provider when no config exists."""
@@ -243,7 +240,7 @@ workflows:
         loader = ConfigLoader()
         loader.load_config()  # No config file
 
-        assert loader.get_default_provider('chat', 'claude') == 'claude'
+        assert loader.get_default_provider("chat", "claude") == "claude"
 
     def test_get_workflow_default_temperature(self, tmp_path):
         """Test getting workflow-specific temperature default."""
@@ -261,10 +258,10 @@ workflows:
         loader.load_config(config_file)
 
         # ThinkDeep should use workflow-specific temperature
-        assert loader.get_workflow_default('thinkdeep', 'temperature', 0.5) == 0.6
+        assert loader.get_workflow_default("thinkdeep", "temperature", 0.5) == 0.6
 
         # Chat should use global temperature
-        assert loader.get_workflow_default('chat', 'temperature', 0.5) == 0.7
+        assert loader.get_workflow_default("chat", "temperature", 0.5) == 0.7
 
     def test_get_default_providers_multi(self, tmp_path):
         """Test getting multiple providers for consensus workflows."""
@@ -282,8 +279,8 @@ workflows:
         loader = ConfigLoader()
         loader.load_config(config_file)
 
-        providers = loader.get_default_providers('consensus', ['fallback'])
-        assert providers == ['claude', 'gemini', 'codex']
+        providers = loader.get_default_providers("consensus", ["fallback"])
+        assert providers == ["claude", "gemini", "codex"]
 
     # ========================================================================
     # Empty/Minimal Config Tests
@@ -319,11 +316,7 @@ workflows:
 
     def test_generation_defaults_validation(self):
         """Test GenerationDefaults model validation."""
-        defaults = GenerationDefaults(
-            temperature=0.7,
-            max_tokens=2000,
-            timeout=120.0
-        )
+        defaults = GenerationDefaults(temperature=0.7, max_tokens=2000, timeout=120.0)
 
         assert defaults.temperature == 0.7
         assert defaults.max_tokens == 2000
@@ -331,11 +324,7 @@ workflows:
 
     def test_workflow_config_validation(self):
         """Test WorkflowConfig model validation."""
-        config = WorkflowConfig(
-            provider="claude",
-            temperature=0.7,
-            strategy="synthesize"
-        )
+        config = WorkflowConfig(provider="claude", temperature=0.7, strategy="synthesize")
 
         assert config.provider == "claude"
         assert config.temperature == 0.7
@@ -353,8 +342,8 @@ workflows:
             generation=GenerationDefaults(temperature=0.7),
             workflows={
                 "chat": WorkflowConfig(provider="gemini"),
-                "consensus": WorkflowConfig(providers=["claude", "gemini"])
-            }
+                "consensus": WorkflowConfig(providers=["claude", "gemini"]),
+            },
         )
 
         assert config.default_provider == "claude"
@@ -520,10 +509,10 @@ workflows:
         loader.load_config(config_file)
 
         # Workflow-specific settings should override global
-        assert loader.get_default_provider('chat') == 'claude'
-        assert loader.get_workflow_default('chat', 'temperature', 0.5) == 0.9
-        assert loader.get_workflow_default('chat', 'max_tokens', 1000) == 3000
+        assert loader.get_default_provider("chat") == "claude"
+        assert loader.get_workflow_default("chat", "temperature", 0.5) == 0.9
+        assert loader.get_workflow_default("chat", "max_tokens", 1000) == 3000
 
         # Other workflows should use global settings
-        assert loader.get_default_provider('thinkdeep') == 'gemini'
-        assert loader.get_workflow_default('thinkdeep', 'temperature', 0.5) == 0.7
+        assert loader.get_default_provider("thinkdeep") == "gemini"
+        assert loader.get_workflow_default("thinkdeep", "temperature", 0.5) == 0.7

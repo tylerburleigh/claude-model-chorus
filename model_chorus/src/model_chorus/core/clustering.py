@@ -31,6 +31,7 @@ class ClusterResult:
         quality_score: Quality/coherence score (0.0 = poor, 1.0 = excellent)
         metadata: Additional cluster metadata
     """
+
     cluster_id: int
     items: List[int]
     centroid: np.ndarray
@@ -67,11 +68,7 @@ class SemanticClustering:
         ...     print(f"{cluster.name}: {cluster.items}")
     """
 
-    def __init__(
-        self,
-        model_name: str = "all-MiniLM-L6-v2",
-        cache_embeddings: bool = True
-    ):
+    def __init__(self, model_name: str = "all-MiniLM-L6-v2", cache_embeddings: bool = True):
         """
         Initialize the semantic clustering engine.
 
@@ -89,6 +86,7 @@ class SemanticClustering:
         if self._model is None:
             try:
                 from sentence_transformers import SentenceTransformer
+
                 self._model = SentenceTransformer(self.model_name)
             except ImportError:
                 raise ImportError(
@@ -140,11 +138,7 @@ class SemanticClustering:
         else:
             return self._model.encode(texts, convert_to_numpy=True)
 
-    def compute_similarity(
-        self,
-        embeddings: np.ndarray,
-        metric: str = "cosine"
-    ) -> np.ndarray:
+    def compute_similarity(self, embeddings: np.ndarray, metric: str = "cosine") -> np.ndarray:
         """
         Compute pairwise similarity matrix between embeddings.
 
@@ -171,7 +165,8 @@ class SemanticClustering:
         elif metric == "euclidean":
             # Compute pairwise Euclidean distances, convert to similarity
             from scipy.spatial.distance import cdist
-            distances = cdist(embeddings, embeddings, metric='euclidean')
+
+            distances = cdist(embeddings, embeddings, metric="euclidean")
             # Convert distance to similarity (closer = more similar)
             return 1 / (1 + distances)
         elif metric == "dot":
@@ -181,10 +176,7 @@ class SemanticClustering:
             raise ValueError(f"Unknown similarity metric: {metric}")
 
     def cluster_kmeans(
-        self,
-        embeddings: np.ndarray,
-        n_clusters: int,
-        random_state: Optional[int] = None
+        self, embeddings: np.ndarray, n_clusters: int, random_state: Optional[int] = None
     ) -> Tuple[np.ndarray, np.ndarray]:
         """
         Cluster embeddings using K-means algorithm.
@@ -210,25 +202,17 @@ class SemanticClustering:
             from sklearn.cluster import KMeans
         except ImportError:
             raise ImportError(
-                "scikit-learn not installed. "
-                "Install with: pip install scikit-learn"
+                "scikit-learn not installed. " "Install with: pip install scikit-learn"
             )
 
-        kmeans = KMeans(
-            n_clusters=n_clusters,
-            random_state=random_state,
-            n_init=10
-        )
+        kmeans = KMeans(n_clusters=n_clusters, random_state=random_state, n_init=10)
         labels = kmeans.fit_predict(embeddings)
         centroids = kmeans.cluster_centers_
 
         return labels, centroids
 
     def cluster_hierarchical(
-        self,
-        embeddings: np.ndarray,
-        n_clusters: int,
-        linkage: str = "ward"
+        self, embeddings: np.ndarray, n_clusters: int, linkage: str = "ward"
     ) -> np.ndarray:
         """
         Cluster embeddings using hierarchical clustering.
@@ -252,23 +236,15 @@ class SemanticClustering:
             from sklearn.cluster import AgglomerativeClustering
         except ImportError:
             raise ImportError(
-                "scikit-learn not installed. "
-                "Install with: pip install scikit-learn"
+                "scikit-learn not installed. " "Install with: pip install scikit-learn"
             )
 
-        clustering = AgglomerativeClustering(
-            n_clusters=n_clusters,
-            linkage=linkage
-        )
+        clustering = AgglomerativeClustering(n_clusters=n_clusters, linkage=linkage)
         labels = clustering.fit_predict(embeddings)
 
         return labels
 
-    def name_cluster(
-        self,
-        texts: List[str],
-        max_length: int = 50
-    ) -> str:
+    def name_cluster(self, texts: List[str], max_length: int = 50) -> str:
         """
         Generate a name/label for a cluster based on member texts.
 
@@ -297,15 +273,11 @@ class SemanticClustering:
         name = min(texts, key=len)
 
         if len(name) > max_length:
-            name = name[:max_length - 3] + "..."
+            name = name[: max_length - 3] + "..."
 
         return name
 
-    def summarize_cluster(
-        self,
-        texts: List[str],
-        max_length: int = 200
-    ) -> str:
+    def summarize_cluster(self, texts: List[str], max_length: int = 200) -> str:
         """
         Generate a summary for a cluster based on member texts.
 
@@ -331,15 +303,11 @@ class SemanticClustering:
         summary = "; ".join(texts)
 
         if len(summary) > max_length:
-            summary = summary[:max_length - 3] + "..."
+            summary = summary[: max_length - 3] + "..."
 
         return summary
 
-    def score_cluster(
-        self,
-        embeddings: np.ndarray,
-        centroid: np.ndarray
-    ) -> float:
+    def score_cluster(self, embeddings: np.ndarray, centroid: np.ndarray) -> float:
         """
         Compute quality score for a cluster based on cohesion.
 
@@ -379,7 +347,7 @@ class SemanticClustering:
         texts: List[str],
         n_clusters: int,
         method: str = "kmeans",
-        random_state: Optional[int] = None
+        random_state: Optional[int] = None,
     ) -> List[ClusterResult]:
         """
         Cluster texts into semantic groups.
@@ -423,10 +391,7 @@ class SemanticClustering:
         elif method == "hierarchical":
             labels = self.cluster_hierarchical(embeddings, n_clusters)
             # Compute centroids for hierarchical clustering
-            centroids = np.array([
-                embeddings[labels == i].mean(axis=0)
-                for i in range(n_clusters)
-            ])
+            centroids = np.array([embeddings[labels == i].mean(axis=0) for i in range(n_clusters)])
         else:
             raise ValueError(f"Unknown clustering method: {method}")
 
@@ -458,7 +423,7 @@ class SemanticClustering:
                 metadata={
                     "size": len(item_indices),
                     "method": method,
-                }
+                },
             )
             results.append(result)
 

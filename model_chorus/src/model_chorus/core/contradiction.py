@@ -203,6 +203,7 @@ class Contradiction(BaseModel):
 # Contradiction Detection Logic
 # ============================================================================
 
+
 # Import semantic similarity functions (lazy import to avoid circular dependencies)
 def _import_semantic_functions():
     """Import semantic similarity functions from workflows.argument.semantic."""
@@ -211,6 +212,7 @@ def _import_semantic_functions():
             compute_claim_similarity,
             compute_embedding,
         )
+
         return compute_claim_similarity, compute_embedding
     except ImportError as e:
         raise ImportError(
@@ -223,6 +225,7 @@ def _import_citation_map():
     """Import CitationMap model."""
     try:
         from model_chorus.core.models import CitationMap
+
         return CitationMap
     except ImportError as e:
         raise ImportError(f"Cannot import CitationMap model: {e}")
@@ -230,18 +233,49 @@ def _import_citation_map():
 
 # Polarity keywords for detecting opposing claims
 POSITIVE_KEYWORDS = [
-    "improves", "increases", "enhances", "better", "higher", "more",
-    "strengthens", "boosts", "raises", "grows", "gains", "benefits",
+    "improves",
+    "increases",
+    "enhances",
+    "better",
+    "higher",
+    "more",
+    "strengthens",
+    "boosts",
+    "raises",
+    "grows",
+    "gains",
+    "benefits",
 ]
 
 NEGATIVE_KEYWORDS = [
-    "reduces", "decreases", "worsens", "worse", "lower", "less",
-    "weakens", "diminishes", "drops", "declines", "losses", "harms",
+    "reduces",
+    "decreases",
+    "worsens",
+    "worse",
+    "lower",
+    "less",
+    "weakens",
+    "diminishes",
+    "drops",
+    "declines",
+    "losses",
+    "harms",
 ]
 
 NEGATION_KEYWORDS = [
-    "not", "never", "no", "without", "neither", "nor", "cannot",
-    "can't", "won't", "doesn't", "don't", "isn't", "aren't",
+    "not",
+    "never",
+    "no",
+    "without",
+    "neither",
+    "nor",
+    "cannot",
+    "can't",
+    "won't",
+    "doesn't",
+    "don't",
+    "isn't",
+    "aren't",
 ]
 
 
@@ -306,7 +340,7 @@ def detect_polarity_opposition(
 
     # Pattern 3: Numerical opposition (e.g., "23% increase" vs "15% decrease")
     # Look for percentages or numbers with opposite directions
-    percent_pattern = r'(\d+(?:\.\d+)?)\s*%'
+    percent_pattern = r"(\d+(?:\.\d+)?)\s*%"
     numbers_1 = re.findall(percent_pattern, text1_lower)
     numbers_2 = re.findall(percent_pattern, text2_lower)
 
@@ -411,18 +445,12 @@ def generate_contradiction_explanation(
             f"Claims have opposing polarity (confidence: {polarity_confidence:.2f})"
         )
 
-    explanation_parts.append(
-        f"Semantic similarity: {semantic_similarity:.2f}"
-    )
+    explanation_parts.append(f"Semantic similarity: {semantic_similarity:.2f}")
 
     if severity in [ContradictionSeverity.CRITICAL, ContradictionSeverity.MAJOR]:
-        explanation_parts.append(
-            "Claims are highly related but present contradictory assertions"
-        )
+        explanation_parts.append("Claims are highly related but present contradictory assertions")
     elif severity == ContradictionSeverity.MODERATE:
-        explanation_parts.append(
-            "Claims show notable inconsistency requiring investigation"
-        )
+        explanation_parts.append("Claims show notable inconsistency requiring investigation")
     else:
         explanation_parts.append(
             "Claims show minor inconsistency, may be due to different contexts"
@@ -462,9 +490,7 @@ def generate_reconciliation_suggestion(
             "Claims may apply to different domains or conditions."
         )
     elif severity == ContradictionSeverity.MODERATE:
-        return (
-            "Check for temporal differences or scope variations between sources."
-        )
+        return "Check for temporal differences or scope variations between sources."
 
     # No suggestion for MINOR severity
     return None
@@ -612,8 +638,10 @@ def detect_contradictions_batch(
             claim_2_id, claim_2_text = claims[j]
 
             contradiction = detect_contradiction(
-                claim_1_id, claim_1_text,
-                claim_2_id, claim_2_text,
+                claim_1_id,
+                claim_1_text,
+                claim_2_id,
+                claim_2_text,
                 similarity_threshold=similarity_threshold,
                 model_name=model_name,
             )

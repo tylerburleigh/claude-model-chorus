@@ -28,10 +28,10 @@ def mock_provider():
     # Mock async generate method
     async def mock_generate(request: GenerationRequest) -> GenerationResponse:
         # Determine response content based on the prompt
-        prompt_content = request.prompt if hasattr(request, 'prompt') else ''
+        prompt_content = request.prompt if hasattr(request, "prompt") else ""
 
         # For idea extraction
-        if 'extract individual ideas' in str(prompt_content).lower():
+        if "extract individual ideas" in str(prompt_content).lower():
             content = """**[IDEA-1] Gamification System** (from practical)
 Add points, badges, and leaderboards to improve engagement.
 
@@ -42,7 +42,7 @@ Create step-by-step guided tutorials for new users.
 Use machine learning to suggest personalized content."""
 
         # For clustering
-        elif 'cluster' in str(prompt_content).lower() and 'thematic' in str(prompt_content).lower():
+        elif "cluster" in str(prompt_content).lower() and "thematic" in str(prompt_content).lower():
             content = """**[CLUSTER-1] User Engagement**
 Features that improve user interaction and retention.
 
@@ -57,7 +57,7 @@ Ideas in this cluster:
 - idea-3: Uses AI to personalize recommendations"""
 
         # For scoring
-        elif 'score' in str(prompt_content).lower() and 'criteria' in str(prompt_content).lower():
+        elif "score" in str(prompt_content).lower() and "criteria" in str(prompt_content).lower():
             content = """**[SCORE-cluster-1] User Engagement**
 
 Scores:
@@ -79,7 +79,7 @@ Overall Score: 3.7/5
 Recommendation: Medium Priority"""
 
         # For elaboration
-        elif 'detailed, actionable outline' in str(prompt_content).lower():
+        elif "detailed, actionable outline" in str(prompt_content).lower():
             content = """## Overview
 Implementation of user engagement features including gamification and tutorials.
 
@@ -129,6 +129,7 @@ Phased rollout starting with core gamification mechanics.
 
     provider.generate = AsyncMock(side_effect=mock_generate)
     return provider
+
 
 # Note: conversation_memory fixture is now in conftest.py (generic version)
 
@@ -185,15 +186,13 @@ class TestBasicIdeation:
     @pytest.mark.asyncio
     async def test_run_basic_ideation(self, ideate_workflow):
         """Test basic run method for ideation."""
-        result = await ideate_workflow.run(
-            prompt="How can we improve user onboarding?"
-        )
+        result = await ideate_workflow.run(prompt="How can we improve user onboarding?")
 
         assert result is not None
         assert result.synthesis is not None
         assert len(result.steps) == 1
-        assert result.metadata['workflow'] == 'ideate'
-        assert 'thread_id' in result.metadata
+        assert result.metadata["workflow"] == "ideate"
+        assert "thread_id" in result.metadata
 
     @pytest.mark.asyncio
     async def test_run_with_empty_prompt_raises_error(self, ideate_workflow):
@@ -205,38 +204,30 @@ class TestBasicIdeation:
     async def test_run_with_continuation_id(self, ideate_workflow):
         """Test running with continuation_id for thread continuity."""
         # First call
-        result1 = await ideate_workflow.run(
-            prompt="Initial ideation on user onboarding"
-        )
-        thread_id = result1.metadata['thread_id']
+        result1 = await ideate_workflow.run(prompt="Initial ideation on user onboarding")
+        thread_id = result1.metadata["thread_id"]
 
         # Continued call
         result2 = await ideate_workflow.run(
-            prompt="Expand on gamification ideas",
-            continuation_id=thread_id
+            prompt="Expand on gamification ideas", continuation_id=thread_id
         )
 
-        assert result2.metadata['thread_id'] == thread_id
-        assert result2.metadata['round'] == 2
+        assert result2.metadata["thread_id"] == thread_id
+        assert result2.metadata["round"] == 2
 
     @pytest.mark.asyncio
     async def test_run_with_custom_temperature(self, ideate_workflow):
         """Test running with custom temperature parameter."""
-        result = await ideate_workflow.run(
-            prompt="Generate creative ideas",
-            temperature=0.95
-        )
+        result = await ideate_workflow.run(prompt="Generate creative ideas", temperature=0.95)
 
-        assert result.metadata['temperature'] == 0.95
+        assert result.metadata["temperature"] == 0.95
 
     @pytest.mark.asyncio
     async def test_run_updates_conversation_memory(self, ideate_workflow):
         """Test that run updates conversation memory."""
-        result = await ideate_workflow.run(
-            prompt="Test prompt for memory"
-        )
+        result = await ideate_workflow.run(prompt="Test prompt for memory")
 
-        thread_id = result.metadata['thread_id']
+        thread_id = result.metadata["thread_id"]
         thread = ideate_workflow.conversation_memory.get_thread(thread_id)
 
         assert thread is not None
@@ -287,20 +278,22 @@ class TestParallelBrainstorming:
         }
 
         # Mock RoleOrchestrator
-        with patch('model_chorus.workflows.ideate.ideate_workflow.RoleOrchestrator') as mock_orch:
+        with patch("model_chorus.workflows.ideate.ideate_workflow.RoleOrchestrator") as mock_orch:
             # Create mock orchestration result
             mock_result = MagicMock()
             mock_result.role_responses = [
-                ("brainstormer-practical", GenerationResponse(
-                    content="Practical ideas...",
-                    model="claude",
-                    usage={"total_tokens": 100}
-                )),
-                ("brainstormer-innovative", GenerationResponse(
-                    content="Innovative ideas...",
-                    model="gemini",
-                    usage={"total_tokens": 120}
-                )),
+                (
+                    "brainstormer-practical",
+                    GenerationResponse(
+                        content="Practical ideas...", model="claude", usage={"total_tokens": 100}
+                    ),
+                ),
+                (
+                    "brainstormer-innovative",
+                    GenerationResponse(
+                        content="Innovative ideas...", model="gemini", usage={"total_tokens": 120}
+                    ),
+                ),
             ]
 
             mock_orch_instance = MagicMock()
@@ -311,14 +304,14 @@ class TestParallelBrainstorming:
             result = await ideate_workflow.run_parallel_brainstorming(
                 prompt="How to improve our API?",
                 provider_map=provider_map,
-                perspectives=['practical', 'innovative']
+                perspectives=["practical", "innovative"],
             )
 
             assert result is not None
             assert len(result.steps) == 2
-            assert result.metadata['workflow'] == 'ideate-parallel'
-            assert result.metadata['pattern'] == 'parallel'
-            assert result.metadata['perspectives'] == ['practical', 'innovative']
+            assert result.metadata["workflow"] == "ideate-parallel"
+            assert result.metadata["pattern"] == "parallel"
+            assert result.metadata["perspectives"] == ["practical", "innovative"]
 
     @pytest.mark.asyncio
     async def test_parallel_brainstorming_empty_prompt_raises_error(self, ideate_workflow):
@@ -326,19 +319,13 @@ class TestParallelBrainstorming:
         provider_map = {"claude": MagicMock()}
 
         with pytest.raises(ValueError, match="Prompt cannot be empty"):
-            await ideate_workflow.run_parallel_brainstorming(
-                prompt="",
-                provider_map=provider_map
-            )
+            await ideate_workflow.run_parallel_brainstorming(prompt="", provider_map=provider_map)
 
     @pytest.mark.asyncio
     async def test_parallel_brainstorming_empty_provider_map_raises_error(self, ideate_workflow):
         """Test that empty provider map raises ValueError."""
         with pytest.raises(ValueError, match="Provider map cannot be empty"):
-            await ideate_workflow.run_parallel_brainstorming(
-                prompt="Test prompt",
-                provider_map={}
-            )
+            await ideate_workflow.run_parallel_brainstorming(prompt="Test prompt", provider_map={})
 
 
 class TestConvergentAnalysis:
@@ -354,13 +341,13 @@ class TestConvergentAnalysis:
                 step_number=1,
                 content="Practical perspective ideas...",
                 model="claude",
-                metadata={"perspective": "practical", "model": "claude"}
+                metadata={"perspective": "practical", "model": "claude"},
             ),
             WorkflowStep(
                 step_number=2,
                 content="Innovative perspective ideas...",
                 model="gemini",
-                metadata={"perspective": "innovative", "model": "gemini"}
+                metadata={"perspective": "innovative", "model": "gemini"},
             ),
         ]
 
@@ -368,9 +355,9 @@ class TestConvergentAnalysis:
             synthesis="Combined brainstorming results",
             steps=steps,
             metadata={
-                'perspectives': ['practical', 'innovative'],
-                'models_used': ['claude', 'gemini']
-            }
+                "perspectives": ["practical", "innovative"],
+                "models_used": ["claude", "gemini"],
+            },
         )
 
     @pytest.mark.asyncio
@@ -378,23 +365,21 @@ class TestConvergentAnalysis:
         """Test convergent analysis on brainstorming results."""
         result = await ideate_workflow.run_convergent_analysis(
             brainstorming_result=mock_brainstorming_result,
-            scoring_criteria=['feasibility', 'impact', 'novelty']
+            scoring_criteria=["feasibility", "impact", "novelty"],
         )
 
         assert result is not None
-        assert result.metadata['workflow'] == 'ideate-convergent'
-        assert 'num_ideas_extracted' in result.metadata
-        assert 'num_clusters' in result.metadata
-        assert result.metadata['scoring_criteria'] == ['feasibility', 'impact', 'novelty']
+        assert result.metadata["workflow"] == "ideate-convergent"
+        assert "num_ideas_extracted" in result.metadata
+        assert "num_clusters" in result.metadata
+        assert result.metadata["scoring_criteria"] == ["feasibility", "impact", "novelty"]
         assert len(result.steps) == 3  # extraction, clustering, scoring
 
     @pytest.mark.asyncio
     async def test_convergent_analysis_without_brainstorming_raises_error(self, ideate_workflow):
         """Test that missing brainstorming result raises ValueError."""
         with pytest.raises(ValueError, match="Brainstorming result must have steps"):
-            await ideate_workflow.run_convergent_analysis(
-                brainstorming_result=None
-            )
+            await ideate_workflow.run_convergent_analysis(brainstorming_result=None)
 
     @pytest.mark.asyncio
     async def test_idea_extraction(self, ideate_workflow, mock_brainstorming_result):
@@ -404,10 +389,10 @@ class TestConvergentAnalysis:
         )
 
         assert extraction_step is not None
-        assert extraction_step.metadata['title'] == 'Idea Extraction'
-        assert 'num_ideas' in extraction_step.metadata
-        assert 'extracted_ideas' in extraction_step.metadata
-        assert extraction_step.metadata['num_ideas'] == 3
+        assert extraction_step.metadata["title"] == "Idea Extraction"
+        assert "num_ideas" in extraction_step.metadata
+        assert "extracted_ideas" in extraction_step.metadata
+        assert extraction_step.metadata["num_ideas"] == 3
 
     @pytest.mark.asyncio
     async def test_idea_clustering(self, ideate_workflow):
@@ -420,25 +405,39 @@ class TestConvergentAnalysis:
             content="Extracted ideas...",
             model="claude",
             metadata={
-                'title': 'Idea Extraction',
-                'extracted_ideas': [
-                    {'id': 'idea-1', 'label': 'Gamification', 'perspective': 'practical', 'description': 'Add game elements'},
-                    {'id': 'idea-2', 'label': 'Tutorials', 'perspective': 'user-focused', 'description': 'Interactive guides'},
-                    {'id': 'idea-3', 'label': 'AI Recommendations', 'perspective': 'innovative', 'description': 'ML-powered suggestions'},
-                ]
-            }
+                "title": "Idea Extraction",
+                "extracted_ideas": [
+                    {
+                        "id": "idea-1",
+                        "label": "Gamification",
+                        "perspective": "practical",
+                        "description": "Add game elements",
+                    },
+                    {
+                        "id": "idea-2",
+                        "label": "Tutorials",
+                        "perspective": "user-focused",
+                        "description": "Interactive guides",
+                    },
+                    {
+                        "id": "idea-3",
+                        "label": "AI Recommendations",
+                        "perspective": "innovative",
+                        "description": "ML-powered suggestions",
+                    },
+                ],
+            },
         )
 
         clustering_step = await ideate_workflow._cluster_ideas(
-            extraction_step=extraction_step,
-            num_clusters=2
+            extraction_step=extraction_step, num_clusters=2
         )
 
         assert clustering_step is not None
-        assert clustering_step.metadata['title'] == 'Idea Clustering'
-        assert 'num_clusters' in clustering_step.metadata
-        assert 'clusters' in clustering_step.metadata
-        assert clustering_step.metadata['num_clusters'] == 2
+        assert clustering_step.metadata["title"] == "Idea Clustering"
+        assert "num_clusters" in clustering_step.metadata
+        assert "clusters" in clustering_step.metadata
+        assert clustering_step.metadata["num_clusters"] == 2
 
     @pytest.mark.asyncio
     async def test_idea_scoring(self, ideate_workflow):
@@ -451,38 +450,37 @@ class TestConvergentAnalysis:
             content="Clustered ideas...",
             model="claude",
             metadata={
-                'title': 'Idea Clustering',
-                'clusters': [
+                "title": "Idea Clustering",
+                "clusters": [
                     {
-                        'id': 'cluster-1',
-                        'theme': 'User Engagement',
-                        'description': 'Features for engagement',
-                        'ideas': [
-                            {'idea_id': 'idea-1', 'reason': 'Gamification'},
-                        ]
+                        "id": "cluster-1",
+                        "theme": "User Engagement",
+                        "description": "Features for engagement",
+                        "ideas": [
+                            {"idea_id": "idea-1", "reason": "Gamification"},
+                        ],
                     },
                     {
-                        'id': 'cluster-2',
-                        'theme': 'Personalization',
-                        'description': 'AI-driven customization',
-                        'ideas': [
-                            {'idea_id': 'idea-3', 'reason': 'AI recommendations'},
-                        ]
+                        "id": "cluster-2",
+                        "theme": "Personalization",
+                        "description": "AI-driven customization",
+                        "ideas": [
+                            {"idea_id": "idea-3", "reason": "AI recommendations"},
+                        ],
                     },
-                ]
-            }
+                ],
+            },
         )
 
         scoring_step = await ideate_workflow._score_ideas(
-            clustering_step=clustering_step,
-            scoring_criteria=['feasibility', 'impact', 'novelty']
+            clustering_step=clustering_step, scoring_criteria=["feasibility", "impact", "novelty"]
         )
 
         assert scoring_step is not None
-        assert scoring_step.metadata['title'] == 'Idea Scoring'
-        assert 'scored_clusters' in scoring_step.metadata
-        assert scoring_step.metadata['scoring_criteria'] == ['feasibility', 'impact', 'novelty']
-        assert len(scoring_step.metadata['scored_clusters']) == 2
+        assert scoring_step.metadata["title"] == "Idea Scoring"
+        assert "scored_clusters" in scoring_step.metadata
+        assert scoring_step.metadata["scoring_criteria"] == ["feasibility", "impact", "novelty"]
+        assert len(scoring_step.metadata["scored_clusters"]) == 2
 
 
 class TestInteractiveSelection:
@@ -498,16 +496,16 @@ class TestInteractiveSelection:
             content="Clustered ideas...",
             model="claude",
             metadata={
-                'title': 'Idea Clustering',
-                'clusters': [
+                "title": "Idea Clustering",
+                "clusters": [
                     {
-                        'id': 'cluster-1',
-                        'theme': 'User Engagement',
-                        'description': 'Engagement features',
-                        'ideas': [{'idea_id': 'idea-1', 'reason': 'Gamification'}]
+                        "id": "cluster-1",
+                        "theme": "User Engagement",
+                        "description": "Engagement features",
+                        "ideas": [{"idea_id": "idea-1", "reason": "Gamification"}],
                     },
-                ]
-            }
+                ],
+            },
         )
 
         scoring_step = WorkflowStep(
@@ -515,26 +513,26 @@ class TestInteractiveSelection:
             content="Scored ideas...",
             model="claude",
             metadata={
-                'title': 'Idea Scoring',
-                'scored_clusters': [
+                "title": "Idea Scoring",
+                "scored_clusters": [
                     {
-                        'cluster_id': 'cluster-1',
-                        'theme': 'User Engagement',
-                        'overall_score': 4.2,
-                        'recommendation': 'High Priority',
-                        'scores': {
-                            'feasibility': {'score': 4, 'explanation': 'Achievable'},
-                            'impact': {'score': 5, 'explanation': 'High impact'},
-                        }
+                        "cluster_id": "cluster-1",
+                        "theme": "User Engagement",
+                        "overall_score": 4.2,
+                        "recommendation": "High Priority",
+                        "scores": {
+                            "feasibility": {"score": 4, "explanation": "Achievable"},
+                            "impact": {"score": 5, "explanation": "High impact"},
+                        },
                     },
-                ]
-            }
+                ],
+            },
         )
 
         return WorkflowResult(
             synthesis="Analysis complete",
             steps=[clustering_step, scoring_step],
-            metadata={'workflow': 'ideate-convergent'}
+            metadata={"workflow": "ideate-convergent"},
         )
 
     def test_parse_selection_input_single_number(self, ideate_workflow):
@@ -586,42 +584,40 @@ class TestElaboration:
             content="Selection complete",
             model="claude",
             metadata={
-                'title': 'Interactive Selection',
-                'selected_clusters': [
+                "title": "Interactive Selection",
+                "selected_clusters": [
                     {
-                        'cluster_id': 'cluster-1',
-                        'theme': 'User Engagement',
-                        'overall_score': 4.5,
-                        'recommendation': 'High Priority',
-                        'scores': {
-                            'feasibility': {'score': 4, 'explanation': 'Doable'},
-                            'impact': {'score': 5, 'explanation': 'High value'},
+                        "cluster_id": "cluster-1",
+                        "theme": "User Engagement",
+                        "overall_score": 4.5,
+                        "recommendation": "High Priority",
+                        "scores": {
+                            "feasibility": {"score": 4, "explanation": "Doable"},
+                            "impact": {"score": 5, "explanation": "High value"},
                         },
-                        'ideas': [{'idea_id': 'idea-1', 'reason': 'Gamification'}]
+                        "ideas": [{"idea_id": "idea-1", "reason": "Gamification"}],
                     },
-                ]
-            }
+                ],
+            },
         )
 
         return WorkflowResult(
             synthesis="Selected 1 cluster",
             steps=[selection_step],
             metadata={
-                'workflow': 'ideate-selection',
-                'selected_clusters': selection_step.metadata['selected_clusters']
-            }
+                "workflow": "ideate-selection",
+                "selected_clusters": selection_step.metadata["selected_clusters"],
+            },
         )
 
     @pytest.mark.asyncio
     async def test_run_elaboration(self, ideate_workflow, mock_selection_result):
         """Test elaboration of selected clusters."""
-        result = await ideate_workflow.run_elaboration(
-            selection_result=mock_selection_result
-        )
+        result = await ideate_workflow.run_elaboration(selection_result=mock_selection_result)
 
         assert result is not None
-        assert result.metadata['workflow'] == 'ideate-elaboration'
-        assert result.metadata['num_elaborated'] == 1
+        assert result.metadata["workflow"] == "ideate-elaboration"
+        assert result.metadata["num_elaborated"] == 1
         assert len(result.steps) == 1
 
     @pytest.mark.asyncio
@@ -634,24 +630,21 @@ class TestElaboration:
     async def test_elaborate_cluster(self, ideate_workflow):
         """Test elaborating a single cluster."""
         cluster = {
-            'cluster_id': 'cluster-1',
-            'theme': 'User Engagement',
-            'overall_score': 4.5,
-            'scores': {
-                'feasibility': {'score': 4, 'explanation': 'Achievable'},
+            "cluster_id": "cluster-1",
+            "theme": "User Engagement",
+            "overall_score": 4.5,
+            "scores": {
+                "feasibility": {"score": 4, "explanation": "Achievable"},
             },
-            'ideas': [{'idea_id': 'idea-1', 'reason': 'Gamification'}]
+            "ideas": [{"idea_id": "idea-1", "reason": "Gamification"}],
         }
 
-        elaboration_step = await ideate_workflow._elaborate_cluster(
-            cluster=cluster,
-            step_number=1
-        )
+        elaboration_step = await ideate_workflow._elaborate_cluster(cluster=cluster, step_number=1)
 
         assert elaboration_step is not None
-        assert elaboration_step.metadata['title'] == 'Elaboration: User Engagement'
-        assert elaboration_step.metadata['theme'] == 'User Engagement'
-        assert 'outline_sections' in elaboration_step.metadata
+        assert elaboration_step.metadata["title"] == "Elaboration: User Engagement"
+        assert elaboration_step.metadata["theme"] == "User Engagement"
+        assert "outline_sections" in elaboration_step.metadata
 
     def test_parse_outline_sections(self, ideate_workflow):
         """Test parsing outline sections from elaboration content."""
@@ -668,8 +661,10 @@ Step-by-step approach here."""
         sections = ideate_workflow._parse_outline_sections(content)
 
         assert len(sections) >= 2
-        assert any('overview' in s['title'].lower() for s in sections)
-        assert any('goals' in s['title'].lower() or 'objectives' in s['title'].lower() for s in sections)
+        assert any("overview" in s["title"].lower() for s in sections)
+        assert any(
+            "goals" in s["title"].lower() or "objectives" in s["title"].lower() for s in sections
+        )
 
 
 class TestCompleteIdeation:
@@ -684,19 +679,25 @@ class TestCompleteIdeation:
         }
 
         # Mock RoleOrchestrator for parallel brainstorming
-        with patch('model_chorus.workflows.ideate.ideate_workflow.RoleOrchestrator') as mock_orch:
+        with patch("model_chorus.workflows.ideate.ideate_workflow.RoleOrchestrator") as mock_orch:
             mock_result = MagicMock()
             mock_result.role_responses = [
-                ("brainstormer-practical", GenerationResponse(
-                    content="Practical ideas for API improvement",
-                    model="claude",
-                    usage={"total_tokens": 100}
-                )),
-                ("brainstormer-innovative", GenerationResponse(
-                    content="Innovative ideas for API improvement",
-                    model="gemini",
-                    usage={"total_tokens": 120}
-                )),
+                (
+                    "brainstormer-practical",
+                    GenerationResponse(
+                        content="Practical ideas for API improvement",
+                        model="claude",
+                        usage={"total_tokens": 100},
+                    ),
+                ),
+                (
+                    "brainstormer-innovative",
+                    GenerationResponse(
+                        content="Innovative ideas for API improvement",
+                        model="gemini",
+                        usage={"total_tokens": 120},
+                    ),
+                ),
             ]
 
             mock_orch_instance = MagicMock()
@@ -707,14 +708,14 @@ class TestCompleteIdeation:
             result = await ideate_workflow.run_complete_ideation(
                 prompt="How to improve our API documentation?",
                 provider_map=provider_map,
-                perspectives=['practical', 'innovative'],
-                scoring_criteria=['feasibility', 'impact']
+                perspectives=["practical", "innovative"],
+                scoring_criteria=["feasibility", "impact"],
             )
 
             assert result is not None
-            assert result.metadata['workflow'] == 'ideate-complete'
-            assert 'divergent_phase' in result.metadata
-            assert 'convergent_phase' in result.metadata
+            assert result.metadata["workflow"] == "ideate-complete"
+            assert "divergent_phase" in result.metadata
+            assert "convergent_phase" in result.metadata
             # Divergent (2) + Convergent (3: extraction, clustering, scoring)
             assert len(result.steps) >= 5
 
@@ -724,19 +725,13 @@ class TestCompleteIdeation:
         provider_map = {"claude": MagicMock()}
 
         with pytest.raises(ValueError, match="Prompt cannot be empty"):
-            await ideate_workflow.run_complete_ideation(
-                prompt="",
-                provider_map=provider_map
-            )
+            await ideate_workflow.run_complete_ideation(prompt="", provider_map=provider_map)
 
     @pytest.mark.asyncio
     async def test_complete_ideation_empty_provider_map_raises_error(self, ideate_workflow):
         """Test that empty provider map raises ValueError."""
         with pytest.raises(ValueError, match="Provider map cannot be empty"):
-            await ideate_workflow.run_complete_ideation(
-                prompt="Test",
-                provider_map={}
-            )
+            await ideate_workflow.run_complete_ideation(prompt="Test", provider_map={})
 
 
 class TestErrorHandling:
@@ -746,9 +741,7 @@ class TestErrorHandling:
     async def test_provider_generation_failure(self, ideate_workflow):
         """Test handling of provider generation failure."""
         # Mock provider to raise exception
-        ideate_workflow.provider.generate = AsyncMock(
-            side_effect=Exception("Provider error")
-        )
+        ideate_workflow.provider.generate = AsyncMock(side_effect=Exception("Provider error"))
 
         with pytest.raises(Exception, match="Provider error"):
             await ideate_workflow.run(prompt="Test prompt")
@@ -758,12 +751,7 @@ class TestErrorHandling:
         """Test extraction fails gracefully with no brainstorming steps."""
         from model_chorus.core.base_workflow import WorkflowResult
 
-        empty_result = WorkflowResult(
-            success=True,
-            synthesis="Empty",
-            steps=[],
-            metadata={}
-        )
+        empty_result = WorkflowResult(success=True, synthesis="Empty", steps=[], metadata={})
 
         # _extract_ideas expects brainstorming_result.steps to exist
         # This should handle empty steps gracefully
@@ -779,10 +767,7 @@ class TestErrorHandling:
         from model_chorus.core.base_workflow import WorkflowStep
 
         extraction_step = WorkflowStep(
-            step_number=1,
-            content="No ideas",
-            model="claude",
-            metadata={'extracted_ideas': []}
+            step_number=1, content="No ideas", model="claude", metadata={"extracted_ideas": []}
         )
 
         with pytest.raises(ValueError, match="No ideas found"):
@@ -794,17 +779,11 @@ class TestErrorHandling:
         from model_chorus.core.base_workflow import WorkflowStep
 
         clustering_step = WorkflowStep(
-            step_number=2,
-            content="No clusters",
-            model="claude",
-            metadata={'clusters': []}
+            step_number=2, content="No clusters", model="claude", metadata={"clusters": []}
         )
 
         with pytest.raises(ValueError, match="No clusters found"):
-            await ideate_workflow._score_ideas(
-                clustering_step,
-                scoring_criteria=['feasibility']
-            )
+            await ideate_workflow._score_ideas(clustering_step, scoring_criteria=["feasibility"])
 
 
 class TestSystemPrompts:
@@ -854,20 +833,14 @@ class TestPromptFraming:
 
     def test_frame_ideation_prompt_initial(self, ideate_workflow):
         """Test framing initial ideation prompt."""
-        framed = ideate_workflow._frame_ideation_prompt(
-            "Test topic",
-            is_continuation=False
-        )
+        framed = ideate_workflow._frame_ideation_prompt("Test topic", is_continuation=False)
 
         assert "brainstorm" in framed.lower()
         assert "Test topic" in framed
 
     def test_frame_ideation_prompt_continuation(self, ideate_workflow):
         """Test framing continuation ideation prompt."""
-        framed = ideate_workflow._frame_ideation_prompt(
-            "Follow-up request",
-            is_continuation=True
-        )
+        framed = ideate_workflow._frame_ideation_prompt("Follow-up request", is_continuation=True)
 
         assert "continue" in framed.lower()
         assert "Follow-up request" in framed

@@ -50,8 +50,15 @@ class GeminiProvider(CLIProvider):
     """
 
     # Model capability mappings
-    VISION_MODELS = {"gemini-2.5-pro", "gemini-2.5-flash", "pro"}  # All Gemini models support vision
-    THINKING_MODELS = {"gemini-2.5-pro", "gemini-2.5-flash"}  # Pro has Deep Think, Flash has hybrid reasoning
+    VISION_MODELS = {
+        "gemini-2.5-pro",
+        "gemini-2.5-flash",
+        "pro",
+    }  # All Gemini models support vision
+    THINKING_MODELS = {
+        "gemini-2.5-pro",
+        "gemini-2.5-flash",
+    }  # Pro has Deep Think, Flash has hybrid reasoning
 
     def __init__(
         self,
@@ -154,7 +161,10 @@ class GeminiProvider(CLIProvider):
                     await process.wait()
                 except:
                     pass
-                return (False, f"CLI command '{self.cli_command}' timed out during availability check")
+                return (
+                    False,
+                    f"CLI command '{self.cli_command}' timed out during availability check",
+                )
 
         except FileNotFoundError:
             return (False, f"CLI command '{self.cli_command}' not found in PATH")
@@ -193,8 +203,8 @@ class GeminiProvider(CLIProvider):
             # We'll allow this with a warning since we handle it by concatenation
             logger.info("System prompt will be merged with user prompt (Gemini CLI limitation)")
 
-        thinking_mode = request.metadata.get('thinking_mode') if request.metadata else None
-        if thinking_mode and thinking_mode != 'medium':  # medium is default, so it's ok
+        thinking_mode = request.metadata.get("thinking_mode") if request.metadata else None
+        if thinking_mode and thinking_mode != "medium":  # medium is default, so it's ok
             unsupported_params.append(f"thinking_mode={thinking_mode}")
 
         if unsupported_params:
@@ -280,7 +290,7 @@ class GeminiProvider(CLIProvider):
             # Extract model info from stats if available
             model_name = "unknown"
             token_usage = TokenUsage()
-            
+
             if "stats" in data and "models" in data["stats"]:
                 # Get the first (and usually only) model from stats
                 models = data["stats"]["models"]
@@ -301,7 +311,7 @@ class GeminiProvider(CLIProvider):
                 model=model_name,
                 usage=token_usage,
                 stop_reason=None,  # Gemini CLI doesn't provide finish_reason
-                thread_id=None,    # Gemini CLI does not support conversation continuation
+                thread_id=None,  # Gemini CLI does not support conversation continuation
                 provider="gemini",
                 stderr=stderr,
                 duration_ms=None,
@@ -355,7 +365,9 @@ class GeminiProvider(CLIProvider):
         forced_home = self._get_forced_cli_home()
 
         if forced_home:
-            self._prepare_cli_home(Path(forced_home), copy_existing=False, original_home=original_home)
+            self._prepare_cli_home(
+                Path(forced_home), copy_existing=False, original_home=original_home
+            )
             return
 
         if self._is_home_writable(original_home):
@@ -394,7 +406,9 @@ class GeminiProvider(CLIProvider):
             logger.debug("Gemini CLI home %s is not writable: %s", home_path, exc)
         return False
 
-    def _prepare_cli_home(self, home_path: Path, *, copy_existing: bool, original_home: Path) -> None:
+    def _prepare_cli_home(
+        self, home_path: Path, *, copy_existing: bool, original_home: Path
+    ) -> None:
         """Ensure the CLI home exists and update environment overrides."""
         try:
             home_path.mkdir(parents=True, exist_ok=True)

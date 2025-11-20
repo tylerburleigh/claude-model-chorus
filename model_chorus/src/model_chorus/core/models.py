@@ -628,9 +628,9 @@ class Hypothesis(BaseModel):
                 "evidence": [
                     "Found async def in auth.py line 45",
                     "Tests use asyncio.run() in test_auth.py",
-                    "No callback patterns found in service layer"
+                    "No callback patterns found in service layer",
                 ],
-                "status": "validated"
+                "status": "validated",
             }
         }
     )
@@ -672,12 +672,8 @@ class InvestigationStep(BaseModel):
             "example": {
                 "step_number": 1,
                 "findings": "Found async/await pattern in auth service. No callbacks detected in user-facing API.",
-                "files_checked": [
-                    "src/services/auth.py",
-                    "src/api/users.py",
-                    "tests/test_auth.py"
-                ],
-                "confidence": "high"
+                "files_checked": ["src/services/auth.py", "src/api/users.py", "tests/test_auth.py"],
+                "confidence": "high",
             }
         }
     )
@@ -728,34 +724,34 @@ class ThinkDeepState(BaseModel):
                     {
                         "hypothesis": "API uses async/await pattern",
                         "evidence": ["Found async def in auth.py", "Tests use asyncio"],
-                        "status": "validated"
+                        "status": "validated",
                     },
                     {
                         "hypothesis": "Error handling uses custom exceptions",
                         "evidence": ["Found CustomError class", "Used in auth service"],
-                        "status": "active"
-                    }
+                        "status": "active",
+                    },
                 ],
                 "steps": [
                     {
                         "step_number": 1,
                         "findings": "Examined auth service implementation",
                         "files_checked": ["src/auth.py"],
-                        "confidence": "medium"
+                        "confidence": "medium",
                     },
                     {
                         "step_number": 2,
                         "findings": "Validated hypothesis with tests",
                         "files_checked": ["tests/test_auth.py"],
-                        "confidence": "high"
-                    }
+                        "confidence": "high",
+                    },
                 ],
                 "current_confidence": "high",
                 "relevant_files": [
                     "src/services/auth.py",
                     "src/api/users.py",
-                    "tests/test_auth.py"
-                ]
+                    "tests/test_auth.py",
+                ],
             }
         }
     )
@@ -813,17 +809,17 @@ class StudyState(BaseModel):
                         "persona": "Researcher",
                         "finding": "Authentication uses JWT tokens",
                         "evidence": ["Found JWT library in dependencies"],
-                        "confidence": "high"
+                        "confidence": "high",
                     },
                     {
                         "persona": "Critic",
                         "finding": "Token expiration not consistently checked",
                         "evidence": ["Missing validation in 3 endpoints"],
-                        "confidence": "medium"
-                    }
+                        "confidence": "medium",
+                    },
                 ],
                 "personas_active": ["Researcher", "Critic"],
-                "relevant_files": ["src/auth.py", "src/middleware/jwt.py"]
+                "relevant_files": ["src/auth.py", "src/middleware/jwt.py"],
             }
         }
     )
@@ -1393,41 +1389,31 @@ class ArgumentPerspective(BaseModel):
                 "content": "Universal basic income would reduce poverty...",
                 "key_points": ["Ensures basic needs", "Reduces wealth gap"],
                 "model": "claude-sonnet-4",
-                "metadata": {}
+                "metadata": {},
             }
         }
     )
 
     role: Literal["creator", "skeptic", "moderator"] = Field(
-        ...,
-        description="The role name (creator, skeptic, moderator)"
+        ..., description="The role name (creator, skeptic, moderator)"
     )
 
     stance: Literal["for", "against", "neutral"] = Field(
-        ...,
-        description="The perspective's stance (for, against, neutral)"
+        ..., description="The perspective's stance (for, against, neutral)"
     )
 
     content: str = Field(
-        ...,
-        description="Full response content from this perspective",
-        min_length=1
+        ..., description="Full response content from this perspective", min_length=1
     )
 
     key_points: List[str] = Field(
-        default_factory=list,
-        description="List of key points or arguments"
+        default_factory=list, description="List of key points or arguments"
     )
 
-    model: str = Field(
-        ...,
-        description="Model used for this perspective",
-        min_length=1
-    )
+    model: str = Field(..., description="Model used for this perspective", min_length=1)
 
     metadata: Dict[str, Any] = Field(
-        default_factory=dict,
-        description="Additional perspective metadata"
+        default_factory=dict, description="Additional perspective metadata"
     )
 
 
@@ -1469,36 +1455,26 @@ class ArgumentMap(BaseModel):
                         "content": "Universal basic income would reduce poverty...",
                         "key_points": ["Ensures basic needs", "Reduces wealth gap"],
                         "model": "claude-sonnet-4",
-                        "metadata": {}
+                        "metadata": {},
                     }
                 ],
                 "synthesis": "After examining both perspectives...",
-                "metadata": {"thread_id": "abc123"}
+                "metadata": {"thread_id": "abc123"},
             }
         }
     )
 
-    topic: str = Field(
-        ...,
-        description="The argument topic or claim being analyzed",
-        min_length=1
-    )
+    topic: str = Field(..., description="The argument topic or claim being analyzed", min_length=1)
 
     perspectives: List[ArgumentPerspective] = Field(
-        ...,
-        description="List of perspectives (Creator, Skeptic, Moderator)",
-        min_length=1
+        ..., description="List of perspectives (Creator, Skeptic, Moderator)", min_length=1
     )
 
-    synthesis: str = Field(
-        ...,
-        description="Final balanced synthesis from Moderator",
-        min_length=1
-    )
+    synthesis: str = Field(..., description="Final balanced synthesis from Moderator", min_length=1)
 
     metadata: Dict[str, Any] = Field(
         default_factory=dict,
-        description="Additional workflow metadata (thread_id, model, timestamps, etc.)"
+        description="Additional workflow metadata (thread_id, model, timestamps, etc.)",
     )
 
     def get_perspective(self, role: str) -> Optional[ArgumentPerspective]:
@@ -1540,7 +1516,7 @@ class ArgumentMap(BaseModel):
             "topic": self.topic,
             "perspectives": [p.model_dump() for p in self.perspectives],
             "synthesis": self.synthesis,
-            "metadata": self.metadata
+            "metadata": self.metadata,
         }
 
     @classmethod
@@ -1565,14 +1541,13 @@ class ArgumentMap(BaseModel):
         """
         # Convert perspective dicts to ArgumentPerspective objects
         perspectives = [
-            ArgumentPerspective(**p) if isinstance(p, dict) else p
-            for p in data["perspectives"]
+            ArgumentPerspective(**p) if isinstance(p, dict) else p for p in data["perspectives"]
         ]
         return cls(
             topic=data["topic"],
             perspectives=perspectives,
             synthesis=data["synthesis"],
-            metadata=data.get("metadata", {})
+            metadata=data.get("metadata", {}),
         )
 
 
@@ -1614,43 +1589,32 @@ class Idea(BaseModel):
                 "description": "Implement semantic search using AI embeddings for better discovery",
                 "perspective": "technical",
                 "source_model": "gpt-4",
-                "metadata": {"tokens": 150, "temperature": 0.9}
+                "metadata": {"tokens": 150, "temperature": 0.9},
             }
         }
     )
 
     id: str = Field(
-        ...,
-        description="Unique identifier for the idea (e.g., 'idea-1')",
-        pattern=r"^idea-\d+$"
+        ..., description="Unique identifier for the idea (e.g., 'idea-1')", pattern=r"^idea-\d+$"
     )
 
     label: str = Field(
-        ...,
-        description="Brief descriptive label (1-5 words)",
-        min_length=1,
-        max_length=100
+        ..., description="Brief descriptive label (1-5 words)", min_length=1, max_length=100
     )
 
     description: str = Field(
-        ...,
-        description="Full description of the idea (1-3 sentences)",
-        min_length=1
+        ..., description="Full description of the idea (1-3 sentences)", min_length=1
     )
 
     perspective: str = Field(
         ...,
-        description="Perspective this idea originated from (practical, innovative, user-focused, etc.)"
+        description="Perspective this idea originated from (practical, innovative, user-focused, etc.)",
     )
 
-    source_model: Optional[str] = Field(
-        default=None,
-        description="Model that generated this idea"
-    )
+    source_model: Optional[str] = Field(default=None, description="Model that generated this idea")
 
     metadata: Dict[str, Any] = Field(
-        default_factory=dict,
-        description="Additional metadata about the idea"
+        default_factory=dict, description="Additional metadata about the idea"
     )
 
 
@@ -1695,7 +1659,7 @@ class IdeaCluster(BaseModel):
                 "scores": {"feasibility": 4.0, "impact": 4.5, "novelty": 4.0},
                 "overall_score": 4.17,
                 "recommendation": "High Priority",
-                "metadata": {"num_ideas": 3}
+                "metadata": {"num_ideas": 3},
             }
         }
     )
@@ -1703,51 +1667,37 @@ class IdeaCluster(BaseModel):
     id: str = Field(
         ...,
         description="Unique identifier for the cluster (e.g., 'cluster-1')",
-        pattern=r"^cluster-\d+$"
+        pattern=r"^cluster-\d+$",
     )
 
     theme: str = Field(
-        ...,
-        description="Theme name describing this cluster",
-        min_length=1,
-        max_length=200
+        ..., description="Theme name describing this cluster", min_length=1, max_length=200
     )
 
-    description: str = Field(
-        default="",
-        description="Detailed description of the cluster theme"
-    )
+    description: str = Field(default="", description="Detailed description of the cluster theme")
 
     idea_ids: List[str] = Field(
-        default_factory=list,
-        description="List of idea IDs in this cluster"
+        default_factory=list, description="List of idea IDs in this cluster"
     )
 
     ideas: Optional[List[Idea]] = Field(
-        default=None,
-        description="Optional full Idea objects in this cluster"
+        default=None, description="Optional full Idea objects in this cluster"
     )
 
     scores: Dict[str, float] = Field(
-        default_factory=dict,
-        description="Evaluation scores (e.g., feasibility: 4.5, impact: 4.0)"
+        default_factory=dict, description="Evaluation scores (e.g., feasibility: 4.5, impact: 4.0)"
     )
 
     overall_score: float = Field(
-        default=0.0,
-        ge=0.0,
-        le=5.0,
-        description="Average score across all criteria (0.0-5.0)"
+        default=0.0, ge=0.0, le=5.0, description="Average score across all criteria (0.0-5.0)"
     )
 
     recommendation: str = Field(
-        default="Medium Priority",
-        description="Priority recommendation (High/Medium/Low Priority)"
+        default="Medium Priority", description="Priority recommendation (High/Medium/Low Priority)"
     )
 
     metadata: Dict[str, Any] = Field(
-        default_factory=dict,
-        description="Additional metadata about the cluster"
+        default_factory=dict, description="Additional metadata about the cluster"
     )
 
     def add_idea(self, idea: Idea) -> None:
@@ -1827,67 +1777,52 @@ class IdeationState(BaseModel):
                 "scoring_criteria": ["feasibility", "impact", "novelty"],
                 "workflow_metadata": {"models_used": ["claude", "gpt-4"]},
                 "created_at": "2024-01-15T10:30:00Z",
-                "updated_at": "2024-01-15T11:45:00Z"
+                "updated_at": "2024-01-15T11:45:00Z",
             }
         }
     )
 
     session_id: str = Field(
-        ...,
-        description="Unique identifier for this ideation session",
-        min_length=1
+        ..., description="Unique identifier for this ideation session", min_length=1
     )
 
-    topic: str = Field(
-        ...,
-        description="The topic or problem being ideated on",
-        min_length=1
-    )
+    topic: str = Field(..., description="The topic or problem being ideated on", min_length=1)
 
     perspectives: List[str] = Field(
         default_factory=list,
-        description="Perspectives used in brainstorming (practical, innovative, etc.)"
+        description="Perspectives used in brainstorming (practical, innovative, etc.)",
     )
 
     ideas: List[Idea] = Field(
-        default_factory=list,
-        description="All extracted ideas from brainstorming"
+        default_factory=list, description="All extracted ideas from brainstorming"
     )
 
     clusters: List[IdeaCluster] = Field(
-        default_factory=list,
-        description="Thematic clusters of related ideas"
+        default_factory=list, description="Thematic clusters of related ideas"
     )
 
     selected_cluster_ids: List[str] = Field(
-        default_factory=list,
-        description="IDs of clusters selected for elaboration"
+        default_factory=list, description="IDs of clusters selected for elaboration"
     )
 
     elaborations: Dict[str, str] = Field(
         default_factory=dict,
-        description="Detailed outlines for selected clusters (cluster_id -> outline)"
+        description="Detailed outlines for selected clusters (cluster_id -> outline)",
     )
 
     scoring_criteria: List[str] = Field(
-        default_factory=list,
-        description="Criteria used for evaluation (feasibility, impact, etc.)"
+        default_factory=list, description="Criteria used for evaluation (feasibility, impact, etc.)"
     )
 
     workflow_metadata: Dict[str, Any] = Field(
-        default_factory=dict,
-        description="Metadata about workflow execution"
+        default_factory=dict, description="Metadata about workflow execution"
     )
 
     created_at: Optional[str] = Field(
-        default=None,
-        description="ISO timestamp when ideation session started"
+        default=None, description="ISO timestamp when ideation session started"
     )
 
-    updated_at: Optional[str] = Field(
-        default=None,
-        description="ISO timestamp of last update"
-    )
+    updated_at: Optional[str] = Field(default=None, description="ISO timestamp of last update")
 
     def add_idea(self, idea: Idea) -> None:
         """
@@ -1944,10 +1879,7 @@ class IdeationState(BaseModel):
             >>> selected = state.get_selected_clusters()
             >>> print(f"Selected {len(selected)} clusters")
         """
-        return [
-            cluster for cluster in self.clusters
-            if cluster.id in self.selected_cluster_ids
-        ]
+        return [cluster for cluster in self.clusters if cluster.id in self.selected_cluster_ids]
 
     def get_idea_count(self) -> int:
         """
@@ -1994,7 +1926,7 @@ class IdeationState(BaseModel):
             "scoring_criteria": self.scoring_criteria,
             "workflow_metadata": self.workflow_metadata,
             "created_at": self.created_at,
-            "updated_at": self.updated_at
+            "updated_at": self.updated_at,
         }
 
     @classmethod
@@ -2012,15 +1944,11 @@ class IdeationState(BaseModel):
             >>> state = IdeationState.from_dict(state_data)
         """
         # Convert idea dicts to Idea objects
-        ideas = [
-            Idea(**i) if isinstance(i, dict) else i
-            for i in data.get("ideas", [])
-        ]
+        ideas = [Idea(**i) if isinstance(i, dict) else i for i in data.get("ideas", [])]
 
         # Convert cluster dicts to IdeaCluster objects
         clusters = [
-            IdeaCluster(**c) if isinstance(c, dict) else c
-            for c in data.get("clusters", [])
+            IdeaCluster(**c) if isinstance(c, dict) else c for c in data.get("clusters", [])
         ]
 
         return cls(
@@ -2034,7 +1962,7 @@ class IdeationState(BaseModel):
             scoring_criteria=data.get("scoring_criteria", []),
             workflow_metadata=data.get("workflow_metadata", {}),
             created_at=data.get("created_at"),
-            updated_at=data.get("updated_at")
+            updated_at=data.get("updated_at"),
         )
 
 
@@ -2088,65 +2016,39 @@ class Source(BaseModel):
                 "validation_score": 8,
                 "validation_notes": ["URL provided", "Credible type: article"],
                 "ingested_at": "2025-11-06T12:00:00Z",
-                "metadata": {}
+                "metadata": {},
             }
         }
     )
 
-    source_id: str = Field(
-        ...,
-        description="Unique identifier for this source",
-        min_length=1
-    )
+    source_id: str = Field(..., description="Unique identifier for this source", min_length=1)
 
-    title: str = Field(
-        ...,
-        description="Title or description of the source",
-        min_length=1
-    )
+    title: str = Field(..., description="Title or description of the source", min_length=1)
 
-    url: Optional[str] = Field(
-        default=None,
-        description="Optional URL or reference to the source"
-    )
+    url: Optional[str] = Field(default=None, description="Optional URL or reference to the source")
 
     source_type: str = Field(
-        default="unknown",
-        description="Type of source (article, paper, book, website, etc.)"
+        default="unknown", description="Type of source (article, paper, book, website, etc.)"
     )
 
     credibility: Literal["high", "medium", "low", "unassessed"] = Field(
-        default="unassessed",
-        description="Credibility assessment"
+        default="unassessed", description="Credibility assessment"
     )
 
     tags: List[str] = Field(
-        default_factory=list,
-        description="Optional list of tags for categorization"
+        default_factory=list, description="Optional list of tags for categorization"
     )
 
-    validated: bool = Field(
-        default=False,
-        description="Whether source has been validated"
-    )
+    validated: bool = Field(default=False, description="Whether source has been validated")
 
     validation_score: int = Field(
-        default=0,
-        ge=0,
-        description="Numeric validation score if validated"
+        default=0, ge=0, description="Numeric validation score if validated"
     )
 
     validation_notes: List[str] = Field(
-        default_factory=list,
-        description="List of validation findings"
+        default_factory=list, description="List of validation findings"
     )
 
-    ingested_at: str = Field(
-        ...,
-        description="ISO timestamp when source was added"
-    )
+    ingested_at: str = Field(..., description="ISO timestamp when source was added")
 
-    metadata: Dict[str, Any] = Field(
-        default_factory=dict,
-        description="Additional source metadata"
-    )
+    metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional source metadata")

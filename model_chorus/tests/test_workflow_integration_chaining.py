@@ -75,33 +75,32 @@ class TestConsensusThinkDeepChatChaining:
         # Setup consensus mock responses (simulating two models with different opinions)
         mock_provider.generate.return_value = GenerationResponse(
             content="Redis is recommended for this use case. It provides persistence, "
-                   "richer data structures (lists, sets, sorted sets), and built-in "
-                   "replication. The main concern is memory usage - Redis keeps all "
-                   "data in memory which could be expensive at scale.",
+            "richer data structures (lists, sets, sorted sets), and built-in "
+            "replication. The main concern is memory usage - Redis keeps all "
+            "data in memory which could be expensive at scale.",
             model="test-model-1",
             usage={"input_tokens": 50, "output_tokens": 100},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         mock_provider_2.generate.return_value = GenerationResponse(
             content="Memcached is simpler and more memory-efficient for pure caching. "
-                   "However, Redis offers more features that could be valuable: "
-                   "persistence, pub/sub, transactions. Both are excellent choices, "
-                   "but Redis has more long-term flexibility.",
+            "However, Redis offers more features that could be valuable: "
+            "persistence, pub/sub, transactions. Both are excellent choices, "
+            "but Redis has more long-term flexibility.",
             model="test-model-2",
             usage={"input_tokens": 50, "output_tokens": 95},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         # Create and execute consensus workflow
         consensus_workflow = ConsensusWorkflow(
-            providers=[mock_provider, mock_provider_2],
-            strategy=ConsensusStrategy.ALL_RESPONSES
+            providers=[mock_provider, mock_provider_2], strategy=ConsensusStrategy.ALL_RESPONSES
         )
 
         consensus_request = GenerationRequest(
             prompt="Should we use Redis or Memcached for session caching in our web application? "
-                  "Consider: performance, scalability, operational complexity, and cost."
+            "Consider: performance, scalability, operational complexity, and cost."
         )
 
         consensus_result = await consensus_workflow.execute(consensus_request)
@@ -121,34 +120,36 @@ class TestConsensusThinkDeepChatChaining:
         # Reset mock for thinkdeep investigation
         mock_provider.generate.return_value = GenerationResponse(
             content=f"Investigating {consensus_concern}. Redis uses a memory allocator "
-                   "that can lead to fragmentation over time. For 1M sessions (~1KB each), "
-                   "expect ~1.5GB actual usage due to allocator overhead. Mitigation: "
-                   "Use maxmemory policies, monitor with INFO memory, consider Redis "
-                   "clustering for horizontal scaling.",
+            "that can lead to fragmentation over time. For 1M sessions (~1KB each), "
+            "expect ~1.5GB actual usage due to allocator overhead. Mitigation: "
+            "Use maxmemory policies, monitor with INFO memory, consider Redis "
+            "clustering for horizontal scaling.",
             model="test-model-1",
             usage={"input_tokens": 120, "output_tokens": 150},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         # Create ThinkDeep workflow (uses same conversation memory)
         thinkdeep_workflow = ThinkDeepWorkflow(
-            provider=mock_provider,
-            conversation_memory=conversation_memory
+            provider=mock_provider, conversation_memory=conversation_memory
         )
 
         # Execute investigation (no continuation_id - this is a new investigation)
         thinkdeep_result = await thinkdeep_workflow.run(
             prompt=f"Based on earlier consensus discussion about Redis vs Memcached, "
-                  f"investigate: {consensus_concern}. Analyze memory footprint patterns, "
-                  f"fragmentation issues, and mitigation strategies.",
-            files=[]
+            f"investigate: {consensus_concern}. Analyze memory footprint patterns, "
+            f"fragmentation issues, and mitigation strategies.",
+            files=[],
         )
 
         # Verify thinkdeep execution
         assert thinkdeep_result.success is True
         assert thinkdeep_result.synthesis is not None
         assert "memory" in thinkdeep_result.synthesis.lower()
-        assert "maxmemory" in thinkdeep_result.synthesis or "fragmentation" in thinkdeep_result.synthesis
+        assert (
+            "maxmemory" in thinkdeep_result.synthesis
+            or "fragmentation" in thinkdeep_result.synthesis
+        )
 
         # Get thread ID for continuation
         thinkdeep_thread_id = thinkdeep_result.metadata.get("thread_id")
@@ -160,33 +161,35 @@ class TestConsensusThinkDeepChatChaining:
         # Reset mock for chat refinement
         mock_provider.generate.return_value = GenerationResponse(
             content="For deployment, I recommend starting with Redis in a single-instance "
-                   "configuration with maxmemory-policy allkeys-lru set to 2GB. Monitor "
-                   "memory usage with CloudWatch/Prometheus. Once you hit 70% memory usage, "
-                   "plan for Redis Cluster with 3 masters. This gives you time to validate "
-                   "the architecture while keeping costs low initially.",
+            "configuration with maxmemory-policy allkeys-lru set to 2GB. Monitor "
+            "memory usage with CloudWatch/Prometheus. Once you hit 70% memory usage, "
+            "plan for Redis Cluster with 3 masters. This gives you time to validate "
+            "the architecture while keeping costs low initially.",
             model="test-model-1",
             usage={"input_tokens": 200, "output_tokens": 120},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         # Create Chat workflow (uses same conversation memory)
         chat_workflow = ChatWorkflow(
-            provider=mock_provider,
-            conversation_memory=conversation_memory
+            provider=mock_provider, conversation_memory=conversation_memory
         )
 
         # Execute chat with continuation from thinkdeep
         chat_result = await chat_workflow.run(
             prompt="Given the memory analysis, what specific deployment configuration "
-                  "would you recommend for a production environment handling 100K "
-                  "concurrent users?",
-            continuation_id=thinkdeep_thread_id  # Continue from thinkdeep thread
+            "would you recommend for a production environment handling 100K "
+            "concurrent users?",
+            continuation_id=thinkdeep_thread_id,  # Continue from thinkdeep thread
         )
 
         # Verify chat execution
         assert chat_result.success is True
         assert chat_result.synthesis is not None
-        assert "deployment" in chat_result.synthesis.lower() or "configuration" in chat_result.synthesis.lower()
+        assert (
+            "deployment" in chat_result.synthesis.lower()
+            or "configuration" in chat_result.synthesis.lower()
+        )
 
         # Verify continuation worked
         assert chat_result.metadata.get("is_continuation") is True
@@ -202,7 +205,9 @@ class TestConsensusThinkDeepChatChaining:
         # Should have messages from thinkdeep + chat (2 user prompts + 2 assistant responses = 4 messages)
         # ThinkDeep: user prompt + assistant response
         # Chat: user prompt + assistant response
-        assert len(thread.messages) >= 4, f"Expected at least 4 messages, got {len(thread.messages)}"
+        assert (
+            len(thread.messages) >= 4
+        ), f"Expected at least 4 messages, got {len(thread.messages)}"
 
         # Verify message sequence
         messages = thread.messages
@@ -231,32 +236,24 @@ class TestConsensusThinkDeepChatChaining:
             content="Response from independent workflow execution",
             model="test-model",
             usage={"input_tokens": 10, "output_tokens": 20},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         # Create two independent thinkdeep workflows
         thinkdeep_1 = ThinkDeepWorkflow(
-            provider=mock_provider,
-            conversation_memory=conversation_memory
+            provider=mock_provider, conversation_memory=conversation_memory
         )
 
         thinkdeep_2 = ThinkDeepWorkflow(
-            provider=mock_provider,
-            conversation_memory=conversation_memory
+            provider=mock_provider, conversation_memory=conversation_memory
         )
 
         # Execute first workflow
-        result_1 = await thinkdeep_1.run(
-            prompt="First independent investigation",
-            files=[]
-        )
+        result_1 = await thinkdeep_1.run(prompt="First independent investigation", files=[])
         thread_1_id = result_1.metadata.get("thread_id")
 
         # Execute second workflow (independent - no continuation)
-        result_2 = await thinkdeep_2.run(
-            prompt="Second independent investigation",
-            files=[]
-        )
+        result_2 = await thinkdeep_2.run(prompt="Second independent investigation", files=[])
         thread_2_id = result_2.metadata.get("thread_id")
 
         # Verify different threads
@@ -270,15 +267,9 @@ class TestConsensusThinkDeepChatChaining:
         assert len(thread_2.messages) == 2  # user + assistant
 
         # Now create a chat that continues from thinkdeep_1
-        chat = ChatWorkflow(
-            provider=mock_provider,
-            conversation_memory=conversation_memory
-        )
+        chat = ChatWorkflow(provider=mock_provider, conversation_memory=conversation_memory)
 
-        result_3 = await chat.run(
-            prompt="Follow-up question",
-            continuation_id=thread_1_id
-        )
+        result_3 = await chat.run(prompt="Follow-up question", continuation_id=thread_1_id)
 
         # Verify chat continued thread_1
         assert result_3.metadata.get("thread_id") == thread_1_id
@@ -286,16 +277,16 @@ class TestConsensusThinkDeepChatChaining:
 
         # Verify thread_1 now has both thinkdeep and chat messages
         thread_1_updated = conversation_memory.get_thread(thread_1_id)
-        assert len(thread_1_updated.messages) == 4  # thinkdeep (user+assistant) + chat (user+assistant)
+        assert (
+            len(thread_1_updated.messages) == 4
+        )  # thinkdeep (user+assistant) + chat (user+assistant)
 
         # Verify thread_2 unchanged
         thread_2_unchanged = conversation_memory.get_thread(thread_2_id)
         assert len(thread_2_unchanged.messages) == 2
 
     @pytest.mark.asyncio
-    async def test_consensus_without_continuation_support(
-        self, mock_provider, mock_provider_2
-    ):
+    async def test_consensus_without_continuation_support(self, mock_provider, mock_provider_2):
         """
         Test that ConsensusWorkflow works independently without continuation.
 
@@ -308,26 +299,23 @@ class TestConsensusThinkDeepChatChaining:
             content="Consensus response 1",
             model="model-1",
             usage={"input_tokens": 10, "output_tokens": 20},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         mock_provider_2.generate.return_value = GenerationResponse(
             content="Consensus response 2",
             model="model-2",
             usage={"input_tokens": 10, "output_tokens": 20},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         # Create consensus workflow
         consensus = ConsensusWorkflow(
-            providers=[mock_provider, mock_provider_2],
-            strategy=ConsensusStrategy.ALL_RESPONSES
+            providers=[mock_provider, mock_provider_2], strategy=ConsensusStrategy.ALL_RESPONSES
         )
 
         # Execute consensus
-        result = await consensus.execute(
-            GenerationRequest(prompt="Test question")
-        )
+        result = await consensus.execute(GenerationRequest(prompt="Test question"))
 
         # Verify consensus executed successfully
         assert result is not None

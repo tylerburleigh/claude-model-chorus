@@ -110,6 +110,7 @@ class TestArgumentMapGeneration:
 
     def test_generate_argument_map(self, argument_workflow):
         """Test ArgumentMap generation from role responses."""
+
         # Create mock responses
         class MockResponse:
             def __init__(self, content, model):
@@ -127,7 +128,7 @@ class TestArgumentMapGeneration:
             skeptic_response=skeptic_resp,
             moderator_response=moderator_resp,
             synthesis="Final balanced synthesis",
-            metadata={"thread_id": "test123"}
+            metadata={"thread_id": "test123"},
         )
 
         # Verify ArgumentMap structure
@@ -139,6 +140,7 @@ class TestArgumentMapGeneration:
 
     def test_argument_map_creator_perspective(self, argument_workflow):
         """Test Creator perspective in ArgumentMap."""
+
         class MockResponse:
             def __init__(self, content, model):
                 self.content = content
@@ -154,7 +156,7 @@ class TestArgumentMapGeneration:
             skeptic_response=skeptic_resp,
             moderator_response=moderator_resp,
             synthesis="Test synthesis",
-            metadata={}
+            metadata={},
         )
 
         creator = arg_map.get_perspective("creator")
@@ -168,6 +170,7 @@ class TestArgumentMapGeneration:
 
     def test_argument_map_skeptic_perspective(self, argument_workflow):
         """Test Skeptic perspective in ArgumentMap."""
+
         class MockResponse:
             def __init__(self, content, model):
                 self.content = content
@@ -183,7 +186,7 @@ class TestArgumentMapGeneration:
             skeptic_response=skeptic_resp,
             moderator_response=moderator_resp,
             synthesis="Test synthesis",
-            metadata={}
+            metadata={},
         )
 
         skeptic = arg_map.get_perspective("skeptic")
@@ -197,6 +200,7 @@ class TestArgumentMapGeneration:
 
     def test_argument_map_moderator_perspective(self, argument_workflow):
         """Test Moderator perspective in ArgumentMap."""
+
         class MockResponse:
             def __init__(self, content, model):
                 self.content = content
@@ -212,7 +216,7 @@ class TestArgumentMapGeneration:
             skeptic_response=skeptic_resp,
             moderator_response=moderator_resp,
             synthesis="Test synthesis",
-            metadata={}
+            metadata={},
         )
 
         moderator = arg_map.get_perspective("moderator")
@@ -236,21 +240,21 @@ class TestArgumentWorkflowExecution:
             content="Strong thesis supporting the position with evidence",
             model="test-model",
             usage={"input_tokens": 10, "output_tokens": 20, "total_tokens": 30},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         skeptic_response = GenerationResponse(
             content="Critical rebuttal challenging the thesis with counter-arguments",
             model="test-model",
             usage={"input_tokens": 10, "output_tokens": 20, "total_tokens": 30},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         moderator_response = GenerationResponse(
             content="Balanced synthesis integrating both perspectives",
             model="test-model",
             usage={"input_tokens": 10, "output_tokens": 20, "total_tokens": 30},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         # Create mock orchestration result
@@ -259,14 +263,16 @@ class TestArgumentWorkflowExecution:
             role_responses=[
                 ("creator", creator_response),
                 ("skeptic", skeptic_response),
-                ("moderator", moderator_response)
+                ("moderator", moderator_response),
             ],
             pattern_used=OrchestrationPattern.SEQUENTIAL,
-            execution_order=["creator", "skeptic", "moderator"]
+            execution_order=["creator", "skeptic", "moderator"],
         )
 
         # Patch RoleOrchestrator.execute
-        with patch('model_chorus.workflows.argument.argument_workflow.RoleOrchestrator') as MockOrchestrator:
+        with patch(
+            "model_chorus.workflows.argument.argument_workflow.RoleOrchestrator"
+        ) as MockOrchestrator:
             mock_orchestrator_instance = MockOrchestrator.return_value
             mock_orchestrator_instance.execute = AsyncMock(return_value=mock_orchestration_result)
 
@@ -310,37 +316,30 @@ class TestArgumentWorkflowExecution:
         """Test workflow metadata generation."""
         # Create mock role responses
         creator_response = GenerationResponse(
-            content="Thesis",
-            model="test-model",
-            usage={},
-            stop_reason="end_turn"
+            content="Thesis", model="test-model", usage={}, stop_reason="end_turn"
         )
 
         skeptic_response = GenerationResponse(
-            content="Rebuttal",
-            model="test-model",
-            usage={},
-            stop_reason="end_turn"
+            content="Rebuttal", model="test-model", usage={}, stop_reason="end_turn"
         )
 
         moderator_response = GenerationResponse(
-            content="Synthesis",
-            model="test-model",
-            usage={},
-            stop_reason="end_turn"
+            content="Synthesis", model="test-model", usage={}, stop_reason="end_turn"
         )
 
         mock_orchestration_result = OrchestrationResult(
             role_responses=[
                 ("creator", creator_response),
                 ("skeptic", skeptic_response),
-                ("moderator", moderator_response)
+                ("moderator", moderator_response),
             ],
             pattern_used=OrchestrationPattern.SEQUENTIAL,
-            execution_order=["creator", "skeptic", "moderator"]
+            execution_order=["creator", "skeptic", "moderator"],
         )
 
-        with patch('model_chorus.workflows.argument.argument_workflow.RoleOrchestrator') as MockOrchestrator:
+        with patch(
+            "model_chorus.workflows.argument.argument_workflow.RoleOrchestrator"
+        ) as MockOrchestrator:
             mock_orchestrator_instance = MockOrchestrator.return_value
             mock_orchestrator_instance.execute = AsyncMock(return_value=mock_orchestration_result)
 
@@ -374,13 +373,15 @@ class TestConversationThreading:
             role_responses=[
                 ("creator", creator_response),
                 ("skeptic", skeptic_response),
-                ("moderator", moderator_response)
+                ("moderator", moderator_response),
             ],
             pattern_used=OrchestrationPattern.SEQUENTIAL,
-            execution_order=["creator", "skeptic", "moderator"]
+            execution_order=["creator", "skeptic", "moderator"],
         )
 
-        with patch('model_chorus.workflows.argument.argument_workflow.RoleOrchestrator') as MockOrchestrator:
+        with patch(
+            "model_chorus.workflows.argument.argument_workflow.RoleOrchestrator"
+        ) as MockOrchestrator:
             mock_orchestrator_instance = MockOrchestrator.return_value
             mock_orchestrator_instance.execute = AsyncMock(return_value=mock_result)
 
@@ -407,13 +408,15 @@ class TestConversationThreading:
             role_responses=[
                 ("creator", creator_response),
                 ("skeptic", skeptic_response),
-                ("moderator", moderator_response)
+                ("moderator", moderator_response),
             ],
             pattern_used=OrchestrationPattern.SEQUENTIAL,
-            execution_order=["creator", "skeptic", "moderator"]
+            execution_order=["creator", "skeptic", "moderator"],
         )
 
-        with patch('model_chorus.workflows.argument.argument_workflow.RoleOrchestrator') as MockOrchestrator:
+        with patch(
+            "model_chorus.workflows.argument.argument_workflow.RoleOrchestrator"
+        ) as MockOrchestrator:
             mock_orchestrator_instance = MockOrchestrator.return_value
             mock_orchestrator_instance.execute = AsyncMock(return_value=mock_result)
 
@@ -423,8 +426,7 @@ class TestConversationThreading:
 
             # Continuation
             result2 = await argument_workflow.run(
-                prompt="Follow-up question",
-                continuation_id=thread_id
+                prompt="Follow-up question", continuation_id=thread_id
             )
 
             assert result2.metadata["thread_id"] == thread_id
@@ -437,7 +439,9 @@ class TestErrorHandling:
     @pytest.mark.asyncio
     async def test_workflow_handles_orchestration_failure(self, argument_workflow):
         """Test that workflow handles orchestration failures gracefully."""
-        with patch('model_chorus.workflows.argument.argument_workflow.RoleOrchestrator') as MockOrchestrator:
+        with patch(
+            "model_chorus.workflows.argument.argument_workflow.RoleOrchestrator"
+        ) as MockOrchestrator:
             mock_orchestrator_instance = MockOrchestrator.return_value
             mock_orchestrator_instance.execute = AsyncMock(
                 side_effect=Exception("Orchestration failed")
@@ -463,13 +467,15 @@ class TestErrorHandling:
         mock_result = OrchestrationResult(
             role_responses=[
                 ("creator", creator_response),
-                ("skeptic", skeptic_response)
+                ("skeptic", skeptic_response),
             ],  # Missing Moderator
             pattern_used=OrchestrationPattern.SEQUENTIAL,
-            execution_order=["creator", "skeptic"]
+            execution_order=["creator", "skeptic"],
         )
 
-        with patch('model_chorus.workflows.argument.argument_workflow.RoleOrchestrator') as MockOrchestrator:
+        with patch(
+            "model_chorus.workflows.argument.argument_workflow.RoleOrchestrator"
+        ) as MockOrchestrator:
             mock_orchestrator_instance = MockOrchestrator.return_value
             mock_orchestrator_instance.execute = AsyncMock(return_value=mock_result)
 

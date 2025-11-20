@@ -344,10 +344,10 @@ def calculate_citation_confidence(citation: "Citation") -> Dict[str, Any]:  # ty
 
     # Calculate overall confidence (weighted average)
     overall_confidence = (
-        base_confidence * 0.4 +      # 40% from original confidence
-        metadata_score * 0.3 +        # 30% from metadata completeness
-        source_quality * 0.2 +        # 20% from source quality
-        location_score * 0.1          # 10% from location specificity
+        base_confidence * 0.4  # 40% from original confidence
+        + metadata_score * 0.3  # 30% from metadata completeness
+        + source_quality * 0.2  # 20% from source quality
+        + location_score * 0.1  # 10% from location specificity
     )
 
     return {
@@ -358,7 +358,9 @@ def calculate_citation_confidence(citation: "Citation") -> Dict[str, Any]:  # ty
         "location_score": round(location_score, 3),
         "factors": {
             "metadata_completeness": metadata_factors,
-            "source_type": "academic" if source_quality >= 0.9 else "web" if "http" in source_lower else "file",
+            "source_type": (
+                "academic" if source_quality >= 0.9 else "web" if "http" in source_lower else "file"
+            ),
             "has_specific_location": location_score > 0.5,
         },
     }
@@ -401,8 +403,7 @@ def calculate_citation_map_confidence(citation_map: "CitationMap") -> Dict[str, 
 
     # Calculate confidence for each citation
     individual_scores = [
-        calculate_citation_confidence(citation)
-        for citation in citation_map.citations
+        calculate_citation_confidence(citation) for citation in citation_map.citations
     ]
 
     overall_confidences = [score["overall_confidence"] for score in individual_scores]
@@ -419,9 +420,7 @@ def calculate_citation_map_confidence(citation_map: "CitationMap") -> Dict[str, 
     citation_count_factor = min(len(citation_map.citations) / 5.0, 1.0)
 
     overall_confidence = (
-        average_confidence * 0.5 +
-        citation_map.strength * 0.3 +
-        citation_count_factor * 0.2
+        average_confidence * 0.5 + citation_map.strength * 0.3 + citation_count_factor * 0.2
     )
 
     return {

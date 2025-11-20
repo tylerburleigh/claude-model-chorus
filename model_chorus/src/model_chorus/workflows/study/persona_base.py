@@ -70,7 +70,7 @@ class Persona:
         return PersonaResponse(
             findings=[f"{self.name} placeholder finding"],
             confidence_update=None,
-            metadata={"persona": self.name, "invoked": True}
+            metadata={"persona": self.name, "invoked": True},
         )
 
 

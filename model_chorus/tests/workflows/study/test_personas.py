@@ -10,11 +10,7 @@ Tests verify that:
 """
 
 import pytest
-from model_chorus.workflows.study.persona_base import (
-    Persona,
-    PersonaResponse,
-    PersonaRegistry
-)
+from model_chorus.workflows.study.persona_base import Persona, PersonaResponse, PersonaRegistry
 from model_chorus.workflows.study.personas import (
     ResearcherPersona,
     CriticPersona,
@@ -66,11 +62,7 @@ class TestPersonaResponse:
         findings = ["Finding A", "Finding B"]
         metadata = {"status": "complete"}
 
-        response = PersonaResponse(
-            findings=findings,
-            confidence_update="medium",
-            metadata=metadata
-        )
+        response = PersonaResponse(findings=findings, confidence_update="medium", metadata=metadata)
 
         assert response.findings == findings
         assert response.confidence_update == "medium"
@@ -82,10 +74,7 @@ class TestPersona:
 
     def test_persona_init(self):
         """Test Persona initializes with required parameters."""
-        persona = Persona(
-            name="TestPersona",
-            prompt_template="Test template"
-        )
+        persona = Persona(name="TestPersona", prompt_template="Test template")
 
         assert persona.name == "TestPersona"
         assert persona.prompt_template == "Test template"
@@ -94,30 +83,19 @@ class TestPersona:
 
     def test_persona_init_custom_temperature(self):
         """Test Persona with custom temperature."""
-        persona = Persona(
-            name="TestPersona",
-            prompt_template="Test template",
-            temperature=0.3
-        )
+        persona = Persona(name="TestPersona", prompt_template="Test template", temperature=0.3)
 
         assert persona.temperature == 0.3
 
     def test_persona_init_custom_max_tokens(self):
         """Test Persona with custom max_tokens."""
-        persona = Persona(
-            name="TestPersona",
-            prompt_template="Test template",
-            max_tokens=2048
-        )
+        persona = Persona(name="TestPersona", prompt_template="Test template", max_tokens=2048)
 
         assert persona.max_tokens == 2048
 
     def test_persona_invoke_returns_response(self):
         """Test Persona.invoke returns PersonaResponse."""
-        persona = Persona(
-            name="TestPersona",
-            prompt_template="Test template"
-        )
+        persona = Persona(name="TestPersona", prompt_template="Test template")
 
         response = persona.invoke({"prompt": "Test"})
 
@@ -125,10 +103,7 @@ class TestPersona:
 
     def test_persona_invoke_with_context(self):
         """Test Persona.invoke processes context."""
-        persona = Persona(
-            name="TestPersona",
-            prompt_template="Test template"
-        )
+        persona = Persona(name="TestPersona", prompt_template="Test template")
         context = {"prompt": "Test question", "phase": "discovery"}
 
         response = persona.invoke(context)
@@ -138,10 +113,7 @@ class TestPersona:
 
     def test_persona_invoke_includes_metadata(self):
         """Test Persona.invoke includes persona name in metadata."""
-        persona = Persona(
-            name="TestPersona",
-            prompt_template="Test template"
-        )
+        persona = Persona(name="TestPersona", prompt_template="Test template")
 
         response = persona.invoke({})
 
@@ -161,10 +133,7 @@ class TestPersonaRegistry:
     def test_registry_register_persona(self):
         """Test registering a persona."""
         registry = PersonaRegistry()
-        persona = Persona(
-            name="TestPersona",
-            prompt_template="Test template"
-        )
+        persona = Persona(name="TestPersona", prompt_template="Test template")
 
         registry.register(persona)
 
@@ -256,7 +225,10 @@ class TestResearcherPersona:
 
         assert researcher.prompt_template is not None
         assert len(researcher.prompt_template) > 0
-        assert "Researcher" in researcher.prompt_template or "systematic" in researcher.prompt_template.lower()
+        assert (
+            "Researcher" in researcher.prompt_template
+            or "systematic" in researcher.prompt_template.lower()
+        )
 
     def test_researcher_invoke_returns_response(self):
         """Test ResearcherPersona.invoke returns PersonaResponse."""
@@ -601,16 +573,8 @@ class TestPersonaIntegration:
 
     def test_persona_max_tokens_configuration(self):
         """Test that max_tokens setting is preserved."""
-        short_persona = Persona(
-            name="Short",
-            prompt_template="Test",
-            max_tokens=1000
-        )
-        long_persona = Persona(
-            name="Long",
-            prompt_template="Test",
-            max_tokens=8000
-        )
+        short_persona = Persona(name="Short", prompt_template="Test", max_tokens=1000)
+        long_persona = Persona(name="Long", prompt_template="Test", max_tokens=8000)
 
         assert short_persona.max_tokens == 1000
         assert long_persona.max_tokens == 8000

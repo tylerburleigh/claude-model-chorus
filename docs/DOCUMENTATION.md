@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-20 16:18:17
+**Generated:** 2025-11-20 16:22:51
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 103
-- **Total Lines:** 44897
-- **Total Classes:** 247
+- **Total Files:** 104
+- **Total Lines:** 45377
+- **Total Classes:** 255
 - **Total Functions:** 206
 - **Avg Complexity:** 4.96
 - **Max Complexity:** 55
@@ -3003,6 +3003,21 @@ Example:
 
 ---
 
+### `TestCanReadFile`
+
+**Language:** python
+**Defined in:** `tests/test_context_ingestion.py:208`
+
+**Description:**
+> Test file readability checks.
+
+**Methods:**
+- `test_can_read_small_file()`
+- `test_can_read_large_file()`
+- `test_can_read_nonexistent_file()`
+
+---
+
 ### `TestChatErrorHandling`
 
 **Language:** python
@@ -3632,6 +3647,23 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 
 ---
 
+### `TestContextIngestionServiceInitialization`
+
+**Language:** python
+**Defined in:** `tests/test_context_ingestion.py:20`
+
+**Description:**
+> Test service initialization and configuration.
+
+**Methods:**
+- `test_default_initialization()`
+- `test_custom_initialization()`
+- `test_initialization_validation_max_size_zero()`
+- `test_initialization_validation_max_size_negative()`
+- `test_initialization_validation_warn_exceeds_max()`
+
+---
+
 ### `TestContradictionDetection`
 
 **Language:** python
@@ -3861,6 +3893,20 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 - `test_supports_vision()`
 - `test_supports_code_generation()`
 - `test_read_only_mode_by_default()`
+
+---
+
+### `TestCustomSizeLimits`
+
+**Language:** python
+**Defined in:** `tests/test_context_ingestion.py:444`
+
+**Description:**
+> Test service with custom size limits.
+
+**Methods:**
+- `test_custom_max_size_allows_larger_files()`
+- `test_custom_warn_threshold()`
 
 ---
 
@@ -4213,6 +4259,21 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 - `test_parse_response_error_handling()`
 - `test_supports_vision()`
 - `test_supports_thinking()`
+
+---
+
+### `TestGetFileInfo`
+
+**Language:** python
+**Defined in:** `tests/test_context_ingestion.py:163`
+
+**Description:**
+> Test file metadata retrieval.
+
+**Methods:**
+- `test_get_file_info_small_file()`
+- `test_get_file_info_large_file()`
+- `test_get_file_info_nonexistent_file()`
 
 ---
 
@@ -4642,6 +4703,20 @@ with long-running conversations with many messages.
 
 ---
 
+### `TestPathValidation`
+
+**Language:** python
+**Defined in:** `tests/test_context_ingestion.py:414`
+
+**Description:**
+> Test path validation and normalization.
+
+**Methods:**
+- `test_validate_path_with_string()`
+- `test_validate_path_with_pathlib()`
+
+---
+
 ### `TestPersona`
 
 **Language:** python
@@ -4779,6 +4854,60 @@ with long-running conversations with many messages.
 **Methods:**
 - `test_frame_ideation_prompt_initial()`
 - `test_frame_ideation_prompt_continuation()`
+
+---
+
+### `TestReadFile`
+
+**Language:** python
+**Defined in:** `tests/test_context_ingestion.py:51`
+
+**Description:**
+> Test basic file reading functionality.
+
+**Methods:**
+- `test_read_small_text_file()`
+- `test_read_file_with_unicode()`
+- `test_read_file_with_multiple_lines()`
+- `test_read_file_not_found()`
+- `test_read_directory_raises_error()`
+- `test_read_file_too_large()`
+- `test_read_file_exceeds_warning_threshold()`
+- `test_read_binary_file_raises_error()`
+
+---
+
+### `TestReadFileChunked`
+
+**Language:** python
+**Defined in:** `tests/test_context_ingestion.py:247`
+
+**Description:**
+> Test chunked file reading.
+
+**Methods:**
+- `test_read_file_chunked_single_chunk()`
+- `test_read_file_chunked_multiple_chunks()`
+- `test_read_file_chunked_with_max_chunks()`
+- `test_read_file_chunked_invalid_chunk_size()`
+- `test_read_file_chunked_binary_file()`
+
+---
+
+### `TestReadFileLines`
+
+**Language:** python
+**Defined in:** `tests/test_context_ingestion.py:330`
+
+**Description:**
+> Test line-by-line file reading.
+
+**Methods:**
+- `test_read_file_lines_all_lines()`
+- `test_read_file_lines_with_max_lines()`
+- `test_read_file_lines_skip_empty()`
+- `test_read_file_lines_keep_empty()`
+- `test_read_file_lines_too_large()`
 
 ---
 
@@ -10884,6 +11013,17 @@ Returns:
 - `model_chorus.workflows.consensus.ConsensusWorkflow`
 - `pytest`
 - `unittest.mock.AsyncMock`
+
+### `tests/test_context_ingestion.py`
+
+- `model_chorus.core.context_ingestion.BinaryFileError`
+- `model_chorus.core.context_ingestion.ContextIngestionService`
+- `model_chorus.core.context_ingestion.DEFAULT_MAX_FILE_SIZE_KB`
+- `model_chorus.core.context_ingestion.DEFAULT_WARN_FILE_SIZE_KB`
+- `model_chorus.core.context_ingestion.FileTooLargeError`
+- `pathlib.Path`
+- `pytest`
+- `tempfile`
 
 ### `tests/test_contradiction.py`
 

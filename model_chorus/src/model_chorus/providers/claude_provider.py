@@ -209,7 +209,9 @@ class ClaudeProvider(CLIProvider):
             token_usage = TokenUsage(
                 input_tokens=usage_data.get("input_tokens", 0),
                 output_tokens=usage_data.get("output_tokens", 0),
-                cached_input_tokens=usage_data.get("cached_tokens", 0),  # Generic mapping, adjust if needed
+                cached_input_tokens=usage_data.get(
+                    "cached_tokens", 0
+                ),  # Generic mapping, adjust if needed
                 total_tokens=usage_data.get("input_tokens", 0) + usage_data.get("output_tokens", 0),
             )
 

@@ -38,8 +38,7 @@ def _get_model(model_name: str = _DEFAULT_MODEL) -> SentenceTransformer:
     if _model is None:
         # Initialize with tokenizer kwargs to suppress FutureWarning
         _model = SentenceTransformer(
-            model_name,
-            tokenizer_kwargs={"clean_up_tokenization_spaces": True}
+            model_name, tokenizer_kwargs={"clean_up_tokenization_spaces": True}
         )
     return _model
 
@@ -464,7 +463,9 @@ def cluster_claims_kmeans(
             r = rng.random()
             next_idx = np.searchsorted(cumulative, r)
             centroids[i] = embeddings[next_idx]
-            distances = np.minimum(distances, np.linalg.norm(embeddings - centroids[i], axis=1) ** 2)
+            distances = np.minimum(
+                distances, np.linalg.norm(embeddings - centroids[i], axis=1) ** 2
+            )
 
     labels = np.zeros(len(embeddings), dtype=int)
 
@@ -690,7 +691,7 @@ def summarize_cluster(
         # For single-item clusters, return the claim itself
         claim_text = cluster[0].claim_text
         if len(claim_text) > max_length:
-            return claim_text[:max_length - 3] + "..."
+            return claim_text[: max_length - 3] + "..."
         return claim_text
 
     # Get representative claim as central theme
@@ -707,7 +708,7 @@ def summarize_cluster(
 
     # Truncate if too long
     if len(summary) > max_length:
-        summary = summary[:max_length - 3] + "..."
+        summary = summary[: max_length - 3] + "..."
 
     return summary
 
@@ -786,7 +787,9 @@ def compute_cluster_statistics(
         "max_cluster_size": max(cluster_sizes) if cluster_sizes else 0,
         "representatives": representatives,
         "intra_cluster_similarities": intra_cluster_sims,
-        "avg_intra_cluster_similarity": float(np.mean(intra_cluster_sims)) if intra_cluster_sims else 0.0,
+        "avg_intra_cluster_similarity": (
+            float(np.mean(intra_cluster_sims)) if intra_cluster_sims else 0.0
+        ),
     }
 
 
@@ -978,8 +981,7 @@ def score_clustering_quality(
 
     # Compute coherence for each cluster
     coherence_scores = [
-        score_cluster_coherence(cluster, model_name=model_name)
-        for cluster in non_empty_clusters
+        score_cluster_coherence(cluster, model_name=model_name) for cluster in non_empty_clusters
     ]
     avg_coherence = float(np.mean(coherence_scores))
 
@@ -1001,14 +1003,13 @@ def score_clustering_quality(
                     labels.append(cluster_idx)
 
             # Compute embeddings
-            embeddings = np.array([
-                compute_embedding(claim, model_name=model_name)
-                for claim in all_claims
-            ])
+            embeddings = np.array(
+                [compute_embedding(claim, model_name=model_name) for claim in all_claims]
+            )
 
             # Compute silhouette score
             if len(set(labels)) > 1:  # Need at least 2 clusters
-                silhouette = float(sklearn_silhouette(embeddings, labels, metric='cosine'))
+                silhouette = float(sklearn_silhouette(embeddings, labels, metric="cosine"))
                 # Convert from [-1, 1] to [0, 1] range
                 silhouette = (silhouette + 1.0) / 2.0
         except ImportError:
@@ -1020,12 +1021,10 @@ def score_clustering_quality(
 
     # Generate cluster names and summaries for interpretability
     cluster_names = [
-        generate_cluster_name(cluster, model_name=model_name)
-        for cluster in non_empty_clusters
+        generate_cluster_name(cluster, model_name=model_name) for cluster in non_empty_clusters
     ]
     cluster_summaries = [
-        summarize_cluster(cluster, model_name=model_name)
-        for cluster in non_empty_clusters
+        summarize_cluster(cluster, model_name=model_name) for cluster in non_empty_clusters
     ]
 
     return {

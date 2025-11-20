@@ -69,9 +69,7 @@ class TestSeverityAssessment:
     def test_critical_severity_high_similarity_strong_polarity(self):
         """Test CRITICAL severity for high similarity with strong polarity opposition."""
         severity = assess_contradiction_severity(
-            semantic_similarity=0.85,
-            has_polarity_opposition=True,
-            polarity_confidence=0.8
+            semantic_similarity=0.85, has_polarity_opposition=True, polarity_confidence=0.8
         )
 
         assert severity == ContradictionSeverity.CRITICAL
@@ -79,9 +77,7 @@ class TestSeverityAssessment:
     def test_major_severity_high_similarity_weak_polarity(self):
         """Test MAJOR severity for high similarity with weak polarity opposition."""
         severity = assess_contradiction_severity(
-            semantic_similarity=0.75,
-            has_polarity_opposition=True,
-            polarity_confidence=0.5
+            semantic_similarity=0.75, has_polarity_opposition=True, polarity_confidence=0.5
         )
 
         assert severity == ContradictionSeverity.MAJOR
@@ -89,9 +85,7 @@ class TestSeverityAssessment:
     def test_moderate_severity_medium_similarity(self):
         """Test MODERATE severity for moderate similarity."""
         severity = assess_contradiction_severity(
-            semantic_similarity=0.6,
-            has_polarity_opposition=True,
-            polarity_confidence=0.7
+            semantic_similarity=0.6, has_polarity_opposition=True, polarity_confidence=0.7
         )
 
         assert severity == ContradictionSeverity.MODERATE
@@ -99,9 +93,7 @@ class TestSeverityAssessment:
     def test_minor_severity_low_similarity(self):
         """Test MINOR severity for low similarity."""
         severity = assess_contradiction_severity(
-            semantic_similarity=0.4,
-            has_polarity_opposition=True,
-            polarity_confidence=0.6
+            semantic_similarity=0.4, has_polarity_opposition=True, polarity_confidence=0.6
         )
 
         assert severity == ContradictionSeverity.MINOR
@@ -109,9 +101,7 @@ class TestSeverityAssessment:
     def test_moderate_severity_high_similarity_no_opposition(self):
         """Test MODERATE severity for high similarity without opposition."""
         severity = assess_contradiction_severity(
-            semantic_similarity=0.8,
-            has_polarity_opposition=False,
-            polarity_confidence=0.0
+            semantic_similarity=0.8, has_polarity_opposition=False, polarity_confidence=0.0
         )
 
         assert severity == ContradictionSeverity.MODERATE
@@ -126,7 +116,7 @@ class TestContradictionExplanation:
             severity=ContradictionSeverity.CRITICAL,
             semantic_similarity=0.85,
             has_polarity_opposition=True,
-            polarity_confidence=0.8
+            polarity_confidence=0.8,
         )
 
         assert "opposing polarity" in explanation.lower()
@@ -139,7 +129,7 @@ class TestContradictionExplanation:
             severity=ContradictionSeverity.CRITICAL,
             semantic_similarity=0.9,
             has_polarity_opposition=True,
-            polarity_confidence=0.9
+            polarity_confidence=0.9,
         )
 
         assert "highly related" in explanation.lower()
@@ -150,7 +140,7 @@ class TestContradictionExplanation:
             severity=ContradictionSeverity.MODERATE,
             semantic_similarity=0.6,
             has_polarity_opposition=True,
-            polarity_confidence=0.7
+            polarity_confidence=0.7,
         )
 
         assert "investigation" in explanation.lower() or "inconsistency" in explanation.lower()
@@ -161,7 +151,7 @@ class TestContradictionExplanation:
             severity=ContradictionSeverity.MINOR,
             semantic_similarity=0.4,
             has_polarity_opposition=False,
-            polarity_confidence=0.3
+            polarity_confidence=0.3,
         )
 
         assert "context" in explanation.lower() or "minor" in explanation.lower()
@@ -213,7 +203,7 @@ class TestContradictionModel:
             confidence=0.85,
             explanation="Test explanation",
             resolution_suggestion="Test suggestion",
-            metadata={"test": "value"}
+            metadata={"test": "value"},
         )
 
         assert contra.contradiction_id == "contra-001"
@@ -231,7 +221,7 @@ class TestContradictionModel:
             claim_2_text="Test claim 2",
             severity=ContradictionSeverity.MINOR,
             confidence=0.5,
-            explanation="Test"
+            explanation="Test",
         )
         assert contra.confidence == 0.5
 
@@ -248,7 +238,7 @@ class TestContradictionModel:
                 claim_2_text="Test claim 2",
                 severity=ContradictionSeverity.MINOR,
                 confidence=1.5,
-                explanation="Test"
+                explanation="Test",
             )
 
     def test_confidence_validation_too_low(self):
@@ -264,7 +254,7 @@ class TestContradictionModel:
                 claim_2_text="Test claim 2",
                 severity=ContradictionSeverity.MINOR,
                 confidence=-0.5,
-                explanation="Test"
+                explanation="Test",
             )
 
     def test_different_claim_ids_validation(self):
@@ -278,7 +268,7 @@ class TestContradictionModel:
                 claim_2_text="Test claim 2",
                 severity=ContradictionSeverity.MINOR,
                 confidence=0.5,
-                explanation="Test"
+                explanation="Test",
             )
 
 
@@ -295,13 +285,16 @@ class TestContradictionDetection:
                 claim_1_text="Artificial intelligence improves diagnostic accuracy by 25%",
                 claim_2_id="claim-2",
                 claim_2_text="Artificial intelligence reduces diagnostic accuracy by 18%",
-                similarity_threshold=0.3
+                similarity_threshold=0.3,
             )
 
             assert contra is not None
             assert contra.severity in [ContradictionSeverity.CRITICAL, ContradictionSeverity.MAJOR]
             assert contra.confidence > 0.5
-            assert "opposing polarity" in contra.explanation.lower() or "polarity" in contra.explanation.lower()
+            assert (
+                "opposing polarity" in contra.explanation.lower()
+                or "polarity" in contra.explanation.lower()
+            )
         except ImportError:
             pytest.skip("Semantic similarity functions not available")
 
@@ -313,7 +306,7 @@ class TestContradictionDetection:
                 claim_1_text="The weather is sunny today",
                 claim_2_id="claim-2",
                 claim_2_text="Python is a programming language",
-                similarity_threshold=0.3
+                similarity_threshold=0.3,
             )
 
             # Unrelated claims should return None
@@ -329,7 +322,7 @@ class TestContradictionDetection:
                 claim_1_text="Machine learning improves accuracy",
                 claim_2_id="claim-2",
                 claim_2_text="Deep learning enhances precision",
-                similarity_threshold=0.3
+                similarity_threshold=0.3,
             )
 
             # Similar positive claims should return None
@@ -394,13 +387,18 @@ class TestRealisticScenarios:
                 claim_1_text="The new drug improves patient outcomes by 42% in clinical trials",
                 claim_2_id="study-2",
                 claim_2_text="The new drug worsens patient outcomes by 28% according to recent data",
-                similarity_threshold=0.3
+                similarity_threshold=0.3,
             )
 
             if contra is not None:  # May be None if similarity too low
-                assert contra.severity in [ContradictionSeverity.CRITICAL, ContradictionSeverity.MAJOR]
-                assert "reliability" in (contra.resolution_suggestion or "").lower() or \
-                       "domain" in (contra.resolution_suggestion or "").lower()
+                assert contra.severity in [
+                    ContradictionSeverity.CRITICAL,
+                    ContradictionSeverity.MAJOR,
+                ]
+                assert (
+                    "reliability" in (contra.resolution_suggestion or "").lower()
+                    or "domain" in (contra.resolution_suggestion or "").lower()
+                )
         except ImportError:
             pytest.skip("Semantic similarity functions not available")
 
@@ -412,11 +410,15 @@ class TestRealisticScenarios:
                 claim_1_text="System latency increases by 150ms under load",
                 claim_2_id="benchmark-2",
                 claim_2_text="System latency decreases by 200ms under load",
-                similarity_threshold=0.3
+                similarity_threshold=0.3,
             )
 
             if contra is not None:
-                assert contra.severity in [ContradictionSeverity.CRITICAL, ContradictionSeverity.MAJOR, ContradictionSeverity.MODERATE]
+                assert contra.severity in [
+                    ContradictionSeverity.CRITICAL,
+                    ContradictionSeverity.MAJOR,
+                    ContradictionSeverity.MODERATE,
+                ]
                 assert contra.confidence > 0.4
         except ImportError:
             pytest.skip("Semantic similarity functions not available")

@@ -14,7 +14,9 @@ from test_helpers import GEMINI_AVAILABLE
 
 
 @pytest.mark.requires_gemini
-@pytest.mark.skipif(not GEMINI_AVAILABLE, reason="Gemini not available (config disabled or CLI not found)")
+@pytest.mark.skipif(
+    not GEMINI_AVAILABLE, reason="Gemini not available (config disabled or CLI not found)"
+)
 class TestGeminiIntegration:
     """Integration tests for Gemini provider."""
 
@@ -72,19 +74,23 @@ class TestGeminiIntegration:
         assert "--json" not in command, "Gemini CLI uses --output-format json, not --json"
 
         # Should include --output-format json
-        assert "--output-format" in command and "json" in command, "Should use --output-format json for JSON output"
+        assert (
+            "--output-format" in command and "json" in command
+        ), "Should use --output-format json for JSON output"
 
         # Prompt is passed as positional argument (after all flags)
         # The -p flag only works with shell=True, not with subprocess.exec
         # Gemini prepends "Human: " to prompts, so check for that
-        assert command[-1].endswith(simple_request.prompt) or simple_request.prompt in command[-1], \
-            f"Prompt should be in command as positional argument. Got: {command[-1]}"
+        assert (
+            command[-1].endswith(simple_request.prompt) or simple_request.prompt in command[-1]
+        ), f"Prompt should be in command as positional argument. Got: {command[-1]}"
         assert "-p" not in command, "Should not use -p flag (use positional arg instead)"
 
         # Verify input_data is NOT set (we use positional args, not stdin)
         command_result = provider.build_command(simple_request)  # Reset state
-        assert not hasattr(provider, 'input_data') or provider.input_data is None, \
-            "Provider should not use input_data (positional args used instead)"
+        assert (
+            not hasattr(provider, "input_data") or provider.input_data is None
+        ), "Provider should not use input_data (positional args used instead)"
 
     def test_build_command_with_model(self, provider):
         """Test command building with model metadata."""

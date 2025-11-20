@@ -43,14 +43,12 @@ class WorkflowResult:
     error: Optional[str] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
 
-    def add_step(self, step_number: int, content: str, model: Optional[str] = None,
-                 **metadata) -> None:
+    def add_step(
+        self, step_number: int, content: str, model: Optional[str] = None, **metadata
+    ) -> None:
         """Add a step to the workflow result."""
         step = WorkflowStep(
-            step_number=step_number,
-            content=content,
-            model=model,
-            metadata=metadata
+            step_number=step_number, content=content, model=model, metadata=metadata
         )
         self.steps.append(step)
 
@@ -74,7 +72,7 @@ class BaseWorkflow(ABC):
         name: str,
         description: str,
         config: Optional[Dict[str, Any]] = None,
-        conversation_memory: Optional[ConversationMemory] = None
+        conversation_memory: Optional[ConversationMemory] = None,
     ):
         """
         Initialize the base workflow.
@@ -165,7 +163,7 @@ class BaseWorkflow(ABC):
         self,
         request: "GenerationRequest",
         primary_provider: "ModelProvider",
-        fallback_providers: Optional[List["ModelProvider"]] = None
+        fallback_providers: Optional[List["ModelProvider"]] = None,
     ) -> tuple["GenerationResponse", str, List[str]]:
         """
         Execute generation with automatic fallback to alternative providers.
@@ -201,8 +199,7 @@ class BaseWorkflow(ABC):
         for i, provider in enumerate(all_providers):
             try:
                 logger.info(
-                    f"Attempting provider {provider.provider_name} "
-                    f"({i+1}/{len(all_providers)})"
+                    f"Attempting provider {provider.provider_name} " f"({i+1}/{len(all_providers)})"
                 )
                 response = await provider.generate(request)
 
@@ -217,31 +214,24 @@ class BaseWorkflow(ABC):
             except ProviderUnavailableError as e:
                 # Permanent error - provider CLI not available
                 failed_providers.append(provider.provider_name)
-                logger.error(
-                    f"{provider.provider_name} unavailable: {e.reason}"
-                )
+                logger.error(f"{provider.provider_name} unavailable: {e.reason}")
                 last_exception = e
 
             except Exception as e:
                 # Other error - could be transient or permanent
                 failed_providers.append(provider.provider_name)
-                logger.warning(
-                    f"{provider.provider_name} failed: {str(e)[:100]}"
-                )
+                logger.warning(f"{provider.provider_name} failed: {str(e)[:100]}")
                 last_exception = e
 
         # All providers failed
-        error_msg = (
-            f"All {len(all_providers)} providers failed. "
-            f"Last error: {last_exception}"
-        )
+        error_msg = f"All {len(all_providers)} providers failed. " f"Last error: {last_exception}"
         logger.error(error_msg)
         raise Exception(error_msg)
 
     async def check_provider_availability(
         self,
         primary_provider: "ModelProvider",
-        fallback_providers: Optional[List["ModelProvider"]] = None
+        fallback_providers: Optional[List["ModelProvider"]] = None,
     ) -> tuple[bool, List[str], List[tuple[str, str]]]:
         """
         Check availability of all providers before starting workflow.
@@ -328,13 +318,7 @@ class BaseWorkflow(ABC):
             return None
         return self.conversation_memory.get_thread(thread_id)
 
-    def add_message(
-        self,
-        thread_id: str,
-        role: str,
-        content: str,
-        **kwargs
-    ) -> bool:
+    def add_message(self, thread_id: str, role: str, content: str, **kwargs) -> bool:
         """
         Add message to conversation thread.
 

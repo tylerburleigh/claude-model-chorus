@@ -35,10 +35,7 @@ async def basic_investigation_example():
     memory = ConversationMemory()
 
     # Create ThinkDeep workflow
-    workflow = ThinkDeepWorkflow(
-        provider=provider,
-        conversation_memory=memory
-    )
+    workflow = ThinkDeepWorkflow(provider=provider, conversation_memory=memory)
 
     # Start investigation
     result = await workflow.run(
@@ -47,9 +44,9 @@ async def basic_investigation_example():
     )
 
     if result.success:
-        thread_id = result.metadata['thread_id']
-        confidence = result.metadata['confidence']
-        hypotheses_count = result.metadata['hypotheses_count']
+        thread_id = result.metadata["thread_id"]
+        confidence = result.metadata["confidence"]
+        hypotheses_count = result.metadata["hypotheses_count"]
 
         print(f"Thread ID: {thread_id}")
         print(f"Investigation Step: {result.metadata['investigation_step']}")
@@ -103,7 +100,7 @@ db = Session()
 DATABASE_POOL_SIZE = 5
 REQUEST_TIMEOUT = 30
 ENABLE_QUERY_LOGGING = False
-"""
+""",
     }
 
     # Write sample files
@@ -115,10 +112,7 @@ ENABLE_QUERY_LOGGING = False
     memory = ConversationMemory()
 
     # Create ThinkDeep workflow
-    workflow = ThinkDeepWorkflow(
-        provider=provider,
-        conversation_memory=memory
-    )
+    workflow = ThinkDeepWorkflow(provider=provider, conversation_memory=memory)
 
     # Step 1: Initial investigation - examine API handler
     print("\n--- Investigation Step 1: Analyze API Handler ---")
@@ -132,7 +126,7 @@ ENABLE_QUERY_LOGGING = False
         print(f"Error: {result1.error}")
         return
 
-    thread_id = result1.metadata['thread_id']
+    thread_id = result1.metadata["thread_id"]
     print(f"Thread ID: {thread_id}")
     print(f"Confidence: {result1.metadata['confidence']}")
     print(f"Hypotheses: {result1.metadata['hypotheses_count']}")
@@ -205,7 +199,8 @@ async def investigation_with_expert_validation():
 
     # Create sample authentication code
     auth_code = Path("/tmp/auth_service.py")
-    auth_code.write_text("""
+    auth_code.write_text(
+        """
 import jwt
 from datetime import datetime, timedelta
 
@@ -226,7 +221,8 @@ def verify_token(token):
         return payload['user_id']
     except:
         return None
-""")
+"""
+    )
 
     # Create primary provider and expert provider
     primary_provider = ClaudeProvider()
@@ -238,7 +234,7 @@ def verify_token(token):
         provider=primary_provider,
         expert_provider=expert_provider,
         conversation_memory=memory,
-        config={'enable_expert_validation': True}
+        config={"enable_expert_validation": True},
     )
 
     # Investigate security issues
@@ -250,8 +246,8 @@ def verify_token(token):
     )
 
     if result.success:
-        thread_id = result.metadata['thread_id']
-        expert_performed = result.metadata['expert_validation_performed']
+        thread_id = result.metadata["thread_id"]
+        expert_performed = result.metadata["expert_validation_performed"]
 
         print(f"Thread ID: {thread_id}")
         print(f"Confidence: {result.metadata['confidence']}")
@@ -286,10 +282,7 @@ async def hypothesis_management_example():
     # Create provider and workflow
     provider = ClaudeProvider()
     memory = ConversationMemory()
-    workflow = ThinkDeepWorkflow(
-        provider=provider,
-        conversation_memory=memory
-    )
+    workflow = ThinkDeepWorkflow(provider=provider, conversation_memory=memory)
 
     # Start investigation
     print("\n--- Starting Investigation ---")
@@ -302,7 +295,7 @@ async def hypothesis_management_example():
         print(f"Error: {result.error}")
         return
 
-    thread_id = result.metadata['thread_id']
+    thread_id = result.metadata["thread_id"]
     print(f"Thread ID: {thread_id}")
     print(f"Initial Confidence: {result.metadata['confidence']}\n")
 
@@ -311,14 +304,12 @@ async def hypothesis_management_example():
     workflow.add_hypothesis(
         thread_id,
         hypothesis_text="Data distribution has changed (data drift)",
-        evidence=["User report mentions recent changes in input data"]
+        evidence=["User report mentions recent changes in input data"],
     )
 
     # Add another hypothesis
     workflow.add_hypothesis(
-        thread_id,
-        hypothesis_text="Training data was contaminated",
-        evidence=[]
+        thread_id, hypothesis_text="Training data was contaminated", evidence=[]
     )
 
     # Get investigation summary
@@ -344,7 +335,7 @@ async def hypothesis_management_example():
             thread_id,
             first_hypothesis,
             new_evidence=["Analysis confirmed: Input data statistics differ significantly"],
-            new_status="validated"
+            new_status="validated",
         )
         print(f"Validated: {first_hypothesis}")
 
@@ -375,10 +366,7 @@ async def confidence_progression_example():
 
     provider = ClaudeProvider()
     memory = ConversationMemory()
-    workflow = ThinkDeepWorkflow(
-        provider=provider,
-        conversation_memory=memory
-    )
+    workflow = ThinkDeepWorkflow(provider=provider, conversation_memory=memory)
 
     # Track confidence across steps
     confidence_levels = []
@@ -391,8 +379,8 @@ async def confidence_progression_example():
     )
 
     if result1.success:
-        thread_id = result1.metadata['thread_id']
-        confidence_levels.append(result1.metadata['confidence'])
+        thread_id = result1.metadata["thread_id"]
+        confidence_levels.append(result1.metadata["confidence"])
         print(f"Confidence: {result1.metadata['confidence']}")
 
         # Step 2: Gather evidence (confidence: medium)
@@ -404,7 +392,7 @@ async def confidence_progression_example():
         )
 
         if result2.success:
-            confidence_levels.append(result2.metadata['confidence'])
+            confidence_levels.append(result2.metadata["confidence"])
             print(f"Confidence: {result2.metadata['confidence']}")
 
             # Step 3: Validate hypothesis (confidence: high/very_high)
@@ -416,7 +404,7 @@ async def confidence_progression_example():
             )
 
             if result3.success:
-                confidence_levels.append(result3.metadata['confidence'])
+                confidence_levels.append(result3.metadata["confidence"])
                 print(f"Confidence: {result3.metadata['confidence']}")
 
     # Show confidence progression

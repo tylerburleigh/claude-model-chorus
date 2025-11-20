@@ -75,10 +75,7 @@ def is_cli_available(cli_command: str) -> bool:
 
         # Try running --version to verify it works
         result = subprocess.run(
-            [cli_command, "--version"],
-            capture_output=True,
-            timeout=5,
-            text=True
+            [cli_command, "--version"], capture_output=True, timeout=5, text=True
         )
         return result.returncode == 0
     except (FileNotFoundError, subprocess.TimeoutExpired, PermissionError):
@@ -112,4 +109,6 @@ CLAUDE_AVAILABLE = is_provider_available("claude", "claude", _MODEL_CHORUS_CONFI
 GEMINI_AVAILABLE = is_provider_available("gemini", "gemini", _MODEL_CHORUS_CONFIG)
 CODEX_AVAILABLE = is_provider_available("codex", "codex", _MODEL_CHORUS_CONFIG)
 CURSOR_AGENT_AVAILABLE = is_provider_available("cursor-agent", "cursor-agent", _MODEL_CHORUS_CONFIG)
-ANY_PROVIDER_AVAILABLE = CLAUDE_AVAILABLE or GEMINI_AVAILABLE or CODEX_AVAILABLE or CURSOR_AGENT_AVAILABLE
+ANY_PROVIDER_AVAILABLE = (
+    CLAUDE_AVAILABLE or GEMINI_AVAILABLE or CODEX_AVAILABLE or CURSOR_AGENT_AVAILABLE
+)

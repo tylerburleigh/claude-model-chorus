@@ -27,7 +27,9 @@ class TestIntegration:
         workflow = ConsensusWorkflow([claude, codex], strategy=ConsensusStrategy.ALL_RESPONSES)
 
         # Mock CLI command execution
-        with patch("model_chorus.providers.cli_provider.asyncio.create_subprocess_exec") as mock_exec:
+        with patch(
+            "model_chorus.providers.cli_provider.asyncio.create_subprocess_exec"
+        ) as mock_exec:
             import json
 
             async def mock_process(*args, **kwargs):
@@ -63,8 +65,11 @@ class TestIntegration:
         provider = ClaudeProvider()
 
         # Mock subprocess execution
-        with patch("model_chorus.providers.cli_provider.asyncio.create_subprocess_exec") as mock_exec:
+        with patch(
+            "model_chorus.providers.cli_provider.asyncio.create_subprocess_exec"
+        ) as mock_exec:
             import json
+
             mock_proc = AsyncMock()
             mock_proc.returncode = 0
             mock_proc.communicate.return_value = (
@@ -86,7 +91,9 @@ class TestIntegration:
         workflow = ConsensusWorkflow([claude])
 
         # Mock provider that fails
-        with patch("model_chorus.providers.cli_provider.asyncio.create_subprocess_exec") as mock_exec:
+        with patch(
+            "model_chorus.providers.cli_provider.asyncio.create_subprocess_exec"
+        ) as mock_exec:
             mock_proc = AsyncMock()
             mock_proc.returncode = 1
             mock_proc.communicate.return_value = (b"", b"Error: API key missing")
@@ -104,7 +111,10 @@ class TestIntegration:
         import json
 
         # Mock CLI execution
-        with patch("model_chorus.providers.cli_provider.asyncio.create_subprocess_exec") as mock_exec:
+        with patch(
+            "model_chorus.providers.cli_provider.asyncio.create_subprocess_exec"
+        ) as mock_exec:
+
             async def mock_process(*args, **kwargs):
                 mock_proc = AsyncMock()
                 mock_proc.returncode = 0
@@ -125,7 +135,9 @@ class TestIntegration:
             # Test ALL_RESPONSES strategy
             claude_all = ClaudeProvider()
             codex_all = CodexProvider()
-            workflow_all = ConsensusWorkflow([claude_all, codex_all], strategy=ConsensusStrategy.ALL_RESPONSES)
+            workflow_all = ConsensusWorkflow(
+                [claude_all, codex_all], strategy=ConsensusStrategy.ALL_RESPONSES
+            )
             request = GenerationRequest(prompt="Test")
             result_all = await workflow_all.execute(request)
 
@@ -134,7 +146,9 @@ class TestIntegration:
             # Test FIRST_VALID strategy
             claude_first = ClaudeProvider()
             codex_first = CodexProvider()
-            workflow_first = ConsensusWorkflow([claude_first, codex_first], strategy=ConsensusStrategy.FIRST_VALID)
+            workflow_first = ConsensusWorkflow(
+                [claude_first, codex_first], strategy=ConsensusStrategy.FIRST_VALID
+            )
             result_first = await workflow_first.execute(request)
 
             # First valid should return after first success
@@ -150,12 +164,15 @@ class TestIntegration:
         codex = CodexProvider()
         workflow = ConsensusWorkflow([claude, codex])
 
-        with patch("model_chorus.providers.cli_provider.asyncio.create_subprocess_exec") as mock_exec:
+        with patch(
+            "model_chorus.providers.cli_provider.asyncio.create_subprocess_exec"
+        ) as mock_exec:
             call_times = []
 
             async def mock_process(*args, **kwargs):
                 call_times.append(time.time())
                 import asyncio
+
                 await asyncio.sleep(0.1)  # Simulate some delay
 
                 mock_proc = AsyncMock()

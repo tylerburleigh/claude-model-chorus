@@ -54,7 +54,7 @@ Provide your findings in a clear, structured format with supporting reasoning.""
             name="Researcher",
             prompt_template=prompt_template,
             temperature=temperature,
-            max_tokens=max_tokens
+            max_tokens=max_tokens,
         )
 
     def invoke(self, context: Dict[str, Any]) -> PersonaResponse:
@@ -102,11 +102,7 @@ Provide your findings in a clear, structured format with supporting reasoning.""
         return PersonaResponse(
             findings=findings,
             confidence_update=confidence_update,
-            metadata={
-                "persona": self.name,
-                "phase": phase,
-                "approach": "systematic_analysis"
-            }
+            metadata={"persona": self.name, "phase": phase, "approach": "systematic_analysis"},
         )
 
 

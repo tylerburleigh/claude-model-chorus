@@ -100,7 +100,7 @@ class StudyWorkflow(BaseWorkflow):
         provider: ModelProvider,
         fallback_providers: Optional[List[ModelProvider]] = None,
         config: Optional[Dict[str, Any]] = None,
-        conversation_memory: Optional[ConversationMemory] = None
+        conversation_memory: Optional[ConversationMemory] = None,
     ):
         """
         Initialize StudyWorkflow with a primary provider.
@@ -121,7 +121,7 @@ class StudyWorkflow(BaseWorkflow):
             name="Study",
             description="Persona-based collaborative research workflow",
             config=config,
-            conversation_memory=conversation_memory
+            conversation_memory=conversation_memory,
         )
         self.provider = provider
         self.fallback_providers = fallback_providers or []
@@ -131,7 +131,9 @@ class StudyWorkflow(BaseWorkflow):
         self.persona_router = PersonaRouter(persona_registry)
 
         logger.info(f"StudyWorkflow initialized with provider: {provider.provider_name}")
-        logger.info(f"PersonaRouter initialized with {len(self.persona_router.get_available_personas())} personas")
+        logger.info(
+            f"PersonaRouter initialized with {len(self.persona_router.get_available_personas())} personas"
+        )
 
     async def run(
         self,
@@ -139,7 +141,7 @@ class StudyWorkflow(BaseWorkflow):
         continuation_id: Optional[str] = None,
         files: Optional[List[str]] = None,
         skip_provider_check: bool = False,
-        **kwargs
+        **kwargs,
     ) -> WorkflowResult:
         """
         Execute persona-based research workflow.
@@ -176,6 +178,7 @@ class StudyWorkflow(BaseWorkflow):
 
             if not has_available:
                 from ...providers.cli_provider import ProviderUnavailableError
+
                 error_msg = "No providers available for study workflow:\n"
                 for name, error in unavailable:
                     error_msg += f"  - {name}: {error}\n"
@@ -184,8 +187,8 @@ class StudyWorkflow(BaseWorkflow):
                     error_msg,
                     [
                         "Check installations: model-chorus list-providers --check",
-                        "Install missing providers or update .model-chorusrc"
-                    ]
+                        "Install missing providers or update .model-chorusrc",
+                    ],
                 )
 
             if unavailable and logger.isEnabledFor(logging.WARNING):
@@ -198,9 +201,7 @@ class StudyWorkflow(BaseWorkflow):
         else:
             # Create new thread if conversation memory available
             if self.conversation_memory:
-                thread_id = self.conversation_memory.create_thread(
-                    workflow_name="Study"
-                )
+                thread_id = self.conversation_memory.create_thread(workflow_name="Study")
             else:
                 thread_id = str(uuid.uuid4())
 
@@ -220,16 +221,12 @@ class StudyWorkflow(BaseWorkflow):
 
         try:
             # PHASE 1: Setup personas (to be implemented)
-            personas = self._setup_personas(kwargs.get('personas'))
+            personas = self._setup_personas(kwargs.get("personas"))
             logger.info(f"Study workflow using {len(personas)} personas")
 
             # PHASE 2: Investigation loop (to be implemented)
             investigation_steps = await self._conduct_investigation(
-                prompt=prompt,
-                personas=personas,
-                history=history,
-                thread_id=thread_id,
-                **kwargs
+                prompt=prompt, personas=personas, history=history, thread_id=thread_id, **kwargs
             )
 
             # PHASE 3: Synthesis (to be implemented)
@@ -241,7 +238,7 @@ class StudyWorkflow(BaseWorkflow):
                     thread_id,
                     "user",
                     prompt,
-                    metadata={"workflow": "study", "is_continuation": bool(continuation_id)}
+                    metadata={"workflow": "study", "is_continuation": bool(continuation_id)},
                 )
 
             # Save investigation results to conversation history
@@ -254,9 +251,9 @@ class StudyWorkflow(BaseWorkflow):
                     assistant_content,
                     metadata={
                         "workflow": "study",
-                        "personas": [p.get('name', 'unknown') for p in personas],
-                        "steps": len(investigation_steps)
-                    }
+                        "personas": [p.get("name", "unknown") for p in personas],
+                        "steps": len(investigation_steps),
+                    },
                 )
 
             # Build result
@@ -266,10 +263,10 @@ class StudyWorkflow(BaseWorkflow):
             result.metadata = {
                 "thread_id": thread_id,
                 "workflow_type": "study",
-                "personas_used": [p.get('name', 'unknown') for p in personas],
+                "personas_used": [p.get("name", "unknown") for p in personas],
                 "investigation_rounds": len(investigation_steps),
                 "timestamp": datetime.now(timezone.utc).isoformat(),
-                "is_continuation": bool(continuation_id)
+                "is_continuation": bool(continuation_id),
             }
 
             logger.info(f"Study workflow completed successfully. Thread: {thread_id}")
@@ -302,13 +299,13 @@ class StudyWorkflow(BaseWorkflow):
                 {
                     "name": "Researcher",
                     "expertise": "systematic investigation and analysis",
-                    "role": "primary investigator"
+                    "role": "primary investigator",
                 },
                 {
                     "name": "Critic",
                     "expertise": "identifying assumptions and edge cases",
-                    "role": "critical reviewer"
-                }
+                    "role": "critical reviewer",
+                },
             ]
         return personas
 
@@ -318,7 +315,7 @@ class StudyWorkflow(BaseWorkflow):
         personas: List[Dict[str, Any]],
         history: List[ConversationMessage],
         thread_id: str,
-        **kwargs
+        **kwargs,
     ) -> List[WorkflowStep]:
         """
         Conduct persona-based investigation.
@@ -387,18 +384,14 @@ class StudyWorkflow(BaseWorkflow):
                 "phase": "investigation",
                 "personas_ready": len(personas),
                 "router_available": True,
-                "available_personas": self.persona_router.get_available_personas()
-            }
+                "available_personas": self.persona_router.get_available_personas(),
+            },
         )
         steps.append(step)
 
         return steps
 
-    async def _synthesize_findings(
-        self,
-        steps: List[WorkflowStep],
-        **kwargs
-    ) -> str:
+    async def _synthesize_findings(self, steps: List[WorkflowStep], **kwargs) -> str:
         """
         Synthesize findings from investigation steps.
 
@@ -421,9 +414,7 @@ class StudyWorkflow(BaseWorkflow):
         )
 
     def get_routing_history(
-        self,
-        investigation_id: Optional[str] = None,
-        limit: Optional[int] = None
+        self, investigation_id: Optional[str] = None, limit: Optional[int] = None
     ) -> List[Any]:
         """
         Get routing history from the PersonaRouter.
@@ -446,6 +437,5 @@ class StudyWorkflow(BaseWorkflow):
             ...     print(f"{entry.timestamp}: {entry.selected_persona}")
         """
         return self.persona_router.get_routing_history(
-            investigation_id=investigation_id,
-            limit=limit
+            investigation_id=investigation_id, limit=limit
         )

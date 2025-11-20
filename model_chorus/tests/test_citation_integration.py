@@ -260,7 +260,9 @@ class TestCitationValidation:
         # Should have recommendations for missing metadata
         assert len(issues) > 0
         assert any("author" in issue.lower() for issue in issues)
-        assert any("year" in issue.lower() or "publication_date" in issue.lower() for issue in issues)
+        assert any(
+            "year" in issue.lower() or "publication_date" in issue.lower() for issue in issues
+        )
         assert any("title" in issue.lower() for issue in issues)
 
     def test_validate_empty_source_fails(self):
@@ -369,7 +371,9 @@ class TestCitationConfidenceScoring:
         # Minimal citation should have lower scores
         assert scores["metadata_score"] < 0.5  # Missing author, year, title
         assert scores["location_score"] == 0.0  # No location
-        assert scores["overall_confidence"] < scores["base_confidence"]  # Pulled down by missing info
+        assert (
+            scores["overall_confidence"] < scores["base_confidence"]
+        )  # Pulled down by missing info
 
     def test_confidence_academic_source_bonus(self):
         """Test that academic sources get quality bonus."""
@@ -498,8 +502,7 @@ class TestCitationMapConfidenceScoring:
         """Test that citation count factor plateaus at 5."""
         # Create citation map with many citations
         many_citations = [
-            Citation(source=f"https://example.com/{i}", confidence=0.8)
-            for i in range(10)
+            Citation(source=f"https://example.com/{i}", confidence=0.8) for i in range(10)
         ]
 
         citation_map = CitationMap(

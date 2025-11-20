@@ -35,17 +35,11 @@ class ExampleWorkflow(BaseWorkflow):
 
         # Add a workflow step
         result.add_step(
-            step_number=1,
-            content=f"Processing prompt: {prompt}",
-            model="example-model"
+            step_number=1, content=f"Processing prompt: {prompt}", model="example-model"
         )
 
         # Add another step
-        result.add_step(
-            step_number=2,
-            content="Analysis complete",
-            model="example-model"
-        )
+        result.add_step(step_number=2, content="Analysis complete", model="example-model")
 
         # Generate synthesis
         result.synthesis = self.synthesize(result.steps)
@@ -60,7 +54,7 @@ async def main():
     request = WorkflowRequest(
         prompt="What are the benefits of multi-model AI workflows?",
         models=["example-model"],
-        config={"example_param": "value"}
+        config={"example_param": "value"},
     )
 
     print("ModelChorus - Basic Workflow Example")
@@ -74,8 +68,7 @@ async def main():
 
     # Create a workflow instance
     workflow = workflow_class(
-        name="Example Workflow",
-        description="A simple demonstration workflow"
+        name="Example Workflow", description="A simple demonstration workflow"
     )
 
     print(f"\nExecuting workflow: {workflow.name}")

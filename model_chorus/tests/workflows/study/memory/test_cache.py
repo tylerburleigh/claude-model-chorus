@@ -176,9 +176,7 @@ def test_cache_query(cache):
     assert len(results) == 2
 
     # Query with multiple filters
-    results = cache.query(
-        MemoryQuery(investigation_id="inv-1", persona="researcher")
-    )
+    results = cache.query(MemoryQuery(investigation_id="inv-1", persona="researcher"))
     assert len(results) == 1
     assert results[0].persona == "researcher"
 

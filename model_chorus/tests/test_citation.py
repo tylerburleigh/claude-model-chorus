@@ -30,7 +30,7 @@ class TestCitation:
                 "author": "Smith et al.",
                 "publication_date": "2024-01-15",
                 "citation_type": "academic_paper",
-            }
+            },
         )
 
         assert citation.source == "https://arxiv.org/abs/2401.12345"
@@ -43,10 +43,7 @@ class TestCitation:
 
     def test_citation_minimal_creation(self):
         """Test citation with only required fields."""
-        citation = Citation(
-            source="https://example.com/doc",
-            confidence=0.8
-        )
+        citation = Citation(source="https://example.com/doc", confidence=0.8)
 
         assert citation.source == "https://example.com/doc"
         assert citation.confidence == 0.8
@@ -57,10 +54,7 @@ class TestCitation:
     def test_citation_empty_source(self):
         """Test that empty source fails validation."""
         with pytest.raises(ValidationError):
-            Citation(
-                source="",  # min_length=1 constraint
-                confidence=0.5
-            )
+            Citation(source="", confidence=0.5)  # min_length=1 constraint
 
     def test_citation_confidence_bounds(self):
         """Test confidence value bounds (0.0-1.0)."""
@@ -110,11 +104,7 @@ class TestCitation:
         ]
 
         for location in locations:
-            citation = Citation(
-                source="test",
-                location=location,
-                confidence=0.8
-            )
+            citation = Citation(source="test", location=location, confidence=0.8)
             assert citation.location == location
 
     def test_citation_metadata_flexibility(self):
@@ -129,12 +119,8 @@ class TestCitation:
                 "peer_reviewed": True,
                 "impact_factor": 4.5,
                 "keywords": ["machine learning", "optimization"],
-                "nested": {
-                    "journal": "Nature",
-                    "volume": 123,
-                    "issue": 4
-                }
-            }
+                "nested": {"journal": "Nature", "volume": 123, "issue": 4},
+            },
         )
 
         assert citation.metadata["author"] == "Jane Doe"
@@ -150,7 +136,7 @@ class TestCitation:
             location="Page 10",
             confidence=0.85,
             snippet="Important finding here",
-            metadata={"author": "John Doe"}
+            metadata={"author": "John Doe"},
         )
 
         data = citation.model_dump()
@@ -163,11 +149,7 @@ class TestCitation:
 
     def test_citation_json_serialization(self):
         """Test citation JSON serialization."""
-        citation = Citation(
-            source="test_source",
-            confidence=0.75,
-            snippet="Test snippet"
-        )
+        citation = Citation(source="test_source", confidence=0.75, snippet="Test snippet")
 
         json_str = citation.model_dump_json()
         assert isinstance(json_str, str)
@@ -185,7 +167,7 @@ class TestCitation:
             "location": "Section 3.2",
             "confidence": 0.95,
             "snippet": "Test snippet",
-            "metadata": {"author": "Smith et al."}
+            "metadata": {"author": "Smith et al."},
         }
 
         citation = Citation(**data)
@@ -203,11 +185,7 @@ class TestCitation:
             location="Figure 7, Page 42",
             confidence=0.92,
             snippet="Detailed experimental results demonstrate...",
-            metadata={
-                "author": "Research Team",
-                "year": 2024,
-                "verified": True
-            }
+            metadata={"author": "Research Team", "year": 2024, "verified": True},
         )
 
         # Serialize to JSON
@@ -234,14 +212,14 @@ class TestCitationMap:
                 source="https://arxiv.org/abs/2401.12345",
                 location="Section 3.2",
                 confidence=0.95,
-                snippet="Our experiments show a 23% improvement..."
+                snippet="Our experiments show a 23% improvement...",
             ),
             Citation(
                 source="paper2.pdf",
                 location="Figure 4",
                 confidence=0.85,
-                snippet="Results demonstrate significant gains..."
-            )
+                snippet="Results demonstrate significant gains...",
+            ),
         ]
 
         citation_map = CitationMap(
@@ -252,8 +230,8 @@ class TestCitationMap:
             metadata={
                 "argument_type": "empirical",
                 "verification_status": "verified",
-                "citation_count": 2
-            }
+                "citation_count": 2,
+            },
         )
 
         assert citation_map.claim_id == "claim-001"
@@ -266,11 +244,7 @@ class TestCitationMap:
 
     def test_citation_map_minimal_creation(self):
         """Test citation map with only required fields."""
-        citation_map = CitationMap(
-            claim_id="claim-001",
-            claim_text="Test claim",
-            strength=0.7
-        )
+        citation_map = CitationMap(claim_id="claim-001", claim_text="Test claim", strength=0.7)
 
         assert citation_map.claim_id == "claim-001"
         assert citation_map.claim_text == "Test claim"
@@ -281,66 +255,41 @@ class TestCitationMap:
     def test_citation_map_empty_claim_id(self):
         """Test that empty claim_id fails validation."""
         with pytest.raises(ValidationError):
-            CitationMap(
-                claim_id="",  # min_length=1 constraint
-                claim_text="Test",
-                strength=0.5
-            )
+            CitationMap(claim_id="", claim_text="Test", strength=0.5)  # min_length=1 constraint
 
     def test_citation_map_empty_claim_text(self):
         """Test that empty claim_text fails validation."""
         with pytest.raises(ValidationError):
             CitationMap(
-                claim_id="claim-001",
-                claim_text="",  # min_length=1 constraint
-                strength=0.5
+                claim_id="claim-001", claim_text="", strength=0.5  # min_length=1 constraint
             )
 
     def test_citation_map_strength_bounds(self):
         """Test strength value bounds (0.0-1.0)."""
         # Valid boundary values
-        map_zero = CitationMap(
-            claim_id="test",
-            claim_text="Test claim",
-            strength=0.0
-        )
+        map_zero = CitationMap(claim_id="test", claim_text="Test claim", strength=0.0)
         assert map_zero.strength == 0.0
 
-        map_one = CitationMap(
-            claim_id="test",
-            claim_text="Test claim",
-            strength=1.0
-        )
+        map_one = CitationMap(claim_id="test", claim_text="Test claim", strength=1.0)
         assert map_one.strength == 1.0
 
         # Invalid: strength < 0
         with pytest.raises(ValidationError):
-            CitationMap(
-                claim_id="test",
-                claim_text="Test claim",
-                strength=-0.1
-            )
+            CitationMap(claim_id="test", claim_text="Test claim", strength=-0.1)
 
         # Invalid: strength > 1
         with pytest.raises(ValidationError):
-            CitationMap(
-                claim_id="test",
-                claim_text="Test claim",
-                strength=1.1
-            )
+            CitationMap(claim_id="test", claim_text="Test claim", strength=1.1)
 
     def test_citation_map_single_citation(self):
         """Test citation map with a single citation."""
-        citation = Citation(
-            source="https://example.com",
-            confidence=0.9
-        )
+        citation = Citation(source="https://example.com", confidence=0.9)
 
         citation_map = CitationMap(
             claim_id="claim-single",
             claim_text="Single citation claim",
             citations=[citation],
-            strength=0.9
+            strength=0.9,
         )
 
         assert len(citation_map.citations) == 1
@@ -353,14 +302,14 @@ class TestCitationMap:
             Citation(source="source2", confidence=0.85),
             Citation(source="source3", confidence=0.95),
             Citation(source="source4", confidence=0.8),
-            Citation(source="source5", confidence=0.9)
+            Citation(source="source5", confidence=0.9),
         ]
 
         citation_map = CitationMap(
             claim_id="claim-multi",
             claim_text="Well-supported claim with multiple sources",
             citations=citations,
-            strength=0.88
+            strength=0.88,
         )
 
         assert len(citation_map.citations) == 5
@@ -384,8 +333,8 @@ class TestCitationMap:
                 "review_date": "2024-01-15",
                 "confidence_level": "high",
                 "tags": ["ml", "optimization", "performance"],
-                "cross_references": ["claim-002", "claim-005"]
-            }
+                "cross_references": ["claim-002", "claim-005"],
+            },
         )
 
         assert citation_map.metadata["argument_type"] == "empirical"
@@ -402,7 +351,7 @@ class TestCitationMap:
             claim_text="Serialization test claim",
             citations=[citation],
             strength=0.85,
-            metadata={"test_key": "test_value"}
+            metadata={"test_key": "test_value"},
         )
 
         data = citation_map.model_dump()
@@ -416,9 +365,7 @@ class TestCitationMap:
     def test_citation_map_json_serialization(self):
         """Test citation map JSON serialization."""
         citation_map = CitationMap(
-            claim_id="claim-json",
-            claim_text="JSON test claim",
-            strength=0.75
+            claim_id="claim-json", claim_text="JSON test claim", strength=0.75
         )
 
         json_str = citation_map.model_dump_json()
@@ -437,22 +384,12 @@ class TestCitationMap:
             claim_text="Complex roundtrip test",
             citations=[
                 Citation(
-                    source="source1",
-                    location="page 10",
-                    confidence=0.9,
-                    snippet="Evidence 1"
+                    source="source1", location="page 10", confidence=0.9, snippet="Evidence 1"
                 ),
-                Citation(
-                    source="source2",
-                    confidence=0.85,
-                    metadata={"author": "Jane Doe"}
-                )
+                Citation(source="source2", confidence=0.85, metadata={"author": "Jane Doe"}),
             ],
             strength=0.87,
-            metadata={
-                "argument_type": "empirical",
-                "verified": True
-            }
+            metadata={"argument_type": "empirical", "verified": True},
         )
 
         # Serialize to JSON
@@ -487,9 +424,9 @@ class TestCitationMap:
                 claim_text="Test",
                 citations=[
                     Citation(source="valid", confidence=0.9),
-                    Citation(source="", confidence=0.8)  # Empty source
+                    Citation(source="", confidence=0.8),  # Empty source
                 ],
-                strength=0.85
+                strength=0.85,
             )
 
         # Invalid citation (confidence out of bounds)
@@ -497,10 +434,8 @@ class TestCitationMap:
             CitationMap(
                 claim_id="test",
                 claim_text="Test",
-                citations=[
-                    Citation(source="test", confidence=1.5)  # > 1.0
-                ],
-                strength=0.85
+                citations=[Citation(source="test", confidence=1.5)],  # > 1.0
+                strength=0.85,
             )
 
 
@@ -515,7 +450,7 @@ class TestCitationIntegration:
             location="Section 3.2, Table 1",
             confidence=0.95,
             snippet="Performance improved by 23% ± 2%",
-            metadata={"paper_type": "peer_reviewed", "year": 2024}
+            metadata={"paper_type": "peer_reviewed", "year": 2024},
         )
 
         industry_report = Citation(
@@ -523,14 +458,14 @@ class TestCitationIntegration:
             location="Page 15",
             confidence=0.80,
             snippet="Industry benchmarks show 20-25% improvement",
-            metadata={"source_type": "industry_report"}
+            metadata={"source_type": "industry_report"},
         )
 
         technical_blog = Citation(
             source="https://engineering-blog.com/optimization",
             confidence=0.70,
             snippet="Our experiments yielded 22% better accuracy",
-            metadata={"source_type": "blog", "verified": False}
+            metadata={"source_type": "blog", "verified": False},
         )
 
         # Map claim to all supporting citations
@@ -544,8 +479,8 @@ class TestCitationIntegration:
                 "verification_status": "verified",
                 "citation_count": 3,
                 "confidence_range": "0.70-0.95",
-                "sources": ["academic", "industry", "blog"]
-            }
+                "sources": ["academic", "industry", "blog"],
+            },
         )
 
         # Verify the mapping
@@ -571,21 +506,21 @@ class TestCitationIntegration:
             source=source,
             location="Section 2.1",
             confidence=0.9,
-            snippet="Training time reduced by 40%"
+            snippet="Training time reduced by 40%",
         )
 
         citation2 = Citation(
             source=source,
             location="Section 3.3",
             confidence=0.85,
-            snippet="Memory usage decreased by 25%"
+            snippet="Memory usage decreased by 25%",
         )
 
         citation3 = Citation(
             source=source,
             location="Section 4.2",
             confidence=0.92,
-            snippet="Inference latency improved by 15%"
+            snippet="Inference latency improved by 15%",
         )
 
         # Create separate claims from different sections
@@ -593,21 +528,21 @@ class TestCitationIntegration:
             claim_id="claim-training",
             claim_text="Training time reduced by 40%",
             citations=[citation1],
-            strength=0.9
+            strength=0.9,
         )
 
         claim2 = CitationMap(
             claim_id="claim-memory",
             claim_text="Memory usage decreased by 25%",
             citations=[citation2],
-            strength=0.85
+            strength=0.85,
         )
 
         claim3 = CitationMap(
             claim_id="claim-latency",
             claim_text="Inference latency improved by 15%",
             citations=[citation3],
-            strength=0.92
+            strength=0.92,
         )
 
         # Verify all use same source but different locations
@@ -634,7 +569,7 @@ class TestCitationIntegration:
             claim_id="claim-strength",
             claim_text="Test claim",
             citations=citations,
-            strength=avg_confidence
+            strength=avg_confidence,
         )
 
         assert citation_map.strength == 0.875
@@ -661,8 +596,8 @@ class TestCitationIntegration:
             metadata={
                 "total_citations": len(all_citations),
                 "high_confidence_citations": len(high_confidence),
-                "threshold": 0.80
-            }
+                "threshold": 0.80,
+            },
         )
 
         assert len(citation_map.citations) == 2
@@ -678,7 +613,7 @@ class TestCitationIntegration:
             location="Results section",
             confidence=0.90,
             snippet="TypeScript reduces runtime errors by 15%",
-            metadata={"stance": "proponent"}
+            metadata={"stance": "proponent"},
         )
 
         opponent_citation = Citation(
@@ -686,7 +621,7 @@ class TestCitationIntegration:
             location="Discussion",
             confidence=0.85,
             snippet="No significant difference in error rates",
-            metadata={"stance": "opponent"}
+            metadata={"stance": "opponent"},
         )
 
         # Proponent claim map
@@ -698,8 +633,8 @@ class TestCitationIntegration:
             metadata={
                 "argument_type": "empirical",
                 "stance": "proponent",
-                "verification_status": "verified"
-            }
+                "verification_status": "verified",
+            },
         )
 
         # Opponent claim map (contradicts proponent)
@@ -712,8 +647,8 @@ class TestCitationIntegration:
                 "argument_type": "empirical",
                 "stance": "opponent",
                 "verification_status": "verified",
-                "contradicts": "pro-typescript-001"
-            }
+                "contradicts": "pro-typescript-001",
+            },
         )
 
         # Verify both claims are properly tracked

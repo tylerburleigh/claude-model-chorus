@@ -37,13 +37,13 @@ class InvestigationStateMachine:
         InvestigationPhase.DISCOVERY: [InvestigationPhase.VALIDATION],
         InvestigationPhase.VALIDATION: [
             InvestigationPhase.PLANNING,
-            InvestigationPhase.DISCOVERY  # Allow returning to discovery if needed
+            InvestigationPhase.DISCOVERY,  # Allow returning to discovery if needed
         ],
         InvestigationPhase.PLANNING: [
             InvestigationPhase.COMPLETE,
-            InvestigationPhase.DISCOVERY  # Allow returning if gaps found
+            InvestigationPhase.DISCOVERY,  # Allow returning if gaps found
         ],
-        InvestigationPhase.COMPLETE: []  # Terminal state
+        InvestigationPhase.COMPLETE: [],  # Terminal state
     }
 
     def __init__(self, state: StudyState):
@@ -190,7 +190,9 @@ class InvestigationStateMachine:
         if self.current_phase == InvestigationPhase.COMPLETE:
             raise ValueError("Cannot reset from COMPLETE phase")
 
-        return self.transition(InvestigationPhase.DISCOVERY, reason or "Resetting for additional exploration")
+        return self.transition(
+            InvestigationPhase.DISCOVERY, reason or "Resetting for additional exploration"
+        )
 
     def update_confidence(self, new_confidence: ConfidenceLevel) -> None:
         """
@@ -263,7 +265,9 @@ class InvestigationStateMachine:
 
         return should_escalate
 
-    def get_confidence_threshold(self, phase: Optional[InvestigationPhase] = None) -> Optional[ConfidenceLevel]:
+    def get_confidence_threshold(
+        self, phase: Optional[InvestigationPhase] = None
+    ) -> Optional[ConfidenceLevel]:
         """
         Get the confidence threshold required for escalation from a given phase.
 

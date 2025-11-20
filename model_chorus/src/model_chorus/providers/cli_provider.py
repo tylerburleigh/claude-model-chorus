@@ -125,7 +125,10 @@ class CLIProvider(ModelProvider):
                     await process.wait()
                 except:
                     pass
-                return (False, f"CLI command '{self.cli_command}' timed out during availability check")
+                return (
+                    False,
+                    f"CLI command '{self.cli_command}' timed out during availability check",
+                )
 
         except FileNotFoundError:
             return (False, f"CLI command '{self.cli_command}' not found in PATH")
@@ -229,7 +232,7 @@ class CLIProvider(ModelProvider):
 
         try:
             stdin_pipe = asyncio.subprocess.PIPE if self.input_data else None
-            input_bytes = self.input_data.encode('utf-8') if self.input_data else None
+            input_bytes = self.input_data.encode("utf-8") if self.input_data else None
 
             process = await asyncio.create_subprocess_exec(
                 *command,
@@ -269,7 +272,7 @@ class CLIProvider(ModelProvider):
                     f"Install the {self.provider_name} CLI tool",
                     f"Ensure '{self.cli_command}' is in your system PATH",
                     "Or use a different provider with --provider flag",
-                ]
+                ],
             )
         except PermissionError:
             # No permission to execute CLI command
@@ -281,7 +284,7 @@ class CLIProvider(ModelProvider):
                 suggestions=[
                     f"Check file permissions for '{self.cli_command}'",
                     "Or use a different provider with --provider flag",
-                ]
+                ],
             )
         except asyncio.TimeoutError:
             logger.error(f"Command timed out after {self.timeout} seconds")
@@ -366,9 +369,7 @@ class CLIProvider(ModelProvider):
                 stdout, stderr, returncode = await self.execute_command(command)
                 response = self.parse_response(stdout, stderr, returncode)
 
-                logger.info(
-                    f"Generation successful on attempt {attempt + 1}/{self.retry_limit}"
-                )
+                logger.info(f"Generation successful on attempt {attempt + 1}/{self.retry_limit}")
                 return response
 
             except Exception as e:
@@ -379,13 +380,11 @@ class CLIProvider(ModelProvider):
                     logger.error(f"Permanent error encountered, not retrying: {e}")
                     raise
 
-                logger.warning(
-                    f"Attempt {attempt + 1}/{self.retry_limit} failed: {e}"
-                )
+                logger.warning(f"Attempt {attempt + 1}/{self.retry_limit} failed: {e}")
 
                 if attempt < self.retry_limit - 1:
                     # Exponential backoff: wait 2^attempt seconds
-                    wait_time = 2 ** attempt
+                    wait_time = 2**attempt
                     logger.info(f"Retrying in {wait_time} seconds...")
                     await asyncio.sleep(wait_time)
 

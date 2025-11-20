@@ -133,10 +133,10 @@ class TestStudyWorkflowRun:
         result = await workflow.run("Test prompt", skip_provider_check=True)
 
         assert isinstance(result, WorkflowResult)
-        assert hasattr(result, 'success')
-        assert hasattr(result, 'synthesis')
-        assert hasattr(result, 'steps')
-        assert hasattr(result, 'metadata')
+        assert hasattr(result, "success")
+        assert hasattr(result, "synthesis")
+        assert hasattr(result, "steps")
+        assert hasattr(result, "metadata")
 
     @pytest.mark.asyncio
     async def test_run_result_metadata_structure(self, workflow):
@@ -167,9 +167,9 @@ class TestStudyWorkflowRun:
 
         for step in result.steps:
             assert isinstance(step, WorkflowStep)
-            assert hasattr(step, 'step_number')
-            assert hasattr(step, 'content')
-            assert hasattr(step, 'model')
+            assert hasattr(step, "step_number")
+            assert hasattr(step, "content")
+            assert hasattr(step, "model")
 
     @pytest.mark.asyncio
     async def test_run_creates_thread_id(self, workflow):
@@ -186,9 +186,7 @@ class TestStudyWorkflowRun:
         continuation_id = "test-thread-123"
 
         result = await workflow.run(
-            "Test prompt",
-            continuation_id=continuation_id,
-            skip_provider_check=True
+            "Test prompt", continuation_id=continuation_id, skip_provider_check=True
         )
 
         assert result.metadata["thread_id"] == continuation_id
@@ -209,7 +207,7 @@ class TestStudyWorkflowRun:
         timestamp = result.metadata["timestamp"]
         # Should be able to parse as ISO format
         try:
-            datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
+            datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
             assert True
         except ValueError:
             pytest.fail(f"Invalid ISO timestamp: {timestamp}")
@@ -244,26 +242,22 @@ class TestStudyWorkflowPersonaSetup:
 
         assert isinstance(personas, list)
         assert len(personas) == 2
-        assert any(p['name'] == 'Researcher' for p in personas)
-        assert any(p['name'] == 'Critic' for p in personas)
+        assert any(p["name"] == "Researcher" for p in personas)
+        assert any(p["name"] == "Critic" for p in personas)
 
     def test_setup_personas_default_structure(self, workflow):
         """Test default personas have required fields."""
         personas = workflow._setup_personas(None)
 
         for persona in personas:
-            assert 'name' in persona
-            assert 'expertise' in persona
-            assert 'role' in persona
+            assert "name" in persona
+            assert "expertise" in persona
+            assert "role" in persona
 
     def test_setup_personas_custom(self, workflow):
         """Test _setup_personas preserves custom personas."""
         custom_personas = [
-            {
-                "name": "Expert",
-                "expertise": "specialized knowledge",
-                "role": "domain expert"
-            }
+            {"name": "Expert", "expertise": "specialized knowledge", "role": "domain expert"}
         ]
 
         personas = workflow._setup_personas(custom_personas)
@@ -352,9 +346,7 @@ class TestStudyWorkflowConversationHandling:
 
         # Second run with continuation
         result2 = await workflow_with_memory.run(
-            "Follow-up question",
-            continuation_id=thread_id,
-            skip_provider_check=True
+            "Follow-up question", continuation_id=thread_id, skip_provider_check=True
         )
 
         # Verify same thread is used
@@ -386,10 +378,7 @@ class TestStudyWorkflowInvestigation:
         personas = [{"name": "Researcher"}, {"name": "Critic"}]
 
         steps = await workflow._conduct_investigation(
-            prompt="Test question",
-            personas=personas,
-            history=[],
-            thread_id="test-123"
+            prompt="Test question", personas=personas, history=[], thread_id="test-123"
         )
 
         assert isinstance(steps, list)
@@ -402,10 +391,7 @@ class TestStudyWorkflowInvestigation:
         personas = [{"name": "Researcher"}]
 
         steps = await workflow._conduct_investigation(
-            prompt="Test question",
-            personas=personas,
-            history=[],
-            thread_id="test-123"
+            prompt="Test question", personas=personas, history=[], thread_id="test-123"
         )
 
         for step in steps:
@@ -420,10 +406,7 @@ class TestStudyWorkflowInvestigation:
         personas = [{"name": "Researcher"}, {"name": "Critic"}]
 
         steps = await workflow._conduct_investigation(
-            prompt="Test question",
-            personas=personas,
-            history=[],
-            thread_id="test-123"
+            prompt="Test question", personas=personas, history=[], thread_id="test-123"
         )
 
         # Metadata should indicate router is available
@@ -434,10 +417,7 @@ class TestStudyWorkflowInvestigation:
     async def test_investigation_empty_personas(self, workflow):
         """Test _conduct_investigation handles empty personas."""
         steps = await workflow._conduct_investigation(
-            prompt="Test question",
-            personas=[],
-            history=[],
-            thread_id="test-123"
+            prompt="Test question", personas=[], history=[], thread_id="test-123"
         )
 
         assert isinstance(steps, list)
@@ -462,11 +442,7 @@ class TestStudyWorkflowSynthesis:
     @pytest.mark.asyncio
     async def test_synthesize_findings_returns_string(self, workflow):
         """Test _synthesize_findings returns a string."""
-        step = WorkflowStep(
-            step_number=1,
-            content="Test finding",
-            model="test-model"
-        )
+        step = WorkflowStep(step_number=1, content="Test finding", model="test-model")
 
         synthesis = await workflow._synthesize_findings([step])
 
@@ -543,7 +519,7 @@ class TestStudyWorkflowErrorHandling:
 
         # Error should be captured if workflow fails
         if not result.success:
-            assert hasattr(result, 'error')
+            assert hasattr(result, "error")
 
 
 class TestStudyWorkflowRoutingHistory:
@@ -622,8 +598,7 @@ class TestStudyWorkflowIntegration:
         """Test conversation continuation across multiple runs."""
         # First investigation
         result1 = await workflow_with_memory.run(
-            "Initial research question",
-            skip_provider_check=True
+            "Initial research question", skip_provider_check=True
         )
         thread_id = result1.metadata["thread_id"]
 
@@ -633,9 +608,7 @@ class TestStudyWorkflowIntegration:
 
         # Continue investigation
         result2 = await workflow_with_memory.run(
-            "Follow-up investigation",
-            continuation_id=thread_id,
-            skip_provider_check=True
+            "Follow-up investigation", continuation_id=thread_id, skip_provider_check=True
         )
 
         # Verify continuation
@@ -652,8 +625,7 @@ class TestStudyWorkflowIntegration:
         # Note: personas is extracted from kwargs in run(), so we test
         # that the workflow properly uses default personas when none are passed
         result = await workflow_with_memory.run(
-            "Test with custom personas",
-            skip_provider_check=True
+            "Test with custom personas", skip_provider_check=True
         )
 
         assert result.success is True

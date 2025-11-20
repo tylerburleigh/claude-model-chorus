@@ -124,8 +124,7 @@ class TokenUsage:
         Returns:
             List of field names in the TokenUsage dataclass.
         """
-        return ['input_tokens', 'output_tokens', 'cached_input_tokens',
-                'total_tokens', 'metadata']
+        return ["input_tokens", "output_tokens", "cached_input_tokens", "total_tokens", "metadata"]
 
     def values(self) -> List[Any]:
         """Return field values like dict.values().
@@ -133,8 +132,13 @@ class TokenUsage:
         Returns:
             List of current field values.
         """
-        return [self.input_tokens, self.output_tokens,
-                self.cached_input_tokens, self.total_tokens, self.metadata]
+        return [
+            self.input_tokens,
+            self.output_tokens,
+            self.cached_input_tokens,
+            self.total_tokens,
+            self.metadata,
+        ]
 
     def items(self) -> zip:
         """Return (key, value) pairs like dict.items().
@@ -245,7 +249,7 @@ class ModelProvider(ABC):
         self,
         provider_name: str,
         api_key: Optional[str] = None,
-        config: Optional[Dict[str, Any]] = None
+        config: Optional[Dict[str, Any]] = None,
     ):
         """
         Initialize the model provider.

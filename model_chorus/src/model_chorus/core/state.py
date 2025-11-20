@@ -49,11 +49,7 @@ class StateManager:
         _lock: Lock for thread-safe operations
     """
 
-    def __init__(
-        self,
-        state_dir: Path = DEFAULT_STATE_DIR,
-        enable_file_persistence: bool = False
-    ):
+    def __init__(self, state_dir: Path = DEFAULT_STATE_DIR, enable_file_persistence: bool = False):
         """
         Initialize state manager.
 
@@ -80,10 +76,7 @@ class StateManager:
     # ========================================================================
 
     def set_state(
-        self,
-        workflow_name: str,
-        state_data: Dict[str, Any],
-        schema_version: str = "1.0"
+        self, workflow_name: str, state_data: Dict[str, Any], schema_version: str = "1.0"
     ) -> None:
         """
         Store workflow state in memory.
@@ -116,7 +109,7 @@ class StateManager:
                 data=state_data,
                 schema_version=schema_version,
                 created_at=created_at,
-                updated_at=now
+                updated_at=now,
             )
 
             # Store in memory
@@ -173,11 +166,7 @@ class StateManager:
         with self._lock:
             return self._state_store.get(workflow_name)
 
-    def update_state(
-        self,
-        workflow_name: str,
-        updates: Dict[str, Any]
-    ) -> bool:
+    def update_state(self, workflow_name: str, updates: Dict[str, Any]) -> bool:
         """
         Update specific fields in workflow state.
 

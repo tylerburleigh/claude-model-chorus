@@ -17,7 +17,12 @@ from ..providers import (
     GenerationRequest,
     GenerationResponse,
 )
-from ..core.progress import emit_workflow_start, emit_provider_start, emit_provider_complete, emit_workflow_complete
+from ..core.progress import (
+    emit_workflow_start,
+    emit_provider_start,
+    emit_provider_complete,
+    emit_workflow_complete,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -109,8 +114,7 @@ class ConsensusWorkflow:
             raise ValueError("At least one provider must be specified")
 
         self.provider_configs = [
-            ProviderConfig(provider=p, timeout=default_timeout)
-            for p in providers
+            ProviderConfig(provider=p, timeout=default_timeout) for p in providers
         ]
         self.strategy = strategy
         self.default_timeout = default_timeout
@@ -161,9 +165,7 @@ class ConsensusWorkflow:
             base_metadata = dict(request.metadata) if request.metadata else {}
             provider_metadata = config.metadata or {}
             merged_metadata = (
-                {**provider_metadata, **base_metadata}
-                if provider_metadata
-                else base_metadata
+                {**provider_metadata, **base_metadata} if provider_metadata else base_metadata
             )
             # Clone the request per provider so model overrides and future metadata
             # customizations apply without mutating the shared request object.
@@ -183,9 +185,7 @@ class ConsensusWorkflow:
             return provider_name, response, None
 
         except asyncio.TimeoutError:
-            error = TimeoutError(
-                f"Provider {provider_name} timed out after {config.timeout}s"
-            )
+            error = TimeoutError(f"Provider {provider_name} timed out after {config.timeout}s")
             logger.warning(str(error))
             return provider_name, None, error
 
@@ -232,7 +232,9 @@ class ConsensusWorkflow:
         provider_index = 0
 
         # Try providers until we have enough successful responses or run out
-        while len(all_responses) < self.num_to_consult and provider_index < len(self.provider_configs):
+        while len(all_responses) < self.num_to_consult and provider_index < len(
+            self.provider_configs
+        ):
             # Calculate how many more we need
             needed = self.num_to_consult - len(all_responses)
             # Calculate how many providers we can try in this batch
@@ -240,17 +242,14 @@ class ConsensusWorkflow:
             batch_size = min(needed, available)
 
             # Get the next batch of providers to try
-            batch_configs = self.provider_configs[provider_index:provider_index + batch_size]
+            batch_configs = self.provider_configs[provider_index : provider_index + batch_size]
 
             logger.info(
                 f"Trying batch of {batch_size} providers (already have {len(all_responses)}/{self.num_to_consult})"
             )
 
             # Execute batch in parallel
-            tasks = [
-                self._execute_provider(config, request)
-                for config in batch_configs
-            ]
+            tasks = [self._execute_provider(config, request) for config in batch_configs]
 
             results = await asyncio.gather(*tasks)
 
@@ -259,10 +258,14 @@ class ConsensusWorkflow:
                 if response is not None:
                     provider_results[provider_name] = response
                     all_responses.append(response)
-                    logger.info(f"Provider {provider_name} succeeded ({len(all_responses)}/{self.num_to_consult})")
+                    logger.info(
+                        f"Provider {provider_name} succeeded ({len(all_responses)}/{self.num_to_consult})"
+                    )
                 else:
                     failed_providers.append(provider_name)
-                    logger.warning(f"Provider {provider_name} failed, will try fallback if available")
+                    logger.warning(
+                        f"Provider {provider_name} failed, will try fallback if available"
+                    )
 
             provider_index += batch_size
 
@@ -277,9 +280,7 @@ class ConsensusWorkflow:
             raise RuntimeError(error_msg)
 
         # Apply consensus strategy
-        consensus_response = self._apply_strategy(
-            strategy, all_responses, provider_results
-        )
+        consensus_response = self._apply_strategy(strategy, all_responses, provider_results)
 
         # Build metadata
         metadata = {
@@ -363,13 +364,9 @@ class ConsensusWorkflow:
 
         elif strategy == ConsensusStrategy.SYNTHESIZE:
             # For synthesis, concatenate with clear attribution
-            synthesis_parts = [
-                "# Synthesized Response from Multiple Models\n"
-            ]
+            synthesis_parts = ["# Synthesized Response from Multiple Models\n"]
 
-            for i, (provider_name, response) in enumerate(
-                provider_results.items(), 1
-            ):
+            for i, (provider_name, response) in enumerate(provider_results.items(), 1):
                 synthesis_parts.append(
                     f"\n## Perspective {i}: {provider_name}\n\n{response.content}"
                 )

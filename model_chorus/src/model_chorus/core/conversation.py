@@ -56,7 +56,7 @@ class ConversationMemory:
         self,
         conversations_dir: Path = DEFAULT_CONVERSATIONS_DIR,
         ttl_hours: int = DEFAULT_TTL_HOURS,
-        max_messages: int = DEFAULT_MAX_MESSAGES_PER_THREAD
+        max_messages: int = DEFAULT_MAX_MESSAGES_PER_THREAD,
     ):
         """
         Initialize conversation memory manager.
@@ -86,7 +86,7 @@ class ConversationMemory:
         self,
         workflow_name: str,
         initial_context: Optional[Dict[str, Any]] = None,
-        parent_thread_id: Optional[str] = None
+        parent_thread_id: Optional[str] = None,
     ) -> str:
         """
         Create new conversation thread.
@@ -122,7 +122,7 @@ class ConversationMemory:
             messages=[],
             state={},
             initial_context=initial_context or {},
-            status="active"
+            status="active",
         )
 
         # Persist to disk
@@ -168,10 +168,12 @@ class ConversationMemory:
         lock = filelock.FileLock(f"{thread_file}.lock", timeout=5)
         try:
             with lock:
-                with open(thread_file, 'r') as f:
+                with open(thread_file, "r") as f:
                     data = json.load(f)
                     thread = ConversationThread(**data)
-                    logger.debug(f"Retrieved thread {thread_id} with {len(thread.messages)} messages")
+                    logger.debug(
+                        f"Retrieved thread {thread_id} with {len(thread.messages)} messages"
+                    )
                     return thread
         except filelock.Timeout:
             logger.error(f"Timeout acquiring lock for thread {thread_id}")
@@ -180,11 +182,7 @@ class ConversationMemory:
             logger.error(f"Error loading thread {thread_id}: {e}")
             return None
 
-    def get_thread_chain(
-        self,
-        thread_id: str,
-        max_depth: int = 20
-    ) -> List[ConversationThread]:
+    def get_thread_chain(self, thread_id: str, max_depth: int = 20) -> List[ConversationThread]:
         """
         Retrieve thread and all parent threads in chronological order.
 
@@ -234,7 +232,7 @@ class ConversationMemory:
         workflow_name: Optional[str] = None,
         model_provider: Optional[str] = None,
         model_name: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None
+        metadata: Optional[Dict[str, Any]] = None,
     ) -> bool:
         """
         Add message to conversation thread.
@@ -275,7 +273,7 @@ class ConversationMemory:
                 messages=[],
                 state={},
                 initial_context={},
-                status="active"
+                status="active",
             )
             logger.info(f"Created new thread {thread_id} implicitly from add_message")
 
@@ -288,7 +286,7 @@ class ConversationMemory:
             workflow_name=workflow_name,
             model_provider=model_provider,
             model_name=model_name,
-            metadata=metadata or {}
+            metadata=metadata or {},
         )
 
         # Add to thread
@@ -297,7 +295,7 @@ class ConversationMemory:
         # Enforce max messages limit (keep most recent)
         if len(thread.messages) > self.max_messages:
             removed_count = len(thread.messages) - self.max_messages
-            thread.messages = thread.messages[-self.max_messages:]
+            thread.messages = thread.messages[-self.max_messages :]
             logger.warning(
                 f"Thread {thread_id} exceeded max messages, "
                 f"removed {removed_count} oldest messages"
@@ -313,10 +311,7 @@ class ConversationMemory:
         return True
 
     def get_messages(
-        self,
-        thread_id: str,
-        limit: Optional[int] = None,
-        role: Optional[str] = None
+        self, thread_id: str, limit: Optional[int] = None, role: Optional[str] = None
     ) -> List[ConversationMessage]:
         """
         Retrieve messages from thread with optional filtering.
@@ -355,10 +350,7 @@ class ConversationMemory:
     # ========================================================================
 
     def build_conversation_history(
-        self,
-        thread_id: str,
-        max_messages: Optional[int] = None,
-        include_files: bool = True
+        self, thread_id: str, max_messages: Optional[int] = None, include_files: bool = True
     ) -> Tuple[str, int]:
         """
         Build formatted conversation history for context injection.
@@ -416,7 +408,7 @@ class ConversationMemory:
             f"Thread: {thread_id}",
             f"Workflow: {thread.workflow_name}",
             f"Messages: {len(messages)}/{len(thread.messages)}",
-            ""
+            "",
         ]
 
         if truncated > 0:
@@ -495,7 +487,7 @@ class ConversationMemory:
                 "message_count": 0,
                 "unique_files": 0,
                 "user_messages": 0,
-                "assistant_messages": 0
+                "assistant_messages": 0,
             }
 
         # Collect statistics
@@ -523,7 +515,7 @@ class ConversationMemory:
             "unique_files": len(unique_files),
             "created_at": thread.created_at,
             "last_updated_at": thread.last_updated_at,
-            "has_parent": thread.parent_thread_id is not None
+            "has_parent": thread.parent_thread_id is not None,
         }
 
     # ========================================================================
@@ -602,9 +594,7 @@ class ConversationMemory:
 
         for thread_file in self.conversations_dir.glob("*.json"):
             try:
-                file_age = now - datetime.fromtimestamp(
-                    thread_file.stat().st_mtime, timezone.utc
-                )
+                file_age = now - datetime.fromtimestamp(thread_file.stat().st_mtime, timezone.utc)
                 if file_age > ttl:
                     thread_id = thread_file.stem
                     self._delete_thread(thread_id)
@@ -665,7 +655,7 @@ class ConversationMemory:
 
         try:
             with lock:
-                with open(thread_file, 'w') as f:
+                with open(thread_file, "w") as f:
                     json.dump(thread.model_dump(), f, indent=2)
         except filelock.Timeout:
             logger.error(f"Timeout acquiring lock for thread {thread.thread_id}")

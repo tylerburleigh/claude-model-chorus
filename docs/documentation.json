@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-20T21:18:17.831030Z",
+    "generated_at": "2025-11-20T21:22:51.470564Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 103,
-    "total_lines": 44897,
-    "total_classes": 247,
+    "total_files": 104,
+    "total_lines": 45377,
+    "total_classes": 255,
     "total_functions": 206,
     "avg_complexity": 4.96,
     "max_complexity": 55,
@@ -24,9 +24,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 103,
-        "lines": 44897,
-        "classes": 247,
+        "files": 104,
+        "lines": 45377,
+        "classes": 255,
         "functions": 206,
         "avg_complexity": 4.96
       }
@@ -2062,6 +2062,35 @@
       ],
       "exports": [],
       "lines": 141
+    },
+    {
+      "name": "test_context_ingestion",
+      "file": "tests/test_context_ingestion.py",
+      "language": "python",
+      "docstring": "Tests for the ContextIngestionService.\n\nCovers file reading, size limits, encoding detection, chunking,\nand error handling for the context ingestion service.",
+      "classes": [
+        "TestContextIngestionServiceInitialization",
+        "TestReadFile",
+        "TestGetFileInfo",
+        "TestCanReadFile",
+        "TestReadFileChunked",
+        "TestReadFileLines",
+        "TestPathValidation",
+        "TestCustomSizeLimits"
+      ],
+      "functions": [],
+      "imports": [
+        "pytest",
+        "tempfile",
+        "pathlib.Path",
+        "model_chorus.core.context_ingestion.ContextIngestionService",
+        "model_chorus.core.context_ingestion.FileTooLargeError",
+        "model_chorus.core.context_ingestion.BinaryFileError",
+        "model_chorus.core.context_ingestion.DEFAULT_MAX_FILE_SIZE_KB",
+        "model_chorus.core.context_ingestion.DEFAULT_WARN_FILE_SIZE_KB"
+      ],
+      "exports": [],
+      "lines": 480
     },
     {
       "name": "test_contradiction",
@@ -4351,10 +4380,316 @@
           "context": [
             "construct_prompt_with_files"
           ]
+        },
+        {
+          "instantiator": "test_default_initialization",
+          "file": "tests/test_context_ingestion.py",
+          "line": 25,
+          "context": [
+            "TestContextIngestionServiceInitialization",
+            "test_default_initialization"
+          ]
+        },
+        {
+          "instantiator": "test_custom_initialization",
+          "file": "tests/test_context_ingestion.py",
+          "line": 31,
+          "context": [
+            "TestContextIngestionServiceInitialization",
+            "test_custom_initialization"
+          ]
+        },
+        {
+          "instantiator": "test_initialization_validation_max_size_zero",
+          "file": "tests/test_context_ingestion.py",
+          "line": 38,
+          "context": [
+            "TestContextIngestionServiceInitialization",
+            "test_initialization_validation_max_size_zero"
+          ]
+        },
+        {
+          "instantiator": "test_initialization_validation_max_size_negative",
+          "file": "tests/test_context_ingestion.py",
+          "line": 43,
+          "context": [
+            "TestContextIngestionServiceInitialization",
+            "test_initialization_validation_max_size_negative"
+          ]
+        },
+        {
+          "instantiator": "test_initialization_validation_warn_exceeds_max",
+          "file": "tests/test_context_ingestion.py",
+          "line": 48,
+          "context": [
+            "TestContextIngestionServiceInitialization",
+            "test_initialization_validation_warn_exceeds_max"
+          ]
+        },
+        {
+          "instantiator": "test_read_small_text_file",
+          "file": "tests/test_context_ingestion.py",
+          "line": 61,
+          "context": [
+            "TestReadFile",
+            "test_read_small_text_file"
+          ]
+        },
+        {
+          "instantiator": "test_read_file_with_unicode",
+          "file": "tests/test_context_ingestion.py",
+          "line": 82,
+          "context": [
+            "TestReadFile",
+            "test_read_file_with_unicode"
+          ]
+        },
+        {
+          "instantiator": "test_read_file_with_multiple_lines",
+          "file": "tests/test_context_ingestion.py",
+          "line": 98,
+          "context": [
+            "TestReadFile",
+            "test_read_file_with_multiple_lines"
+          ]
+        },
+        {
+          "instantiator": "test_read_file_not_found",
+          "file": "tests/test_context_ingestion.py",
+          "line": 106,
+          "context": [
+            "TestReadFile",
+            "test_read_file_not_found"
+          ]
+        },
+        {
+          "instantiator": "test_read_directory_raises_error",
+          "file": "tests/test_context_ingestion.py",
+          "line": 113,
+          "context": [
+            "TestReadFile",
+            "test_read_directory_raises_error"
+          ]
+        },
+        {
+          "instantiator": "test_read_file_too_large",
+          "file": "tests/test_context_ingestion.py",
+          "line": 125,
+          "context": [
+            "TestReadFile",
+            "test_read_file_too_large"
+          ]
+        },
+        {
+          "instantiator": "test_read_file_exceeds_warning_threshold",
+          "file": "tests/test_context_ingestion.py",
+          "line": 139,
+          "context": [
+            "TestReadFile",
+            "test_read_file_exceeds_warning_threshold"
+          ]
+        },
+        {
+          "instantiator": "test_read_binary_file_raises_error",
+          "file": "tests/test_context_ingestion.py",
+          "line": 156,
+          "context": [
+            "TestReadFile",
+            "test_read_binary_file_raises_error"
+          ]
+        },
+        {
+          "instantiator": "test_get_file_info_small_file",
+          "file": "tests/test_context_ingestion.py",
+          "line": 173,
+          "context": [
+            "TestGetFileInfo",
+            "test_get_file_info_small_file"
+          ]
+        },
+        {
+          "instantiator": "test_get_file_info_large_file",
+          "file": "tests/test_context_ingestion.py",
+          "line": 192,
+          "context": [
+            "TestGetFileInfo",
+            "test_get_file_info_large_file"
+          ]
+        },
+        {
+          "instantiator": "test_get_file_info_nonexistent_file",
+          "file": "tests/test_context_ingestion.py",
+          "line": 203,
+          "context": [
+            "TestGetFileInfo",
+            "test_get_file_info_nonexistent_file"
+          ]
+        },
+        {
+          "instantiator": "test_can_read_small_file",
+          "file": "tests/test_context_ingestion.py",
+          "line": 218,
+          "context": [
+            "TestCanReadFile",
+            "test_can_read_small_file"
+          ]
+        },
+        {
+          "instantiator": "test_can_read_large_file",
+          "file": "tests/test_context_ingestion.py",
+          "line": 232,
+          "context": [
+            "TestCanReadFile",
+            "test_can_read_large_file"
+          ]
+        },
+        {
+          "instantiator": "test_can_read_nonexistent_file",
+          "file": "tests/test_context_ingestion.py",
+          "line": 241,
+          "context": [
+            "TestCanReadFile",
+            "test_can_read_nonexistent_file"
+          ]
+        },
+        {
+          "instantiator": "test_read_file_chunked_single_chunk",
+          "file": "tests/test_context_ingestion.py",
+          "line": 257,
+          "context": [
+            "TestReadFileChunked",
+            "test_read_file_chunked_single_chunk"
+          ]
+        },
+        {
+          "instantiator": "test_read_file_chunked_multiple_chunks",
+          "file": "tests/test_context_ingestion.py",
+          "line": 273,
+          "context": [
+            "TestReadFileChunked",
+            "test_read_file_chunked_multiple_chunks"
+          ]
+        },
+        {
+          "instantiator": "test_read_file_chunked_with_max_chunks",
+          "file": "tests/test_context_ingestion.py",
+          "line": 293,
+          "context": [
+            "TestReadFileChunked",
+            "test_read_file_chunked_with_max_chunks"
+          ]
+        },
+        {
+          "instantiator": "test_read_file_chunked_invalid_chunk_size",
+          "file": "tests/test_context_ingestion.py",
+          "line": 308,
+          "context": [
+            "TestReadFileChunked",
+            "test_read_file_chunked_invalid_chunk_size"
+          ]
+        },
+        {
+          "instantiator": "test_read_file_chunked_binary_file",
+          "file": "tests/test_context_ingestion.py",
+          "line": 323,
+          "context": [
+            "TestReadFileChunked",
+            "test_read_file_chunked_binary_file"
+          ]
+        },
+        {
+          "instantiator": "test_read_file_lines_all_lines",
+          "file": "tests/test_context_ingestion.py",
+          "line": 341,
+          "context": [
+            "TestReadFileLines",
+            "test_read_file_lines_all_lines"
+          ]
+        },
+        {
+          "instantiator": "test_read_file_lines_with_max_lines",
+          "file": "tests/test_context_ingestion.py",
+          "line": 358,
+          "context": [
+            "TestReadFileLines",
+            "test_read_file_lines_with_max_lines"
+          ]
+        },
+        {
+          "instantiator": "test_read_file_lines_skip_empty",
+          "file": "tests/test_context_ingestion.py",
+          "line": 374,
+          "context": [
+            "TestReadFileLines",
+            "test_read_file_lines_skip_empty"
+          ]
+        },
+        {
+          "instantiator": "test_read_file_lines_keep_empty",
+          "file": "tests/test_context_ingestion.py",
+          "line": 391,
+          "context": [
+            "TestReadFileLines",
+            "test_read_file_lines_keep_empty"
+          ]
+        },
+        {
+          "instantiator": "test_read_file_lines_too_large",
+          "file": "tests/test_context_ingestion.py",
+          "line": 407,
+          "context": [
+            "TestReadFileLines",
+            "test_read_file_lines_too_large"
+          ]
+        },
+        {
+          "instantiator": "test_validate_path_with_string",
+          "file": "tests/test_context_ingestion.py",
+          "line": 424,
+          "context": [
+            "TestPathValidation",
+            "test_validate_path_with_string"
+          ]
+        },
+        {
+          "instantiator": "test_validate_path_with_pathlib",
+          "file": "tests/test_context_ingestion.py",
+          "line": 437,
+          "context": [
+            "TestPathValidation",
+            "test_validate_path_with_pathlib"
+          ]
+        },
+        {
+          "instantiator": "test_custom_max_size_allows_larger_files",
+          "file": "tests/test_context_ingestion.py",
+          "line": 456,
+          "context": [
+            "TestCustomSizeLimits",
+            "test_custom_max_size_allows_larger_files"
+          ]
+        },
+        {
+          "instantiator": "test_custom_max_size_allows_larger_files",
+          "file": "tests/test_context_ingestion.py",
+          "line": 461,
+          "context": [
+            "TestCustomSizeLimits",
+            "test_custom_max_size_allows_larger_files"
+          ]
+        },
+        {
+          "instantiator": "test_custom_warn_threshold",
+          "file": "tests/test_context_ingestion.py",
+          "line": 476,
+          "context": [
+            "TestCustomSizeLimits",
+            "test_custom_warn_threshold"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 1
+      "instantiation_count": 35
     },
     {
       "name": "ContradictionSeverity",
@@ -16067,6 +16402,159 @@
       "imported_by": []
     },
     {
+      "name": "TestContextIngestionServiceInitialization",
+      "file": "tests/test_context_ingestion.py",
+      "line": 20,
+      "language": "python",
+      "docstring": "Test service initialization and configuration.",
+      "bases": [],
+      "methods": [
+        "test_default_initialization",
+        "test_custom_initialization",
+        "test_initialization_validation_max_size_zero",
+        "test_initialization_validation_max_size_negative",
+        "test_initialization_validation_warn_exceeds_max"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestReadFile",
+      "file": "tests/test_context_ingestion.py",
+      "line": 51,
+      "language": "python",
+      "docstring": "Test basic file reading functionality.",
+      "bases": [],
+      "methods": [
+        "test_read_small_text_file",
+        "test_read_file_with_unicode",
+        "test_read_file_with_multiple_lines",
+        "test_read_file_not_found",
+        "test_read_directory_raises_error",
+        "test_read_file_too_large",
+        "test_read_file_exceeds_warning_threshold",
+        "test_read_binary_file_raises_error"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestGetFileInfo",
+      "file": "tests/test_context_ingestion.py",
+      "line": 163,
+      "language": "python",
+      "docstring": "Test file metadata retrieval.",
+      "bases": [],
+      "methods": [
+        "test_get_file_info_small_file",
+        "test_get_file_info_large_file",
+        "test_get_file_info_nonexistent_file"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestCanReadFile",
+      "file": "tests/test_context_ingestion.py",
+      "line": 208,
+      "language": "python",
+      "docstring": "Test file readability checks.",
+      "bases": [],
+      "methods": [
+        "test_can_read_small_file",
+        "test_can_read_large_file",
+        "test_can_read_nonexistent_file"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestReadFileChunked",
+      "file": "tests/test_context_ingestion.py",
+      "line": 247,
+      "language": "python",
+      "docstring": "Test chunked file reading.",
+      "bases": [],
+      "methods": [
+        "test_read_file_chunked_single_chunk",
+        "test_read_file_chunked_multiple_chunks",
+        "test_read_file_chunked_with_max_chunks",
+        "test_read_file_chunked_invalid_chunk_size",
+        "test_read_file_chunked_binary_file"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestReadFileLines",
+      "file": "tests/test_context_ingestion.py",
+      "line": 330,
+      "language": "python",
+      "docstring": "Test line-by-line file reading.",
+      "bases": [],
+      "methods": [
+        "test_read_file_lines_all_lines",
+        "test_read_file_lines_with_max_lines",
+        "test_read_file_lines_skip_empty",
+        "test_read_file_lines_keep_empty",
+        "test_read_file_lines_too_large"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestPathValidation",
+      "file": "tests/test_context_ingestion.py",
+      "line": 414,
+      "language": "python",
+      "docstring": "Test path validation and normalization.",
+      "bases": [],
+      "methods": [
+        "test_validate_path_with_string",
+        "test_validate_path_with_pathlib"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestCustomSizeLimits",
+      "file": "tests/test_context_ingestion.py",
+      "line": 444,
+      "language": "python",
+      "docstring": "Test service with custom size limits.",
+      "bases": [],
+      "methods": [
+        "test_custom_max_size_allows_larger_files",
+        "test_custom_warn_threshold"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
       "name": "TestPolarityOpposition",
       "file": "tests/test_contradiction.py",
       "line": 21,
@@ -26545,7 +27033,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 1840,
           "call_type": "method_call"
         },
@@ -31091,7 +31579,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 167,
           "call_type": "method_call"
         },
@@ -31133,7 +31621,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 556,
           "call_type": "method_call"
         },
@@ -40408,6 +40896,16 @@
       "model_chorus.workflows.consensus.ConsensusStrategy",
       "model_chorus.providers.base_provider.GenerationResponse",
       "model_chorus.providers.base_provider.GenerationRequest"
+    ],
+    "tests/test_context_ingestion.py": [
+      "pytest",
+      "tempfile",
+      "pathlib.Path",
+      "model_chorus.core.context_ingestion.ContextIngestionService",
+      "model_chorus.core.context_ingestion.FileTooLargeError",
+      "model_chorus.core.context_ingestion.BinaryFileError",
+      "model_chorus.core.context_ingestion.DEFAULT_MAX_FILE_SIZE_KB",
+      "model_chorus.core.context_ingestion.DEFAULT_WARN_FILE_SIZE_KB"
     ],
     "tests/test_contradiction.py": [
       "pytest",

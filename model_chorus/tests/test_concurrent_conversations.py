@@ -45,9 +45,7 @@ class TestConcurrentConversationHandling:
         return ConversationMemory()
 
     @pytest.mark.asyncio
-    async def test_100_concurrent_chat_conversations(
-        self, mock_provider, conversation_memory
-    ):
+    async def test_100_concurrent_chat_conversations(self, mock_provider, conversation_memory):
         """
         Test handling 100 concurrent chat conversations.
 
@@ -65,28 +63,25 @@ class TestConcurrentConversationHandling:
                 content=f"Response {uuid.uuid4()}",
                 model="test-model",
                 usage={"input_tokens": 10, "output_tokens": 20},
-                stop_reason="end_turn"
+                stop_reason="end_turn",
             )
 
         mock_provider.generate.side_effect = generate_response
 
         # Create chat workflow (shared across all conversations)
         chat_workflow = ChatWorkflow(
-            provider=mock_provider,
-            conversation_memory=conversation_memory
+            provider=mock_provider, conversation_memory=conversation_memory
         )
 
         # Define concurrent conversation tasks
         async def run_conversation(conversation_id: int):
             """Run a single conversation."""
-            result = await chat_workflow.run(
-                prompt=f"Conversation {conversation_id}: What is AI?"
-            )
+            result = await chat_workflow.run(prompt=f"Conversation {conversation_id}: What is AI?")
             return {
                 "conversation_id": conversation_id,
                 "thread_id": result.metadata.get("thread_id"),
                 "success": result.success,
-                "content": result.synthesis
+                "content": result.synthesis,
             }
 
         # Execute all conversations concurrently
@@ -133,21 +128,21 @@ class TestConcurrentConversationHandling:
                     except ValueError:
                         pass
 
-        assert len(conversation_ids_in_messages) == num_conversations, \
-            "All conversation IDs should be present in messages"
+        assert (
+            len(conversation_ids_in_messages) == num_conversations
+        ), "All conversation IDs should be present in messages"
 
         # Performance check - should complete in reasonable time
         # 100 conversations with mocked provider should be fast (< 5 seconds)
-        assert execution_time < 5.0, \
-            f"100 concurrent conversations took {execution_time:.2f}s, expected < 5s"
+        assert (
+            execution_time < 5.0
+        ), f"100 concurrent conversations took {execution_time:.2f}s, expected < 5s"
 
         print(f"\n✓ Executed {num_conversations} concurrent conversations in {execution_time:.2f}s")
         print(f"✓ Average time per conversation: {execution_time/num_conversations*1000:.1f}ms")
 
     @pytest.mark.asyncio
-    async def test_concurrent_multi_turn_conversations(
-        self, mock_provider, conversation_memory
-    ):
+    async def test_concurrent_multi_turn_conversations(self, mock_provider, conversation_memory):
         """
         Test concurrent multi-turn conversations.
 
@@ -169,15 +164,14 @@ class TestConcurrentConversationHandling:
                 content=f"Turn response {response_counter}",
                 model="test-model",
                 usage={"input_tokens": 10, "output_tokens": 20},
-                stop_reason="end_turn"
+                stop_reason="end_turn",
             )
 
         mock_provider.generate.side_effect = generate_response
 
         # Create chat workflow
         chat_workflow = ChatWorkflow(
-            provider=mock_provider,
-            conversation_memory=conversation_memory
+            provider=mock_provider, conversation_memory=conversation_memory
         )
 
         # Track thread IDs for each conversation
@@ -185,6 +179,7 @@ class TestConcurrentConversationHandling:
 
         # Execute multiple turns for each conversation concurrently
         for turn in range(turns_per_conversation):
+
             async def run_turn(conversation_id: int):
                 """Run a single turn of a conversation."""
                 # Get existing thread ID if this is a continuation
@@ -192,7 +187,7 @@ class TestConcurrentConversationHandling:
 
                 result = await chat_workflow.run(
                     prompt=f"Conversation {conversation_id}, Turn {turn}",
-                    continuation_id=continuation_id
+                    continuation_id=continuation_id,
                 )
 
                 # Store thread ID for next turn
@@ -203,7 +198,7 @@ class TestConcurrentConversationHandling:
                     "conversation_id": conversation_id,
                     "turn": turn,
                     "thread_id": thread_id,
-                    "success": result.success
+                    "success": result.success,
                 }
 
             # Execute all conversations for this turn concurrently
@@ -221,22 +216,23 @@ class TestConcurrentConversationHandling:
         for conversation_id, thread_id in conversation_threads.items():
             thread = conversation_memory.get_thread(thread_id)
             assert thread is not None
-            assert len(thread.messages) == expected_messages, \
-                f"Conversation {conversation_id} should have {expected_messages} messages, " \
+            assert len(thread.messages) == expected_messages, (
+                f"Conversation {conversation_id} should have {expected_messages} messages, "
                 f"got {len(thread.messages)}"
+            )
 
             # Verify all turns are present in order
             user_messages = [msg for msg in thread.messages if msg.role == "user"]
             for turn in range(turns_per_conversation):
                 assert f"Turn {turn}" in user_messages[turn].content
 
-        print(f"\n✓ Executed {num_conversations} conversations × {turns_per_conversation} turns = "
-              f"{num_conversations * turns_per_conversation} total turns")
+        print(
+            f"\n✓ Executed {num_conversations} conversations × {turns_per_conversation} turns = "
+            f"{num_conversations * turns_per_conversation} total turns"
+        )
 
     @pytest.mark.asyncio
-    async def test_mixed_workflow_concurrent_execution(
-        self, mock_provider, conversation_memory
-    ):
+    async def test_mixed_workflow_concurrent_execution(self, mock_provider, conversation_memory):
         """
         Test concurrent execution of different workflow types.
 
@@ -253,18 +249,16 @@ class TestConcurrentConversationHandling:
             content="Mixed workflow response",
             model="test-model",
             usage={"input_tokens": 10, "output_tokens": 20},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         # Create workflows
         chat_workflow = ChatWorkflow(
-            provider=mock_provider,
-            conversation_memory=conversation_memory
+            provider=mock_provider, conversation_memory=conversation_memory
         )
 
         thinkdeep_workflow = ThinkDeepWorkflow(
-            provider=mock_provider,
-            conversation_memory=conversation_memory
+            provider=mock_provider, conversation_memory=conversation_memory
         )
 
         # Define tasks
@@ -273,10 +267,7 @@ class TestConcurrentConversationHandling:
             return ("chat", result.metadata.get("thread_id"), result.success)
 
         async def run_thinkdeep(i: int):
-            result = await thinkdeep_workflow.run(
-                prompt=f"ThinkDeep investigation {i}",
-                files=[]
-            )
+            result = await thinkdeep_workflow.run(prompt=f"ThinkDeep investigation {i}", files=[])
             return ("thinkdeep", result.metadata.get("thread_id"), result.success)
 
         # Execute mixed workflows concurrently
@@ -314,13 +305,13 @@ class TestConcurrentConversationHandling:
             assert thread is not None
             assert len(thread.messages) == 2  # user + assistant
 
-        print(f"\n✓ Executed {num_chat} chat + {num_thinkdeep} thinkdeep = "
-              f"{len(results)} mixed workflows in {execution_time:.2f}s")
+        print(
+            f"\n✓ Executed {num_chat} chat + {num_thinkdeep} thinkdeep = "
+            f"{len(results)} mixed workflows in {execution_time:.2f}s"
+        )
 
     @pytest.mark.asyncio
-    async def test_performance_scalability(
-        self, mock_provider, conversation_memory
-    ):
+    async def test_performance_scalability(self, mock_provider, conversation_memory):
         """
         Test performance scalability with increasing load.
 
@@ -332,22 +323,18 @@ class TestConcurrentConversationHandling:
             content="Scalability test response",
             model="test-model",
             usage={"input_tokens": 10, "output_tokens": 20},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         chat_workflow = ChatWorkflow(
-            provider=mock_provider,
-            conversation_memory=conversation_memory
+            provider=mock_provider, conversation_memory=conversation_memory
         )
 
         async def run_batch(batch_size: int):
             """Run a batch of conversations and return execution time."""
             start = time.time()
 
-            tasks = [
-                chat_workflow.run(prompt=f"Request {i}")
-                for i in range(batch_size)
-            ]
+            tasks = [chat_workflow.run(prompt=f"Request {i}") for i in range(batch_size)]
             await asyncio.gather(*tasks)
 
             return time.time() - start
@@ -366,7 +353,8 @@ class TestConcurrentConversationHandling:
         # Verify performance doesn't degrade exponentially
         # Time for 100 should be < 15x time for 10 (allowing for overhead)
         time_ratio = execution_times[100] / execution_times[10]
-        assert time_ratio < 15.0, \
-            f"Performance degradation too high: {time_ratio:.1f}x for 10x load"
+        assert (
+            time_ratio < 15.0
+        ), f"Performance degradation too high: {time_ratio:.1f}x for 10x load"
 
         print(f"\n✓ Performance scaling factor: {time_ratio:.1f}x for 10x load increase")

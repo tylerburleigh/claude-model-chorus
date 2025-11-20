@@ -32,11 +32,7 @@ def is_progress_enabled() -> bool:
     return _progress_enabled
 
 
-def emit_progress(
-    message: str,
-    prefix: Optional[str] = None,
-    style: str = "cyan"
-) -> None:
+def emit_progress(message: str, prefix: Optional[str] = None, style: str = "cyan") -> None:
     """
     Emit a progress update to stderr.
 

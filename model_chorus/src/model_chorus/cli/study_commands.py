@@ -99,7 +99,9 @@ def get_provider_by_name(name: str, timeout: int = 120):
 
 @study_app.command()
 def start(
-    scenario: str = typer.Option(..., "--scenario", help="Investigation description or research question"),
+    scenario: str = typer.Option(
+        ..., "--scenario", help="Investigation description or research question"
+    ),
     provider: Optional[str] = typer.Option(
         None,
         "--provider",
@@ -182,20 +184,24 @@ def start(
         # Apply config defaults if values not provided
         config = get_config()
         if provider is None:
-            provider = config.get_workflow_default_provider('study', 'claude')
+            provider = config.get_workflow_default_provider("study", "claude")
             if provider is None:
-                console.print("[red]Error: Default provider for 'study' workflow is disabled.[/red]")
-                console.print("[yellow]Enable it in .claude/model_chorus_config.yaml or specify --provider[/yellow]")
+                console.print(
+                    "[red]Error: Default provider for 'study' workflow is disabled.[/red]"
+                )
+                console.print(
+                    "[yellow]Enable it in .claude/model_chorus_config.yaml or specify --provider[/yellow]"
+                )
                 raise typer.Exit(1)
         if temperature is None:
-            temperature = config.get_workflow_default('study', 'temperature', 0.7)
+            temperature = config.get_workflow_default("study", "temperature", 0.7)
         if max_tokens is None:
-            max_tokens = config.get_workflow_default('study', 'max_tokens', None)
+            max_tokens = config.get_workflow_default("study", "max_tokens", None)
         if system is None:
-            system = config.get_workflow_default('study', 'system_prompt', None)
+            system = config.get_workflow_default("study", "system_prompt", None)
 
         # Read timeout from config
-        timeout = config.get_workflow_default('study', 'timeout', 120.0)
+        timeout = config.get_workflow_default("study", "timeout", 120.0)
 
         # Create provider instance
         if verbose:
@@ -213,18 +219,22 @@ def start(
                 for suggestion in e.suggestions:
                     console.print(f"  • {suggestion}")
             console.print(f"\n[yellow]Installation:[/yellow] {get_install_command(provider)}")
-            console.print(f"\n[dim]Run 'model-chorus list-providers --check' to see which providers are available[/dim]")
+            console.print(
+                f"\n[dim]Run 'model-chorus list-providers --check' to see which providers are available[/dim]"
+            )
             raise typer.Exit(1)
         except Exception as e:
             console.print(f"[red]Failed to initialize {provider}: {e}[/red]")
             raise typer.Exit(1)
 
         # Load fallback providers from config
-        fallback_provider_names = config.get_workflow_default('study', 'fallback_providers', [])
+        fallback_provider_names = config.get_workflow_default("study", "fallback_providers", [])
         fallback_providers = []
 
         if fallback_provider_names and verbose:
-            console.print(f"[cyan]Initializing fallback providers: {', '.join(fallback_provider_names)}[/cyan]")
+            console.print(
+                f"[cyan]Initializing fallback providers: {', '.join(fallback_provider_names)}[/cyan]"
+            )
 
         for fallback_name in fallback_provider_names:
             try:
@@ -234,7 +244,9 @@ def start(
                     console.print(f"[green]✓ {fallback_name} initialized (fallback)[/green]")
             except Exception as e:
                 if verbose:
-                    console.print(f"[yellow]⚠ Could not initialize fallback {fallback_name}: {e}[/yellow]")
+                    console.print(
+                        f"[yellow]⚠ Could not initialize fallback {fallback_name}: {e}[/yellow]"
+                    )
 
         # Create conversation memory (in-memory for now)
         memory = ConversationMemory()
@@ -243,10 +255,7 @@ def start(
         workflow_config = {}
         if personas:
             # Convert persona names to persona configurations
-            workflow_config['personas'] = [
-                {"name": p, "role": "investigator"}
-                for p in personas
-            ]
+            workflow_config["personas"] = [{"name": p, "role": "investigator"} for p in personas]
 
         workflow = StudyWorkflow(
             provider=provider_instance,
@@ -266,7 +275,9 @@ def start(
                     raise typer.Exit(1)
 
         # Display investigation info
-        console.print(f"\n[bold cyan]{'Continuing' if continuation_id else 'Starting'} STUDY Investigation[/bold cyan]")
+        console.print(
+            f"\n[bold cyan]{'Continuing' if continuation_id else 'Starting'} STUDY Investigation[/bold cyan]"
+        )
         console.print(f"Scenario: {scenario[:100]}{'...' if len(scenario) > 100 else ''}")
         console.print(f"Provider: {provider}")
         if continuation_id:
@@ -280,13 +291,13 @@ def start(
         # Build kwargs for workflow
         workflow_kwargs = {}
         if personas:
-            workflow_kwargs['personas'] = workflow_config.get('personas', [])
+            workflow_kwargs["personas"] = workflow_config.get("personas", [])
         if system:
-            workflow_kwargs['system_prompt'] = system
+            workflow_kwargs["system_prompt"] = system
         if temperature is not None:
-            workflow_kwargs['temperature'] = temperature
+            workflow_kwargs["temperature"] = temperature
         if max_tokens is not None:
-            workflow_kwargs['max_tokens'] = max_tokens
+            workflow_kwargs["max_tokens"] = max_tokens
 
         # Run async workflow
         result = asyncio.run(
@@ -295,7 +306,7 @@ def start(
                 continuation_id=continuation_id,
                 files=files,
                 skip_provider_check=skip_provider_check,
-                **workflow_kwargs
+                **workflow_kwargs,
             )
         )
 
@@ -304,9 +315,9 @@ def start(
             console.print(f"[bold green]✓ STUDY investigation completed[/bold green]\n")
 
             # Show thread info
-            thread_id = result.metadata.get('thread_id')
-            is_continuation = result.metadata.get('is_continuation', False)
-            personas_used = result.metadata.get('personas_used', [])
+            thread_id = result.metadata.get("thread_id")
+            is_continuation = result.metadata.get("is_continuation", False)
+            personas_used = result.metadata.get("personas_used", [])
 
             console.print(f"[cyan]Thread ID:[/cyan] {thread_id}")
             if not is_continuation:
@@ -321,7 +332,11 @@ def start(
             if result.steps:
                 console.print("[bold]Investigation Steps:[/bold]\n")
                 for i, step in enumerate(result.steps, 1):
-                    persona_name = step.metadata.get('persona', f'Step {i}') if hasattr(step, 'metadata') and step.metadata else f'Step {i}'
+                    persona_name = (
+                        step.metadata.get("persona", f"Step {i}")
+                        if hasattr(step, "metadata") and step.metadata
+                        else f"Step {i}"
+                    )
                     console.print(f"[bold cyan]{persona_name}:[/bold cyan]")
                     console.print(step.content)
                     console.print()
@@ -331,7 +346,7 @@ def start(
             console.print(result.synthesis)
 
             # Show usage info if available
-            usage = result.metadata.get('usage', {})
+            usage = result.metadata.get("usage", {})
             if usage and verbose:
                 console.print(f"\n[dim]Tokens: {usage.get('total_tokens', 'N/A')}[/dim]")
 
@@ -345,14 +360,18 @@ def start(
                     "personas_used": personas_used,
                     "steps": [
                         {
-                            "persona": step.metadata.get('persona', f'Step {i}') if hasattr(step, 'metadata') and step.metadata else f'Step {i}',
+                            "persona": (
+                                step.metadata.get("persona", f"Step {i}")
+                                if hasattr(step, "metadata") and step.metadata
+                                else f"Step {i}"
+                            ),
                             "content": step.content,
-                            "metadata": step.metadata if hasattr(step, 'metadata') else {}
+                            "metadata": step.metadata if hasattr(step, "metadata") else {},
                         }
                         for i, step in enumerate(result.steps, 1)
                     ],
                     "synthesis": result.synthesis,
-                    "model": result.metadata.get('model'),
+                    "model": result.metadata.get("model"),
                     "usage": usage,
                 }
                 if files:
@@ -361,7 +380,9 @@ def start(
                 output.write_text(json.dumps(output_data, indent=2))
                 console.print(f"\n[green]✓ Result saved to {output}[/green]")
 
-            console.print(f"\n[dim]To continue this investigation, use: --continue {thread_id}[/dim]")
+            console.print(
+                f"\n[dim]To continue this investigation, use: --continue {thread_id}[/dim]"
+            )
 
         else:
             console.print(f"[red]✗ STUDY investigation failed: {result.error}[/red]")
@@ -374,13 +395,16 @@ def start(
         console.print(f"\n[red]Error: {e}[/red]")
         if verbose:
             import traceback
+
             console.print(f"\n[red]{traceback.format_exc()}[/red]")
         raise typer.Exit(1)
 
 
 @study_app.command(name="next")
 def study_next(
-    investigation: str = typer.Option(..., "--investigation", help="Investigation ID (thread ID) to continue"),
+    investigation: str = typer.Option(
+        ..., "--investigation", help="Investigation ID (thread ID) to continue"
+    ),
     provider: Optional[str] = typer.Option(
         None,
         "--provider",
@@ -440,14 +464,18 @@ def study_next(
         # Apply config defaults if values not provided
         config = get_config()
         if provider is None:
-            provider = config.get_workflow_default_provider('study', 'claude')
+            provider = config.get_workflow_default_provider("study", "claude")
             if provider is None:
-                console.print("[red]Error: Default provider for 'study' workflow is disabled.[/red]")
-                console.print("[yellow]Enable it in .claude/model_chorus_config.yaml or specify --provider[/yellow]")
+                console.print(
+                    "[red]Error: Default provider for 'study' workflow is disabled.[/red]"
+                )
+                console.print(
+                    "[yellow]Enable it in .claude/model_chorus_config.yaml or specify --provider[/yellow]"
+                )
                 raise typer.Exit(1)
 
         # Read timeout from config
-        timeout = config.get_workflow_default('study', 'timeout', 120.0)
+        timeout = config.get_workflow_default("study", "timeout", 120.0)
 
         # Create provider instance
         if verbose:
@@ -465,18 +493,22 @@ def study_next(
                 for suggestion in e.suggestions:
                     console.print(f"  • {suggestion}")
             console.print(f"\n[yellow]Installation:[/yellow] {get_install_command(provider)}")
-            console.print(f"\n[dim]Run 'model-chorus list-providers --check' to see which providers are available[/dim]")
+            console.print(
+                f"\n[dim]Run 'model-chorus list-providers --check' to see which providers are available[/dim]"
+            )
             raise typer.Exit(1)
         except Exception as e:
             console.print(f"[red]Failed to initialize {provider}: {e}[/red]")
             raise typer.Exit(1)
 
         # Load fallback providers from config
-        fallback_provider_names = config.get_workflow_default('study', 'fallback_providers', [])
+        fallback_provider_names = config.get_workflow_default("study", "fallback_providers", [])
         fallback_providers = []
 
         if fallback_provider_names and verbose:
-            console.print(f"[cyan]Initializing fallback providers: {', '.join(fallback_provider_names)}[/cyan]")
+            console.print(
+                f"[cyan]Initializing fallback providers: {', '.join(fallback_provider_names)}[/cyan]"
+            )
 
         for fallback_name in fallback_provider_names:
             try:
@@ -486,7 +518,9 @@ def study_next(
                     console.print(f"[green]✓ {fallback_name} initialized (fallback)[/green]")
             except Exception as e:
                 if verbose:
-                    console.print(f"[yellow]⚠ Could not initialize fallback {fallback_name}: {e}[/yellow]")
+                    console.print(
+                        f"[yellow]⚠ Could not initialize fallback {fallback_name}: {e}[/yellow]"
+                    )
 
         # Create conversation memory
         memory = ConversationMemory()
@@ -495,8 +529,12 @@ def study_next(
         thread = memory.get_thread(investigation)
         if not thread:
             console.print(f"[red]Error: Investigation not found: {investigation}[/red]")
-            console.print("[yellow]Make sure you're using the correct thread ID from a previous investigation.[/yellow]")
-            console.print("\nTo start a new investigation, use: model-chorus study --scenario \"...\"")
+            console.print(
+                "[yellow]Make sure you're using the correct thread ID from a previous investigation.[/yellow]"
+            )
+            console.print(
+                '\nTo start a new investigation, use: model-chorus study --scenario "..."'
+            )
             raise typer.Exit(1)
 
         # Create workflow
@@ -531,7 +569,7 @@ def study_next(
         # Build kwargs for workflow
         workflow_kwargs = {}
         if max_tokens is not None:
-            workflow_kwargs['max_tokens'] = max_tokens
+            workflow_kwargs["max_tokens"] = max_tokens
 
         # Run async workflow with continuation
         result = asyncio.run(
@@ -540,7 +578,7 @@ def study_next(
                 continuation_id=investigation,
                 files=files,
                 skip_provider_check=skip_provider_check,
-                **workflow_kwargs
+                **workflow_kwargs,
             )
         )
 
@@ -549,8 +587,8 @@ def study_next(
             console.print(f"[bold green]✓ Investigation step completed[/bold green]\n")
 
             # Show thread info
-            thread_id = result.metadata.get('thread_id')
-            personas_used = result.metadata.get('personas_used', [])
+            thread_id = result.metadata.get("thread_id")
+            personas_used = result.metadata.get("personas_used", [])
 
             console.print(f"[cyan]Investigation ID:[/cyan] {thread_id}")
             if personas_used:
@@ -561,7 +599,11 @@ def study_next(
             if result.steps:
                 console.print("[bold]Investigation Steps:[/bold]\n")
                 for i, step in enumerate(result.steps, 1):
-                    persona_name = step.metadata.get('persona', f'Step {i}') if hasattr(step, 'metadata') and step.metadata else f'Step {i}'
+                    persona_name = (
+                        step.metadata.get("persona", f"Step {i}")
+                        if hasattr(step, "metadata") and step.metadata
+                        else f"Step {i}"
+                    )
                     console.print(f"[bold cyan]{persona_name}:[/bold cyan]")
                     console.print(step.content)
                     console.print()
@@ -571,7 +613,7 @@ def study_next(
             console.print(result.synthesis)
 
             # Show usage info if available
-            usage = result.metadata.get('usage', {})
+            usage = result.metadata.get("usage", {})
             if usage and verbose:
                 console.print(f"\n[dim]Tokens: {usage.get('total_tokens', 'N/A')}[/dim]")
 
@@ -584,14 +626,18 @@ def study_next(
                     "personas_used": personas_used,
                     "steps": [
                         {
-                            "persona": step.metadata.get('persona', f'Step {i}') if hasattr(step, 'metadata') and step.metadata else f'Step {i}',
+                            "persona": (
+                                step.metadata.get("persona", f"Step {i}")
+                                if hasattr(step, "metadata") and step.metadata
+                                else f"Step {i}"
+                            ),
                             "content": step.content,
-                            "metadata": step.metadata if hasattr(step, 'metadata') else {}
+                            "metadata": step.metadata if hasattr(step, "metadata") else {},
                         }
                         for i, step in enumerate(result.steps, 1)
                     ],
                     "synthesis": result.synthesis,
-                    "model": result.metadata.get('model'),
+                    "model": result.metadata.get("model"),
                     "usage": usage,
                 }
                 if files:
@@ -600,7 +646,9 @@ def study_next(
                 output.write_text(json.dumps(output_data, indent=2))
                 console.print(f"\n[green]✓ Result saved to {output}[/green]")
 
-            console.print(f"\n[dim]To continue this investigation, use: model-chorus study-next --investigation {thread_id}[/dim]")
+            console.print(
+                f"\n[dim]To continue this investigation, use: model-chorus study-next --investigation {thread_id}[/dim]"
+            )
 
         else:
             console.print(f"[red]✗ Investigation continuation failed: {result.error}[/red]")
@@ -613,13 +661,16 @@ def study_next(
         console.print(f"\n[red]Error: {e}[/red]")
         if verbose:
             import traceback
+
             console.print(f"\n[red]{traceback.format_exc()}[/red]")
         raise typer.Exit(1)
 
 
 @study_app.command(name="view")
 def study_view(
-    investigation: str = typer.Option(..., "--investigation", help="Investigation ID (thread ID) to view"),
+    investigation: str = typer.Option(
+        ..., "--investigation", help="Investigation ID (thread ID) to view"
+    ),
     persona: Optional[str] = typer.Option(
         None,
         "--persona",
@@ -670,22 +721,29 @@ def study_view(
         thread = memory.get_thread(investigation)
         if not thread:
             console.print(f"[red]Error: Investigation not found: {investigation}[/red]")
-            console.print("[yellow]Make sure you're using the correct thread ID from a previous investigation.[/yellow]")
-            console.print("\nTo start a new investigation, use: model-chorus study --scenario \"...\"")
+            console.print(
+                "[yellow]Make sure you're using the correct thread ID from a previous investigation.[/yellow]"
+            )
+            console.print(
+                '\nTo start a new investigation, use: model-chorus study --scenario "..."'
+            )
             raise typer.Exit(1)
 
         # Extract messages and metadata
         messages = thread.messages
-        metadata = thread.metadata if hasattr(thread, 'metadata') else {}
+        metadata = thread.metadata if hasattr(thread, "metadata") else {}
 
         # Filter by persona if specified
         if persona:
             messages = [
-                msg for msg in messages
-                if msg.metadata and msg.metadata.get('persona', '').lower() == persona.lower()
+                msg
+                for msg in messages
+                if msg.metadata and msg.metadata.get("persona", "").lower() == persona.lower()
             ]
             if not messages:
-                console.print(f"[yellow]No messages found for persona '{persona}' in investigation {investigation}[/yellow]")
+                console.print(
+                    f"[yellow]No messages found for persona '{persona}' in investigation {investigation}[/yellow]"
+                )
                 console.print(f"Total messages in thread: {len(thread.messages)}")
                 raise typer.Exit(0)
 
@@ -699,16 +757,28 @@ def study_view(
                 "messages": [
                     {
                         "role": msg.role,
-                        "content": msg.content[:200] + "..." if len(msg.content) > 200 and not show_all else msg.content,
-                        "metadata": msg.metadata if hasattr(msg, 'metadata') else {},
+                        "content": (
+                            msg.content[:200] + "..."
+                            if len(msg.content) > 200 and not show_all
+                            else msg.content
+                        ),
+                        "metadata": msg.metadata if hasattr(msg, "metadata") else {},
                         "timestamp": (
-                            msg.timestamp if isinstance(msg.timestamp, str)
-                            else msg.timestamp.isoformat() if hasattr(msg.timestamp, 'isoformat')
+                            (
+                                msg.timestamp
+                                if isinstance(msg.timestamp, str)
+                                else (
+                                    msg.timestamp.isoformat()
+                                    if hasattr(msg.timestamp, "isoformat")
+                                    else None
+                                )
+                            )
+                            if hasattr(msg, "timestamp") and msg.timestamp
                             else None
-                        ) if hasattr(msg, 'timestamp') and msg.timestamp else None
+                        ),
                     }
                     for msg in messages
-                ]
+                ],
             }
             if persona:
                 output_data["filter_persona"] = persona
@@ -738,16 +808,20 @@ def study_view(
             console.print("[bold]Conversation History:[/bold]\n")
             for i, msg in enumerate(messages, 1):
                 # Extract persona from metadata if available
-                msg_persona = msg.metadata.get('persona', 'Unknown') if hasattr(msg, 'metadata') and msg.metadata else 'Unknown'
+                msg_persona = (
+                    msg.metadata.get("persona", "Unknown")
+                    if hasattr(msg, "metadata") and msg.metadata
+                    else "Unknown"
+                )
 
                 # Handle timestamp (could be datetime object or string)
-                if hasattr(msg, 'timestamp') and msg.timestamp:
+                if hasattr(msg, "timestamp") and msg.timestamp:
                     if isinstance(msg.timestamp, str):
                         timestamp = msg.timestamp
                     else:
-                        timestamp = msg.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+                        timestamp = msg.timestamp.strftime("%Y-%m-%d %H:%M:%S")
                 else:
-                    timestamp = 'N/A'
+                    timestamp = "N/A"
 
                 # Display message header
                 console.print(f"[bold cyan]Message {i}[/bold cyan]")
@@ -781,5 +855,6 @@ def study_view(
         console.print(f"\n[red]Error: {e}[/red]")
         if verbose:
             import traceback
+
             console.print(f"\n[red]{traceback.format_exc()}[/red]")
         raise typer.Exit(1)

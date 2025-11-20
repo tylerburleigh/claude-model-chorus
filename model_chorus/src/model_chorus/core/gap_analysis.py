@@ -192,6 +192,7 @@ def _import_citation_map():
     """Import CitationMap model."""
     try:
         from model_chorus.core.models import CitationMap
+
         return CitationMap
     except ImportError as e:
         raise ImportError(f"Cannot import CitationMap model: {e}")
@@ -303,9 +304,7 @@ def generate_gap_recommendation(
                 "or data supporting this claim."
             )
         else:
-            return (
-                "Consider adding additional citations to strengthen the claim's evidence base."
-            )
+            return "Consider adding additional citations to strengthen the claim's evidence base."
 
     elif gap_type == GapType.LOGICAL:
         return (
@@ -377,12 +376,13 @@ def detect_missing_evidence(
                 f"{expected_citation_count}. Lacks adequate empirical support."
             )
 
-            recommendation = generate_gap_recommendation(
-                GapType.EVIDENCE, severity, claim_text
-            )
+            recommendation = generate_gap_recommendation(GapType.EVIDENCE, severity, claim_text)
 
             # Calculate confidence based on citation deficit
-            confidence = min(0.9, 0.6 + (0.3 * (expected_citation_count - citation_count) / expected_citation_count))
+            confidence = min(
+                0.9,
+                0.6 + (0.3 * (expected_citation_count - citation_count) / expected_citation_count),
+            )
 
             gap = Gap(
                 gap_id=f"gap-evidence-{claim_id}",
@@ -437,8 +437,14 @@ def detect_logical_gaps(
 
     # Check for conclusion indicators without support
     conclusion_indicators = [
-        "therefore", "thus", "hence", "consequently", "as a result",
-        "it follows that", "we conclude that", "in conclusion"
+        "therefore",
+        "thus",
+        "hence",
+        "consequently",
+        "as a result",
+        "it follows that",
+        "we conclude that",
+        "in conclusion",
     ]
 
     text_lower = claim_text.lower()
@@ -456,9 +462,7 @@ def detect_logical_gaps(
             "Logical steps from evidence to conclusion are missing."
         )
 
-        recommendation = generate_gap_recommendation(
-            GapType.LOGICAL, severity, claim_text
-        )
+        recommendation = generate_gap_recommendation(GapType.LOGICAL, severity, claim_text)
 
         gap = Gap(
             gap_id=f"gap-logical-{claim_id}",

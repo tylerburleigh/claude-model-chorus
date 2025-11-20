@@ -60,13 +60,10 @@ class TestConversationMemory:
         initial_context = {
             "prompt": "Test prompt",
             "models": ["claude", "gpt-5"],
-            "temperature": 0.7
+            "temperature": 0.7,
         }
 
-        thread_id = memory.create_thread(
-            workflow_name="consensus",
-            initial_context=initial_context
-        )
+        thread_id = memory.create_thread(workflow_name="consensus", initial_context=initial_context)
 
         # Retrieve and verify context was stored
         thread = memory.get_thread(thread_id)
@@ -97,10 +94,7 @@ class TestConversationMemory:
         parent_id = memory.create_thread(workflow_name="parent_workflow")
 
         # Create child thread
-        child_id = memory.create_thread(
-            workflow_name="child_workflow",
-            parent_thread_id=parent_id
-        )
+        child_id = memory.create_thread(workflow_name="child_workflow", parent_thread_id=parent_id)
 
         # Verify relationship
         child_thread = memory.get_thread(child_id)
@@ -117,11 +111,7 @@ class TestConversationMemory:
         thread_id = memory.create_thread(workflow_name="test_workflow")
 
         # Add user message
-        memory.add_message(
-            thread_id=thread_id,
-            role="user",
-            content="Test question"
-        )
+        memory.add_message(thread_id=thread_id, role="user", content="Test question")
 
         # Retrieve thread and verify message
         thread = memory.get_thread(thread_id)
@@ -161,7 +151,7 @@ class TestConversationMemory:
             workflow_name="consensus",
             model_provider="cli",
             model_name="claude-3-opus",
-            metadata={"tokens": 450, "latency_ms": 1200}
+            metadata={"tokens": 450, "latency_ms": 1200},
         )
 
         # Verify metadata preserved
@@ -211,8 +201,7 @@ class TestConversationMemory:
     def test_thread_context_window_management(self, tmp_path):
         """Test that thread respects max_messages limit."""
         memory = ConversationMemory(
-            conversations_dir=tmp_path,
-            max_messages=3  # Low limit for testing
+            conversations_dir=tmp_path, max_messages=3  # Low limit for testing
         )
         thread_id = memory.create_thread(workflow_name="test")
 
@@ -233,11 +222,8 @@ class TestConversationMemory:
             workflow_name="test",
             initial_context={
                 "prompt": "Test",
-                "state": {
-                    "current_step": 2,
-                    "models_consulted": ["claude", "gpt-5"]
-                }
-            }
+                "state": {"current_step": 2, "models_consulted": ["claude", "gpt-5"]},
+            },
         )
 
         # Retrieve and verify context

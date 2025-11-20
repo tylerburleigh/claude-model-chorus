@@ -134,29 +134,20 @@ def mock_brainstorming_result():
             step_number=1,
             content="Practical ideas: Gamification system with points and badges. Progress tracking dashboard.",
             model="test-model",
-            metadata={
-                "perspective": "practical",
-                "tokens": 100
-            }
+            metadata={"perspective": "practical", "tokens": 100},
         ),
         WorkflowStep(
             step_number=2,
             content="Innovative ideas: AI-powered personalized onboarding. Machine learning recommendation engine.",
             model="test-model",
-            metadata={
-                "perspective": "innovative",
-                "tokens": 120
-            }
+            metadata={"perspective": "innovative", "tokens": 120},
         ),
         WorkflowStep(
             step_number=3,
             content="User-focused ideas: Interactive tutorials. Community forums for peer support.",
             model="test-model",
-            metadata={
-                "perspective": "user-focused",
-                "tokens": 90
-            }
-        )
+            metadata={"perspective": "user-focused", "tokens": 90},
+        ),
     ]
 
     return WorkflowResult(
@@ -164,12 +155,12 @@ def mock_brainstorming_result():
         synthesis="Combined brainstorming from all perspectives",
         steps=steps,
         metadata={
-            'workflow': 'ideate-parallel',
-            'perspectives': ['practical', 'innovative', 'user-focused'],
-            'models_used': ['test-model', 'test-model', 'test-model'],
-            'pattern': 'parallel',
-            'total_ideas': 3
-        }
+            "workflow": "ideate-parallel",
+            "perspectives": ["practical", "innovative", "user-focused"],
+            "models_used": ["test-model", "test-model", "test-model"],
+            "pattern": "parallel",
+            "total_ideas": 3,
+        },
     )
 
 
@@ -203,9 +194,7 @@ class TestConvergentAnalysis:
 
     @pytest.mark.asyncio
     async def test_convergent_analysis_with_brainstorming_result(
-        self,
-        ideate_workflow,
-        mock_brainstorming_result
+        self, ideate_workflow, mock_brainstorming_result
     ):
         """Test convergent analysis with mock brainstorming result."""
         result = await ideate_workflow.run_convergent_analysis(
@@ -220,52 +209,38 @@ class TestConvergentAnalysis:
         assert result.steps[2].content is not None
 
     @pytest.mark.asyncio
-    async def test_convergent_analysis_metadata(
-        self,
-        ideate_workflow,
-        mock_brainstorming_result
-    ):
+    async def test_convergent_analysis_metadata(self, ideate_workflow, mock_brainstorming_result):
         """Test that convergent analysis includes proper metadata."""
         result = await ideate_workflow.run_convergent_analysis(
             brainstorming_result=mock_brainstorming_result,
-            scoring_criteria=['feasibility', 'impact', 'novelty']
+            scoring_criteria=["feasibility", "impact", "novelty"],
         )
 
-        assert 'workflow' in result.metadata
-        assert result.metadata['workflow'] == 'ideate-convergent'
-        assert 'scoring_criteria' in result.metadata
-        assert result.metadata['scoring_criteria'] == ['feasibility', 'impact', 'novelty']
+        assert "workflow" in result.metadata
+        assert result.metadata["workflow"] == "ideate-convergent"
+        assert "scoring_criteria" in result.metadata
+        assert result.metadata["scoring_criteria"] == ["feasibility", "impact", "novelty"]
 
     @pytest.mark.asyncio
     async def test_convergent_analysis_raises_error_on_empty_result(self, ideate_workflow):
         """Test that convergent analysis raises error with no steps."""
-        empty_result = WorkflowResult(
-            success=True,
-            synthesis="Empty",
-            steps=[],
-            metadata={}
-        )
+        empty_result = WorkflowResult(success=True, synthesis="Empty", steps=[], metadata={})
 
         with pytest.raises(ValueError, match="Brainstorming result must have steps"):
-            await ideate_workflow.run_convergent_analysis(
-                brainstorming_result=empty_result
-            )
+            await ideate_workflow.run_convergent_analysis(brainstorming_result=empty_result)
 
     @pytest.mark.asyncio
     async def test_convergent_analysis_custom_criteria(
-        self,
-        ideate_workflow,
-        mock_brainstorming_result
+        self, ideate_workflow, mock_brainstorming_result
     ):
         """Test convergent analysis with custom scoring criteria."""
-        custom_criteria = ['feasibility', 'impact', 'user_value']
+        custom_criteria = ["feasibility", "impact", "user_value"]
 
         result = await ideate_workflow.run_convergent_analysis(
-            brainstorming_result=mock_brainstorming_result,
-            scoring_criteria=custom_criteria
+            brainstorming_result=mock_brainstorming_result, scoring_criteria=custom_criteria
         )
 
-        assert result.metadata['scoring_criteria'] == custom_criteria
+        assert result.metadata["scoring_criteria"] == custom_criteria
 
 
 class TestIdeaExtraction:
@@ -273,9 +248,7 @@ class TestIdeaExtraction:
 
     @pytest.mark.asyncio
     async def test_extract_ideas_from_brainstorming(
-        self,
-        ideate_workflow,
-        mock_brainstorming_result
+        self, ideate_workflow, mock_brainstorming_result
     ):
         """Test idea extraction returns WorkflowStep with ideas."""
         extraction_step = await ideate_workflow._extract_ideas(
@@ -283,28 +256,26 @@ class TestIdeaExtraction:
         )
 
         assert extraction_step.content is not None
-        assert 'extracted_ideas' in extraction_step.metadata
-        assert 'num_ideas' in extraction_step.metadata
-        ideas = extraction_step.metadata['extracted_ideas']
+        assert "extracted_ideas" in extraction_step.metadata
+        assert "num_ideas" in extraction_step.metadata
+        ideas = extraction_step.metadata["extracted_ideas"]
         assert len(ideas) > 0
-        assert all('id' in idea for idea in ideas)
-        assert all('label' in idea for idea in ideas)
-        assert all('description' in idea for idea in ideas)
+        assert all("id" in idea for idea in ideas)
+        assert all("label" in idea for idea in ideas)
+        assert all("description" in idea for idea in ideas)
 
     @pytest.mark.asyncio
     async def test_extract_ideas_preserves_perspectives(
-        self,
-        ideate_workflow,
-        mock_brainstorming_result
+        self, ideate_workflow, mock_brainstorming_result
     ):
         """Test that idea extraction preserves perspective information."""
         extraction_step = await ideate_workflow._extract_ideas(
             brainstorming_result=mock_brainstorming_result
         )
 
-        ideas = extraction_step.metadata['extracted_ideas']
+        ideas = extraction_step.metadata["extracted_ideas"]
         # Check that ideas have perspective information
-        assert all('perspective' in idea for idea in ideas)
+        assert all("perspective" in idea for idea in ideas)
 
 
 class TestIdeaClustering:
@@ -319,19 +290,17 @@ class TestIdeaClustering:
         )
 
         # Then cluster them
-        clustering_step = await ideate_workflow._cluster_ideas(
-            extraction_step=extraction_step
-        )
+        clustering_step = await ideate_workflow._cluster_ideas(extraction_step=extraction_step)
 
         assert clustering_step.content is not None
-        assert 'clusters' in clustering_step.metadata
-        assert 'num_clusters' in clustering_step.metadata
+        assert "clusters" in clustering_step.metadata
+        assert "num_clusters" in clustering_step.metadata
 
-        clusters = clustering_step.metadata['clusters']
+        clusters = clustering_step.metadata["clusters"]
         assert len(clusters) > 0
-        assert all('id' in cluster for cluster in clusters)
-        assert all('theme' in cluster for cluster in clusters)
-        assert all('ideas' in cluster for cluster in clusters)
+        assert all("id" in cluster for cluster in clusters)
+        assert all("theme" in cluster for cluster in clusters)
+        assert all("ideas" in cluster for cluster in clusters)
 
 
 class TestIdeaScoring:
@@ -344,26 +313,23 @@ class TestIdeaScoring:
         extraction_step = await ideate_workflow._extract_ideas(
             brainstorming_result=mock_brainstorming_result
         )
-        clustering_step = await ideate_workflow._cluster_ideas(
-            extraction_step=extraction_step
-        )
+        clustering_step = await ideate_workflow._cluster_ideas(extraction_step=extraction_step)
 
         # Score the clusters
         scoring_step = await ideate_workflow._score_ideas(
-            clustering_step=clustering_step,
-            scoring_criteria=['feasibility', 'impact', 'novelty']
+            clustering_step=clustering_step, scoring_criteria=["feasibility", "impact", "novelty"]
         )
 
         assert scoring_step.content is not None
-        assert 'scored_clusters' in scoring_step.metadata
-        assert 'scoring_criteria' in scoring_step.metadata
+        assert "scored_clusters" in scoring_step.metadata
+        assert "scoring_criteria" in scoring_step.metadata
 
-        scored_clusters = scoring_step.metadata['scored_clusters']
+        scored_clusters = scoring_step.metadata["scored_clusters"]
         # Check structure of scored clusters if present
         assert isinstance(scored_clusters, list)
         if len(scored_clusters) > 0:
-            assert all('overall_score' in cluster for cluster in scored_clusters)
-            assert all('recommendation' in cluster for cluster in scored_clusters)
+            assert all("overall_score" in cluster for cluster in scored_clusters)
+            assert all("recommendation" in cluster for cluster in scored_clusters)
 
 
 class TestCompleteIdeation:
@@ -375,22 +341,17 @@ class TestCompleteIdeation:
         workflow = IdeateWorkflow(provider=mock_provider)
 
         # Create provider map with multiple providers for parallel brainstorming
-        provider_map = {
-            "model1": mock_provider,
-            "model2": mock_provider,
-            "model3": mock_provider
-        }
+        provider_map = {"model1": mock_provider, "model2": mock_provider, "model3": mock_provider}
 
         result = await workflow.run_complete_ideation(
-            prompt="How can we improve user onboarding?",
-            provider_map=provider_map
+            prompt="How can we improve user onboarding?", provider_map=provider_map
         )
 
         assert result.success is True
-        assert 'workflow' in result.metadata
-        assert result.metadata['workflow'] == 'ideate-complete'
-        assert 'divergent_phase' in result.metadata
-        assert 'convergent_phase' in result.metadata
+        assert "workflow" in result.metadata
+        assert result.metadata["workflow"] == "ideate-complete"
+        assert "divergent_phase" in result.metadata
+        assert "convergent_phase" in result.metadata
 
         # Check that steps include both divergent and convergent phases
         # Divergent: 3 perspectives
@@ -402,21 +363,18 @@ class TestCompleteIdeation:
         """Test complete ideation with custom perspectives and criteria."""
         workflow = IdeateWorkflow(provider=mock_provider)
 
-        provider_map = {
-            "model1": mock_provider,
-            "model2": mock_provider
-        }
+        provider_map = {"model1": mock_provider, "model2": mock_provider}
 
-        custom_perspectives = ['technical', 'business']
-        custom_criteria = ['feasibility', 'impact', 'effort']
+        custom_perspectives = ["technical", "business"]
+        custom_criteria = ["feasibility", "impact", "effort"]
 
         result = await workflow.run_complete_ideation(
             prompt="How should we architect our microservices?",
             provider_map=provider_map,
             perspectives=custom_perspectives,
-            scoring_criteria=custom_criteria
+            scoring_criteria=custom_criteria,
         )
 
         assert result.success is True
-        assert result.metadata['perspectives'] == custom_perspectives
-        assert result.metadata['scoring_criteria'] == custom_criteria
+        assert result.metadata["perspectives"] == custom_perspectives
+        assert result.metadata["scoring_criteria"] == custom_criteria

@@ -54,7 +54,7 @@ Provide critiques in a clear, constructive format with specific concerns."""
             name="Critic",
             prompt_template=prompt_template,
             temperature=temperature,
-            max_tokens=max_tokens
+            max_tokens=max_tokens,
         )
 
     def invoke(self, context: Dict[str, Any]) -> PersonaResponse:
@@ -114,8 +114,8 @@ Provide critiques in a clear, constructive format with specific concerns."""
                 "persona": self.name,
                 "phase": phase,
                 "approach": "critical_analysis",
-                "findings_reviewed": len(existing_findings)
-            }
+                "findings_reviewed": len(existing_findings),
+            },
         )
 
 

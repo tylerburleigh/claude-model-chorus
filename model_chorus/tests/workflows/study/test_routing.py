@@ -33,7 +33,7 @@ class TestRoutingSkillInvocation:
             current_phase="discovery",
             confidence="medium",
             findings=[],
-            personas_active=[]
+            personas_active=[],
         )
 
         # Execute: Route to next persona
@@ -42,8 +42,10 @@ class TestRoutingSkillInvocation:
         # Verify: Decision is valid RoutingDecision
         assert isinstance(decision, RoutingDecision), "Should return RoutingDecision"
         assert decision.persona is not None, "Should select a persona for discovery phase"
-        assert decision.persona_name in ["Researcher", "Critic"], \
-            f"Discovery should select Researcher or Critic, got {decision.persona_name}"
+        assert decision.persona_name in [
+            "Researcher",
+            "Critic",
+        ], f"Discovery should select Researcher or Critic, got {decision.persona_name}"
 
         # Verify: Decision has required fields
         assert decision.reasoning, "Should include reasoning"
@@ -65,8 +67,9 @@ class TestRoutingSkillInvocation:
         assert decision.metadata["phase"] == "discovery"
 
         # Verify: No fallback was used (normal routing)
-        assert decision.metadata.get("fallback_used") is not True, \
-            "Normal routing should not use fallback"
+        assert (
+            decision.metadata.get("fallback_used") is not True
+        ), "Normal routing should not use fallback"
 
     def test_routing_different_phases(self):
         """Test routing for different investigation phases."""
@@ -88,13 +91,14 @@ class TestRoutingSkillInvocation:
                 current_phase=phase,
                 confidence="medium",
                 findings=[],
-                personas_active=[]
+                personas_active=[],
             )
 
             decision = router.route_next_persona(state)
 
-            assert decision.persona_name in expected_personas, \
-                f"Phase {phase} should select from {expected_personas}, got {decision.persona_name}"
+            assert (
+                decision.persona_name in expected_personas
+            ), f"Phase {phase} should select from {expected_personas}, got {decision.persona_name}"
 
     def test_routing_with_findings(self):
         """Test routing behavior when findings are present."""
@@ -113,17 +117,18 @@ class TestRoutingSkillInvocation:
                     "persona": "Researcher",
                     "finding": "Test finding 1",
                     "evidence": [],
-                    "confidence": "high"
+                    "confidence": "high",
                 }
             ],
-            personas_active=["Researcher"]
+            personas_active=["Researcher"],
         )
 
         decision = router.route_next_persona(state)
 
         # With Researcher as prior persona and findings, should get Critic
-        assert decision.persona_name == "Critic", \
-            "After Researcher with findings, should select Critic to challenge assumptions"
+        assert (
+            decision.persona_name == "Critic"
+        ), "After Researcher with findings, should select Critic to challenge assumptions"
 
     def test_routing_complete_phase(self):
         """Test routing when investigation is complete."""
@@ -138,7 +143,7 @@ class TestRoutingSkillInvocation:
             current_phase="complete",
             confidence="high",
             findings=[],
-            personas_active=[]
+            personas_active=[],
         )
 
         decision = router.route_next_persona(state)
@@ -163,28 +168,32 @@ class TestFallbackRouting:
             current_phase="discovery",
             confidence="medium",
             findings=[],
-            personas_active=[]
+            personas_active=[],
         )
 
         # Mock analyze_context to raise exception
-        with patch('model_chorus.workflows.study.persona_router.analyze_context') as mock_analyze:
+        with patch("model_chorus.workflows.study.persona_router.analyze_context") as mock_analyze:
             mock_analyze.side_effect = RuntimeError("Simulated skill failure")
 
             decision = router.route_next_persona(state)
 
             # Verify fallback activated
             assert decision.persona is not None, "Fallback should return a persona"
-            assert decision.persona_name == "Researcher", \
-                "Discovery phase should fallback to Researcher"
+            assert (
+                decision.persona_name == "Researcher"
+            ), "Discovery phase should fallback to Researcher"
 
-            assert "Fallback routing" in decision.reasoning, \
-                "Reasoning should indicate fallback was used"
+            assert (
+                "Fallback routing" in decision.reasoning
+            ), "Reasoning should indicate fallback was used"
 
-            assert decision.metadata.get("fallback_used") is True, \
-                "Metadata should indicate fallback"
+            assert (
+                decision.metadata.get("fallback_used") is True
+            ), "Metadata should indicate fallback"
 
-            assert "RuntimeError" in decision.metadata.get("original_error_type", ""), \
-                "Metadata should include error type"
+            assert "RuntimeError" in decision.metadata.get(
+                "original_error_type", ""
+            ), "Metadata should include error type"
 
     def test_fallback_for_all_phases(self):
         """Test fallback routing for all investigation phases."""
@@ -197,7 +206,7 @@ class TestFallbackRouting:
             "planning": "Planner",
         }
 
-        with patch('model_chorus.workflows.study.persona_router.analyze_context') as mock_analyze:
+        with patch("model_chorus.workflows.study.persona_router.analyze_context") as mock_analyze:
             mock_analyze.side_effect = Exception("Simulated failure")
 
             for phase, expected_persona in fallback_map.items():
@@ -208,13 +217,14 @@ class TestFallbackRouting:
                     current_phase=phase,
                     confidence="medium",
                     findings=[],
-                    personas_active=[]
+                    personas_active=[],
                 )
 
                 decision = router.route_next_persona(state)
 
-                assert decision.persona_name == expected_persona, \
-                    f"Phase {phase} should fallback to {expected_persona}"
+                assert (
+                    decision.persona_name == expected_persona
+                ), f"Phase {phase} should fallback to {expected_persona}"
 
                 assert decision.metadata.get("fallback_used") is True
 
@@ -230,20 +240,20 @@ class TestFallbackRouting:
             current_phase="discovery",
             confidence="medium",
             findings=[],
-            personas_active=[]
+            personas_active=[],
         )
 
-        with patch('model_chorus.workflows.study.persona_router.analyze_context') as mock_analyze:
+        with patch("model_chorus.workflows.study.persona_router.analyze_context") as mock_analyze:
             mock_analyze.side_effect = Exception("Failure")
 
             decision = router.route_next_persona(state)
 
             # Verify guidance is present and valid
             assert len(decision.guidance) > 0, "Fallback should provide guidance"
-            assert all(isinstance(g, str) for g in decision.guidance), \
-                "All guidance items should be strings"
-            assert all(len(g) > 5 for g in decision.guidance), \
-                "Guidance should be descriptive"
+            assert all(
+                isinstance(g, str) for g in decision.guidance
+            ), "All guidance items should be strings"
+            assert all(len(g) > 5 for g in decision.guidance), "Guidance should be descriptive"
 
 
 class TestRoutingHistory:
@@ -261,7 +271,7 @@ class TestRoutingHistory:
             current_phase="discovery",
             confidence="medium",
             findings=[],
-            personas_active=[]
+            personas_active=[],
         )
 
         # Make routing decision
@@ -289,7 +299,7 @@ class TestRoutingHistory:
                 current_phase="discovery",
                 confidence="medium",
                 findings=[],
-                personas_active=[]
+                personas_active=[],
             )
             router.route_next_persona(state)
 
@@ -312,7 +322,7 @@ class TestRoutingHistory:
                 current_phase="discovery",
                 confidence="medium",
                 findings=[],
-                personas_active=[]
+                personas_active=[],
             )
             router.route_next_persona(state)
 
@@ -336,11 +346,13 @@ class TestStudyWorkflowIntegration:
             workflow = StudyWorkflow(provider)
 
             # Verify router is initialized
-            assert hasattr(workflow, 'persona_router'), \
-                "StudyWorkflow should have persona_router attribute"
+            assert hasattr(
+                workflow, "persona_router"
+            ), "StudyWorkflow should have persona_router attribute"
 
-            assert isinstance(workflow.persona_router, PersonaRouter), \
-                "persona_router should be PersonaRouter instance"
+            assert isinstance(
+                workflow.persona_router, PersonaRouter
+            ), "persona_router should be PersonaRouter instance"
 
             # Verify router has personas
             personas = workflow.persona_router.get_available_personas()
@@ -363,8 +375,9 @@ class TestStudyWorkflowIntegration:
             workflow = StudyWorkflow(provider)
 
             # Verify get_routing_history method exists
-            assert hasattr(workflow, 'get_routing_history'), \
-                "StudyWorkflow should have get_routing_history method"
+            assert hasattr(
+                workflow, "get_routing_history"
+            ), "StudyWorkflow should have get_routing_history method"
 
             # Call should work (even if empty)
             history = workflow.get_routing_history()

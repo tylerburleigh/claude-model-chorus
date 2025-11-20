@@ -30,6 +30,7 @@ from model_chorus.core.role_orchestration import (
 @dataclass
 class MockGenerationRequest:
     """Mock GenerationRequest for testing."""
+
     prompt: str
     system_prompt: Optional[str] = None
     temperature: Optional[float] = None
@@ -39,6 +40,7 @@ class MockGenerationRequest:
 @dataclass
 class MockGenerationResponse:
     """Mock GenerationResponse for testing."""
+
     content: str
     model: str
     usage: Dict[str, int] = None
@@ -51,7 +53,12 @@ class MockGenerationResponse:
 class MockProvider:
     """Mock provider for testing orchestration."""
 
-    def __init__(self, model_name: str = "mock-model", fail: bool = False, response_content: Optional[str] = None):
+    def __init__(
+        self,
+        model_name: str = "mock-model",
+        fail: bool = False,
+        response_content: Optional[str] = None,
+    ):
         """
         Initialize mock provider.
 
@@ -367,7 +374,7 @@ class TestRoleOrchestrator:
     async def test_execute_sequential_success(self, simple_roles, simple_providers):
         """Test successful sequential execution."""
         # Patch GenerationRequest import
-        with patch('model_chorus.providers.GenerationRequest', MockGenerationRequest):
+        with patch("model_chorus.providers.GenerationRequest", MockGenerationRequest):
             orchestrator = RoleOrchestrator(
                 simple_roles,
                 simple_providers,
@@ -395,7 +402,7 @@ class TestRoleOrchestrator:
     @pytest.mark.asyncio
     async def test_execute_sequential_with_context(self, simple_roles, simple_providers):
         """Test sequential execution with context."""
-        with patch('model_chorus.providers.GenerationRequest', MockGenerationRequest):
+        with patch("model_chorus.providers.GenerationRequest", MockGenerationRequest):
             orchestrator = RoleOrchestrator(simple_roles, simple_providers)
 
             result = await orchestrator.execute(
@@ -416,7 +423,7 @@ class TestRoleOrchestrator:
             "gemini": MockProvider("gemini", fail=True),
         }
 
-        with patch('model_chorus.providers.GenerationRequest', MockGenerationRequest):
+        with patch("model_chorus.providers.GenerationRequest", MockGenerationRequest):
             orchestrator = RoleOrchestrator(simple_roles, providers)
 
             result = await orchestrator.execute("Test prompt")
@@ -433,7 +440,7 @@ class TestRoleOrchestrator:
     @pytest.mark.asyncio
     async def test_execute_parallel_success(self, simple_roles, simple_providers):
         """Test successful parallel execution."""
-        with patch('model_chorus.providers.GenerationRequest', MockGenerationRequest):
+        with patch("model_chorus.providers.GenerationRequest", MockGenerationRequest):
             orchestrator = RoleOrchestrator(
                 simple_roles,
                 simple_providers,
@@ -464,7 +471,7 @@ class TestRoleOrchestrator:
             "gemini": MockProvider("gemini", fail=True),
         }
 
-        with patch('model_chorus.providers.GenerationRequest', MockGenerationRequest):
+        with patch("model_chorus.providers.GenerationRequest", MockGenerationRequest):
             orchestrator = RoleOrchestrator(
                 simple_roles,
                 providers,
@@ -489,7 +496,7 @@ class TestRoleOrchestrator:
             ModelRole(role="role3", model="gpt-5"),
         ]
 
-        with patch('model_chorus.providers.GenerationRequest', MockGenerationRequest):
+        with patch("model_chorus.providers.GenerationRequest", MockGenerationRequest):
             orchestrator = RoleOrchestrator(
                 roles,
                 simple_providers,
@@ -507,7 +514,7 @@ class TestRoleOrchestrator:
     @pytest.mark.asyncio
     async def test_synthesize_none_strategy(self, simple_roles, simple_providers):
         """Test synthesis with NONE strategy."""
-        with patch('model_chorus.providers.GenerationRequest', MockGenerationRequest):
+        with patch("model_chorus.providers.GenerationRequest", MockGenerationRequest):
             orchestrator = RoleOrchestrator(simple_roles, simple_providers)
 
             result = await orchestrator.execute("Test prompt")
@@ -519,7 +526,7 @@ class TestRoleOrchestrator:
     @pytest.mark.asyncio
     async def test_synthesize_concatenate_strategy(self, simple_roles, simple_providers):
         """Test synthesis with CONCATENATE strategy."""
-        with patch('model_chorus.providers.GenerationRequest', MockGenerationRequest):
+        with patch("model_chorus.providers.GenerationRequest", MockGenerationRequest):
             orchestrator = RoleOrchestrator(simple_roles, simple_providers)
 
             result = await orchestrator.execute("Test prompt")
@@ -535,7 +542,7 @@ class TestRoleOrchestrator:
     @pytest.mark.asyncio
     async def test_synthesize_structured_strategy(self, simple_roles, simple_providers):
         """Test synthesis with STRUCTURED strategy."""
-        with patch('model_chorus.providers.GenerationRequest', MockGenerationRequest):
+        with patch("model_chorus.providers.GenerationRequest", MockGenerationRequest):
             orchestrator = RoleOrchestrator(simple_roles, simple_providers)
 
             result = await orchestrator.execute("Test prompt")
@@ -552,7 +559,7 @@ class TestRoleOrchestrator:
     @pytest.mark.asyncio
     async def test_synthesize_ai_strategy_default_provider(self, simple_roles, simple_providers):
         """Test synthesis with AI_SYNTHESIZE strategy using default provider."""
-        with patch('model_chorus.providers.GenerationRequest', MockGenerationRequest):
+        with patch("model_chorus.providers.GenerationRequest", MockGenerationRequest):
             orchestrator = RoleOrchestrator(simple_roles, simple_providers)
 
             result = await orchestrator.execute("Test prompt")
@@ -568,7 +575,7 @@ class TestRoleOrchestrator:
         """Test synthesis with AI_SYNTHESIZE strategy using custom provider."""
         synthesis_provider = MockProvider("synthesis-model", response_content="Synthesized result")
 
-        with patch('model_chorus.providers.GenerationRequest', MockGenerationRequest):
+        with patch("model_chorus.providers.GenerationRequest", MockGenerationRequest):
             orchestrator = RoleOrchestrator(simple_roles, simple_providers)
 
             result = await orchestrator.execute("Test prompt")
@@ -584,7 +591,7 @@ class TestRoleOrchestrator:
     @pytest.mark.asyncio
     async def test_synthesize_ai_strategy_custom_prompt(self, simple_roles, simple_providers):
         """Test synthesis with AI_SYNTHESIZE strategy using custom prompt."""
-        with patch('model_chorus.providers.GenerationRequest', MockGenerationRequest):
+        with patch("model_chorus.providers.GenerationRequest", MockGenerationRequest):
             orchestrator = RoleOrchestrator(simple_roles, simple_providers)
 
             result = await orchestrator.execute("Test prompt")
@@ -608,7 +615,7 @@ class TestRoleOrchestrator:
             "gemini": MockProvider("gemini"),
         }
 
-        with patch('model_chorus.providers.GenerationRequest', MockGenerationRequest):
+        with patch("model_chorus.providers.GenerationRequest", MockGenerationRequest):
             # First execute successfully
             orchestrator = RoleOrchestrator(simple_roles, providers)
             providers["gpt-5"].fail = False  # Allow initial execution to succeed
@@ -626,7 +633,7 @@ class TestRoleOrchestrator:
     @pytest.mark.asyncio
     async def test_synthesize_ai_strategy_no_responses(self, simple_roles, simple_providers):
         """Test synthesis with AI_SYNTHESIZE fails when no responses available."""
-        with patch('model_chorus.providers.GenerationRequest', MockGenerationRequest):
+        with patch("model_chorus.providers.GenerationRequest", MockGenerationRequest):
             orchestrator = RoleOrchestrator(simple_roles, simple_providers)
 
             # Create empty result
@@ -638,7 +645,7 @@ class TestRoleOrchestrator:
     @pytest.mark.asyncio
     async def test_synthesize_unknown_strategy(self, simple_roles, simple_providers):
         """Test synthesis with unknown strategy raises error."""
-        with patch('model_chorus.providers.GenerationRequest', MockGenerationRequest):
+        with patch("model_chorus.providers.GenerationRequest", MockGenerationRequest):
             orchestrator = RoleOrchestrator(simple_roles, simple_providers)
 
             result = await orchestrator.execute("Test prompt")
@@ -670,7 +677,7 @@ class TestRoleOrchestrator:
             ),
         ]
 
-        with patch('model_chorus.providers.GenerationRequest', MockGenerationRequest):
+        with patch("model_chorus.providers.GenerationRequest", MockGenerationRequest):
             orchestrator = RoleOrchestrator(roles, simple_providers)
 
             result = await orchestrator.execute("Should we adopt this?")

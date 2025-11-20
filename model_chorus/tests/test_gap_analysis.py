@@ -33,7 +33,7 @@ class TestGapModel:
             description="Lacks empirical evidence",
             recommendation="Add peer-reviewed citations",
             confidence=0.85,
-            metadata={"test": "value"}
+            metadata={"test": "value"},
         )
 
         assert gap.gap_id == "gap-001"
@@ -51,7 +51,7 @@ class TestGapModel:
             claim_text="Test claim",
             description="Test description",
             recommendation="Test recommendation",
-            confidence=0.5
+            confidence=0.5,
         )
         assert gap.confidence == 0.5
 
@@ -68,7 +68,7 @@ class TestGapModel:
                 claim_text="Test claim",
                 description="Test description",
                 recommendation="Test recommendation",
-                confidence=1.5
+                confidence=1.5,
             )
 
     def test_confidence_validation_too_low(self):
@@ -84,7 +84,7 @@ class TestGapModel:
                 claim_text="Test claim",
                 description="Test description",
                 recommendation="Test recommendation",
-                confidence=-0.5
+                confidence=-0.5,
             )
 
 
@@ -94,9 +94,7 @@ class TestSeverityAssessment:
     def test_evidence_gap_critical_no_citations(self):
         """Test CRITICAL severity for evidence gap with no citations."""
         severity = assess_gap_severity(
-            gap_type=GapType.EVIDENCE,
-            citation_count=0,
-            expected_citations=2
+            gap_type=GapType.EVIDENCE, citation_count=0, expected_citations=2
         )
 
         assert severity == GapSeverity.CRITICAL
@@ -104,9 +102,7 @@ class TestSeverityAssessment:
     def test_evidence_gap_major_no_citations_low_expectation(self):
         """Test MAJOR severity for evidence gap with no citations but low expectation."""
         severity = assess_gap_severity(
-            gap_type=GapType.EVIDENCE,
-            citation_count=0,
-            expected_citations=1
+            gap_type=GapType.EVIDENCE, citation_count=0, expected_citations=1
         )
 
         assert severity == GapSeverity.MAJOR
@@ -114,28 +110,20 @@ class TestSeverityAssessment:
     def test_evidence_gap_moderate_insufficient_citations(self):
         """Test MODERATE severity for insufficient citations."""
         severity = assess_gap_severity(
-            gap_type=GapType.EVIDENCE,
-            citation_count=1,
-            expected_citations=2
+            gap_type=GapType.EVIDENCE, citation_count=1, expected_citations=2
         )
 
         assert severity == GapSeverity.MODERATE
 
     def test_logical_gap_major_no_support(self):
         """Test MAJOR severity for logical gap without support."""
-        severity = assess_gap_severity(
-            gap_type=GapType.LOGICAL,
-            has_supporting_logic=False
-        )
+        severity = assess_gap_severity(gap_type=GapType.LOGICAL, has_supporting_logic=False)
 
         assert severity == GapSeverity.MAJOR
 
     def test_logical_gap_moderate_with_support(self):
         """Test MODERATE severity for logical gap with some support."""
-        severity = assess_gap_severity(
-            gap_type=GapType.LOGICAL,
-            has_supporting_logic=True
-        )
+        severity = assess_gap_severity(gap_type=GapType.LOGICAL, has_supporting_logic=True)
 
         assert severity == GapSeverity.MODERATE
 
@@ -147,19 +135,13 @@ class TestSeverityAssessment:
 
     def test_assumption_gap_moderate_no_logic(self):
         """Test MODERATE severity for assumption gap without logic."""
-        severity = assess_gap_severity(
-            gap_type=GapType.ASSUMPTION,
-            has_supporting_logic=False
-        )
+        severity = assess_gap_severity(gap_type=GapType.ASSUMPTION, has_supporting_logic=False)
 
         assert severity == GapSeverity.MODERATE
 
     def test_assumption_gap_minor_with_logic(self):
         """Test MINOR severity for assumption gap with logic."""
-        severity = assess_gap_severity(
-            gap_type=GapType.ASSUMPTION,
-            has_supporting_logic=True
-        )
+        severity = assess_gap_severity(gap_type=GapType.ASSUMPTION, has_supporting_logic=True)
 
         assert severity == GapSeverity.MINOR
 
@@ -170,9 +152,7 @@ class TestGapRecommendations:
     def test_evidence_recommendation_critical(self):
         """Test recommendation for CRITICAL evidence gap."""
         rec = generate_gap_recommendation(
-            GapType.EVIDENCE,
-            GapSeverity.CRITICAL,
-            "AI improves accuracy"
+            GapType.EVIDENCE, GapSeverity.CRITICAL, "AI improves accuracy"
         )
 
         assert "empirical evidence" in rec.lower()
@@ -181,40 +161,26 @@ class TestGapRecommendations:
     def test_evidence_recommendation_minor(self):
         """Test recommendation for MINOR evidence gap."""
         rec = generate_gap_recommendation(
-            GapType.EVIDENCE,
-            GapSeverity.MINOR,
-            "AI improves accuracy"
+            GapType.EVIDENCE, GapSeverity.MINOR, "AI improves accuracy"
         )
 
         assert "additional citations" in rec.lower()
 
     def test_logical_recommendation(self):
         """Test recommendation for logical gap."""
-        rec = generate_gap_recommendation(
-            GapType.LOGICAL,
-            GapSeverity.MAJOR,
-            "Therefore X is true"
-        )
+        rec = generate_gap_recommendation(GapType.LOGICAL, GapSeverity.MAJOR, "Therefore X is true")
 
         assert "logical connection" in rec.lower() or "reasoning" in rec.lower()
 
     def test_support_recommendation(self):
         """Test recommendation for support gap."""
-        rec = generate_gap_recommendation(
-            GapType.SUPPORT,
-            GapSeverity.MODERATE,
-            "Main claim"
-        )
+        rec = generate_gap_recommendation(GapType.SUPPORT, GapSeverity.MODERATE, "Main claim")
 
         assert "supporting arguments" in rec.lower() or "sub-claims" in rec.lower()
 
     def test_assumption_recommendation(self):
         """Test recommendation for assumption gap."""
-        rec = generate_gap_recommendation(
-            GapType.ASSUMPTION,
-            GapSeverity.MODERATE,
-            "X leads to Y"
-        )
+        rec = generate_gap_recommendation(GapType.ASSUMPTION, GapSeverity.MODERATE, "X leads to Y")
 
         assert "assumption" in rec.lower() or "premises" in rec.lower()
 
@@ -228,7 +194,7 @@ class TestMissingEvidenceDetection:
             claim_id="claim-1",
             claim_text="AI reduces diagnostic errors by 40%",
             citations=[],
-            expected_citation_count=1
+            expected_citation_count=1,
         )
 
         assert gap is not None
@@ -243,7 +209,7 @@ class TestMissingEvidenceDetection:
             claim_id="claim-2",
             claim_text="Multiple studies show benefits",
             citations=["citation-1"],
-            expected_citation_count=3
+            expected_citation_count=3,
         )
 
         assert gap is not None
@@ -256,7 +222,7 @@ class TestMissingEvidenceDetection:
             claim_id="claim-3",
             claim_text="Research demonstrates X",
             citations=["citation-1", "citation-2"],
-            expected_citation_count=2
+            expected_citation_count=2,
         )
 
         assert gap is None
@@ -264,10 +230,7 @@ class TestMissingEvidenceDetection:
     def test_evidence_gap_metadata(self):
         """Test that evidence gap includes proper metadata."""
         gap = detect_missing_evidence(
-            claim_id="claim-4",
-            claim_text="Test claim",
-            citations=[],
-            expected_citation_count=2
+            claim_id="claim-4", claim_text="Test claim", citations=[], expected_citation_count=2
         )
 
         assert gap is not None
@@ -285,7 +248,7 @@ class TestLogicalGapDetection:
         gap = detect_logical_gaps(
             claim_id="claim-1",
             claim_text="Therefore, we should implement universal healthcare",
-            supporting_claims=[]
+            supporting_claims=[],
         )
 
         assert gap is not None
@@ -298,7 +261,7 @@ class TestLogicalGapDetection:
         gap = detect_logical_gaps(
             claim_id="claim-2",
             claim_text="Thus, the policy would be effective",
-            supporting_claims=["All citizens benefit", "Cost is manageable"]
+            supporting_claims=["All citizens benefit", "Cost is manageable"],
         )
 
         assert gap is None
@@ -308,7 +271,7 @@ class TestLogicalGapDetection:
         gap = detect_logical_gaps(
             claim_id="claim-3",
             claim_text="The system processes data efficiently",
-            supporting_claims=[]
+            supporting_claims=[],
         )
 
         assert gap is None
@@ -325,11 +288,7 @@ class TestLogicalGapDetection:
         ]
 
         for claim_text in indicators:
-            gap = detect_logical_gaps(
-                claim_id="test",
-                claim_text=claim_text,
-                supporting_claims=[]
-            )
+            gap = detect_logical_gaps(claim_id="test", claim_text=claim_text, supporting_claims=[])
             assert gap is not None, f"Failed to detect gap for: {claim_text}"
 
 
@@ -389,13 +348,13 @@ class TestComprehensiveGapDetection:
                 "claim_id": "claim-1",
                 "claim_text": "AI improves outcomes",
                 "citations": [],
-                "supporting_claims": []
+                "supporting_claims": [],
             },
             {
                 "claim_id": "claim-2",
                 "claim_text": "Therefore, we should adopt AI",
                 "citations": [],
-                "supporting_claims": []
+                "supporting_claims": [],
             },
         ]
 
@@ -415,13 +374,13 @@ class TestComprehensiveGapDetection:
                 "claim_id": "claim-1",
                 "claim_text": "Studies show X is effective",
                 "citations": ["citation-1", "citation-2"],
-                "supporting_claims": []
+                "supporting_claims": [],
             },
             {
                 "claim_id": "claim-2",
                 "claim_text": "Implementation is feasible",
                 "citations": ["citation-3"],
-                "supporting_claims": []
+                "supporting_claims": [],
             },
         ]
 
@@ -436,19 +395,19 @@ class TestComprehensiveGapDetection:
                 "claim_id": "good",
                 "claim_text": "Research demonstrates benefits",
                 "citations": ["c1", "c2"],
-                "supporting_claims": ["sub-claim"]
+                "supporting_claims": ["sub-claim"],
             },
             {
                 "claim_id": "bad-evidence",
                 "claim_text": "X is clearly true",
                 "citations": [],
-                "supporting_claims": ["sub-claim"]
+                "supporting_claims": ["sub-claim"],
             },
             {
                 "claim_id": "bad-logic",
                 "claim_text": "Therefore, policy Y is optimal",
                 "citations": ["c3"],
-                "supporting_claims": []
+                "supporting_claims": [],
             },
         ]
 
@@ -479,13 +438,13 @@ class TestRealisticScenarios:
                 "claim_id": "claim-1",
                 "claim_text": "Universal basic income reduces poverty rates significantly",
                 "citations": [],  # Missing evidence!
-                "supporting_claims": []
+                "supporting_claims": [],
             },
             {
                 "claim_id": "claim-2",
                 "claim_text": "Therefore, all countries should implement UBI immediately",
                 "citations": [],  # Missing evidence!
-                "supporting_claims": []  # Missing logical support!
+                "supporting_claims": [],  # Missing logical support!
             },
         ]
 
@@ -508,7 +467,7 @@ class TestRealisticScenarios:
                 "claim_id": "claim-1",
                 "claim_text": "Machine learning models achieve 95% accuracy on ImageNet dataset",
                 "citations": ["ResNet paper", "ImageNet challenge results", "Validation study"],
-                "supporting_claims": ["Multiple architectures tested", "Reproducible results"]
+                "supporting_claims": ["Multiple architectures tested", "Reproducible results"],
             },
         ]
 
@@ -524,25 +483,25 @@ class TestRealisticScenarios:
                 "claim_id": "thesis",
                 "claim_text": "Climate change requires immediate action",
                 "citations": ["IPCC report", "NASA data"],
-                "supporting_claims": []
+                "supporting_claims": [],
             },
             {
                 "claim_id": "evidence-1",
                 "claim_text": "Global temperatures have risen 1.1°C since pre-industrial times",
                 "citations": ["NOAA data"],
-                "supporting_claims": []
+                "supporting_claims": [],
             },
             {
                 "claim_id": "weak-claim",
                 "claim_text": "Everyone agrees we must act now",
                 "citations": [],  # Unsupported generalization
-                "supporting_claims": []
+                "supporting_claims": [],
             },
             {
                 "claim_id": "conclusion",
                 "claim_text": "Thus, carbon emissions must be reduced by 50% by 2030",
                 "citations": [],  # Missing policy citations
-                "supporting_claims": []  # Missing intermediate steps
+                "supporting_claims": [],  # Missing intermediate steps
             },
         ]
 

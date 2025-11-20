@@ -27,10 +27,7 @@ async def basic_chat_example():
     memory = ConversationMemory()
 
     # Create chat workflow
-    workflow = ChatWorkflow(
-        provider=provider,
-        conversation_memory=memory
-    )
+    workflow = ChatWorkflow(provider=provider, conversation_memory=memory)
 
     # Send a message
     result = await workflow.run(
@@ -56,10 +53,7 @@ async def multi_turn_conversation_example():
     memory = ConversationMemory()
 
     # Create chat workflow
-    workflow = ChatWorkflow(
-        provider=provider,
-        conversation_memory=memory
-    )
+    workflow = ChatWorkflow(provider=provider, conversation_memory=memory)
 
     # First turn: Start conversation
     print("\n--- Turn 1 ---")
@@ -72,7 +66,7 @@ async def multi_turn_conversation_example():
         print(f"Error: {result1.error}")
         return
 
-    thread_id = result1.metadata['thread_id']
+    thread_id = result1.metadata["thread_id"]
     print(f"Thread ID: {thread_id}")
     print(f"Response: {result1.synthesis[:200]}...\n")
 
@@ -111,7 +105,8 @@ async def chat_with_file_context_example():
 
     # Create a sample file for demonstration
     sample_file = Path("/tmp/sample_code.py")
-    sample_file.write_text("""
+    sample_file.write_text(
+        """
 def fibonacci(n):
     '''Calculate Fibonacci number recursively.'''
     if n <= 1:
@@ -120,17 +115,15 @@ def fibonacci(n):
 
 # Example usage
 print(fibonacci(10))
-""")
+"""
+    )
 
     # Create provider and conversation memory
     provider = ClaudeProvider()
     memory = ConversationMemory()
 
     # Create chat workflow
-    workflow = ChatWorkflow(
-        provider=provider,
-        conversation_memory=memory
-    )
+    workflow = ChatWorkflow(provider=provider, conversation_memory=memory)
 
     # Send message with file context
     result = await workflow.run(
@@ -160,10 +153,7 @@ async def conversation_tracking_example():
     memory = ConversationMemory()
 
     # Create chat workflow
-    workflow = ChatWorkflow(
-        provider=provider,
-        conversation_memory=memory
-    )
+    workflow = ChatWorkflow(provider=provider, conversation_memory=memory)
 
     # Start conversation
     print("\n--- Starting conversation ---")
@@ -175,7 +165,7 @@ async def conversation_tracking_example():
         print(f"Error: {result1.error}")
         return
 
-    thread_id = result1.metadata['thread_id']
+    thread_id = result1.metadata["thread_id"]
 
     # Check conversation history
     thread = workflow.get_thread(thread_id)

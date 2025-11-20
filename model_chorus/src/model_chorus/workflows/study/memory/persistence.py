@@ -98,7 +98,8 @@ class LongTermStorage:
             cursor = conn.cursor()
 
             # Create investigations table
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE IF NOT EXISTS investigations (
                     investigation_id TEXT PRIMARY KEY,
                     created_at TEXT NOT NULL,
@@ -107,10 +108,12 @@ class LongTermStorage:
                     entry_count INTEGER DEFAULT 0,
                     metadata_json TEXT
                 )
-            """)
+            """
+            )
 
             # Create memory_entries table
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE IF NOT EXISTS memory_entries (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     entry_id TEXT UNIQUE NOT NULL,
@@ -126,24 +129,32 @@ class LongTermStorage:
                     metadata_json TEXT,
                     FOREIGN KEY (investigation_id) REFERENCES investigations(investigation_id)
                 )
-            """)
+            """
+            )
 
             # Create indexes for common queries
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_memory_entries_investigation
                 ON memory_entries(investigation_id)
-            """)
-            cursor.execute("""
+            """
+            )
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_memory_entries_persona
                 ON memory_entries(persona)
-            """)
-            cursor.execute("""
+            """
+            )
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_memory_entries_timestamp
                 ON memory_entries(timestamp)
-            """)
+            """
+            )
 
             # Create memory_references table
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE IF NOT EXISTS memory_references (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     source_entry_id TEXT NOT NULL,
@@ -152,12 +163,15 @@ class LongTermStorage:
                     FOREIGN KEY (source_entry_id) REFERENCES memory_entries(entry_id),
                     FOREIGN KEY (target_entry_id) REFERENCES memory_entries(entry_id)
                 )
-            """)
+            """
+            )
 
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_memory_references_source
                 ON memory_references(source_entry_id)
-            """)
+            """
+            )
 
             conn.commit()
             logger.info("Database schema initialized successfully")

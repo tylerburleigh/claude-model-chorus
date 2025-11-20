@@ -53,7 +53,7 @@ class TestReadFile:
 
     def test_read_small_text_file(self):
         """Test reading a small text file."""
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
             f.write("Hello, World!")
             temp_file = f.name
 
@@ -67,16 +67,18 @@ class TestReadFile:
     def test_read_file_with_unicode(self):
         """Test reading file with unicode characters."""
         # Create temp file path
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
             temp_file = f.name
 
         # Write file with standard text content (chardet works best with regular ASCII/UTF-8 text)
         # Avoid emojis as they can confuse encoding detection
-        content = ("This is a test file with various characters.\n"
-                   "Hello, World! Bonjour, Monde! Hola, Mundo!\n"
-                   "Testing accented characters: café, naïve, résumé.\n"
-                   "Some more text to ensure proper encoding detection.\n") * 50
-        Path(temp_file).write_text(content, encoding='utf-8')
+        content = (
+            "This is a test file with various characters.\n"
+            "Hello, World! Bonjour, Monde! Hola, Mundo!\n"
+            "Testing accented characters: café, naïve, résumé.\n"
+            "Some more text to ensure proper encoding detection.\n"
+        ) * 50
+        Path(temp_file).write_text(content, encoding="utf-8")
 
         try:
             service = ContextIngestionService()
@@ -90,7 +92,7 @@ class TestReadFile:
     def test_read_file_with_multiple_lines(self):
         """Test reading file with multiple lines."""
         test_content = "Line 1\nLine 2\nLine 3"
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
             f.write(test_content)
             temp_file = f.name
 
@@ -117,8 +119,8 @@ class TestReadFile:
     def test_read_file_too_large(self):
         """Test reading file exceeding max size raises FileTooLargeError."""
         # Create file larger than default max (100KB)
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
-            f.write('x' * (110 * 1024))  # 110KB
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
+            f.write("x" * (110 * 1024))  # 110KB
             temp_file = f.name
 
         try:
@@ -131,8 +133,8 @@ class TestReadFile:
     def test_read_file_exceeds_warning_threshold(self, caplog):
         """Test file exceeding warning threshold logs warning."""
         # Create file larger than warning threshold (50KB) but smaller than max (100KB)
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
-            f.write('x' * (60 * 1024))  # 60KB
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
+            f.write("x" * (60 * 1024))  # 60KB
             temp_file = f.name
 
         try:
@@ -145,10 +147,12 @@ class TestReadFile:
 
     def test_read_binary_file_raises_error(self):
         """Test reading binary file raises BinaryFileError."""
-        with tempfile.NamedTemporaryFile(mode='wb', suffix='.bin', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="wb", suffix=".bin", delete=False) as f:
             # Write realistic binary data (like a simple image header or compressed data)
             # Create data that is clearly binary with many null bytes and non-printable characters
-            binary_data = bytes([0x89, 0x50, 0x4E, 0x47]) + bytes(range(256)) * 20  # PNG-like header + binary
+            binary_data = (
+                bytes([0x89, 0x50, 0x4E, 0x47]) + bytes(range(256)) * 20
+            )  # PNG-like header + binary
             f.write(binary_data)
             temp_file = f.name
 
@@ -165,7 +169,7 @@ class TestGetFileInfo:
 
     def test_get_file_info_small_file(self):
         """Test getting info for a small file."""
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
             f.write("Small file")
             temp_file = f.name
 
@@ -184,8 +188,8 @@ class TestGetFileInfo:
 
     def test_get_file_info_large_file(self):
         """Test getting info for a large file."""
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
-            f.write('x' * (110 * 1024))  # 110KB
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
+            f.write("x" * (110 * 1024))  # 110KB
             temp_file = f.name
 
         try:
@@ -210,7 +214,7 @@ class TestCanReadFile:
 
     def test_can_read_small_file(self):
         """Test can_read_file returns True for small file."""
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
             f.write("Small file")
             temp_file = f.name
 
@@ -224,8 +228,8 @@ class TestCanReadFile:
 
     def test_can_read_large_file(self):
         """Test can_read_file returns False for file exceeding max size."""
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
-            f.write('x' * (110 * 1024))  # 110KB
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
+            f.write("x" * (110 * 1024))  # 110KB
             temp_file = f.name
 
         try:
@@ -249,7 +253,7 @@ class TestReadFileChunked:
 
     def test_read_file_chunked_single_chunk(self):
         """Test reading small file returns single chunk."""
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
             f.write("Small file content")
             temp_file = f.name
 
@@ -264,8 +268,8 @@ class TestReadFileChunked:
     def test_read_file_chunked_multiple_chunks(self):
         """Test reading large file returns multiple chunks."""
         # Create a file larger than chunk size
-        content = 'x' * (60 * 1024)  # 60KB
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+        content = "x" * (60 * 1024)  # 60KB
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
             f.write(content)
             temp_file = f.name
 
@@ -277,15 +281,15 @@ class TestReadFileChunked:
             assert len(chunks) >= 2
 
             # Verify all chunks combined equal original content
-            combined = ''.join(chunks)
+            combined = "".join(chunks)
             assert combined == content
         finally:
             Path(temp_file).unlink()
 
     def test_read_file_chunked_with_max_chunks(self):
         """Test reading file with max_chunks limit."""
-        content = 'x' * (100 * 1024)  # 100KB
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+        content = "x" * (100 * 1024)  # 100KB
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
             f.write(content)
             temp_file = f.name
 
@@ -300,7 +304,7 @@ class TestReadFileChunked:
 
     def test_read_file_chunked_invalid_chunk_size(self):
         """Test reading file with invalid chunk size raises ValueError."""
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
             f.write("Test content")
             temp_file = f.name
 
@@ -313,7 +317,7 @@ class TestReadFileChunked:
 
     def test_read_file_chunked_binary_file(self):
         """Test reading binary file in chunks raises BinaryFileError."""
-        with tempfile.NamedTemporaryFile(mode='wb', suffix='.bin', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="wb", suffix=".bin", delete=False) as f:
             # Write realistic binary data
             binary_data = bytes([0x89, 0x50, 0x4E, 0x47]) + bytes(range(256)) * 20
             f.write(binary_data)
@@ -333,7 +337,7 @@ class TestReadFileLines:
     def test_read_file_lines_all_lines(self):
         """Test reading all lines from a file."""
         content = "Line 1\nLine 2\nLine 3"
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
             f.write(content)
             temp_file = f.name
 
@@ -350,7 +354,7 @@ class TestReadFileLines:
     def test_read_file_lines_with_max_lines(self):
         """Test reading file with max_lines limit."""
         content = "Line 1\nLine 2\nLine 3\nLine 4\nLine 5"
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
             f.write(content)
             temp_file = f.name
 
@@ -366,7 +370,7 @@ class TestReadFileLines:
     def test_read_file_lines_skip_empty(self):
         """Test reading file with skip_empty option."""
         content = "Line 1\n\nLine 3\n\nLine 5"
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
             f.write(content)
             temp_file = f.name
 
@@ -383,7 +387,7 @@ class TestReadFileLines:
     def test_read_file_lines_keep_empty(self):
         """Test reading file without skipping empty lines."""
         content = "Line 1\n\nLine 3"
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
             f.write(content)
             temp_file = f.name
 
@@ -399,8 +403,8 @@ class TestReadFileLines:
 
     def test_read_file_lines_too_large(self):
         """Test reading large file with lines raises FileTooLargeError."""
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
-            f.write('x' * (110 * 1024))  # 110KB
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
+            f.write("x" * (110 * 1024))  # 110KB
             temp_file = f.name
 
         try:
@@ -416,7 +420,7 @@ class TestPathValidation:
 
     def test_validate_path_with_string(self):
         """Test path validation accepts string paths."""
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
             f.write("Test")
             temp_file = f.name
 
@@ -429,7 +433,7 @@ class TestPathValidation:
 
     def test_validate_path_with_pathlib(self):
         """Test path validation accepts Path objects."""
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
             f.write("Test")
             temp_file = Path(f.name)
 
@@ -447,8 +451,8 @@ class TestCustomSizeLimits:
     def test_custom_max_size_allows_larger_files(self):
         """Test custom max_file_size_kb allows reading larger files."""
         # Create 150KB file
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
-            f.write('x' * (150 * 1024))
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
+            f.write("x" * (150 * 1024))
             temp_file = f.name
 
         try:
@@ -467,8 +471,8 @@ class TestCustomSizeLimits:
     def test_custom_warn_threshold(self, caplog):
         """Test custom warn_file_size_kb threshold."""
         # Create 30KB file
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
-            f.write('x' * (30 * 1024))
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
+            f.write("x" * (30 * 1024))
             temp_file = f.name
 
         try:

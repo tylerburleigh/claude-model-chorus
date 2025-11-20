@@ -54,7 +54,7 @@ Provide plans in a clear, actionable format with specific recommendations."""
             name="Planner",
             prompt_template=prompt_template,
             temperature=temperature,
-            max_tokens=max_tokens
+            max_tokens=max_tokens,
         )
 
     def invoke(self, context: Dict[str, Any]) -> PersonaResponse:
@@ -115,8 +115,8 @@ Provide plans in a clear, actionable format with specific recommendations."""
                 "persona": self.name,
                 "phase": phase,
                 "approach": "synthesis_and_planning",
-                "findings_synthesized": len(all_findings)
-            }
+                "findings_synthesized": len(all_findings),
+            },
         )
 
 

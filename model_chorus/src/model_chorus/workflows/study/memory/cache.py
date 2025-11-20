@@ -132,9 +132,7 @@ class ShortTermCache:
                     # Remove least recently used (first item)
                     evicted_id, _ = self.cache.popitem(last=False)
                     self.stats["evictions"] += 1
-                    logger.debug(
-                        f"Evicted LRU entry {evicted_id} (cache full at {self.max_size})"
-                    )
+                    logger.debug(f"Evicted LRU entry {evicted_id} (cache full at {self.max_size})")
 
                 # Add new entry at end
                 self.cache[entry_id] = entry
@@ -290,9 +288,7 @@ class ShortTermCache:
         """
         with self.lock:
             total_requests = self.stats["hits"] + self.stats["misses"]
-            hit_rate = (
-                self.stats["hits"] / total_requests if total_requests > 0 else 0.0
-            )
+            hit_rate = self.stats["hits"] / total_requests if total_requests > 0 else 0.0
 
             return MemoryMetadata(
                 total_entries=len(self.cache),

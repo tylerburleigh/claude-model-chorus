@@ -205,7 +205,9 @@ class TestFindSimilarClaims:
 
         # Should find at least the very similar claims
         assert len(results) >= 1
-        assert all(isinstance(cm, CitationMap) and isinstance(score, float) for cm, score in results)
+        assert all(
+            isinstance(cm, CitationMap) and isinstance(score, float) for cm, score in results
+        )
 
     def test_find_similar_claims_threshold(self, sample_citation_maps):
         """Test threshold filtering."""
@@ -645,9 +647,7 @@ class TestHierarchicalClustering:
         """Test different linkage methods."""
         for linkage in ["ward", "complete", "average", "single"]:
             clusters = cluster_claims_hierarchical(
-                sample_maps,
-                n_clusters=2,
-                linkage_method=linkage
+                sample_maps, n_clusters=2, linkage_method=linkage
             )
 
             assert len(clusters) == 2
@@ -728,8 +728,12 @@ class TestClusterStatistics:
             ],
             # Cluster 2: 2 similar claims
             [
-                CitationMap(claim_id="4", claim_text="Weather forecast", citations=[], strength=0.8),
-                CitationMap(claim_id="5", claim_text="Climate prediction", citations=[], strength=0.82),
+                CitationMap(
+                    claim_id="4", claim_text="Weather forecast", citations=[], strength=0.8
+                ),
+                CitationMap(
+                    claim_id="5", claim_text="Climate prediction", citations=[], strength=0.82
+                ),
             ],
         ]
 
@@ -771,7 +775,9 @@ class TestClusteringIntegration:
     def test_kmeans_to_statistics_pipeline(self):
         """Test complete pipeline: cluster -> compute statistics."""
         maps = [
-            CitationMap(claim_id=str(i), claim_text=f"Claim about topic {i % 3}", citations=[], strength=0.9)
+            CitationMap(
+                claim_id=str(i), claim_text=f"Claim about topic {i % 3}", citations=[], strength=0.9
+            )
             for i in range(9)
         ]
 
@@ -790,8 +796,12 @@ class TestClusteringIntegration:
         maps = [
             CitationMap(claim_id="ml-1", claim_text="Machine learning", citations=[], strength=0.9),
             CitationMap(claim_id="ml-2", claim_text="AI algorithms", citations=[], strength=0.85),
-            CitationMap(claim_id="db-1", claim_text="Database optimization", citations=[], strength=0.8),
-            CitationMap(claim_id="db-2", claim_text="Query performance", citations=[], strength=0.82),
+            CitationMap(
+                claim_id="db-1", claim_text="Database optimization", citations=[], strength=0.8
+            ),
+            CitationMap(
+                claim_id="db-2", claim_text="Query performance", citations=[], strength=0.82
+            ),
         ]
 
         # Cluster

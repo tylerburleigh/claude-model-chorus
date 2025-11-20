@@ -27,11 +27,13 @@ DEFAULT_WARN_FILE_SIZE_KB = 50
 
 class FileTooLargeError(Exception):
     """Raised when a file exceeds the maximum size limit."""
+
     pass
 
 
 class BinaryFileError(Exception):
     """Raised when attempting to read a binary file as text."""
+
     pass
 
 

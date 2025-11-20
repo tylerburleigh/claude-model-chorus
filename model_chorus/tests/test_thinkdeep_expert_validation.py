@@ -57,7 +57,7 @@ class TestExpertProviderIntegration:
         workflow = ThinkDeepWorkflow(
             provider=mock_provider,
             expert_provider=mock_expert_provider,
-            conversation_memory=conversation_memory
+            conversation_memory=conversation_memory,
         )
 
         # Expert validation should be enabled by default when expert_provider is set
@@ -71,8 +71,7 @@ class TestExpertProviderIntegration:
         """Test that expert validation is disabled when no expert provider."""
         # Create workflow without expert provider
         workflow = ThinkDeepWorkflow(
-            provider=mock_provider,
-            conversation_memory=conversation_memory
+            provider=mock_provider, conversation_memory=conversation_memory
         )
 
         # Expert validation should be disabled
@@ -89,7 +88,7 @@ class TestExpertProviderIntegration:
             provider=mock_provider,
             expert_provider=mock_expert_provider,
             conversation_memory=conversation_memory,
-            config={"enable_expert_validation": False}
+            config={"enable_expert_validation": False},
         )
 
         # Expert validation should be disabled despite expert_provider being set
@@ -106,7 +105,7 @@ class TestExpertProviderIntegration:
             provider=mock_provider,
             expert_provider=mock_expert_provider,
             conversation_memory=conversation_memory,
-            config={"enable_expert_validation": True}
+            config={"enable_expert_validation": True},
         )
 
         # Expert validation should be enabled
@@ -144,17 +143,14 @@ class TestExpertValidationTriggering:
         """Test expert validation is triggered when confidence reaches medium."""
         # Setup mock responses
         mock_provider.generate.return_value = GenerationResponse(
-            content="Investigation findings.",
-            model="test-model",
-            usage={},
-            stop_reason="end_turn"
+            content="Investigation findings.", model="test-model", usage={}, stop_reason="end_turn"
         )
 
         mock_expert_provider.generate.return_value = GenerationResponse(
             content="Expert validation confirms findings.",
             model="expert-model",
             usage={},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         # Create workflow with expert validation enabled
@@ -162,7 +158,7 @@ class TestExpertValidationTriggering:
             provider=mock_provider,
             expert_provider=mock_expert_provider,
             conversation_memory=conversation_memory,
-            config={"enable_expert_validation": True}
+            config={"enable_expert_validation": True},
         )
 
         # Start investigation
@@ -176,10 +172,7 @@ class TestExpertValidationTriggering:
         mock_expert_provider.generate.reset_mock()
 
         # Continue investigation (should trigger expert validation)
-        result2 = await workflow.run(
-            prompt="Continue investigation",
-            continuation_id=thread_id
-        )
+        result2 = await workflow.run(prompt="Continue investigation", continuation_id=thread_id)
 
         # Expert provider should have been called
         assert mock_expert_provider.generate.call_count >= 1
@@ -192,10 +185,7 @@ class TestExpertValidationTriggering:
         """Test expert validation is NOT triggered at exploring confidence."""
         # Setup mock responses
         mock_provider.generate.return_value = GenerationResponse(
-            content="Investigation findings.",
-            model="test-model",
-            usage={},
-            stop_reason="end_turn"
+            content="Investigation findings.", model="test-model", usage={}, stop_reason="end_turn"
         )
 
         # Create workflow with expert validation enabled
@@ -203,7 +193,7 @@ class TestExpertValidationTriggering:
             provider=mock_provider,
             expert_provider=mock_expert_provider,
             conversation_memory=conversation_memory,
-            config={"enable_expert_validation": True}
+            config={"enable_expert_validation": True},
         )
 
         # Start investigation (confidence: exploring)
@@ -214,10 +204,7 @@ class TestExpertValidationTriggering:
         mock_expert_provider.generate.reset_mock()
 
         # Continue investigation without updating confidence
-        result2 = await workflow.run(
-            prompt="Continue investigation",
-            continuation_id=thread_id
-        )
+        result2 = await workflow.run(prompt="Continue investigation", continuation_id=thread_id)
 
         # Expert provider should NOT have been called for second step (confidence too low)
         # Note: Expert validation may be attempted but errors are caught and handled gracefully
@@ -231,17 +218,14 @@ class TestExpertValidationTriggering:
         """Test expert validation is triggered at high confidence."""
         # Setup mock responses
         mock_provider.generate.return_value = GenerationResponse(
-            content="Investigation findings.",
-            model="test-model",
-            usage={},
-            stop_reason="end_turn"
+            content="Investigation findings.", model="test-model", usage={}, stop_reason="end_turn"
         )
 
         mock_expert_provider.generate.return_value = GenerationResponse(
             content="Expert validation confirms findings.",
             model="expert-model",
             usage={},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         # Create workflow with expert validation enabled
@@ -249,7 +233,7 @@ class TestExpertValidationTriggering:
             provider=mock_provider,
             expert_provider=mock_expert_provider,
             conversation_memory=conversation_memory,
-            config={"enable_expert_validation": True}
+            config={"enable_expert_validation": True},
         )
 
         # Start investigation
@@ -263,10 +247,7 @@ class TestExpertValidationTriggering:
         mock_expert_provider.generate.reset_mock()
 
         # Continue investigation (should trigger expert validation)
-        result2 = await workflow.run(
-            prompt="Continue investigation",
-            continuation_id=thread_id
-        )
+        result2 = await workflow.run(prompt="Continue investigation", continuation_id=thread_id)
 
         # Expert provider should have been called
         assert mock_expert_provider.generate.call_count >= 1
@@ -279,10 +260,7 @@ class TestExpertValidationTriggering:
         """Test expert validation is NOT triggered when disabled via config."""
         # Setup mock responses
         mock_provider.generate.return_value = GenerationResponse(
-            content="Investigation findings.",
-            model="test-model",
-            usage={},
-            stop_reason="end_turn"
+            content="Investigation findings.", model="test-model", usage={}, stop_reason="end_turn"
         )
 
         # Create workflow with expert validation DISABLED
@@ -290,7 +268,7 @@ class TestExpertValidationTriggering:
             provider=mock_provider,
             expert_provider=mock_expert_provider,
             conversation_memory=conversation_memory,
-            config={"enable_expert_validation": False}
+            config={"enable_expert_validation": False},
         )
 
         # Start investigation
@@ -301,10 +279,7 @@ class TestExpertValidationTriggering:
         workflow.update_confidence(thread_id, ConfidenceLevel.HIGH.value)
 
         # Continue investigation
-        result2 = await workflow.run(
-            prompt="Continue investigation",
-            continuation_id=thread_id
-        )
+        result2 = await workflow.run(prompt="Continue investigation", continuation_id=thread_id)
 
         # Expert provider should NOT have been called (validation disabled)
         assert mock_expert_provider.generate.call_count == 0
@@ -342,17 +317,14 @@ class TestExpertValidationResultHandling:
         """Test that expert validation result is included in result metadata."""
         # Setup mock responses
         mock_provider.generate.return_value = GenerationResponse(
-            content="Primary analysis.",
-            model="test-model",
-            usage={},
-            stop_reason="end_turn"
+            content="Primary analysis.", model="test-model", usage={}, stop_reason="end_turn"
         )
 
         mock_expert_provider.generate.return_value = GenerationResponse(
             content="Expert validation: Analysis confirmed.",
             model="expert-model",
             usage={"input_tokens": 100, "output_tokens": 50},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         # Create workflow
@@ -360,7 +332,7 @@ class TestExpertValidationResultHandling:
             provider=mock_provider,
             expert_provider=mock_expert_provider,
             conversation_memory=conversation_memory,
-            config={"enable_expert_validation": True}
+            config={"enable_expert_validation": True},
         )
 
         # Start investigation and trigger expert validation
@@ -369,10 +341,7 @@ class TestExpertValidationResultHandling:
 
         workflow.update_confidence(thread_id, ConfidenceLevel.MEDIUM.value)
 
-        result2 = await workflow.run(
-            prompt="Continue",
-            continuation_id=thread_id
-        )
+        result2 = await workflow.run(prompt="Continue", continuation_id=thread_id)
 
         # Verify expert validation metadata
         assert result2.metadata.get("expert_validation_performed") is True
@@ -385,18 +354,17 @@ class TestExpertValidationResultHandling:
         """Test that expert validation updates conversation history."""
         # Setup mock responses
         mock_provider.generate.return_value = GenerationResponse(
-            content="Primary analysis.",
-            model="test-model",
-            usage={},
-            stop_reason="end_turn"
+            content="Primary analysis.", model="test-model", usage={}, stop_reason="end_turn"
         )
 
-        expert_validation_content = "Expert validation: Root cause confirmed. High confidence in diagnosis."
+        expert_validation_content = (
+            "Expert validation: Root cause confirmed. High confidence in diagnosis."
+        )
         mock_expert_provider.generate.return_value = GenerationResponse(
             content=expert_validation_content,
             model="expert-model",
             usage={},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         # Create workflow
@@ -404,7 +372,7 @@ class TestExpertValidationResultHandling:
             provider=mock_provider,
             expert_provider=mock_expert_provider,
             conversation_memory=conversation_memory,
-            config={"enable_expert_validation": True}
+            config={"enable_expert_validation": True},
         )
 
         # Start investigation
@@ -413,10 +381,7 @@ class TestExpertValidationResultHandling:
 
         # Trigger expert validation
         workflow.update_confidence(thread_id, ConfidenceLevel.MEDIUM.value)
-        result2 = await workflow.run(
-            prompt="Continue investigation",
-            continuation_id=thread_id
-        )
+        result2 = await workflow.run(prompt="Continue investigation", continuation_id=thread_id)
 
         # Verify expert validation was performed
         assert result2.metadata.get("expert_validation_performed") is True
@@ -459,7 +424,7 @@ class TestExpertValidationErrorHandling:
             content="Primary analysis continues.",
             model="test-model",
             usage={},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         # Expert provider raises exception
@@ -470,7 +435,7 @@ class TestExpertValidationErrorHandling:
             provider=mock_provider,
             expert_provider=mock_expert_provider,
             conversation_memory=conversation_memory,
-            config={"enable_expert_validation": True}
+            config={"enable_expert_validation": True},
         )
 
         # Start investigation
@@ -481,10 +446,7 @@ class TestExpertValidationErrorHandling:
         workflow.update_confidence(thread_id, ConfidenceLevel.MEDIUM.value)
 
         # Continue investigation (expert validation will fail but shouldn't crash)
-        result2 = await workflow.run(
-            prompt="Continue investigation",
-            continuation_id=thread_id
-        )
+        result2 = await workflow.run(prompt="Continue investigation", continuation_id=thread_id)
 
         # Investigation should still succeed even if expert validation failed
         assert result2.success is True
@@ -498,14 +460,12 @@ class TestExpertValidationErrorHandling:
         """Test handling of expert validation timeouts."""
         # Setup mock responses
         mock_provider.generate.return_value = GenerationResponse(
-            content="Primary analysis.",
-            model="test-model",
-            usage={},
-            stop_reason="end_turn"
+            content="Primary analysis.", model="test-model", usage={}, stop_reason="end_turn"
         )
 
         # Expert provider times out
         import asyncio
+
         mock_expert_provider.generate.side_effect = asyncio.TimeoutError("Request timeout")
 
         # Create workflow
@@ -513,7 +473,7 @@ class TestExpertValidationErrorHandling:
             provider=mock_provider,
             expert_provider=mock_expert_provider,
             conversation_memory=conversation_memory,
-            config={"enable_expert_validation": True}
+            config={"enable_expert_validation": True},
         )
 
         # Start investigation
@@ -524,10 +484,7 @@ class TestExpertValidationErrorHandling:
         workflow.update_confidence(thread_id, ConfidenceLevel.HIGH.value)
 
         # Continue (expert validation will timeout but shouldn't crash)
-        result2 = await workflow.run(
-            prompt="Continue",
-            continuation_id=thread_id
-        )
+        result2 = await workflow.run(prompt="Continue", continuation_id=thread_id)
 
         # Investigation should continue successfully
         assert result2.success is True
@@ -539,18 +496,12 @@ class TestExpertValidationErrorHandling:
         """Test handling of empty expert validation response."""
         # Setup mock responses
         mock_provider.generate.return_value = GenerationResponse(
-            content="Primary analysis.",
-            model="test-model",
-            usage={},
-            stop_reason="end_turn"
+            content="Primary analysis.", model="test-model", usage={}, stop_reason="end_turn"
         )
 
         # Expert provider returns empty content
         mock_expert_provider.generate.return_value = GenerationResponse(
-            content="",
-            model="expert-model",
-            usage={},
-            stop_reason="end_turn"
+            content="", model="expert-model", usage={}, stop_reason="end_turn"
         )
 
         # Create workflow
@@ -558,7 +509,7 @@ class TestExpertValidationErrorHandling:
             provider=mock_provider,
             expert_provider=mock_expert_provider,
             conversation_memory=conversation_memory,
-            config={"enable_expert_validation": True}
+            config={"enable_expert_validation": True},
         )
 
         # Start investigation and trigger expert validation
@@ -567,10 +518,7 @@ class TestExpertValidationErrorHandling:
 
         workflow.update_confidence(thread_id, ConfidenceLevel.MEDIUM.value)
 
-        result2 = await workflow.run(
-            prompt="Continue",
-            continuation_id=thread_id
-        )
+        result2 = await workflow.run(prompt="Continue", continuation_id=thread_id)
 
         # Investigation should handle empty expert response gracefully
         assert result2.success is True
@@ -610,14 +558,14 @@ class TestExpertValidationWithHypotheses:
             content="Investigation suggests memory leak in cache.",
             model="test-model",
             usage={},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         mock_expert_provider.generate.return_value = GenerationResponse(
             content="Expert analysis confirms memory leak hypothesis. Evidence is strong.",
             model="expert-model",
             usage={},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         # Create workflow
@@ -625,7 +573,7 @@ class TestExpertValidationWithHypotheses:
             provider=mock_provider,
             expert_provider=mock_expert_provider,
             conversation_memory=conversation_memory,
-            config={"enable_expert_validation": True}
+            config={"enable_expert_validation": True},
         )
 
         # Start investigation and add hypothesis
@@ -635,15 +583,14 @@ class TestExpertValidationWithHypotheses:
         workflow.add_hypothesis(
             thread_id,
             "Memory leak in cache layer",
-            evidence=["Memory grows over time", "No eviction policy"]
+            evidence=["Memory grows over time", "No eviction policy"],
         )
 
         # Trigger expert validation at medium confidence
         workflow.update_confidence(thread_id, ConfidenceLevel.MEDIUM.value)
 
         result2 = await workflow.run(
-            prompt="Verify hypothesis with expert",
-            continuation_id=thread_id
+            prompt="Verify hypothesis with expert", continuation_id=thread_id
         )
 
         # Expert validation should have been performed
@@ -664,14 +611,14 @@ class TestExpertValidationWithHypotheses:
             content="Investigation shows multiple potential causes.",
             model="test-model",
             usage={},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         mock_expert_provider.generate.return_value = GenerationResponse(
             content="Expert analysis: First hypothesis most likely. Evidence for H1 is stronger than H2.",
             model="expert-model",
             usage={},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         # Create workflow
@@ -679,7 +626,7 @@ class TestExpertValidationWithHypotheses:
             provider=mock_provider,
             expert_provider=mock_expert_provider,
             conversation_memory=conversation_memory,
-            config={"enable_expert_validation": True}
+            config={"enable_expert_validation": True},
         )
 
         # Start investigation with multiple hypotheses
@@ -694,8 +641,7 @@ class TestExpertValidationWithHypotheses:
         workflow.update_confidence(thread_id, ConfidenceLevel.MEDIUM.value)
 
         result2 = await workflow.run(
-            prompt="Get expert opinion on hypotheses",
-            continuation_id=thread_id
+            prompt="Get expert opinion on hypotheses", continuation_id=thread_id
         )
 
         # Expert validation performed with multiple hypotheses

@@ -6,11 +6,7 @@ valid phase transitions and confidence escalation logic.
 """
 
 import pytest
-from model_chorus.core.models import (
-    InvestigationPhase,
-    StudyState,
-    ConfidenceLevel
-)
+from model_chorus.core.models import InvestigationPhase, StudyState, ConfidenceLevel
 from model_chorus.workflows.study.state_machine import InvestigationStateMachine
 
 
@@ -256,8 +252,7 @@ class TestInvestigationStateMachineTransitions:
         """Test that transition reason is logged."""
         # Transition with reason (just verify it doesn't error)
         result = state_machine.transition(
-            InvestigationPhase.VALIDATION,
-            reason="Sufficient evidence gathered"
+            InvestigationPhase.VALIDATION, reason="Sufficient evidence gathered"
         )
         assert result is True
         assert state_machine.current_phase == InvestigationPhase.VALIDATION

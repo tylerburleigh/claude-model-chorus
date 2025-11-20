@@ -246,10 +246,7 @@ class MemoryController:
         storage_results = self.storage.query(storage_query)
 
         # Merge results, removing duplicates (by investigation_id + timestamp)
-        seen = {
-            (entry.investigation_id, entry.timestamp): entry
-            for entry in cache_results
-        }
+        seen = {(entry.investigation_id, entry.timestamp): entry for entry in cache_results}
 
         for entry in storage_results:
             key = (entry.investigation_id, entry.timestamp)
@@ -302,8 +299,7 @@ class MemoryController:
 
         if deleted:
             logger.debug(
-                f"Deleted entry {entry_id} "
-                f"(cache: {cache_deleted}, storage: {storage_deleted})"
+                f"Deleted entry {entry_id} " f"(cache: {cache_deleted}, storage: {storage_deleted})"
             )
         else:
             logger.debug(f"Entry {entry_id} not found for deletion")

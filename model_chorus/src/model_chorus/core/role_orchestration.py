@@ -217,9 +217,7 @@ class ModelRole(BaseModel):
         stance_lower = v.lower()
 
         if stance_lower not in allowed_stances:
-            raise ValueError(
-                f"Stance must be one of {allowed_stances}, got '{v}'"
-            )
+            raise ValueError(f"Stance must be one of {allowed_stances}, got '{v}'")
 
         return stance_lower
 
@@ -424,9 +422,7 @@ class RoleOrchestrator:
         self.pattern = pattern
         self.default_timeout = default_timeout
 
-        logger.info(
-            f"Initialized RoleOrchestrator with {len(roles)} roles, pattern={pattern}"
-        )
+        logger.info(f"Initialized RoleOrchestrator with {len(roles)} roles, pattern={pattern}")
 
     def _resolve_provider(self, model_id: str) -> Any:
         """
@@ -458,9 +454,7 @@ class RoleOrchestrator:
 
         for variation in variations:
             if variation in self.provider_map:
-                logger.debug(
-                    f"Resolved model '{model_id}' to provider via variation '{variation}'"
-                )
+                logger.debug(f"Resolved model '{model_id}' to provider via variation '{variation}'")
                 return self.provider_map[variation]
 
         # No provider found
@@ -530,9 +524,7 @@ class RoleOrchestrator:
         # Import here to avoid circular dependency
         from ..providers import GenerationRequest
 
-        logger.info(
-            f"Starting sequential execution of {len(self.roles)} roles"
-        )
+        logger.info(f"Starting sequential execution of {len(self.roles)} roles")
 
         role_responses = []
         all_responses = []
@@ -579,10 +571,7 @@ class RoleOrchestrator:
                 )
 
             except Exception as e:
-                logger.error(
-                    f"Role '{role.role}' failed: {e}",
-                    exc_info=True
-                )
+                logger.error(f"Role '{role.role}' failed: {e}", exc_info=True)
                 failed_roles.append(role.role)
                 # Continue with remaining roles even if one fails
 
@@ -628,9 +617,7 @@ class RoleOrchestrator:
         # Import here to avoid circular dependency
         from ..providers import GenerationRequest
 
-        logger.info(
-            f"Starting parallel execution of {len(self.roles)} roles"
-        )
+        logger.info(f"Starting parallel execution of {len(self.roles)} roles")
 
         # Build context-enhanced prompt if context provided
         full_base_prompt = base_prompt
@@ -638,7 +625,9 @@ class RoleOrchestrator:
             full_base_prompt = f"{context}\n\n{base_prompt}"
 
         # Create tasks for all roles
-        async def execute_role(role: ModelRole, index: int) -> tuple[int, Optional[str], Optional[Any], Optional[str]]:
+        async def execute_role(
+            role: ModelRole, index: int
+        ) -> tuple[int, Optional[str], Optional[Any], Optional[str]]:
             """
             Execute a single role and return (index, role_name, response, error).
 
@@ -650,7 +639,9 @@ class RoleOrchestrator:
                 Tuple of (index, role_name, response or None, error_message or None)
             """
             try:
-                logger.info(f"Executing role {index + 1}/{len(self.roles)}: {role.role} (model: {role.model})")
+                logger.info(
+                    f"Executing role {index + 1}/{len(self.roles)}: {role.role} (model: {role.model})"
+                )
 
                 # Resolve provider for this role
                 provider = self._resolve_provider(role.model)
@@ -669,7 +660,9 @@ class RoleOrchestrator:
                 # Execute via provider
                 response = await provider.generate(request)
 
-                logger.info(f"Role '{role.role}' completed successfully ({len(response.content)} chars)")
+                logger.info(
+                    f"Role '{role.role}' completed successfully ({len(response.content)} chars)"
+                )
 
                 return (index, role.role, response, None)
 
@@ -768,7 +761,9 @@ class RoleOrchestrator:
             result.synthesis_strategy = strategy
             result.metadata["synthesis_method"] = "concatenate"
 
-            logger.info(f"Concatenated {len(result.role_responses)} responses ({len(synthesized)} chars)")
+            logger.info(
+                f"Concatenated {len(result.role_responses)} responses ({len(synthesized)} chars)"
+            )
 
             return result
 

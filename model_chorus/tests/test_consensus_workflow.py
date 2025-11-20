@@ -60,7 +60,9 @@ class TestConsensusWorkflow:
             usage={},
         )
 
-        workflow = ConsensusWorkflow([mock_claude, mock_codex], strategy=ConsensusStrategy.ALL_RESPONSES)
+        workflow = ConsensusWorkflow(
+            [mock_claude, mock_codex], strategy=ConsensusStrategy.ALL_RESPONSES
+        )
 
         request = GenerationRequest(prompt="Test prompt")
         result = await workflow.execute(request)
@@ -86,7 +88,9 @@ class TestConsensusWorkflow:
             usage={},
         )
 
-        workflow = ConsensusWorkflow([mock_claude, mock_codex], strategy=ConsensusStrategy.FIRST_VALID, num_to_consult=1)
+        workflow = ConsensusWorkflow(
+            [mock_claude, mock_codex], strategy=ConsensusStrategy.FIRST_VALID, num_to_consult=1
+        )
 
         request = GenerationRequest(prompt="Test prompt")
         result = await workflow.execute(request)

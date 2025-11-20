@@ -51,20 +51,22 @@ class StudyConfig:
         metadata: Additional workflow-specific metadata
     """
 
-    personas: List[PersonaConfig] = field(default_factory=lambda: [
-        PersonaConfig(
-            name="Researcher",
-            expertise="systematic investigation and analysis",
-            role="primary investigator",
-            temperature=0.7
-        ),
-        PersonaConfig(
-            name="Critic",
-            expertise="identifying assumptions and edge cases",
-            role="critical reviewer",
-            temperature=0.6
-        )
-    ])
+    personas: List[PersonaConfig] = field(
+        default_factory=lambda: [
+            PersonaConfig(
+                name="Researcher",
+                expertise="systematic investigation and analysis",
+                role="primary investigator",
+                temperature=0.7,
+            ),
+            PersonaConfig(
+                name="Critic",
+                expertise="identifying assumptions and edge cases",
+                role="critical reviewer",
+                temperature=0.6,
+            ),
+        ]
+    )
 
     max_iterations: int = 5
     min_confidence_for_completion: str = "high"  # ConfidenceLevel value

@@ -40,9 +40,7 @@ class TestArchitecturalDecisionScenarios:
         return ConversationMemory()
 
     @pytest.mark.asyncio
-    async def test_architectural_decision_rest_vs_graphql(
-        self, mock_provider, conversation_memory
-    ):
+    async def test_architectural_decision_rest_vs_graphql(self, mock_provider, conversation_memory):
         """
         Test architectural decision scenario: REST vs GraphQL API design.
 
@@ -54,8 +52,7 @@ class TestArchitecturalDecisionScenarios:
         - Final recommendation with confidence
         """
         workflow = ThinkDeepWorkflow(
-            provider=mock_provider,
-            conversation_memory=conversation_memory
+            provider=mock_provider, conversation_memory=conversation_memory
         )
 
         # Step 1: Understand requirements
@@ -63,12 +60,12 @@ class TestArchitecturalDecisionScenarios:
             content="Requirements: Building API for mobile app with complex data relationships. Need efficient data fetching.",
             model="test-model",
             usage={},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         result1 = await workflow.run(
             prompt="Should we use REST or GraphQL for our new API? Analyze requirements first.",
-            files=["docs/requirements.md"]
+            files=["docs/requirements.md"],
         )
 
         assert result1.success is True
@@ -78,13 +75,13 @@ class TestArchitecturalDecisionScenarios:
         workflow.add_hypothesis(
             thread_id,
             "REST API is the better choice",
-            evidence=["Simpler to implement", "Team familiar with REST", "Good caching support"]
+            evidence=["Simpler to implement", "Team familiar with REST", "Good caching support"],
         )
 
         workflow.add_hypothesis(
             thread_id,
             "GraphQL API is the better choice",
-            evidence=["Complex data relationships", "Flexible querying", "Reduced over-fetching"]
+            evidence=["Complex data relationships", "Flexible querying", "Reduced over-fetching"],
         )
 
         # Step 2: Analyze REST approach
@@ -92,12 +89,12 @@ class TestArchitecturalDecisionScenarios:
             content="REST analysis: Simple endpoints, established patterns. However, mobile clients need multiple endpoints for single views, causing over-fetching.",
             model="test-model",
             usage={},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         result2 = await workflow.run(
             prompt="Analyze the pros and cons of REST API for our use case",
-            continuation_id=thread_id
+            continuation_id=thread_id,
         )
 
         # Update REST hypothesis with analysis
@@ -108,8 +105,8 @@ class TestArchitecturalDecisionScenarios:
                 "PRO: Simple implementation",
                 "PRO: Team expertise",
                 "CON: Over-fetching data for mobile",
-                "CON: Multiple round trips needed"
-            ]
+                "CON: Multiple round trips needed",
+            ],
         )
 
         workflow.update_confidence(thread_id, ConfidenceLevel.LOW.value)
@@ -119,12 +116,12 @@ class TestArchitecturalDecisionScenarios:
             content="GraphQL analysis: Solves over-fetching, single endpoint. Learning curve for team, requires new tooling and caching strategy.",
             model="test-model",
             usage={},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         result3 = await workflow.run(
             prompt="Analyze the pros and cons of GraphQL for our use case",
-            continuation_id=thread_id
+            continuation_id=thread_id,
         )
 
         # Update GraphQL hypothesis with analysis
@@ -137,8 +134,8 @@ class TestArchitecturalDecisionScenarios:
                 "PRO: Strong typing with schema",
                 "CON: Team learning curve",
                 "CON: Complex caching",
-                "CON: New tooling needed"
-            ]
+                "CON: New tooling needed",
+            ],
         )
 
         workflow.update_confidence(thread_id, ConfidenceLevel.MEDIUM.value)
@@ -148,12 +145,11 @@ class TestArchitecturalDecisionScenarios:
             content="Trade-off analysis: Mobile data efficiency critical, over-fetching causes performance issues. GraphQL's benefits outweigh learning curve for this use case.",
             model="test-model",
             usage={},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         result4 = await workflow.run(
-            prompt="Weigh the trade-offs and make a recommendation",
-            continuation_id=thread_id
+            prompt="Weigh the trade-offs and make a recommendation", continuation_id=thread_id
         )
 
         # Validate GraphQL hypothesis as the recommendation
@@ -196,8 +192,7 @@ class TestArchitecturalDecisionScenarios:
         for a high-traffic application.
         """
         workflow = ThinkDeepWorkflow(
-            provider=mock_provider,
-            conversation_memory=conversation_memory
+            provider=mock_provider, conversation_memory=conversation_memory
         )
 
         # Step 1: Requirements analysis
@@ -205,12 +200,12 @@ class TestArchitecturalDecisionScenarios:
             content="Requirements: High write throughput, eventual consistency acceptable, horizontal scaling needed.",
             model="test-model",
             usage={},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         result = await workflow.run(
             prompt="Choose database: PostgreSQL vs MongoDB vs Cassandra. Analyze requirements.",
-            files=["docs/requirements.md", "docs/scale_projections.md"]
+            files=["docs/requirements.md", "docs/scale_projections.md"],
         )
 
         thread_id = result.metadata["thread_id"]
@@ -226,13 +221,10 @@ class TestArchitecturalDecisionScenarios:
                 content=f"Analysis step {i}: Evaluating option {i-1}",
                 model="test-model",
                 usage={},
-                stop_reason="end_turn"
+                stop_reason="end_turn",
             )
 
-            await workflow.run(
-                prompt=f"Analyze option {i-1}",
-                continuation_id=thread_id
-            )
+            await workflow.run(prompt=f"Analyze option {i-1}", continuation_id=thread_id)
 
         # Validate Cassandra based on requirements
         workflow.validate_hypothesis(thread_id, "Cassandra is best choice")
@@ -264,9 +256,7 @@ class TestBugInvestigationScenarios:
         return ConversationMemory()
 
     @pytest.mark.asyncio
-    async def test_bug_investigation_api_slowness(
-        self, mock_provider, conversation_memory
-    ):
+    async def test_bug_investigation_api_slowness(self, mock_provider, conversation_memory):
         """
         Test bug investigation: API endpoint responding slowly.
 
@@ -278,8 +268,7 @@ class TestBugInvestigationScenarios:
         - Confidence progression to certain
         """
         workflow = ThinkDeepWorkflow(
-            provider=mock_provider,
-            conversation_memory=conversation_memory
+            provider=mock_provider, conversation_memory=conversation_memory
         )
 
         # Step 1: Symptom analysis
@@ -287,12 +276,12 @@ class TestBugInvestigationScenarios:
             content="Symptom: /api/users endpoint responding in 5+ seconds. Started after recent deployment. Peak traffic times worse.",
             model="test-model",
             usage={},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         result1 = await workflow.run(
             prompt="Investigate why /api/users endpoint is slow. Start with symptom analysis.",
-            files=["logs/api_performance.log"]
+            files=["logs/api_performance.log"],
         )
 
         assert result1.success is True
@@ -302,25 +291,25 @@ class TestBugInvestigationScenarios:
         workflow.add_hypothesis(
             thread_id,
             "Database query inefficiency (missing index)",
-            evidence=["Slow response correlates with database calls"]
+            evidence=["Slow response correlates with database calls"],
         )
 
         workflow.add_hypothesis(
             thread_id,
             "N+1 query problem in ORM",
-            evidence=["Recent code changes added eager loading"]
+            evidence=["Recent code changes added eager loading"],
         )
 
         workflow.add_hypothesis(
             thread_id,
             "Network latency to database",
-            evidence=["Problem started after deployment to new region"]
+            evidence=["Problem started after deployment to new region"],
         )
 
         workflow.add_hypothesis(
             thread_id,
             "Memory leak causing GC pressure",
-            evidence=["Performance degrades over time"]
+            evidence=["Performance degrades over time"],
         )
 
         # Step 2: Check database queries
@@ -328,13 +317,13 @@ class TestBugInvestigationScenarios:
             content="Database slow query log shows SELECT * FROM users taking 4.5s. EXPLAIN shows full table scan, no index on email column used in WHERE clause.",
             model="test-model",
             usage={},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         result2 = await workflow.run(
             prompt="Analyze database query performance and execution plans",
             continuation_id=thread_id,
-            files=["logs/slow_query.log", "db/schema.sql"]
+            files=["logs/slow_query.log", "db/schema.sql"],
         )
 
         # Strong evidence for missing index hypothesis
@@ -344,8 +333,8 @@ class TestBugInvestigationScenarios:
             new_evidence=[
                 "Full table scan detected in EXPLAIN",
                 "No index on email column",
-                "Query takes 4.5s of total 5s response time"
-            ]
+                "Query takes 4.5s of total 5s response time",
+            ],
         )
 
         workflow.update_confidence(thread_id, ConfidenceLevel.MEDIUM.value)
@@ -355,13 +344,13 @@ class TestBugInvestigationScenarios:
             content="Code analysis: Recent changes use select_related() correctly. Only 3 queries total, not N+1 pattern.",
             model="test-model",
             usage={},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         result3 = await workflow.run(
             prompt="Check for N+1 query patterns in recent code changes",
             continuation_id=thread_id,
-            files=["src/api/users.py"]
+            files=["src/api/users.py"],
         )
 
         # Disprove N+1 hypothesis
@@ -369,7 +358,7 @@ class TestBugInvestigationScenarios:
             thread_id,
             "N+1 query problem in ORM",
             new_evidence=["Only 3 queries executed", "select_related() used correctly"],
-            new_status="disproven"
+            new_status="disproven",
         )
 
         # Step 4: Rule out network latency
@@ -377,13 +366,13 @@ class TestBugInvestigationScenarios:
             content="Network metrics: Database connection latency 2ms average, 5ms p99. Not significant contributor.",
             model="test-model",
             usage={},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         result4 = await workflow.run(
             prompt="Measure network latency to database server",
             continuation_id=thread_id,
-            files=["logs/network_metrics.log"]
+            files=["logs/network_metrics.log"],
         )
 
         # Disprove network latency hypothesis
@@ -395,13 +384,13 @@ class TestBugInvestigationScenarios:
             content="Memory analysis: Heap usage stable, GC pauses under 10ms. Memory not the issue.",
             model="test-model",
             usage={},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         result5 = await workflow.run(
             prompt="Analyze memory usage and GC metrics",
             continuation_id=thread_id,
-            files=["logs/gc.log", "logs/heap_dump.hprof"]
+            files=["logs/gc.log", "logs/heap_dump.hprof"],
         )
 
         # Disprove memory leak hypothesis
@@ -412,13 +401,13 @@ class TestBugInvestigationScenarios:
             content="Added index on users.email column. Query time reduced from 4.5s to 15ms. Response time now 200ms total.",
             model="test-model",
             usage={},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         result6 = await workflow.run(
             prompt="Verify that adding index fixes the performance issue",
             continuation_id=thread_id,
-            files=["staging/performance_test_results.log"]
+            files=["staging/performance_test_results.log"],
         )
 
         # Validate root cause with high confidence
@@ -454,9 +443,7 @@ class TestBugInvestigationScenarios:
         assert summary["confidence"] == ConfidenceLevel.VERY_HIGH.value
 
     @pytest.mark.asyncio
-    async def test_bug_investigation_intermittent_crash(
-        self, mock_provider, conversation_memory
-    ):
+    async def test_bug_investigation_intermittent_crash(self, mock_provider, conversation_memory):
         """
         Test bug investigation: Intermittent application crash.
 
@@ -464,8 +451,7 @@ class TestBugInvestigationScenarios:
         Requires analyzing logs, stack traces, and environmental factors.
         """
         workflow = ThinkDeepWorkflow(
-            provider=mock_provider,
-            conversation_memory=conversation_memory
+            provider=mock_provider, conversation_memory=conversation_memory
         )
 
         # Step 1: Analyze crash symptoms
@@ -473,12 +459,12 @@ class TestBugInvestigationScenarios:
             content="Crash pattern: NullPointerException in background thread. Happens ~10% of requests. No obvious pattern in timing.",
             model="test-model",
             usage={},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         result1 = await workflow.run(
             prompt="Investigate intermittent application crashes. Analyze stack traces and patterns.",
-            files=["logs/crash_reports.log"]
+            files=["logs/crash_reports.log"],
         )
 
         thread_id = result1.metadata["thread_id"]
@@ -487,19 +473,19 @@ class TestBugInvestigationScenarios:
         workflow.add_hypothesis(
             thread_id,
             "Race condition in background processing",
-            evidence=["Crash in background thread", "Intermittent nature"]
+            evidence=["Crash in background thread", "Intermittent nature"],
         )
 
         workflow.add_hypothesis(
             thread_id,
             "Null value from external API",
-            evidence=["NullPointerException in code that processes API response"]
+            evidence=["NullPointerException in code that processes API response"],
         )
 
         workflow.add_hypothesis(
             thread_id,
             "Memory corruption under high load",
-            evidence=["Only happens under production load"]
+            evidence=["Only happens under production load"],
         )
 
         # Step 2: Analyze thread interactions
@@ -507,20 +493,20 @@ class TestBugInvestigationScenarios:
             content="Thread dump analysis: No obvious race condition. Synchronized blocks used correctly. Thread count stable.",
             model="test-model",
             usage={},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         result2 = await workflow.run(
             prompt="Analyze thread dumps for race conditions",
             continuation_id=thread_id,
-            files=["logs/thread_dumps.log"]
+            files=["logs/thread_dumps.log"],
         )
 
         # Weak evidence against race condition
         workflow.update_hypothesis(
             thread_id,
             "Race condition in background processing",
-            new_evidence=["No race detected in thread dumps", "Synchronization appears correct"]
+            new_evidence=["No race detected in thread dumps", "Synchronization appears correct"],
         )
 
         # Step 3: Check external API responses
@@ -528,13 +514,13 @@ class TestBugInvestigationScenarios:
             content="API response analysis: External service occasionally returns null for 'metadata' field. Code assumes non-null.",
             model="test-model",
             usage={},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         result3 = await workflow.run(
             prompt="Analyze external API responses for null values",
             continuation_id=thread_id,
-            files=["logs/api_responses.json", "src/integrations/external_api.py"]
+            files=["logs/api_responses.json", "src/integrations/external_api.py"],
         )
 
         # Strong evidence for null API response
@@ -544,8 +530,8 @@ class TestBugInvestigationScenarios:
             new_evidence=[
                 "API returns null for 'metadata' field in some responses",
                 "Code accesses metadata.user without null check",
-                "Crash rate matches API null response rate (10%)"
-            ]
+                "Crash rate matches API null response rate (10%)",
+            ],
         )
 
         workflow.update_confidence(thread_id, ConfidenceLevel.HIGH.value)
@@ -555,12 +541,11 @@ class TestBugInvestigationScenarios:
             content="Memory analysis shows no corruption. Stack traces consistent with null pointer, not memory issues.",
             model="test-model",
             usage={},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         result4 = await workflow.run(
-            prompt="Check for memory corruption",
-            continuation_id=thread_id
+            prompt="Check for memory corruption", continuation_id=thread_id
         )
 
         workflow.disprove_hypothesis(thread_id, "Memory corruption under high load")
@@ -570,13 +555,13 @@ class TestBugInvestigationScenarios:
             content="Added null check for metadata field. Tested with 1000 requests, no crashes. Problem resolved.",
             model="test-model",
             usage={},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         result5 = await workflow.run(
             prompt="Verify that null check fixes the crash",
             continuation_id=thread_id,
-            files=["tests/integration_test_results.log"]
+            files=["tests/integration_test_results.log"],
         )
 
         # Validate root cause
@@ -624,8 +609,7 @@ class TestComplexMultiStepReasoning:
         - Complex evidence accumulation
         """
         workflow = ThinkDeepWorkflow(
-            provider=mock_provider,
-            conversation_memory=conversation_memory
+            provider=mock_provider, conversation_memory=conversation_memory
         )
 
         # Initial investigation
@@ -633,20 +617,16 @@ class TestComplexMultiStepReasoning:
             content="Starting complex investigation.",
             model="test-model",
             usage={},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
-        result = await workflow.run(
-            prompt="Investigate complex system performance degradation"
-        )
+        result = await workflow.run(prompt="Investigate complex system performance degradation")
 
         thread_id = result.metadata["thread_id"]
 
         # Add initial hypothesis
         workflow.add_hypothesis(
-            thread_id,
-            "Initial hypothesis: CPU bottleneck",
-            evidence=["High CPU usage observed"]
+            thread_id, "Initial hypothesis: CPU bottleneck", evidence=["High CPU usage observed"]
         )
 
         # Simulate 10+ investigation steps with hypothesis evolution
@@ -655,13 +635,10 @@ class TestComplexMultiStepReasoning:
                 content=f"Investigation step {step_num}: Gathering evidence and refining understanding.",
                 model="test-model",
                 usage={},
-                stop_reason="end_turn"
+                stop_reason="end_turn",
             )
 
-            await workflow.run(
-                prompt=f"Investigation step {step_num}",
-                continuation_id=thread_id
-            )
+            await workflow.run(prompt=f"Investigation step {step_num}", continuation_id=thread_id)
 
             # Simulate hypothesis evolution
             if step_num == 4:
@@ -670,7 +647,7 @@ class TestComplexMultiStepReasoning:
                 workflow.add_hypothesis(
                     thread_id,
                     "Revised hypothesis: I/O bottleneck",
-                    evidence=["Disk I/O wait time high"]
+                    evidence=["Disk I/O wait time high"],
                 )
                 workflow.update_confidence(thread_id, ConfidenceLevel.LOW.value)
 
@@ -679,7 +656,7 @@ class TestComplexMultiStepReasoning:
                 workflow.update_hypothesis(
                     thread_id,
                     "Revised hypothesis: I/O bottleneck",
-                    new_evidence=["Database queries show high I/O", "Disk queue depth elevated"]
+                    new_evidence=["Database queries show high I/O", "Disk queue depth elevated"],
                 )
                 workflow.update_confidence(thread_id, ConfidenceLevel.MEDIUM.value)
 
@@ -731,8 +708,7 @@ class TestComplexMultiStepReasoning:
         - All integrated into coherent investigation
         """
         workflow = ThinkDeepWorkflow(
-            provider=mock_provider,
-            conversation_memory=conversation_memory
+            provider=mock_provider, conversation_memory=conversation_memory
         )
 
         # Step 1: Analyze user reports
@@ -740,12 +716,12 @@ class TestComplexMultiStepReasoning:
             content="User reports: Form submission fails 30% of the time. Error message: 'Request timeout'.",
             model="test-model",
             usage={},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         result = await workflow.run(
             prompt="Investigate form submission failures reported by users",
-            files=["docs/user_reports.md"]
+            files=["docs/user_reports.md"],
         )
 
         thread_id = result.metadata["thread_id"]
@@ -753,7 +729,7 @@ class TestComplexMultiStepReasoning:
         workflow.add_hypothesis(
             thread_id,
             "Backend processing timeout causing failures",
-            evidence=["User reports show timeout errors"]
+            evidence=["User reports show timeout errors"],
         )
 
         # Step 2: Analyze logs
@@ -761,19 +737,19 @@ class TestComplexMultiStepReasoning:
             content="Logs show: form submission endpoint has 504 Gateway Timeout errors. Backend processing takes >30s.",
             model="test-model",
             usage={},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         result2 = await workflow.run(
             prompt="Check application logs for form submission errors",
             continuation_id=thread_id,
-            files=["logs/application.log"]
+            files=["logs/application.log"],
         )
 
         workflow.update_hypothesis(
             thread_id,
             "Backend processing timeout causing failures",
-            new_evidence=["504 Gateway Timeout in logs", "Processing exceeds 30s timeout"]
+            new_evidence=["504 Gateway Timeout in logs", "Processing exceeds 30s timeout"],
         )
 
         # Step 3: Analyze code
@@ -781,13 +757,13 @@ class TestComplexMultiStepReasoning:
             content="Code analysis: Form handler makes synchronous API call to external service with no timeout config.",
             model="test-model",
             usage={},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         result3 = await workflow.run(
             prompt="Analyze form submission code for timeout handling",
             continuation_id=thread_id,
-            files=["src/forms/submission_handler.py"]
+            files=["src/forms/submission_handler.py"],
         )
 
         workflow.update_hypothesis(
@@ -796,8 +772,8 @@ class TestComplexMultiStepReasoning:
             new_evidence=[
                 "Synchronous API call to external service",
                 "No timeout configured on API client",
-                "External service response time varies"
-            ]
+                "External service response time varies",
+            ],
         )
 
         # Step 4: Check performance metrics
@@ -805,13 +781,13 @@ class TestComplexMultiStepReasoning:
             content="Metrics: External API p50=2s, p95=25s, p99=45s. Highly variable response times.",
             model="test-model",
             usage={},
-            stop_reason="end_turn"
+            stop_reason="end_turn",
         )
 
         result4 = await workflow.run(
             prompt="Review external API performance metrics",
             continuation_id=thread_id,
-            files=["metrics/external_api_latency.json"]
+            files=["metrics/external_api_latency.json"],
         )
 
         workflow.update_hypothesis(
@@ -819,8 +795,8 @@ class TestComplexMultiStepReasoning:
             "Backend processing timeout causing failures",
             new_evidence=[
                 "External API p99 latency: 45s",
-                "30% of requests exceed 30s (matches failure rate)"
-            ]
+                "30% of requests exceed 30s (matches failure rate)",
+            ],
         )
 
         workflow.update_confidence(thread_id, ConfidenceLevel.HIGH.value)
