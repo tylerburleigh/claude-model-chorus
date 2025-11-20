@@ -1059,7 +1059,13 @@ def ideate(
 
 
 def construct_prompt_with_files(prompt: str, files: list[str] | None) -> str:
-    """Construct a prompt by prepending the content of files using ContextIngestionService."""
+    """Construct a prompt by prepending the content of files using ContextIngestionService.
+
+    NOTE: This function is retained as a convenience wrapper for backward compatibility.
+    It uses ContextIngestionService internally per architectural requirements while
+    maintaining a simple API for CLI command handlers. Direct use of ContextIngestionService
+    is preferred for new code requiring more control over file reading behavior.
+    """
     if not files:
         return prompt
 

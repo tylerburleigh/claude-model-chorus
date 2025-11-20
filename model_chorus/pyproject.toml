@@ -32,6 +32,7 @@ dependencies = [
     "httpx>=0.24.0",
     "rich>=13.0.0",
     "typer>=0.16.0,<0.20",
+    "chardet>=5.0.0",
 ]
 
 [project.optional-dependencies]
@@ -74,8 +75,36 @@ warn_unused_configs = true
 disallow_untyped_defs = true
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["model_chorus/tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
-addopts = "-v --cov=model_chorus --cov-report=term-missing"
+minversion = "3.9"
+asyncio_mode = "auto"
+console_output_style = "progress"
+addopts = [
+    "-v",
+    "--cov=model_chorus",
+    "--cov-report=term-missing",
+    "--strict-markers",
+    "--tb=short",
+    "--reruns=2",
+    "--reruns-delay=1",
+    "--only-rerun=CLI command.*timed out",
+    "--only-rerun=ProviderUnavailableError",
+]
+markers = [
+    "requires_claude: test requires Claude provider (config enabled + CLI available)",
+    "requires_gemini: test requires Gemini provider (config enabled + CLI available)",
+    "requires_codex: test requires Codex provider (config enabled + CLI available)",
+    "requires_any_provider: test requires at least one provider to be available",
+    "integration: integration tests that may require real provider APIs",
+    "unit: unit tests that should use mocks",
+    "slow: tests that take a long time to run",
+    "flaky: mark test as flaky (will be retried automatically)",
+]
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]

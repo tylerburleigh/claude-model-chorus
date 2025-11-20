@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-20T23:39:22.297532Z",
+    "generated_at": "2025-11-20T23:40:45.907655Z",
     "languages": [
       "python"
     ],
@@ -22152,7 +22152,7 @@
         },
         {
           "name": "read",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 86,
           "call_type": "method_call"
         },
@@ -28297,7 +28297,7 @@
         },
         {
           "name": "read",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 596,
           "call_type": "method_call"
         },
@@ -28648,7 +28648,7 @@
         },
         {
           "name": "read",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 815,
           "call_type": "method_call"
         },
@@ -31680,7 +31680,7 @@
         },
         {
           "name": "read",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 189,
           "call_type": "method_call"
         },
@@ -31722,7 +31722,7 @@
         },
         {
           "name": "read",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 606,
           "call_type": "method_call"
         },
