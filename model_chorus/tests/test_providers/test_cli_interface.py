@@ -6,11 +6,7 @@ CodexProvider, GeminiProvider, CursorAgentProvider) properly implement the
 ModelProvider abstract interface.
 """
 
-import sys
 from pathlib import Path
-
-# Add model_chorus to path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "model-chorus" / "src"))
 
 import pytest
 from model_chorus.providers import (

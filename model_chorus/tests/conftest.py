@@ -12,11 +12,6 @@ from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock
 from model_chorus.providers.base_provider import GenerationResponse
 
-# Add tests directory to path to allow importing test_helpers
-_TESTS_DIR = Path(__file__).parent
-if str(_TESTS_DIR) not in sys.path:
-    sys.path.insert(0, str(_TESTS_DIR))
-
 # Control whether integration tests use real CLIs or mocks
 USE_MOCK_PROVIDERS = os.getenv("USE_MOCK_PROVIDERS", "false").lower() == "true"
 
@@ -26,7 +21,7 @@ USE_MOCK_PROVIDERS = os.getenv("USE_MOCK_PROVIDERS", "false").lower() == "true"
 # ============================================================================
 
 # Import provider availability detection from shared test helpers
-import test_helpers
+from . import test_helpers
 CLAUDE_AVAILABLE = test_helpers.CLAUDE_AVAILABLE
 GEMINI_AVAILABLE = test_helpers.GEMINI_AVAILABLE
 CODEX_AVAILABLE = test_helpers.CODEX_AVAILABLE

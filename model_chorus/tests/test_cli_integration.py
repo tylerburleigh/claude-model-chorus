@@ -6,24 +6,11 @@ with various parameters, options, and error conditions.
 """
 
 import json
-import importlib
-import sys
 import pytest
 from pathlib import Path
 from typer.testing import CliRunner
 from unittest.mock import AsyncMock, MagicMock, patch, mock_open
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-SOURCE_ROOT = REPO_ROOT / "model_chorus" / "src"
-source_root_str = str(SOURCE_ROOT)
-inserted_source_path = False
-if source_root_str not in sys.path:
-    sys.path.insert(0, source_root_str)
-    inserted_source_path = True
-
-cli_main = importlib.import_module("model_chorus.cli.main")
-if inserted_source_path and sys.path[0] == source_root_str:
-    sys.path.pop(0)
 from model_chorus.cli.main import app
 from model_chorus.providers.base_provider import GenerationResponse
 from model_chorus.core.base_workflow import WorkflowResult, WorkflowStep

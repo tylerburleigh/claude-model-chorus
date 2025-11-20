@@ -2,17 +2,10 @@
 Tests for provider-level metadata handling within the consensus workflow.
 """
 
-import sys
 from pathlib import Path
 from unittest.mock import AsyncMock
 
 import pytest
-
-REPO_ROOT = Path(__file__).resolve().parents[1]
-SOURCE_ROOT = REPO_ROOT / "model_chorus" / "src"
-source_root_str = str(SOURCE_ROOT)
-if source_root_str not in sys.path:
-    sys.path.insert(0, source_root_str)
 
 from model_chorus.providers.base_provider import GenerationRequest, GenerationResponse
 from model_chorus.workflows.consensus import ConsensusWorkflow

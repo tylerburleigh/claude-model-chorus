@@ -8,18 +8,11 @@ demonstrating ModelChorus's orchestration capabilities:
 - Continuation ID management across workflow types
 """
 
-import sys
 import uuid
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
 import pytest
-
-REPO_ROOT = Path(__file__).resolve().parents[1]
-SOURCE_ROOT = REPO_ROOT / "model_chorus" / "src"
-source_root_str = str(SOURCE_ROOT)
-if source_root_str not in sys.path:
-    sys.path.insert(0, source_root_str)
 
 from model_chorus.workflows.consensus import ConsensusWorkflow, ConsensusStrategy
 from model_chorus.workflows.thinkdeep import ThinkDeepWorkflow
