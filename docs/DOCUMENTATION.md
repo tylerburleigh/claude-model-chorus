@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-20 18:53:12
+**Generated:** 2025-11-20 18:57:14
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 106
-- **Total Lines:** 47232
-- **Total Classes:** 257
+- **Total Lines:** 47318
+- **Total Classes:** 258
 - **Total Functions:** 210
 - **Avg Complexity:** 4.92
 - **Max Complexity:** 55
@@ -2168,6 +2168,25 @@ Example:
     ...     synthesized_output="After considering both perspectives...",
     ...     synthesis_strategy=SynthesisStrategy.AI_SYNTHESIZE
     ... )
+
+---
+
+### `OutputFormatter`
+
+**Language:** python
+**Defined in:** `model_chorus/src/model_chorus/cli/primitives.py:317`
+
+**Description:**
+> Standardizes console output formatting for workflow commands.
+
+Extracts common patterns for:
+1. Displaying workflow start/continuation messages
+2. Showing execution parameters (prompt, provider, files, etc.)
+3. Consistent formatting and truncation
+
+**Methods:**
+- `display_workflow_start()`
+- `write_json_output()`
 
 ---
 

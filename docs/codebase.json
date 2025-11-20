@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-20T23:53:12.884991Z",
+    "generated_at": "2025-11-20T23:57:14.138170Z",
     "languages": [
       "python"
     ],
@@ -10,8 +10,8 @@
   },
   "statistics": {
     "total_files": 106,
-    "total_lines": 47232,
-    "total_classes": 257,
+    "total_lines": 47318,
+    "total_classes": 258,
     "total_functions": 210,
     "avg_complexity": 4.92,
     "max_complexity": 55,
@@ -25,8 +25,8 @@
     "by_language": {
       "python": {
         "files": 106,
-        "lines": 47232,
-        "classes": 257,
+        "lines": 47318,
+        "classes": 258,
         "functions": 210,
         "avg_complexity": 4.92
       }
@@ -285,7 +285,8 @@
       "docstring": "CLI primitive classes for ModelChorus command-line interface.\n\nThis module provides reusable components that extract common patterns from\nCLI command implementations, reducing duplication and improving maintainability.",
       "classes": [
         "ProviderResolver",
-        "WorkflowContext"
+        "WorkflowContext",
+        "OutputFormatter"
       ],
       "functions": [],
       "imports": [
@@ -293,7 +294,7 @@
         "rich.console.Console"
       ],
       "exports": [],
-      "lines": 314
+      "lines": 400
     },
     {
       "name": "setup",
@@ -2760,6 +2761,23 @@
         "resolve_config_defaults",
         "create_memory",
         "prepare_prompt_with_files"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "OutputFormatter",
+      "file": "model_chorus/src/model_chorus/cli/primitives.py",
+      "line": 317,
+      "language": "python",
+      "docstring": "Standardizes console output formatting for workflow commands.\n\nExtracts common patterns for:\n1. Displaying workflow start/continuation messages\n2. Showing execution parameters (prompt, provider, files, etc.)\n3. Consistent formatting and truncation",
+      "bases": [],
+      "methods": [
+        "display_workflow_start",
+        "write_json_output"
       ],
       "properties": [],
       "is_exported": false,
@@ -22240,7 +22258,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 102,
           "call_type": "method_call"
         },
@@ -27186,7 +27204,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 2124,
           "call_type": "method_call"
         },
@@ -28055,7 +28073,7 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 342,
           "call_type": "method_call"
         },
@@ -28361,7 +28379,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 596,
           "call_type": "method_call"
         },
@@ -28463,7 +28481,7 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 703,
           "call_type": "method_call"
         },
@@ -28712,7 +28730,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 815,
           "call_type": "method_call"
         },
@@ -28748,25 +28766,25 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 837,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 840,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 842,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 844,
           "call_type": "method_call"
         },
@@ -28875,7 +28893,7 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 908,
           "call_type": "method_call"
         },

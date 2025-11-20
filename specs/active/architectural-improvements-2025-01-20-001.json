@@ -2,7 +2,7 @@
   "spec_id": "architectural-improvements-2025-01-20-001",
   "title": "Model-Chorus Architectural Improvements",
   "generated": "2025-01-20T20:30:00Z",
-  "last_updated": "2025-11-20T23:53:42.614642Z",
+  "last_updated": "2025-11-20T23:57:15.798227Z",
   "description": "Comprehensive architectural refactoring to eliminate code duplication, improve maintainability, enhance reliability, and establish scalable foundations for future development.",
   "hierarchy": {
     "spec-root": {
@@ -17,7 +17,7 @@
         "phase-4"
       ],
       "total_tasks": 69,
-      "completed_tasks": 21,
+      "completed_tasks": 22,
       "metadata": {
         "objectives": [
           "Reduce code duplication by 30-40% through shared primitives",
@@ -37,18 +37,21 @@
     "phase-1": {
       "type": "phase",
       "title": "Foundation & Quick Wins",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "spec-root",
       "children": [
         "phase-1-files",
         "phase-1-verify"
       ],
       "total_tasks": 18,
-      "completed_tasks": 17,
+      "completed_tasks": 18,
       "metadata": {
         "purpose": "Establish code quality infrastructure and shared context handling",
         "risk_level": "low",
-        "estimated_duration": "1-2 weeks"
+        "estimated_duration": "1-2 weeks",
+        "needs_journaling": false,
+        "completed_at": "2025-11-20T23:57:15.786499Z",
+        "journaled_at": "2025-11-20T23:57:15.798199Z"
       },
       "dependencies": {
         "blocks": [
@@ -518,7 +521,7 @@
     "phase-1-verify": {
       "type": "group",
       "title": "Verification",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-1",
       "children": [
         "verify-1-1",
@@ -535,8 +538,12 @@
         "depends": []
       },
       "total_tasks": 5,
-      "completed_tasks": 4,
-      "metadata": {}
+      "completed_tasks": 5,
+      "metadata": {
+        "needs_journaling": false,
+        "completed_at": "2025-11-20T23:57:15.786496Z",
+        "journaled_at": "2025-11-20T23:57:15.796147Z"
+      }
     },
     "verify-1-1": {
       "type": "verify",
@@ -592,7 +599,7 @@
     "verify-1-3": {
       "type": "verify",
       "title": "CI/CD pipeline runs successfully",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-1-verify",
       "children": [],
       "dependencies": {
@@ -601,13 +608,17 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "manual",
         "expected": "GitHub Actions workflows complete successfully",
         "command": "",
         "started_at": "2025-11-20T23:37:54.423045Z",
-        "status_note": "Skipping CI/CD verification per user request"
+        "status_note": "Skipping CI/CD verification per user request",
+        "completed_at": "2025-11-20T23:57:15.786317Z",
+        "needs_journaling": false,
+        "actual_hours": 0.323,
+        "journaled_at": "2025-11-20T23:57:15.791538Z"
       }
     },
     "verify-1-4": {
@@ -905,7 +916,9 @@
         "file_path": "model_chorus/src/model_chorus/config/models.py",
         "task_category": "implementation",
         "estimated_hours": 3,
-        "description": "Enhance typed configuration objects"
+        "description": "Enhance typed configuration objects",
+        "started_at": "2025-11-20T23:54:50.912629Z",
+        "status_note": "Enhancing typed configuration objects"
       }
     },
     "task-2-3-1": {
@@ -2271,8 +2284,8 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-20T20:38:01.399125Z",
-    "progress_percentage": 30,
-    "current_phase": "phase-1"
+    "progress_percentage": 31,
+    "current_phase": "phase-2"
   },
   "journal": [
     {
@@ -2481,6 +2494,33 @@
       "content": "Implemented OutputFormatter class in model_chorus/src/model_chorus/cli/primitives.py.\n\nCLASS FEATURES:\n- display_workflow_start(): Standardized display of workflow execution info with automatic prompt truncation, continuation detection, and flexible parameter display via **kwargs\n- write_json_output(): Consistent JSON output writing with directory creation and success messaging\n\nEXTRACTED PATTERNS:\n- Workflow start/continuation messages (~10-12 lines from each command)\n- Parameter display formatting (prompt, provider, files, thread ID)\n- Prompt truncation for readability\n- JSON output handling\n\nFILES MODIFIED:\n- model_chorus/src/model_chorus/cli/primitives.py (now 401 lines total, added 86 lines)\n\nCOMPLETE PRIMITIVES MODULE:\nThe primitives.py module now contains all three planned classes:\n1. ProviderResolver (165 lines) - Provider initialization and fallbacks\n2. WorkflowContext (145 lines) - Config, prompt validation, memory setup\n3. OutputFormatter (86 lines) - Standardized console and file output\n\nTotal: 401 lines of reusable code that will eliminate ~440-475 lines of duplication across 5 workflow commands.",
       "metadata": {},
       "task_id": "task-2-2-3"
+    },
+    {
+      "timestamp": "2025-11-20T23:57:15.791528Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: CI/CD pipeline runs successfully",
+      "author": "claude-code",
+      "content": "Skipped CI/CD verification per user request. Task marked complete to allow progression to Phase 2.",
+      "metadata": {},
+      "task_id": "verify-1-3"
+    },
+    {
+      "timestamp": "2025-11-20T23:57:15.796136Z",
+      "entry_type": "status_change",
+      "title": "Group Completed: Verification",
+      "author": "claude-code",
+      "content": "All child tasks in group phase-1-verify have been completed.",
+      "metadata": {},
+      "task_id": "phase-1-verify"
+    },
+    {
+      "timestamp": "2025-11-20T23:57:15.798192Z",
+      "entry_type": "status_change",
+      "title": "Phase Completed: Foundation & Quick Wins",
+      "author": "claude-code",
+      "content": "All child tasks in phase phase-1 have been completed.",
+      "metadata": {},
+      "task_id": "phase-1"
     }
   ]
 }
