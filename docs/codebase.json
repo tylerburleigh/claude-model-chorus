@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-20T23:40:45.907655Z",
+    "generated_at": "2025-11-20T23:47:38.579400Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 105,
-    "total_lines": 46912,
+    "total_lines": 46918,
     "total_classes": 255,
     "total_functions": 210,
     "avg_complexity": 4.92,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 105,
-        "lines": 46912,
+        "lines": 46918,
         "classes": 255,
         "functions": 210,
         "avg_complexity": 4.92
@@ -276,7 +276,7 @@
         "study_commands.study_app"
       ],
       "exports": [],
-      "lines": 2237
+      "lines": 2243
     },
     {
       "name": "setup",
@@ -4148,7 +4148,7 @@
         {
           "instantiator": "construct_prompt_with_files",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1067,
+          "line": 1073,
           "context": [
             "construct_prompt_with_files"
           ]
@@ -4768,7 +4768,7 @@
         {
           "instantiator": "thinkdeep",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1590,
+          "line": 1596,
           "context": [
             "thinkdeep"
           ]
@@ -4776,7 +4776,7 @@
         {
           "instantiator": "thinkdeep_status",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1816,
+          "line": 1822,
           "context": [
             "thinkdeep_status"
           ]
@@ -9348,7 +9348,7 @@
         {
           "instantiator": "consensus",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1300,
+          "line": 1306,
           "context": [
             "consensus"
           ]
@@ -11362,7 +11362,7 @@
         {
           "instantiator": "thinkdeep_status",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1820,
+          "line": 1826,
           "context": [
             "thinkdeep_status"
           ]
@@ -11370,7 +11370,7 @@
         {
           "instantiator": "list_providers",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 2147,
+          "line": 2153,
           "context": [
             "list_providers"
           ]
@@ -11739,7 +11739,7 @@
         {
           "instantiator": "list_providers",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 2148,
+          "line": 2154,
           "context": [
             "list_providers"
           ]
@@ -11960,7 +11960,7 @@
         {
           "instantiator": "list_providers",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 2150,
+          "line": 2156,
           "context": [
             "list_providers"
           ]
@@ -12176,7 +12176,7 @@
         {
           "instantiator": "list_providers",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 2149,
+          "line": 2155,
           "context": [
             "list_providers"
           ]
@@ -12695,7 +12695,7 @@
         {
           "instantiator": "consensus",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1273,
+          "line": 1279,
           "context": [
             "consensus"
           ]
@@ -14767,7 +14767,7 @@
         {
           "instantiator": "thinkdeep",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1596,
+          "line": 1602,
           "context": [
             "thinkdeep"
           ]
@@ -14775,7 +14775,7 @@
         {
           "instantiator": "thinkdeep_status",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1821,
+          "line": 1827,
           "context": [
             "thinkdeep_status"
           ]
@@ -19881,7 +19881,7 @@
         {
           "name": "<module>",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 2237,
+          "line": 2243,
           "call_type": "function_call"
         },
         {
@@ -19990,7 +19990,7 @@
         {
           "name": "<module>",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 2237,
+          "line": 2243,
           "call_type": "function_call"
         },
         {
@@ -20607,7 +20607,7 @@
         {
           "name": "<module>",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 2237,
+          "line": 2243,
           "call_type": "function_call"
         },
         {
@@ -20728,7 +20728,7 @@
         {
           "name": "<module>",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 2237,
+          "line": 2243,
           "call_type": "function_call"
         },
         {
@@ -21880,7 +21880,7 @@
         {
           "name": "<module>",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 2237,
+          "line": 2243,
           "call_type": "function_call"
         },
         {
@@ -22152,7 +22152,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 86,
           "call_type": "method_call"
         },
@@ -22176,7 +22176,7 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 102,
           "call_type": "method_call"
         },
@@ -22248,7 +22248,7 @@
         {
           "name": "<module>",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 2237,
+          "line": 2243,
           "call_type": "function_call"
         },
         {
@@ -22413,13 +22413,13 @@
         {
           "name": "thinkdeep",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1610,
+          "line": 1616,
           "call_type": "function_call"
         },
         {
           "name": "thinkdeep",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1626,
+          "line": 1632,
           "call_type": "function_call"
         }
       ],
@@ -22660,31 +22660,31 @@
         {
           "name": "consensus",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1197,
+          "line": 1203,
           "call_type": "function_call"
         },
         {
           "name": "thinkdeep",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1495,
+          "line": 1501,
           "call_type": "function_call"
         },
         {
           "name": "_config_show",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1972,
+          "line": 1978,
           "call_type": "function_call"
         },
         {
           "name": "_config_show",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1973,
+          "line": 1979,
           "call_type": "method_call"
         },
         {
           "name": "_config_validate",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 2035,
+          "line": 2041,
           "call_type": "function_call"
         },
         {
@@ -22853,7 +22853,7 @@
         {
           "name": "list_providers",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 2188,
+          "line": 2194,
           "call_type": "function_call"
         },
         {
@@ -22949,19 +22949,19 @@
         {
           "name": "consensus",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1259,
+          "line": 1265,
           "call_type": "function_call"
         },
         {
           "name": "thinkdeep",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1543,
+          "line": 1549,
           "call_type": "function_call"
         },
         {
           "name": "thinkdeep",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1570,
+          "line": 1576,
           "call_type": "function_call"
         },
         {
@@ -24719,7 +24719,7 @@
       "file": "model_chorus/src/model_chorus/cli/main.py",
       "line": 1061,
       "language": "python",
-      "docstring": "Construct a prompt by prepending the content of files using ContextIngestionService.",
+      "docstring": "Construct a prompt by prepending the content of files using ContextIngestionService.\n\nNOTE: This function is retained as a convenience wrapper for backward compatibility.\nIt uses ContextIngestionService internally per architectural requirements while\nmaintaining a simple API for CLI command handlers. Direct use of ContextIngestionService\nis preferred for new code requiring more control over file reading behavior.",
       "parameters": [
         {
           "name": "prompt",
@@ -24760,7 +24760,7 @@
         {
           "name": "consensus",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1225,
+          "line": 1231,
           "call_type": "function_call"
         }
       ],
@@ -24768,25 +24768,7 @@
         {
           "name": "can_read_file",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/context_ingestion.py",
-          "line": 1074,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1077,
-          "call_type": "method_call"
-        },
-        {
-          "name": "Exit",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1078,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get_file_info",
-          "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/context_ingestion.py",
-          "line": 1081,
+          "line": 1080,
           "call_type": "method_call"
         },
         {
@@ -24796,33 +24778,33 @@
           "call_type": "method_call"
         },
         {
-          "name": "read_file",
-          "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/context_ingestion.py",
-          "line": 1088,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1092,
-          "call_type": "method_call"
-        },
-        {
           "name": "Exit",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1093,
+          "line": 1084,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get_file_info",
+          "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/context_ingestion.py",
+          "line": 1087,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1095,
+          "line": 1089,
+          "call_type": "method_call"
+        },
+        {
+          "name": "read_file",
+          "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/context_ingestion.py",
+          "line": 1094,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1096,
+          "line": 1098,
           "call_type": "method_call"
         },
         {
@@ -24856,9 +24838,27 @@
           "call_type": "method_call"
         },
         {
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "line": 1108,
+          "call_type": "method_call"
+        },
+        {
           "name": "Exit",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1108,
+          "line": 1111,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "line": 1113,
+          "call_type": "method_call"
+        },
+        {
+          "name": "Exit",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
+          "line": 1114,
           "call_type": "method_call"
         }
       ],
@@ -24867,7 +24867,7 @@
     {
       "name": "consensus",
       "file": "model_chorus/src/model_chorus/cli/main.py",
-      "line": 1114,
+      "line": 1120,
       "language": "python",
       "docstring": "Run consensus workflow with priority-based provider selection.\n\nTries providers in priority order until num_to_consult successful responses\nare obtained. If a provider fails, automatically falls back to the next\nprovider in the priority list.\n\nExample:\n    # Positional prompt\n    model-chorus consensus \"Explain quantum computing\" --num-to-consult 2\n\n    # Flag prompt\n    model-chorus consensus --prompt \"Explain quantum computing\" --num-to-consult 2",
       "parameters": [
@@ -24935,19 +24935,13 @@
         {
           "name": "Argument",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1115,
-          "call_type": "method_call"
-        },
-        {
-          "name": "Option",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1116,
-          "call_type": "method_call"
-        },
-        {
-          "name": "Option",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
           "line": 1121,
+          "call_type": "method_call"
+        },
+        {
+          "name": "Option",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
+          "line": 1122,
           "call_type": "method_call"
         },
         {
@@ -24971,13 +24965,13 @@
         {
           "name": "Option",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1144,
+          "line": 1145,
           "call_type": "method_call"
         },
         {
           "name": "Option",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1149,
+          "line": 1150,
           "call_type": "method_call"
         },
         {
@@ -24993,57 +24987,51 @@
           "call_type": "method_call"
         },
         {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1184,
-          "call_type": "method_call"
-        },
-        {
-          "name": "Exit",
+          "name": "Option",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1187,
+          "line": 1167,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1189,
+          "line": 1190,
           "call_type": "method_call"
         },
         {
           "name": "Exit",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1192,
+          "line": 1193,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "line": 1195,
+          "call_type": "method_call"
+        },
+        {
+          "name": "Exit",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
+          "line": 1198,
           "call_type": "method_call"
         },
         {
           "name": "get_config",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/cli/main.py",
-          "line": 1197,
+          "line": 1203,
           "call_type": "function_call"
         },
         {
           "name": "get_workflow_provider_priority",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
-          "line": 1200,
+          "line": 1206,
           "call_type": "method_call"
         },
         {
           "name": "get_workflow_num_to_consult",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
-          "line": 1204,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get_workflow_default",
-          "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
-          "line": 1207,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get_workflow_default",
-          "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
-          "line": 1211,
+          "line": 1210,
           "call_type": "method_call"
         },
         {
@@ -25053,70 +25041,64 @@
           "call_type": "method_call"
         },
         {
-          "name": "upper",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "name": "get_workflow_default",
+          "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
           "line": 1217,
           "call_type": "method_call"
         },
         {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "name": "get_workflow_default",
+          "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
           "line": 1219,
+          "call_type": "method_call"
+        },
+        {
+          "name": "upper",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "line": 1223,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1220,
+          "line": 1225,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "line": 1226,
           "call_type": "method_call"
         },
         {
           "name": "join",
           "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1221,
+          "line": 1227,
           "call_type": "method_call"
         },
         {
           "name": "lower",
           "file": "built-in",
-          "line": 1221,
+          "line": 1227,
           "call_type": "method_call"
         },
         {
           "name": "Exit",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1223,
+          "line": 1229,
           "call_type": "method_call"
         },
         {
           "name": "construct_prompt_with_files",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/cli/main.py",
-          "line": 1225,
+          "line": 1231,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1229,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1232,
-          "call_type": "method_call"
-        },
-        {
-          "name": "Exit",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
           "line": 1235,
           "call_type": "method_call"
-        },
-        {
-          "name": "len",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1237,
-          "call_type": "function_call"
         },
         {
           "name": "print",
@@ -25125,166 +25107,166 @@
           "call_type": "method_call"
         },
         {
+          "name": "Exit",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
+          "line": 1241,
+          "call_type": "method_call"
+        },
+        {
           "name": "len",
           "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1240,
+          "line": 1243,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "line": 1244,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "line": 1246,
           "call_type": "function_call"
         },
         {
           "name": "join",
           "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1240,
+          "line": 1246,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1242,
+          "line": 1248,
           "call_type": "method_call"
         },
         {
           "name": "Exit",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1245,
+          "line": 1251,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1249,
+          "line": 1255,
           "call_type": "method_call"
         },
         {
           "name": "join",
           "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1250,
+          "line": 1256,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1252,
+          "line": 1258,
           "call_type": "method_call"
         },
         {
           "name": "get_provider_by_name",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/cli/main.py",
-          "line": 1259,
+          "line": 1265,
           "call_type": "function_call"
         },
         {
           "name": "append",
           "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1260,
+          "line": 1266,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1262,
+          "line": 1268,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1265,
+          "line": 1271,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1269,
+          "line": 1275,
           "call_type": "method_call"
         },
         {
           "name": "Exit",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1270,
+          "line": 1276,
           "call_type": "method_call"
         },
         {
           "name": "cast",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/cli/main.py",
-          "line": 1274,
+          "line": 1280,
           "call_type": "function_call"
         },
         {
           "name": "lower",
           "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1282,
+          "line": 1288,
           "call_type": "method_call"
         },
         {
           "name": "get_provider_model",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
-          "line": 1283,
+          "line": 1289,
           "call_type": "method_call"
         },
         {
           "name": "dict",
           "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1286,
-          "call_type": "function_call"
-        },
-        {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
           "line": 1292,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1297,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1306,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1307,
-          "call_type": "method_call"
-        },
-        {
-          "name": "len",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1307,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1308,
+          "line": 1298,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "line": 1303,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "line": 1312,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "line": 1313,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1309,
+          "line": 1313,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1311,
-          "call_type": "method_call"
-        },
-        {
-          "name": "run",
-          "file": "/opt/anaconda3/lib/python3.13/asyncio/runners.py",
           "line": 1314,
           "call_type": "method_call"
         },
         {
-          "name": "execute",
-          "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/workflows/consensus.py",
-          "line": 1314,
-          "call_type": "method_call"
+          "name": "len",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "line": 1315,
+          "call_type": "function_call"
         },
         {
           "name": "print",
@@ -25293,46 +25275,52 @@
           "call_type": "method_call"
         },
         {
-          "name": "add_column",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/table.py",
-          "line": 1321,
+          "name": "run",
+          "file": "/opt/anaconda3/lib/python3.13/asyncio/runners.py",
+          "line": 1320,
           "call_type": "method_call"
         },
         {
-          "name": "add_column",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/table.py",
-          "line": 1322,
+          "name": "execute",
+          "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/workflows/consensus.py",
+          "line": 1320,
           "call_type": "method_call"
         },
         {
-          "name": "add_column",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/table.py",
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
           "line": 1323,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_column",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/table.py",
+          "line": 1327,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_column",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/table.py",
+          "line": 1328,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_column",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/table.py",
+          "line": 1329,
           "call_type": "method_call"
         },
         {
           "name": "list",
           "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1326,
+          "line": 1332,
           "call_type": "function_call"
         },
         {
           "name": "keys",
           "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1326,
+          "line": 1332,
           "call_type": "method_call"
-        },
-        {
-          "name": "add_row",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/table.py",
-          "line": 1330,
-          "call_type": "method_call"
-        },
-        {
-          "name": "len",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1333,
-          "call_type": "function_call"
         },
         {
           "name": "add_row",
@@ -25341,15 +25329,15 @@
           "call_type": "method_call"
         },
         {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1342,
-          "call_type": "method_call"
+          "name": "len",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "line": 1339,
+          "call_type": "function_call"
         },
         {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1343,
+          "name": "add_row",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/table.py",
+          "line": 1342,
           "call_type": "method_call"
         },
         {
@@ -25361,115 +25349,127 @@
         {
           "name": "print",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1350,
+          "line": 1349,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1351,
+          "line": 1354,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1353,
+          "line": 1356,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "line": 1357,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "line": 1359,
           "call_type": "method_call"
         },
         {
           "name": "items",
           "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1369,
+          "line": 1375,
           "call_type": "method_call"
         },
         {
           "name": "write_text",
           "file": "/opt/anaconda3/lib/python3.13/pathlib/_local.py",
-          "line": 1375,
+          "line": 1381,
           "call_type": "method_call"
         },
         {
           "name": "dumps",
           "file": "/opt/anaconda3/lib/python3.13/json/__init__.py",
-          "line": 1375,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1376,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1380,
-          "call_type": "method_call"
-        },
-        {
-          "name": "len",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
           "line": 1381,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "line": 1382,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "line": 1386,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "line": 1387,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1383,
+          "line": 1389,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1384,
+          "line": 1390,
           "call_type": "method_call"
         },
         {
           "name": "Exit",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1385,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1388,
-          "call_type": "method_call"
-        },
-        {
-          "name": "Exit",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1389,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
           "line": 1391,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1395,
-          "call_type": "method_call"
-        },
-        {
-          "name": "format_exc",
-          "file": "/opt/anaconda3/lib/python3.13/traceback.py",
-          "line": 1395,
+          "line": 1394,
           "call_type": "method_call"
         },
         {
           "name": "Exit",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1396,
+          "line": 1395,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "line": 1397,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "line": 1401,
+          "call_type": "method_call"
+        },
+        {
+          "name": "format_exc",
+          "file": "/opt/anaconda3/lib/python3.13/traceback.py",
+          "line": 1401,
+          "call_type": "method_call"
+        },
+        {
+          "name": "Exit",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
+          "line": 1402,
           "call_type": "method_call"
         },
         {
           "name": "command",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/main.py",
-          "line": 1113,
+          "line": 1119,
           "call_type": "method_call"
         }
       ]
@@ -25477,7 +25477,7 @@
     {
       "name": "thinkdeep",
       "file": "model_chorus/src/model_chorus/cli/main.py",
-      "line": 1400,
+      "line": 1406,
       "language": "python",
       "docstring": "Start a ThinkDeep investigation for systematic problem analysis.\n\nThinkDeep provides multi-step investigation with explicit hypothesis tracking,\nconfidence progression, and state management across investigation steps.\n\nExample:\n    # Start new investigation\n    model-chorus thinkdeep --step \"Investigate why API latency increased\" --step-number 1 --total-steps 3 --next-step-required --findings \"Examining deployment logs\" --confidence exploring\n\n    # Continue investigation\n    model-chorus thinkdeep --continuation-id \"thread-123\" --step \"Check database query performance\" --step-number 2 --total-steps 3 --next-step-required --findings \"Found N+1 query pattern\" --confidence medium --hypothesis \"N+1 queries causing slowdown\"\n\n    # Final step (omit --next-step-required)\n    model-chorus thinkdeep --continuation-id \"thread-123\" --step \"Verify fix resolves issue\" --step-number 3 --total-steps 3 --findings \"Latency reduced to baseline\" --confidence high --hypothesis \"Confirmed: N+1 queries were root cause\"",
       "parameters": [
@@ -25575,19 +25575,7 @@
         {
           "name": "Option",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1401,
-          "call_type": "method_call"
-        },
-        {
-          "name": "Option",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1402,
-          "call_type": "method_call"
-        },
-        {
-          "name": "Option",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1405,
+          "line": 1407,
           "call_type": "method_call"
         },
         {
@@ -25599,61 +25587,67 @@
         {
           "name": "Option",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1413,
+          "line": 1411,
           "call_type": "method_call"
         },
         {
           "name": "Option",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1416,
+          "line": 1414,
           "call_type": "method_call"
         },
         {
           "name": "Option",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1421,
+          "line": 1419,
           "call_type": "method_call"
         },
         {
           "name": "Option",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1429,
+          "line": 1422,
           "call_type": "method_call"
         },
         {
           "name": "Option",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1434,
+          "line": 1427,
           "call_type": "method_call"
         },
         {
           "name": "Option",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1439,
+          "line": 1435,
           "call_type": "method_call"
         },
         {
           "name": "Option",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1444,
+          "line": 1440,
           "call_type": "method_call"
         },
         {
           "name": "Option",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1449,
+          "line": 1445,
           "call_type": "method_call"
         },
         {
           "name": "Option",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1454,
+          "line": 1450,
           "call_type": "method_call"
         },
         {
           "name": "Option",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1459,
+          "line": 1455,
+          "call_type": "method_call"
+        },
+        {
+          "name": "Option",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
+          "line": 1460,
           "call_type": "method_call"
         },
         {
@@ -25669,123 +25663,111 @@
           "call_type": "method_call"
         },
         {
+          "name": "Option",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
+          "line": 1477,
+          "call_type": "method_call"
+        },
+        {
           "name": "get_config",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/cli/main.py",
-          "line": 1495,
+          "line": 1501,
           "call_type": "function_call"
         },
         {
           "name": "get_workflow_default_provider",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
-          "line": 1497,
+          "line": 1503,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1499,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1502,
-          "call_type": "method_call"
-        },
-        {
-          "name": "Exit",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
           "line": 1505,
           "call_type": "method_call"
         },
         {
-          "name": "get_workflow_default",
-          "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
-          "line": 1507,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get_workflow_default",
-          "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
-          "line": 1512,
-          "call_type": "method_call"
-        },
-        {
           "name": "print",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1525,
-          "call_type": "method_call"
-        },
-        {
-          "name": "join",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1526,
+          "line": 1508,
           "call_type": "method_call"
         },
         {
           "name": "Exit",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1528,
+          "line": 1511,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get_workflow_default",
+          "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
+          "line": 1513,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get_workflow_default",
+          "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
+          "line": 1518,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1533,
+          "line": 1531,
           "call_type": "method_call"
         },
         {
           "name": "join",
           "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "line": 1532,
+          "call_type": "method_call"
+        },
+        {
+          "name": "Exit",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
           "line": 1534,
           "call_type": "method_call"
         },
         {
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "line": 1539,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "line": 1540,
+          "call_type": "method_call"
+        },
+        {
           "name": "Exit",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1536,
+          "line": 1542,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1540,
+          "line": 1546,
           "call_type": "method_call"
         },
         {
           "name": "get_provider_by_name",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/cli/main.py",
-          "line": 1543,
+          "line": 1549,
           "call_type": "function_call"
         },
         {
           "name": "int",
           "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1543,
+          "line": 1549,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1545,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1548,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1549,
-          "call_type": "method_call"
-        },
-        {
-          "name": "Exit",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1552,
+          "line": 1551,
           "call_type": "method_call"
         },
         {
@@ -25795,153 +25777,147 @@
           "call_type": "method_call"
         },
         {
-          "name": "Exit",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
           "line": 1555,
           "call_type": "method_call"
         },
         {
-          "name": "get_workflow_fallback_providers",
-          "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
+          "name": "Exit",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
           "line": 1558,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1564,
-          "call_type": "method_call"
-        },
-        {
-          "name": "join",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1565,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get_provider_by_name",
-          "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/cli/main.py",
-          "line": 1570,
-          "call_type": "function_call"
-        },
-        {
-          "name": "int",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1571,
-          "call_type": "function_call"
-        },
-        {
-          "name": "append",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1573,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1575,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1580,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1585,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1605,
-          "call_type": "method_call"
-        },
-        {
-          "name": "resolve_context_files",
-          "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/cli/main.py",
-          "line": 1610,
-          "call_type": "function_call"
-        },
-        {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1615,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1617,
-          "call_type": "method_call"
-        },
-        {
-          "name": "join",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1618,
-          "call_type": "method_call"
-        },
-        {
-          "name": "resolve_context_files",
-          "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/cli/main.py",
-          "line": 1626,
-          "call_type": "function_call"
-        },
-        {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1630,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1632,
-          "call_type": "method_call"
-        },
-        {
-          "name": "join",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1633,
+          "line": 1560,
           "call_type": "method_call"
         },
         {
           "name": "Exit",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1635,
+          "line": 1561,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get_workflow_fallback_providers",
+          "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
+          "line": 1564,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "line": 1570,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "line": 1571,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get_provider_by_name",
+          "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/cli/main.py",
+          "line": 1576,
+          "call_type": "function_call"
+        },
+        {
+          "name": "int",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "line": 1577,
+          "call_type": "function_call"
+        },
+        {
+          "name": "append",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "line": 1579,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "line": 1581,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "line": 1586,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "line": 1591,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "line": 1611,
+          "call_type": "method_call"
+        },
+        {
+          "name": "resolve_context_files",
+          "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/cli/main.py",
+          "line": 1616,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "line": 1621,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "line": 1623,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "line": 1624,
+          "call_type": "method_call"
+        },
+        {
+          "name": "resolve_context_files",
+          "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/cli/main.py",
+          "line": 1632,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "line": 1636,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "line": 1638,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
           "line": 1639,
           "call_type": "method_call"
         },
         {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1642,
+          "name": "Exit",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
+          "line": 1641,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1643,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1644,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1646,
+          "line": 1645,
           "call_type": "method_call"
         },
         {
@@ -25953,12 +25929,12 @@
         {
           "name": "print",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1650,
+          "line": 1649,
           "call_type": "method_call"
         },
         {
-          "name": "join",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
           "line": 1650,
           "call_type": "method_call"
         },
@@ -25969,75 +25945,75 @@
           "call_type": "method_call"
         },
         {
-          "name": "join",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1652,
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "line": 1654,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1653,
+          "line": 1656,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "line": 1656,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "line": 1658,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "line": 1658,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "line": 1659,
           "call_type": "method_call"
         },
         {
           "name": "run",
           "file": "/opt/anaconda3/lib/python3.13/asyncio/runners.py",
-          "line": 1656,
+          "line": 1662,
           "call_type": "method_call"
         },
         {
           "name": "run",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/workflows/thinkdeep.py",
-          "line": 1657,
+          "line": 1663,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1675,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/typing.pyi",
-          "line": 1680,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/typing.pyi",
           "line": 1681,
           "call_type": "method_call"
         },
         {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1683,
+          "name": "get",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/typing.pyi",
+          "line": 1686,
           "call_type": "method_call"
         },
         {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1684,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1685,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "name": "get",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/typing.pyi",
           "line": 1687,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
-          "line": 1688,
+          "line": 1689,
           "call_type": "method_call"
         },
         {
@@ -26047,28 +26023,34 @@
           "call_type": "method_call"
         },
         {
-          "name": "len",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1690,
-          "call_type": "function_call"
-        },
-        {
-          "name": "get",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/typing.pyi",
-          "line": 1692,
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "line": 1691,
           "call_type": "method_call"
         },
         {
           "name": "print",
-          "file": "built-in",
-          "line": 1695,
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "line": 1693,
           "call_type": "method_call"
         },
         {
-          "name": "join",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
+          "line": 1694,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/rich/console.py",
           "line": 1696,
           "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "line": 1696,
+          "call_type": "function_call"
         },
         {
           "name": "get",
@@ -26079,19 +26061,19 @@
         {
           "name": "print",
           "file": "built-in",
-          "line": 1700,
+          "line": 1701,
           "call_type": "method_call"
         },
         {
           "name": "join",
           "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1701,
+          "line": 1702,
           "call_type": "method_call"
         },
         {
-          "name": "print",
-          "file": "built-in",
-          "line": 1703,
+          "name": "get",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/typing.pyi",
+          "line": 1704,
           "call_type": "method_call"
         },
         {
@@ -26101,21 +26083,15 @@
           "call_type": "method_call"
         },
         {
-          "name": "print",
-          "file": "built-in",
+          "name": "join",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
           "line": 1707,
           "call_type": "method_call"
         },
         {
-          "name": "len",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1710,
-          "call_type": "function_call"
-        },
-        {
           "name": "print",
           "file": "built-in",
-          "line": 1711,
+          "line": 1709,
           "call_type": "method_call"
         },
         {
@@ -26125,10 +26101,16 @@
           "call_type": "method_call"
         },
         {
-          "name": "get",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/typing.pyi",
-          "line": 1715,
+          "name": "print",
+          "file": "built-in",
+          "line": 1713,
           "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "line": 1716,
+          "call_type": "function_call"
         },
         {
           "name": "print",
@@ -26137,7 +26119,7 @@
           "call_type": "method_call"
         },
         {
-          "name": "get",
+          "name": "print",
           "file": "built-in",
           "line": 1718,
           "call_type": "method_call"
@@ -26145,103 +26127,121 @@
         {
           "name": "get",
           "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/typing.pyi",
-          "line": 1740,
+          "line": 1721,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 1723,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "built-in",
+          "line": 1724,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/typing.pyi",
+          "line": 1746,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1743,
+          "line": 1749,
           "call_type": "function_call"
         },
         {
           "name": "write_text",
           "file": "unknown",
-          "line": 1746,
+          "line": 1752,
           "call_type": "method_call"
         },
         {
           "name": "dumps",
           "file": "/opt/anaconda3/lib/python3.13/json/__init__.py",
-          "line": 1746,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 1747,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 1751,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
           "line": 1752,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "built-in",
-          "line": 1756,
+          "line": 1753,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "built-in",
-          "line": 1761,
+          "line": 1757,
           "call_type": "method_call"
         },
         {
-          "name": "Exit",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
+          "name": "print",
+          "file": "built-in",
+          "line": 1758,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
           "line": 1762,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "built-in",
-          "line": 1765,
+          "line": 1767,
           "call_type": "method_call"
         },
         {
           "name": "Exit",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1766,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
           "line": 1768,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "built-in",
-          "line": 1772,
-          "call_type": "method_call"
-        },
-        {
-          "name": "format_exc",
-          "file": "/opt/anaconda3/lib/python3.13/traceback.py",
-          "line": 1772,
+          "line": 1771,
           "call_type": "method_call"
         },
         {
           "name": "Exit",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1773,
+          "line": 1772,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 1774,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 1778,
+          "call_type": "method_call"
+        },
+        {
+          "name": "format_exc",
+          "file": "/opt/anaconda3/lib/python3.13/traceback.py",
+          "line": 1778,
+          "call_type": "method_call"
+        },
+        {
+          "name": "Exit",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
+          "line": 1779,
           "call_type": "method_call"
         },
         {
           "name": "command",
           "file": "unknown",
-          "line": 1399,
+          "line": 1405,
           "call_type": "method_call"
         }
       ]
@@ -26249,7 +26249,7 @@
     {
       "name": "thinkdeep_status",
       "file": "model_chorus/src/model_chorus/cli/main.py",
-      "line": 1777,
+      "line": 1783,
       "language": "python",
       "docstring": "Inspect the state of an ongoing ThinkDeep investigation.\n\nShows current hypotheses, confidence level, investigation progress,\nand optionally all steps and examined files.\n\nExample:\n    # View basic status\n    model-chorus thinkdeep-status thread-id-123\n\n    # View with all steps\n    model-chorus thinkdeep-status thread-id-123 --steps\n\n    # View with files\n    model-chorus thinkdeep-status thread-id-123 --files --verbose",
       "parameters": [
@@ -26287,86 +26287,56 @@
         {
           "name": "Argument",
           "file": "unknown",
-          "line": 1778,
+          "line": 1784,
           "call_type": "method_call"
         },
         {
           "name": "Option",
           "file": "unknown",
-          "line": 1781,
+          "line": 1787,
           "call_type": "method_call"
         },
         {
           "name": "Option",
           "file": "unknown",
-          "line": 1786,
+          "line": 1792,
           "call_type": "method_call"
         },
         {
           "name": "Option",
           "file": "unknown",
-          "line": 1791,
+          "line": 1797,
           "call_type": "method_call"
         },
         {
           "name": "get_investigation_state",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/workflows/thinkdeep.py",
-          "line": 1827,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 1830,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
           "line": 1833,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 1836,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 1839,
           "call_type": "method_call"
         },
         {
           "name": "Exit",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1836,
+          "line": 1842,
           "call_type": "method_call"
         },
         {
           "name": "get_investigation_summary",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/workflows/thinkdeep.py",
-          "line": 1839,
+          "line": 1845,
           "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 1842,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 1843,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 1846,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 1847,
-          "call_type": "method_call"
-        },
-        {
-          "name": "len",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1847,
-          "call_type": "function_call"
         },
         {
           "name": "print",
@@ -26375,22 +26345,10 @@
           "call_type": "method_call"
         },
         {
-          "name": "len",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1848,
-          "call_type": "function_call"
-        },
-        {
           "name": "print",
           "file": "built-in",
           "line": 1849,
           "call_type": "method_call"
-        },
-        {
-          "name": "len",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1849,
-          "call_type": "function_call"
         },
         {
           "name": "print",
@@ -26401,8 +26359,38 @@
         {
           "name": "print",
           "file": "built-in",
+          "line": 1853,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "line": 1853,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 1854,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "line": 1854,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
           "line": 1855,
           "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "line": 1855,
+          "call_type": "function_call"
         },
         {
           "name": "print",
@@ -26419,44 +26407,32 @@
         {
           "name": "print",
           "file": "built-in",
+          "line": 1864,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
           "line": 1867,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 1873,
           "call_type": "method_call"
         },
         {
           "name": "enumerate",
           "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1868,
+          "line": 1874,
           "call_type": "function_call"
         },
         {
           "name": "get",
           "file": "built-in",
-          "line": 1869,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 1874,
-          "call_type": "method_call"
-        },
-        {
-          "name": "upper",
-          "file": "built-in",
           "line": 1875,
           "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 1878,
-          "call_type": "method_call"
-        },
-        {
-          "name": "len",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1878,
-          "call_type": "function_call"
         },
         {
           "name": "print",
@@ -26465,22 +26441,28 @@
           "call_type": "method_call"
         },
         {
+          "name": "upper",
+          "file": "built-in",
+          "line": 1881,
+          "call_type": "method_call"
+        },
+        {
           "name": "print",
           "file": "built-in",
-          "line": 1882,
+          "line": 1884,
           "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "line": 1884,
+          "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "built-in",
           "line": 1886,
           "call_type": "method_call"
-        },
-        {
-          "name": "enumerate",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1887,
-          "call_type": "function_call"
         },
         {
           "name": "print",
@@ -26491,44 +26473,50 @@
         {
           "name": "print",
           "file": "built-in",
-          "line": 1889,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 1890,
-          "call_type": "method_call"
-        },
-        {
-          "name": "len",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1890,
-          "call_type": "function_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
           "line": 1892,
           "call_type": "method_call"
         },
         {
-          "name": "len",
+          "name": "enumerate",
           "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 1897,
+          "line": 1893,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "built-in",
-          "line": 1900,
+          "line": 1894,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "built-in",
-          "line": 1904,
+          "line": 1895,
           "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 1896,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "line": 1896,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 1898,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "line": 1903,
+          "call_type": "function_call"
         },
         {
           "name": "print",
@@ -26539,18 +26527,12 @@
         {
           "name": "print",
           "file": "built-in",
-          "line": 1908,
+          "line": 1910,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "built-in",
-          "line": 1911,
-          "call_type": "method_call"
-        },
-        {
-          "name": "Exit",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
           "line": 1912,
           "call_type": "method_call"
         },
@@ -26563,25 +26545,43 @@
         {
           "name": "print",
           "file": "built-in",
-          "line": 1918,
-          "call_type": "method_call"
-        },
-        {
-          "name": "format_exc",
-          "file": "/opt/anaconda3/lib/python3.13/traceback.py",
-          "line": 1918,
+          "line": 1917,
           "call_type": "method_call"
         },
         {
           "name": "Exit",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1919,
+          "line": 1918,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 1920,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 1924,
+          "call_type": "method_call"
+        },
+        {
+          "name": "format_exc",
+          "file": "/opt/anaconda3/lib/python3.13/traceback.py",
+          "line": 1924,
+          "call_type": "method_call"
+        },
+        {
+          "name": "Exit",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
+          "line": 1925,
           "call_type": "method_call"
         },
         {
           "name": "command",
           "file": "unknown",
-          "line": 1776,
+          "line": 1782,
           "call_type": "method_call"
         }
       ]
@@ -26589,7 +26589,7 @@
     {
       "name": "config_cmd",
       "file": "model_chorus/src/model_chorus/cli/main.py",
-      "line": 1923,
+      "line": 1929,
       "language": "python",
       "docstring": "Manage ModelChorus configuration.\n\nSubcommands:\n    show     - Display current effective configuration\n    validate - Validate .model-chorusrc file\n    init     - Generate sample .model-chorusrc file\n\nExamples:\n    model-chorus config show\n    model-chorus config validate\n    model-chorus config init",
       "parameters": [
@@ -26617,61 +26617,37 @@
         {
           "name": "Argument",
           "file": "unknown",
-          "line": 1924,
+          "line": 1930,
           "call_type": "method_call"
         },
         {
           "name": "Option",
           "file": "unknown",
-          "line": 1927,
+          "line": 1933,
           "call_type": "method_call"
         },
         {
           "name": "_config_show",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/cli/main.py",
-          "line": 1949,
+          "line": 1955,
           "call_type": "function_call"
         },
         {
           "name": "_config_validate",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/cli/main.py",
-          "line": 1951,
+          "line": 1957,
           "call_type": "function_call"
         },
         {
           "name": "_config_init",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/cli/main.py",
-          "line": 1953,
+          "line": 1959,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "built-in",
-          "line": 1955,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 1956,
-          "call_type": "method_call"
-        },
-        {
-          "name": "Exit",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1957,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 1959,
-          "call_type": "method_call"
-        },
-        {
-          "name": "Exit",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1960,
+          "line": 1961,
           "call_type": "method_call"
         },
         {
@@ -26681,27 +26657,51 @@
           "call_type": "method_call"
         },
         {
-          "name": "print",
-          "file": "built-in",
-          "line": 1966,
+          "name": "Exit",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
+          "line": 1963,
           "call_type": "method_call"
         },
         {
-          "name": "format_exc",
-          "file": "/opt/anaconda3/lib/python3.13/traceback.py",
-          "line": 1966,
+          "name": "print",
+          "file": "built-in",
+          "line": 1965,
           "call_type": "method_call"
         },
         {
           "name": "Exit",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 1967,
+          "line": 1966,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 1968,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 1972,
+          "call_type": "method_call"
+        },
+        {
+          "name": "format_exc",
+          "file": "/opt/anaconda3/lib/python3.13/traceback.py",
+          "line": 1972,
+          "call_type": "method_call"
+        },
+        {
+          "name": "Exit",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
+          "line": 1973,
           "call_type": "method_call"
         },
         {
           "name": "command",
           "file": "unknown",
-          "line": 1922,
+          "line": 1928,
           "call_type": "method_call"
         }
       ]
@@ -26709,7 +26709,7 @@
     {
       "name": "_config_show",
       "file": "model_chorus/src/model_chorus/cli/main.py",
-      "line": 1970,
+      "line": 1976,
       "language": "python",
       "docstring": "Show current effective configuration.",
       "parameters": [
@@ -26729,13 +26729,13 @@
         {
           "name": "config_cmd",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1949,
+          "line": 1955,
           "call_type": "function_call"
         },
         {
           "name": "_config_validate",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 2059,
+          "line": 2065,
           "call_type": "function_call"
         }
       ],
@@ -26743,24 +26743,12 @@
         {
           "name": "get_config",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/cli/main.py",
-          "line": 1972,
+          "line": 1978,
           "call_type": "function_call"
         },
         {
           "name": "get_config",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
-          "line": 1973,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 1975,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
           "line": 1979,
           "call_type": "method_call"
         },
@@ -26773,37 +26761,31 @@
         {
           "name": "print",
           "file": "built-in",
-          "line": 1984,
+          "line": 1985,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "built-in",
-          "line": 1986,
+          "line": 1987,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "built-in",
-          "line": 1988,
+          "line": 1990,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "built-in",
-          "line": 1991,
+          "line": 1992,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "built-in",
-          "line": 1993,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 1995,
+          "line": 1994,
           "call_type": "method_call"
         },
         {
@@ -26821,49 +26803,31 @@
         {
           "name": "print",
           "file": "built-in",
+          "line": 2001,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 2003,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
           "line": 2005,
           "call_type": "method_call"
         },
         {
-          "name": "items",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 2006,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 2007,
-          "call_type": "method_call"
-        },
-        {
-          "name": "model_dump",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/pydantic/main.py",
-          "line": 2008,
-          "call_type": "method_call"
-        },
-        {
-          "name": "items",
-          "file": "built-in",
-          "line": 2009,
-          "call_type": "method_call"
-        },
-        {
-          "name": "isinstance",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 2010,
-          "call_type": "function_call"
-        },
-        {
           "name": "print",
           "file": "built-in",
           "line": 2011,
           "call_type": "method_call"
         },
         {
-          "name": "join",
+          "name": "items",
           "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 2011,
+          "line": 2012,
           "call_type": "method_call"
         },
         {
@@ -26873,39 +26837,45 @@
           "call_type": "method_call"
         },
         {
+          "name": "model_dump",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/pydantic/main.py",
+          "line": 2014,
+          "call_type": "method_call"
+        },
+        {
+          "name": "items",
+          "file": "built-in",
+          "line": 2015,
+          "call_type": "method_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "line": 2016,
+          "call_type": "function_call"
+        },
+        {
           "name": "print",
           "file": "built-in",
           "line": 2017,
           "call_type": "method_call"
         },
         {
-          "name": "print",
-          "file": "built-in",
-          "line": 2020,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get_default_providers",
-          "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
-          "line": 2022,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 2023,
-          "call_type": "method_call"
-        },
-        {
           "name": "join",
           "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 2023,
+          "line": 2017,
           "call_type": "method_call"
         },
         {
-          "name": "get_workflow_default_provider",
-          "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
-          "line": 2025,
+          "name": "print",
+          "file": "built-in",
+          "line": 2019,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 2023,
           "call_type": "method_call"
         },
         {
@@ -26915,21 +26885,51 @@
           "call_type": "method_call"
         },
         {
-          "name": "get_workflow_default",
+          "name": "get_default_providers",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
-          "line": 2027,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
           "line": 2028,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "built-in",
-          "line": 2030,
+          "line": 2029,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "line": 2029,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get_workflow_default_provider",
+          "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
+          "line": 2031,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 2032,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get_workflow_default",
+          "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
+          "line": 2033,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 2034,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 2036,
           "call_type": "method_call"
         }
       ],
@@ -26938,7 +26938,7 @@
     {
       "name": "_config_validate",
       "file": "model_chorus/src/model_chorus/cli/main.py",
-      "line": 2033,
+      "line": 2039,
       "language": "python",
       "docstring": "Validate .model-chorusrc file.",
       "parameters": [
@@ -26958,7 +26958,7 @@
         {
           "name": "config_cmd",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1951,
+          "line": 1957,
           "call_type": "function_call"
         }
       ],
@@ -26966,24 +26966,12 @@
         {
           "name": "get_config",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/cli/main.py",
-          "line": 2035,
+          "line": 2041,
           "call_type": "function_call"
         },
         {
           "name": "find_config_file",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
-          "line": 2038,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 2041,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
           "line": 2044,
           "call_type": "method_call"
         },
@@ -26994,40 +26982,34 @@
           "call_type": "method_call"
         },
         {
-          "name": "Exit",
-          "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 2048,
-          "call_type": "method_call"
-        },
-        {
           "name": "print",
           "file": "built-in",
           "line": 2050,
           "call_type": "method_call"
         },
         {
-          "name": "load_config",
-          "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
+          "name": "print",
+          "file": "built-in",
+          "line": 2053,
+          "call_type": "method_call"
+        },
+        {
+          "name": "Exit",
+          "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
           "line": 2054,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "built-in",
-          "line": 2055,
+          "line": 2056,
           "call_type": "method_call"
         },
         {
-          "name": "print",
-          "file": "built-in",
-          "line": 2058,
+          "name": "load_config",
+          "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
+          "line": 2060,
           "call_type": "method_call"
-        },
-        {
-          "name": "_config_show",
-          "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/cli/main.py",
-          "line": 2059,
-          "call_type": "function_call"
         },
         {
           "name": "print",
@@ -27038,19 +27020,37 @@
         {
           "name": "print",
           "file": "built-in",
-          "line": 2062,
+          "line": 2064,
+          "call_type": "method_call"
+        },
+        {
+          "name": "_config_show",
+          "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/cli/main.py",
+          "line": 2065,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 2067,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 2068,
           "call_type": "method_call"
         },
         {
           "name": "str",
           "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 2062,
+          "line": 2068,
           "call_type": "function_call"
         },
         {
           "name": "Exit",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 2063,
+          "line": 2069,
           "call_type": "method_call"
         }
       ],
@@ -27059,7 +27059,7 @@
     {
       "name": "_config_init",
       "file": "model_chorus/src/model_chorus/cli/main.py",
-      "line": 2066,
+      "line": 2072,
       "language": "python",
       "docstring": "Initialize a sample .model-chorusrc file.",
       "parameters": [
@@ -27079,7 +27079,7 @@
         {
           "name": "config_cmd",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1953,
+          "line": 1959,
           "call_type": "function_call"
         }
       ],
@@ -27087,61 +27087,49 @@
         {
           "name": "cwd",
           "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 2069,
+          "line": 2075,
           "call_type": "method_call"
         },
         {
           "name": "exists",
           "file": "built-in",
-          "line": 2071,
+          "line": 2077,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "built-in",
-          "line": 2072,
+          "line": 2078,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "built-in",
-          "line": 2073,
+          "line": 2079,
           "call_type": "method_call"
         },
         {
           "name": "Exit",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 2074,
+          "line": 2080,
           "call_type": "method_call"
         },
         {
           "name": "open",
           "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 2117,
+          "line": 2123,
           "call_type": "function_call"
         },
         {
           "name": "write",
           "file": "/opt/anaconda3/lib/python3.13/typing.py",
-          "line": 2118,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 2120,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 2121,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
           "line": 2124,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 2126,
           "call_type": "method_call"
         },
         {
@@ -27153,19 +27141,31 @@
         {
           "name": "print",
           "file": "built-in",
-          "line": 2128,
+          "line": 2130,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "built-in",
-          "line": 2130,
+          "line": 2133,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 2134,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 2136,
           "call_type": "method_call"
         },
         {
           "name": "Exit",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/typer/__init__.py",
-          "line": 2131,
+          "line": 2137,
           "call_type": "method_call"
         }
       ],
@@ -27174,7 +27174,7 @@
     {
       "name": "list_providers",
       "file": "model_chorus/src/model_chorus/cli/main.py",
-      "line": 2135,
+      "line": 2141,
       "language": "python",
       "docstring": "List all available providers and their models.\n\nUse --check to verify which providers are actually installed and working.",
       "parameters": [
@@ -27197,56 +27197,32 @@
         {
           "name": "Option",
           "file": "unknown",
-          "line": 2136,
+          "line": 2142,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "built-in",
-          "line": 2153,
+          "line": 2159,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "built-in",
-          "line": 2162,
+          "line": 2168,
           "call_type": "method_call"
         },
         {
           "name": "run",
           "file": "/opt/anaconda3/lib/python3.13/asyncio/runners.py",
-          "line": 2171,
+          "line": 2177,
           "call_type": "method_call"
         },
         {
           "name": "check_all",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/cli/main.py",
-          "line": 2171,
+          "line": 2177,
           "call_type": "function_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 2180,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 2181,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 2182,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 2183,
-          "call_type": "method_call"
         },
         {
           "name": "print",
@@ -27261,52 +27237,52 @@
           "call_type": "method_call"
         },
         {
+          "name": "print",
+          "file": "built-in",
+          "line": 2188,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 2189,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 2192,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 2193,
+          "call_type": "method_call"
+        },
+        {
           "name": "get_install_command",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/cli/main.py",
-          "line": 2188,
+          "line": 2194,
           "call_type": "function_call"
         },
         {
           "name": "get_available_models",
           "file": "unknown",
-          "line": 2191,
+          "line": 2197,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "built-in",
-          "line": 2192,
+          "line": 2198,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 2192,
+          "line": 2198,
           "call_type": "function_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 2195,
-          "call_type": "method_call"
-        },
-        {
-          "name": "join",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 2195,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 2197,
-          "call_type": "method_call"
-        },
-        {
-          "name": "items",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 2200,
-          "call_type": "method_call"
         },
         {
           "name": "print",
@@ -27315,9 +27291,9 @@
           "call_type": "method_call"
         },
         {
-          "name": "print",
-          "file": "built-in",
-          "line": 2202,
+          "name": "join",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "line": 2201,
           "call_type": "method_call"
         },
         {
@@ -27327,33 +27303,33 @@
           "call_type": "method_call"
         },
         {
+          "name": "items",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "line": 2206,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 2207,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 2208,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 2209,
+          "call_type": "method_call"
+        },
+        {
           "name": "get_available_models",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/providers/base_provider.py",
-          "line": 2205,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 2206,
-          "call_type": "method_call"
-        },
-        {
-          "name": "len",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 2206,
-          "call_type": "function_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 2210,
-          "call_type": "method_call"
-        },
-        {
-          "name": "join",
-          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 2210,
+          "line": 2211,
           "call_type": "method_call"
         },
         {
@@ -27363,15 +27339,39 @@
           "call_type": "method_call"
         },
         {
+          "name": "len",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "line": 2212,
+          "call_type": "function_call"
+        },
+        {
           "name": "print",
           "file": "built-in",
-          "line": 2214,
+          "line": 2216,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "line": 2216,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 2218,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 2220,
           "call_type": "method_call"
         },
         {
           "name": "command",
           "file": "unknown",
-          "line": 2134,
+          "line": 2140,
           "call_type": "method_call"
         }
       ]
@@ -27379,7 +27379,7 @@
     {
       "name": "version",
       "file": "model_chorus/src/model_chorus/cli/main.py",
-      "line": 2220,
+      "line": 2226,
       "language": "python",
       "docstring": "Show version information.",
       "parameters": [],
@@ -27396,49 +27396,49 @@
         {
           "name": "print",
           "file": "built-in",
-          "line": 2222,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 2223,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 2224,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 2225,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 2226,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
-          "line": 2227,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "built-in",
           "line": 2228,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 2229,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 2230,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 2231,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 2232,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 2233,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "built-in",
+          "line": 2234,
           "call_type": "method_call"
         },
         {
           "name": "command",
           "file": "unknown",
-          "line": 2219,
+          "line": 2225,
           "call_type": "method_call"
         }
       ]
@@ -27446,7 +27446,7 @@
     {
       "name": "main",
       "file": "model_chorus/src/model_chorus/cli/main.py",
-      "line": 2231,
+      "line": 2237,
       "language": "python",
       "docstring": "Main entry point for CLI.",
       "parameters": [],
@@ -27496,7 +27496,7 @@
         {
           "name": "<module>",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 2237,
+          "line": 2243,
           "call_type": "function_call"
         },
         {
@@ -27522,7 +27522,7 @@
         {
           "name": "app",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/cli/main.py",
-          "line": 2233,
+          "line": 2239,
           "call_type": "function_call"
         }
       ],
@@ -27991,7 +27991,7 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 342,
           "call_type": "method_call"
         },
@@ -28297,7 +28297,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 596,
           "call_type": "method_call"
         },
@@ -28399,7 +28399,7 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 703,
           "call_type": "method_call"
         },
@@ -28648,7 +28648,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 815,
           "call_type": "method_call"
         },
@@ -28684,25 +28684,25 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 837,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 840,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 842,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 844,
           "call_type": "method_call"
         },
@@ -28811,7 +28811,7 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 908,
           "call_type": "method_call"
         },
@@ -28883,7 +28883,7 @@
         {
           "name": "<module>",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 2237,
+          "line": 2243,
           "call_type": "function_call"
         },
         {
@@ -29322,31 +29322,31 @@
         {
           "name": "consensus",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1197,
+          "line": 1203,
           "call_type": "function_call"
         },
         {
           "name": "thinkdeep",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1495,
+          "line": 1501,
           "call_type": "function_call"
         },
         {
           "name": "_config_show",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1972,
+          "line": 1978,
           "call_type": "function_call"
         },
         {
           "name": "_config_show",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1973,
+          "line": 1979,
           "call_type": "method_call"
         },
         {
           "name": "_config_validate",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 2035,
+          "line": 2041,
           "call_type": "function_call"
         },
         {
@@ -29515,7 +29515,7 @@
         {
           "name": "list_providers",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 2188,
+          "line": 2194,
           "call_type": "function_call"
         },
         {
@@ -29611,19 +29611,19 @@
         {
           "name": "consensus",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1259,
+          "line": 1265,
           "call_type": "function_call"
         },
         {
           "name": "thinkdeep",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1543,
+          "line": 1549,
           "call_type": "function_call"
         },
         {
           "name": "thinkdeep",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1570,
+          "line": 1576,
           "call_type": "function_call"
         },
         {
@@ -31517,7 +31517,7 @@
         {
           "name": "_config_validate",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 2054,
+          "line": 2060,
           "call_type": "method_call"
         },
         {
@@ -31680,7 +31680,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 189,
           "call_type": "method_call"
         },
@@ -31722,7 +31722,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 606,
           "call_type": "method_call"
         },
@@ -31776,31 +31776,31 @@
         {
           "name": "consensus",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1197,
+          "line": 1203,
           "call_type": "function_call"
         },
         {
           "name": "thinkdeep",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1495,
+          "line": 1501,
           "call_type": "function_call"
         },
         {
           "name": "_config_show",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1972,
+          "line": 1978,
           "call_type": "function_call"
         },
         {
           "name": "_config_show",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 1973,
+          "line": 1979,
           "call_type": "method_call"
         },
         {
           "name": "_config_validate",
           "file": "model_chorus/src/model_chorus/cli/main.py",
-          "line": 2035,
+          "line": 2041,
           "call_type": "function_call"
         },
         {

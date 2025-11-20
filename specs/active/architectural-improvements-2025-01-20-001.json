@@ -2,7 +2,7 @@
   "spec_id": "architectural-improvements-2025-01-20-001",
   "title": "Model-Chorus Architectural Improvements",
   "generated": "2025-01-20T20:30:00Z",
-  "last_updated": "2025-11-20T23:46:19.242673Z",
+  "last_updated": "2025-11-20T23:48:51.060083Z",
   "description": "Comprehensive architectural refactoring to eliminate code duplication, improve maintainability, enhance reliability, and establish scalable foundations for future development.",
   "hierarchy": {
     "spec-root": {
@@ -17,7 +17,7 @@
         "phase-4"
       ],
       "total_tasks": 69,
-      "completed_tasks": 17,
+      "completed_tasks": 18,
       "metadata": {
         "objectives": [
           "Reduce code duplication by 30-40% through shared primitives",
@@ -670,7 +670,7 @@
     "phase-2": {
       "type": "phase",
       "title": "CLI Architecture Refactoring",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "spec-root",
       "children": [
         "phase-2-investigation",
@@ -687,7 +687,7 @@
         "depends": []
       },
       "total_tasks": 17,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "purpose": "Break down monolithic main.py into reusable command primitives",
         "risk_level": "medium-high",
@@ -697,14 +697,18 @@
     "phase-2-investigation": {
       "type": "group",
       "title": "Investigation",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2",
       "children": [
         "task-2-1"
       ],
       "total_tasks": 1,
-      "completed_tasks": 0,
-      "metadata": {},
+      "completed_tasks": 1,
+      "metadata": {
+        "needs_journaling": false,
+        "completed_at": "2025-11-20T23:48:51.050247Z",
+        "journaled_at": "2025-11-20T23:48:51.060046Z"
+      },
       "dependencies": {
         "blocks": [
           "phase-2-files"
@@ -716,7 +720,7 @@
     "task-2-1": {
       "type": "task",
       "title": "Analyze main.py duplication patterns",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2-investigation",
       "children": [],
       "dependencies": {
@@ -727,12 +731,18 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "task_category": "investigation",
         "estimated_hours": 3,
         "description": "Identify provider resolution, memory setup, and output formatting patterns across commands",
-        "file_path": "task-2-1.md"
+        "file_path": "task-2-1.md",
+        "started_at": "2025-11-20T23:47:25.693291Z",
+        "status_note": "Starting Phase 2 investigation",
+        "completed_at": "2025-11-20T23:48:51.050094Z",
+        "needs_journaling": false,
+        "actual_hours": 0.024,
+        "journaled_at": "2025-11-20T23:48:51.055292Z"
       }
     },
     "phase-2-files": {
@@ -2243,7 +2253,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-20T20:38:01.399125Z",
-    "progress_percentage": 24,
+    "progress_percentage": 26,
     "current_phase": "phase-1"
   },
   "journal": [
@@ -2408,6 +2418,24 @@
       "content": "Phase 1 fidelity review completed. Addressed all critical issues found:\n\nFIXES APPLIED:\n- BLOCKING: Added chardet>=5.0.0 to dependencies (pyproject.toml line 35)\n- MAJOR: Fixed pytest configuration - updated testpaths to [\"model_chorus/tests\"], merged pytest.ini settings into pyproject.toml, removed duplicate pytest.ini file\n- MINOR: Documented construct_prompt_with_files() wrapper function with comprehensive docstring explaining backward compatibility design decision\n\nSKIPPED (per user request to ignore CI):\n- MyPy continue-on-error flag in CI workflow\n\nFILES MODIFIED:\n- model_chorus/pyproject.toml (added chardet, fixed testpaths, consolidated pytest config)\n- model_chorus/pytest.ini (removed - duplicated configuration)\n- model_chorus/src/model_chorus/cli/main.py (added documentation to construct_prompt_with_files)\n\nFIDELITY VERDICT: Phase 1 can now proceed to Phase 2. All blocking and major configuration issues resolved.",
       "metadata": {},
       "task_id": "verify-1-5"
+    },
+    {
+      "timestamp": "2025-11-20T23:48:51.055279Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Analyze main.py duplication patterns",
+      "author": "claude-code",
+      "content": "Analyzed main.py duplication patterns across 5 workflow commands (chat, consensus, thinkdeep, argument, ideate). Identified 7 major duplication patterns totaling ~440-475 lines of duplicated code:\n\n1. Prompt Validation Pattern (~75 lines) - Validates prompt_arg/prompt_flag in all 5 commands\n2. Config Resolution Pattern (~75-100 lines) - Loads workflow defaults for provider, system, timeout\n3. Provider Initialization Pattern (~140 lines) - Provider instantiation with error handling in 4 commands\n4. Fallback Provider Initialization (~90 lines) - Fallback provider setup in 3 commands\n5. Memory Setup Pattern (~5 lines) - ConversationMemory creation in all 5 commands\n6. File Context Ingestion (~5 lines) - construct_prompt_with_files() call in all 5 commands\n7. Output Formatting Pattern (~50-60 lines) - Console output for workflow start/parameters\n\nRECOMMENDATIONS:\n- Create ProviderResolver class for provider initialization and fallback handling\n- Create WorkflowContext class for config resolution, prompt validation, memory setup\n- Create OutputFormatter utility for standardized console output\n\nIMPACT:\n- Current file size: 2,243 lines\n- Estimated reduction: ~400-450 lines (20% reduction)\n- Improved maintainability and consistency across commands",
+      "metadata": {},
+      "task_id": "task-2-1"
+    },
+    {
+      "timestamp": "2025-11-20T23:48:51.060037Z",
+      "entry_type": "status_change",
+      "title": "Group Completed: Investigation",
+      "author": "claude-code",
+      "content": "All child tasks in group phase-2-investigation have been completed.",
+      "metadata": {},
+      "task_id": "phase-2-investigation"
     }
   ]
 }

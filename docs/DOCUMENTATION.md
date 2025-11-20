@@ -1,14 +1,14 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-20 18:40:45
+**Generated:** 2025-11-20 18:47:38
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 105
-- **Total Lines:** 46912
+- **Total Lines:** 46918
 - **Total Classes:** 255
 - **Total Functions:** 210
 - **Avg Complexity:** 4.92
@@ -5866,7 +5866,7 @@ Returns:
 ### `_config_init(verbose) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:2066`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:2072`
 **Complexity:** 4
 
 **Description:**
@@ -5880,7 +5880,7 @@ Returns:
 ### `_config_show(verbose) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1970`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1976`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -5894,7 +5894,7 @@ Returns:
 ### `_config_validate(verbose) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:2033`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:2039`
 **Complexity:** 4
 
 **Description:**
@@ -6977,7 +6977,7 @@ and hypotheses are validated.
 ### `config_cmd(subcommand, verbose) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1923`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1929`
 **Complexity:** 7
 
 **Decorators:** `@app.command(name='config')`
@@ -7004,7 +7004,7 @@ Examples:
 ### `consensus(prompt_arg, prompt_flag, num_to_consult, strategy, files, system, timeout, output, verbose, skip_provider_check) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1114`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1120`
 ⚠️ **Complexity:** 33 (High)
 
 **Decorators:** `@app.command()`
@@ -7045,6 +7045,11 @@ Example:
 
 **Description:**
 > Construct a prompt by prepending the content of files using ContextIngestionService.
+
+NOTE: This function is retained as a convenience wrapper for backward compatibility.
+It uses ContextIngestionService internally per architectural requirements while
+maintaining a simple API for CLI command handlers. Direct use of ContextIngestionService
+is preferred for new code requiring more control over file reading behavior.
 
 **Parameters:**
 - `prompt`: str
@@ -8696,7 +8701,7 @@ Returns:
 ### `list_providers(check) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:2135`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:2141`
 **Complexity:** 8
 
 **Decorators:** `@app.command()`
@@ -8814,7 +8819,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:2231`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:2237`
 **Complexity:** 1
 
 **Description:**
@@ -9973,7 +9978,7 @@ Example:
 ### `thinkdeep(step, step_number, total_steps, next_step_required, findings, provider, continuation_id, hypothesis, confidence, files_checked, relevant_files, thinking_mode, use_assistant_model, output, verbose, skip_provider_check) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1400`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1406`
 ⚠️ **Complexity:** 55 (High)
 
 **Decorators:** `@app.command()`
@@ -10017,7 +10022,7 @@ Example:
 ### `thinkdeep_status(thread_id, show_steps, show_files, verbose) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1777`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1783`
 ⚠️ **Complexity:** 18 (High)
 
 **Decorators:** `@app.command(name='thinkdeep-status')`
@@ -10096,7 +10101,7 @@ Returns:
 ### `version() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:2220`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:2226`
 **Complexity:** 1
 
 **Decorators:** `@app.command()`
