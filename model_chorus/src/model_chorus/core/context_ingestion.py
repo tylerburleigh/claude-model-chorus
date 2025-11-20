@@ -70,6 +70,69 @@ class ContextIngestionService:
         self.max_file_size_kb = max_file_size_kb
         self.warn_file_size_kb = warn_file_size_kb
 
+    def _validate_path(self, file_path: str | Path) -> Path:
+        """
+        Validate and normalize file path.
+
+        Centralized validation ensures consistent error handling
+        across all methods.
+
+        Args:
+            file_path: Path to validate
+
+        Returns:
+            Resolved absolute Path object
+
+        Raises:
+            FileNotFoundError: If file doesn't exist
+            ValueError: If path is not a file
+        """
+        path = Path(file_path).resolve()
+
+        if not path.exists():
+            raise FileNotFoundError(f"File not found: {path}")
+
+        if not path.is_file():
+            raise ValueError(f"Path is not a file: {path}")
+
+        return path
+
+    def _detect_encoding(self, path: Path) -> str:
+        """
+        Detect file encoding and check if binary.
+
+        Centralized encoding detection ensures consistent behavior
+        across all read methods.
+
+        Args:
+            path: Resolved file path
+
+        Returns:
+            Detected encoding string
+
+        Raises:
+            BinaryFileError: If file appears to be binary
+            PermissionError: If file cannot be accessed
+        """
+        try:
+            with open(path, "rb") as f:
+                raw_data = f.read(8192)  # Read first 8KB for detection
+
+            detection = chardet.detect(raw_data)
+            encoding = detection.get("encoding")
+            confidence = detection.get("confidence", 0)
+
+            if encoding is None or confidence < 0.7:
+                raise BinaryFileError(
+                    f"File appears to be binary: {path} "
+                    f"(detection confidence: {confidence:.2f})"
+                )
+
+            return encoding
+
+        except (IOError, OSError) as e:
+            raise PermissionError(f"Cannot access file {path}: {e}")
+
     def read_file(self, file_path: str | Path) -> str:
         """
         Read file contents with size validation.
@@ -87,14 +150,8 @@ class ContextIngestionService:
             PermissionError: If file cannot be accessed
             ValueError: If path is invalid
         """
-        # Normalize and validate path
-        path = Path(file_path).resolve()
-
-        if not path.exists():
-            raise FileNotFoundError(f"File not found: {path}")
-
-        if not path.is_file():
-            raise ValueError(f"Path is not a file: {path}")
+        # Validate path
+        path = self._validate_path(file_path)
 
         # Check file size
         file_size_kb = path.stat().st_size / 1024
@@ -111,20 +168,8 @@ class ContextIngestionService:
                 f"of {self.warn_file_size_kb} KB"
             )
 
-        # Detect encoding and check if binary
-        try:
-            with open(path, "rb") as f:
-                raw_data = f.read(8192)  # Read first 8KB for detection
-
-            detection = chardet.detect(raw_data)
-            encoding = detection.get("encoding")
-            confidence = detection.get("confidence", 0)
-
-            if encoding is None or confidence < 0.7:
-                raise BinaryFileError(f"File appears to be binary: {path}")
-
-        except (IOError, OSError) as e:
-            raise PermissionError(f"Cannot access file {path}: {e}")
+        # Detect encoding
+        encoding = self._detect_encoding(path)
 
         # Read file with detected encoding
         try:
@@ -153,14 +198,7 @@ class ContextIngestionService:
             FileNotFoundError: If file doesn't exist
             ValueError: If path is invalid
         """
-        path = Path(file_path).resolve()
-
-        if not path.exists():
-            raise FileNotFoundError(f"File not found: {path}")
-
-        if not path.is_file():
-            raise ValueError(f"Path is not a file: {path}")
-
+        path = self._validate_path(file_path)
         file_size_kb = path.stat().st_size / 1024
 
         return {
@@ -228,29 +266,9 @@ class ContextIngestionService:
         if chunk_size_kb <= 0:
             raise ValueError("chunk_size_kb must be positive")
 
-        # Normalize and validate path
-        path = Path(file_path).resolve()
-
-        if not path.exists():
-            raise FileNotFoundError(f"File not found: {path}")
-
-        if not path.is_file():
-            raise ValueError(f"Path is not a file: {path}")
-
-        # Detect encoding
-        try:
-            with open(path, "rb") as f:
-                raw_data = f.read(8192)
-
-            detection = chardet.detect(raw_data)
-            encoding = detection.get("encoding")
-            confidence = detection.get("confidence", 0)
-
-            if encoding is None or confidence < 0.7:
-                raise BinaryFileError(f"File appears to be binary: {path}")
-
-        except (IOError, OSError) as e:
-            raise PermissionError(f"Cannot access file {path}: {e}")
+        # Validate path and detect encoding
+        path = self._validate_path(file_path)
+        encoding = self._detect_encoding(path)
 
         # Read file in chunks
         chunks = []

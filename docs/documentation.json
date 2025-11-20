@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-20T21:09:13.432322Z",
+    "generated_at": "2025-11-20T21:10:24.696689Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 103,
-    "total_lines": 44725,
+    "total_lines": 44848,
     "total_classes": 247,
     "total_functions": 206,
     "avg_complexity": 4.94,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 103,
-        "lines": 44725,
+        "lines": 44848,
         "classes": 247,
         "functions": 206,
         "avg_complexity": 4.94
@@ -499,7 +499,7 @@
         "chardet"
       ],
       "exports": [],
-      "lines": 196
+      "lines": 319
     },
     {
       "name": "contradiction",
@@ -4306,10 +4306,28 @@
             "ContextIngestionService",
             "read_file"
           ]
+        },
+        {
+          "instantiator": "read_file_chunked",
+          "file": "model_chorus/src/model_chorus/core/context_ingestion.py",
+          "line": 250,
+          "context": [
+            "ContextIngestionService",
+            "read_file_chunked"
+          ]
+        },
+        {
+          "instantiator": "read_file_chunked",
+          "file": "model_chorus/src/model_chorus/core/context_ingestion.py",
+          "line": 274,
+          "context": [
+            "ContextIngestionService",
+            "read_file_chunked"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 2
+      "instantiation_count": 4
     },
     {
       "name": "ContextIngestionService",
@@ -4322,7 +4340,9 @@
         "__init__",
         "read_file",
         "get_file_info",
-        "can_read_file"
+        "can_read_file",
+        "read_file_chunked",
+        "read_file_lines"
       ],
       "properties": [],
       "is_exported": false,
@@ -27316,7 +27336,7 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 380,
           "call_type": "method_call"
         },
@@ -27724,7 +27744,7 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 759,
           "call_type": "method_call"
         },
@@ -28009,25 +28029,25 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 914,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 917,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 919,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 921,
           "call_type": "method_call"
         },
@@ -28136,7 +28156,7 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 997,
           "call_type": "method_call"
         },
