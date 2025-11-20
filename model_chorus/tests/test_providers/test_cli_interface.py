@@ -6,17 +6,16 @@ CodexProvider, GeminiProvider, CursorAgentProvider) properly implement the
 ModelProvider abstract interface.
 """
 
-from pathlib import Path
-
 import pytest
+
 from model_chorus.providers import (
-    ModelProvider,
-    CLIProvider,
     ClaudeProvider,
+    CLIProvider,
     CodexProvider,
-    GeminiProvider,
     CursorAgentProvider,
+    GeminiProvider,
     GenerationRequest,
+    ModelProvider,
 )
 
 
@@ -50,8 +49,12 @@ class TestCLIProvidersImplementInterface:
     def test_all_providers_have_generate_method(self, providers):
         """Verify all providers have the generate() method."""
         for name, provider in providers.items():
-            assert hasattr(provider, "generate"), f"{name} provider must have generate() method"
-            assert callable(provider.generate), f"{name} provider generate() must be callable"
+            assert hasattr(
+                provider, "generate"
+            ), f"{name} provider must have generate() method"
+            assert callable(
+                provider.generate
+            ), f"{name} provider generate() must be callable"
 
     def test_all_providers_have_build_command_method(self, providers):
         """Verify all providers have the build_command() method."""
@@ -100,7 +103,9 @@ class TestCLIProvidersImplementInterface:
             assert isinstance(
                 models, list
             ), f"{name} provider get_available_models() must return a list"
-            assert len(models) > 0, f"{name} provider must have at least one available model"
+            assert (
+                len(models) > 0
+            ), f"{name} provider must have at least one available model"
 
     def test_all_providers_have_provider_name(self, providers):
         """Verify all providers have a provider_name attribute."""
@@ -124,7 +129,9 @@ class TestCLIProvidersImplementInterface:
             assert isinstance(
                 provider.cli_command, str
             ), f"{name} provider cli_command must be a string"
-            assert len(provider.cli_command) > 0, f"{name} provider cli_command must not be empty"
+            assert (
+                len(provider.cli_command) > 0
+            ), f"{name} provider cli_command must not be empty"
 
     def test_build_command_returns_list(self, providers):
         """Verify build_command() returns a list of command parts."""
@@ -132,8 +139,12 @@ class TestCLIProvidersImplementInterface:
 
         for name, provider in providers.items():
             command = provider.build_command(request)
-            assert isinstance(command, list), f"{name} provider build_command() must return a list"
-            assert len(command) > 0, f"{name} provider build_command() must return non-empty list"
+            assert isinstance(
+                command, list
+            ), f"{name} provider build_command() must return a list"
+            assert (
+                len(command) > 0
+            ), f"{name} provider build_command() must return non-empty list"
             assert all(
                 isinstance(part, str) for part in command
             ), f"{name} provider build_command() must return list of strings"

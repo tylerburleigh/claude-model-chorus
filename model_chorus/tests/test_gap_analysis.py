@@ -6,15 +6,16 @@ and unsupported claims accurately with appropriate severity levels.
 """
 
 import pytest
+
 from model_chorus.core.gap_analysis import (
     Gap,
-    GapType,
     GapSeverity,
-    detect_gaps,
-    detect_missing_evidence,
-    detect_logical_gaps,
-    detect_unsupported_claims,
+    GapType,
     assess_gap_severity,
+    detect_gaps,
+    detect_logical_gaps,
+    detect_missing_evidence,
+    detect_unsupported_claims,
     generate_gap_recommendation,
 )
 
@@ -117,13 +118,17 @@ class TestSeverityAssessment:
 
     def test_logical_gap_major_no_support(self):
         """Test MAJOR severity for logical gap without support."""
-        severity = assess_gap_severity(gap_type=GapType.LOGICAL, has_supporting_logic=False)
+        severity = assess_gap_severity(
+            gap_type=GapType.LOGICAL, has_supporting_logic=False
+        )
 
         assert severity == GapSeverity.MAJOR
 
     def test_logical_gap_moderate_with_support(self):
         """Test MODERATE severity for logical gap with some support."""
-        severity = assess_gap_severity(gap_type=GapType.LOGICAL, has_supporting_logic=True)
+        severity = assess_gap_severity(
+            gap_type=GapType.LOGICAL, has_supporting_logic=True
+        )
 
         assert severity == GapSeverity.MODERATE
 
@@ -135,13 +140,17 @@ class TestSeverityAssessment:
 
     def test_assumption_gap_moderate_no_logic(self):
         """Test MODERATE severity for assumption gap without logic."""
-        severity = assess_gap_severity(gap_type=GapType.ASSUMPTION, has_supporting_logic=False)
+        severity = assess_gap_severity(
+            gap_type=GapType.ASSUMPTION, has_supporting_logic=False
+        )
 
         assert severity == GapSeverity.MODERATE
 
     def test_assumption_gap_minor_with_logic(self):
         """Test MINOR severity for assumption gap with logic."""
-        severity = assess_gap_severity(gap_type=GapType.ASSUMPTION, has_supporting_logic=True)
+        severity = assess_gap_severity(
+            gap_type=GapType.ASSUMPTION, has_supporting_logic=True
+        )
 
         assert severity == GapSeverity.MINOR
 
@@ -168,19 +177,25 @@ class TestGapRecommendations:
 
     def test_logical_recommendation(self):
         """Test recommendation for logical gap."""
-        rec = generate_gap_recommendation(GapType.LOGICAL, GapSeverity.MAJOR, "Therefore X is true")
+        rec = generate_gap_recommendation(
+            GapType.LOGICAL, GapSeverity.MAJOR, "Therefore X is true"
+        )
 
         assert "logical connection" in rec.lower() or "reasoning" in rec.lower()
 
     def test_support_recommendation(self):
         """Test recommendation for support gap."""
-        rec = generate_gap_recommendation(GapType.SUPPORT, GapSeverity.MODERATE, "Main claim")
+        rec = generate_gap_recommendation(
+            GapType.SUPPORT, GapSeverity.MODERATE, "Main claim"
+        )
 
         assert "supporting arguments" in rec.lower() or "sub-claims" in rec.lower()
 
     def test_assumption_recommendation(self):
         """Test recommendation for assumption gap."""
-        rec = generate_gap_recommendation(GapType.ASSUMPTION, GapSeverity.MODERATE, "X leads to Y")
+        rec = generate_gap_recommendation(
+            GapType.ASSUMPTION, GapSeverity.MODERATE, "X leads to Y"
+        )
 
         assert "assumption" in rec.lower() or "premises" in rec.lower()
 
@@ -230,7 +245,10 @@ class TestMissingEvidenceDetection:
     def test_evidence_gap_metadata(self):
         """Test that evidence gap includes proper metadata."""
         gap = detect_missing_evidence(
-            claim_id="claim-4", claim_text="Test claim", citations=[], expected_citation_count=2
+            claim_id="claim-4",
+            claim_text="Test claim",
+            citations=[],
+            expected_citation_count=2,
         )
 
         assert gap is not None
@@ -288,7 +306,9 @@ class TestLogicalGapDetection:
         ]
 
         for claim_text in indicators:
-            gap = detect_logical_gaps(claim_id="test", claim_text=claim_text, supporting_claims=[])
+            gap = detect_logical_gaps(
+                claim_id="test", claim_text=claim_text, supporting_claims=[]
+            )
             assert gap is not None, f"Failed to detect gap for: {claim_text}"
 
 
@@ -466,8 +486,15 @@ class TestRealisticScenarios:
             {
                 "claim_id": "claim-1",
                 "claim_text": "Machine learning models achieve 95% accuracy on ImageNet dataset",
-                "citations": ["ResNet paper", "ImageNet challenge results", "Validation study"],
-                "supporting_claims": ["Multiple architectures tested", "Reproducible results"],
+                "citations": [
+                    "ResNet paper",
+                    "ImageNet challenge results",
+                    "Validation study",
+                ],
+                "supporting_claims": [
+                    "Multiple architectures tested",
+                    "Reproducible results",
+                ],
             },
         ]
 

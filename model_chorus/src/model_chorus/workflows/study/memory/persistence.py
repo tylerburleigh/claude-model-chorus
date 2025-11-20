@@ -13,12 +13,12 @@ Architecture:
 - Full-text search support (future enhancement)
 """
 
+import json
 import logging
 import sqlite3
-import json
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import List, Optional, Dict, Any
-from datetime import datetime, timezone
+from typing import Any
 
 from .models import MemoryEntry, MemoryMetadata, MemoryQuery, MemoryType
 
@@ -81,7 +81,7 @@ class LongTermStorage:
             db_path: Path to SQLite database file (created if doesn't exist)
         """
         self.db_path = Path(db_path)
-        self.connection: Optional[sqlite3.Connection] = None
+        self.connection: sqlite3.Connection | None = None
         logger.info(f"LongTermStorage initialized with db_path={db_path}")
 
     def initialize(self) -> None:
@@ -211,7 +211,7 @@ class LongTermStorage:
                 """,
                     (
                         entry.investigation_id,
-                        datetime.now(timezone.utc).isoformat(),
+                        datetime.now(UTC).isoformat(),
                         json.dumps({}),
                     ),
                 )
@@ -248,7 +248,7 @@ class LongTermStorage:
                         source_entry_id, target_entry_id, created_at
                     ) VALUES (?, ?, ?)
                 """,
-                    (entry_id, ref_id, datetime.now(timezone.utc).isoformat()),
+                    (entry_id, ref_id, datetime.now(UTC).isoformat()),
                 )
 
             # Update investigation entry count
@@ -271,7 +271,7 @@ class LongTermStorage:
             logger.error(f"Failed to save entry {entry_id}: {e}")
             raise
 
-    def get(self, entry_id: str) -> Optional[MemoryEntry]:
+    def get(self, entry_id: str) -> MemoryEntry | None:
         """
         Retrieve a memory entry from persistent storage.
 
@@ -333,7 +333,7 @@ class LongTermStorage:
             logger.error(f"Failed to retrieve entry {entry_id}: {e}")
             raise
 
-    def query(self, query: MemoryQuery) -> List[MemoryEntry]:
+    def query(self, query: MemoryQuery) -> list[MemoryEntry]:
         """
         Query persistent storage for entries matching filter criteria.
 
@@ -355,7 +355,7 @@ class LongTermStorage:
 
             # Build WHERE clauses
             where_clauses = []
-            params = []
+            params: list[Any] = []
 
             if query.investigation_id:
                 where_clauses.append("investigation_id = ?")

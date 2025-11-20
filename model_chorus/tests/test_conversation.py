@@ -10,13 +10,9 @@ Tests verify ConversationMemory functionality including:
 """
 
 import json
-import pytest
 import uuid
-from pathlib import Path
-from datetime import datetime, timezone
 
 from model_chorus.core.conversation import ConversationMemory
-from model_chorus.core.models import ConversationMessage, ConversationThread
 
 
 class TestConversationMemory:
@@ -63,7 +59,9 @@ class TestConversationMemory:
             "temperature": 0.7,
         }
 
-        thread_id = memory.create_thread(workflow_name="consensus", initial_context=initial_context)
+        thread_id = memory.create_thread(
+            workflow_name="consensus", initial_context=initial_context
+        )
 
         # Retrieve and verify context was stored
         thread = memory.get_thread(thread_id)
@@ -81,7 +79,7 @@ class TestConversationMemory:
         assert thread_file.exists()
 
         # Verify file contains valid JSON
-        with open(thread_file, "r") as f:
+        with open(thread_file) as f:
             data = json.load(f)
             assert data["thread_id"] == thread_id
             assert data["workflow_name"] == "test_workflow"
@@ -94,7 +92,9 @@ class TestConversationMemory:
         parent_id = memory.create_thread(workflow_name="parent_workflow")
 
         # Create child thread
-        child_id = memory.create_thread(workflow_name="child_workflow", parent_thread_id=parent_id)
+        child_id = memory.create_thread(
+            workflow_name="child_workflow", parent_thread_id=parent_id
+        )
 
         # Verify relationship
         child_thread = memory.get_thread(child_id)
@@ -229,4 +229,7 @@ class TestConversationMemory:
         # Retrieve and verify context
         thread = memory.get_thread(thread_id)
         assert thread.initial_context["state"]["current_step"] == 2
-        assert thread.initial_context["state"]["models_consulted"] == ["claude", "gpt-5"]
+        assert thread.initial_context["state"]["models_consulted"] == [
+            "claude",
+            "gpt-5",
+        ]

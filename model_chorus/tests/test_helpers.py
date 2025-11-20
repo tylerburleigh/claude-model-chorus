@@ -7,8 +7,9 @@ conftest.py and individual test files.
 
 import shutil
 import subprocess
-import yaml
 from pathlib import Path
+
+import yaml
 
 
 def load_model_chorus_config():
@@ -38,7 +39,9 @@ def load_model_chorus_config():
     return {}
 
 
-def is_provider_enabled_in_config(provider_name: str, model_chorus_config: dict) -> bool:
+def is_provider_enabled_in_config(
+    provider_name: str, model_chorus_config: dict
+) -> bool:
     """
     Check if a provider is enabled in model_chorus_config.yaml.
 
@@ -84,7 +87,9 @@ def is_cli_available(cli_command: str) -> bool:
         return False
 
 
-def is_provider_available(provider_name: str, cli_command: str, model_chorus_config: dict) -> bool:
+def is_provider_available(
+    provider_name: str, cli_command: str, model_chorus_config: dict
+) -> bool:
     """
     Combined check: provider must be enabled in config AND have CLI available.
 
@@ -108,7 +113,9 @@ _MODEL_CHORUS_CONFIG = load_model_chorus_config()
 CLAUDE_AVAILABLE = is_provider_available("claude", "claude", _MODEL_CHORUS_CONFIG)
 GEMINI_AVAILABLE = is_provider_available("gemini", "gemini", _MODEL_CHORUS_CONFIG)
 CODEX_AVAILABLE = is_provider_available("codex", "codex", _MODEL_CHORUS_CONFIG)
-CURSOR_AGENT_AVAILABLE = is_provider_available("cursor-agent", "cursor-agent", _MODEL_CHORUS_CONFIG)
+CURSOR_AGENT_AVAILABLE = is_provider_available(
+    "cursor-agent", "cursor-agent", _MODEL_CHORUS_CONFIG
+)
 ANY_PROVIDER_AVAILABLE = (
     CLAUDE_AVAILABLE or GEMINI_AVAILABLE or CODEX_AVAILABLE or CURSOR_AGENT_AVAILABLE
 )

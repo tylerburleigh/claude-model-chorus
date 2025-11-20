@@ -8,17 +8,15 @@ demonstrating ModelChorus's orchestration capabilities:
 - Continuation ID management across workflow types
 """
 
-import uuid
-from pathlib import Path
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock
 
 import pytest
 
-from model_chorus.workflows.consensus import ConsensusWorkflow, ConsensusStrategy
-from model_chorus.workflows.thinkdeep import ThinkDeepWorkflow
-from model_chorus.workflows.chat import ChatWorkflow
-from model_chorus.providers.base_provider import GenerationResponse, GenerationRequest
 from model_chorus.core.conversation import ConversationMemory
+from model_chorus.providers.base_provider import GenerationRequest, GenerationResponse
+from model_chorus.workflows.chat import ChatWorkflow
+from model_chorus.workflows.consensus import ConsensusStrategy, ConsensusWorkflow
+from model_chorus.workflows.thinkdeep import ThinkDeepWorkflow
 
 
 class TestConsensusThinkDeepChatChaining:
@@ -95,7 +93,8 @@ class TestConsensusThinkDeepChatChaining:
 
         # Create and execute consensus workflow
         consensus_workflow = ConsensusWorkflow(
-            providers=[mock_provider, mock_provider_2], strategy=ConsensusStrategy.ALL_RESPONSES
+            providers=[mock_provider, mock_provider_2],
+            strategy=ConsensusStrategy.ALL_RESPONSES,
         )
 
         consensus_request = GenerationRequest(
@@ -136,9 +135,13 @@ class TestConsensusThinkDeepChatChaining:
 
         # Execute investigation (no continuation_id - this is a new investigation)
         thinkdeep_result = await thinkdeep_workflow.run(
-            prompt=f"Based on earlier consensus discussion about Redis vs Memcached, "
+            step=f"Based on earlier consensus discussion about Redis vs Memcached, "
             f"investigate: {consensus_concern}. Analyze memory footprint patterns, "
             f"fragmentation issues, and mitigation strategies.",
+            step_number=1,
+            total_steps=1,
+            next_step_required=False,
+            findings="Investigating Redis memory usage concern raised in consensus discussion",
             files=[],
         )
 
@@ -211,8 +214,16 @@ class TestConsensusThinkDeepChatChaining:
 
         # Verify message sequence
         messages = thread.messages
-        assert any("investigate" in msg.content.lower() for msg in messages if msg.role == "user")
-        assert any("deployment" in msg.content.lower() for msg in messages if msg.role == "user")
+        assert any(
+            "investigate" in msg.content.lower()
+            for msg in messages
+            if msg.role == "user"
+        )
+        assert any(
+            "deployment" in msg.content.lower()
+            for msg in messages
+            if msg.role == "user"
+        )
 
         # Verify all three workflow stages produced results
         assert consensus_result.all_responses  # Stage 1: consensus opinions
@@ -249,11 +260,25 @@ class TestConsensusThinkDeepChatChaining:
         )
 
         # Execute first workflow
-        result_1 = await thinkdeep_1.run(prompt="First independent investigation", files=[])
+        result_1 = await thinkdeep_1.run(
+            step="First independent investigation",
+            step_number=1,
+            total_steps=1,
+            next_step_required=False,
+            findings="Starting first independent investigation",
+            files=[],
+        )
         thread_1_id = result_1.metadata.get("thread_id")
 
         # Execute second workflow (independent - no continuation)
-        result_2 = await thinkdeep_2.run(prompt="Second independent investigation", files=[])
+        result_2 = await thinkdeep_2.run(
+            step="Second independent investigation",
+            step_number=1,
+            total_steps=1,
+            next_step_required=False,
+            findings="Starting second independent investigation",
+            files=[],
+        )
         thread_2_id = result_2.metadata.get("thread_id")
 
         # Verify different threads
@@ -267,9 +292,13 @@ class TestConsensusThinkDeepChatChaining:
         assert len(thread_2.messages) == 2  # user + assistant
 
         # Now create a chat that continues from thinkdeep_1
-        chat = ChatWorkflow(provider=mock_provider, conversation_memory=conversation_memory)
+        chat = ChatWorkflow(
+            provider=mock_provider, conversation_memory=conversation_memory
+        )
 
-        result_3 = await chat.run(prompt="Follow-up question", continuation_id=thread_1_id)
+        result_3 = await chat.run(
+            prompt="Follow-up question", continuation_id=thread_1_id
+        )
 
         # Verify chat continued thread_1
         assert result_3.metadata.get("thread_id") == thread_1_id
@@ -286,7 +315,9 @@ class TestConsensusThinkDeepChatChaining:
         assert len(thread_2_unchanged.messages) == 2
 
     @pytest.mark.asyncio
-    async def test_consensus_without_continuation_support(self, mock_provider, mock_provider_2):
+    async def test_consensus_without_continuation_support(
+        self, mock_provider, mock_provider_2
+    ):
         """
         Test that ConsensusWorkflow works independently without continuation.
 
@@ -311,7 +342,8 @@ class TestConsensusThinkDeepChatChaining:
 
         # Create consensus workflow
         consensus = ConsensusWorkflow(
-            providers=[mock_provider, mock_provider_2], strategy=ConsensusStrategy.ALL_RESPONSES
+            providers=[mock_provider, mock_provider_2],
+            strategy=ConsensusStrategy.ALL_RESPONSES,
         )
 
         # Execute consensus

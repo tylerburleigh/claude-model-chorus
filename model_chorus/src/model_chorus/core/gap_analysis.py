@@ -20,8 +20,9 @@ Public API:
 """
 
 from enum import Enum
-from typing import Any, Dict, Optional, List
-from pydantic import BaseModel, Field, ConfigDict, field_validator
+from typing import Any
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class GapType(str, Enum):
@@ -156,7 +157,7 @@ class Gap(BaseModel):
         le=1.0,
     )
 
-    metadata: Dict[str, Any] = Field(
+    metadata: dict[str, Any] = Field(
         default_factory=dict,
         description="Additional metadata (detection_method, context, scores, etc.)",
     )
@@ -331,9 +332,9 @@ def generate_gap_recommendation(
 def detect_missing_evidence(
     claim_id: str,
     claim_text: str,
-    citations: Optional[List[Any]] = None,
+    citations: list[Any] | None = None,
     expected_citation_count: int = 1,
-) -> Optional[Gap]:
+) -> Gap | None:
     """
     Detect if a claim lacks adequate evidential support.
 
@@ -376,12 +377,19 @@ def detect_missing_evidence(
                 f"{expected_citation_count}. Lacks adequate empirical support."
             )
 
-            recommendation = generate_gap_recommendation(GapType.EVIDENCE, severity, claim_text)
+            recommendation = generate_gap_recommendation(
+                GapType.EVIDENCE, severity, claim_text
+            )
 
             # Calculate confidence based on citation deficit
             confidence = min(
                 0.9,
-                0.6 + (0.3 * (expected_citation_count - citation_count) / expected_citation_count),
+                0.6
+                + (
+                    0.3
+                    * (expected_citation_count - citation_count)
+                    / expected_citation_count
+                ),
             )
 
             gap = Gap(
@@ -408,8 +416,8 @@ def detect_missing_evidence(
 def detect_logical_gaps(
     claim_id: str,
     claim_text: str,
-    supporting_claims: Optional[List[str]] = None,
-) -> Optional[Gap]:
+    supporting_claims: list[str] | None = None,
+) -> Gap | None:
     """
     Detect logical gaps or missing reasoning steps.
 
@@ -448,7 +456,9 @@ def detect_logical_gaps(
     ]
 
     text_lower = claim_text.lower()
-    has_conclusion_indicator = any(indicator in text_lower for indicator in conclusion_indicators)
+    has_conclusion_indicator = any(
+        indicator in text_lower for indicator in conclusion_indicators
+    )
 
     # If claim appears to be a conclusion but lacks support, flag it
     if has_conclusion_indicator and not has_support:
@@ -462,7 +472,9 @@ def detect_logical_gaps(
             "Logical steps from evidence to conclusion are missing."
         )
 
-        recommendation = generate_gap_recommendation(GapType.LOGICAL, severity, claim_text)
+        recommendation = generate_gap_recommendation(
+            GapType.LOGICAL, severity, claim_text
+        )
 
         gap = Gap(
             gap_id=f"gap-logical-{claim_id}",
@@ -486,9 +498,9 @@ def detect_logical_gaps(
 
 
 def detect_unsupported_claims(
-    claims: List[tuple[str, str, Optional[List[Any]]]],
+    claims: list[tuple[str, str, list[Any] | None]],
     min_citations_per_claim: int = 1,
-) -> List[Gap]:
+) -> list[Gap]:
     """
     Detect unsupported claims in a collection.
 
@@ -526,9 +538,9 @@ def detect_unsupported_claims(
 
 
 def detect_gaps(
-    claims: List[Dict[str, Any]],
+    claims: list[dict[str, Any]],
     min_citations_per_claim: int = 1,
-) -> List[Gap]:
+) -> list[Gap]:
     """
     Main entry point for comprehensive gap detection.
 

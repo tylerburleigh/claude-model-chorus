@@ -6,7 +6,7 @@ collaborative research investigations.
 """
 
 from dataclasses import dataclass, field
-from typing import Dict, Any, List, Optional
+from typing import Any
 
 
 @dataclass
@@ -26,9 +26,9 @@ class PersonaConfig:
     name: str
     expertise: str
     role: str
-    system_prompt: Optional[str] = None
-    temperature: Optional[float] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    system_prompt: str | None = None
+    temperature: float | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -51,7 +51,7 @@ class StudyConfig:
         metadata: Additional workflow-specific metadata
     """
 
-    personas: List[PersonaConfig] = field(
+    personas: list[PersonaConfig] = field(
         default_factory=lambda: [
             PersonaConfig(
                 name="Researcher",
@@ -75,7 +75,7 @@ class StudyConfig:
     max_tokens: int = 4096
     enable_file_analysis: bool = True
     collaboration_rounds: int = 2
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -101,7 +101,7 @@ class InvestigationResult:
     final_phase: str
     final_confidence: str
     iteration_count: int
-    persona_findings: Dict[str, List[Dict[str, Any]]] = field(default_factory=dict)
-    synthesis: Optional[str] = None
-    relevant_files: List[str] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    persona_findings: dict[str, list[dict[str, Any]]] = field(default_factory=dict)
+    synthesis: str | None = None
+    relevant_files: list[str] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)

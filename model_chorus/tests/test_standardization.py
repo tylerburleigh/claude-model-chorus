@@ -1,8 +1,8 @@
-import pytest
 import json
+
+from model_chorus.providers.base_provider import TokenUsage
 from model_chorus.providers.claude_provider import ClaudeProvider
 from model_chorus.providers.gemini_provider import GeminiProvider
-from model_chorus.providers.base_provider import TokenUsage
 
 
 class TestStandardization:
@@ -39,7 +39,9 @@ class TestStandardization:
             "response": "Test Content",
             "stats": {
                 "models": {
-                    "gemini-2.5-pro": {"tokens": {"prompt": 15, "candidates": 25, "total": 40}}
+                    "gemini-2.5-pro": {
+                        "tokens": {"prompt": 15, "candidates": 25, "total": 40}
+                    }
                 }
             },
         }

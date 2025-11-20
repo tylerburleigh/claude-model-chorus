@@ -5,15 +5,17 @@ Covers file reading, size limits, encoding detection, chunking,
 and error handling for the context ingestion service.
 """
 
-import pytest
 import tempfile
 from pathlib import Path
+
+import pytest
+
 from model_chorus.core.context_ingestion import (
-    ContextIngestionService,
-    FileTooLargeError,
-    BinaryFileError,
     DEFAULT_MAX_FILE_SIZE_KB,
     DEFAULT_WARN_FILE_SIZE_KB,
+    BinaryFileError,
+    ContextIngestionService,
+    FileTooLargeError,
 )
 
 
@@ -44,7 +46,9 @@ class TestContextIngestionServiceInitialization:
 
     def test_initialization_validation_warn_exceeds_max(self):
         """Test initialization fails when warn_file_size_kb exceeds max_file_size_kb."""
-        with pytest.raises(ValueError, match="warn_file_size_kb cannot exceed max_file_size_kb"):
+        with pytest.raises(
+            ValueError, match="warn_file_size_kb cannot exceed max_file_size_kb"
+        ):
             ContextIngestionService(max_file_size_kb=50, warn_file_size_kb=100)
 
 
@@ -295,7 +299,9 @@ class TestReadFileChunked:
 
         try:
             service = ContextIngestionService(max_file_size_kb=200)
-            chunks = service.read_file_chunked(temp_file, chunk_size_kb=30, max_chunks=2)
+            chunks = service.read_file_chunked(
+                temp_file, chunk_size_kb=30, max_chunks=2
+            )
 
             # Should have exactly 2 chunks due to max_chunks limit
             assert len(chunks) == 2
@@ -477,7 +483,9 @@ class TestCustomSizeLimits:
 
         try:
             # Service with 20KB warning threshold should warn
-            service = ContextIngestionService(max_file_size_kb=100, warn_file_size_kb=20)
+            service = ContextIngestionService(
+                max_file_size_kb=100, warn_file_size_kb=20
+            )
             content = service.read_file(temp_file)
             assert "exceeds warning threshold" in caplog.text
         finally:

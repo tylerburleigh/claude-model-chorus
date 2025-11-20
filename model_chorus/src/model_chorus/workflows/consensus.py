@@ -8,20 +8,20 @@ and reliability.
 
 import asyncio
 import logging
-from typing import List, Dict, Any, Optional
 from dataclasses import dataclass, field, replace
 from enum import Enum
+from typing import Any
 
+from ..core.progress import (
+    emit_provider_complete,
+    emit_provider_start,
+    emit_workflow_complete,
+    emit_workflow_start,
+)
 from ..providers import (
-    ModelProvider,
     GenerationRequest,
     GenerationResponse,
-)
-from ..core.progress import (
-    emit_workflow_start,
-    emit_provider_start,
-    emit_provider_complete,
-    emit_workflow_complete,
+    ModelProvider,
 )
 
 logger = logging.getLogger(__name__)
@@ -43,20 +43,20 @@ class ProviderConfig:
 
     provider: ModelProvider
     weight: float = 1.0
-    timeout: Optional[float] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    timeout: float | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
 class ConsensusResult:
     """Result from a consensus workflow execution."""
 
-    consensus_response: Optional[str] = None
-    all_responses: List[GenerationResponse] = field(default_factory=list)
-    provider_results: Dict[str, GenerationResponse] = field(default_factory=dict)
-    failed_providers: List[str] = field(default_factory=list)
+    consensus_response: str | None = None
+    all_responses: list[GenerationResponse] = field(default_factory=list)
+    provider_results: dict[str, GenerationResponse] = field(default_factory=dict)
+    failed_providers: list[str] = field(default_factory=list)
     strategy_used: ConsensusStrategy = ConsensusStrategy.ALL_RESPONSES
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 class ConsensusWorkflow:
@@ -96,10 +96,10 @@ class ConsensusWorkflow:
 
     def __init__(
         self,
-        providers: List[ModelProvider],
+        providers: list[ModelProvider],
         strategy: ConsensusStrategy = ConsensusStrategy.ALL_RESPONSES,
         default_timeout: float = 120.0,
-        num_to_consult: Optional[int] = None,
+        num_to_consult: int | None = None,
     ):
         """
         Initialize the consensus workflow.
@@ -118,13 +118,15 @@ class ConsensusWorkflow:
         ]
         self.strategy = strategy
         self.default_timeout = default_timeout
-        self.num_to_consult = num_to_consult if num_to_consult is not None else len(providers)
+        self.num_to_consult = (
+            num_to_consult if num_to_consult is not None else len(providers)
+        )
 
     def add_provider(
         self,
         provider: ModelProvider,
         weight: float = 1.0,
-        timeout: Optional[float] = None,
+        timeout: float | None = None,
     ) -> None:
         """
         Add a provider to the consensus workflow.
@@ -145,7 +147,7 @@ class ConsensusWorkflow:
         self,
         config: ProviderConfig,
         request: GenerationRequest,
-    ) -> tuple[str, Optional[GenerationResponse], Optional[Exception]]:
+    ) -> tuple[str, GenerationResponse | None, Exception | None]:
         """
         Execute a single provider with timeout and error handling.
 
@@ -165,7 +167,9 @@ class ConsensusWorkflow:
             base_metadata = dict(request.metadata) if request.metadata else {}
             provider_metadata = config.metadata or {}
             merged_metadata = (
-                {**provider_metadata, **base_metadata} if provider_metadata else base_metadata
+                {**provider_metadata, **base_metadata}
+                if provider_metadata
+                else base_metadata
             )
             # Clone the request per provider so model overrides and future metadata
             # customizations apply without mutating the shared request object.
@@ -184,8 +188,10 @@ class ConsensusWorkflow:
             emit_provider_complete(provider_name)
             return provider_name, response, None
 
-        except asyncio.TimeoutError:
-            error = TimeoutError(f"Provider {provider_name} timed out after {config.timeout}s")
+        except TimeoutError:
+            error = TimeoutError(
+                f"Provider {provider_name} timed out after {config.timeout}s"
+            )
             logger.warning(str(error))
             return provider_name, None, error
 
@@ -196,7 +202,7 @@ class ConsensusWorkflow:
     async def execute(
         self,
         request: GenerationRequest,
-        strategy: Optional[ConsensusStrategy] = None,
+        strategy: ConsensusStrategy | None = None,
     ) -> ConsensusResult:
         """
         Execute the consensus workflow with dynamic fallback.
@@ -227,7 +233,7 @@ class ConsensusWorkflow:
 
         # Track successful and failed providers
         provider_results = {}
-        all_responses = []
+        all_responses: list[GenerationResponse] = []
         failed_providers = []
         provider_index = 0
 
@@ -242,14 +248,18 @@ class ConsensusWorkflow:
             batch_size = min(needed, available)
 
             # Get the next batch of providers to try
-            batch_configs = self.provider_configs[provider_index : provider_index + batch_size]
+            batch_configs = self.provider_configs[
+                provider_index : provider_index + batch_size
+            ]
 
             logger.info(
                 f"Trying batch of {batch_size} providers (already have {len(all_responses)}/{self.num_to_consult})"
             )
 
             # Execute batch in parallel
-            tasks = [self._execute_provider(config, request) for config in batch_configs]
+            tasks = [
+                self._execute_provider(config, request) for config in batch_configs
+            ]
 
             results = await asyncio.gather(*tasks)
 
@@ -280,7 +290,9 @@ class ConsensusWorkflow:
             raise RuntimeError(error_msg)
 
         # Apply consensus strategy
-        consensus_response = self._apply_strategy(strategy, all_responses, provider_results)
+        consensus_response = self._apply_strategy(
+            strategy, all_responses, provider_results
+        )
 
         # Build metadata
         metadata = {
@@ -314,9 +326,9 @@ class ConsensusWorkflow:
     def _apply_strategy(
         self,
         strategy: ConsensusStrategy,
-        responses: List[GenerationResponse],
-        provider_results: Dict[str, GenerationResponse],
-    ) -> Optional[str]:
+        responses: list[GenerationResponse],
+        provider_results: dict[str, GenerationResponse],
+    ) -> str | None:
         """
         Apply consensus strategy to synthesize responses.
 
@@ -346,7 +358,7 @@ class ConsensusWorkflow:
         elif strategy == ConsensusStrategy.MAJORITY:
             # Find most common response (simple implementation)
             # For real use, would need more sophisticated comparison
-            response_counts: Dict[str, int] = {}
+            response_counts: dict[str, int] = {}
             for response in responses:
                 content = response.content.strip()
                 response_counts[content] = response_counts.get(content, 0) + 1
@@ -387,7 +399,7 @@ class ConsensusWorkflow:
         """Get the number of configured providers."""
         return len(self.provider_configs)
 
-    def get_providers(self) -> List[ModelProvider]:
+    def get_providers(self) -> list[ModelProvider]:
         """Get list of all configured providers."""
         return [config.provider for config in self.provider_configs]
 

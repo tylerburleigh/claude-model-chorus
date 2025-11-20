@@ -11,11 +11,10 @@ Tests verify that:
 - Error handling and edge cases are managed properly
 """
 
-import pytest
-import asyncio
-from unittest.mock import Mock, AsyncMock, patch
 from dataclasses import dataclass
-from typing import Optional, Dict, Any
+from unittest.mock import patch
+
+import pytest
 
 from model_chorus.core.role_orchestration import (
     ModelRole,
@@ -32,9 +31,9 @@ class MockGenerationRequest:
     """Mock GenerationRequest for testing."""
 
     prompt: str
-    system_prompt: Optional[str] = None
-    temperature: Optional[float] = None
-    max_tokens: Optional[int] = None
+    system_prompt: str | None = None
+    temperature: float | None = None
+    max_tokens: int | None = None
 
 
 @dataclass
@@ -43,7 +42,7 @@ class MockGenerationResponse:
 
     content: str
     model: str
-    usage: Dict[str, int] = None
+    usage: dict[str, int] = None
 
     def __post_init__(self):
         if self.usage is None:
@@ -57,7 +56,7 @@ class MockProvider:
         self,
         model_name: str = "mock-model",
         fail: bool = False,
-        response_content: Optional[str] = None,
+        response_content: str | None = None,
     ):
         """
         Initialize mock provider.
@@ -329,9 +328,13 @@ class TestRoleOrchestrator:
         with pytest.raises(ValueError, match="At least one role is required"):
             RoleOrchestrator([], simple_providers)
 
-    def test_orchestrator_initialization_unsupported_pattern(self, simple_roles, simple_providers):
+    def test_orchestrator_initialization_unsupported_pattern(
+        self, simple_roles, simple_providers
+    ):
         """Test orchestrator initialization with unsupported pattern."""
-        with pytest.raises(ValueError, match="Only SEQUENTIAL and PARALLEL patterns are supported"):
+        with pytest.raises(
+            ValueError, match="Only SEQUENTIAL and PARALLEL patterns are supported"
+        ):
             RoleOrchestrator(
                 simple_roles,
                 simple_providers,
@@ -400,7 +403,9 @@ class TestRoleOrchestrator:
             assert result.metadata["failed_roles"] == 0
 
     @pytest.mark.asyncio
-    async def test_execute_sequential_with_context(self, simple_roles, simple_providers):
+    async def test_execute_sequential_with_context(
+        self, simple_roles, simple_providers
+    ):
         """Test sequential execution with context."""
         with patch("model_chorus.providers.GenerationRequest", MockGenerationRequest):
             orchestrator = RoleOrchestrator(simple_roles, simple_providers)
@@ -524,13 +529,17 @@ class TestRoleOrchestrator:
             assert synthesized.synthesized_output is None
 
     @pytest.mark.asyncio
-    async def test_synthesize_concatenate_strategy(self, simple_roles, simple_providers):
+    async def test_synthesize_concatenate_strategy(
+        self, simple_roles, simple_providers
+    ):
         """Test synthesis with CONCATENATE strategy."""
         with patch("model_chorus.providers.GenerationRequest", MockGenerationRequest):
             orchestrator = RoleOrchestrator(simple_roles, simple_providers)
 
             result = await orchestrator.execute("Test prompt")
-            synthesized = await orchestrator.synthesize(result, SynthesisStrategy.CONCATENATE)
+            synthesized = await orchestrator.synthesize(
+                result, SynthesisStrategy.CONCATENATE
+            )
 
             assert synthesized.synthesis_strategy == SynthesisStrategy.CONCATENATE
             assert "## ANALYST" in synthesized.synthesized_output
@@ -546,24 +555,34 @@ class TestRoleOrchestrator:
             orchestrator = RoleOrchestrator(simple_roles, simple_providers)
 
             result = await orchestrator.execute("Test prompt")
-            synthesized = await orchestrator.synthesize(result, SynthesisStrategy.STRUCTURED)
+            synthesized = await orchestrator.synthesize(
+                result, SynthesisStrategy.STRUCTURED
+            )
 
             assert synthesized.synthesis_strategy == SynthesisStrategy.STRUCTURED
             assert isinstance(synthesized.synthesized_output, dict)
             assert "analyst" in synthesized.synthesized_output
             assert "critic" in synthesized.synthesized_output
-            assert synthesized.synthesized_output["analyst"]["content"] == "GPT-5 analysis"
-            assert synthesized.synthesized_output["critic"]["content"] == "Gemini critique"
+            assert (
+                synthesized.synthesized_output["analyst"]["content"] == "GPT-5 analysis"
+            )
+            assert (
+                synthesized.synthesized_output["critic"]["content"] == "Gemini critique"
+            )
             assert synthesized.metadata["synthesis_method"] == "structured"
 
     @pytest.mark.asyncio
-    async def test_synthesize_ai_strategy_default_provider(self, simple_roles, simple_providers):
+    async def test_synthesize_ai_strategy_default_provider(
+        self, simple_roles, simple_providers
+    ):
         """Test synthesis with AI_SYNTHESIZE strategy using default provider."""
         with patch("model_chorus.providers.GenerationRequest", MockGenerationRequest):
             orchestrator = RoleOrchestrator(simple_roles, simple_providers)
 
             result = await orchestrator.execute("Test prompt")
-            synthesized = await orchestrator.synthesize(result, SynthesisStrategy.AI_SYNTHESIZE)
+            synthesized = await orchestrator.synthesize(
+                result, SynthesisStrategy.AI_SYNTHESIZE
+            )
 
             assert synthesized.synthesis_strategy == SynthesisStrategy.AI_SYNTHESIZE
             assert synthesized.synthesized_output is not None
@@ -571,9 +590,13 @@ class TestRoleOrchestrator:
             assert "synthesis_model" in synthesized.metadata
 
     @pytest.mark.asyncio
-    async def test_synthesize_ai_strategy_custom_provider(self, simple_roles, simple_providers):
+    async def test_synthesize_ai_strategy_custom_provider(
+        self, simple_roles, simple_providers
+    ):
         """Test synthesis with AI_SYNTHESIZE strategy using custom provider."""
-        synthesis_provider = MockProvider("synthesis-model", response_content="Synthesized result")
+        synthesis_provider = MockProvider(
+            "synthesis-model", response_content="Synthesized result"
+        )
 
         with patch("model_chorus.providers.GenerationRequest", MockGenerationRequest):
             orchestrator = RoleOrchestrator(simple_roles, simple_providers)
@@ -589,7 +612,9 @@ class TestRoleOrchestrator:
             assert synthesized.metadata["synthesis_model"] == "synthesis-model"
 
     @pytest.mark.asyncio
-    async def test_synthesize_ai_strategy_custom_prompt(self, simple_roles, simple_providers):
+    async def test_synthesize_ai_strategy_custom_prompt(
+        self, simple_roles, simple_providers
+    ):
         """Test synthesis with AI_SYNTHESIZE strategy using custom prompt."""
         with patch("model_chorus.providers.GenerationRequest", MockGenerationRequest):
             orchestrator = RoleOrchestrator(simple_roles, simple_providers)
@@ -624,14 +649,18 @@ class TestRoleOrchestrator:
 
             # Now fail during synthesis
             providers["gpt-5"].fail = True
-            synthesized = await orchestrator.synthesize(result, SynthesisStrategy.AI_SYNTHESIZE)
+            synthesized = await orchestrator.synthesize(
+                result, SynthesisStrategy.AI_SYNTHESIZE
+            )
 
             # Should fall back to CONCATENATE
             assert synthesized.synthesis_strategy == SynthesisStrategy.CONCATENATE
             assert "## ANALYST" in synthesized.synthesized_output
 
     @pytest.mark.asyncio
-    async def test_synthesize_ai_strategy_no_responses(self, simple_roles, simple_providers):
+    async def test_synthesize_ai_strategy_no_responses(
+        self, simple_roles, simple_providers
+    ):
         """Test synthesis with AI_SYNTHESIZE fails when no responses available."""
         with patch("model_chorus.providers.GenerationRequest", MockGenerationRequest):
             orchestrator = RoleOrchestrator(simple_roles, simple_providers)

@@ -6,12 +6,13 @@ with ModelChorus.
 """
 
 import asyncio
+
 from model_chorus.providers import (
-    ModelProvider,
-    ModelConfig,
-    ModelCapability,
     GenerationRequest,
     GenerationResponse,
+    ModelCapability,
+    ModelConfig,
+    ModelProvider,
 )
 
 
@@ -116,8 +117,12 @@ async def main():
 
     # Check capabilities
     print("\nCapability Checks:")
-    print(f"  example-basic supports vision: {provider.supports_vision('example-basic')}")
-    print(f"  example-vision supports vision: {provider.supports_vision('example-vision')}")
+    print(
+        f"  example-basic supports vision: {provider.supports_vision('example-basic')}"
+    )
+    print(
+        f"  example-vision supports vision: {provider.supports_vision('example-vision')}"
+    )
     print(
         f"  example-basic supports text: {provider.supports_capability('example-basic', ModelCapability.TEXT_GENERATION)}"
     )

@@ -20,7 +20,6 @@ Requirements:
 import asyncio
 import sys
 from pathlib import Path
-from typing import Optional
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent / "model-chorus" / "src"))
@@ -34,6 +33,7 @@ from model_chorus.core.conversation import ConversationMemory
 # ARGUMENT WORKFLOW EXAMPLES
 # ============================================================================
 
+
 async def example_argument_basic():
     """
     Example 1: Basic argument analysis.
@@ -41,36 +41,30 @@ async def example_argument_basic():
     Demonstrates the simplest use case - analyzing a single argument/claim
     through dialectical reasoning (Creator → Skeptic → Moderator).
     """
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("EXAMPLE 1: Basic Argument Analysis")
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     # Initialize provider and memory
     provider = ClaudeProvider()
     memory = ConversationMemory()
 
     # Create workflow
-    workflow = ArgumentWorkflow(
-        provider=provider,
-        conversation_memory=memory
-    )
+    workflow = ArgumentWorkflow(provider=provider, conversation_memory=memory)
 
     # Run analysis
     prompt = "Universal basic income would significantly reduce poverty and inequality."
 
     print(f"Analyzing argument: {prompt}\n")
 
-    result = await workflow.run(
-        prompt=prompt,
-        temperature=0.7
-    )
+    result = await workflow.run(prompt=prompt, temperature=0.7)
 
     if result.success:
         print("✓ Analysis Complete\n")
 
         # Show each role's perspective
         for step in result.steps:
-            role_name = step.metadata.get('name', 'Step')
+            role_name = step.metadata.get("name", "Step")
             print(f"--- {role_name} ---")
             print(step.content)
             print()
@@ -82,7 +76,7 @@ async def example_argument_basic():
             print()
 
         # Show thread ID for continuation
-        thread_id = result.metadata.get('thread_id')
+        thread_id = result.metadata.get("thread_id")
         print(f"Thread ID for continuation: {thread_id}")
     else:
         print(f"✗ Analysis failed: {result.error}")
@@ -95,14 +89,15 @@ async def example_argument_with_files():
     Shows how to provide supporting documents/context files to enrich
     the argument analysis with specific data or background information.
     """
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("EXAMPLE 2: Argument Analysis with File Context")
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     # Create sample context file
     context_file = Path("examples/ubi_data.txt")
     context_file.parent.mkdir(exist_ok=True)
-    context_file.write_text("""
+    context_file.write_text(
+        """
     UBI Pilot Study Results:
     - Finland (2017-2018): Recipients reported higher well-being, no significant employment impact
     - Stockton, CA (2019-2021): 25% increase in full-time employment among recipients
@@ -112,7 +107,8 @@ async def example_argument_with_files():
     - US poverty rate: 11.4% (2020)
     - Cost estimate for $1000/month UBI: ~$3.9 trillion annually
     - Current federal welfare spending: ~$1.1 trillion annually
-    """)
+    """
+    )
 
     provider = ClaudeProvider()
     memory = ConversationMemory()
@@ -124,9 +120,7 @@ async def example_argument_with_files():
     print(f"Context file: {context_file}\n")
 
     result = await workflow.run(
-        prompt=prompt,
-        files=[str(context_file)],
-        temperature=0.7
+        prompt=prompt, files=[str(context_file)], temperature=0.7
     )
 
     if result.success:
@@ -144,9 +138,9 @@ async def example_argument_continuation():
     Demonstrates how to use conversation threading to continue
     a previous analysis with follow-up questions or new angles.
     """
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("EXAMPLE 3: Argument Continuation (Threading)")
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     provider = ClaudeProvider()
     memory = ConversationMemory()
@@ -162,20 +156,21 @@ async def example_argument_continuation():
         print(f"✗ Failed: {result1.error}")
         return
 
-    thread_id = result1.metadata['thread_id']
+    thread_id = result1.metadata["thread_id"]
     print(f"✓ Complete. Thread ID: {thread_id}\n")
 
     # Continue the conversation
     print("Continuing analysis with follow-up:")
     result2 = await workflow.run(
-        prompt="But what about collaboration and creativity?",
-        continuation_id=thread_id
+        prompt="But what about collaboration and creativity?", continuation_id=thread_id
     )
 
     if result2.success:
         print("✓ Continuation complete\n")
         print(result2.synthesis)
-        print(f"\nConversation length: {result2.metadata.get('conversation_length', 0)} messages")
+        print(
+            f"\nConversation length: {result2.metadata.get('conversation_length', 0)} messages"
+        )
 
 
 async def example_argument_custom_config():
@@ -185,9 +180,9 @@ async def example_argument_custom_config():
     Shows how to customize the argument workflow with different
     parameters like temperature, max_tokens, and system prompts.
     """
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("EXAMPLE 4: Custom Configuration")
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     provider = ClaudeProvider()
     memory = ConversationMemory()
@@ -201,7 +196,7 @@ async def example_argument_custom_config():
         prompt=prompt,
         system_prompt="Focus on economic impacts and regulatory challenges.",
         temperature=0.5,  # Lower temperature for more focused analysis
-        max_tokens=2000
+        max_tokens=2000,
     )
 
     if result.success:
@@ -213,15 +208,16 @@ async def example_argument_custom_config():
 # IDEATE WORKFLOW EXAMPLES
 # ============================================================================
 
+
 async def example_ideate_basic():
     """
     Example 5: Basic ideation/brainstorming.
 
     Demonstrates simple creative idea generation with default parameters.
     """
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("EXAMPLE 5: Basic Ideation")
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     provider = ClaudeProvider()
     memory = ConversationMemory()
@@ -232,9 +228,7 @@ async def example_ideate_basic():
     print(f"Generating ideas for: {prompt}\n")
 
     result = await workflow.run(
-        prompt=prompt,
-        num_ideas=5,
-        temperature=0.9  # High creativity
+        prompt=prompt, num_ideas=5, temperature=0.9  # High creativity
     )
 
     if result.success:
@@ -242,7 +236,7 @@ async def example_ideate_basic():
 
         # Show generated ideas
         for i, step in enumerate(result.steps, 1):
-            idea_name = step.metadata.get('name', f'Idea {i}')
+            idea_name = step.metadata.get("name", f"Idea {i}")
             print(f"--- {idea_name} ---")
             print(step.content)
             print()
@@ -259,9 +253,9 @@ async def example_ideate_high_creativity():
 
     Uses maximum temperature for highly creative, unconventional ideas.
     """
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("EXAMPLE 6: High-Creativity Ideation")
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     provider = ClaudeProvider()
     memory = ConversationMemory()
@@ -273,9 +267,7 @@ async def example_ideate_high_creativity():
     print("Temperature: 1.0 (maximum creativity)\n")
 
     result = await workflow.run(
-        prompt=prompt,
-        num_ideas=7,
-        temperature=1.0  # Maximum creativity
+        prompt=prompt, num_ideas=7, temperature=1.0  # Maximum creativity
     )
 
     if result.success:
@@ -290,9 +282,9 @@ async def example_ideate_with_constraints():
     Demonstrates how to guide idea generation with specific constraints
     or requirements via system prompts.
     """
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("EXAMPLE 7: Ideation with Constraints")
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     provider = ClaudeProvider()
     memory = ConversationMemory()
@@ -312,10 +304,7 @@ async def example_ideate_with_constraints():
     print(f"Constraints: {constraints}\n")
 
     result = await workflow.run(
-        prompt=prompt,
-        system_prompt=constraints,
-        num_ideas=6,
-        temperature=0.85
+        prompt=prompt, system_prompt=constraints, num_ideas=6, temperature=0.85
     )
 
     if result.success:
@@ -330,9 +319,9 @@ async def example_ideate_refine():
     Shows how to use threading to drill down into specific ideas
     and develop them further.
     """
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("EXAMPLE 8: Idea Refinement via Continuation")
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     provider = ClaudeProvider()
     memory = ConversationMemory()
@@ -341,15 +330,14 @@ async def example_ideate_refine():
     # Initial brainstorming
     print("Initial brainstorming:")
     result1 = await workflow.run(
-        prompt="Gamification features for an online learning platform",
-        num_ideas=4
+        prompt="Gamification features for an online learning platform", num_ideas=4
     )
 
     if not result1.success:
         print(f"✗ Failed: {result1.error}")
         return
 
-    thread_id = result1.metadata['thread_id']
+    thread_id = result1.metadata["thread_id"]
     print(f"✓ Generated {len(result1.steps)} ideas\n")
 
     # Refine a specific idea
@@ -357,7 +345,7 @@ async def example_ideate_refine():
     result2 = await workflow.run(
         prompt="Expand on idea #2. Provide detailed implementation steps and engagement metrics.",
         continuation_id=thread_id,
-        num_ideas=1
+        num_ideas=1,
     )
 
     if result2.success:
@@ -369,15 +357,16 @@ async def example_ideate_refine():
 # CROSS-WORKFLOW PATTERNS
 # ============================================================================
 
+
 async def example_error_handling():
     """
     Example 13: Proper error handling across workflows.
 
     Demonstrates best practices for handling workflow failures.
     """
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("EXAMPLE 13: Error Handling Best Practices")
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     try:
         provider = ClaudeProvider()
@@ -386,7 +375,7 @@ async def example_error_handling():
 
         result = await workflow.run(
             prompt="Test prompt with intentional issues",
-            max_tokens=10  # Too small, may cause issues
+            max_tokens=10,  # Too small, may cause issues
         )
 
         if result.success:
@@ -415,9 +404,9 @@ async def example_output_management():
 
     Shows how to save, load, and process workflow results.
     """
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("EXAMPLE 14: Output Management")
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     import json
     from datetime import datetime
@@ -427,8 +416,7 @@ async def example_output_management():
     workflow = IdeateWorkflow(provider=provider, conversation_memory=memory)
 
     result = await workflow.run(
-        prompt="Ideas for improving code review processes",
-        num_ideas=5
+        prompt="Ideas for improving code review processes", num_ideas=5
     )
 
     if result.success:
@@ -441,14 +429,14 @@ async def example_output_management():
             "success": result.success,
             "ideas": [
                 {
-                    "name": step.metadata.get('name', f'Idea {i}'),
+                    "name": step.metadata.get("name", f"Idea {i}"),
                     "content": step.content,
-                    "metadata": step.metadata
+                    "metadata": step.metadata,
                 }
                 for i, step in enumerate(result.steps, 1)
             ],
             "synthesis": result.synthesis,
-            "metadata": result.metadata
+            "metadata": result.metadata,
         }
 
         output_file.write_text(json.dumps(output_data, indent=2))
@@ -469,9 +457,9 @@ async def example_provider_comparison():
     Demonstrates running the same query with different providers
     to compare outputs.
     """
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("EXAMPLE 15: Multi-Provider Comparison")
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     prompt = "Is TypeScript worth adopting for a small team?"
 
@@ -488,10 +476,7 @@ async def example_provider_comparison():
         try:
             workflow = ArgumentWorkflow(provider=provider, conversation_memory=memory)
 
-            result = await workflow.run(
-                prompt=prompt,
-                temperature=0.7
-            )
+            result = await workflow.run(prompt=prompt, temperature=0.7)
 
             if result.success:
                 print(f"✓ {name} analysis complete")
@@ -509,6 +494,7 @@ async def example_provider_comparison():
 # MAIN EXECUTION
 # ============================================================================
 
+
 async def run_all_examples():
     """Run all examples in sequence."""
     examples = [
@@ -525,9 +511,9 @@ async def run_all_examples():
         ("Provider Comparison", example_provider_comparison),
     ]
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("MODELCHORUS WORKFLOW EXAMPLES")
-    print("="*80)
+    print("=" * 80)
     print(f"\nRunning {len(examples)} examples...\n")
 
     for name, example_func in examples:
@@ -540,11 +526,12 @@ async def run_all_examples():
         except Exception as e:
             print(f"\n✗ Example failed with error: {e}")
             import traceback
+
             traceback.print_exc()
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("EXAMPLES COMPLETE")
-    print("="*80)
+    print("=" * 80)
 
 
 async def run_specific_example(example_name: str):

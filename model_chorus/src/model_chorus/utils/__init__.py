@@ -7,11 +7,11 @@ used across the ModelChorus package.
 
 from model_chorus.utils.citation_formatter import (
     CitationStyle,
+    calculate_citation_confidence,
+    calculate_citation_map_confidence,
     format_citation,
     format_citation_map,
     validate_citation,
-    calculate_citation_confidence,
-    calculate_citation_map_confidence,
 )
 
 __all__ = [

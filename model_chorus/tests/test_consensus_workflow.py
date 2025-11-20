@@ -2,11 +2,12 @@
 Tests for Consensus workflow.
 """
 
-import pytest
 from unittest.mock import AsyncMock
 
-from model_chorus.workflows.consensus import ConsensusWorkflow, ConsensusStrategy
-from model_chorus.providers.base_provider import GenerationResponse, GenerationRequest
+import pytest
+
+from model_chorus.providers.base_provider import GenerationRequest, GenerationResponse
+from model_chorus.workflows.consensus import ConsensusStrategy, ConsensusWorkflow
 
 
 class TestConsensusWorkflow:
@@ -37,7 +38,9 @@ class TestConsensusWorkflow:
         mock_provider = AsyncMock()
         mock_provider.provider_name = "test"
 
-        workflow = ConsensusWorkflow([mock_provider], strategy=ConsensusStrategy.FIRST_VALID)
+        workflow = ConsensusWorkflow(
+            [mock_provider], strategy=ConsensusStrategy.FIRST_VALID
+        )
         assert workflow.strategy == ConsensusStrategy.FIRST_VALID
 
     @pytest.mark.asyncio
@@ -89,7 +92,9 @@ class TestConsensusWorkflow:
         )
 
         workflow = ConsensusWorkflow(
-            [mock_claude, mock_codex], strategy=ConsensusStrategy.FIRST_VALID, num_to_consult=1
+            [mock_claude, mock_codex],
+            strategy=ConsensusStrategy.FIRST_VALID,
+            num_to_consult=1,
         )
 
         request = GenerationRequest(prompt="Test prompt")

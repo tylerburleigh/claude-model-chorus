@@ -5,7 +5,8 @@ The Critic persona focuses on challenging assumptions, identifying edge cases,
 and stress-testing conclusions through rigorous scrutiny.
 """
 
-from typing import Dict, Any, List
+from typing import Any
+
 from ..persona_base import Persona, PersonaResponse
 
 
@@ -57,7 +58,7 @@ Provide critiques in a clear, constructive format with specific concerns."""
             max_tokens=max_tokens,
         )
 
-    def invoke(self, context: Dict[str, Any]) -> PersonaResponse:
+    def invoke(self, context: dict[str, Any]) -> PersonaResponse:
         """
         Invoke the Critic persona with investigation context.
 
@@ -95,7 +96,9 @@ Provide critiques in a clear, constructive format with specific concerns."""
 
         # If there are existing findings to critique, acknowledge them
         if existing_findings:
-            findings.append(f"[Critic] Examining {len(existing_findings)} existing finding(s)")
+            findings.append(
+                f"[Critic] Examining {len(existing_findings)} existing finding(s)"
+            )
 
         # Placeholder confidence assessment
         # Critic typically reduces confidence by identifying uncertainties

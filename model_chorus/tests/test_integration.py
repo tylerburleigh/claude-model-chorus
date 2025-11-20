@@ -5,26 +5,31 @@ These tests verify that components work together correctly.
 Note: These tests use mocks to avoid calling actual CLI tools.
 """
 
-import pytest
-from unittest.mock import patch, AsyncMock
+from unittest.mock import AsyncMock, patch
 
-from model_chorus.workflows.consensus import ConsensusWorkflow, ConsensusStrategy
-from model_chorus.providers.base_provider import GenerationResponse, GenerationRequest
+import pytest
+
+from model_chorus.providers.base_provider import GenerationRequest
 from model_chorus.providers.claude_provider import ClaudeProvider
 from model_chorus.providers.codex_provider import CodexProvider
+from model_chorus.workflows.consensus import ConsensusStrategy, ConsensusWorkflow
 
 
 class TestIntegration:
     """Integration test suite."""
 
     @pytest.mark.asyncio
-    async def test_end_to_end_consensus(self, mock_claude_response, mock_codex_response):
+    async def test_end_to_end_consensus(
+        self, mock_claude_response, mock_codex_response
+    ):
         """Test end-to-end consensus workflow with multiple providers."""
         # Create providers
         claude = ClaudeProvider()
         codex = CodexProvider()
 
-        workflow = ConsensusWorkflow([claude, codex], strategy=ConsensusStrategy.ALL_RESPONSES)
+        workflow = ConsensusWorkflow(
+            [claude, codex], strategy=ConsensusStrategy.ALL_RESPONSES
+        )
 
         # Mock CLI command execution
         with patch(
@@ -106,7 +111,9 @@ class TestIntegration:
                 await workflow.execute(request)
 
     @pytest.mark.asyncio
-    async def test_multiple_strategy_comparison(self, mock_claude_response, mock_codex_response):
+    async def test_multiple_strategy_comparison(
+        self, mock_claude_response, mock_codex_response
+    ):
         """Test different consensus strategies with same data."""
         import json
 
@@ -155,7 +162,9 @@ class TestIntegration:
             assert result_first.consensus_response is not None
 
     @pytest.mark.asyncio
-    async def test_concurrent_provider_execution(self, mock_claude_response, mock_codex_response):
+    async def test_concurrent_provider_execution(
+        self, mock_claude_response, mock_codex_response
+    ):
         """Test that providers execute concurrently, not sequentially."""
         import json
         import time

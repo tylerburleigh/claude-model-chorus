@@ -8,12 +8,13 @@ Tests cover:
 - Integration with StudyWorkflow
 """
 
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import Mock, patch
-from model_chorus.workflows.study.persona_router import PersonaRouter, RoutingDecision
-from model_chorus.workflows.study.persona_base import Persona, PersonaRegistry
-from model_chorus.workflows.study.personas import get_default_registry
+
 from model_chorus.core.models import StudyState
+from model_chorus.workflows.study.persona_router import PersonaRouter, RoutingDecision
+from model_chorus.workflows.study.personas import get_default_registry
 
 
 class TestRoutingSkillInvocation:
@@ -41,7 +42,9 @@ class TestRoutingSkillInvocation:
 
         # Verify: Decision is valid RoutingDecision
         assert isinstance(decision, RoutingDecision), "Should return RoutingDecision"
-        assert decision.persona is not None, "Should select a persona for discovery phase"
+        assert (
+            decision.persona is not None
+        ), "Should select a persona for discovery phase"
         assert decision.persona_name in [
             "Researcher",
             "Critic",
@@ -172,7 +175,9 @@ class TestFallbackRouting:
         )
 
         # Mock analyze_context to raise exception
-        with patch("model_chorus.workflows.study.persona_router.analyze_context") as mock_analyze:
+        with patch(
+            "model_chorus.workflows.study.persona_router.analyze_context"
+        ) as mock_analyze:
             mock_analyze.side_effect = RuntimeError("Simulated skill failure")
 
             decision = router.route_next_persona(state)
@@ -206,7 +211,9 @@ class TestFallbackRouting:
             "planning": "Planner",
         }
 
-        with patch("model_chorus.workflows.study.persona_router.analyze_context") as mock_analyze:
+        with patch(
+            "model_chorus.workflows.study.persona_router.analyze_context"
+        ) as mock_analyze:
             mock_analyze.side_effect = Exception("Simulated failure")
 
             for phase, expected_persona in fallback_map.items():
@@ -243,7 +250,9 @@ class TestFallbackRouting:
             personas_active=[],
         )
 
-        with patch("model_chorus.workflows.study.persona_router.analyze_context") as mock_analyze:
+        with patch(
+            "model_chorus.workflows.study.persona_router.analyze_context"
+        ) as mock_analyze:
             mock_analyze.side_effect = Exception("Failure")
 
             decision = router.route_next_persona(state)
@@ -253,7 +262,9 @@ class TestFallbackRouting:
             assert all(
                 isinstance(g, str) for g in decision.guidance
             ), "All guidance items should be strings"
-            assert all(len(g) > 5 for g in decision.guidance), "Guidance should be descriptive"
+            assert all(
+                len(g) > 5 for g in decision.guidance
+            ), "Guidance should be descriptive"
 
 
 class TestRoutingHistory:
@@ -337,8 +348,8 @@ class TestStudyWorkflowIntegration:
     @pytest.mark.asyncio
     async def test_workflow_has_router(self):
         """Test that StudyWorkflow initializes PersonaRouter."""
-        from model_chorus.workflows.study.study_workflow import StudyWorkflow
         from model_chorus.providers.claude_provider import ClaudeProvider
+        from model_chorus.workflows.study.study_workflow import StudyWorkflow
 
         # Create workflow (may fail if provider unavailable, skip test)
         try:
@@ -367,8 +378,8 @@ class TestStudyWorkflowIntegration:
     @pytest.mark.asyncio
     async def test_workflow_routing_history_access(self):
         """Test that StudyWorkflow provides access to routing history."""
-        from model_chorus.workflows.study.study_workflow import StudyWorkflow
         from model_chorus.providers.claude_provider import ClaudeProvider
+        from model_chorus.workflows.study.study_workflow import StudyWorkflow
 
         try:
             provider = ClaudeProvider()

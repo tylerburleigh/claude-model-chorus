@@ -10,14 +10,14 @@ Tests verify configuration loading, validation, and default behavior including:
 """
 
 import json
+
 import pytest
-from pathlib import Path
 
 from model_chorus.core.config import (
     ConfigLoader,
     GenerationDefaults,
-    WorkflowConfig,
     ModelChorusConfig,
+    WorkflowConfig,
     get_config_loader,
 )
 
@@ -324,7 +324,9 @@ workflows:
 
     def test_workflow_config_validation(self):
         """Test WorkflowConfig model validation."""
-        config = WorkflowConfig(provider="claude", temperature=0.7, strategy="synthesize")
+        config = WorkflowConfig(
+            provider="claude", temperature=0.7, strategy="synthesize"
+        )
 
         assert config.provider == "claude"
         assert config.temperature == 0.7

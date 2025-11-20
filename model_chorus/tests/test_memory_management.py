@@ -8,16 +8,14 @@ Tests verify that:
 - No memory leaks from conversation storage
 """
 
-import pytest
 import asyncio
 from unittest.mock import AsyncMock
-import uuid
-import sys
 
-from model_chorus.workflows.chat import ChatWorkflow
-from model_chorus.workflows.thinkdeep import ThinkDeepWorkflow
-from model_chorus.providers.base_provider import GenerationResponse
+import pytest
+
 from model_chorus.core.conversation import ConversationMemory
+from model_chorus.providers.base_provider import GenerationResponse
+from model_chorus.workflows.chat import ChatWorkflow
 
 
 class TestMemoryManagement:
@@ -42,7 +40,9 @@ class TestMemoryManagement:
         return ConversationMemory()
 
     @pytest.mark.asyncio
-    async def test_long_conversation_memory_stability(self, mock_provider, conversation_memory):
+    async def test_long_conversation_memory_stability(
+        self, mock_provider, conversation_memory
+    ):
         """
         Test memory stability with a long conversation (50+ turns).
 
@@ -61,7 +61,9 @@ class TestMemoryManagement:
             nonlocal response_counter
             response_counter += 1
             # Simulate varied response sizes
-            content = f"Response {response_counter}: " + ("data " * (response_counter % 10 + 1))
+            content = f"Response {response_counter}: " + (
+                "data " * (response_counter % 10 + 1)
+            )
             return GenerationResponse(
                 content=content,
                 model="test-model",
@@ -103,7 +105,9 @@ class TestMemoryManagement:
         # This is correct behavior for context window management
         final_message_count = len(thread.messages)
         assert final_message_count > 0, "Thread should have messages"
-        assert final_message_count <= num_turns * 2, f"Should have at most {num_turns * 2} messages"
+        assert (
+            final_message_count <= num_turns * 2
+        ), f"Should have at most {num_turns * 2} messages"
 
         # If fewer messages than expected, context window management is working
         if final_message_count < num_turns * 2:
@@ -139,7 +143,7 @@ class TestMemoryManagement:
         print(f"✓ Completed {num_turns} turn conversation")
         print(f"✓ Messages retained: {len(thread.messages)}")
         print(f"✓ Approximate content size: {total_content_size} bytes")
-        print(f"✓ Memory management working correctly")
+        print("✓ Memory management working correctly")
 
     @pytest.mark.asyncio
     async def test_multiple_long_conversations_memory_isolation(
@@ -178,7 +182,8 @@ class TestMemoryManagement:
 
             for turn in range(turns_per_conversation):
                 result = await chat_workflow.run(
-                    prompt=f"Conversation {conv_id}, Turn {turn}", continuation_id=thread_id
+                    prompt=f"Conversation {conv_id}, Turn {turn}",
+                    continuation_id=thread_id,
                 )
 
                 if thread_id is None:
@@ -204,10 +209,12 @@ class TestMemoryManagement:
         print(f"\n✓ Created {num_conversations} long conversations")
         print(f"✓ Each with {turns_per_conversation} turns")
         print(f"✓ Total messages across all conversations: {total_messages}")
-        print(f"✓ All conversations properly isolated")
+        print("✓ All conversations properly isolated")
 
     @pytest.mark.asyncio
-    async def test_memory_efficiency_with_large_messages(self, mock_provider, conversation_memory):
+    async def test_memory_efficiency_with_large_messages(
+        self, mock_provider, conversation_memory
+    ):
         """
         Test memory handling with large message content.
 
@@ -239,7 +246,8 @@ class TestMemoryManagement:
         thread_id = None
         for i in range(num_messages):
             result = await chat_workflow.run(
-                prompt="x" * large_content_size, continuation_id=thread_id  # Large prompt too
+                prompt="x" * large_content_size,
+                continuation_id=thread_id,  # Large prompt too
             )
 
             if thread_id is None:
@@ -260,10 +268,14 @@ class TestMemoryManagement:
 
         print(f"\n✓ Stored {num_messages * 2} large messages")
         print(f"✓ Total content size: {total_content_size / 1024:.1f} KB")
-        print(f"✓ Average message size: {total_content_size / (num_messages * 2) / 1024:.1f} KB")
+        print(
+            f"✓ Average message size: {total_content_size / (num_messages * 2) / 1024:.1f} KB"
+        )
 
     @pytest.mark.asyncio
-    async def test_concurrent_long_conversations_memory(self, mock_provider, conversation_memory):
+    async def test_concurrent_long_conversations_memory(
+        self, mock_provider, conversation_memory
+    ):
         """
         Test memory management with concurrent long conversations.
 
@@ -294,7 +306,8 @@ class TestMemoryManagement:
 
             for turn in range(turns_per_conversation):
                 result = await chat_workflow.run(
-                    prompt=f"Conversation {conv_id}, Turn {turn}", continuation_id=thread_id
+                    prompt=f"Conversation {conv_id}, Turn {turn}",
+                    continuation_id=thread_id,
                 )
 
                 if thread_id is None:
@@ -333,4 +346,4 @@ class TestMemoryManagement:
             print(
                 f"✓ Context window management active: {trimmed_count}/{num_concurrent} conversations trimmed"
             )
-        print(f"✓ All conversations isolated and complete")
+        print("✓ All conversations isolated and complete")

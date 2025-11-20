@@ -6,7 +6,7 @@ This module provides integration with Anthropic's Claude models via the `claude`
 
 import json
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from .base_provider import (
     GenerationRequest,
@@ -47,12 +47,15 @@ class ClaudeProvider(CLIProvider):
 
     # Model capability mappings
     VISION_MODELS = {"sonnet", "haiku"}  # Models that support vision
-    THINKING_MODELS = {"sonnet", "haiku"}  # Models that support thinking mode (extended thinking)
+    THINKING_MODELS = {
+        "sonnet",
+        "haiku",
+    }  # Models that support thinking mode (extended thinking)
 
     def __init__(
         self,
-        api_key: Optional[str] = None,
-        config: Optional[Dict[str, Any]] = None,
+        api_key: str | None = None,
+        config: dict[str, Any] | None = None,
         timeout: int = 120,
         retry_limit: int = 3,
     ):
@@ -113,7 +116,7 @@ class ClaudeProvider(CLIProvider):
         ]
         self.set_model_list(models)
 
-    def build_command(self, request: GenerationRequest) -> List[str]:
+    def build_command(self, request: GenerationRequest) -> list[str]:
         """
         Build the CLI command for a Claude generation request.
 
@@ -136,7 +139,15 @@ class ClaudeProvider(CLIProvider):
 
         # Add read-only tool restrictions for security
         # Allow only read-only and information-gathering tools
-        readonly_tools = ["Read", "Grep", "Glob", "WebSearch", "WebFetch", "Task", "Explore"]
+        readonly_tools = [
+            "Read",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "Task",
+            "Explore",
+        ]
         command.extend(["--allowed-tools"] + readonly_tools)
 
         # Explicitly block write operations
@@ -160,7 +171,9 @@ class ClaudeProvider(CLIProvider):
         logger.debug(f"Built Claude command: {' '.join(command)}")
         return command
 
-    def parse_response(self, stdout: str, stderr: str, returncode: int) -> GenerationResponse:
+    def parse_response(
+        self, stdout: str, stderr: str, returncode: int
+    ) -> GenerationResponse:
         """
         Parse CLI output into a GenerationResponse.
 
@@ -212,7 +225,8 @@ class ClaudeProvider(CLIProvider):
                 cached_input_tokens=usage_data.get(
                     "cached_tokens", 0
                 ),  # Generic mapping, adjust if needed
-                total_tokens=usage_data.get("input_tokens", 0) + usage_data.get("output_tokens", 0),
+                total_tokens=usage_data.get("input_tokens", 0)
+                + usage_data.get("output_tokens", 0),
             )
 
             response = GenerationResponse(
@@ -237,7 +251,9 @@ class ClaudeProvider(CLIProvider):
             return response
 
         except json.JSONDecodeError as e:
-            error_msg = f"Failed to parse Claude CLI JSON output: {e}\nOutput: {stdout[:200]}"
+            error_msg = (
+                f"Failed to parse Claude CLI JSON output: {e}\nOutput: {stdout[:200]}"
+            )
             logger.error(error_msg)
             raise ValueError(error_msg)
 

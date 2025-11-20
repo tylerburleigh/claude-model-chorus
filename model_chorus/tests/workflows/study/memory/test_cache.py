@@ -10,7 +10,6 @@ import pytest
 from model_chorus.workflows.study.memory import (
     MemoryEntry,
     MemoryQuery,
-    MemoryType,
     ShortTermCache,
 )
 

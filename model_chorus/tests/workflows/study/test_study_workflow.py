@@ -9,14 +9,14 @@ Tests verify that the StudyWorkflow correctly:
 - Integrates with PersonaRouter for intelligent persona selection
 """
 
-import pytest
-from unittest.mock import Mock, patch, AsyncMock, MagicMock
-from datetime import datetime, timezone
+from datetime import datetime
+from unittest.mock import AsyncMock, Mock
 
-from model_chorus.workflows.study.study_workflow import StudyWorkflow
+import pytest
+
 from model_chorus.core.base_workflow import WorkflowResult, WorkflowStep
 from model_chorus.core.conversation import ConversationMemory
-from model_chorus.core.models import ConversationMessage
+from model_chorus.workflows.study.study_workflow import StudyWorkflow
 
 
 class TestStudyWorkflowInitialization:
@@ -257,7 +257,11 @@ class TestStudyWorkflowPersonaSetup:
     def test_setup_personas_custom(self, workflow):
         """Test _setup_personas preserves custom personas."""
         custom_personas = [
-            {"name": "Expert", "expertise": "specialized knowledge", "role": "domain expert"}
+            {
+                "name": "Expert",
+                "expertise": "specialized knowledge",
+                "role": "domain expert",
+            }
         ]
 
         personas = workflow._setup_personas(custom_personas)
@@ -328,7 +332,9 @@ class TestStudyWorkflowConversationHandling:
     @pytest.mark.asyncio
     async def test_run_without_memory_still_works(self, workflow_without_memory):
         """Test run() works correctly without conversation memory."""
-        result = await workflow_without_memory.run("Test prompt", skip_provider_check=True)
+        result = await workflow_without_memory.run(
+            "Test prompt", skip_provider_check=True
+        )
 
         assert result.success is True
         assert result.metadata["thread_id"] is not None
@@ -337,7 +343,9 @@ class TestStudyWorkflowConversationHandling:
     async def test_run_reuses_thread_on_continuation(self, workflow_with_memory):
         """Test run() with continuation_id reuses the thread."""
         # First run
-        result1 = await workflow_with_memory.run("First question", skip_provider_check=True)
+        result1 = await workflow_with_memory.run(
+            "First question", skip_provider_check=True
+        )
         thread_id = result1.metadata["thread_id"]
 
         # Get message count after first run
@@ -608,7 +616,9 @@ class TestStudyWorkflowIntegration:
 
         # Continue investigation
         result2 = await workflow_with_memory.run(
-            "Follow-up investigation", continuation_id=thread_id, skip_provider_check=True
+            "Follow-up investigation",
+            continuation_id=thread_id,
+            skip_provider_check=True,
         )
 
         # Verify continuation

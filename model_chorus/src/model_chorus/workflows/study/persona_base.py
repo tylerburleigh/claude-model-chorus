@@ -6,7 +6,7 @@ for persona-based collaborative research.
 """
 
 from dataclasses import dataclass, field
-from typing import Optional, Dict, List, Any
+from typing import Any
 
 
 @dataclass
@@ -23,9 +23,9 @@ class PersonaResponse:
         metadata: Additional response metadata
     """
 
-    findings: List[str] = field(default_factory=list)
-    confidence_update: Optional[str] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    findings: list[str] = field(default_factory=list)
+    confidence_update: str | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -45,10 +45,10 @@ class Persona:
 
     name: str
     prompt_template: str
-    temperature: Optional[float] = 0.7
-    max_tokens: Optional[int] = 4096
+    temperature: float | None = 0.7
+    max_tokens: int | None = 4096
 
-    def invoke(self, context: Dict[str, Any]) -> PersonaResponse:
+    def invoke(self, context: dict[str, Any]) -> PersonaResponse:
         """
         Invoke the persona with the given context.
 
@@ -84,7 +84,7 @@ class PersonaRegistry:
 
     def __init__(self):
         """Initialize an empty persona registry."""
-        self._personas: Dict[str, Persona] = {}
+        self._personas: dict[str, Persona] = {}
 
     def register(self, persona: Persona) -> None:
         """
@@ -100,7 +100,7 @@ class PersonaRegistry:
             raise ValueError(f"Persona '{persona.name}' is already registered")
         self._personas[persona.name] = persona
 
-    def get(self, name: str) -> Optional[Persona]:
+    def get(self, name: str) -> Persona | None:
         """
         Retrieve a persona by name.
 
@@ -112,7 +112,7 @@ class PersonaRegistry:
         """
         return self._personas.get(name)
 
-    def list_all(self) -> List[Persona]:
+    def list_all(self) -> list[Persona]:
         """
         List all registered personas.
 

@@ -9,16 +9,16 @@ import logging
 import os
 import shutil
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
-from .cli_provider import CLIProvider
 from .base_provider import (
     GenerationRequest,
     GenerationResponse,
-    ModelConfig,
     ModelCapability,
+    ModelConfig,
     TokenUsage,
 )
+from .cli_provider import CLIProvider
 
 logger = logging.getLogger(__name__)
 
@@ -62,8 +62,8 @@ class GeminiProvider(CLIProvider):
 
     def __init__(
         self,
-        api_key: Optional[str] = None,
-        config: Optional[Dict[str, Any]] = None,
+        api_key: str | None = None,
+        config: dict[str, Any] | None = None,
         timeout: int = 120,
         retry_limit: int = 3,
     ):
@@ -101,7 +101,11 @@ class GeminiProvider(CLIProvider):
                     ModelCapability.STREAMING,
                     ModelCapability.THINKING,
                 ],
-                metadata={"tier": "pro", "context_window": "1M", "thinking": "deep_think"},
+                metadata={
+                    "tier": "pro",
+                    "context_window": "1M",
+                    "thinking": "deep_think",
+                },
             ),
             ModelConfig(
                 model_id="gemini-2.5-flash",
@@ -127,7 +131,7 @@ class GeminiProvider(CLIProvider):
         ]
         self.set_model_list(models)
 
-    async def check_availability(self) -> tuple[bool, Optional[str]]:
+    async def check_availability(self) -> tuple[bool, str | None]:
         """
         Check if Gemini CLI is available and working.
 
@@ -154,7 +158,7 @@ class GeminiProvider(CLIProvider):
                 # Use longer timeout for Gemini (20 seconds) due to slower CLI initialization
                 await asyncio.wait_for(process.communicate(), timeout=20.0)
                 return (True, None)
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 # Kill the process if it times out
                 try:
                     process.kill()
@@ -171,9 +175,12 @@ class GeminiProvider(CLIProvider):
         except PermissionError:
             return (False, f"Permission denied to execute '{self.cli_command}'")
         except Exception as e:
-            return (False, f"Failed to check '{self.cli_command}' availability: {str(e)}")
+            return (
+                False,
+                f"Failed to check '{self.cli_command}' availability: {str(e)}",
+            )
 
-    def build_command(self, request: GenerationRequest) -> List[str]:
+    def build_command(self, request: GenerationRequest) -> list[str]:
         """
         Build the CLI command for a Gemini generation request.
 
@@ -201,9 +208,13 @@ class GeminiProvider(CLIProvider):
         if request.system_prompt is not None:
             # System prompt gets merged into prompt but not as a separate parameter
             # We'll allow this with a warning since we handle it by concatenation
-            logger.info("System prompt will be merged with user prompt (Gemini CLI limitation)")
+            logger.info(
+                "System prompt will be merged with user prompt (Gemini CLI limitation)"
+            )
 
-        thinking_mode = request.metadata.get("thinking_mode") if request.metadata else None
+        thinking_mode = (
+            request.metadata.get("thinking_mode") if request.metadata else None
+        )
         if thinking_mode and thinking_mode != "medium":  # medium is default, so it's ok
             unsupported_params.append(f"thinking_mode={thinking_mode}")
 
@@ -245,7 +256,9 @@ class GeminiProvider(CLIProvider):
         logger.debug(f"Built Gemini command: {' '.join(command)}")
         return command
 
-    def parse_response(self, stdout: str, stderr: str, returncode: int) -> GenerationResponse:
+    def parse_response(
+        self, stdout: str, stderr: str, returncode: int
+    ) -> GenerationResponse:
         """
         Parse CLI output into a GenerationResponse.
 
@@ -328,7 +341,9 @@ class GeminiProvider(CLIProvider):
             return response
 
         except json.JSONDecodeError as e:
-            error_msg = f"Failed to parse Gemini CLI JSON output: {e}\nOutput: {stdout[:200]}"
+            error_msg = (
+                f"Failed to parse Gemini CLI JSON output: {e}\nOutput: {stdout[:200]}"
+            )
             logger.error(error_msg)
             raise ValueError(error_msg)
 
@@ -374,14 +389,16 @@ class GeminiProvider(CLIProvider):
             return
 
         fallback_home = Path.cwd() / "tmp" / "gemini_cli_home"
-        self._prepare_cli_home(fallback_home, copy_existing=True, original_home=original_home)
+        self._prepare_cli_home(
+            fallback_home, copy_existing=True, original_home=original_home
+        )
         logger.warning(
             "Gemini CLI home %s is not writable. Using sandboxed home at %s",
             original_home,
             fallback_home,
         )
 
-    def _get_forced_cli_home(self) -> Optional[str]:
+    def _get_forced_cli_home(self) -> str | None:
         """Check config/env for a user-specified CLI HOME override."""
         env_override = os.getenv("MODEL_CHORUS_GEMINI_HOME")
         if env_override:
@@ -413,7 +430,9 @@ class GeminiProvider(CLIProvider):
         try:
             home_path.mkdir(parents=True, exist_ok=True)
         except Exception as exc:
-            logger.error("Failed to create Gemini CLI sandbox home %s: %s", home_path, exc)
+            logger.error(
+                "Failed to create Gemini CLI sandbox home %s: %s", home_path, exc
+            )
             return
 
         if copy_existing:

@@ -13,16 +13,15 @@ Key Features:
 """
 
 import json
-import uuid
 import logging
+import uuid
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from datetime import datetime, timezone, timedelta
-from typing import Optional, List, Tuple, Dict, Any
+from typing import Any, Literal
 
 import filelock
 
-from .models import ConversationMessage, ConversationThread, ConversationState
-
+from .models import ConversationMessage, ConversationThread
 
 logger = logging.getLogger(__name__)
 
@@ -85,8 +84,8 @@ class ConversationMemory:
     def create_thread(
         self,
         workflow_name: str,
-        initial_context: Optional[Dict[str, Any]] = None,
-        parent_thread_id: Optional[str] = None,
+        initial_context: dict[str, Any] | None = None,
+        parent_thread_id: str | None = None,
     ) -> str:
         """
         Create new conversation thread.
@@ -112,7 +111,7 @@ class ConversationMemory:
         thread_id = str(uuid.uuid4())
 
         # Create thread context
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(UTC).isoformat()
         thread = ConversationThread(
             thread_id=thread_id,
             parent_thread_id=parent_thread_id,
@@ -131,7 +130,7 @@ class ConversationMemory:
         logger.info(f"Created thread {thread_id} for workflow '{workflow_name}'")
         return thread_id
 
-    def get_thread(self, thread_id: str) -> Optional[ConversationThread]:
+    def get_thread(self, thread_id: str) -> ConversationThread | None:
         """
         Retrieve conversation thread by ID.
 
@@ -156,8 +155,8 @@ class ConversationMemory:
             return None
 
         # Check TTL
-        file_age = datetime.now(timezone.utc) - datetime.fromtimestamp(
-            thread_file.stat().st_mtime, timezone.utc
+        file_age = datetime.now(UTC) - datetime.fromtimestamp(
+            thread_file.stat().st_mtime, UTC
         )
         if file_age > timedelta(hours=self.ttl_hours):
             logger.info(f"Thread {thread_id} expired (age: {file_age})")
@@ -168,7 +167,7 @@ class ConversationMemory:
         lock = filelock.FileLock(f"{thread_file}.lock", timeout=5)
         try:
             with lock:
-                with open(thread_file, "r") as f:
+                with open(thread_file) as f:
                     data = json.load(f)
                     thread = ConversationThread(**data)
                     logger.debug(
@@ -182,7 +181,9 @@ class ConversationMemory:
             logger.error(f"Error loading thread {thread_id}: {e}")
             return None
 
-    def get_thread_chain(self, thread_id: str, max_depth: int = 20) -> List[ConversationThread]:
+    def get_thread_chain(
+        self, thread_id: str, max_depth: int = 20
+    ) -> list[ConversationThread]:
         """
         Retrieve thread and all parent threads in chronological order.
 
@@ -201,8 +202,8 @@ class ConversationMemory:
             >>> for thread in chain:
             ...     print(f"Thread {thread.thread_id}: {len(thread.messages)} messages")
         """
-        chain = []
-        current_id = thread_id
+        chain: list[ConversationThread] = []
+        current_id: str | None = thread_id
         depth = 0
 
         while current_id and depth < max_depth:
@@ -215,7 +216,9 @@ class ConversationMemory:
             depth += 1
 
         if depth >= max_depth:
-            logger.warning(f"Thread chain depth limit reached ({max_depth}) for {thread_id}")
+            logger.warning(
+                f"Thread chain depth limit reached ({max_depth}) for {thread_id}"
+            )
 
         return chain
 
@@ -226,13 +229,13 @@ class ConversationMemory:
     def add_message(
         self,
         thread_id: str,
-        role: str,
+        role: Literal["user", "assistant"],
         content: str,
-        files: Optional[List[str]] = None,
-        workflow_name: Optional[str] = None,
-        model_provider: Optional[str] = None,
-        model_name: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None,
+        files: list[str] | None = None,
+        workflow_name: str | None = None,
+        model_provider: str | None = None,
+        model_name: str | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> bool:
         """
         Add message to conversation thread.
@@ -264,7 +267,7 @@ class ConversationMemory:
         thread = self.get_thread(thread_id)
         if not thread:
             # If thread doesn't exist, create it
-            now = datetime.now(timezone.utc).isoformat()
+            now = datetime.now(UTC).isoformat()
             thread = ConversationThread(
                 thread_id=thread_id,
                 created_at=now,
@@ -281,7 +284,7 @@ class ConversationMemory:
         message = ConversationMessage(
             role=role,
             content=content,
-            timestamp=datetime.now(timezone.utc).isoformat(),
+            timestamp=datetime.now(UTC).isoformat(),
             files=files,
             workflow_name=workflow_name,
             model_provider=model_provider,
@@ -302,17 +305,19 @@ class ConversationMemory:
             )
 
         # Update timestamp
-        thread.last_updated_at = datetime.now(timezone.utc).isoformat()
+        thread.last_updated_at = datetime.now(UTC).isoformat()
 
         # Persist
         self._save_thread(thread)
 
-        logger.debug(f"Added {role} message to thread {thread_id} ({len(thread.messages)} total)")
+        logger.debug(
+            f"Added {role} message to thread {thread_id} ({len(thread.messages)} total)"
+        )
         return True
 
     def get_messages(
-        self, thread_id: str, limit: Optional[int] = None, role: Optional[str] = None
-    ) -> List[ConversationMessage]:
+        self, thread_id: str, limit: int | None = None, role: str | None = None
+    ) -> list[ConversationMessage]:
         """
         Retrieve messages from thread with optional filtering.
 
@@ -350,8 +355,11 @@ class ConversationMemory:
     # ========================================================================
 
     def build_conversation_history(
-        self, thread_id: str, max_messages: Optional[int] = None, include_files: bool = True
-    ) -> Tuple[str, int]:
+        self,
+        thread_id: str,
+        max_messages: int | None = None,
+        include_files: bool = True,
+    ) -> tuple[str, int]:
         """
         Build formatted conversation history for context injection.
 
@@ -428,7 +436,9 @@ class ConversationMemory:
             if file_map:
                 lines.append("=== FILES REFERENCED ===")
                 for file_path in sorted(file_map.keys()):
-                    lines.append(f"- {file_path} (referenced in turn {file_map[file_path] + 1})")
+                    lines.append(
+                        f"- {file_path} (referenced in turn {file_map[file_path] + 1})"
+                    )
                 lines.append("=== END FILES ===")
                 lines.append("")
 
@@ -463,7 +473,7 @@ class ConversationMemory:
         history = "\n".join(lines)
         return history, len(messages)
 
-    def get_context_summary(self, thread_id: str) -> Dict[str, Any]:
+    def get_context_summary(self, thread_id: str) -> dict[str, Any]:
         """
         Get summary statistics for thread context.
 
@@ -542,7 +552,7 @@ class ConversationMemory:
             return False
 
         thread.status = "completed"
-        thread.last_updated_at = datetime.now(timezone.utc).isoformat()
+        thread.last_updated_at = datetime.now(UTC).isoformat()
         self._save_thread(thread)
 
         logger.info(f"Thread {thread_id} marked as completed")
@@ -568,7 +578,7 @@ class ConversationMemory:
             return False
 
         thread.status = "archived"
-        thread.last_updated_at = datetime.now(timezone.utc).isoformat()
+        thread.last_updated_at = datetime.now(UTC).isoformat()
         self._save_thread(thread)
 
         logger.info(f"Thread {thread_id} archived")
@@ -588,13 +598,15 @@ class ConversationMemory:
             >>> deleted = memory.cleanup_expired_threads()
             >>> print(f"Cleaned up {deleted} expired threads")
         """
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         ttl = timedelta(hours=self.ttl_hours)
         deleted = 0
 
         for thread_file in self.conversations_dir.glob("*.json"):
             try:
-                file_age = now - datetime.fromtimestamp(thread_file.stat().st_mtime, timezone.utc)
+                file_age = now - datetime.fromtimestamp(
+                    thread_file.stat().st_mtime, UTC
+                )
                 if file_age > ttl:
                     thread_id = thread_file.stem
                     self._delete_thread(thread_id)

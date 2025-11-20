@@ -18,10 +18,11 @@ Public API:
     - detect_polarity_opposition: Detect opposing polarity between claims
 """
 
-from enum import Enum
-from typing import Any, Dict, Optional, List, Tuple
-from pydantic import BaseModel, Field, ConfigDict, field_validator
 import re
+from enum import Enum
+from typing import Any
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class ContradictionSeverity(str, Enum):
@@ -140,12 +141,12 @@ class Contradiction(BaseModel):
         min_length=1,
     )
 
-    resolution_suggestion: Optional[str] = Field(
+    resolution_suggestion: str | None = Field(
         default=None,
         description="Optional suggestion for resolving or investigating the contradiction",
     )
 
-    metadata: Dict[str, Any] = Field(
+    metadata: dict[str, Any] = Field(
         default_factory=dict,
         description="Additional metadata (detection_method, timestamp, scores, etc.)",
     )
@@ -195,7 +196,9 @@ class Contradiction(BaseModel):
         # Check if claim_1_id exists and matches claim_2_id
         claim_1_id = info.data.get("claim_1_id")
         if claim_1_id and v == claim_1_id:
-            raise ValueError(f"claim_2_id must be different from claim_1_id (both are '{v}')")
+            raise ValueError(
+                f"claim_2_id must be different from claim_1_id (both are '{v}')"
+            )
         return v
 
 
@@ -282,7 +285,7 @@ NEGATION_KEYWORDS = [
 def detect_polarity_opposition(
     claim_text_1: str,
     claim_text_2: str,
-) -> Tuple[bool, float]:
+) -> tuple[bool, float]:
     """
     Detect if two claims have opposing polarity (positive vs negative).
 
@@ -448,9 +451,13 @@ def generate_contradiction_explanation(
     explanation_parts.append(f"Semantic similarity: {semantic_similarity:.2f}")
 
     if severity in [ContradictionSeverity.CRITICAL, ContradictionSeverity.MAJOR]:
-        explanation_parts.append("Claims are highly related but present contradictory assertions")
+        explanation_parts.append(
+            "Claims are highly related but present contradictory assertions"
+        )
     elif severity == ContradictionSeverity.MODERATE:
-        explanation_parts.append("Claims show notable inconsistency requiring investigation")
+        explanation_parts.append(
+            "Claims show notable inconsistency requiring investigation"
+        )
     else:
         explanation_parts.append(
             "Claims show minor inconsistency, may be due to different contexts"
@@ -461,7 +468,7 @@ def generate_contradiction_explanation(
 
 def generate_reconciliation_suggestion(
     severity: ContradictionSeverity,
-) -> Optional[str]:
+) -> str | None:
     """
     Generate reconciliation suggestion based on contradiction severity.
 
@@ -503,7 +510,7 @@ def detect_contradiction(
     claim_2_text: str,
     similarity_threshold: float = 0.3,
     model_name: str = "all-MiniLM-L6-v2",
-) -> Optional[Contradiction]:
+) -> Contradiction | None:
     """
     Detect contradiction between two claims.
 
@@ -545,7 +552,9 @@ def detect_contradiction(
     compute_claim_similarity, _ = _import_semantic_functions()
 
     # Compute semantic similarity
-    similarity = compute_claim_similarity(claim_1_text, claim_2_text, model_name=model_name)
+    similarity = compute_claim_similarity(
+        claim_1_text, claim_2_text, model_name=model_name
+    )
 
     # If very low similarity, likely unrelated
     if similarity < similarity_threshold:
@@ -601,10 +610,10 @@ def detect_contradiction(
 
 
 def detect_contradictions_batch(
-    claims: List[Tuple[str, str]],
+    claims: list[tuple[str, str]],
     similarity_threshold: float = 0.3,
     model_name: str = "all-MiniLM-L6-v2",
-) -> List[Contradiction]:
+) -> list[Contradiction]:
     """
     Detect contradictions in a batch of claims.
 

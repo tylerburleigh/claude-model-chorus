@@ -2,12 +2,12 @@
 Tests for CodexProvider CLI integration.
 """
 
-import json
-import pytest
-from unittest.mock import AsyncMock, patch
+from unittest.mock import patch
 
-from model_chorus.providers.codex_provider import CodexProvider
+import pytest
+
 from model_chorus.providers.base_provider import GenerationRequest
+from model_chorus.providers.codex_provider import CodexProvider
 
 
 class TestCodexProvider:

@@ -10,14 +10,13 @@ Tests verify StateManager functionality including:
 """
 
 import json
-import pytest
 import threading
 import time
-from pathlib import Path
-from datetime import datetime, timezone
 
-from model_chorus.core.state import StateManager, get_default_state_manager
+import pytest
+
 from model_chorus.core.models import ConversationState
+from model_chorus.core.state import StateManager, get_default_state_manager
 
 
 class TestStateManager:
@@ -155,7 +154,9 @@ class TestStateManager:
 
         def write_state(thread_id):
             for i in range(operations_per_thread):
-                manager.set_state(f"workflow_{thread_id}", {"thread": thread_id, "iteration": i})
+                manager.set_state(
+                    f"workflow_{thread_id}", {"thread": thread_id, "iteration": i}
+                )
 
         threads = []
         for i in range(num_threads):
@@ -196,7 +197,9 @@ class TestStateManager:
 
         def writer(thread_id):
             for i in range(iterations):
-                manager.update_state("shared_workflow", {"counter": thread_id * 1000 + i})
+                manager.update_state(
+                    "shared_workflow", {"counter": thread_id * 1000 + i}
+                )
                 time.sleep(0.001)
 
         threads = []
@@ -251,7 +254,11 @@ class TestStateManager:
         """Test serializing state to JSON string."""
         manager = StateManager()
 
-        test_data = {"step": 1, "models": ["claude", "gpt-5"], "config": {"temperature": 0.7}}
+        test_data = {
+            "step": 1,
+            "models": ["claude", "gpt-5"],
+            "config": {"temperature": 0.7},
+        }
         manager.set_state("test_workflow", test_data)
 
         json_str = manager.serialize_state("test_workflow")

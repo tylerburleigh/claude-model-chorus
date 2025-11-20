@@ -8,14 +8,13 @@ through threading.
 
 import logging
 import uuid
-from typing import Optional, Dict, Any, List
+from typing import Any
 
-from ..core.base_workflow import BaseWorkflow, WorkflowResult, WorkflowStep
+from ..core.base_workflow import BaseWorkflow, WorkflowResult
 from ..core.conversation import ConversationMemory
+from ..core.progress import emit_workflow_complete, emit_workflow_start
 from ..core.prompts import prepend_system_constraints
-from ..providers import ModelProvider, GenerationRequest, GenerationResponse
-from ..core.models import ConversationMessage
-from ..core.progress import emit_workflow_start, emit_workflow_complete
+from ..providers import GenerationRequest, ModelProvider
 
 logger = logging.getLogger(__name__)
 
@@ -73,9 +72,9 @@ class ChatWorkflow(BaseWorkflow):
     def __init__(
         self,
         provider: ModelProvider,
-        fallback_providers: Optional[List[ModelProvider]] = None,
-        config: Optional[Dict[str, Any]] = None,
-        conversation_memory: Optional[ConversationMemory] = None,
+        fallback_providers: list[ModelProvider] | None = None,
+        config: dict[str, Any] | None = None,
+        conversation_memory: ConversationMemory | None = None,
     ):
         """
         Initialize ChatWorkflow with a single provider.
@@ -106,8 +105,8 @@ class ChatWorkflow(BaseWorkflow):
     async def run(
         self,
         prompt: str,
-        continuation_id: Optional[str] = None,
-        files: Optional[List[str]] = None,
+        continuation_id: str | None = None,
+        files: list[str] | None = None,
         skip_provider_check: bool = False,
         **kwargs,
     ) -> WorkflowResult:
@@ -169,8 +168,10 @@ class ChatWorkflow(BaseWorkflow):
 
         # Check provider availability
         if not skip_provider_check:
-            has_available, available, unavailable = await self.check_provider_availability(
-                self.provider, self.fallback_providers
+            has_available, available, unavailable = (
+                await self.check_provider_availability(
+                    self.provider, self.fallback_providers
+                )
             )
 
             if not has_available:
@@ -189,7 +190,9 @@ class ChatWorkflow(BaseWorkflow):
                 )
 
             if unavailable and logger.isEnabledFor(logging.WARNING):
-                logger.warning(f"Some providers unavailable: {[n for n, _ in unavailable]}")
+                logger.warning(
+                    f"Some providers unavailable: {[n for n, _ in unavailable]}"
+                )
                 logger.info(f"Will use available providers: {available}")
 
         # Generate or use thread ID
@@ -210,7 +213,9 @@ class ChatWorkflow(BaseWorkflow):
                         f"Continuation ID '{continuation_id}' not found in conversation memory. "
                         f"Creating new conversation instead."
                     )
-                    thread_id = self.conversation_memory.create_thread(workflow_name=self.name)
+                    thread_id = self.conversation_memory.create_thread(
+                        workflow_name=self.name
+                    )
                     is_valid_continuation = False
             else:
                 # No conversation memory, just use the provided ID
@@ -219,7 +224,9 @@ class ChatWorkflow(BaseWorkflow):
         else:
             # Create new thread if conversation memory available
             if self.conversation_memory:
-                thread_id = self.conversation_memory.create_thread(workflow_name=self.name)
+                thread_id = self.conversation_memory.create_thread(
+                    workflow_name=self.name
+                )
             else:
                 thread_id = str(uuid.uuid4())
 
@@ -256,7 +263,8 @@ class ChatWorkflow(BaseWorkflow):
                 logger.warning(f"Providers failed before success: {', '.join(failed)}")
 
             logger.info(
-                f"Received response from {used_provider}: " f"{len(response.content)} chars"
+                f"Received response from {used_provider}: "
+                f"{len(response.content)} chars"
             )
 
             # Add user message to conversation history
@@ -284,7 +292,9 @@ class ChatWorkflow(BaseWorkflow):
             # Build successful result
             result.success = True
             result.synthesis = response.content
-            result.add_step(step_number=1, content=response.content, model=response.model)
+            result.add_step(
+                step_number=1, content=response.content, model=response.model
+            )
 
             # Add metadata
             result.metadata.update(
@@ -315,7 +325,7 @@ class ChatWorkflow(BaseWorkflow):
         return result
 
     def _build_prompt_with_history(
-        self, prompt: str, thread_id: str, files: Optional[List[str]] = None
+        self, prompt: str, thread_id: str, files: list[str] | None = None
     ) -> str:
         """
         Build prompt with conversation history and file context if available.
@@ -335,14 +345,16 @@ class ChatWorkflow(BaseWorkflow):
             context_parts.append("File context:\n")
             for file_path in files:
                 try:
-                    with open(file_path, "r", encoding="utf-8") as f:
+                    with open(file_path, encoding="utf-8") as f:
                         file_content = f.read()
                     context_parts.append(f"\n--- File: {file_path} ---\n")
                     context_parts.append(file_content)
                     context_parts.append(f"\n--- End of {file_path} ---\n")
                 except Exception as e:
                     logger.warning(f"Failed to read file {file_path}: {e}")
-                    context_parts.append(f"\n--- File: {file_path} (Failed to read: {e}) ---\n")
+                    context_parts.append(
+                        f"\n--- File: {file_path} (Failed to read: {e}) ---\n"
+                    )
 
         # If no conversation memory, return prompt with file context only
         if not self.conversation_memory:
@@ -363,7 +375,9 @@ class ChatWorkflow(BaseWorkflow):
 
                 # Include file references from history if present
                 if msg.files:
-                    context_parts.append(f"  [Referenced files: {', '.join(msg.files)}]\n")
+                    context_parts.append(
+                        f"  [Referenced files: {', '.join(msg.files)}]\n"
+                    )
 
             # Add current user prompt with USER: prefix when there's history
             context_parts.append(f"\nUSER: {prompt}")
@@ -429,7 +443,7 @@ class ChatWorkflow(BaseWorkflow):
         logger.warning("clear_conversation not yet implemented in ConversationMemory")
         return False
 
-    def get_message_count(self, thread_id: Optional[str] = None) -> int:
+    def get_message_count(self, thread_id: str | None = None) -> int:
         """
         Get total message count across all threads or for a specific thread.
 
@@ -465,7 +479,9 @@ class ChatWorkflow(BaseWorkflow):
             return False
 
         if not self.provider.validate_api_key():
-            logger.warning(f"Provider {self.provider.provider_name} API key validation failed")
+            logger.warning(
+                f"Provider {self.provider.provider_name} API key validation failed"
+            )
             return False
 
         return True
@@ -473,4 +489,7 @@ class ChatWorkflow(BaseWorkflow):
     def __repr__(self) -> str:
         """String representation of the workflow."""
         memory_status = "with memory" if self.conversation_memory else "no memory"
-        return f"ChatWorkflow(provider='{self.provider.provider_name}', " f"{memory_status})"
+        return (
+            f"ChatWorkflow(provider='{self.provider.provider_name}', "
+            f"{memory_status})"
+        )

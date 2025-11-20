@@ -8,21 +8,21 @@ multiple perspectives and assesses argument strength.
 
 import logging
 import uuid
-from typing import Optional, Dict, Any, List
+from typing import Any
 
-from ...core.base_workflow import BaseWorkflow, WorkflowResult, WorkflowStep
+from ...core.base_workflow import BaseWorkflow, WorkflowResult
 from ...core.conversation import ConversationMemory
+from ...core.models import ArgumentMap, ArgumentPerspective
+from ...core.progress import emit_stage, emit_workflow_complete, emit_workflow_start
 from ...core.prompts import prepend_system_constraints
 from ...core.registry import WorkflowRegistry
 from ...core.role_orchestration import (
-    RoleOrchestrator,
     ModelRole,
     OrchestrationPattern,
     OrchestrationResult,
+    RoleOrchestrator,
 )
-from ...providers import ModelProvider, GenerationRequest, GenerationResponse
-from ...core.models import ConversationMessage, ArgumentMap, ArgumentPerspective
-from ...core.progress import emit_workflow_start, emit_stage, emit_workflow_complete
+from ...providers import ModelProvider
 
 logger = logging.getLogger(__name__)
 
@@ -99,9 +99,9 @@ class ArgumentWorkflow(BaseWorkflow):
     def __init__(
         self,
         provider: ModelProvider,
-        fallback_providers: Optional[List[ModelProvider]] = None,
-        config: Optional[Dict[str, Any]] = None,
-        conversation_memory: Optional[ConversationMemory] = None,
+        fallback_providers: list[ModelProvider] | None = None,
+        config: dict[str, Any] | None = None,
+        conversation_memory: ConversationMemory | None = None,
     ):
         """
         Initialize ArgumentWorkflow with a single provider.
@@ -127,9 +127,11 @@ class ArgumentWorkflow(BaseWorkflow):
         self.provider = provider
         self.fallback_providers = fallback_providers or []
 
-        logger.info(f"ArgumentWorkflow initialized with provider: {provider.provider_name}")
+        logger.info(
+            f"ArgumentWorkflow initialized with provider: {provider.provider_name}"
+        )
 
-    def _create_creator_role(self, temperature: Optional[float] = 0.7) -> ModelRole:
+    def _create_creator_role(self, temperature: float | None = 0.7) -> ModelRole:
         """
         Create Creator role for thesis generation (Step 1 of ARGUMENT workflow).
 
@@ -174,7 +176,7 @@ class ArgumentWorkflow(BaseWorkflow):
             },
         )
 
-    def _create_skeptic_role(self, temperature: Optional[float] = 0.7) -> ModelRole:
+    def _create_skeptic_role(self, temperature: float | None = 0.7) -> ModelRole:
         """
         Create Skeptic role for critical rebuttal (Step 2 of ARGUMENT workflow).
 
@@ -219,7 +221,7 @@ class ArgumentWorkflow(BaseWorkflow):
             },
         )
 
-    def _create_moderator_role(self, temperature: Optional[float] = 0.7) -> ModelRole:
+    def _create_moderator_role(self, temperature: float | None = 0.7) -> ModelRole:
         """
         Create Moderator role for balanced synthesis (Step 3 of ARGUMENT workflow).
 
@@ -274,7 +276,7 @@ class ArgumentWorkflow(BaseWorkflow):
         skeptic_response,
         moderator_response,
         synthesis: str,
-        metadata: Dict[str, Any],
+        metadata: dict[str, Any],
     ) -> ArgumentMap:
         """
         Generate structured ArgumentMap from role responses.
@@ -338,7 +340,11 @@ class ArgumentWorkflow(BaseWorkflow):
         # Create ArgumentMap with all perspectives
         argument_map = ArgumentMap(
             topic=prompt,
-            perspectives=[creator_perspective, skeptic_perspective, moderator_perspective],
+            perspectives=[
+                creator_perspective,
+                skeptic_perspective,
+                moderator_perspective,
+            ],
             synthesis=synthesis,
             metadata=metadata,
         )
@@ -348,8 +354,8 @@ class ArgumentWorkflow(BaseWorkflow):
     async def run(
         self,
         prompt: str,
-        continuation_id: Optional[str] = None,
-        files: Optional[List[str]] = None,
+        continuation_id: str | None = None,
+        files: list[str] | None = None,
         skip_provider_check: bool = False,
         **kwargs,
     ) -> WorkflowResult:
@@ -412,8 +418,10 @@ class ArgumentWorkflow(BaseWorkflow):
 
         # Check provider availability
         if not skip_provider_check:
-            has_available, available, unavailable = await self.check_provider_availability(
-                self.provider, self.fallback_providers
+            has_available, available, unavailable = (
+                await self.check_provider_availability(
+                    self.provider, self.fallback_providers
+                )
             )
 
             if not has_available:
@@ -432,7 +440,9 @@ class ArgumentWorkflow(BaseWorkflow):
                 )
 
             if unavailable and logger.isEnabledFor(logging.WARNING):
-                logger.warning(f"Some providers unavailable: {[n for n, _ in unavailable]}")
+                logger.warning(
+                    f"Some providers unavailable: {[n for n, _ in unavailable]}"
+                )
                 logger.info(f"Will use available providers: {available}")
 
         # Generate or use thread ID
@@ -441,7 +451,9 @@ class ArgumentWorkflow(BaseWorkflow):
         else:
             # Create new thread if conversation memory available
             if self.conversation_memory:
-                thread_id = self.conversation_memory.create_thread(workflow_name=self.name)
+                thread_id = self.conversation_memory.create_thread(
+                    workflow_name=self.name
+                )
             else:
                 thread_id = str(uuid.uuid4())
 
@@ -478,7 +490,9 @@ class ArgumentWorkflow(BaseWorkflow):
                 pattern=OrchestrationPattern.SEQUENTIAL,
             )
 
-            logger.info("Executing ARGUMENT workflow with Creator → Skeptic → Moderator roles...")
+            logger.info(
+                "Executing ARGUMENT workflow with Creator → Skeptic → Moderator roles..."
+            )
 
             # Emit workflow start
             emit_workflow_start("argument", "15-30s")
@@ -506,7 +520,9 @@ class ArgumentWorkflow(BaseWorkflow):
                     step_name="Thesis Generation (Creator)",
                 )
 
-                logger.info(f"Creator role generated thesis: {len(creator_response.content)} chars")
+                logger.info(
+                    f"Creator role generated thesis: {len(creator_response.content)} chars"
+                )
 
                 # Add Skeptic's rebuttal as Step 2
                 result.add_step(
@@ -593,10 +609,14 @@ class ArgumentWorkflow(BaseWorkflow):
             result.metadata.update(base_metadata)
             result.metadata["argument_map"] = argument_map
 
-            logger.info(f"ARGUMENT workflow completed successfully for thread: {thread_id}")
+            logger.info(
+                f"ARGUMENT workflow completed successfully for thread: {thread_id}"
+            )
             logger.info(f"Creator role: {len(creator_response.content)} chars thesis")
             logger.info(f"Skeptic role: {len(skeptic_response.content)} chars rebuttal")
-            logger.info(f"Moderator role: {len(moderator_response.content)} chars synthesis")
+            logger.info(
+                f"Moderator role: {len(moderator_response.content)} chars synthesis"
+            )
 
             # Emit workflow complete
             emit_workflow_complete("argument")
@@ -612,7 +632,7 @@ class ArgumentWorkflow(BaseWorkflow):
         return result
 
     def _build_prompt_with_history(
-        self, prompt: str, thread_id: str, files: Optional[List[str]] = None
+        self, prompt: str, thread_id: str, files: list[str] | None = None
     ) -> str:
         """
         Build prompt with conversation history and file context if available.
@@ -632,14 +652,16 @@ class ArgumentWorkflow(BaseWorkflow):
             context_parts.append("File context:\n")
             for file_path in files:
                 try:
-                    with open(file_path, "r", encoding="utf-8") as f:
+                    with open(file_path, encoding="utf-8") as f:
                         file_content = f.read()
                     context_parts.append(f"\n--- File: {file_path} ---\n")
                     context_parts.append(file_content)
                     context_parts.append(f"\n--- End of {file_path} ---\n")
                 except Exception as e:
                     logger.warning(f"Failed to read file {file_path}: {e}")
-                    context_parts.append(f"\n--- File: {file_path} (Failed to read: {e}) ---\n")
+                    context_parts.append(
+                        f"\n--- File: {file_path} (Failed to read: {e}) ---\n"
+                    )
 
         # If no conversation memory, return prompt with file context only
         if not self.conversation_memory:
@@ -660,7 +682,9 @@ class ArgumentWorkflow(BaseWorkflow):
 
                 # Include file references from history if present
                 if msg.files:
-                    context_parts.append(f"  [Referenced files: {', '.join(msg.files)}]\n")
+                    context_parts.append(
+                        f"  [Referenced files: {', '.join(msg.files)}]\n"
+                    )
 
             # Add current user prompt with USER: prefix when there's history
             context_parts.append(f"\nUSER: {prompt}")
@@ -722,7 +746,9 @@ class ArgumentWorkflow(BaseWorkflow):
             return False
 
         if not self.provider.validate_api_key():
-            logger.warning(f"Provider {self.provider.provider_name} API key validation failed")
+            logger.warning(
+                f"Provider {self.provider.provider_name} API key validation failed"
+            )
             return False
 
         return True
@@ -730,4 +756,7 @@ class ArgumentWorkflow(BaseWorkflow):
     def __repr__(self) -> str:
         """String representation of the workflow."""
         memory_status = "with memory" if self.conversation_memory else "no memory"
-        return f"ArgumentWorkflow(provider='{self.provider.provider_name}', " f"{memory_status})"
+        return (
+            f"ArgumentWorkflow(provider='{self.provider.provider_name}', "
+            f"{memory_status})"
+        )

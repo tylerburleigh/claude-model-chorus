@@ -3,13 +3,10 @@ Pytest configuration and fixtures for ModelChorus tests.
 """
 
 import os
-import sys
-import shutil
-import subprocess
-import pytest
-import yaml
-from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock
+
+import pytest
+
 from model_chorus.providers.base_provider import GenerationResponse
 
 # Control whether integration tests use real CLIs or mocks
@@ -38,20 +35,24 @@ ANY_PROVIDER_AVAILABLE = test_helpers.ANY_PROVIDER_AVAILABLE
 def pytest_configure(config):
     """Register custom markers for provider-specific tests."""
     config.addinivalue_line(
-        "markers", "requires_claude: test requires Claude provider (config enabled + CLI available)"
+        "markers",
+        "requires_claude: test requires Claude provider (config enabled + CLI available)",
     )
     config.addinivalue_line(
-        "markers", "requires_gemini: test requires Gemini provider (config enabled + CLI available)"
+        "markers",
+        "requires_gemini: test requires Gemini provider (config enabled + CLI available)",
     )
     config.addinivalue_line(
-        "markers", "requires_codex: test requires Codex provider (config enabled + CLI available)"
+        "markers",
+        "requires_codex: test requires Codex provider (config enabled + CLI available)",
     )
     config.addinivalue_line(
         "markers",
         "requires_cursor_agent: test requires Cursor Agent provider (config enabled + CLI available)",
     )
     config.addinivalue_line(
-        "markers", "requires_any_provider: test requires at least one provider to be available"
+        "markers",
+        "requires_any_provider: test requires at least one provider to be available",
     )
 
 
@@ -79,7 +80,8 @@ def pytest_configure(config):
         pytest.param(
             "codex",
             marks=pytest.mark.skipif(
-                not CODEX_AVAILABLE, reason="Codex not available (config disabled or CLI not found)"
+                not CODEX_AVAILABLE,
+                reason="Codex not available (config disabled or CLI not found)",
             ),
         ),
         pytest.param(
@@ -249,7 +251,10 @@ def _create_smart_mock_provider(provider_name: str, model_name: str, stop_reason
                 response_content = match.group()
             else:
                 response_content = "Acknowledged"
-        elif "what number did we start" in prompt or "number did we start counting" in prompt:
+        elif (
+            "what number did we start" in prompt
+            or "number did we start counting" in prompt
+        ):
             response_content = "We started counting with 1."
         # Handle guessing game
         elif "thinking of a number" in prompt or "guess what it is" in prompt:
@@ -257,9 +262,7 @@ def _create_smart_mock_provider(provider_name: str, model_name: str, stop_reason
         elif "no, try again" in prompt or "different guess" in prompt:
             response_content = "Let me try 5."
         elif "original question" in prompt:
-            response_content = (
-                "You asked me to guess the number you were thinking of between 1 and 10."
-            )
+            response_content = "You asked me to guess the number you were thinking of between 1 and 10."
         # Handle acknowledgments
         elif "acknowledge" in prompt or "just acknowledge" in prompt:
             response_content = "Acknowledged."
@@ -267,7 +270,9 @@ def _create_smart_mock_provider(provider_name: str, model_name: str, stop_reason
             response_content = "Continuing conversation."
         # Default response
         else:
-            response_content = f"{provider_name.title()} response: {request.prompt[:50]}..."
+            response_content = (
+                f"{provider_name.title()} response: {request.prompt[:50]}..."
+            )
 
         return GenerationResponse(
             content=response_content,

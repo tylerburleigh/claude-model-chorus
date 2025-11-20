@@ -11,6 +11,7 @@ Tests verify ThinkDeep model functionality including:
 """
 
 import json
+
 import pytest
 from pydantic import ValidationError
 
@@ -106,7 +107,9 @@ class TestHypothesis:
     def test_hypothesis_invalid_status(self):
         """Test that invalid status raises validation error."""
         with pytest.raises(ValidationError):
-            Hypothesis(hypothesis="Test", status="invalid_status")  # Not in allowed values
+            Hypothesis(
+                hypothesis="Test", status="invalid_status"
+            )  # Not in allowed values
 
     def test_hypothesis_empty_hypothesis_text(self):
         """Test that empty hypothesis text fails validation."""
@@ -148,7 +151,9 @@ class TestHypothesis:
     def test_hypothesis_json_serialization(self):
         """Test hypothesis can be serialized to JSON."""
         hyp = Hypothesis(
-            hypothesis="Test hypothesis", evidence=["Evidence 1", "Evidence 2"], status="validated"
+            hypothesis="Test hypothesis",
+            evidence=["Evidence 1", "Evidence 2"],
+            status="validated",
         )
 
         json_str = hyp.model_dump_json()
@@ -229,10 +234,14 @@ class TestInvestigationStep:
 
         # Invalid step numbers
         with pytest.raises(ValidationError):
-            InvestigationStep(step_number=0, findings="Test", confidence="low")  # Less than 1
+            InvestigationStep(
+                step_number=0, findings="Test", confidence="low"
+            )  # Less than 1
 
         with pytest.raises(ValidationError):
-            InvestigationStep(step_number=-1, findings="Test", confidence="low")  # Negative
+            InvestigationStep(
+                step_number=-1, findings="Test", confidence="low"
+            )  # Negative
 
     def test_investigation_step_empty_findings(self):
         """Test that empty findings fails validation."""
@@ -245,7 +254,9 @@ class TestInvestigationStep:
         """Test that empty confidence fails validation."""
         with pytest.raises(ValidationError):
             InvestigationStep(
-                step_number=1, findings="Test findings", confidence=""  # min_length=1 constraint
+                step_number=1,
+                findings="Test findings",
+                confidence="",  # min_length=1 constraint
             )
 
     def test_investigation_step_serialization(self):
@@ -291,12 +302,19 @@ class TestThinkDeepState:
 
     def test_thinkdeep_state_creation(self):
         """Test basic ThinkDeepState creation."""
-        hyp = Hypothesis(hypothesis="Test hypothesis", evidence=["Evidence 1"], status="active")
+        hyp = Hypothesis(
+            hypothesis="Test hypothesis", evidence=["Evidence 1"], status="active"
+        )
 
-        step = InvestigationStep(step_number=1, findings="Initial findings", confidence="low")
+        step = InvestigationStep(
+            step_number=1, findings="Initial findings", confidence="low"
+        )
 
         state = ThinkDeepState(
-            hypotheses=[hyp], steps=[step], current_confidence="low", relevant_files=["test.py"]
+            hypotheses=[hyp],
+            steps=[step],
+            current_confidence="low",
+            relevant_files=["test.py"],
         )
 
         assert len(state.hypotheses) == 1
@@ -334,9 +352,15 @@ class TestThinkDeepState:
             InvestigationStep(
                 step_number=1, findings="Initial exploration", confidence="exploring"
             ),
-            InvestigationStep(step_number=2, findings="Hypothesis formed", confidence="low"),
-            InvestigationStep(step_number=3, findings="Evidence gathered", confidence="medium"),
-            InvestigationStep(step_number=4, findings="Hypothesis validated", confidence="high"),
+            InvestigationStep(
+                step_number=2, findings="Hypothesis formed", confidence="low"
+            ),
+            InvestigationStep(
+                step_number=3, findings="Evidence gathered", confidence="medium"
+            ),
+            InvestigationStep(
+                step_number=4, findings="Hypothesis validated", confidence="high"
+            ),
         ]
 
         state = ThinkDeepState(steps=steps, current_confidence="high")
@@ -377,7 +401,10 @@ class TestThinkDeepState:
             ),
             Hypothesis(
                 hypothesis="Memory leak in cache layer",
-                evidence=["Memory usage grows over time", "Cache has no eviction policy"],
+                evidence=[
+                    "Memory usage grows over time",
+                    "Cache has no eviction policy",
+                ],
                 status="active",
             ),
         ]
@@ -439,7 +466,10 @@ class TestThinkDeepState:
         step = InvestigationStep(step_number=1, findings="Test", confidence="low")
 
         state = ThinkDeepState(
-            hypotheses=[hyp], steps=[step], current_confidence="medium", relevant_files=["test.py"]
+            hypotheses=[hyp],
+            steps=[step],
+            current_confidence="medium",
+            relevant_files=["test.py"],
         )
 
         data = state.model_dump()
@@ -459,7 +489,10 @@ class TestThinkDeepState:
             ],
             steps=[
                 InvestigationStep(
-                    step_number=1, findings="F1", files_checked=["f1.py"], confidence="low"
+                    step_number=1,
+                    findings="F1",
+                    files_checked=["f1.py"],
+                    confidence="low",
                 ),
                 InvestigationStep(
                     step_number=2,
@@ -524,7 +557,9 @@ class TestModelIntegration:
         """Test typical hypothesis lifecycle in an investigation."""
         # Step 1: Form hypothesis
         hyp = Hypothesis(
-            hypothesis="API timeout caused by slow database queries", evidence=[], status="active"
+            hypothesis="API timeout caused by slow database queries",
+            evidence=[],
+            status="active",
         )
 
         # Step 2: Add evidence
@@ -550,7 +585,9 @@ class TestModelIntegration:
         hyp1 = Hypothesis(hypothesis="Memory leak in cache", status="active")
         state.hypotheses.append(hyp1)
         state.steps.append(
-            InvestigationStep(step_number=1, findings="Observed memory growth", confidence="low")
+            InvestigationStep(
+                step_number=1, findings="Observed memory growth", confidence="low"
+            )
         )
         state.current_confidence = "low"
 
@@ -559,7 +596,9 @@ class TestModelIntegration:
         hyp1.evidence.append("No eviction policy configured")
         state.steps.append(
             InvestigationStep(
-                step_number=2, findings="Confirmed no cache eviction", confidence="medium"
+                step_number=2,
+                findings="Confirmed no cache eviction",
+                confidence="medium",
             )
         )
         state.current_confidence = "medium"
@@ -568,7 +607,9 @@ class TestModelIntegration:
         hyp1.status = "validated"
         state.steps.append(
             InvestigationStep(
-                step_number=3, findings="Root cause identified and confirmed", confidence="high"
+                step_number=3,
+                findings="Root cause identified and confirmed",
+                confidence="high",
             )
         )
         state.current_confidence = "high"

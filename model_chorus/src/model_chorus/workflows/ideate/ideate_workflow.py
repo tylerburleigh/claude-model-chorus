@@ -7,21 +7,19 @@ through structured brainstorming sessions with creative prompting.
 
 import logging
 import uuid
-from datetime import datetime, timezone
-from typing import Optional, Dict, Any, List
+from typing import Any
 
 from ...core.base_workflow import BaseWorkflow, WorkflowResult, WorkflowStep
 from ...core.conversation import ConversationMemory
+from ...core.progress import emit_workflow_complete, emit_workflow_start
 from ...core.registry import WorkflowRegistry
 from ...core.role_orchestration import (
-    RoleOrchestrator,
     ModelRole,
     OrchestrationPattern,
     OrchestrationResult,
+    RoleOrchestrator,
 )
-from ...providers import ModelProvider, GenerationRequest, GenerationResponse
-from ...core.models import ConversationMessage
-from ...core.progress import emit_workflow_start, emit_workflow_complete
+from ...providers import GenerationRequest, ModelProvider
 
 logger = logging.getLogger(__name__)
 
@@ -88,9 +86,9 @@ class IdeateWorkflow(BaseWorkflow):
     def __init__(
         self,
         provider: ModelProvider,
-        fallback_providers: Optional[List[ModelProvider]] = None,
-        config: Optional[Dict[str, Any]] = None,
-        conversation_memory: Optional[ConversationMemory] = None,
+        fallback_providers: list[ModelProvider] | None = None,
+        config: dict[str, Any] | None = None,
+        conversation_memory: ConversationMemory | None = None,
     ):
         """
         Initialize IdeateWorkflow with a single provider.
@@ -116,13 +114,15 @@ class IdeateWorkflow(BaseWorkflow):
         self.provider = provider
         self.fallback_providers = fallback_providers or []
 
-        logger.info(f"IdeateWorkflow initialized with provider: {provider.provider_name}")
+        logger.info(
+            f"IdeateWorkflow initialized with provider: {provider.provider_name}"
+        )
 
     async def run(
         self,
         prompt: str,
-        continuation_id: Optional[str] = None,
-        files: Optional[List[str]] = None,
+        continuation_id: str | None = None,
+        files: list[str] | None = None,
         skip_provider_check: bool = False,
         **kwargs,
     ) -> WorkflowResult:
@@ -156,8 +156,10 @@ class IdeateWorkflow(BaseWorkflow):
 
         # Check provider availability
         if not skip_provider_check:
-            has_available, available, unavailable = await self.check_provider_availability(
-                self.provider, self.fallback_providers
+            has_available, available, unavailable = (
+                await self.check_provider_availability(
+                    self.provider, self.fallback_providers
+                )
             )
 
             if not has_available:
@@ -176,7 +178,9 @@ class IdeateWorkflow(BaseWorkflow):
                 )
 
             if unavailable and logger.isEnabledFor(logging.WARNING):
-                logger.warning(f"Some providers unavailable: {[n for n, _ in unavailable]}")
+                logger.warning(
+                    f"Some providers unavailable: {[n for n, _ in unavailable]}"
+                )
                 logger.info(f"Will use available providers: {available}")
 
         # Get or create thread ID
@@ -188,7 +192,9 @@ class IdeateWorkflow(BaseWorkflow):
             thread = self.conversation_memory.get_thread(continuation_id)
             if thread:
                 history = thread.messages
-                logger.info(f"Loaded {len(history)} messages from thread {continuation_id}")
+                logger.info(
+                    f"Loaded {len(history)} messages from thread {continuation_id}"
+                )
 
         # Prepare creative system prompt
         system_prompt = kwargs.get("system_prompt", self._get_ideation_system_prompt())
@@ -197,11 +203,15 @@ class IdeateWorkflow(BaseWorkflow):
         temperature = kwargs.get("temperature", 0.9)
 
         # Prepare user message with ideation framing
-        user_message = self._frame_ideation_prompt(prompt, is_continuation=bool(history))
+        user_message = self._frame_ideation_prompt(
+            prompt, is_continuation=bool(history)
+        )
 
         # Prepend conversation history if it exists
         if history:
-            history_str = "\n".join([f"{msg.role.upper()}: {msg.content}" for msg in history])
+            history_str = "\n".join(
+                [f"{msg.role.upper()}: {msg.content}" for msg in history]
+            )
             user_message = f"Previous conversation:\n{history_str}\n\n{user_message}"
 
         # Create generation request
@@ -231,7 +241,9 @@ class IdeateWorkflow(BaseWorkflow):
                 metadata={
                     "title": "Ideation Round",
                     "temperature": temperature,
-                    "tokens_used": response.usage.get("total_tokens", 0) if response.usage else 0,
+                    "tokens_used": (
+                        response.usage.get("total_tokens", 0) if response.usage else 0
+                    ),
                 },
             )
 
@@ -354,7 +366,8 @@ Generate diverse, innovative ideas. Think broadly and explore multiple approache
         }
 
         stance_prompt = perspective_prompts.get(
-            perspective, "Generate diverse, creative ideas from your unique perspective."
+            perspective,
+            "Generate diverse, creative ideas from your unique perspective.",
         )
 
         return ModelRole(
@@ -373,8 +386,8 @@ Generate diverse, innovative ideas. Think broadly and explore multiple approache
     async def run_parallel_brainstorming(
         self,
         prompt: str,
-        provider_map: Dict[str, ModelProvider],
-        perspectives: Optional[List[str]] = None,
+        provider_map: dict[str, ModelProvider],
+        perspectives: list[str] | None = None,
         **kwargs,
     ) -> WorkflowResult:
         """
@@ -429,7 +442,9 @@ Generate diverse, innovative ideas. Think broadly and explore multiple approache
 
         # Create orchestrator with PARALLEL pattern
         orchestrator = RoleOrchestrator(
-            roles=roles, provider_map=provider_map, pattern=OrchestrationPattern.PARALLEL
+            roles=roles,
+            provider_map=provider_map,
+            pattern=OrchestrationPattern.PARALLEL,
         )
 
         # Execute parallel brainstorming
@@ -440,7 +455,9 @@ Generate diverse, innovative ideas. Think broadly and explore multiple approache
 
             # Convert orchestration steps to workflow steps
             steps = []
-            for i, (role_name, response) in enumerate(orchestration_result.role_responses):
+            for i, (role_name, response) in enumerate(
+                orchestration_result.role_responses
+            ):
                 perspective = perspectives[i] if i < len(perspectives) else "general"
                 step = WorkflowStep(
                     step_number=i + 1,
@@ -450,7 +467,11 @@ Generate diverse, innovative ideas. Think broadly and explore multiple approache
                         "title": f"Brainstorming ({perspective})",
                         "perspective": perspective,
                         "role": role_name,
-                        "tokens": response.usage.get("total_tokens", 0) if response.usage else 0,
+                        "tokens": (
+                            response.usage.get("total_tokens", 0)
+                            if response.usage
+                            else 0
+                        ),
                     },
                 )
                 steps.append(step)
@@ -472,7 +493,9 @@ Generate diverse, innovative ideas. Think broadly and explore multiple approache
                 },
             )
 
-            logger.info(f"Parallel brainstorming completed with {len(steps)} perspectives")
+            logger.info(
+                f"Parallel brainstorming completed with {len(steps)} perspectives"
+            )
             return result
 
         except Exception as e:
@@ -480,7 +503,7 @@ Generate diverse, innovative ideas. Think broadly and explore multiple approache
             raise
 
     def _synthesize_brainstorming_results(
-        self, steps: List[WorkflowStep], perspectives: List[str]
+        self, steps: list[WorkflowStep], perspectives: list[str]
     ) -> str:
         """
         Synthesize parallel brainstorming results into a cohesive summary.
@@ -513,8 +536,8 @@ Generate diverse, innovative ideas. Think broadly and explore multiple approache
     async def run_convergent_analysis(
         self,
         brainstorming_result: WorkflowResult,
-        scoring_criteria: Optional[List[str]] = None,
-        num_clusters: Optional[int] = None,
+        scoring_criteria: list[str] | None = None,
+        num_clusters: int | None = None,
         **kwargs,
     ) -> WorkflowResult:
         """
@@ -583,14 +606,18 @@ Generate diverse, innovative ideas. Think broadly and explore multiple approache
                 "num_ideas_extracted": extraction_result.metadata.get("num_ideas", 0),
                 "num_clusters": clustering_result.metadata.get("num_clusters", 0),
                 "scoring_criteria": scoring_criteria,
-                "source_perspectives": brainstorming_result.metadata.get("perspectives", []),
+                "source_perspectives": brainstorming_result.metadata.get(
+                    "perspectives", []
+                ),
             },
         )
 
         logger.info("Convergent analysis completed successfully")
         return result
 
-    async def _extract_ideas(self, brainstorming_result: WorkflowResult, **kwargs) -> WorkflowStep:
+    async def _extract_ideas(
+        self, brainstorming_result: WorkflowResult, **kwargs
+    ) -> WorkflowStep:
         """
         Extract individual ideas from brainstorming results.
 
@@ -638,7 +665,9 @@ Generate diverse, innovative ideas. Think broadly and explore multiple approache
                 request, self.provider, self.fallback_providers
             )
             if failed:
-                logger.warning(f"Providers failed for idea extraction: {', '.join(failed)}")
+                logger.warning(
+                    f"Providers failed for idea extraction: {', '.join(failed)}"
+                )
 
             # Parse extracted ideas from response
             ideas = self._parse_extracted_ideas(response.content, perspectives_content)
@@ -664,7 +693,9 @@ Generate diverse, innovative ideas. Think broadly and explore multiple approache
             logger.error(f"Idea extraction failed: {e}")
             raise
 
-    def _create_extraction_prompt(self, perspectives_content: List[Dict[str, str]]) -> str:
+    def _create_extraction_prompt(
+        self, perspectives_content: list[dict[str, str]]
+    ) -> str:
         """
         Create prompt for extracting individual ideas.
 
@@ -685,7 +716,9 @@ Generate diverse, innovative ideas. Think broadly and explore multiple approache
         ]
 
         for i, pc in enumerate(perspectives_content, 1):
-            prompt_parts.append(f"--- Perspective {i}: {pc['perspective'].title()} ---\n")
+            prompt_parts.append(
+                f"--- Perspective {i}: {pc['perspective'].title()} ---\n"
+            )
             prompt_parts.append(f"{pc['content']}\n\n")
 
         prompt_parts.append(
@@ -718,8 +751,8 @@ Be thorough but focused. Extract concrete ideas, not vague statements.
 Use the requested format exactly."""
 
     def _parse_extracted_ideas(
-        self, extraction_content: str, perspectives_content: List[Dict[str, str]]
-    ) -> List[Dict[str, Any]]:
+        self, extraction_content: str, perspectives_content: list[dict[str, str]]
+    ) -> list[dict[str, Any]]:
         """
         Parse extracted ideas from LLM response.
 
@@ -783,7 +816,10 @@ Use the requested format exactly."""
         return ideas
 
     async def _cluster_ideas(
-        self, extraction_step: WorkflowStep, num_clusters: Optional[int] = None, **kwargs
+        self,
+        extraction_step: WorkflowStep,
+        num_clusters: int | None = None,
+        **kwargs,
     ) -> WorkflowStep:
         """
         Cluster similar ideas into thematic groups.
@@ -826,7 +862,9 @@ Use the requested format exactly."""
                 request, self.provider, self.fallback_providers
             )
             if failed:
-                logger.warning(f"Providers failed for idea clustering: {', '.join(failed)}")
+                logger.warning(
+                    f"Providers failed for idea clustering: {', '.join(failed)}"
+                )
 
             # Parse clusters from response
             clusters = self._parse_clusters(response.content, ideas)
@@ -853,7 +891,7 @@ Use the requested format exactly."""
             raise
 
     def _create_clustering_prompt(
-        self, ideas: List[Dict[str, Any]], num_clusters: Optional[int]
+        self, ideas: list[dict[str, Any]], num_clusters: int | None
     ) -> str:
         """
         Create prompt for clustering ideas.
@@ -921,8 +959,8 @@ Guidelines:
 Use the requested format exactly."""
 
     def _parse_clusters(
-        self, clustering_content: str, ideas: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
+        self, clustering_content: str, ideas: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
         """
         Parse clusters from LLM response.
 
@@ -933,10 +971,10 @@ Use the requested format exactly."""
         Returns:
             List of cluster dictionaries
         """
-        clusters = []
+        clusters: list[dict[str, Any]] = []
 
         lines = clustering_content.split("\n")
-        current_cluster = None
+        current_cluster: dict[str, Any] | None = None
 
         for line in lines:
             line = line.strip()
@@ -970,9 +1008,15 @@ Use the requested format exactly."""
                         idea_part = line[2:].split(":")[0].strip().lower()
 
                         # Extract reason
-                        reason = ":".join(line[2:].split(":")[1:]).strip() if ":" in line else ""
+                        reason = (
+                            ":".join(line[2:].split(":")[1:]).strip()
+                            if ":" in line
+                            else ""
+                        )
 
-                        current_cluster["ideas"].append({"idea_id": idea_part, "reason": reason})
+                        current_cluster["ideas"].append(
+                            {"idea_id": idea_part, "reason": reason}
+                        )
                     except Exception as e:
                         logger.warning(f"Failed to parse idea assignment: {line} - {e}")
 
@@ -996,7 +1040,7 @@ Use the requested format exactly."""
         return clusters
 
     async def _score_ideas(
-        self, clustering_step: WorkflowStep, scoring_criteria: List[str], **kwargs
+        self, clustering_step: WorkflowStep, scoring_criteria: list[str], **kwargs
     ) -> WorkflowStep:
         """
         Score ideas/clusters based on multiple criteria.
@@ -1039,10 +1083,14 @@ Use the requested format exactly."""
                 request, self.provider, self.fallback_providers
             )
             if failed:
-                logger.warning(f"Providers failed for idea scoring: {', '.join(failed)}")
+                logger.warning(
+                    f"Providers failed for idea scoring: {', '.join(failed)}"
+                )
 
             # Parse scores from response
-            scored_clusters = self._parse_scores(response.content, clusters, scoring_criteria)
+            scored_clusters = self._parse_scores(
+                response.content, clusters, scoring_criteria
+            )
 
             # Create workflow step
             step = WorkflowStep(
@@ -1068,7 +1116,7 @@ Use the requested format exactly."""
             raise
 
     def _create_scoring_prompt(
-        self, clusters: List[Dict[str, Any]], scoring_criteria: List[str]
+        self, clusters: list[dict[str, Any]], scoring_criteria: list[str]
     ) -> str:
         """
         Create prompt for scoring clusters.
@@ -1117,7 +1165,9 @@ Use the requested format exactly."""
         )
 
         for criterion in scoring_criteria:
-            prompt_parts.append(f"- {criterion.title()}: {'{score}'}/5 - {'{brief explanation}'}\n")
+            prompt_parts.append(
+                f"- {criterion.title()}: {'{score}'}/5 - {'{brief explanation}'}\n"
+            )
 
         prompt_parts.append(
             "\n"
@@ -1154,8 +1204,11 @@ Guidelines:
 Use the requested format exactly."""
 
     def _parse_scores(
-        self, scoring_content: str, clusters: List[Dict[str, Any]], scoring_criteria: List[str]
-    ) -> List[Dict[str, Any]]:
+        self,
+        scoring_content: str,
+        clusters: list[dict[str, Any]],
+        scoring_criteria: list[str],
+    ) -> list[dict[str, Any]]:
         """
         Parse scores from LLM response.
 
@@ -1167,10 +1220,10 @@ Use the requested format exactly."""
         Returns:
             List of scored cluster dictionaries
         """
-        scored_clusters = []
+        scored_clusters: list[dict[str, Any]] = []
 
         lines = scoring_content.split("\n")
-        current_score = None
+        current_score: dict[str, Any] | None = None
 
         for line in lines:
             line = line.strip()
@@ -1210,7 +1263,9 @@ Use the requested format exactly."""
 
                         # Extract explanation (after the score)
                         explanation = (
-                            score_part.split("-", 1)[1].strip() if "-" in score_part else ""
+                            score_part.split("-", 1)[1].strip()
+                            if "-" in score_part
+                            else ""
                         )
 
                         current_score["scores"][criterion_part] = {
@@ -1249,7 +1304,7 @@ Use the requested format exactly."""
         extraction_step: WorkflowStep,
         clustering_step: WorkflowStep,
         scoring_step: WorkflowStep,
-        scoring_criteria: List[str],
+        scoring_criteria: list[str],
     ) -> str:
         """
         Synthesize convergent analysis results into formatted output.
@@ -1284,14 +1339,18 @@ Use the requested format exactly."""
         ]
 
         # High Priority Clusters
-        high_priority = [sc for sc in sorted_scored if sc.get("overall_score", 0) >= 4.0]
+        high_priority = [
+            sc for sc in sorted_scored if sc.get("overall_score", 0) >= 4.0
+        ]
         if high_priority:
             synthesis_parts.append("## High Priority Clusters\n\n")
             for sc in high_priority:
                 synthesis_parts.append(self._format_scored_cluster(sc, clusters, ideas))
 
         # Medium Priority Clusters
-        medium_priority = [sc for sc in sorted_scored if 3.0 <= sc.get("overall_score", 0) < 4.0]
+        medium_priority = [
+            sc for sc in sorted_scored if 3.0 <= sc.get("overall_score", 0) < 4.0
+        ]
         if medium_priority:
             synthesis_parts.append("\n## Medium Priority Clusters\n\n")
             for sc in medium_priority:
@@ -1331,9 +1390,9 @@ Use the requested format exactly."""
 
     def _format_scored_cluster(
         self,
-        scored_cluster: Dict[str, Any],
-        all_clusters: List[Dict[str, Any]],
-        all_ideas: List[Dict[str, Any]],
+        scored_cluster: dict[str, Any],
+        all_clusters: list[dict[str, Any]],
+        all_ideas: list[dict[str, Any]],
     ) -> str:
         """
         Format a single scored cluster for display.
@@ -1396,10 +1455,10 @@ Use the requested format exactly."""
     async def run_complete_ideation(
         self,
         prompt: str,
-        provider_map: Dict[str, ModelProvider],
-        perspectives: Optional[List[str]] = None,
-        scoring_criteria: Optional[List[str]] = None,
-        num_clusters: Optional[int] = None,
+        provider_map: dict[str, ModelProvider],
+        perspectives: list[str] | None = None,
+        scoring_criteria: list[str] | None = None,
+        num_clusters: int | None = None,
         **kwargs,
     ) -> WorkflowResult:
         """
@@ -1469,7 +1528,10 @@ Use the requested format exactly."""
         # Step 1: Divergent brainstorming with multiple perspectives
         logger.info("Phase 1: Divergent brainstorming")
         brainstorming_result = await self.run_parallel_brainstorming(
-            prompt=prompt, provider_map=provider_map, perspectives=perspectives, **kwargs
+            prompt=prompt,
+            provider_map=provider_map,
+            perspectives=perspectives,
+            **kwargs,
         )
 
         # Step 2: Convergent analysis
@@ -1491,7 +1553,8 @@ Use the requested format exactly."""
             "convergent_phase": convergent_result.metadata,
             "total_steps": len(all_steps),
             "perspectives": perspectives or ["practical", "innovative", "user-focused"],
-            "scoring_criteria": scoring_criteria or ["feasibility", "impact", "novelty"],
+            "scoring_criteria": scoring_criteria
+            or ["feasibility", "impact", "novelty"],
         }
 
         # Create final result with convergent analysis as synthesis
@@ -1506,7 +1569,7 @@ Use the requested format exactly."""
         return result
 
     def run_interactive_selection(
-        self, convergent_result: WorkflowResult, max_selections: Optional[int] = None
+        self, convergent_result: WorkflowResult, max_selections: int | None = None
     ) -> WorkflowResult:
         """
         Run interactive CLI selection of idea clusters.
@@ -1558,7 +1621,9 @@ Use the requested format exactly."""
         if not scored_clusters:
             raise ValueError("No scored clusters found")
 
-        logger.info(f"Starting interactive selection for {len(scored_clusters)} clusters")
+        logger.info(
+            f"Starting interactive selection for {len(scored_clusters)} clusters"
+        )
 
         # Display clusters and get user selection
         selected_cluster_ids = self._display_and_select_clusters(
@@ -1572,15 +1637,21 @@ Use the requested format exactly."""
                 clustering_step = step
                 break
 
-        all_clusters = clustering_step.metadata.get("clusters", []) if clustering_step else []
+        all_clusters = (
+            clustering_step.metadata.get("clusters", []) if clustering_step else []
+        )
 
         # Extract selected clusters with full details
         selected_clusters = []
         for cluster_id in selected_cluster_ids:
             # Find scored cluster
-            scored = next((sc for sc in scored_clusters if sc["cluster_id"] == cluster_id), None)
+            scored = next(
+                (sc for sc in scored_clusters if sc["cluster_id"] == cluster_id), None
+            )
             # Find full cluster details
-            cluster = next((c for c in all_clusters if c["id"] == cluster_id), {})
+            cluster: dict[str, Any] = next(
+                (c for c in all_clusters if c["id"] == cluster_id), {}
+            )
 
             if scored:
                 selected_clusters.append(
@@ -1623,12 +1694,16 @@ Use the requested format exactly."""
             },
         )
 
-        logger.info(f"Interactive selection completed. Selected {len(selected_clusters)} clusters")
+        logger.info(
+            f"Interactive selection completed. Selected {len(selected_clusters)} clusters"
+        )
         return result
 
     def _display_and_select_clusters(
-        self, scored_clusters: List[Dict[str, Any]], max_selections: Optional[int] = None
-    ) -> List[str]:
+        self,
+        scored_clusters: list[dict[str, Any]],
+        max_selections: int | None = None,
+    ) -> list[str]:
         """
         Display scored clusters and prompt user for selection.
 
@@ -1648,7 +1723,9 @@ Use the requested format exactly."""
         print("IDEATE: CLUSTER SELECTION")
         print("=" * 80 + "\n")
 
-        print(f"Found {len(sorted_clusters)} idea clusters from brainstorming session.\n")
+        print(
+            f"Found {len(sorted_clusters)} idea clusters from brainstorming session.\n"
+        )
 
         # Display clusters with numbers
         for i, cluster in enumerate(sorted_clusters, 1):
@@ -1665,13 +1742,16 @@ Use the requested format exactly."""
 
             # Show top scoring criteria
             scores = cluster.get("scores", {})
-            top_scores = sorted(scores.items(), key=lambda x: x[1].get("score", 0), reverse=True)[
-                :2
-            ]
+            top_scores = sorted(
+                scores.items(), key=lambda x: x[1].get("score", 0), reverse=True
+            )[:2]
 
             if top_scores:
                 criteria_str = ", ".join(
-                    [f"{crit.title()}: {data.get('score', 0)}/5" for crit, data in top_scores]
+                    [
+                        f"{crit.title()}: {data.get('score', 0)}/5"
+                        for crit, data in top_scores
+                    ]
                 )
                 print(f"   Strengths: {criteria_str}")
 
@@ -1698,7 +1778,9 @@ Use the requested format exactly."""
 
                 # Parse selection
                 selected_indices = self._parse_selection_input(
-                    user_input, total_count=len(sorted_clusters), max_selections=max_selections
+                    user_input,
+                    total_count=len(sorted_clusters),
+                    max_selections=max_selections,
                 )
 
                 if selected_indices is None:
@@ -1706,7 +1788,8 @@ Use the requested format exactly."""
 
                 # Convert indices to cluster IDs
                 selected_ids = [
-                    sorted_clusters[idx - 1].get("cluster_id", "") for idx in selected_indices
+                    sorted_clusters[idx - 1].get("cluster_id", "")
+                    for idx in selected_indices
                 ]
 
                 print(f"\n✅ Selected {len(selected_ids)} cluster(s)\n")
@@ -1717,8 +1800,8 @@ Use the requested format exactly."""
                 return []
 
     def _parse_selection_input(
-        self, user_input: str, total_count: int, max_selections: Optional[int] = None
-    ) -> Optional[List[int]]:
+        self, user_input: str, total_count: int, max_selections: int | None = None
+    ) -> list[int] | None:
         """
         Parse user selection input.
 
@@ -1746,7 +1829,7 @@ Use the requested format exactly."""
             return selections
 
         # Parse comma-separated or range selections
-        selections = set()
+        selection_set: set[int] = set()
 
         try:
             parts = user_input.split(",")
@@ -1765,10 +1848,12 @@ Use the requested format exactly."""
                     end = int(range_parts[1].strip())
 
                     if start < 1 or end > total_count or start > end:
-                        print(f"⚠️  Invalid range: {start}-{end} (valid: 1-{total_count})\n")
+                        print(
+                            f"⚠️  Invalid range: {start}-{end} (valid: 1-{total_count})\n"
+                        )
                         return None
 
-                    selections.update(range(start, end + 1))
+                    selection_set.update(range(start, end + 1))
 
                 # Single number
                 else:
@@ -1778,22 +1863,26 @@ Use the requested format exactly."""
                         print(f"⚠️  Invalid selection: {num} (valid: 1-{total_count})\n")
                         return None
 
-                    selections.add(num)
+                    selection_set.add(num)
 
-        except ValueError as e:
+        except ValueError:
             print(f"⚠️  Invalid input format: {user_input}\n")
             print("   Use numbers (1,2,3), ranges (1-3), 'all', or 'none'\n")
             return None
 
         # Check max selections
-        if max_selections and len(selections) > max_selections:
-            print(f"⚠️  Too many selections: {len(selections)} (maximum: {max_selections})\n")
+        if max_selections and len(selection_set) > max_selections:
+            print(
+                f"⚠️  Too many selections: {len(selection_set)} (maximum: {max_selections})\n"
+            )
             return None
 
-        return sorted(list(selections))
+        return sorted(list(selection_set))
 
     def _synthesize_selection(
-        self, selected_clusters: List[Dict[str, Any]], all_clusters: List[Dict[str, Any]]
+        self,
+        selected_clusters: list[dict[str, Any]],
+        all_clusters: list[dict[str, Any]],
     ) -> str:
         """
         Synthesize selection results into summary.
@@ -1833,7 +1922,9 @@ Use the requested format exactly."""
                 for criterion, data in scores.items():
                     val = data.get("score", 0)
                     explanation = data.get("explanation", "")
-                    synthesis_parts.append(f"- {criterion.title()}: {val}/5 - {explanation}\n")
+                    synthesis_parts.append(
+                        f"- {criterion.title()}: {val}/5 - {explanation}\n"
+                    )
                 synthesis_parts.append("\n")
 
             # Add ideas
@@ -1851,14 +1942,18 @@ Use the requested format exactly."""
                 synthesis_parts.append("\n")
 
         synthesis_parts.append("---\n\n## Next Steps\n\n")
-        synthesis_parts.append("1. Develop detailed implementation plans for selected clusters\n")
+        synthesis_parts.append(
+            "1. Develop detailed implementation plans for selected clusters\n"
+        )
         synthesis_parts.append("2. Prioritize ideas within each cluster\n")
         synthesis_parts.append("3. Estimate resources and timelines\n")
         synthesis_parts.append("4. Begin prototyping highest-priority ideas\n")
 
         return "".join(synthesis_parts)
 
-    async def run_elaboration(self, selection_result: WorkflowResult, **kwargs) -> WorkflowResult:
+    async def run_elaboration(
+        self, selection_result: WorkflowResult, **kwargs
+    ) -> WorkflowResult:
         """
         Elaborate selected clusters into detailed, actionable outlines.
 
@@ -1902,7 +1997,9 @@ Use the requested format exactly."""
         if not selected_clusters:
             raise ValueError("No selected clusters found in selection result")
 
-        logger.info(f"Starting elaboration for {len(selected_clusters)} selected clusters")
+        logger.info(
+            f"Starting elaboration for {len(selected_clusters)} selected clusters"
+        )
 
         # Elaborate each selected cluster
         elaboration_steps = []
@@ -1937,7 +2034,7 @@ Use the requested format exactly."""
         return result
 
     async def _elaborate_cluster(
-        self, cluster: Dict[str, Any], step_number: int, **kwargs
+        self, cluster: dict[str, Any], step_number: int, **kwargs
     ) -> WorkflowStep:
         """
         Elaborate a single cluster into a detailed outline.
@@ -2003,7 +2100,7 @@ Use the requested format exactly."""
             logger.error(f"Cluster elaboration failed for '{theme}': {e}")
             raise
 
-    def _create_elaboration_prompt(self, cluster: Dict[str, Any]) -> str:
+    def _create_elaboration_prompt(self, cluster: dict[str, Any]) -> str:
         """
         Create prompt for elaborating a cluster into a detailed outline.
 
@@ -2019,7 +2116,7 @@ Use the requested format exactly."""
         ideas = cluster.get("ideas", [])
 
         prompt_parts = [
-            f"You are creating a detailed, actionable outline for implementing the following idea cluster:\n\n",
+            "You are creating a detailed, actionable outline for implementing the following idea cluster:\n\n",
             f"**Theme**: {theme}\n\n",
         ]
 
@@ -2032,7 +2129,9 @@ Use the requested format exactly."""
             for criterion, data in scores.items():
                 score_val = data.get("score", 0)
                 explanation = data.get("explanation", "")
-                prompt_parts.append(f"- {criterion.title()}: {score_val}/5 - {explanation}\n")
+                prompt_parts.append(
+                    f"- {criterion.title()}: {score_val}/5 - {explanation}\n"
+                )
             prompt_parts.append("\n")
 
         # Add related ideas
@@ -2089,7 +2188,7 @@ Your outline should give the reader a clear understanding of:
 
 Write in a professional, clear style. Use markdown formatting for structure."""
 
-    def _parse_outline_sections(self, elaboration_content: str) -> List[Dict[str, str]]:
+    def _parse_outline_sections(self, elaboration_content: str) -> list[dict[str, str]]:
         """
         Parse outline sections from elaboration response.
 
@@ -2150,7 +2249,9 @@ Write in a professional, clear style. Use markdown formatting for structure."""
         return sections
 
     def _synthesize_elaborations(
-        self, elaboration_steps: List[WorkflowStep], selected_clusters: List[Dict[str, Any]]
+        self,
+        elaboration_steps: list[WorkflowStep],
+        selected_clusters: list[dict[str, Any]],
     ) -> str:
         """
         Synthesize all elaborated outlines into formatted collection.
@@ -2174,7 +2275,9 @@ Write in a professional, clear style. Use markdown formatting for structure."""
             num_sections = len(step.metadata.get("outline_sections", []))
 
             synthesis_parts.append(f"## Outline {i}: {theme}\n\n")
-            synthesis_parts.append(f"**Score**: {score:.1f}/5.0 | **Sections**: {num_sections}\n\n")
+            synthesis_parts.append(
+                f"**Score**: {score:.1f}/5.0 | **Sections**: {num_sections}\n\n"
+            )
             synthesis_parts.append(step.content)
             synthesis_parts.append("\n\n---\n\n")
 
@@ -2200,7 +2303,7 @@ Write in a professional, clear style. Use markdown formatting for structure."""
 
         return "".join(synthesis_parts)
 
-    def validate_config(self, config: Dict[str, Any]) -> bool:
+    def validate_config(self, config: dict[str, Any]) -> bool:  # type: ignore[override]
         """
         Validate ideation workflow configuration.
 

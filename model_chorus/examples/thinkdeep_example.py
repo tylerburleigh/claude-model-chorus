@@ -13,15 +13,12 @@ This example demonstrates how to:
 import asyncio
 from pathlib import Path
 
+from model_chorus.core.conversation import ConversationMemory
 from model_chorus.providers import ClaudeProvider, GeminiProvider
 from model_chorus.workflows import (
-    ThinkDeepWorkflow,
     ConfidenceLevel,
-    Hypothesis,
-    InvestigationStep,
-    ThinkDeepState,
+    ThinkDeepWorkflow,
 )
-from model_chorus.core.conversation import ConversationMemory
 
 
 async def basic_investigation_example():
@@ -39,7 +36,11 @@ async def basic_investigation_example():
 
     # Start investigation
     result = await workflow.run(
-        prompt="Why might a Python web application be experiencing intermittent 500 errors?",
+        step="Why might a Python web application be experiencing intermittent 500 errors?",
+        step_number=1,
+        total_steps=1,
+        next_step_required=False,
+        findings="Investigating intermittent 500 errors in Python web application",
         temperature=0.7,
     )
 
@@ -49,7 +50,7 @@ async def basic_investigation_example():
         hypotheses_count = result.metadata["hypotheses_count"]
 
         print(f"Thread ID: {thread_id}")
-        print(f"Investigation Step: {result.metadata['investigation_step']}")
+        print(f"Investigation Step: {result.metadata['step_number']}")
         print(f"Confidence Level: {confidence}")
         print(f"Hypotheses Tracked: {hypotheses_count}")
         print(f"\nFindings:\n{result.synthesis[:300]}...\n")
@@ -117,7 +118,11 @@ ENABLE_QUERY_LOGGING = False
     # Step 1: Initial investigation - examine API handler
     print("\n--- Investigation Step 1: Analyze API Handler ---")
     result1 = await workflow.run(
-        prompt="Investigate this API handler for potential performance issues. What could cause slowdowns?",
+        step="Investigate this API handler for potential performance issues. What could cause slowdowns?",
+        step_number=1,
+        total_steps=3,
+        next_step_required=True,
+        findings="Analyzing API handler code for performance bottlenecks",
         files=["/tmp/api_handler.py"],
         temperature=0.7,
     )
@@ -136,14 +141,18 @@ ENABLE_QUERY_LOGGING = False
     # Step 2: Continue investigation - examine database configuration
     print("\n--- Investigation Step 2: Check Database Configuration ---")
     result2 = await workflow.run(
-        prompt="Now examine the database configuration. Does this support or contradict our hypothesis about async/sync mixing?",
+        step="Now examine the database configuration. Does this support or contradict our hypothesis about async/sync mixing?",
+        step_number=2,
+        total_steps=3,
+        next_step_required=True,
+        findings="Checking database configuration for async/sync issues",
         continuation_id=thread_id,
         files=["/tmp/database.py"],
         temperature=0.7,
     )
 
     if result2.success:
-        print(f"Investigation Step: {result2.metadata['investigation_step']}")
+        print(f"Investigation Step: {result2.metadata['step_number']}")
         print(f"Confidence: {result2.metadata['confidence']}")
         print(f"Hypotheses: {result2.metadata['hypotheses_count']}")
         print(f"Total Files Examined: {result2.metadata['files_examined']}")
@@ -152,14 +161,18 @@ ENABLE_QUERY_LOGGING = False
     # Step 3: Final investigation - check configuration
     print("\n--- Investigation Step 3: Review Configuration Settings ---")
     result3 = await workflow.run(
-        prompt="Review the application configuration. Are there any settings that could exacerbate the performance issues we've identified?",
+        step="Review the application configuration. Are there any settings that could exacerbate the performance issues we've identified?",
+        step_number=3,
+        total_steps=3,
+        next_step_required=False,
+        findings="Reviewing configuration settings for performance impact",
         continuation_id=thread_id,
         files=["/tmp/config.py"],
         temperature=0.7,
     )
 
     if result3.success:
-        print(f"Investigation Step: {result3.metadata['investigation_step']}")
+        print(f"Investigation Step: {result3.metadata['step_number']}")
         print(f"Confidence: {result3.metadata['confidence']}")
         print(f"Hypotheses: {result3.metadata['hypotheses_count']}")
         print(f"Total Files Examined: {result3.metadata['files_examined']}")
@@ -240,7 +253,11 @@ def verify_token(token):
     # Investigate security issues
     print("\n--- Investigation: Security Analysis ---")
     result = await workflow.run(
-        prompt="Analyze this authentication code for security vulnerabilities. What are the risks?",
+        step="Analyze this authentication code for security vulnerabilities. What are the risks?",
+        step_number=1,
+        total_steps=1,
+        next_step_required=False,
+        findings="Analyzing authentication code for security vulnerabilities",
         files=[str(auth_code)],
         temperature=0.7,
     )
@@ -251,7 +268,9 @@ def verify_token(token):
 
         print(f"Thread ID: {thread_id}")
         print(f"Confidence: {result.metadata['confidence']}")
-        print(f"Expert Validation: {'✓ Performed' if expert_performed else '✗ Not performed'}")
+        print(
+            f"Expert Validation: {'✓ Performed' if expert_performed else '✗ Not performed'}"
+        )
 
         # Primary findings
         print(f"\n--- Primary Investigation ({primary_provider.provider_name}) ---")
@@ -287,7 +306,11 @@ async def hypothesis_management_example():
     # Start investigation
     print("\n--- Starting Investigation ---")
     result = await workflow.run(
-        prompt="Investigate why a machine learning model's accuracy dropped from 95% to 75%.",
+        step="Investigate why a machine learning model's accuracy dropped from 95% to 75%.",
+        step_number=1,
+        total_steps=1,
+        next_step_required=False,
+        findings="Investigating ML model accuracy drop",
         temperature=0.7,
     )
 
@@ -334,7 +357,9 @@ async def hypothesis_management_example():
         workflow.update_hypothesis(
             thread_id,
             first_hypothesis,
-            new_evidence=["Analysis confirmed: Input data statistics differ significantly"],
+            new_evidence=[
+                "Analysis confirmed: Input data statistics differ significantly"
+            ],
             new_status="validated",
         )
         print(f"Validated: {first_hypothesis}")
@@ -374,7 +399,11 @@ async def confidence_progression_example():
     # Step 1: Initial exploration (confidence: exploring/low)
     print("\n--- Step 1: Initial Exploration ---")
     result1 = await workflow.run(
-        prompt="A Python script crashes with 'RecursionError: maximum recursion depth exceeded'. What could be the cause?",
+        step="A Python script crashes with 'RecursionError: maximum recursion depth exceeded'. What could be the cause?",
+        step_number=1,
+        total_steps=3,
+        next_step_required=True,
+        findings="Exploring possible causes of RecursionError",
         temperature=0.7,
     )
 
@@ -386,7 +415,11 @@ async def confidence_progression_example():
         # Step 2: Gather evidence (confidence: medium)
         print("\n--- Step 2: Hypothesis Testing ---")
         result2 = await workflow.run(
-            prompt="Let's test the hypothesis: Is it an infinite recursion problem? What evidence would support this?",
+            step="Let's test the hypothesis: Is it an infinite recursion problem? What evidence would support this?",
+            step_number=2,
+            total_steps=3,
+            next_step_required=True,
+            findings="Testing infinite recursion hypothesis and gathering evidence",
             continuation_id=thread_id,
             temperature=0.7,
         )
@@ -398,7 +431,11 @@ async def confidence_progression_example():
             # Step 3: Validate hypothesis (confidence: high/very_high)
             print("\n--- Step 3: Validation ---")
             result3 = await workflow.run(
-                prompt="Given the evidence we've found, can we conclude with high confidence what the root cause is?",
+                step="Given the evidence we've found, can we conclude with high confidence what the root cause is?",
+                step_number=3,
+                total_steps=3,
+                next_step_required=False,
+                findings="Validating hypothesis with high confidence conclusion",
                 continuation_id=thread_id,
                 temperature=0.7,
             )
@@ -412,7 +449,9 @@ async def confidence_progression_example():
     confidence_order = [level.value for level in ConfidenceLevel]
     for i, conf in enumerate(confidence_levels, 1):
         conf_index = confidence_order.index(conf) if conf in confidence_order else 0
-        progress_bar = "█" * (conf_index + 1) + "░" * (len(confidence_order) - conf_index - 1)
+        progress_bar = "█" * (conf_index + 1) + "░" * (
+            len(confidence_order) - conf_index - 1
+        )
         print(f"Step {i}: {conf:15} [{progress_bar}]")
 
 
@@ -444,7 +483,9 @@ async def main():
     print("=" * 60)
     print("\nKey Takeaways:")
     print("• ThinkDeep provides systematic investigation with hypothesis tracking")
-    print("• Confidence progresses from 'exploring' to 'certain' as evidence accumulates")
+    print(
+        "• Confidence progresses from 'exploring' to 'certain' as evidence accumulates"
+    )
     print("• Multi-turn investigations maintain state across conversation turns")
     print("• Expert validation provides additional validation from different models")
     print("• Investigation state can be inspected and managed programmatically")

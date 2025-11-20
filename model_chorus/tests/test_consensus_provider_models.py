@@ -2,7 +2,6 @@
 Tests for provider-level metadata handling within the consensus workflow.
 """
 
-from pathlib import Path
 from unittest.mock import AsyncMock
 
 import pytest

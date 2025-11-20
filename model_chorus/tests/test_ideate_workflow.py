@@ -4,14 +4,13 @@ Tests for IdeateWorkflow functionality.
 Tests divergent brainstorming, convergent analysis, and complete ideation workflow.
 """
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock
-from typing import Dict, Any
 
-from model_chorus.workflows.ideate.ideate_workflow import IdeateWorkflow
-from model_chorus.providers.base_provider import GenerationRequest, GenerationResponse
+import pytest
+
 from model_chorus.core.base_workflow import WorkflowResult, WorkflowStep
-from model_chorus.core.models import ConversationMessage
+from model_chorus.providers.base_provider import GenerationRequest, GenerationResponse
+from model_chorus.workflows.ideate.ideate_workflow import IdeateWorkflow
 
 
 @pytest.fixture
@@ -209,7 +208,9 @@ class TestConvergentAnalysis:
         assert result.steps[2].content is not None
 
     @pytest.mark.asyncio
-    async def test_convergent_analysis_metadata(self, ideate_workflow, mock_brainstorming_result):
+    async def test_convergent_analysis_metadata(
+        self, ideate_workflow, mock_brainstorming_result
+    ):
         """Test that convergent analysis includes proper metadata."""
         result = await ideate_workflow.run_convergent_analysis(
             brainstorming_result=mock_brainstorming_result,
@@ -219,15 +220,25 @@ class TestConvergentAnalysis:
         assert "workflow" in result.metadata
         assert result.metadata["workflow"] == "ideate-convergent"
         assert "scoring_criteria" in result.metadata
-        assert result.metadata["scoring_criteria"] == ["feasibility", "impact", "novelty"]
+        assert result.metadata["scoring_criteria"] == [
+            "feasibility",
+            "impact",
+            "novelty",
+        ]
 
     @pytest.mark.asyncio
-    async def test_convergent_analysis_raises_error_on_empty_result(self, ideate_workflow):
+    async def test_convergent_analysis_raises_error_on_empty_result(
+        self, ideate_workflow
+    ):
         """Test that convergent analysis raises error with no steps."""
-        empty_result = WorkflowResult(success=True, synthesis="Empty", steps=[], metadata={})
+        empty_result = WorkflowResult(
+            success=True, synthesis="Empty", steps=[], metadata={}
+        )
 
         with pytest.raises(ValueError, match="Brainstorming result must have steps"):
-            await ideate_workflow.run_convergent_analysis(brainstorming_result=empty_result)
+            await ideate_workflow.run_convergent_analysis(
+                brainstorming_result=empty_result
+            )
 
     @pytest.mark.asyncio
     async def test_convergent_analysis_custom_criteria(
@@ -237,7 +248,8 @@ class TestConvergentAnalysis:
         custom_criteria = ["feasibility", "impact", "user_value"]
 
         result = await ideate_workflow.run_convergent_analysis(
-            brainstorming_result=mock_brainstorming_result, scoring_criteria=custom_criteria
+            brainstorming_result=mock_brainstorming_result,
+            scoring_criteria=custom_criteria,
         )
 
         assert result.metadata["scoring_criteria"] == custom_criteria
@@ -290,7 +302,9 @@ class TestIdeaClustering:
         )
 
         # Then cluster them
-        clustering_step = await ideate_workflow._cluster_ideas(extraction_step=extraction_step)
+        clustering_step = await ideate_workflow._cluster_ideas(
+            extraction_step=extraction_step
+        )
 
         assert clustering_step.content is not None
         assert "clusters" in clustering_step.metadata
@@ -313,11 +327,14 @@ class TestIdeaScoring:
         extraction_step = await ideate_workflow._extract_ideas(
             brainstorming_result=mock_brainstorming_result
         )
-        clustering_step = await ideate_workflow._cluster_ideas(extraction_step=extraction_step)
+        clustering_step = await ideate_workflow._cluster_ideas(
+            extraction_step=extraction_step
+        )
 
         # Score the clusters
         scoring_step = await ideate_workflow._score_ideas(
-            clustering_step=clustering_step, scoring_criteria=["feasibility", "impact", "novelty"]
+            clustering_step=clustering_step,
+            scoring_criteria=["feasibility", "impact", "novelty"],
         )
 
         assert scoring_step.content is not None
@@ -341,7 +358,11 @@ class TestCompleteIdeation:
         workflow = IdeateWorkflow(provider=mock_provider)
 
         # Create provider map with multiple providers for parallel brainstorming
-        provider_map = {"model1": mock_provider, "model2": mock_provider, "model3": mock_provider}
+        provider_map = {
+            "model1": mock_provider,
+            "model2": mock_provider,
+            "model3": mock_provider,
+        }
 
         result = await workflow.run_complete_ideation(
             prompt="How can we improve user onboarding?", provider_map=provider_map

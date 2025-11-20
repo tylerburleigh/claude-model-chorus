@@ -5,8 +5,9 @@ This module provides a registry for dynamically registering and loading
 workflow implementations, enabling a flexible plugin architecture.
 """
 
-from typing import Dict, Type, Optional, Callable
 import inspect
+from collections.abc import Callable
+
 from .base_workflow import BaseWorkflow
 
 
@@ -32,7 +33,7 @@ class WorkflowRegistry:
         ```
     """
 
-    _workflows: Dict[str, Type[BaseWorkflow]] = {}
+    _workflows: dict[str, type[BaseWorkflow]] = {}
 
     @classmethod
     def register(cls, name: str) -> Callable:
@@ -57,7 +58,7 @@ class WorkflowRegistry:
             ```
         """
 
-        def decorator(workflow_class: Type[BaseWorkflow]) -> Type[BaseWorkflow]:
+        def decorator(workflow_class: type[BaseWorkflow]) -> type[BaseWorkflow]:
             # Validate that the class inherits from BaseWorkflow
             if not inspect.isclass(workflow_class):
                 raise TypeError(f"Expected a class, got {type(workflow_class)}")
@@ -81,7 +82,7 @@ class WorkflowRegistry:
         return decorator
 
     @classmethod
-    def register_workflow(cls, name: str, workflow_class: Type[BaseWorkflow]) -> None:
+    def register_workflow(cls, name: str, workflow_class: type[BaseWorkflow]) -> None:
         """
         Programmatically register a workflow class.
 
@@ -120,7 +121,7 @@ class WorkflowRegistry:
         cls._workflows[name] = workflow_class
 
     @classmethod
-    def get(cls, name: str) -> Type[BaseWorkflow]:
+    def get(cls, name: str) -> type[BaseWorkflow]:
         """
         Retrieve a registered workflow class by name.
 
@@ -142,13 +143,14 @@ class WorkflowRegistry:
         if name not in cls._workflows:
             available = ", ".join(cls._workflows.keys()) if cls._workflows else "none"
             raise KeyError(
-                f"No workflow registered with name '{name}'. " f"Available workflows: {available}"
+                f"No workflow registered with name '{name}'. "
+                f"Available workflows: {available}"
             )
 
         return cls._workflows[name]
 
     @classmethod
-    def list_workflows(cls) -> Dict[str, Type[BaseWorkflow]]:
+    def list_workflows(cls) -> dict[str, type[BaseWorkflow]]:
         """
         Get all registered workflows.
 

@@ -12,9 +12,10 @@ Key Features:
 - Cluster quality scoring and metrics
 """
 
-from typing import List, Dict, Any, Optional, Tuple
-import numpy as np
 from dataclasses import dataclass, field
+from typing import Any
+
+import numpy as np
 
 
 @dataclass
@@ -33,12 +34,12 @@ class ClusterResult:
     """
 
     cluster_id: int
-    items: List[int]
+    items: list[int]
     centroid: np.ndarray
     name: str = ""
     summary: str = ""
     quality_score: float = 0.0
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def __repr__(self) -> str:
         """Return string representation of cluster result."""
@@ -68,7 +69,9 @@ class SemanticClustering:
         ...     print(f"{cluster.name}: {cluster.items}")
     """
 
-    def __init__(self, model_name: str = "all-MiniLM-L6-v2", cache_embeddings: bool = True):
+    def __init__(
+        self, model_name: str = "all-MiniLM-L6-v2", cache_embeddings: bool = True
+    ):
         """
         Initialize the semantic clustering engine.
 
@@ -78,7 +81,7 @@ class SemanticClustering:
         """
         self.model_name = model_name
         self.cache_embeddings = cache_embeddings
-        self._embedding_cache: Dict[str, np.ndarray] = {}
+        self._embedding_cache: dict[str, np.ndarray] = {}
         self._model = None  # Lazy load
 
     def _load_model(self):
@@ -94,7 +97,7 @@ class SemanticClustering:
                     "Install with: pip install sentence-transformers"
                 )
 
-    def compute_embeddings(self, texts: List[str]) -> np.ndarray:
+    def compute_embeddings(self, texts: list[str]) -> np.ndarray:
         """
         Compute semantic embeddings for a list of texts.
 
@@ -112,6 +115,7 @@ class SemanticClustering:
             (2, 384)  # 384-dimensional embeddings
         """
         self._load_model()
+        assert self._model is not None, "Model should be loaded"
 
         # Check cache first
         if self.cache_embeddings:
@@ -128,7 +132,9 @@ class SemanticClustering:
 
             # Compute uncached embeddings
             if uncached_texts:
-                new_embeddings = self._model.encode(uncached_texts, convert_to_numpy=True)
+                new_embeddings = self._model.encode(
+                    uncached_texts, convert_to_numpy=True
+                )
                 for i, text in zip(uncached_indices, uncached_texts):
                     embedding = new_embeddings[uncached_indices.index(i)]
                     embeddings_list[i] = embedding
@@ -138,7 +144,9 @@ class SemanticClustering:
         else:
             return self._model.encode(texts, convert_to_numpy=True)
 
-    def compute_similarity(self, embeddings: np.ndarray, metric: str = "cosine") -> np.ndarray:
+    def compute_similarity(
+        self, embeddings: np.ndarray, metric: str = "cosine"
+    ) -> np.ndarray:
         """
         Compute pairwise similarity matrix between embeddings.
 
@@ -164,7 +172,7 @@ class SemanticClustering:
             return np.dot(normalized, normalized.T)
         elif metric == "euclidean":
             # Compute pairwise Euclidean distances, convert to similarity
-            from scipy.spatial.distance import cdist
+            from scipy.spatial.distance import cdist  # type: ignore[import]
 
             distances = cdist(embeddings, embeddings, metric="euclidean")
             # Convert distance to similarity (closer = more similar)
@@ -176,8 +184,11 @@ class SemanticClustering:
             raise ValueError(f"Unknown similarity metric: {metric}")
 
     def cluster_kmeans(
-        self, embeddings: np.ndarray, n_clusters: int, random_state: Optional[int] = None
-    ) -> Tuple[np.ndarray, np.ndarray]:
+        self,
+        embeddings: np.ndarray,
+        n_clusters: int,
+        random_state: int | None = None,
+    ) -> tuple[np.ndarray, np.ndarray]:
         """
         Cluster embeddings using K-means algorithm.
 
@@ -239,12 +250,12 @@ class SemanticClustering:
                 "scikit-learn not installed. " "Install with: pip install scikit-learn"
             )
 
-        clustering = AgglomerativeClustering(n_clusters=n_clusters, linkage=linkage)
+        clustering = AgglomerativeClustering(n_clusters=n_clusters, linkage=linkage)  # type: ignore[arg-type]
         labels = clustering.fit_predict(embeddings)
 
         return labels
 
-    def name_cluster(self, texts: List[str], max_length: int = 50) -> str:
+    def name_cluster(self, texts: list[str], max_length: int = 50) -> str:
         """
         Generate a name/label for a cluster based on member texts.
 
@@ -277,7 +288,7 @@ class SemanticClustering:
 
         return name
 
-    def summarize_cluster(self, texts: List[str], max_length: int = 200) -> str:
+    def summarize_cluster(self, texts: list[str], max_length: int = 200) -> str:
         """
         Generate a summary for a cluster based on member texts.
 
@@ -333,7 +344,9 @@ class SemanticClustering:
             return 0.0
 
         # Normalize
-        norm_embeddings = embeddings / (np.linalg.norm(embeddings, axis=1, keepdims=True) + 1e-8)
+        norm_embeddings = embeddings / (
+            np.linalg.norm(embeddings, axis=1, keepdims=True) + 1e-8
+        )
         norm_centroid = centroid / (np.linalg.norm(centroid) + 1e-8)
 
         # Compute cosine similarity to centroid
@@ -344,11 +357,11 @@ class SemanticClustering:
 
     def cluster(
         self,
-        texts: List[str],
+        texts: list[str],
         n_clusters: int,
         method: str = "kmeans",
-        random_state: Optional[int] = None,
-    ) -> List[ClusterResult]:
+        random_state: int | None = None,
+    ) -> list[ClusterResult]:
         """
         Cluster texts into semantic groups.
 
@@ -387,11 +400,15 @@ class SemanticClustering:
 
         # Perform clustering
         if method == "kmeans":
-            labels, centroids = self.cluster_kmeans(embeddings, n_clusters, random_state)
+            labels, centroids = self.cluster_kmeans(
+                embeddings, n_clusters, random_state
+            )
         elif method == "hierarchical":
             labels = self.cluster_hierarchical(embeddings, n_clusters)
             # Compute centroids for hierarchical clustering
-            centroids = np.array([embeddings[labels == i].mean(axis=0) for i in range(n_clusters)])
+            centroids = np.array(
+                [embeddings[labels == i].mean(axis=0) for i in range(n_clusters)]
+            )
         else:
             raise ValueError(f"Unknown clustering method: {method}")
 

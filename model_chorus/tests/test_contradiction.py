@@ -6,13 +6,14 @@ with appropriate severity levels.
 """
 
 import pytest
+
 from model_chorus.core.contradiction import (
     Contradiction,
     ContradictionSeverity,
+    assess_contradiction_severity,
     detect_contradiction,
     detect_contradictions_batch,
     detect_polarity_opposition,
-    assess_contradiction_severity,
     generate_contradiction_explanation,
     generate_reconciliation_suggestion,
 )
@@ -69,7 +70,9 @@ class TestSeverityAssessment:
     def test_critical_severity_high_similarity_strong_polarity(self):
         """Test CRITICAL severity for high similarity with strong polarity opposition."""
         severity = assess_contradiction_severity(
-            semantic_similarity=0.85, has_polarity_opposition=True, polarity_confidence=0.8
+            semantic_similarity=0.85,
+            has_polarity_opposition=True,
+            polarity_confidence=0.8,
         )
 
         assert severity == ContradictionSeverity.CRITICAL
@@ -77,7 +80,9 @@ class TestSeverityAssessment:
     def test_major_severity_high_similarity_weak_polarity(self):
         """Test MAJOR severity for high similarity with weak polarity opposition."""
         severity = assess_contradiction_severity(
-            semantic_similarity=0.75, has_polarity_opposition=True, polarity_confidence=0.5
+            semantic_similarity=0.75,
+            has_polarity_opposition=True,
+            polarity_confidence=0.5,
         )
 
         assert severity == ContradictionSeverity.MAJOR
@@ -85,7 +90,9 @@ class TestSeverityAssessment:
     def test_moderate_severity_medium_similarity(self):
         """Test MODERATE severity for moderate similarity."""
         severity = assess_contradiction_severity(
-            semantic_similarity=0.6, has_polarity_opposition=True, polarity_confidence=0.7
+            semantic_similarity=0.6,
+            has_polarity_opposition=True,
+            polarity_confidence=0.7,
         )
 
         assert severity == ContradictionSeverity.MODERATE
@@ -93,7 +100,9 @@ class TestSeverityAssessment:
     def test_minor_severity_low_similarity(self):
         """Test MINOR severity for low similarity."""
         severity = assess_contradiction_severity(
-            semantic_similarity=0.4, has_polarity_opposition=True, polarity_confidence=0.6
+            semantic_similarity=0.4,
+            has_polarity_opposition=True,
+            polarity_confidence=0.6,
         )
 
         assert severity == ContradictionSeverity.MINOR
@@ -101,7 +110,9 @@ class TestSeverityAssessment:
     def test_moderate_severity_high_similarity_no_opposition(self):
         """Test MODERATE severity for high similarity without opposition."""
         severity = assess_contradiction_severity(
-            semantic_similarity=0.8, has_polarity_opposition=False, polarity_confidence=0.0
+            semantic_similarity=0.8,
+            has_polarity_opposition=False,
+            polarity_confidence=0.0,
         )
 
         assert severity == ContradictionSeverity.MODERATE
@@ -143,7 +154,10 @@ class TestContradictionExplanation:
             polarity_confidence=0.7,
         )
 
-        assert "investigation" in explanation.lower() or "inconsistency" in explanation.lower()
+        assert (
+            "investigation" in explanation.lower()
+            or "inconsistency" in explanation.lower()
+        )
 
     def test_explanation_severity_minor(self):
         """Test explanation for MINOR severity mentions context."""
@@ -259,7 +273,9 @@ class TestContradictionModel:
 
     def test_different_claim_ids_validation(self):
         """Test claim IDs must be different."""
-        with pytest.raises(ValueError, match="claim_2_id must be different from claim_1_id"):
+        with pytest.raises(
+            ValueError, match="claim_2_id must be different from claim_1_id"
+        ):
             Contradiction(
                 contradiction_id="contra-001",
                 claim_1_id="same-id",
@@ -289,7 +305,10 @@ class TestContradictionDetection:
             )
 
             assert contra is not None
-            assert contra.severity in [ContradictionSeverity.CRITICAL, ContradictionSeverity.MAJOR]
+            assert contra.severity in [
+                ContradictionSeverity.CRITICAL,
+                ContradictionSeverity.MAJOR,
+            ]
             assert contra.confidence > 0.5
             assert (
                 "opposing polarity" in contra.explanation.lower()
@@ -345,7 +364,9 @@ class TestBatchContradictionDetection:
                 ("claim-5", "Performance decreases by 20%"),
             ]
 
-            contradictions = detect_contradictions_batch(claims, similarity_threshold=0.3)
+            contradictions = detect_contradictions_batch(
+                claims, similarity_threshold=0.3
+            )
 
             # Should detect at least the AI accuracy contradiction and performance contradiction
             assert len(contradictions) >= 1
@@ -367,7 +388,9 @@ class TestBatchContradictionDetection:
                 ("claim-3", "Water is wet"),
             ]
 
-            contradictions = detect_contradictions_batch(claims, similarity_threshold=0.3)
+            contradictions = detect_contradictions_batch(
+                claims, similarity_threshold=0.3
+            )
 
             # Unrelated claims should produce no contradictions
             assert len(contradictions) == 0

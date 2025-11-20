@@ -11,9 +11,9 @@ This example demonstrates how to:
 import asyncio
 from pathlib import Path
 
+from model_chorus.core.conversation import ConversationMemory
 from model_chorus.providers import ClaudeProvider
 from model_chorus.workflows import ChatWorkflow
-from model_chorus.core.conversation import ConversationMemory
 
 
 async def basic_chat_example():
@@ -80,7 +80,9 @@ async def multi_turn_conversation_example():
 
     if result2.success:
         print(f"Thread ID: {result2.metadata['thread_id']}")
-        print(f"Conversation length: {result2.metadata['conversation_length']} messages")
+        print(
+            f"Conversation length: {result2.metadata['conversation_length']} messages"
+        )
         print(f"Response: {result2.synthesis[:200]}...\n")
 
     # Third turn: Continue with more specific question
@@ -93,7 +95,9 @@ async def multi_turn_conversation_example():
 
     if result3.success:
         print(f"Thread ID: {result3.metadata['thread_id']}")
-        print(f"Conversation length: {result3.metadata['conversation_length']} messages")
+        print(
+            f"Conversation length: {result3.metadata['conversation_length']} messages"
+        )
         print(f"Response: {result3.synthesis[:200]}...\n")
 
 
@@ -170,7 +174,7 @@ async def conversation_tracking_example():
     # Check conversation history
     thread = workflow.get_thread(thread_id)
     if thread:
-        print(f"\nConversation history:")
+        print("\nConversation history:")
         print(f"  Thread ID: {thread.thread_id}")
         print(f"  Messages: {len(thread.messages)}")
         print(f"  Created: {thread.created_at}")

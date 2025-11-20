@@ -6,36 +6,40 @@ Typer-based command-line application for running multi-model workflows.
 
 import asyncio
 import json
-import sys
+from collections.abc import Sequence
 from pathlib import Path
-from typing import List, Optional, Sequence, Tuple, Union
+from typing import cast
 
 import typer
 from rich.console import Console
 from rich.table import Table
-from rich import print as rprint
 
+from model_chorus import __version__
+
+from ..core.config import get_claude_config_loader
+from ..core.context_ingestion import (
+    BinaryFileError,
+    ContextIngestionService,
+    FileTooLargeError,
+)
+from ..core.conversation import ConversationMemory
 from ..providers import (
     ClaudeProvider,
     CodexProvider,
-    GeminiProvider,
     CursorAgentProvider,
+    GeminiProvider,
     GenerationRequest,
 )
+from ..providers.base_provider import ModelProvider
 from ..providers.cli_provider import ProviderUnavailableError
 from ..workflows import (
     ArgumentWorkflow,
     ChatWorkflow,
-    ConsensusWorkflow,
     ConsensusStrategy,
+    ConsensusWorkflow,
     IdeateWorkflow,
     ThinkDeepWorkflow,
 )
-from ..core.conversation import ConversationMemory
-from ..core.config import get_claude_config_loader
-from ..core.progress import set_progress_enabled
-from ..core.context_ingestion import ContextIngestionService, FileTooLargeError, BinaryFileError
-from model_chorus import __version__
 from .study_commands import study_app
 
 
@@ -65,7 +69,7 @@ def _find_project_root(start_path: Path) -> Path:
 PROJECT_ROOT = _find_project_root(Path(__file__).resolve())
 
 # Ordered list so that more specific mappings run before broader fallbacks.
-LEGACY_PATH_MAPPINGS: List[Tuple[Path, Path]] = [
+LEGACY_PATH_MAPPINGS: list[tuple[Path, Path]] = [
     (Path("src/claude_skills/sdd_toolkit"), Path("model_chorus/src/model_chorus")),
     (Path("src/claude_skills"), Path("model_chorus/src/model_chorus")),
 ]
@@ -80,8 +84,8 @@ def _format_path_for_display(path: Path) -> str:
 
 
 def resolve_context_files(
-    files: Optional[Union[str, Sequence[str]]],
-) -> Tuple[List[str], List[str], List[str]]:
+    files: str | Sequence[str] | None,
+) -> tuple[list[str], list[str], list[str]]:
     """Normalize and resolve context file paths with legacy mapping support.
 
     Args:
@@ -101,9 +105,9 @@ def resolve_context_files(
     else:
         entries = [str(item).strip() for item in files if str(item).strip()]
 
-    resolved_paths: List[str] = []
-    remapped_notices: List[str] = []
-    missing_files: List[str] = []
+    resolved_paths: list[str] = []
+    remapped_notices: list[str] = []
+    missing_files: list[str] = []
     cwd = Path.cwd()
 
     for original in entries:
@@ -112,12 +116,14 @@ def resolve_context_files(
         raw_path = Path(normalized_str).expanduser()
 
         candidate_paths = []
-        remapped_target: Optional[Path] = None
+        remapped_target: Path | None = None
 
         if raw_path.is_absolute():
             candidate_paths.append(raw_path.resolve(strict=False))
         else:
-            candidate_paths.append((PROJECT_ROOT / normalized_path).resolve(strict=False))
+            candidate_paths.append(
+                (PROJECT_ROOT / normalized_path).resolve(strict=False)
+            )
             candidate_paths.append((cwd / normalized_path).resolve(strict=False))
 
         for legacy_prefix, new_prefix in LEGACY_PATH_MAPPINGS:
@@ -130,7 +136,7 @@ def resolve_context_files(
             candidate_paths.insert(0, remapped_target)
             break
 
-        unique_candidates: List[Path] = []
+        unique_candidates: list[Path] = []
         seen = set()
         for candidate in candidate_paths:
             key = candidate.as_posix()
@@ -138,12 +144,18 @@ def resolve_context_files(
                 seen.add(key)
                 unique_candidates.append(candidate)
 
-        existing_path = next((path for path in unique_candidates if path.exists()), None)
+        existing_path = next(
+            (path for path in unique_candidates if path.exists()), None
+        )
 
         if existing_path:
             display_path = _format_path_for_display(existing_path)
             resolved_paths.append(display_path)
-            if remapped_target and existing_path == remapped_target and original != display_path:
+            if (
+                remapped_target
+                and existing_path == remapped_target
+                and original != display_path
+            ):
                 remapped_notices.append(f"{original} -> {display_path}")
         else:
             missing_files.append(original)
@@ -189,7 +201,9 @@ def get_install_command(provider: str) -> str:
     return commands.get(provider.lower(), "See provider documentation")
 
 
-def get_provider_by_name(name: str, timeout: int = 120):
+def get_provider_by_name(
+    name: str, timeout: int = 120
+) -> ClaudeProvider | CodexProvider | GeminiProvider | CursorAgentProvider:
     """Get provider instance by name.
 
     Args:
@@ -203,7 +217,13 @@ def get_provider_by_name(name: str, timeout: int = 120):
         ProviderDisabledError: If provider is disabled in config
         typer.Exit: If provider is unknown
     """
-    providers = {
+    providers: dict[
+        str,
+        type[ClaudeProvider]
+        | type[CodexProvider]
+        | type[GeminiProvider]
+        | type[CursorAgentProvider],
+    ] = {
         "claude": ClaudeProvider,
         "codex": CodexProvider,
         "gemini": GeminiProvider,
@@ -229,39 +249,43 @@ def get_provider_by_name(name: str, timeout: int = 120):
 
 @app.command()
 def chat(
-    prompt_arg: Optional[str] = typer.Argument(None, help="Message to send to the AI model"),
-    prompt_flag: Optional[str] = typer.Option(
-        None, "--prompt", help="Message to send to the AI model (alternative to positional)"
+    prompt_arg: str | None = typer.Argument(
+        None, help="Message to send to the AI model"
     ),
-    provider: Optional[str] = typer.Option(
+    prompt_flag: str | None = typer.Option(
+        None,
+        "--prompt",
+        help="Message to send to the AI model (alternative to positional)",
+    ),
+    provider: str | None = typer.Option(
         None,
         "--provider",
         help="Provider to use (claude, gemini, codex, cursor-agent). Defaults to config or 'claude'",
     ),
-    continuation_id: Optional[str] = typer.Option(
+    continuation_id: str | None = typer.Option(
         None,
         "--continue",
         "-c",
         "--session-id",
         help="Thread ID to continue an existing conversation",
     ),
-    files: Optional[List[str]] = typer.Option(
+    files: list[str] | None = typer.Option(
         None,
         "--file",
         "-f",
         help="File paths to include in conversation context (can specify multiple times)",
     ),
-    system: Optional[str] = typer.Option(
+    system: str | None = typer.Option(
         None,
         "--system",
         help="System prompt for context",
     ),
-    timeout: Optional[float] = typer.Option(
+    timeout: float | None = typer.Option(
         None,
         "--timeout",
         help="Timeout per provider in seconds. Defaults to config or 120.0",
     ),
-    output: Optional[Path] = typer.Option(
+    output: Path | None = typer.Option(
         None,
         "--output",
         "-o",
@@ -309,12 +333,15 @@ def chat(
             raise typer.Exit(1)
 
         prompt = prompt_arg or prompt_flag
+        assert prompt is not None  # Validated above
         # Apply config defaults if values not provided
         config = get_config()
         if provider is None:
             provider = config.get_workflow_default_provider("chat", "claude")
             if provider is None:
-                console.print("[red]Error: Default provider for 'chat' workflow is disabled.[/red]")
+                console.print(
+                    "[red]Error: Default provider for 'chat' workflow is disabled.[/red]"
+                )
                 console.print(
                     "[yellow]Enable it in .claude/model_chorus_config.yaml or specify --provider[/yellow]"
                 )
@@ -346,9 +373,11 @@ def chat(
                 console.print("[yellow]To fix this:[/yellow]")
                 for suggestion in e.suggestions:
                     console.print(f"  • {suggestion}")
-            console.print(f"\n[yellow]Installation:[/yellow] {get_install_command(provider)}")
             console.print(
-                f"\n[dim]Run 'model-chorus list-providers --check' to see which providers are available[/dim]"
+                f"\n[yellow]Installation:[/yellow] {get_install_command(provider)}"
+            )
+            console.print(
+                "\n[dim]Run 'model-chorus list-providers --check' to see which providers are available[/dim]"
             )
             raise typer.Exit(1)
         except Exception as e:
@@ -360,7 +389,7 @@ def chat(
             "chat", exclude_provider=provider
         )
 
-        fallback_providers = []
+        fallback_providers: list[ModelProvider] = []
         if fallback_provider_names and verbose:
             console.print(
                 f"[cyan]Initializing fallback providers: {', '.join(fallback_provider_names)}[/cyan]"
@@ -368,10 +397,14 @@ def chat(
 
         for fallback_name in fallback_provider_names:
             try:
-                fallback_instance = get_provider_by_name(fallback_name, timeout=int(timeout))
+                fallback_instance = get_provider_by_name(
+                    fallback_name, timeout=int(timeout)
+                )
                 fallback_providers.append(fallback_instance)
                 if verbose:
-                    console.print(f"[green]✓ {fallback_name} initialized (fallback)[/green]")
+                    console.print(
+                        f"[green]✓ {fallback_name} initialized (fallback)[/green]"
+                    )
             except ProviderDisabledError:
                 if verbose:
                     console.print(
@@ -423,7 +456,7 @@ def chat(
 
         # Display results
         if result.success:
-            console.print(f"[bold green]✓ Chat completed[/bold green]\n")
+            console.print("[bold green]✓ Chat completed[/bold green]\n")
 
             # Show thread info
             thread_id = result.metadata.get("thread_id")
@@ -434,7 +467,9 @@ def chat(
             if not is_continuation:
                 console.print("[cyan]Status:[/cyan] New conversation started")
             else:
-                console.print(f"[cyan]Status:[/cyan] Continued ({conv_length} messages in thread)")
+                console.print(
+                    f"[cyan]Status:[/cyan] Continued ({conv_length} messages in thread)"
+                )
             console.print()
 
             # Show response
@@ -444,7 +479,9 @@ def chat(
             # Show usage info if available
             usage = result.metadata.get("usage", {})
             if usage and verbose:
-                console.print(f"\n[dim]Tokens: {usage.get('total_tokens', 'N/A')}[/dim]")
+                console.print(
+                    f"\n[dim]Tokens: {usage.get('total_tokens', 'N/A')}[/dim]"
+                )
 
             # Save to file if requested
             if output:
@@ -486,41 +523,43 @@ def chat(
 
 @app.command()
 def argument(
-    prompt_arg: Optional[str] = typer.Argument(
+    prompt_arg: str | None = typer.Argument(
         None, help="Argument, claim, or question to analyze"
     ),
-    prompt_flag: Optional[str] = typer.Option(
-        None, "--prompt", help="Argument, claim, or question to analyze (alternative to positional)"
+    prompt_flag: str | None = typer.Option(
+        None,
+        "--prompt",
+        help="Argument, claim, or question to analyze (alternative to positional)",
     ),
-    provider: Optional[str] = typer.Option(
+    provider: str | None = typer.Option(
         None,
         "--provider",
         help="Provider to use (claude, gemini, codex, cursor-agent). Defaults to config or 'claude'",
     ),
-    continuation_id: Optional[str] = typer.Option(
+    continuation_id: str | None = typer.Option(
         None,
         "--continue",
         "-c",
         "--session-id",
         help="Thread ID to continue an existing conversation",
     ),
-    files: Optional[List[str]] = typer.Option(
+    files: list[str] | None = typer.Option(
         None,
         "--file",
         "-f",
         help="File paths to include in conversation context (can specify multiple times)",
     ),
-    system: Optional[str] = typer.Option(
+    system: str | None = typer.Option(
         None,
         "--system",
         help="System prompt for context",
     ),
-    timeout: Optional[float] = typer.Option(
+    timeout: float | None = typer.Option(
         None,
         "--timeout",
         help="Timeout per provider in seconds. Defaults to config or 120.0",
     ),
-    output: Optional[Path] = typer.Option(
+    output: Path | None = typer.Option(
         None,
         "--output",
         "-o",
@@ -571,6 +610,7 @@ def argument(
             raise typer.Exit(1)
 
         prompt = prompt_arg or prompt_flag
+        assert prompt is not None  # Validated above
         # Apply config defaults if values not provided
         config = get_config()
         if provider is None:
@@ -608,9 +648,11 @@ def argument(
                 console.print("[yellow]To fix this:[/yellow]")
                 for suggestion in e.suggestions:
                     console.print(f"  • {suggestion}")
-            console.print(f"\n[yellow]Installation:[/yellow] {get_install_command(provider)}")
             console.print(
-                f"\n[dim]Run 'model-chorus list-providers --check' to see which providers are available[/dim]"
+                f"\n[yellow]Installation:[/yellow] {get_install_command(provider)}"
+            )
+            console.print(
+                "\n[dim]Run 'model-chorus list-providers --check' to see which providers are available[/dim]"
             )
             raise typer.Exit(1)
         except Exception as e:
@@ -622,7 +664,7 @@ def argument(
             "argument", exclude_provider=provider
         )
 
-        fallback_providers = []
+        fallback_providers: list[ModelProvider] = []
         if fallback_provider_names and verbose:
             console.print(
                 f"[cyan]Initializing fallback providers: {', '.join(fallback_provider_names)}[/cyan]"
@@ -630,10 +672,14 @@ def argument(
 
         for fallback_name in fallback_provider_names:
             try:
-                fallback_instance = get_provider_by_name(fallback_name, timeout=int(timeout))
+                fallback_instance = get_provider_by_name(
+                    fallback_name, timeout=int(timeout)
+                )
                 fallback_providers.append(fallback_instance)
                 if verbose:
-                    console.print(f"[green]✓ {fallback_name} initialized (fallback)[/green]")
+                    console.print(
+                        f"[green]✓ {fallback_name} initialized (fallback)[/green]"
+                    )
             except ProviderDisabledError:
                 if verbose:
                     console.print(
@@ -662,9 +708,11 @@ def argument(
 
         # Display analysis info
         console.print(
-            f"\n[bold cyan]Analyzing argument through dialectical reasoning...[/bold cyan]"
+            "\n[bold cyan]Analyzing argument through dialectical reasoning...[/bold cyan]"
         )
-        console.print(f"[dim]Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}[/dim]\n")
+        console.print(
+            f"[dim]Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}[/dim]\n"
+        )
 
         # Build config
         config = {}
@@ -684,7 +732,7 @@ def argument(
 
         # Display results
         console.print("\n[bold green]Analysis Complete[/bold green]")
-        console.print(f"\n[bold]Dialectical Analysis:[/bold]")
+        console.print("\n[bold]Dialectical Analysis:[/bold]")
 
         # Show each role's perspective
         if result.steps:
@@ -695,12 +743,14 @@ def argument(
 
         # Show synthesis
         if result.synthesis:
-            console.print(f"\n[bold magenta]Final Synthesis:[/bold magenta]")
+            console.print("\n[bold magenta]Final Synthesis:[/bold magenta]")
             console.print(result.synthesis)
 
         # Show metadata
         if verbose and result.metadata:
-            console.print(f"\n[dim]Thread ID: {result.metadata.get('thread_id', 'N/A')}[/dim]")
+            console.print(
+                f"\n[dim]Thread ID: {result.metadata.get('thread_id', 'N/A')}[/dim]"
+            )
             console.print(f"[dim]Model: {result.metadata.get('model', 'N/A')}[/dim]")
 
         # Save output if requested
@@ -738,27 +788,27 @@ def argument(
 
 @app.command()
 def ideate(
-    prompt_arg: Optional[str] = typer.Argument(
+    prompt_arg: str | None = typer.Argument(
         None, help="Topic or problem to brainstorm ideas for"
     ),
-    prompt_flag: Optional[str] = typer.Option(
+    prompt_flag: str | None = typer.Option(
         None,
         "--prompt",
         help="Topic or problem to brainstorm ideas for (alternative to positional)",
     ),
-    provider: Optional[str] = typer.Option(
+    provider: str | None = typer.Option(
         None,
         "--provider",
         help="Provider to use (claude, gemini, codex, cursor-agent). Defaults to config or 'claude'",
     ),
-    continuation_id: Optional[str] = typer.Option(
+    continuation_id: str | None = typer.Option(
         None,
         "--continue",
         "-c",
         "--session-id",
         help="Thread ID to continue an existing ideation session",
     ),
-    files: Optional[List[str]] = typer.Option(
+    files: list[str] | None = typer.Option(
         None,
         "--file",
         "-f",
@@ -770,17 +820,17 @@ def ideate(
         "-n",
         help="Number of ideas to generate",
     ),
-    system: Optional[str] = typer.Option(
+    system: str | None = typer.Option(
         None,
         "--system",
         help="System prompt for context",
     ),
-    timeout: Optional[float] = typer.Option(
+    timeout: float | None = typer.Option(
         None,
         "--timeout",
         help="Timeout per provider in seconds. Defaults to config or 120.0",
     ),
-    output: Optional[Path] = typer.Option(
+    output: Path | None = typer.Option(
         None,
         "--output",
         "-o",
@@ -831,6 +881,7 @@ def ideate(
             raise typer.Exit(1)
 
         prompt = prompt_arg or prompt_flag
+        assert prompt is not None  # Validated above
         # Apply config defaults if values not provided
         config = get_config()
         if provider is None:
@@ -868,9 +919,11 @@ def ideate(
                 console.print("[yellow]To fix this:[/yellow]")
                 for suggestion in e.suggestions:
                     console.print(f"  • {suggestion}")
-            console.print(f"\n[yellow]Installation:[/yellow] {get_install_command(provider)}")
             console.print(
-                f"\n[dim]Run 'model-chorus list-providers --check' to see which providers are available[/dim]"
+                f"\n[yellow]Installation:[/yellow] {get_install_command(provider)}"
+            )
+            console.print(
+                "\n[dim]Run 'model-chorus list-providers --check' to see which providers are available[/dim]"
             )
             raise typer.Exit(1)
         except Exception as e:
@@ -882,7 +935,7 @@ def ideate(
             "ideate", exclude_provider=provider
         )
 
-        fallback_providers = []
+        fallback_providers: list[ModelProvider] = []
         if fallback_provider_names and verbose:
             console.print(
                 f"[cyan]Initializing fallback providers: {', '.join(fallback_provider_names)}[/cyan]"
@@ -890,10 +943,14 @@ def ideate(
 
         for fallback_name in fallback_provider_names:
             try:
-                fallback_instance = get_provider_by_name(fallback_name, timeout=int(timeout))
+                fallback_instance = get_provider_by_name(
+                    fallback_name, timeout=int(timeout)
+                )
                 fallback_providers.append(fallback_instance)
                 if verbose:
-                    console.print(f"[green]✓ {fallback_name} initialized (fallback)[/green]")
+                    console.print(
+                        f"[green]✓ {fallback_name} initialized (fallback)[/green]"
+                    )
             except ProviderDisabledError:
                 if verbose:
                     console.print(
@@ -921,8 +978,10 @@ def ideate(
         final_prompt = construct_prompt_with_files(prompt, files)
 
         # Display ideation info
-        console.print(f"\n[bold cyan]Generating creative ideas...[/bold cyan]")
-        console.print(f"[dim]Topic: {prompt[:100]}{'...' if len(prompt) > 100 else ''}[/dim]")
+        console.print("\n[bold cyan]Generating creative ideas...[/bold cyan]")
+        console.print(
+            f"[dim]Topic: {prompt[:100]}{'...' if len(prompt) > 100 else ''}[/dim]"
+        )
         console.print(f"[dim]Ideas requested: {num_ideas}[/dim]\n")
 
         # Build config
@@ -956,12 +1015,14 @@ def ideate(
 
         # Show synthesis
         if result.synthesis:
-            console.print(f"\n[bold magenta]Summary & Recommendations:[/bold magenta]")
+            console.print("\n[bold magenta]Summary & Recommendations:[/bold magenta]")
             console.print(result.synthesis)
 
         # Show metadata
         if verbose and result.metadata:
-            console.print(f"\n[dim]Thread ID: {result.metadata.get('thread_id', 'N/A')}[/dim]")
+            console.print(
+                f"\n[dim]Thread ID: {result.metadata.get('thread_id', 'N/A')}[/dim]"
+            )
             console.print(f"[dim]Model: {result.metadata.get('model', 'N/A')}[/dim]")
 
         # Save output if requested
@@ -997,7 +1058,7 @@ def ideate(
         raise typer.Exit(1)
 
 
-def construct_prompt_with_files(prompt: str, files: Optional[List[str]]) -> str:
+def construct_prompt_with_files(prompt: str, files: list[str] | None) -> str:
     """Construct a prompt by prepending the content of files using ContextIngestionService."""
     if not files:
         return prompt
@@ -1039,7 +1100,7 @@ def construct_prompt_with_files(prompt: str, files: Optional[List[str]]) -> str:
         except BinaryFileError as e:
             console.print(f"[red]Error: {e}[/red]")
             console.print(
-                f"[yellow]Hint: Only text files are supported for context injection.[/yellow]"
+                "[yellow]Hint: Only text files are supported for context injection.[/yellow]"
             )
             raise typer.Exit(1)
         except PermissionError as e:
@@ -1051,39 +1112,41 @@ def construct_prompt_with_files(prompt: str, files: Optional[List[str]]) -> str:
 
 @app.command()
 def consensus(
-    prompt_arg: Optional[str] = typer.Argument(None, help="Prompt to send to all models"),
-    prompt_flag: Optional[str] = typer.Option(
-        None, "--prompt", help="Prompt to send to all models (alternative to positional)"
+    prompt_arg: str | None = typer.Argument(None, help="Prompt to send to all models"),
+    prompt_flag: str | None = typer.Option(
+        None,
+        "--prompt",
+        help="Prompt to send to all models (alternative to positional)",
     ),
-    num_to_consult: Optional[int] = typer.Option(
+    num_to_consult: int | None = typer.Option(
         None,
         "--num-to-consult",
         "-m",
         help="Number of successful responses required (models to consult). Defaults to config or 2",
     ),
-    strategy: Optional[str] = typer.Option(
+    strategy: str | None = typer.Option(
         None,
         "--strategy",
         "-s",
         help="Consensus strategy: all_responses, first_valid, majority, weighted, synthesize. Defaults to config or 'all_responses'",
     ),
-    files: Optional[List[str]] = typer.Option(
+    files: list[str] | None = typer.Option(
         None,
         "--file",
         "-f",
         help="File paths to include in conversation context (can specify multiple times)",
     ),
-    system: Optional[str] = typer.Option(
+    system: str | None = typer.Option(
         None,
         "--system",
         help="System prompt for context",
     ),
-    timeout: Optional[float] = typer.Option(
+    timeout: float | None = typer.Option(
         None,
         "--timeout",
         help="Timeout per provider in seconds. Defaults to config or 120.0",
     ),
-    output: Optional[Path] = typer.Option(
+    output: Path | None = typer.Option(
         None,
         "--output",
         "-o",
@@ -1129,6 +1192,7 @@ def consensus(
             raise typer.Exit(1)
 
         prompt = prompt_arg or prompt_flag
+        assert prompt is not None  # Validated above
         # Apply config defaults if values not provided
         config = get_config()
 
@@ -1140,7 +1204,9 @@ def consensus(
             num_to_consult = config.get_workflow_num_to_consult("consensus", fallback=2)
 
         if strategy is None:
-            strategy = config.get_workflow_default("consensus", "strategy", "all_responses")
+            strategy = config.get_workflow_default(
+                "consensus", "strategy", "all_responses"
+            )
         if timeout is None:
             timeout = config.get_workflow_default("consensus", "timeout", 120.0)
         if system is None:
@@ -1160,7 +1226,9 @@ def consensus(
 
         # Validate we have enough providers
         if not provider_priority:
-            console.print("[red]Error: No providers configured for consensus workflow[/red]")
+            console.print(
+                "[red]Error: No providers configured for consensus workflow[/red]"
+            )
             console.print(
                 "[yellow]Please configure provider_priority in .claude/model_chorus_config.yaml[/yellow]"
             )
@@ -1171,12 +1239,16 @@ def consensus(
                 f"[red]Error: Not enough providers available. Need {num_to_consult} but only "
                 f"{len(provider_priority)} enabled: {', '.join(provider_priority)}[/red]"
             )
-            console.print("[yellow]Please enable more providers or reduce num_to_consult[/yellow]")
+            console.print(
+                "[yellow]Please enable more providers or reduce num_to_consult[/yellow]"
+            )
             raise typer.Exit(1)
 
         # Create provider instances for ALL providers in priority list (for fallback)
         if verbose:
-            console.print(f"[cyan]Provider priority order: {', '.join(provider_priority)}[/cyan]")
+            console.print(
+                f"[cyan]Provider priority order: {', '.join(provider_priority)}[/cyan]"
+            )
             console.print(
                 f"[cyan]Will consult {num_to_consult} providers (with automatic fallback)[/cyan]\n"
             )
@@ -1188,16 +1260,18 @@ def consensus(
                 provider_instances.append(provider)
                 if verbose:
                     console.print(f"[green]✓ {provider_name} initialized[/green]")
-            except ProviderDisabledError as e:
+            except ProviderDisabledError:
                 # This shouldn't happen since we filtered above, but handle it anyway
-                console.print(f"[yellow]Skipping disabled provider {provider_name}[/yellow]")
+                console.print(
+                    f"[yellow]Skipping disabled provider {provider_name}[/yellow]"
+                )
             except Exception as e:
                 console.print(f"[red]Failed to initialize {provider_name}: {e}[/red]")
                 raise typer.Exit(1)
 
         # Create workflow with dynamic fallback support
         workflow = ConsensusWorkflow(
-            providers=provider_instances,
+            providers=cast(list[ModelProvider], provider_instances),
             strategy=strategy_enum,
             default_timeout=timeout,
             num_to_consult=num_to_consult,
@@ -1208,7 +1282,9 @@ def consensus(
             provider_key = provider_config.provider.provider_name.lower()
             override_model = config.get_provider_model(provider_key)
             if override_model:
-                metadata = dict(provider_config.metadata) if provider_config.metadata else {}
+                metadata = (
+                    dict(provider_config.metadata) if provider_config.metadata else {}
+                )
                 if "model" not in metadata:
                     metadata["model"] = override_model
                     provider_config.metadata = metadata
@@ -1227,7 +1303,7 @@ def consensus(
         )
 
         # Execute workflow
-        console.print(f"\n[bold cyan]Executing consensus workflow...[/bold cyan]")
+        console.print("\n[bold cyan]Executing consensus workflow...[/bold cyan]")
         console.print(f"Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
         console.print(
             f"Providers: {len(provider_priority)} available (need {num_to_consult} successful)"
@@ -1238,7 +1314,7 @@ def consensus(
         result = asyncio.run(workflow.execute(request, strategy=strategy_enum))
 
         # Display results
-        console.print(f"[bold green]✓ Workflow completed[/bold green]\n")
+        console.print("[bold green]✓ Workflow completed[/bold green]\n")
 
         # Show summary table
         table = Table(title="Consensus Results")
@@ -1281,7 +1357,7 @@ def consensus(
             output_data = {
                 "prompt": prompt,
                 "strategy": strategy_enum.value,
-                "providers": providers,
+                "providers": provider_priority,
                 "consensus_response": result.consensus_response,
                 "responses": {
                     name: {
@@ -1323,7 +1399,9 @@ def consensus(
 @app.command()
 def thinkdeep(
     step: str = typer.Option(..., "--step", help="Investigation step description"),
-    step_number: int = typer.Option(..., "--step-number", help="Current step index (starts at 1)"),
+    step_number: int = typer.Option(
+        ..., "--step-number", help="Current step index (starts at 1)"
+    ),
     total_steps: int = typer.Option(
         ..., "--total-steps", help="Estimated total investigation steps"
     ),
@@ -1332,13 +1410,15 @@ def thinkdeep(
         "--next-step-required",
         help="Continue investigation with another step (omit for final step)",
     ),
-    findings: str = typer.Option(..., "--findings", help="What was discovered in this step"),
-    provider: Optional[str] = typer.Option(
+    findings: str = typer.Option(
+        ..., "--findings", help="What was discovered in this step"
+    ),
+    provider: str | None = typer.Option(
         None,
         "--provider",
         help="Provider to use (claude, gemini, codex, cursor-agent). Defaults to config or 'claude'",
     ),
-    continuation_id: Optional[str] = typer.Option(
+    continuation_id: str | None = typer.Option(
         None,
         "--continuation-id",
         "--continue",
@@ -1346,7 +1426,7 @@ def thinkdeep(
         "--session-id",
         help="Resume previous investigation thread",
     ),
-    hypothesis: Optional[str] = typer.Option(
+    hypothesis: str | None = typer.Option(
         None,
         "--hypothesis",
         help="Current working theory about the problem",
@@ -1356,17 +1436,17 @@ def thinkdeep(
         "--confidence",
         help="Confidence level (exploring, low, medium, high, very_high, almost_certain, certain)",
     ),
-    files_checked: Optional[str] = typer.Option(
+    files_checked: str | None = typer.Option(
         None,
         "--files-checked",
         help="Comma-separated list of files examined",
     ),
-    relevant_files: Optional[str] = typer.Option(
+    relevant_files: str | None = typer.Option(
         None,
         "--relevant-files",
         help="Comma-separated list of files relevant to findings",
     ),
-    thinking_mode: Optional[str] = typer.Option(
+    thinking_mode: str | None = typer.Option(
         None,
         "--thinking-mode",
         help="Reasoning depth (minimal, low, medium, high, max). Defaults to config or 'medium'",
@@ -1376,7 +1456,7 @@ def thinkdeep(
         "--use-assistant-model/--no-use-assistant-model",
         help="Enable expert validation (default: enabled)",
     ),
-    output: Optional[Path] = typer.Option(
+    output: Path | None = typer.Option(
         None,
         "--output",
         "-o",
@@ -1424,7 +1504,9 @@ def thinkdeep(
                 )
                 raise typer.Exit(1)
         if thinking_mode is None:
-            thinking_mode = config.get_workflow_default("thinkdeep", "thinking_mode", "medium")
+            thinking_mode = config.get_workflow_default(
+                "thinkdeep", "thinking_mode", "medium"
+            )
 
         # Read timeout from config
         timeout = config.get_workflow_default("thinkdeep", "timeout", 120.0)
@@ -1477,7 +1559,7 @@ def thinkdeep(
             "thinkdeep", exclude_provider=provider
         )
 
-        fallback_providers = []
+        fallback_providers: list[ModelProvider] = []
         if fallback_provider_names and verbose:
             console.print(
                 f"[cyan]Initializing fallback providers: {', '.join(fallback_provider_names)}[/cyan]"
@@ -1485,10 +1567,14 @@ def thinkdeep(
 
         for fallback_name in fallback_provider_names:
             try:
-                fallback_instance = get_provider_by_name(fallback_name, timeout=int(timeout))
+                fallback_instance = get_provider_by_name(
+                    fallback_name, timeout=int(timeout)
+                )
                 fallback_providers.append(fallback_instance)
                 if verbose:
-                    console.print(f"[green]✓ {fallback_name} initialized (fallback)[/green]")
+                    console.print(
+                        f"[green]✓ {fallback_name} initialized (fallback)[/green]"
+                    )
             except ProviderDisabledError:
                 if verbose:
                     console.print(
@@ -1521,7 +1607,9 @@ def thinkdeep(
         # Parse files_checked if provided
         files_list = None
         if files_checked:
-            resolved_files, remapped_files, missing_files = resolve_context_files(files_checked)
+            resolved_files, remapped_files, missing_files = resolve_context_files(
+                files_checked
+            )
             if remapped_files:
                 for notice in remapped_files:
                     console.print(f"[cyan]Remapped legacy file path: {notice}[/cyan]")
@@ -1534,8 +1622,8 @@ def thinkdeep(
         # Parse relevant files if provided
         relevant_files_list = None
         if relevant_files:
-            resolved_relevant, remapped_relevant, missing_relevant = resolve_context_files(
-                relevant_files
+            resolved_relevant, remapped_relevant, missing_relevant = (
+                resolve_context_files(relevant_files)
             )
             if remapped_relevant:
                 for notice in remapped_relevant:
@@ -1600,7 +1688,9 @@ def thinkdeep(
             console.print(f"[cyan]Findings:[/cyan] {findings}")
             if files_list:
                 console.print(f"[cyan]Files Examined:[/cyan] {len(files_list)}")
-            relevant_files_this_step = result.metadata.get("relevant_files_this_step") or []
+            relevant_files_this_step = (
+                result.metadata.get("relevant_files_this_step") or []
+            )
             if relevant_files_this_step:
                 console.print(
                     f"[cyan]Relevant Files (this step):[/cyan] {', '.join(relevant_files_this_step)}"
@@ -1624,7 +1714,9 @@ def thinkdeep(
             # Show usage info if available
             usage = result.metadata.get("usage", {})
             if usage and verbose:
-                console.print(f"\n[dim]Tokens: {usage.get('total_tokens', 'N/A')}[/dim]")
+                console.print(
+                    f"\n[dim]Tokens: {usage.get('total_tokens', 'N/A')}[/dim]"
+                )
 
             # Save to file if requested
             if output:
@@ -1656,12 +1748,14 @@ def thinkdeep(
 
             # Show next step guidance
             if next_step_required:
-                console.print(f"\n[dim]To continue this investigation:[/dim]")
+                console.print("\n[dim]To continue this investigation:[/dim]")
                 console.print(
                     f'[dim]  model-chorus thinkdeep --continuation-id {returned_continuation_id} --step "Next investigation step" --step-number {step_number + 1} --total-steps {total_steps} ...[/dim]'
                 )
             else:
-                console.print(f"\n[green]✓ Investigation complete ({total_steps} steps)[/green]")
+                console.print(
+                    f"\n[green]✓ Investigation complete ({total_steps} steps)[/green]"
+                )
 
         else:
             console.print(f"[red]✗ Investigation failed: {result.error}[/red]")
@@ -1681,7 +1775,9 @@ def thinkdeep(
 
 @app.command(name="thinkdeep-status")
 def thinkdeep_status(
-    thread_id: str = typer.Argument(..., help="Thread ID of the investigation to inspect"),
+    thread_id: str = typer.Argument(
+        ..., help="Thread ID of the investigation to inspect"
+    ),
     show_steps: bool = typer.Option(
         False,
         "--steps",
@@ -1731,7 +1827,9 @@ def thinkdeep_status(
         state = workflow.get_investigation_state(thread_id)
 
         if not state:
-            console.print(f"[red]Error: Investigation thread not found: {thread_id}[/red]")
+            console.print(
+                f"[red]Error: Investigation thread not found: {thread_id}[/red]"
+            )
             console.print(
                 "[yellow]Make sure you're using the correct thread ID from a previous investigation.[/yellow]"
             )
@@ -1741,7 +1839,7 @@ def thinkdeep_status(
         summary = workflow.get_investigation_summary(thread_id)
 
         # Display header
-        console.print(f"\n[bold cyan]Investigation Status[/bold cyan]")
+        console.print("\n[bold cyan]Investigation Status[/bold cyan]")
         console.print(f"[cyan]Thread ID:[/cyan] {thread_id}\n")
 
         # Display summary metrics
@@ -1751,18 +1849,28 @@ def thinkdeep_status(
         console.print(f"[cyan]Files Examined:[/cyan] {len(state.relevant_files)}")
 
         if summary:
-            console.print(f"[cyan]Active Hypotheses:[/cyan] {summary['active_hypotheses']}")
-            console.print(f"[cyan]Validated Hypotheses:[/cyan] {summary['validated_hypotheses']}")
-            console.print(f"[cyan]Disproven Hypotheses:[/cyan] {summary['disproven_hypotheses']}")
-            console.print(f"[cyan]Complete:[/cyan] {'Yes' if summary['is_complete'] else 'No'}")
+            console.print(
+                f"[cyan]Active Hypotheses:[/cyan] {summary['active_hypotheses']}"
+            )
+            console.print(
+                f"[cyan]Validated Hypotheses:[/cyan] {summary['validated_hypotheses']}"
+            )
+            console.print(
+                f"[cyan]Disproven Hypotheses:[/cyan] {summary['disproven_hypotheses']}"
+            )
+            console.print(
+                f"[cyan]Complete:[/cyan] {'Yes' if summary['is_complete'] else 'No'}"
+            )
 
         # Display hypotheses
         if state.hypotheses:
             console.print("\n[bold]Hypotheses:[/bold]")
             for i, hyp in enumerate(state.hypotheses, 1):
-                status_color = {"active": "yellow", "validated": "green", "disproven": "red"}.get(
-                    hyp.status, "white"
-                )
+                status_color = {
+                    "active": "yellow",
+                    "validated": "green",
+                    "disproven": "red",
+                }.get(hyp.status, "white")
                 console.print(
                     f"  {i}. [{status_color}]{hyp.status.upper()}[/{status_color}] {hyp.hypothesis}"
                 )
@@ -1785,7 +1893,9 @@ def thinkdeep_status(
                 else:
                     # Truncate findings if not verbose
                     findings_preview = (
-                        step.findings[:150] + "..." if len(step.findings) > 150 else step.findings
+                        step.findings[:150] + "..."
+                        if len(step.findings) > 150
+                        else step.findings
                     )
                     console.print(f"  Findings: {findings_preview}")
 
@@ -1811,7 +1921,9 @@ def thinkdeep_status(
 
 @app.command(name="config")
 def config_cmd(
-    subcommand: str = typer.Argument(..., help="Config subcommand: show, validate, or init"),
+    subcommand: str = typer.Argument(
+        ..., help="Config subcommand: show, validate, or init"
+    ),
     verbose: bool = typer.Option(
         False,
         "--verbose",
@@ -1884,7 +1996,9 @@ def _config_show(verbose: bool):
         if config_obj.generation.timeout is not None:
             console.print(f"    timeout: {config_obj.generation.timeout}")
         if config_obj.generation.system_prompt is not None:
-            console.print(f"    system_prompt: {config_obj.generation.system_prompt[:50]}...")
+            console.print(
+                f"    system_prompt: {config_obj.generation.system_prompt[:50]}..."
+            )
 
     # Show workflow-specific config
     if config_obj.workflows:
@@ -1944,7 +2058,7 @@ def _config_validate(verbose: bool):
             console.print("Configuration details:")
             _config_show(verbose=False)
     except Exception as e:
-        console.print(f"[red]✗ Configuration is invalid:[/red]\n")
+        console.print("[red]✗ Configuration is invalid:[/red]\n")
         console.print(f"  {str(e)}\n")
         raise typer.Exit(1)
 
@@ -2004,11 +2118,13 @@ workflows:
             f.write(example_config)
 
         console.print(f"[green]✓ Created config file:[/green] {config_path}\n")
-        console.print("You can now edit this file to customize your ModelChorus configuration.")
+        console.print(
+            "You can now edit this file to customize your ModelChorus configuration."
+        )
         console.print("\nTo validate your config, run: model-chorus config validate")
 
         if verbose:
-            console.print(f"\n[dim]Config file contents:[/dim]")
+            console.print("\n[dim]Config file contents:[/dim]")
             console.print(example_config)
     except Exception as e:
         console.print(f"[red]✗ Failed to create config file:[/red] {e}")
@@ -2018,7 +2134,9 @@ workflows:
 @app.command()
 def list_providers(
     check: bool = typer.Option(
-        False, "--check", help="Check if provider CLIs are actually installed and working"
+        False,
+        "--check",
+        help="Check if provider CLIs are actually installed and working",
     )
 ):
     """List all available providers and their models.
@@ -2045,7 +2163,9 @@ def list_providers(
 
         # Run all availability checks concurrently
         async def check_all():
-            tasks = [check_provider_async(name, prov) for name, prov in providers.items()]
+            tasks = [
+                check_provider_async(name, prov) for name, prov in providers.items()
+            ]
             return await asyncio.gather(*tasks)
 
         results = asyncio.run(check_all())
@@ -2055,7 +2175,7 @@ def list_providers(
             if is_available:
                 status = "[green]✓ Installed and working[/green]"
             else:
-                status = f"[red]✗ Not available[/red]"
+                status = "[red]✗ Not available[/red]"
 
             console.print(f"[cyan]● {name}[/cyan]")
             console.print(f"  Status: {status}")
@@ -2064,7 +2184,9 @@ def list_providers(
 
             if not is_available:
                 console.print(f"  [yellow]Issue:[/yellow] {error}")
-                console.print(f"  [yellow]Install:[/yellow] {get_install_command(name)}")
+                console.print(
+                    f"  [yellow]Install:[/yellow] {get_install_command(name)}"
+                )
             else:
                 models = provider.get_available_models()
                 console.print(f"  Models ({len(models)}):")
@@ -2089,7 +2211,9 @@ def list_providers(
 
             console.print()
 
-        console.print("[dim]Use --check to verify which providers are actually installed[/dim]\n")
+        console.print(
+            "[dim]Use --check to verify which providers are actually installed[/dim]\n"
+        )
 
 
 @app.command()

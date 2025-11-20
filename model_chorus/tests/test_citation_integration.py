@@ -6,16 +6,16 @@ according to different academic styles (APA, MLA, Chicago).
 """
 
 import pytest
+
 from model_chorus.core.models import Citation, CitationMap
 from model_chorus.utils.citation_formatter import (
     CitationStyle,
+    calculate_citation_confidence,
+    calculate_citation_map_confidence,
     format_citation,
     format_citation_map,
     validate_citation,
-    calculate_citation_confidence,
-    calculate_citation_map_confidence,
 )
-
 
 # ============================================================================
 # Test Fixtures
@@ -202,7 +202,9 @@ class TestCitationMapFormatting:
 
     def test_format_citation_map_with_claim(self, citation_map_complete):
         """Test formatting CitationMap with claim included."""
-        result = format_citation_map(citation_map_complete, CitationStyle.APA, include_claim=True)
+        result = format_citation_map(
+            citation_map_complete, CitationStyle.APA, include_claim=True
+        )
 
         assert "Claim: Machine learning improves diagnostic accuracy by 23%" in result
         assert "Citations:" in result
@@ -213,7 +215,9 @@ class TestCitationMapFormatting:
 
     def test_format_citation_map_without_claim(self, citation_map_complete):
         """Test formatting CitationMap without claim."""
-        result = format_citation_map(citation_map_complete, CitationStyle.APA, include_claim=False)
+        result = format_citation_map(
+            citation_map_complete, CitationStyle.APA, include_claim=False
+        )
 
         assert "Claim:" not in result
         assert "Citations:" in result
@@ -222,7 +226,9 @@ class TestCitationMapFormatting:
 
     def test_format_citation_map_mla_style(self, citation_map_complete):
         """Test CitationMap formatting in MLA style."""
-        result = format_citation_map(citation_map_complete, CitationStyle.MLA, include_claim=True)
+        result = format_citation_map(
+            citation_map_complete, CitationStyle.MLA, include_claim=True
+        )
 
         assert "Claim:" in result
         assert "Citations:" in result
@@ -231,7 +237,9 @@ class TestCitationMapFormatting:
 
     def test_format_citation_map_empty(self, citation_map_empty):
         """Test formatting empty CitationMap."""
-        result = format_citation_map(citation_map_empty, CitationStyle.APA, include_claim=True)
+        result = format_citation_map(
+            citation_map_empty, CitationStyle.APA, include_claim=True
+        )
 
         assert "Claim: This is an unsupported claim" in result
         assert "No citations available" in result
@@ -261,7 +269,8 @@ class TestCitationValidation:
         assert len(issues) > 0
         assert any("author" in issue.lower() for issue in issues)
         assert any(
-            "year" in issue.lower() or "publication_date" in issue.lower() for issue in issues
+            "year" in issue.lower() or "publication_date" in issue.lower()
+            for issue in issues
         )
         assert any("title" in issue.lower() for issue in issues)
 
@@ -324,7 +333,9 @@ class TestCitationValidation:
             is_valid, issues = validate_citation(citation)
 
             # Should not have source format issue
-            assert not any("source format not recognized" in issue.lower() for issue in issues)
+            assert not any(
+                "source format not recognized" in issue.lower() for issue in issues
+            )
 
     def test_validate_unrecognized_source_format(self):
         """Test that unrecognized source format gets warning."""
@@ -415,7 +426,9 @@ class TestCitationConfidenceScoring:
         https_scores = calculate_citation_confidence(https_citation)
         http_scores = calculate_citation_confidence(http_citation)
 
-        assert https_scores["source_quality_score"] > http_scores["source_quality_score"]
+        assert (
+            https_scores["source_quality_score"] > http_scores["source_quality_score"]
+        )
 
     def test_confidence_location_specificity_bonus(self):
         """Test location specificity scoring."""
@@ -502,7 +515,8 @@ class TestCitationMapConfidenceScoring:
         """Test that citation count factor plateaus at 5."""
         # Create citation map with many citations
         many_citations = [
-            Citation(source=f"https://example.com/{i}", confidence=0.8) for i in range(10)
+            Citation(source=f"https://example.com/{i}", confidence=0.8)
+            for i in range(10)
         ]
 
         citation_map = CitationMap(

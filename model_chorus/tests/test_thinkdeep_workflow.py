@@ -11,19 +11,17 @@ Tests verify ThinkDeepWorkflow functionality including:
 - Expert validation integration
 """
 
-import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
-import uuid
+from unittest.mock import AsyncMock
 
-from model_chorus.workflows.thinkdeep import ThinkDeepWorkflow
-from model_chorus.providers.base_provider import GenerationResponse, GenerationRequest
+import pytest
+
 from model_chorus.core.conversation import ConversationMemory
 from model_chorus.core.models import (
     ConfidenceLevel,
-    Hypothesis,
     InvestigationStep,
-    ThinkDeepState,
 )
+from model_chorus.providers.base_provider import GenerationRequest, GenerationResponse
+from model_chorus.workflows.thinkdeep import ThinkDeepWorkflow
 
 
 class TestInvestigationStepExecution:
@@ -53,7 +51,9 @@ class TestInvestigationStepExecution:
         return ConversationMemory()
 
     @pytest.mark.asyncio
-    async def test_single_investigation_step_execution(self, mock_provider, conversation_memory):
+    async def test_single_investigation_step_execution(
+        self, mock_provider, conversation_memory
+    ):
         """Test executing a single investigation step."""
         # Setup mock response
         mock_provider.generate.return_value = GenerationResponse(
@@ -70,7 +70,12 @@ class TestInvestigationStepExecution:
 
         # Execute investigation step
         result = await workflow.run(
-            prompt="Investigate authentication patterns in the codebase", files=["src/auth.py"]
+            step="Investigate authentication patterns in the codebase",
+            step_number=1,
+            total_steps=1,
+            next_step_required=False,
+            findings="Checking authentication patterns",
+            files=["src/auth.py"],
         )
 
         # Verify result success
@@ -82,7 +87,9 @@ class TestInvestigationStepExecution:
         assert "thread_id" in result.metadata
         assert result.metadata["provider"] == "test_provider"
         assert result.metadata["model"] == "test-model"
-        assert result.metadata["investigation_step"] == 2  # State has 1 step, metadata shows next
+        assert (
+            result.metadata["investigation_step"] == 2
+        )  # State has 1 step, metadata shows next
         assert result.metadata["is_continuation"] is False
 
         # Verify provider was called
@@ -112,7 +119,12 @@ class TestInvestigationStepExecution:
 
         # Execute investigation step
         result = await workflow.run(
-            prompt="Check database configuration", files=["config/database.py"]
+            step="Check database configuration",
+            step_number=1,
+            total_steps=1,
+            next_step_required=False,
+            findings="Analyzing database configuration",
+            files=["config/database.py"],
         )
 
         # Get investigation state
@@ -126,12 +138,17 @@ class TestInvestigationStepExecution:
         step = state.steps[0]
         assert isinstance(step, InvestigationStep)
         assert step.step_number == 1
-        assert "database" in step.findings.lower() or "connection pooling" in step.findings.lower()
+        assert (
+            "database" in step.findings.lower()
+            or "connection pooling" in step.findings.lower()
+        )
         assert "config/database.py" in step.files_checked
         assert step.confidence == ConfidenceLevel.EXPLORING.value  # Default confidence
 
     @pytest.mark.asyncio
-    async def test_multi_step_investigation_progression(self, mock_provider, conversation_memory):
+    async def test_multi_step_investigation_progression(
+        self, mock_provider, conversation_memory
+    ):
         """Test multiple investigation steps with state tracking."""
         # Create workflow
         workflow = ThinkDeepWorkflow(
@@ -146,7 +163,14 @@ class TestInvestigationStepExecution:
             stop_reason="end_turn",
         )
 
-        result1 = await workflow.run(prompt="Analyze memory usage patterns", files=["src/cache.py"])
+        result1 = await workflow.run(
+            step="Analyze memory usage patterns",
+            step_number=1,
+            total_steps=3,
+            next_step_required=True,
+            findings="Initial memory analysis",
+            files=["src/cache.py"],
+        )
         thread_id = result1.metadata["thread_id"]
 
         # Verify step 1
@@ -163,7 +187,11 @@ class TestInvestigationStepExecution:
         )
 
         result2 = await workflow.run(
-            prompt="Check cache eviction policy",
+            step="Check cache eviction policy",
+            step_number=2,
+            total_steps=3,
+            next_step_required=True,
+            findings="Found no eviction policy configured",
             continuation_id=thread_id,
             files=["src/cache/eviction.py"],
         )
@@ -183,7 +211,12 @@ class TestInvestigationStepExecution:
         )
 
         result3 = await workflow.run(
-            prompt="Finalize investigation findings", continuation_id=thread_id
+            step="Finalize investigation findings",
+            step_number=3,
+            total_steps=3,
+            next_step_required=False,
+            findings="Root cause identified - unbounded cache growth",
+            continuation_id=thread_id,
         )
 
         # Verify final state
@@ -221,7 +254,14 @@ class TestInvestigationStepExecution:
             "tests/test_auth.py",
         ]
 
-        result = await workflow.run(prompt="Review authentication system", files=files_to_check)
+        result = await workflow.run(
+            step="Review authentication system",
+            step_number=1,
+            total_steps=1,
+            next_step_required=False,
+            findings="Reviewing authentication implementation",
+            files=files_to_check,
+        )
 
         # Get state and verify files tracked
         thread_id = result.metadata["thread_id"]
@@ -280,7 +320,10 @@ class TestInvestigationStepExecution:
         )
 
         assert result1.success is True
-        assert result1.metadata["relevant_files_this_step"] == ["src/api.py", "tests/test_api.py"]
+        assert result1.metadata["relevant_files_this_step"] == [
+            "src/api.py",
+            "tests/test_api.py",
+        ]
 
         first_prompt: GenerationRequest = mock_provider.generate.call_args_list[0][0][0]
         assert "Additional Relevant Files Referenced This Step" in first_prompt.prompt
@@ -317,10 +360,14 @@ class TestInvestigationStepExecution:
             "src/services/auth.py",
         ]
         assert result2.metadata["relevant_files"] == final_state.relevant_files
-        assert result2.metadata["total_files_examined"] == len(final_state.relevant_files)
+        assert result2.metadata["total_files_examined"] == len(
+            final_state.relevant_files
+        )
 
     @pytest.mark.asyncio
-    async def test_investigation_step_with_no_files(self, mock_provider, conversation_memory):
+    async def test_investigation_step_with_no_files(
+        self, mock_provider, conversation_memory
+    ):
         """Test investigation step execution without file context."""
         # Setup mock response
         mock_provider.generate.return_value = GenerationResponse(
@@ -336,7 +383,13 @@ class TestInvestigationStepExecution:
         )
 
         # Execute without files
-        result = await workflow.run(prompt="Describe the system architecture at a high level")
+        result = await workflow.run(
+            step="Describe the system architecture at a high level",
+            step_number=1,
+            total_steps=1,
+            next_step_required=False,
+            findings="System architecture analysis",
+        )
 
         # Get state and verify
         thread_id = result.metadata["thread_id"]
@@ -350,7 +403,9 @@ class TestInvestigationStepExecution:
         assert state.relevant_files == []
 
     @pytest.mark.asyncio
-    async def test_investigation_step_confidence_tracking(self, mock_provider, conversation_memory):
+    async def test_investigation_step_confidence_tracking(
+        self, mock_provider, conversation_memory
+    ):
         """Test that investigation steps track confidence levels."""
         # Create workflow
         workflow = ThinkDeepWorkflow(
@@ -365,7 +420,13 @@ class TestInvestigationStepExecution:
             stop_reason="end_turn",
         )
 
-        result1 = await workflow.run(prompt="Start investigation")
+        result1 = await workflow.run(
+            step="Start investigation",
+            step_number=1,
+            total_steps=2,
+            next_step_required=True,
+            findings="Starting confidence tracking investigation",
+        )
         thread_id = result1.metadata["thread_id"]
 
         # Check initial confidence
@@ -384,7 +445,14 @@ class TestInvestigationStepExecution:
             stop_reason="end_turn",
         )
 
-        result2 = await workflow.run(prompt="Continue investigation", continuation_id=thread_id)
+        result2 = await workflow.run(
+            step="Continue investigation",
+            step_number=2,
+            total_steps=2,
+            next_step_required=False,
+            findings="Evidence gathered, hypothesis forming",
+            continuation_id=thread_id,
+        )
 
         # Check updated confidence
         state2 = workflow.get_investigation_state(thread_id)
@@ -414,7 +482,12 @@ class TestInvestigationStepExecution:
 
         # Execute first step
         result = await workflow.run(
-            prompt="Investigate performance issues", files=["config/database.py"]
+            step="Investigate performance issues",
+            step_number=1,
+            total_steps=2,
+            next_step_required=True,
+            findings="Investigating performance issues with database",
+            files=["config/database.py"],
         )
 
         thread_id = result.metadata["thread_id"]
@@ -435,7 +508,14 @@ class TestInvestigationStepExecution:
             stop_reason="end_turn",
         )
 
-        result2 = await workflow.run(prompt="Analyze timeout patterns", continuation_id=thread_id)
+        result2 = await workflow.run(
+            step="Analyze timeout patterns",
+            step_number=2,
+            total_steps=2,
+            next_step_required=False,
+            findings="Confirmed: timeout errors correlate with peak traffic",
+            continuation_id=thread_id,
+        )
 
         # Get state and verify
         state = workflow.get_investigation_state(thread_id)
@@ -443,11 +523,16 @@ class TestInvestigationStepExecution:
         # Verify steps and hypotheses coexist
         assert len(state.steps) == 2
         assert len(state.hypotheses) == 1
-        assert state.hypotheses[0].hypothesis == "Database pool size causes performance bottleneck"
+        assert (
+            state.hypotheses[0].hypothesis
+            == "Database pool size causes performance bottleneck"
+        )
         assert len(state.hypotheses[0].evidence) == 2
 
     @pytest.mark.asyncio
-    async def test_investigation_step_findings_extraction(self, mock_provider, conversation_memory):
+    async def test_investigation_step_findings_extraction(
+        self, mock_provider, conversation_memory
+    ):
         """Test that findings are properly extracted from responses."""
         # Setup mock response with multiple paragraphs
         full_response = """The investigation reveals a critical memory leak in the cache layer.
@@ -468,7 +553,14 @@ Recommended action: Implement LRU eviction policy with maximum size limit."""
         )
 
         # Execute investigation
-        result = await workflow.run(prompt="Investigate memory leak", files=["src/cache.py"])
+        result = await workflow.run(
+            step="Investigate memory leak",
+            step_number=1,
+            total_steps=1,
+            next_step_required=False,
+            findings="Investigating memory leak in cache layer",
+            files=["src/cache.py"],
+        )
 
         # Get state and check findings
         thread_id = result.metadata["thread_id"]
@@ -511,7 +603,14 @@ Recommended action: Implement LRU eviction policy with maximum size limit."""
         )
 
         # Set confidence to non-certain to trigger expert validation
-        result = await workflow.run(prompt="Review authentication security", files=["src/auth.py"])
+        result = await workflow.run(
+            step="Review authentication security",
+            step_number=1,
+            total_steps=2,
+            next_step_required=True,
+            findings="Reviewing authentication security patterns",
+            files=["src/auth.py"],
+        )
 
         thread_id = result.metadata["thread_id"]
 
@@ -519,7 +618,14 @@ Recommended action: Implement LRU eviction policy with maximum size limit."""
         workflow.update_confidence(thread_id, ConfidenceLevel.MEDIUM.value)
 
         # Run another step to trigger expert validation
-        result2 = await workflow.run(prompt="Verify security findings", continuation_id=thread_id)
+        result2 = await workflow.run(
+            step="Verify security findings",
+            step_number=2,
+            total_steps=2,
+            next_step_required=False,
+            findings="Verifying security findings with expert validation",
+            continuation_id=thread_id,
+        )
 
         # Verify expert validation was performed
         assert result2.metadata.get("expert_validation_performed") is True
@@ -547,7 +653,14 @@ Recommended action: Implement LRU eviction policy with maximum size limit."""
         )
 
         # Execute investigation
-        result = await workflow.run(prompt="Test investigation", files=["test.py"])
+        result = await workflow.run(
+            step="Test investigation",
+            step_number=1,
+            total_steps=1,
+            next_step_required=False,
+            findings="Testing investigation metadata completeness",
+            files=["test.py"],
+        )
 
         # Verify all expected metadata fields
         assert "thread_id" in result.metadata
@@ -575,7 +688,9 @@ Recommended action: Implement LRU eviction policy with maximum size limit."""
         assert result.metadata["files_examined"] == 1
 
     @pytest.mark.asyncio
-    async def test_investigation_step_error_handling(self, mock_provider, conversation_memory):
+    async def test_investigation_step_error_handling(
+        self, mock_provider, conversation_memory
+    ):
         """Test investigation step handles provider errors gracefully."""
         # Setup provider to raise error
         mock_provider.generate.side_effect = Exception("API timeout")
@@ -586,7 +701,13 @@ Recommended action: Implement LRU eviction policy with maximum size limit."""
         )
 
         # Execute investigation (should not raise)
-        result = await workflow.run(prompt="Test investigation")
+        result = await workflow.run(
+            step="Test investigation",
+            step_number=1,
+            total_steps=1,
+            next_step_required=False,
+            findings="Testing error handling",
+        )
 
         # Verify error handling
         assert result.success is False
@@ -594,7 +715,9 @@ Recommended action: Implement LRU eviction policy with maximum size limit."""
         assert "thread_id" in result.metadata
 
     @pytest.mark.asyncio
-    async def test_empty_provider_response_reports_error(self, mock_provider, conversation_memory):
+    async def test_empty_provider_response_reports_error(
+        self, mock_provider, conversation_memory
+    ):
         """Provider empty response should surface error without storing assistant message."""
         mock_provider.generate.return_value = GenerationResponse(
             content="", model="test-model", usage={}, stop_reason="end_turn"
@@ -638,7 +761,13 @@ Recommended action: Implement LRU eviction policy with maximum size limit."""
         workflow = ThinkDeepWorkflow(provider=mock_provider)
 
         # Execute investigation
-        result = await workflow.run(prompt="Test investigation")
+        result = await workflow.run(
+            step="Test investigation",
+            step_number=1,
+            total_steps=1,
+            next_step_required=False,
+            findings="Testing investigation without conversation memory",
+        )
 
         # Verify success
         assert result.success is True
@@ -667,7 +796,9 @@ class TestHypothesisEvolution:
         return ConversationMemory()
 
     @pytest.mark.asyncio
-    async def test_add_hypothesis_to_investigation(self, mock_provider, conversation_memory):
+    async def test_add_hypothesis_to_investigation(
+        self, mock_provider, conversation_memory
+    ):
         """Test adding a hypothesis to an ongoing investigation."""
         # Setup mock response
         mock_provider.generate.return_value = GenerationResponse(
@@ -682,7 +813,13 @@ class TestHypothesisEvolution:
             provider=mock_provider, conversation_memory=conversation_memory
         )
 
-        result = await workflow.run(prompt="Start investigation")
+        result = await workflow.run(
+            step="Start investigation",
+            step_number=1,
+            total_steps=1,
+            next_step_required=False,
+            findings="Starting investigation to add hypothesis",
+        )
         thread_id = result.metadata["thread_id"]
 
         # Add hypothesis
@@ -704,18 +841,29 @@ class TestHypothesisEvolution:
         assert hyp.status == "active"
 
     @pytest.mark.asyncio
-    async def test_update_hypothesis_with_evidence(self, mock_provider, conversation_memory):
+    async def test_update_hypothesis_with_evidence(
+        self, mock_provider, conversation_memory
+    ):
         """Test adding evidence to an existing hypothesis."""
         # Setup workflow and investigation
         mock_provider.generate.return_value = GenerationResponse(
-            content="Investigation findings.", model="test-model", usage={}, stop_reason="end_turn"
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn",
         )
 
         workflow = ThinkDeepWorkflow(
             provider=mock_provider, conversation_memory=conversation_memory
         )
 
-        result = await workflow.run(prompt="Start investigation")
+        result = await workflow.run(
+            step="Start investigation",
+            step_number=1,
+            total_steps=1,
+            next_step_required=False,
+            findings="Starting investigation to update hypothesis with evidence",
+        )
         thread_id = result.metadata["thread_id"]
 
         # Add initial hypothesis
@@ -745,23 +893,36 @@ class TestHypothesisEvolution:
         """Test marking a hypothesis as validated."""
         # Setup workflow and investigation
         mock_provider.generate.return_value = GenerationResponse(
-            content="Investigation complete.", model="test-model", usage={}, stop_reason="end_turn"
+            content="Investigation complete.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn",
         )
 
         workflow = ThinkDeepWorkflow(
             provider=mock_provider, conversation_memory=conversation_memory
         )
 
-        result = await workflow.run(prompt="Start investigation")
+        result = await workflow.run(
+            step="Start investigation",
+            step_number=1,
+            total_steps=1,
+            next_step_required=False,
+            findings="Starting investigation to test hypothesis validation",
+        )
         thread_id = result.metadata["thread_id"]
 
         # Add hypothesis
         workflow.add_hypothesis(
-            thread_id, "API uses async/await pattern", evidence=["Found async def in code"]
+            thread_id,
+            "API uses async/await pattern",
+            evidence=["Found async def in code"],
         )
 
         # Validate hypothesis
-        success = workflow.validate_hypothesis(thread_id, "API uses async/await pattern")
+        success = workflow.validate_hypothesis(
+            thread_id, "API uses async/await pattern"
+        )
 
         assert success is True
 
@@ -775,14 +936,23 @@ class TestHypothesisEvolution:
         """Test marking a hypothesis as disproven."""
         # Setup workflow and investigation
         mock_provider.generate.return_value = GenerationResponse(
-            content="Investigation findings.", model="test-model", usage={}, stop_reason="end_turn"
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn",
         )
 
         workflow = ThinkDeepWorkflow(
             provider=mock_provider, conversation_memory=conversation_memory
         )
 
-        result = await workflow.run(prompt="Start investigation")
+        result = await workflow.run(
+            step="Start investigation",
+            step_number=1,
+            total_steps=1,
+            next_step_required=False,
+            findings="Starting investigation to test hypothesis disprove",
+        )
         thread_id = result.metadata["thread_id"]
 
         # Add hypothesis
@@ -791,7 +961,9 @@ class TestHypothesisEvolution:
         )
 
         # Disprove hypothesis
-        success = workflow.disprove_hypothesis(thread_id, "Network latency causes timeout")
+        success = workflow.disprove_hypothesis(
+            thread_id, "Network latency causes timeout"
+        )
 
         assert success is True
 
@@ -801,23 +973,36 @@ class TestHypothesisEvolution:
         assert hyp.status == "disproven"
 
     @pytest.mark.asyncio
-    async def test_multiple_hypothesis_evolution(self, mock_provider, conversation_memory):
+    async def test_multiple_hypothesis_evolution(
+        self, mock_provider, conversation_memory
+    ):
         """Test evolution of multiple competing hypotheses."""
         # Setup workflow
         mock_provider.generate.return_value = GenerationResponse(
-            content="Investigation findings.", model="test-model", usage={}, stop_reason="end_turn"
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn",
         )
 
         workflow = ThinkDeepWorkflow(
             provider=mock_provider, conversation_memory=conversation_memory
         )
 
-        result = await workflow.run(prompt="Start investigation")
+        result = await workflow.run(
+            step="Start investigation",
+            step_number=1,
+            total_steps=1,
+            next_step_required=False,
+            findings="Starting investigation to test multiple hypothesis evolution",
+        )
         thread_id = result.metadata["thread_id"]
 
         # Add multiple hypotheses
         workflow.add_hypothesis(
-            thread_id, "H1: Database connection issue", evidence=["Slow queries observed"]
+            thread_id,
+            "H1: Database connection issue",
+            evidence=["Slow queries observed"],
         )
 
         workflow.add_hypothesis(
@@ -864,14 +1049,23 @@ class TestHypothesisEvolution:
         """Test filtering active hypotheses."""
         # Setup workflow
         mock_provider.generate.return_value = GenerationResponse(
-            content="Investigation findings.", model="test-model", usage={}, stop_reason="end_turn"
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn",
         )
 
         workflow = ThinkDeepWorkflow(
             provider=mock_provider, conversation_memory=conversation_memory
         )
 
-        result = await workflow.run(prompt="Start investigation")
+        result = await workflow.run(
+            step="Start investigation",
+            step_number=1,
+            total_steps=1,
+            next_step_required=False,
+            findings="Starting investigation to test active hypotheses filtering",
+        )
         thread_id = result.metadata["thread_id"]
 
         # Add hypotheses with different statuses
@@ -897,14 +1091,23 @@ class TestHypothesisEvolution:
         """Test getting all hypotheses regardless of status."""
         # Setup workflow
         mock_provider.generate.return_value = GenerationResponse(
-            content="Investigation findings.", model="test-model", usage={}, stop_reason="end_turn"
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn",
         )
 
         workflow = ThinkDeepWorkflow(
             provider=mock_provider, conversation_memory=conversation_memory
         )
 
-        result = await workflow.run(prompt="Start investigation")
+        result = await workflow.run(
+            step="Start investigation",
+            step_number=1,
+            total_steps=1,
+            next_step_required=False,
+            findings="Starting investigation to test getting all hypotheses",
+        )
         thread_id = result.metadata["thread_id"]
 
         # Add hypotheses with different statuses
@@ -926,7 +1129,9 @@ class TestHypothesisEvolution:
         assert "disproven" in statuses
 
     @pytest.mark.asyncio
-    async def test_hypothesis_persistence_across_turns(self, mock_provider, conversation_memory):
+    async def test_hypothesis_persistence_across_turns(
+        self, mock_provider, conversation_memory
+    ):
         """Test that hypotheses persist across investigation turns."""
         # Setup workflow
         workflow = ThinkDeepWorkflow(
@@ -935,34 +1140,67 @@ class TestHypothesisEvolution:
 
         # Turn 1: Start investigation and add hypothesis
         mock_provider.generate.return_value = GenerationResponse(
-            content="Initial findings.", model="test-model", usage={}, stop_reason="end_turn"
+            content="Initial findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn",
         )
 
-        result1 = await workflow.run(prompt="Start investigation")
+        result1 = await workflow.run(
+            step="Start investigation",
+            step_number=1,
+            total_steps=3,
+            next_step_required=True,
+            findings="Initial investigation findings",
+        )
         thread_id = result1.metadata["thread_id"]
 
         workflow.add_hypothesis(
-            thread_id, "Performance bottleneck in database", evidence=["Slow query times"]
+            thread_id,
+            "Performance bottleneck in database",
+            evidence=["Slow query times"],
         )
 
         # Turn 2: Continue investigation
         mock_provider.generate.return_value = GenerationResponse(
-            content="Additional findings.", model="test-model", usage={}, stop_reason="end_turn"
+            content="Additional findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn",
         )
 
-        result2 = await workflow.run(prompt="Continue investigation", continuation_id=thread_id)
+        result2 = await workflow.run(
+            step="Continue investigation",
+            step_number=2,
+            total_steps=3,
+            next_step_required=True,
+            findings="Additional findings during investigation",
+            continuation_id=thread_id,
+        )
 
         # Add more evidence
         workflow.update_hypothesis(
-            thread_id, "Performance bottleneck in database", new_evidence=["Missing index found"]
+            thread_id,
+            "Performance bottleneck in database",
+            new_evidence=["Missing index found"],
         )
 
         # Turn 3: Conclude investigation
         mock_provider.generate.return_value = GenerationResponse(
-            content="Final analysis.", model="test-model", usage={}, stop_reason="end_turn"
+            content="Final analysis.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn",
         )
 
-        result3 = await workflow.run(prompt="Finalize", continuation_id=thread_id)
+        result3 = await workflow.run(
+            step="Finalize",
+            step_number=3,
+            total_steps=3,
+            next_step_required=False,
+            findings="Final analysis and conclusion",
+            continuation_id=thread_id,
+        )
 
         # Validate hypothesis
         workflow.validate_hypothesis(thread_id, "Performance bottleneck in database")
@@ -979,23 +1217,36 @@ class TestHypothesisEvolution:
         assert hyp.status == "validated"
 
     @pytest.mark.asyncio
-    async def test_hypothesis_update_with_status_change(self, mock_provider, conversation_memory):
+    async def test_hypothesis_update_with_status_change(
+        self, mock_provider, conversation_memory
+    ):
         """Test updating hypothesis evidence and status simultaneously."""
         # Setup workflow
         mock_provider.generate.return_value = GenerationResponse(
-            content="Investigation findings.", model="test-model", usage={}, stop_reason="end_turn"
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn",
         )
 
         workflow = ThinkDeepWorkflow(
             provider=mock_provider, conversation_memory=conversation_memory
         )
 
-        result = await workflow.run(prompt="Start investigation")
+        result = await workflow.run(
+            step="Start investigation",
+            step_number=1,
+            total_steps=1,
+            next_step_required=False,
+            findings="Starting investigation to test hypothesis update with status change",
+        )
         thread_id = result.metadata["thread_id"]
 
         # Add hypothesis
         workflow.add_hypothesis(
-            thread_id, "Cache eviction policy missing", evidence=["Memory grows unbounded"]
+            thread_id,
+            "Cache eviction policy missing",
+            evidence=["Memory grows unbounded"],
         )
 
         # Update with evidence and status
@@ -1015,18 +1266,29 @@ class TestHypothesisEvolution:
         assert hyp.status == "validated"
 
     @pytest.mark.asyncio
-    async def test_hypothesis_not_found_handling(self, mock_provider, conversation_memory):
+    async def test_hypothesis_not_found_handling(
+        self, mock_provider, conversation_memory
+    ):
         """Test handling of operations on non-existent hypothesis."""
         # Setup workflow
         mock_provider.generate.return_value = GenerationResponse(
-            content="Investigation findings.", model="test-model", usage={}, stop_reason="end_turn"
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn",
         )
 
         workflow = ThinkDeepWorkflow(
             provider=mock_provider, conversation_memory=conversation_memory
         )
 
-        result = await workflow.run(prompt="Start investigation")
+        result = await workflow.run(
+            step="Start investigation",
+            step_number=1,
+            total_steps=1,
+            next_step_required=False,
+            findings="Starting investigation to test hypothesis not found handling",
+        )
         thread_id = result.metadata["thread_id"]
 
         # Try to update non-existent hypothesis
@@ -1047,11 +1309,16 @@ class TestHypothesisEvolution:
         assert success is False
 
     @pytest.mark.asyncio
-    async def test_hypothesis_metadata_tracking(self, mock_provider, conversation_memory):
+    async def test_hypothesis_metadata_tracking(
+        self, mock_provider, conversation_memory
+    ):
         """Test that hypothesis count is tracked in result metadata."""
         # Setup workflow
         mock_provider.generate.return_value = GenerationResponse(
-            content="Investigation findings.", model="test-model", usage={}, stop_reason="end_turn"
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn",
         )
 
         workflow = ThinkDeepWorkflow(
@@ -1059,7 +1326,13 @@ class TestHypothesisEvolution:
         )
 
         # Initial investigation - no hypotheses
-        result1 = await workflow.run(prompt="Start investigation")
+        result1 = await workflow.run(
+            step="Start investigation",
+            step_number=1,
+            total_steps=2,
+            next_step_required=True,
+            findings="Starting investigation with no hypotheses",
+        )
         assert result1.metadata["hypotheses_count"] == 0
 
         thread_id = result1.metadata["thread_id"]
@@ -1069,7 +1342,14 @@ class TestHypothesisEvolution:
         workflow.add_hypothesis(thread_id, "H2")
 
         # Continue investigation - should show hypothesis count
-        result2 = await workflow.run(prompt="Continue", continuation_id=thread_id)
+        result2 = await workflow.run(
+            step="Continue",
+            step_number=2,
+            total_steps=2,
+            next_step_required=False,
+            findings="Continuing investigation with hypotheses",
+            continuation_id=thread_id,
+        )
 
         assert result2.metadata["hypotheses_count"] == 2
 
@@ -1095,7 +1375,10 @@ class TestConfidenceProgression:
         """Test that investigations start with 'exploring' confidence."""
         # Setup mock response
         mock_provider.generate.return_value = GenerationResponse(
-            content="Starting investigation.", model="test-model", usage={}, stop_reason="end_turn"
+            content="Starting investigation.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn",
         )
 
         # Create workflow
@@ -1104,7 +1387,13 @@ class TestConfidenceProgression:
         )
 
         # Start investigation
-        result = await workflow.run(prompt="Begin investigation")
+        result = await workflow.run(
+            step="Begin investigation",
+            step_number=1,
+            total_steps=1,
+            next_step_required=False,
+            findings="Beginning investigation to test initial confidence",
+        )
         thread_id = result.metadata["thread_id"]
 
         # Verify initial confidence
@@ -1119,14 +1408,23 @@ class TestConfidenceProgression:
         """Test manually updating confidence level."""
         # Setup workflow
         mock_provider.generate.return_value = GenerationResponse(
-            content="Investigation findings.", model="test-model", usage={}, stop_reason="end_turn"
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn",
         )
 
         workflow = ThinkDeepWorkflow(
             provider=mock_provider, conversation_memory=conversation_memory
         )
 
-        result = await workflow.run(prompt="Start investigation")
+        result = await workflow.run(
+            step="Start investigation",
+            step_number=1,
+            total_steps=1,
+            next_step_required=False,
+            findings="Starting investigation to test confidence level updates",
+        )
         thread_id = result.metadata["thread_id"]
 
         # Update confidence through all levels
@@ -1151,14 +1449,23 @@ class TestConfidenceProgression:
         """Test retrieving current confidence level."""
         # Setup workflow
         mock_provider.generate.return_value = GenerationResponse(
-            content="Investigation findings.", model="test-model", usage={}, stop_reason="end_turn"
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn",
         )
 
         workflow = ThinkDeepWorkflow(
             provider=mock_provider, conversation_memory=conversation_memory
         )
 
-        result = await workflow.run(prompt="Start investigation")
+        result = await workflow.run(
+            step="Start investigation",
+            step_number=1,
+            total_steps=1,
+            next_step_required=False,
+            findings="Starting investigation to test confidence retrieval",
+        )
         thread_id = result.metadata["thread_id"]
 
         # Initial confidence
@@ -1171,7 +1478,9 @@ class TestConfidenceProgression:
         assert confidence == ConfidenceLevel.HIGH.value
 
     @pytest.mark.asyncio
-    async def test_confidence_progression_across_steps(self, mock_provider, conversation_memory):
+    async def test_confidence_progression_across_steps(
+        self, mock_provider, conversation_memory
+    ):
         """Test confidence increases as investigation progresses."""
         # Create workflow
         workflow = ThinkDeepWorkflow(
@@ -1186,7 +1495,13 @@ class TestConfidenceProgression:
             stop_reason="end_turn",
         )
 
-        result1 = await workflow.run(prompt="Start investigation")
+        result1 = await workflow.run(
+            step="Start investigation",
+            step_number=1,
+            total_steps=4,
+            next_step_required=True,
+            findings="Initial exploration shows potential issue",
+        )
         thread_id = result1.metadata["thread_id"]
 
         # Verify exploring confidence
@@ -1203,7 +1518,14 @@ class TestConfidenceProgression:
             stop_reason="end_turn",
         )
 
-        result2 = await workflow.run(prompt="Form hypothesis", continuation_id=thread_id)
+        result2 = await workflow.run(
+            step="Form hypothesis",
+            step_number=2,
+            total_steps=4,
+            next_step_required=True,
+            findings="Hypothesis: Database connection pool issue",
+            continuation_id=thread_id,
+        )
 
         state2 = workflow.get_investigation_state(thread_id)
         assert state2.current_confidence == ConfidenceLevel.LOW.value
@@ -1218,7 +1540,14 @@ class TestConfidenceProgression:
             stop_reason="end_turn",
         )
 
-        result3 = await workflow.run(prompt="Gather evidence", continuation_id=thread_id)
+        result3 = await workflow.run(
+            step="Gather evidence",
+            step_number=3,
+            total_steps=4,
+            next_step_required=True,
+            findings="Evidence supports hypothesis",
+            continuation_id=thread_id,
+        )
 
         state3 = workflow.get_investigation_state(thread_id)
         assert state3.current_confidence == ConfidenceLevel.MEDIUM.value
@@ -1233,7 +1562,14 @@ class TestConfidenceProgression:
             stop_reason="end_turn",
         )
 
-        result4 = await workflow.run(prompt="Validate hypothesis", continuation_id=thread_id)
+        result4 = await workflow.run(
+            step="Validate hypothesis",
+            step_number=4,
+            total_steps=4,
+            next_step_required=False,
+            findings="Hypothesis validated with strong evidence",
+            continuation_id=thread_id,
+        )
 
         state4 = workflow.get_investigation_state(thread_id)
         assert state4.current_confidence == ConfidenceLevel.HIGH.value
@@ -1246,11 +1582,16 @@ class TestConfidenceProgression:
         assert state4.steps[3].confidence == ConfidenceLevel.HIGH.value
 
     @pytest.mark.asyncio
-    async def test_confidence_tracked_in_metadata(self, mock_provider, conversation_memory):
+    async def test_confidence_tracked_in_metadata(
+        self, mock_provider, conversation_memory
+    ):
         """Test confidence level appears in result metadata."""
         # Setup workflow
         mock_provider.generate.return_value = GenerationResponse(
-            content="Investigation findings.", model="test-model", usage={}, stop_reason="end_turn"
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn",
         )
 
         workflow = ThinkDeepWorkflow(
@@ -1258,7 +1599,13 @@ class TestConfidenceProgression:
         )
 
         # Initial investigation
-        result1 = await workflow.run(prompt="Start")
+        result1 = await workflow.run(
+            step="Start",
+            step_number=1,
+            total_steps=2,
+            next_step_required=True,
+            findings="Starting investigation to test confidence in metadata",
+        )
         assert result1.metadata["confidence"] == ConfidenceLevel.EXPLORING.value
 
         thread_id = result1.metadata["thread_id"]
@@ -1267,22 +1614,40 @@ class TestConfidenceProgression:
         workflow.update_confidence(thread_id, ConfidenceLevel.MEDIUM.value)
 
         # Continue investigation
-        result2 = await workflow.run(prompt="Continue", continuation_id=thread_id)
+        result2 = await workflow.run(
+            step="Continue",
+            step_number=2,
+            total_steps=2,
+            next_step_required=False,
+            findings="Continuing investigation with updated confidence",
+            continuation_id=thread_id,
+        )
         assert result2.metadata["confidence"] == ConfidenceLevel.MEDIUM.value
 
     @pytest.mark.asyncio
-    async def test_invalid_confidence_level_rejected(self, mock_provider, conversation_memory):
+    async def test_invalid_confidence_level_rejected(
+        self, mock_provider, conversation_memory
+    ):
         """Test that invalid confidence levels are rejected."""
         # Setup workflow
         mock_provider.generate.return_value = GenerationResponse(
-            content="Investigation findings.", model="test-model", usage={}, stop_reason="end_turn"
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn",
         )
 
         workflow = ThinkDeepWorkflow(
             provider=mock_provider, conversation_memory=conversation_memory
         )
 
-        result = await workflow.run(prompt="Start investigation")
+        result = await workflow.run(
+            step="Start investigation",
+            step_number=1,
+            total_steps=1,
+            next_step_required=False,
+            findings="Starting investigation to test invalid confidence rejection",
+        )
         thread_id = result.metadata["thread_id"]
 
         # Try invalid confidence level
@@ -1294,18 +1659,29 @@ class TestConfidenceProgression:
         assert state.current_confidence == ConfidenceLevel.EXPLORING.value
 
     @pytest.mark.asyncio
-    async def test_confidence_complete_progression(self, mock_provider, conversation_memory):
+    async def test_confidence_complete_progression(
+        self, mock_provider, conversation_memory
+    ):
         """Test complete confidence progression from exploring to certain."""
         # Setup workflow
         mock_provider.generate.return_value = GenerationResponse(
-            content="Investigation findings.", model="test-model", usage={}, stop_reason="end_turn"
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn",
         )
 
         workflow = ThinkDeepWorkflow(
             provider=mock_provider, conversation_memory=conversation_memory
         )
 
-        result = await workflow.run(prompt="Start investigation")
+        result = await workflow.run(
+            step="Start investigation",
+            step_number=1,
+            total_steps=1,
+            next_step_required=False,
+            findings="Starting investigation to test complete confidence progression",
+        )
         thread_id = result.metadata["thread_id"]
 
         # Progress through all confidence levels
@@ -1336,18 +1712,29 @@ class TestConfidenceProgression:
         assert final_state.current_confidence == ConfidenceLevel.CERTAIN.value
 
     @pytest.mark.asyncio
-    async def test_investigation_completion_criteria(self, mock_provider, conversation_memory):
+    async def test_investigation_completion_criteria(
+        self, mock_provider, conversation_memory
+    ):
         """Test investigation completion based on confidence level."""
         # Setup workflow
         mock_provider.generate.return_value = GenerationResponse(
-            content="Investigation findings.", model="test-model", usage={}, stop_reason="end_turn"
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn",
         )
 
         workflow = ThinkDeepWorkflow(
             provider=mock_provider, conversation_memory=conversation_memory
         )
 
-        result = await workflow.run(prompt="Start investigation")
+        result = await workflow.run(
+            step="Start investigation",
+            step_number=1,
+            total_steps=1,
+            next_step_required=False,
+            findings="Starting investigation to test completion criteria",
+        )
         thread_id = result.metadata["thread_id"]
 
         # Not complete initially (no hypotheses, low confidence)
@@ -1380,14 +1767,23 @@ class TestConfidenceProgression:
         """Test that investigation summary includes confidence level."""
         # Setup workflow
         mock_provider.generate.return_value = GenerationResponse(
-            content="Investigation findings.", model="test-model", usage={}, stop_reason="end_turn"
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn",
         )
 
         workflow = ThinkDeepWorkflow(
             provider=mock_provider, conversation_memory=conversation_memory
         )
 
-        result = await workflow.run(prompt="Start investigation")
+        result = await workflow.run(
+            step="Start investigation",
+            step_number=1,
+            total_steps=1,
+            next_step_required=False,
+            findings="Starting investigation to test summary includes confidence",
+        )
         thread_id = result.metadata["thread_id"]
 
         # Get summary with initial confidence
@@ -1410,14 +1806,23 @@ class TestConfidenceProgression:
 
         # Setup workflow
         mock_provider.generate.return_value = GenerationResponse(
-            content="Investigation findings.", model="test-model", usage={}, stop_reason="end_turn"
+            content="Investigation findings.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn",
         )
 
         workflow = ThinkDeepWorkflow(
             provider=mock_provider, conversation_memory=conversation_memory
         )
 
-        result = await workflow.run(prompt="Start investigation")
+        result = await workflow.run(
+            step="Start investigation",
+            step_number=1,
+            total_steps=1,
+            next_step_required=False,
+            findings="Starting investigation to test confidence cannot decrease",
+        )
         thread_id = result.metadata["thread_id"]
 
         # Increase confidence
@@ -1433,7 +1838,9 @@ class TestConfidenceProgression:
         assert state2.current_confidence == ConfidenceLevel.MEDIUM.value
 
     @pytest.mark.asyncio
-    async def test_confidence_persistence_across_turns(self, mock_provider, conversation_memory):
+    async def test_confidence_persistence_across_turns(
+        self, mock_provider, conversation_memory
+    ):
         """Test that confidence persists across investigation turns."""
         # Setup workflow
         workflow = ThinkDeepWorkflow(
@@ -1442,10 +1849,19 @@ class TestConfidenceProgression:
 
         # Turn 1: Start with exploring
         mock_provider.generate.return_value = GenerationResponse(
-            content="Initial exploration.", model="test-model", usage={}, stop_reason="end_turn"
+            content="Initial exploration.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn",
         )
 
-        result1 = await workflow.run(prompt="Start")
+        result1 = await workflow.run(
+            step="Start",
+            step_number=1,
+            total_steps=3,
+            next_step_required=True,
+            findings="Initial exploration",
+        )
         thread_id = result1.metadata["thread_id"]
 
         # Turn 2: Update to medium
@@ -1458,16 +1874,33 @@ class TestConfidenceProgression:
             stop_reason="end_turn",
         )
 
-        result2 = await workflow.run(prompt="Continue", continuation_id=thread_id)
+        result2 = await workflow.run(
+            step="Continue",
+            step_number=2,
+            total_steps=3,
+            next_step_required=True,
+            findings="Continuing investigation",
+            continuation_id=thread_id,
+        )
 
         # Turn 3: Update to high
         workflow.update_confidence(thread_id, ConfidenceLevel.HIGH.value)
 
         mock_provider.generate.return_value = GenerationResponse(
-            content="Final analysis.", model="test-model", usage={}, stop_reason="end_turn"
+            content="Final analysis.",
+            model="test-model",
+            usage={},
+            stop_reason="end_turn",
         )
 
-        result3 = await workflow.run(prompt="Finalize", continuation_id=thread_id)
+        result3 = await workflow.run(
+            step="Finalize",
+            step_number=3,
+            total_steps=3,
+            next_step_required=False,
+            findings="Final analysis",
+            continuation_id=thread_id,
+        )
 
         # Verify confidence persisted and progressed
         state = workflow.get_investigation_state(thread_id)
@@ -1523,7 +1956,12 @@ class TestEndToEndIntegration:
         )
 
         result1 = await workflow.run(
-            prompt="Investigate why application has intermittent timeout errors", files=["app.py"]
+            step="Investigate why application has intermittent timeout errors",
+            step_number=1,
+            total_steps=6,
+            next_step_required=True,
+            findings="Initial exploration: System shows intermittent timeout errors during peak load",
+            files=["app.py"],
         )
 
         assert result1.success is True
@@ -1546,7 +1984,11 @@ class TestEndToEndIntegration:
         )
 
         result2 = await workflow.run(
-            prompt="Check database connection pool configuration",
+            step="Check database connection pool configuration",
+            step_number=2,
+            total_steps=6,
+            next_step_required=True,
+            findings="Database configuration shows pool size of 5. Peak load analysis suggests 20+ concurrent connections needed",
             continuation_id=thread_id,
             files=["config/database.py"],
         )
@@ -1577,7 +2019,11 @@ class TestEndToEndIntegration:
         )
 
         result3 = await workflow.run(
-            prompt="Analyze network latency metrics",
+            step="Analyze network latency metrics",
+            step_number=3,
+            total_steps=6,
+            next_step_required=True,
+            findings="Network metrics show consistent low latency. Average: 2ms, p99: 5ms. No correlation with timeout events",
             continuation_id=thread_id,
             files=["logs/network_metrics.log"],
         )
@@ -1601,7 +2047,11 @@ class TestEndToEndIntegration:
         )
 
         result4 = await workflow.run(
-            prompt="Run load tests to confirm pool exhaustion hypothesis",
+            step="Run load tests to confirm pool exhaustion hypothesis",
+            step_number=4,
+            total_steps=6,
+            next_step_required=True,
+            findings="Load testing confirms: timeout rate increases linearly with connection pool exhaustion. Clear correlation",
             continuation_id=thread_id,
             files=["tests/load_test_results.log"],
         )
@@ -1629,7 +2079,11 @@ class TestEndToEndIntegration:
         )
 
         result5 = await workflow.run(
-            prompt="Test proposed solution: increase pool size to 25",
+            step="Test proposed solution: increase pool size to 25",
+            step_number=5,
+            total_steps=6,
+            next_step_required=True,
+            findings="Solution validated: Increasing pool size to 25 eliminates timeouts under peak load in staging environment",
             continuation_id=thread_id,
             files=["staging/validation_results.log"],
         )
@@ -1646,7 +2100,11 @@ class TestEndToEndIntegration:
         )
 
         result6 = await workflow.run(
-            prompt="Summarize findings and confidence in root cause identification",
+            step="Summarize findings and confidence in root cause identification",
+            step_number=6,
+            total_steps=6,
+            next_step_required=False,
+            findings="Root cause confirmed: Database connection pool size insufficient. Solution verified in staging",
             continuation_id=thread_id,
         )
 
@@ -1660,7 +2118,9 @@ class TestEndToEndIntegration:
 
         # Verify confidence progression
         assert state.steps[0].confidence == ConfidenceLevel.EXPLORING.value
-        assert state.steps[1].confidence == ConfidenceLevel.EXPLORING.value  # Not updated yet
+        assert (
+            state.steps[1].confidence == ConfidenceLevel.EXPLORING.value
+        )  # Not updated yet
         assert state.current_confidence == ConfidenceLevel.VERY_HIGH.value
 
         # Verify hypotheses
@@ -1692,13 +2152,17 @@ class TestEndToEndIntegration:
 
         print("\n✅ End-to-End Verification Complete:")
         print(f"   - Investigation Steps: {summary['total_steps']}")
-        print(f"   - Hypotheses: {summary['total_hypotheses']} (1 validated, 1 disproven)")
+        print(
+            f"   - Hypotheses: {summary['total_hypotheses']} (1 validated, 1 disproven)"
+        )
         print(f"   - Final Confidence: {summary['confidence']}")
         print(f"   - Files Examined: {summary['files_examined']}")
         print(f"   - Investigation Complete: {summary['is_complete']}")
 
     @pytest.mark.asyncio
-    async def test_complete_investigation_workflow(self, mock_provider, conversation_memory):
+    async def test_complete_investigation_workflow(
+        self, mock_provider, conversation_memory
+    ):
         """
         Test complete investigation workflow from start to completion.
 
@@ -1721,11 +2185,19 @@ class TestEndToEndIntegration:
             stop_reason="end_turn",
         )
 
-        result = await workflow.run(prompt="Investigate the issue")
+        result = await workflow.run(
+            step="Investigate the issue",
+            step_number=1,
+            total_steps=5,
+            next_step_required=True,
+            findings="Starting systematic investigation",
+        )
         thread_id = result.metadata["thread_id"]
 
         # Add hypothesis
-        workflow.add_hypothesis(thread_id, "Root cause identified", evidence=["Strong evidence"])
+        workflow.add_hypothesis(
+            thread_id, "Root cause identified", evidence=["Strong evidence"]
+        )
 
         # Progress through investigation
         for step in range(2, 6):
@@ -1737,7 +2209,12 @@ class TestEndToEndIntegration:
             )
 
             result = await workflow.run(
-                prompt=f"Step {step} investigation", continuation_id=thread_id
+                step=f"Step {step} investigation",
+                step_number=step,
+                total_steps=5,
+                next_step_required=(step < 5),
+                findings=f"Investigation step {step} findings",
+                continuation_id=thread_id,
             )
 
             assert result.success is True

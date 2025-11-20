@@ -11,13 +11,14 @@ Tests verify that:
 - Edge cases are handled properly
 """
 
-import pytest
+from unittest.mock import Mock, patch
+
 import numpy as np
-from unittest.mock import Mock, patch, MagicMock
+import pytest
 
 from model_chorus.core.clustering import (
-    SemanticClustering,
     ClusterResult,
+    SemanticClustering,
 )
 
 
@@ -84,7 +85,9 @@ class TestSemanticClustering:
         """Create a mock sentence transformer model."""
         model = Mock()
         # Return 384-dimensional embeddings (standard size for MiniLM)
-        model.encode = Mock(side_effect=lambda texts, **kwargs: np.random.rand(len(texts), 384))
+        model.encode = Mock(
+            side_effect=lambda texts, **kwargs: np.random.rand(len(texts), 384)
+        )
         return model
 
     def test_initialization(self, clustering):
@@ -98,7 +101,9 @@ class TestSemanticClustering:
         """Test that model is loaded lazily on first use."""
         assert clustering._model is None
 
-        with patch("sentence_transformers.SentenceTransformer", return_value=mock_model):
+        with patch(
+            "sentence_transformers.SentenceTransformer", return_value=mock_model
+        ):
             clustering._load_model()
             assert clustering._model is not None
 
@@ -106,7 +111,9 @@ class TestSemanticClustering:
         """Test basic embedding computation."""
         texts = ["Hello world", "Goodbye world"]
 
-        with patch("sentence_transformers.SentenceTransformer", return_value=mock_model):
+        with patch(
+            "sentence_transformers.SentenceTransformer", return_value=mock_model
+        ):
             embeddings = clustering.compute_embeddings(texts)
 
             assert embeddings.shape == (2, 384)
@@ -116,7 +123,9 @@ class TestSemanticClustering:
         """Test that embeddings are cached properly."""
         texts = ["Python is great", "I love Python"]
 
-        with patch("sentence_transformers.SentenceTransformer", return_value=mock_model):
+        with patch(
+            "sentence_transformers.SentenceTransformer", return_value=mock_model
+        ):
             # First call should compute
             embeddings1 = clustering.compute_embeddings(texts)
             call_count_1 = mock_model.encode.call_count
@@ -134,7 +143,9 @@ class TestSemanticClustering:
         clustering = SemanticClustering(cache_embeddings=False)
         texts = ["Test 1", "Test 2"]
 
-        with patch("sentence_transformers.SentenceTransformer", return_value=mock_model):
+        with patch(
+            "sentence_transformers.SentenceTransformer", return_value=mock_model
+        ):
             embeddings1 = clustering.compute_embeddings(texts)
             call_count_1 = mock_model.encode.call_count
 
@@ -215,7 +226,9 @@ class TestSemanticClustering:
             ]
         )
 
-        labels, centroids = clustering.cluster_kmeans(embeddings, n_clusters=2, random_state=42)
+        labels, centroids = clustering.cluster_kmeans(
+            embeddings, n_clusters=2, random_state=42
+        )
 
         assert labels.shape == (4,)
         assert centroids.shape == (2, 2)
@@ -235,7 +248,9 @@ class TestSemanticClustering:
             ]
         )
 
-        labels = clustering.cluster_hierarchical(embeddings, n_clusters=2, linkage="ward")
+        labels = clustering.cluster_hierarchical(
+            embeddings, n_clusters=2, linkage="ward"
+        )
 
         assert labels.shape == (4,)
         # Verify that similar points are in the same cluster
@@ -247,7 +262,9 @@ class TestSemanticClustering:
         embeddings = np.random.rand(10, 5)
 
         for linkage in ["ward", "complete", "average", "single"]:
-            labels = clustering.cluster_hierarchical(embeddings, n_clusters=3, linkage=linkage)
+            labels = clustering.cluster_hierarchical(
+                embeddings, n_clusters=3, linkage=linkage
+            )
             assert labels.shape == (10,)
             assert len(np.unique(labels)) == 3
 
@@ -330,8 +347,12 @@ class TestSemanticClustering:
             "C++ is fast",
         ]
 
-        with patch("sentence_transformers.SentenceTransformer", return_value=mock_model):
-            results = clustering.cluster(texts, n_clusters=2, method="kmeans", random_state=42)
+        with patch(
+            "sentence_transformers.SentenceTransformer", return_value=mock_model
+        ):
+            results = clustering.cluster(
+                texts, n_clusters=2, method="kmeans", random_state=42
+            )
 
             assert len(results) == 2
             assert all(isinstance(r, ClusterResult) for r in results)
@@ -357,7 +378,9 @@ class TestSemanticClustering:
         """Test clustering with hierarchical method."""
         texts = ["Text 1", "Text 2", "Text 3", "Text 4"]
 
-        with patch("sentence_transformers.SentenceTransformer", return_value=mock_model):
+        with patch(
+            "sentence_transformers.SentenceTransformer", return_value=mock_model
+        ):
             results = clustering.cluster(texts, n_clusters=2, method="hierarchical")
 
             assert len(results) == 2
@@ -373,7 +396,9 @@ class TestSemanticClustering:
         """Test clustering when n_clusters > number of texts."""
         texts = ["Text 1", "Text 2"]
 
-        with patch("sentence_transformers.SentenceTransformer", return_value=mock_model):
+        with patch(
+            "sentence_transformers.SentenceTransformer", return_value=mock_model
+        ):
             # Should auto-adjust to n_clusters=2
             results = clustering.cluster(texts, n_clusters=5, method="kmeans")
 
@@ -383,7 +408,9 @@ class TestSemanticClustering:
         """Test clustering with invalid method."""
         texts = ["Text 1", "Text 2"]
 
-        with patch("sentence_transformers.SentenceTransformer", return_value=mock_model):
+        with patch(
+            "sentence_transformers.SentenceTransformer", return_value=mock_model
+        ):
             with pytest.raises(ValueError, match="Unknown clustering method"):
                 clustering.cluster(texts, n_clusters=2, method="invalid")
 
@@ -391,7 +418,9 @@ class TestSemanticClustering:
         """Test clustering with a single text."""
         texts = ["Only one text"]
 
-        with patch("sentence_transformers.SentenceTransformer", return_value=mock_model):
+        with patch(
+            "sentence_transformers.SentenceTransformer", return_value=mock_model
+        ):
             results = clustering.cluster(texts, n_clusters=1, method="kmeans")
 
             assert len(results) == 1
@@ -401,14 +430,20 @@ class TestSemanticClustering:
         """Test that clustering with same random_state produces same results."""
         texts = ["Text 1", "Text 2", "Text 3", "Text 4"]
 
-        with patch("sentence_transformers.SentenceTransformer", return_value=mock_model):
+        with patch(
+            "sentence_transformers.SentenceTransformer", return_value=mock_model
+        ):
             # Use fixed random seed to ensure mock returns consistent embeddings
             np.random.seed(42)
-            results1 = clustering.cluster(texts, n_clusters=2, method="kmeans", random_state=42)
+            results1 = clustering.cluster(
+                texts, n_clusters=2, method="kmeans", random_state=42
+            )
 
             # Reset mock to return same embeddings
             np.random.seed(42)
-            results2 = clustering.cluster(texts, n_clusters=2, method="kmeans", random_state=42)
+            results2 = clustering.cluster(
+                texts, n_clusters=2, method="kmeans", random_state=42
+            )
 
             # Results should be identical with same random state
             assert len(results1) == len(results2)
@@ -421,7 +456,8 @@ class TestClusteringIntegration:
     """Integration tests that verify clustering with real sentence-transformers (if available)."""
 
     @pytest.mark.skipif(
-        not _check_sentence_transformers_available(), reason="sentence-transformers not installed"
+        not _check_sentence_transformers_available(),
+        reason="sentence-transformers not installed",
     )
     def test_real_clustering_with_semantics(self):
         """Test real clustering to verify semantic similarity works."""

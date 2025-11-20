@@ -6,15 +6,13 @@ with various parameters, options, and error conditions.
 """
 
 import json
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import pytest
-from pathlib import Path
 from typer.testing import CliRunner
-from unittest.mock import AsyncMock, MagicMock, patch, mock_open
 
 from model_chorus.cli.main import app
-from model_chorus.providers.base_provider import GenerationResponse
 from model_chorus.core.base_workflow import WorkflowResult, WorkflowStep
-
 
 # Test fixtures
 # Note: mock_provider fixture is now in conftest.py
@@ -89,7 +87,9 @@ class TestArgumentCommand:
         mock_workflow_class.return_value = mock_workflow
 
         # Execute command
-        result = cli_runner.invoke(app, ["argument", "Universal basic income reduces poverty"])
+        result = cli_runner.invoke(
+            app, ["argument", "Universal basic income reduces poverty"]
+        )
 
         # Assertions
         assert result.exit_code == 0
@@ -114,7 +114,9 @@ class TestArgumentCommand:
         mock_workflow.run = AsyncMock(return_value=mock_workflow_result)
         mock_workflow_class.return_value = mock_workflow
 
-        result = cli_runner.invoke(app, ["argument", "Test prompt", "--provider", "gemini"])
+        result = cli_runner.invoke(
+            app, ["argument", "Test prompt", "--provider", "gemini"]
+        )
 
         assert result.exit_code == 0
         mock_get_provider.assert_called_once_with("gemini")
@@ -134,7 +136,10 @@ class TestArgumentCommand:
             synthesis="Continued analysis",
             steps=[
                 WorkflowStep(
-                    step_number=1, content="Continued content", model="test-model", metadata={}
+                    step_number=1,
+                    content="Continued content",
+                    model="test-model",
+                    metadata={},
                 )
             ],
             metadata={
@@ -171,7 +176,9 @@ class TestArgumentCommand:
         mock_workflow.run = AsyncMock(return_value=mock_workflow_result)
         mock_workflow_class.return_value = mock_workflow
 
-        result = cli_runner.invoke(app, ["argument", "Analyze this", "--file", str(temp_test_file)])
+        result = cli_runner.invoke(
+            app, ["argument", "Analyze this", "--file", str(temp_test_file)]
+        )
 
         assert result.exit_code == 0
         # Verify file was passed to workflow
@@ -179,11 +186,15 @@ class TestArgumentCommand:
         assert call_kwargs["files"] == [str(temp_test_file)]
 
     @patch("model_chorus.cli.main.get_provider_by_name")
-    def test_argument_with_nonexistent_file(self, mock_get_provider, cli_runner, mock_provider):
+    def test_argument_with_nonexistent_file(
+        self, mock_get_provider, cli_runner, mock_provider
+    ):
         """Test argument with nonexistent file returns error."""
         mock_get_provider.return_value = mock_provider
 
-        result = cli_runner.invoke(app, ["argument", "Test", "--file", "/nonexistent/file.txt"])
+        result = cli_runner.invoke(
+            app, ["argument", "Test", "--file", "/nonexistent/file.txt"]
+        )
 
         assert result.exit_code == 1
         assert "File not found" in result.stdout
@@ -227,7 +238,9 @@ class TestArgumentCommand:
         mock_workflow.run = AsyncMock(return_value=mock_workflow_result)
         mock_workflow_class.return_value = mock_workflow
 
-        result = cli_runner.invoke(app, ["argument", "Test", "--output", str(temp_output_file)])
+        result = cli_runner.invoke(
+            app, ["argument", "Test", "--output", str(temp_output_file)]
+        )
 
         assert result.exit_code == 0
         assert temp_output_file.exists()
@@ -268,7 +281,9 @@ class TestArgumentCommand:
         """Test argument with invalid provider."""
         mock_get_provider.side_effect = Exception("Unknown provider")
 
-        result = cli_runner.invoke(app, ["argument", "Test", "--provider", "invalid-provider"])
+        result = cli_runner.invoke(
+            app, ["argument", "Test", "--provider", "invalid-provider"]
+        )
 
         assert result.exit_code == 1
         assert "Failed to initialize" in result.stdout
@@ -316,7 +331,9 @@ class TestIdeateCommand:
         mock_workflow.run = AsyncMock(return_value=mock_workflow_result)
         mock_workflow_class.return_value = mock_workflow
 
-        result = cli_runner.invoke(app, ["ideate", "Marketing ideas", "--num-ideas", "10"])
+        result = cli_runner.invoke(
+            app, ["ideate", "Marketing ideas", "--num-ideas", "10"]
+        )
 
         assert result.exit_code == 0
         call_kwargs = mock_workflow.run.call_args[1]
@@ -338,7 +355,9 @@ class TestIdeateCommand:
         mock_workflow.run = AsyncMock(return_value=mock_workflow_result)
         mock_workflow_class.return_value = mock_workflow
 
-        result = cli_runner.invoke(app, ["ideate", "Creative concepts", "--temperature", "1.0"])
+        result = cli_runner.invoke(
+            app, ["ideate", "Creative concepts", "--temperature", "1.0"]
+        )
 
         assert result.exit_code == 0
         call_kwargs = mock_workflow.run.call_args[1]
@@ -358,7 +377,10 @@ class TestIdeateCommand:
             synthesis="Refined ideas",
             steps=[
                 WorkflowStep(
-                    step_number=1, content="Refined content", model="test-model", metadata={}
+                    step_number=1,
+                    content="Refined content",
+                    model="test-model",
+                    metadata={},
                 )
             ],
             metadata={"thread_id": "thread-456", "is_continuation": True},
@@ -367,7 +389,9 @@ class TestIdeateCommand:
         mock_workflow.run = AsyncMock(return_value=continuation_result)
         mock_workflow_class.return_value = mock_workflow
 
-        result = cli_runner.invoke(app, ["ideate", "Refine idea 3", "--continue", "thread-456"])
+        result = cli_runner.invoke(
+            app, ["ideate", "Refine idea 3", "--continue", "thread-456"]
+        )
 
         assert result.exit_code == 0
 
@@ -413,7 +437,9 @@ class TestIdeateCommand:
         mock_workflow.run = AsyncMock(return_value=mock_workflow_result)
         mock_workflow_class.return_value = mock_workflow
 
-        result = cli_runner.invoke(app, ["ideate", "Test", "--output", str(temp_output_file)])
+        result = cli_runner.invoke(
+            app, ["ideate", "Test", "--output", str(temp_output_file)]
+        )
 
         assert result.exit_code == 0
         assert temp_output_file.exists()
@@ -639,7 +665,9 @@ class TestErrorHandling:
         # Note: argument, ideate, and research commands don't explicitly check result.success
         # They just proceed to display results. Only chat command checks success status.
         # So we test with an exception instead to verify error handling.
-        mock_workflow.run = AsyncMock(side_effect=Exception("Workflow execution failed"))
+        mock_workflow.run = AsyncMock(
+            side_effect=Exception("Workflow execution failed")
+        )
         mock_workflow_class.return_value = mock_workflow
 
         result = cli_runner.invoke(app, ["argument", "Test prompt"])
@@ -675,7 +703,9 @@ class TestErrorHandling:
         assert result.exit_code in [0, 1]  # Either success or graceful failure
 
     @patch("model_chorus.cli.main.get_provider_by_name")
-    def test_special_characters_in_prompt(self, mock_get_provider, cli_runner, mock_provider):
+    def test_special_characters_in_prompt(
+        self, mock_get_provider, cli_runner, mock_provider
+    ):
         """Test handling of special characters in prompt."""
         mock_get_provider.return_value = mock_provider
 

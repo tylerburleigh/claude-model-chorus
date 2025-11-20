@@ -8,16 +8,15 @@ must inherit from, providing a consistent interface for multi-model orchestratio
 import asyncio
 import logging
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional, TYPE_CHECKING
 from dataclasses import dataclass, field
 from datetime import datetime
+from typing import TYPE_CHECKING, Any, Literal
 
 from .conversation import ConversationMemory
-from .models import ConversationThread, ConversationMessage
+from .models import ConversationMessage, ConversationThread
 
 if TYPE_CHECKING:
-    from ..providers import ModelProvider, GenerationRequest, GenerationResponse
-    from ..providers.cli_provider import ProviderUnavailableError
+    from ..providers import GenerationRequest, GenerationResponse, ModelProvider
 
 logger = logging.getLogger(__name__)
 
@@ -28,9 +27,9 @@ class WorkflowStep:
 
     step_number: int
     content: str
-    model: Optional[str] = None
+    model: str | None = None
     timestamp: datetime = field(default_factory=datetime.now)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -38,13 +37,13 @@ class WorkflowResult:
     """Result of a workflow execution."""
 
     success: bool
-    steps: List[WorkflowStep] = field(default_factory=list)
-    synthesis: Optional[str] = None
-    error: Optional[str] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    steps: list[WorkflowStep] = field(default_factory=list)
+    synthesis: str | None = None
+    error: str | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def add_step(
-        self, step_number: int, content: str, model: Optional[str] = None, **metadata
+        self, step_number: int, content: str, model: str | None = None, **metadata
     ) -> None:
         """Add a step to the workflow result."""
         step = WorkflowStep(
@@ -71,8 +70,8 @@ class BaseWorkflow(ABC):
         self,
         name: str,
         description: str,
-        config: Optional[Dict[str, Any]] = None,
-        conversation_memory: Optional[ConversationMemory] = None,
+        config: dict[str, Any] | None = None,
+        conversation_memory: ConversationMemory | None = None,
     ):
         """
         Initialize the base workflow.
@@ -87,7 +86,7 @@ class BaseWorkflow(ABC):
         self.description = description
         self.config = config or {}
         self.conversation_memory = conversation_memory
-        self._result: Optional[WorkflowResult] = None
+        self._result: WorkflowResult | None = None
 
     @abstractmethod
     async def run(self, prompt: str, **kwargs) -> WorkflowResult:
@@ -109,7 +108,7 @@ class BaseWorkflow(ABC):
         """
         raise NotImplementedError("Subclasses must implement run()")
 
-    def synthesize(self, steps: List[WorkflowStep], model: Optional[str] = None) -> str:
+    def synthesize(self, steps: list[WorkflowStep], model: str | None = None) -> str:
         """
         Synthesize final results from workflow steps.
 
@@ -135,7 +134,7 @@ class BaseWorkflow(ABC):
 
         return "\n".join(synthesis_parts)
 
-    def get_result(self) -> Optional[WorkflowResult]:
+    def get_result(self) -> WorkflowResult | None:
         """
         Get the most recent workflow execution result.
 
@@ -163,8 +162,8 @@ class BaseWorkflow(ABC):
         self,
         request: "GenerationRequest",
         primary_provider: "ModelProvider",
-        fallback_providers: Optional[List["ModelProvider"]] = None,
-    ) -> tuple["GenerationResponse", str, List[str]]:
+        fallback_providers: list["ModelProvider"] | None = None,
+    ) -> tuple["GenerationResponse", str, list[str]]:
         """
         Execute generation with automatic fallback to alternative providers.
 
@@ -193,13 +192,14 @@ class BaseWorkflow(ABC):
 
         fallback_providers = fallback_providers or []
         all_providers = [primary_provider] + fallback_providers
-        failed_providers = []
-        last_exception = None
+        failed_providers: list[str] = []
+        last_exception: Exception | None = None
 
         for i, provider in enumerate(all_providers):
             try:
                 logger.info(
-                    f"Attempting provider {provider.provider_name} " f"({i+1}/{len(all_providers)})"
+                    f"Attempting provider {provider.provider_name} "
+                    f"({i+1}/{len(all_providers)})"
                 )
                 response = await provider.generate(request)
 
@@ -224,15 +224,18 @@ class BaseWorkflow(ABC):
                 last_exception = e
 
         # All providers failed
-        error_msg = f"All {len(all_providers)} providers failed. " f"Last error: {last_exception}"
+        error_msg = (
+            f"All {len(all_providers)} providers failed. "
+            f"Last error: {last_exception}"
+        )
         logger.error(error_msg)
         raise Exception(error_msg)
 
     async def check_provider_availability(
         self,
         primary_provider: "ModelProvider",
-        fallback_providers: Optional[List["ModelProvider"]] = None,
-    ) -> tuple[bool, List[str], List[tuple[str, str]]]:
+        fallback_providers: list["ModelProvider"] | None = None,
+    ) -> tuple[bool, list[str], list[tuple[str, str]]]:
         """
         Check availability of all providers before starting workflow.
 
@@ -278,7 +281,7 @@ class BaseWorkflow(ABC):
         # Check all providers concurrently
         async def check_one(provider: "ModelProvider"):
             """Check a single provider's availability."""
-            is_available, error = await provider.check_availability()
+            is_available, error = await provider.check_availability()  # type: ignore[attr-defined]
             return provider.provider_name, is_available, error
 
         tasks = [check_one(p) for p in all_providers]
@@ -296,7 +299,7 @@ class BaseWorkflow(ABC):
     # Conversation Support Methods (task-1-5-2)
     # ========================================================================
 
-    def get_thread(self, thread_id: str) -> Optional[ConversationThread]:
+    def get_thread(self, thread_id: str) -> ConversationThread | None:
         """
         Retrieve conversation thread by ID.
 
@@ -318,7 +321,9 @@ class BaseWorkflow(ABC):
             return None
         return self.conversation_memory.get_thread(thread_id)
 
-    def add_message(self, thread_id: str, role: str, content: str, **kwargs) -> bool:
+    def add_message(
+        self, thread_id: str, role: Literal["user", "assistant"], content: str, **kwargs
+    ) -> bool:
         """
         Add message to conversation thread.
 
@@ -376,7 +381,7 @@ class BaseWorkflow(ABC):
 
         return self.conversation_memory.add_message(thread_id, role, content, **kwargs)
 
-    def resume_conversation(self, thread_id: str) -> Optional[List[ConversationMessage]]:
+    def resume_conversation(self, thread_id: str) -> list[ConversationMessage] | None:
         """
         Resume conversation from existing thread.
 

@@ -8,19 +8,17 @@ Tests verify that ConversationMemory can handle:
 - Thread isolation (no cross-contamination between conversations)
 """
 
-import pytest
 import asyncio
-from unittest.mock import AsyncMock
-import uuid
-from concurrent.futures import ThreadPoolExecutor
 import time
-from datetime import datetime, timezone
+import uuid
+from unittest.mock import AsyncMock
 
+import pytest
+
+from model_chorus.core.conversation import ConversationMemory
+from model_chorus.providers.base_provider import GenerationResponse
 from model_chorus.workflows.chat import ChatWorkflow
 from model_chorus.workflows.thinkdeep import ThinkDeepWorkflow
-from model_chorus.providers.base_provider import GenerationResponse
-from model_chorus.core.conversation import ConversationMemory
-from model_chorus.core.models import ConversationMessage
 
 
 class TestConcurrentConversationHandling:
@@ -45,7 +43,9 @@ class TestConcurrentConversationHandling:
         return ConversationMemory()
 
     @pytest.mark.asyncio
-    async def test_100_concurrent_chat_conversations(self, mock_provider, conversation_memory):
+    async def test_100_concurrent_chat_conversations(
+        self, mock_provider, conversation_memory
+    ):
         """
         Test handling 100 concurrent chat conversations.
 
@@ -76,7 +76,9 @@ class TestConcurrentConversationHandling:
         # Define concurrent conversation tasks
         async def run_conversation(conversation_id: int):
             """Run a single conversation."""
-            result = await chat_workflow.run(prompt=f"Conversation {conversation_id}: What is AI?")
+            result = await chat_workflow.run(
+                prompt=f"Conversation {conversation_id}: What is AI?"
+            )
             return {
                 "conversation_id": conversation_id,
                 "thread_id": result.metadata.get("thread_id"),
@@ -96,13 +98,17 @@ class TestConcurrentConversationHandling:
 
         # Verify unique thread IDs
         thread_ids = [r["thread_id"] for r in results]
-        assert len(set(thread_ids)) == num_conversations, "All thread IDs should be unique"
+        assert (
+            len(set(thread_ids)) == num_conversations
+        ), "All thread IDs should be unique"
 
         # Verify thread isolation - each thread should have exactly 2 messages
         for result in results:
             thread = conversation_memory.get_thread(result["thread_id"])
             assert thread is not None, f"Thread {result['thread_id']} should exist"
-            assert len(thread.messages) == 2, "Each thread should have user + assistant message"
+            assert (
+                len(thread.messages) == 2
+            ), "Each thread should have user + assistant message"
 
             # Verify message content contains conversation ID
             user_message = thread.messages[0]
@@ -138,11 +144,17 @@ class TestConcurrentConversationHandling:
             execution_time < 5.0
         ), f"100 concurrent conversations took {execution_time:.2f}s, expected < 5s"
 
-        print(f"\n✓ Executed {num_conversations} concurrent conversations in {execution_time:.2f}s")
-        print(f"✓ Average time per conversation: {execution_time/num_conversations*1000:.1f}ms")
+        print(
+            f"\n✓ Executed {num_conversations} concurrent conversations in {execution_time:.2f}s"
+        )
+        print(
+            f"✓ Average time per conversation: {execution_time/num_conversations*1000:.1f}ms"
+        )
 
     @pytest.mark.asyncio
-    async def test_concurrent_multi_turn_conversations(self, mock_provider, conversation_memory):
+    async def test_concurrent_multi_turn_conversations(
+        self, mock_provider, conversation_memory
+    ):
         """
         Test concurrent multi-turn conversations.
 
@@ -232,7 +244,9 @@ class TestConcurrentConversationHandling:
         )
 
     @pytest.mark.asyncio
-    async def test_mixed_workflow_concurrent_execution(self, mock_provider, conversation_memory):
+    async def test_mixed_workflow_concurrent_execution(
+        self, mock_provider, conversation_memory
+    ):
         """
         Test concurrent execution of different workflow types.
 
@@ -267,7 +281,9 @@ class TestConcurrentConversationHandling:
             return ("chat", result.metadata.get("thread_id"), result.success)
 
         async def run_thinkdeep(i: int):
-            result = await thinkdeep_workflow.run(prompt=f"ThinkDeep investigation {i}", files=[])
+            result = await thinkdeep_workflow.run(
+                prompt=f"ThinkDeep investigation {i}", files=[]
+            )
             return ("thinkdeep", result.metadata.get("thread_id"), result.success)
 
         # Execute mixed workflows concurrently
@@ -285,7 +301,9 @@ class TestConcurrentConversationHandling:
 
         # Verify unique thread IDs
         thread_ids = [r[1] for r in results]
-        assert len(set(thread_ids)) == len(thread_ids), "All thread IDs should be unique"
+        assert len(set(thread_ids)) == len(
+            thread_ids
+        ), "All thread IDs should be unique"
 
         # Verify workflow type separation
         chat_threads = [r[1] for r in results if r[0] == "chat"]
@@ -334,7 +352,9 @@ class TestConcurrentConversationHandling:
             """Run a batch of conversations and return execution time."""
             start = time.time()
 
-            tasks = [chat_workflow.run(prompt=f"Request {i}") for i in range(batch_size)]
+            tasks = [
+                chat_workflow.run(prompt=f"Request {i}") for i in range(batch_size)
+            ]
             await asyncio.gather(*tasks)
 
             return time.time() - start
@@ -348,7 +368,9 @@ class TestConcurrentConversationHandling:
             execution_times[size] = exec_time
 
             avg_time = exec_time / size * 1000  # ms per conversation
-            print(f"\n✓ Batch size {size}: {exec_time:.3f}s total, {avg_time:.1f}ms average")
+            print(
+                f"\n✓ Batch size {size}: {exec_time:.3f}s total, {avg_time:.1f}ms average"
+            )
 
         # Verify performance doesn't degrade exponentially
         # Time for 100 should be < 15x time for 10 (allowing for overhead)
@@ -357,4 +379,6 @@ class TestConcurrentConversationHandling:
             time_ratio < 15.0
         ), f"Performance degradation too high: {time_ratio:.1f}x for 10x load"
 
-        print(f"\n✓ Performance scaling factor: {time_ratio:.1f}x for 10x load increase")
+        print(
+            f"\n✓ Performance scaling factor: {time_ratio:.1f}x for 10x load increase"
+        )

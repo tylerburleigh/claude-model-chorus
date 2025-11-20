@@ -6,7 +6,13 @@ using the ModelChorus framework.
 """
 
 import asyncio
-from model_chorus.core import BaseWorkflow, WorkflowResult, WorkflowRegistry, WorkflowRequest
+
+from model_chorus.core import (
+    BaseWorkflow,
+    WorkflowRegistry,
+    WorkflowRequest,
+    WorkflowResult,
+)
 
 
 # Define a custom workflow
@@ -39,7 +45,9 @@ class ExampleWorkflow(BaseWorkflow):
         )
 
         # Add another step
-        result.add_step(step_number=2, content="Analysis complete", model="example-model")
+        result.add_step(
+            step_number=2, content="Analysis complete", model="example-model"
+        )
 
         # Generate synthesis
         result.synthesis = self.synthesize(result.steps)
@@ -89,7 +97,7 @@ async def main():
         print(f"  Model: {step.model}")
         print(f"  Content: {step.content}")
 
-    print(f"\nSynthesis:")
+    print("\nSynthesis:")
     print(result.synthesis)
 
 

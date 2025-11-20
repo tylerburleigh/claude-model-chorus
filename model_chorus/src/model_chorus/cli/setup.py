@@ -9,8 +9,7 @@ import json
 import subprocess
 import sys
 from pathlib import Path
-from typing import Optional, Dict, Any, List
-
+from typing import Any
 
 # Default models for each provider
 DEFAULT_MODELS = {
@@ -21,7 +20,7 @@ DEFAULT_MODELS = {
 }
 
 
-def check_package_installed() -> Dict[str, Any]:
+def check_package_installed() -> dict[str, Any]:
     """Check if model-chorus package is installed.
 
     Returns:
@@ -52,7 +51,7 @@ def check_package_installed() -> Dict[str, Any]:
         return {"installed": False, "error": str(e)}
 
 
-def install_package(dev_mode: bool = False) -> Dict[str, Any]:
+def install_package(dev_mode: bool = False) -> dict[str, Any]:
     """Install model-chorus package.
 
     Args:
@@ -78,12 +77,16 @@ def install_package(dev_mode: bool = False) -> Dict[str, Any]:
                 "output": result.stdout,
             }
         else:
-            return {"success": False, "message": "Installation failed", "error": result.stderr}
+            return {
+                "success": False,
+                "message": "Installation failed",
+                "error": result.stderr,
+            }
     except Exception as e:
         return {"success": False, "error": str(e)}
 
 
-def check_version_compatibility() -> Dict[str, Any]:
+def check_version_compatibility() -> dict[str, Any]:
     """Check if installed package version matches plugin version.
 
     Compares the version from .claude-plugin/plugin.json with the installed
@@ -98,7 +101,7 @@ def check_version_compatibility() -> Dict[str, Any]:
         plugin_version = None
 
         if plugin_json_path.exists():
-            with open(plugin_json_path, "r") as f:
+            with open(plugin_json_path) as f:
                 plugin_data = json.load(f)
                 plugin_version = plugin_data.get("version", "unknown")
         else:
@@ -168,7 +171,7 @@ def check_version_compatibility() -> Dict[str, Any]:
         }
 
 
-def check_available_providers() -> Dict[str, Any]:
+def check_available_providers() -> dict[str, Any]:
     """Check which CLI providers are available on the system.
 
     Returns:
@@ -177,9 +180,9 @@ def check_available_providers() -> Dict[str, Any]:
     try:
         # Import providers
         from ..providers.claude_provider import ClaudeProvider
-        from ..providers.gemini_provider import GeminiProvider
         from ..providers.codex_provider import CodexProvider
         from ..providers.cursor_agent_provider import CursorAgentProvider
+        from ..providers.gemini_provider import GeminiProvider
 
         providers = {
             "claude": ClaudeProvider(),
@@ -212,13 +215,17 @@ def check_available_providers() -> Dict[str, Any]:
             else:
                 unavailable.append({"name": name, "error": error})
 
-        return {"available": available, "unavailable": unavailable, "count": len(available)}
+        return {
+            "available": available,
+            "unavailable": unavailable,
+            "count": len(available),
+        }
 
     except Exception as e:
         return {"available": [], "unavailable": [], "count": 0, "error": str(e)}
 
 
-def check_config_exists(project_root: Optional[Path] = None) -> Dict[str, Any]:
+def check_config_exists(project_root: Path | None = None) -> dict[str, Any]:
     """Check if .model-chorusrc config file exists.
 
     Args:
@@ -246,12 +253,12 @@ def check_config_exists(project_root: Optional[Path] = None) -> Dict[str, Any]:
 
 
 def create_config_file(
-    project_root: Optional[Path] = None,
+    project_root: Path | None = None,
     default_provider: str = "claude",
     timeout: float = 600.0,
-    available_providers: Optional[List[str]] = None,
-    workflows: Optional[Dict[str, Any]] = None,
-) -> Dict[str, Any]:
+    available_providers: list[str] | None = None,
+    workflows: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     """Create .model-chorusrc configuration file.
 
     Args:
@@ -282,7 +289,9 @@ def create_config_file(
     if available_providers:
         for provider_name in available_providers:
             if provider_name in DEFAULT_MODELS:
-                providers_config[provider_name] = {"model": DEFAULT_MODELS[provider_name]}
+                providers_config[provider_name] = {
+                    "model": DEFAULT_MODELS[provider_name]
+                }
 
     # Build config structure
     config = {"default_provider": default_provider, "generation": {"timeout": timeout}}
@@ -342,7 +351,7 @@ generation:
         return {"success": False, "error": str(e)}
 
 
-def create_express_config(project_root: Optional[Path] = None) -> Dict[str, Any]:
+def create_express_config(project_root: Path | None = None) -> dict[str, Any]:
     """Create Express (zero-question) .model-chorusrc configuration.
 
     Auto-detects available providers and configures with smart defaults:
@@ -400,7 +409,7 @@ def create_express_config(project_root: Optional[Path] = None) -> Dict[str, Any]
 
         # ThinkDeep workflow
         workflows["thinkdeep"] = {
-            "thinking_mode": "medium",
+            "thinking_mode": "medium",  # type: ignore[dict-item]
             "fallback_providers": fallback_providers,
         }
 
@@ -411,8 +420,8 @@ def create_express_config(project_root: Optional[Path] = None) -> Dict[str, Any]
     if len(available_providers) >= 2:
         workflows["consensus"] = {
             "provider_priority": available_providers,  # All providers in priority order
-            "num_to_consult": min(2, len(available_providers)),  # Consult 2 by default
-            "strategy": "all_responses",
+            "num_to_consult": min(2, len(available_providers)),  # type: ignore[arg-type]
+            "strategy": "all_responses",  # type: ignore[dict-item]
         }
 
     # Use the existing create_config_file function with workflows
@@ -426,17 +435,17 @@ def create_express_config(project_root: Optional[Path] = None) -> Dict[str, Any]
 
 
 def create_tiered_config(
-    project_root: Optional[Path] = None,
+    project_root: Path | None = None,
     tier: str = "quick",
     default_provider: str = "claude",
     # Standard tier options
-    consensus_providers: Optional[list] = None,
+    consensus_providers: list | None = None,
     consensus_strategy: str = "all_responses",
     thinkdeep_thinking_mode: str = "medium",
-    ideate_providers: Optional[list] = None,
+    ideate_providers: list | None = None,
     # Advanced tier options
-    workflow_overrides: Optional[Dict[str, Dict[str, Any]]] = None,
-) -> Dict[str, Any]:
+    workflow_overrides: dict[str, dict[str, Any]] | None = None,
+) -> dict[str, Any]:
     """Create tiered .model-chorusrc configuration file.
 
     Args:
@@ -488,12 +497,12 @@ def create_tiered_config(
         if consensus_providers:
             workflows["consensus"] = {
                 "provider_priority": consensus_providers,
-                "num_to_consult": min(2, len(consensus_providers)),
-                "strategy": consensus_strategy,
+                "num_to_consult": min(2, len(consensus_providers)),  # type: ignore[arg-type]
+                "strategy": consensus_strategy,  # type: ignore[dict-item]
             }
 
         # Add thinkdeep workflow (single-provider)
-        workflows["thinkdeep"] = {"thinking_mode": thinkdeep_thinking_mode}
+        workflows["thinkdeep"] = {"thinking_mode": thinkdeep_thinking_mode}  # type: ignore[dict-item]
         if fallback_providers:
             workflows["thinkdeep"]["fallback_providers"] = fallback_providers
 
@@ -524,10 +533,10 @@ def create_tiered_config(
 
 
 def create_claude_config(
-    project_root: Optional[Path] = None,
-    enabled_providers: Optional[List[str]] = None,
+    project_root: Path | None = None,
+    enabled_providers: list[str] | None = None,
     auto_detect: bool = True,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Create .claude/model_chorus_config.yaml configuration file.
 
     Args:
@@ -583,7 +592,7 @@ def create_claude_config(
     # If template exists, use it as base and customize
     if template_file:
         try:
-            with open(template_file, "r") as f:
+            with open(template_file) as f:
                 yaml_content = f.read()
 
             # Customize the template based on enabled providers
@@ -604,10 +613,12 @@ def create_claude_config(
                 default_provider = providers_to_enable[0]
                 # Update default_provider in workflows
                 yaml_content = re.sub(
-                    r"(default_provider:)\s+\w+", f"\\1 {default_provider}", yaml_content
+                    r"(default_provider:)\s+\w+",
+                    f"\\1 {default_provider}",
+                    yaml_content,
                 )
 
-        except Exception as e:
+        except Exception:
             # If template read fails, fall back to generated content
             template_file = None
 
@@ -623,7 +634,7 @@ def create_claude_config(
 
             # Add default model if available
             if provider_name in DEFAULT_MODELS:
-                config["default_model"] = DEFAULT_MODELS[provider_name]
+                config["default_model"] = DEFAULT_MODELS[provider_name]  # type: ignore[assignment]
 
             providers_config[provider_name] = config
 
@@ -633,24 +644,28 @@ def create_claude_config(
         if providers_to_enable:
             # Pick first enabled provider as default
             default_provider = providers_to_enable[0]
-            fallback_providers = providers_to_enable[1:] if len(providers_to_enable) > 1 else []
+            fallback_providers = (
+                providers_to_enable[1:] if len(providers_to_enable) > 1 else []
+            )
 
             # Chat workflow
             workflows_config["chat"] = {"default_provider": default_provider}
             if fallback_providers:
-                workflows_config["chat"]["fallback_providers"] = fallback_providers
+                workflows_config["chat"]["fallback_providers"] = fallback_providers  # type: ignore[assignment]
 
             # Consensus workflow (priority-based with fallback)
             if len(providers_to_enable) >= 2:
                 workflows_config["consensus"] = {
-                    "provider_priority": providers_to_enable,  # All providers in priority order
-                    "num_to_consult": min(2, len(providers_to_enable)),  # Consult 2 by default
+                    "provider_priority": providers_to_enable,  # type: ignore[dict-item]
+                    "num_to_consult": min(  # type: ignore[dict-item]
+                        2, len(providers_to_enable)
+                    ),  # Consult 2 by default
                 }
 
             # ThinkDeep workflow
             workflows_config["thinkdeep"] = {"default_provider": default_provider}
             if fallback_providers:
-                workflows_config["thinkdeep"]["fallback_providers"] = fallback_providers
+                workflows_config["thinkdeep"]["fallback_providers"] = fallback_providers  # type: ignore[assignment]
 
         # Create YAML content
         yaml_content = """# ModelChorus Configuration
@@ -698,7 +713,7 @@ providers:
         return {"success": False, "error": str(e)}
 
 
-def validate_config(project_root: Optional[Path] = None) -> Dict[str, Any]:
+def validate_config(project_root: Path | None = None) -> dict[str, Any]:
     """Validate .model-chorusrc configuration file.
 
     Args:
@@ -724,12 +739,16 @@ def validate_config(project_root: Optional[Path] = None) -> Dict[str, Any]:
 
     try:
         loader.load_config(config_path)
-        return {"valid": True, "message": "Configuration is valid", "path": str(config_path)}
+        return {
+            "valid": True,
+            "message": "Configuration is valid",
+            "path": str(config_path),
+        }
     except Exception as e:
         return {"valid": False, "error": str(e), "path": str(config_path)}
 
 
-def check_permissions(project_root: Optional[Path] = None) -> Dict[str, Any]:
+def check_permissions(project_root: Path | None = None) -> dict[str, Any]:
     """Check if Claude Code permissions are configured.
 
     Args:
@@ -744,10 +763,13 @@ def check_permissions(project_root: Optional[Path] = None) -> Dict[str, Any]:
     settings_file = project_root / ".claude" / "settings.local.json"
 
     if not settings_file.exists():
-        return {"configured": False, "message": "No .claude/settings.local.json file found"}
+        return {
+            "configured": False,
+            "message": "No .claude/settings.local.json file found",
+        }
 
     try:
-        with open(settings_file, "r") as f:
+        with open(settings_file) as f:
             settings = json.load(f)
 
         permissions = settings.get("permissions", {}).get("allow", [])
@@ -764,7 +786,7 @@ def check_permissions(project_root: Optional[Path] = None) -> Dict[str, Any]:
         return {"configured": False, "error": str(e)}
 
 
-def add_to_gitignore(project_root: Optional[Path] = None) -> Dict[str, Any]:
+def add_to_gitignore(project_root: Path | None = None) -> dict[str, Any]:
     """Add .model-chorusrc to project .gitignore.
 
     Args:
@@ -789,7 +811,7 @@ def add_to_gitignore(project_root: Optional[Path] = None) -> Dict[str, Any]:
     # Read existing gitignore or create new
     if gitignore_path.exists():
         try:
-            with open(gitignore_path, "r") as f:
+            with open(gitignore_path) as f:
                 existing_content = f.read()
         except Exception as e:
             return {"success": False, "error": f"Failed to read .gitignore: {e}"}
@@ -831,7 +853,7 @@ def add_to_gitignore(project_root: Optional[Path] = None) -> Dict[str, Any]:
         return {"success": False, "error": f"Failed to write .gitignore: {e}"}
 
 
-def add_permissions(project_root: Optional[Path] = None) -> Dict[str, Any]:
+def add_permissions(project_root: Path | None = None) -> dict[str, Any]:
     """Add ModelChorus permissions to .claude/settings.local.json.
 
     Args:
@@ -857,7 +879,7 @@ def add_permissions(project_root: Optional[Path] = None) -> Dict[str, Any]:
     # Load existing settings or create new
     if settings_file.exists():
         try:
-            with open(settings_file, "r") as f:
+            with open(settings_file) as f:
                 settings = json.load(f)
         except Exception as e:
             return {"success": False, "error": f"Failed to read settings file: {e}"}
@@ -915,7 +937,9 @@ def main():
 
     # install command
     install_parser = subparsers.add_parser("install", help="Install model-chorus")
-    install_parser.add_argument("--dev", action="store_true", help="Install in development mode")
+    install_parser.add_argument(
+        "--dev", action="store_true", help="Install in development mode"
+    )
 
     # check-config command
     config_parser = subparsers.add_parser("check-config", help="Check if config exists")
@@ -930,10 +954,14 @@ def main():
     express_parser = subparsers.add_parser(
         "create-express-config", help="Create Express (zero-question) config"
     )
-    express_parser.add_argument("--project", default=None, help="Project root directory")
+    express_parser.add_argument(
+        "--project", default=None, help="Project root directory"
+    )
 
     # create-tiered-config command
-    tiered_parser = subparsers.add_parser("create-tiered-config", help="Create tiered config file")
+    tiered_parser = subparsers.add_parser(
+        "create-tiered-config", help="Create tiered config file"
+    )
     tiered_parser.add_argument("--project", default=None, help="Project root directory")
     tiered_parser.add_argument(
         "--tier",
@@ -949,7 +977,9 @@ def main():
     tiered_parser.add_argument(
         "--consensus-strategy", default="all_responses", help="Consensus strategy"
     )
-    tiered_parser.add_argument("--thinkdeep-mode", default="medium", help="ThinkDeep thinking mode")
+    tiered_parser.add_argument(
+        "--thinkdeep-mode", default="medium", help="ThinkDeep thinking mode"
+    )
     tiered_parser.add_argument(
         "--ideate-providers", nargs="+", help="Providers for ideate workflow"
     )
@@ -958,7 +988,9 @@ def main():
     claude_config_parser = subparsers.add_parser(
         "create-claude-config", help="Create .claude/model_chorus_config.yaml file"
     )
-    claude_config_parser.add_argument("--project", default=None, help="Project root directory")
+    claude_config_parser.add_argument(
+        "--project", default=None, help="Project root directory"
+    )
     claude_config_parser.add_argument(
         "--enabled-providers", nargs="+", help="Providers to enable (space-separated)"
     )
@@ -969,22 +1001,34 @@ def main():
     )
 
     # validate-config command
-    validate_parser = subparsers.add_parser("validate-config", help="Validate config file")
-    validate_parser.add_argument("--project", default=None, help="Project root directory")
+    validate_parser = subparsers.add_parser(
+        "validate-config", help="Validate config file"
+    )
+    validate_parser.add_argument(
+        "--project", default=None, help="Project root directory"
+    )
 
     # check-permissions command
-    perm_check_parser = subparsers.add_parser("check-permissions", help="Check permissions")
-    perm_check_parser.add_argument("--project", default=None, help="Project root directory")
+    perm_check_parser = subparsers.add_parser(
+        "check-permissions", help="Check permissions"
+    )
+    perm_check_parser.add_argument(
+        "--project", default=None, help="Project root directory"
+    )
 
     # add-permissions command
     perm_add_parser = subparsers.add_parser("add-permissions", help="Add permissions")
-    perm_add_parser.add_argument("--project", default=None, help="Project root directory")
+    perm_add_parser.add_argument(
+        "--project", default=None, help="Project root directory"
+    )
 
     # add-to-gitignore command
     gitignore_parser = subparsers.add_parser(
         "add-to-gitignore", help="Add .model-chorusrc to .gitignore"
     )
-    gitignore_parser.add_argument("--project", default=None, help="Project root directory")
+    gitignore_parser.add_argument(
+        "--project", default=None, help="Project root directory"
+    )
 
     args = parser.parse_args()
 
@@ -1021,7 +1065,9 @@ def main():
         )
     elif args.command == "create-claude-config":
         result = create_claude_config(
-            project, enabled_providers=args.enabled_providers, auto_detect=not args.no_auto_detect
+            project,
+            enabled_providers=args.enabled_providers,
+            auto_detect=not args.no_auto_detect,
         )
     elif args.command == "validate-config":
         result = validate_config(project)

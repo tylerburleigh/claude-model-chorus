@@ -10,16 +10,21 @@ Tests verify that:
 """
 
 import pytest
-from model_chorus.workflows.study.persona_base import Persona, PersonaResponse, PersonaRegistry
+
+from model_chorus.workflows.study.persona_base import (
+    Persona,
+    PersonaRegistry,
+    PersonaResponse,
+)
 from model_chorus.workflows.study.personas import (
-    ResearcherPersona,
     CriticPersona,
     PlannerPersona,
-    create_researcher,
+    ResearcherPersona,
     create_critic,
-    create_planner,
-    get_default_registry,
     create_default_personas,
+    create_planner,
+    create_researcher,
+    get_default_registry,
 )
 
 
@@ -62,7 +67,9 @@ class TestPersonaResponse:
         findings = ["Finding A", "Finding B"]
         metadata = {"status": "complete"}
 
-        response = PersonaResponse(findings=findings, confidence_update="medium", metadata=metadata)
+        response = PersonaResponse(
+            findings=findings, confidence_update="medium", metadata=metadata
+        )
 
         assert response.findings == findings
         assert response.confidence_update == "medium"
@@ -83,13 +90,17 @@ class TestPersona:
 
     def test_persona_init_custom_temperature(self):
         """Test Persona with custom temperature."""
-        persona = Persona(name="TestPersona", prompt_template="Test template", temperature=0.3)
+        persona = Persona(
+            name="TestPersona", prompt_template="Test template", temperature=0.3
+        )
 
         assert persona.temperature == 0.3
 
     def test_persona_init_custom_max_tokens(self):
         """Test Persona with custom max_tokens."""
-        persona = Persona(name="TestPersona", prompt_template="Test template", max_tokens=2048)
+        persona = Persona(
+            name="TestPersona", prompt_template="Test template", max_tokens=2048
+        )
 
         assert persona.max_tokens == 2048
 
@@ -329,7 +340,10 @@ class TestCriticPersona:
 
         assert critic.prompt_template is not None
         assert len(critic.prompt_template) > 0
-        assert "Critic" in critic.prompt_template or "scrutiny" in critic.prompt_template.lower()
+        assert (
+            "Critic" in critic.prompt_template
+            or "scrutiny" in critic.prompt_template.lower()
+        )
 
     def test_critic_invoke_returns_response(self):
         """Test CriticPersona.invoke returns PersonaResponse."""
@@ -451,9 +465,15 @@ class TestPersonaFactories:
         """Test create_default_personas returns correct types."""
         personas = create_default_personas()
 
-        assert isinstance(personas[0], ResearcherPersona) or isinstance(personas[0], Persona)
-        assert isinstance(personas[1], CriticPersona) or isinstance(personas[1], Persona)
-        assert isinstance(personas[2], PlannerPersona) or isinstance(personas[2], Persona)
+        assert isinstance(personas[0], ResearcherPersona) or isinstance(
+            personas[0], Persona
+        )
+        assert isinstance(personas[1], CriticPersona) or isinstance(
+            personas[1], Persona
+        )
+        assert isinstance(personas[2], PlannerPersona) or isinstance(
+            personas[2], Persona
+        )
 
     def test_create_default_personas_independent(self):
         """Test multiple calls create independent instances."""

@@ -6,16 +6,18 @@ Skeptic (rebuttal), and Moderator (synthesis) roles, ArgumentMap generation,
 and conversation threading.
 """
 
-import pytest
 import uuid
-from unittest.mock import AsyncMock, MagicMock, patch
-from pathlib import Path
+from unittest.mock import AsyncMock, patch
 
+import pytest
+
+from model_chorus.core.models import ArgumentMap
+from model_chorus.core.role_orchestration import (
+    OrchestrationPattern,
+    OrchestrationResult,
+)
+from model_chorus.providers.base_provider import GenerationResponse
 from model_chorus.workflows.argument import ArgumentWorkflow
-from model_chorus.providers.base_provider import GenerationRequest, GenerationResponse
-from model_chorus.core.conversation import ConversationMemory
-from model_chorus.core.models import ArgumentMap, ArgumentPerspective
-from model_chorus.core.role_orchestration import OrchestrationResult, OrchestrationPattern
 
 # Note: mock_provider and conversation_memory fixtures are now in conftest.py
 
@@ -40,7 +42,10 @@ class TestArgumentWorkflowInitialization:
         )
 
         assert workflow.name == "Argument"
-        assert workflow.description == "Structured argument analysis with dialectical reasoning"
+        assert (
+            workflow.description
+            == "Structured argument analysis with dialectical reasoning"
+        )
         assert workflow.provider == mock_provider
         assert workflow.conversation_memory == conversation_memory
 
@@ -117,9 +122,15 @@ class TestArgumentMapGeneration:
                 self.content = content
                 self.model = model
 
-        creator_resp = MockResponse("Thesis content supporting the position", "test-model")
-        skeptic_resp = MockResponse("Rebuttal content against the position", "test-model")
-        moderator_resp = MockResponse("Synthesis balancing both perspectives", "test-model")
+        creator_resp = MockResponse(
+            "Thesis content supporting the position", "test-model"
+        )
+        skeptic_resp = MockResponse(
+            "Rebuttal content against the position", "test-model"
+        )
+        moderator_resp = MockResponse(
+            "Synthesis balancing both perspectives", "test-model"
+        )
 
         # Generate ArgumentMap
         arg_map = argument_workflow._generate_argument_map(
@@ -274,7 +285,9 @@ class TestArgumentWorkflowExecution:
             "model_chorus.workflows.argument.argument_workflow.RoleOrchestrator"
         ) as MockOrchestrator:
             mock_orchestrator_instance = MockOrchestrator.return_value
-            mock_orchestrator_instance.execute = AsyncMock(return_value=mock_orchestration_result)
+            mock_orchestrator_instance.execute = AsyncMock(
+                return_value=mock_orchestration_result
+            )
 
             # Execute workflow
             result = await argument_workflow.run(
@@ -301,7 +314,11 @@ class TestArgumentWorkflowExecution:
             assert "Balanced synthesis" in result.steps[2].content
 
             # Verify metadata
-            assert result.metadata["roles_executed"] == ["creator", "skeptic", "moderator"]
+            assert result.metadata["roles_executed"] == [
+                "creator",
+                "skeptic",
+                "moderator",
+            ]
             assert result.metadata["steps_completed"] == 3
             assert "thread_id" in result.metadata
 
@@ -341,7 +358,9 @@ class TestArgumentWorkflowExecution:
             "model_chorus.workflows.argument.argument_workflow.RoleOrchestrator"
         ) as MockOrchestrator:
             mock_orchestrator_instance = MockOrchestrator.return_value
-            mock_orchestrator_instance.execute = AsyncMock(return_value=mock_orchestration_result)
+            mock_orchestrator_instance.execute = AsyncMock(
+                return_value=mock_orchestration_result
+            )
 
             result = await argument_workflow.run(prompt="Test topic")
 

@@ -13,12 +13,13 @@ Skill Input Parameters:
     prior_persona: Previously consulted persona name (optional)
 """
 
-from dataclasses import dataclass, field, asdict
-from typing import Optional, List, Dict, Any
 import json
+from dataclasses import asdict, dataclass, field
+from typing import Any
+
 from pydantic import BaseModel, Field, field_validator
 
-from ...core.models import InvestigationPhase, ConfidenceLevel
+from ...core.models import ConfidenceLevel, InvestigationPhase
 
 
 class ContextAnalysisInput(BaseModel):
@@ -64,17 +65,17 @@ class ContextAnalysisInput(BaseModel):
         description="Current confidence level (ConfidenceLevel enum value or 0-100)",
     )
 
-    findings: List[str] = Field(
+    findings: list[str] = Field(
         default_factory=list,
         description="List of findings/insights discovered so far",
     )
 
-    unresolved_questions: List[str] = Field(
+    unresolved_questions: list[str] = Field(
         default_factory=list,
         description="List of questions that still need investigation",
     )
 
-    prior_persona: Optional[str] = Field(
+    prior_persona: str | None = Field(
         default=None,
         description="Name of the previously consulted persona (if any)",
     )
@@ -96,7 +97,9 @@ class ContextAnalysisInput(BaseModel):
         """
         valid_phases = {phase.value for phase in InvestigationPhase}
         if v.lower() not in valid_phases:
-            raise ValueError(f"Invalid phase '{v}'. Must be one of: {', '.join(valid_phases)}")
+            raise ValueError(
+                f"Invalid phase '{v}'. Must be one of: {', '.join(valid_phases)}"
+            )
         return v.lower()
 
     @field_validator("confidence")
@@ -154,10 +157,10 @@ class ContextAnalysisResult:
     reasoning: str
     context_summary: str
     confidence: str
-    guidance: List[str] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    guidance: list[str] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """
         Convert the result to a dictionary.
 
@@ -166,7 +169,7 @@ class ContextAnalysisResult:
         """
         return asdict(self)
 
-    def to_json(self, indent: Optional[int] = 2) -> str:
+    def to_json(self, indent: int | None = 2) -> str:
         """
         Convert the result to a JSON string.
 
@@ -192,8 +195,8 @@ class ContextAnalysisResult:
 
 
 def _select_persona_by_phase_and_state(
-    phase: str, findings_count: int, has_questions: bool, prior_persona: Optional[str]
-) -> tuple[str, str, List[str]]:
+    phase: str, findings_count: int, has_questions: bool, prior_persona: str | None
+) -> tuple[str, str, list[str]]:
     """
     Select persona based on investigation phase and current state.
 

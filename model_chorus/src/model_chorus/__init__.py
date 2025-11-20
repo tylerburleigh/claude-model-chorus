@@ -9,4 +9,4 @@ __version__ = "0.5.0"
 __author__ = "ModelChorus Contributors"
 
 # Public API will be defined as modules are implemented
-__all__ = []
+__all__: list[str] = []

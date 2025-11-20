@@ -14,7 +14,7 @@ Key Features:
 
 import logging
 from pathlib import Path
-from typing import Optional, Tuple, List
+
 import chardet
 
 logger = logging.getLogger(__name__)
@@ -132,7 +132,7 @@ class ContextIngestionService:
 
             return encoding
 
-        except (IOError, OSError) as e:
+        except OSError as e:
             raise PermissionError(f"Cannot access file {path}: {e}")
 
     def read_file(self, file_path: str | Path) -> str:
@@ -175,7 +175,7 @@ class ContextIngestionService:
 
         # Read file with detected encoding
         try:
-            with open(path, "r", encoding=encoding) as f:
+            with open(path, encoding=encoding) as f:
                 content = f.read()
             return content
 
@@ -210,7 +210,7 @@ class ContextIngestionService:
             "path": str(path),
         }
 
-    def can_read_file(self, file_path: str | Path) -> Tuple[bool, Optional[str]]:
+    def can_read_file(self, file_path: str | Path) -> tuple[bool, str | None]:
         """
         Check if a file can be read without actually reading it.
 
@@ -239,8 +239,8 @@ class ContextIngestionService:
         self,
         file_path: str | Path,
         chunk_size_kb: int = 50,
-        max_chunks: Optional[int] = None,
-    ) -> List[str]:
+        max_chunks: int | None = None,
+    ) -> list[str]:
         """
         Read file in chunks for processing large files.
 
@@ -273,11 +273,11 @@ class ContextIngestionService:
         encoding = self._detect_encoding(path)
 
         # Read file in chunks
-        chunks = []
+        chunks: list[str] = []
         chunk_size_bytes = chunk_size_kb * 1024
 
         try:
-            with open(path, "r", encoding=encoding) as f:
+            with open(path, encoding=encoding) as f:
                 while True:
                     if max_chunks is not None and len(chunks) >= max_chunks:
                         break
@@ -296,9 +296,9 @@ class ContextIngestionService:
     def read_file_lines(
         self,
         file_path: str | Path,
-        max_lines: Optional[int] = None,
+        max_lines: int | None = None,
         skip_empty: bool = False,
-    ) -> List[str]:
+    ) -> list[str]:
         """
         Read file line by line with optional line limit.
 

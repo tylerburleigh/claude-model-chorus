@@ -10,6 +10,7 @@ Tests verify citation tracking functionality including:
 """
 
 import json
+
 import pytest
 from pydantic import ValidationError
 
@@ -36,7 +37,9 @@ class TestCitation:
         assert citation.source == "https://arxiv.org/abs/2401.12345"
         assert citation.location == "Section 3.2, Figure 4"
         assert citation.confidence == 0.95
-        assert citation.snippet == "Our experiments show a 23% improvement in accuracy..."
+        assert (
+            citation.snippet == "Our experiments show a 23% improvement in accuracy..."
+        )
         assert citation.metadata["author"] == "Smith et al."
         assert citation.metadata["publication_date"] == "2024-01-15"
         assert citation.metadata["citation_type"] == "academic_paper"
@@ -149,7 +152,9 @@ class TestCitation:
 
     def test_citation_json_serialization(self):
         """Test citation JSON serialization."""
-        citation = Citation(source="test_source", confidence=0.75, snippet="Test snippet")
+        citation = Citation(
+            source="test_source", confidence=0.75, snippet="Test snippet"
+        )
 
         json_str = citation.model_dump_json()
         assert isinstance(json_str, str)
@@ -235,7 +240,9 @@ class TestCitationMap:
         )
 
         assert citation_map.claim_id == "claim-001"
-        assert citation_map.claim_text == "Machine learning models improve accuracy by 23%"
+        assert (
+            citation_map.claim_text == "Machine learning models improve accuracy by 23%"
+        )
         assert len(citation_map.citations) == 2
         assert citation_map.strength == 0.9
         assert citation_map.metadata["argument_type"] == "empirical"
@@ -244,7 +251,9 @@ class TestCitationMap:
 
     def test_citation_map_minimal_creation(self):
         """Test citation map with only required fields."""
-        citation_map = CitationMap(claim_id="claim-001", claim_text="Test claim", strength=0.7)
+        citation_map = CitationMap(
+            claim_id="claim-001", claim_text="Test claim", strength=0.7
+        )
 
         assert citation_map.claim_id == "claim-001"
         assert citation_map.claim_text == "Test claim"
@@ -255,13 +264,17 @@ class TestCitationMap:
     def test_citation_map_empty_claim_id(self):
         """Test that empty claim_id fails validation."""
         with pytest.raises(ValidationError):
-            CitationMap(claim_id="", claim_text="Test", strength=0.5)  # min_length=1 constraint
+            CitationMap(
+                claim_id="", claim_text="Test", strength=0.5
+            )  # min_length=1 constraint
 
     def test_citation_map_empty_claim_text(self):
         """Test that empty claim_text fails validation."""
         with pytest.raises(ValidationError):
             CitationMap(
-                claim_id="claim-001", claim_text="", strength=0.5  # min_length=1 constraint
+                claim_id="claim-001",
+                claim_text="",
+                strength=0.5,  # min_length=1 constraint
             )
 
     def test_citation_map_strength_bounds(self):
@@ -384,9 +397,14 @@ class TestCitationMap:
             claim_text="Complex roundtrip test",
             citations=[
                 Citation(
-                    source="source1", location="page 10", confidence=0.9, snippet="Evidence 1"
+                    source="source1",
+                    location="page 10",
+                    confidence=0.9,
+                    snippet="Evidence 1",
                 ),
-                Citation(source="source2", confidence=0.85, metadata={"author": "Jane Doe"}),
+                Citation(
+                    source="source2", confidence=0.85, metadata={"author": "Jane Doe"}
+                ),
             ],
             strength=0.87,
             metadata={"argument_type": "empirical", "verified": True},

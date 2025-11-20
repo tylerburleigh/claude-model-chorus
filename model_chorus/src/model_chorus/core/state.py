@@ -12,15 +12,13 @@ Key Features:
 - State isolation per workflow instance
 """
 
-import json
 import logging
 import threading
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
-from datetime import datetime, timezone
+from typing import Any
 
 from .models import ConversationState
-
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +47,9 @@ class StateManager:
         _lock: Lock for thread-safe operations
     """
 
-    def __init__(self, state_dir: Path = DEFAULT_STATE_DIR, enable_file_persistence: bool = False):
+    def __init__(
+        self, state_dir: Path = DEFAULT_STATE_DIR, enable_file_persistence: bool = False
+    ):
         """
         Initialize state manager.
 
@@ -61,7 +61,7 @@ class StateManager:
         self.enable_file_persistence = enable_file_persistence
 
         # Thread-safe in-memory storage (task-1-4-1)
-        self._state_store: Dict[str, ConversationState] = {}
+        self._state_store: dict[str, ConversationState] = {}
         self._lock = threading.RLock()
 
         # Create state directory if file persistence enabled
@@ -76,7 +76,10 @@ class StateManager:
     # ========================================================================
 
     def set_state(
-        self, workflow_name: str, state_data: Dict[str, Any], schema_version: str = "1.0"
+        self,
+        workflow_name: str,
+        state_data: dict[str, Any],
+        schema_version: str = "1.0",
     ) -> None:
         """
         Store workflow state in memory.
@@ -97,7 +100,7 @@ class StateManager:
             ... })
         """
         with self._lock:
-            now = datetime.now(timezone.utc).isoformat()
+            now = datetime.now(UTC).isoformat()
 
             # Check if state exists (for update vs create)
             existing_state = self._state_store.get(workflow_name)
@@ -119,9 +122,11 @@ class StateManager:
             if self.enable_file_persistence:
                 self._save_to_file(workflow_name, state)
 
-            logger.debug(f"State stored for workflow '{workflow_name}' ({len(state_data)} fields)")
+            logger.debug(
+                f"State stored for workflow '{workflow_name}' ({len(state_data)} fields)"
+            )
 
-    def get_state(self, workflow_name: str) -> Optional[Dict[str, Any]]:
+    def get_state(self, workflow_name: str) -> dict[str, Any] | None:
         """
         Retrieve workflow state from memory.
 
@@ -147,7 +152,7 @@ class StateManager:
                 logger.debug(f"No state found for workflow '{workflow_name}'")
                 return None
 
-    def get_state_object(self, workflow_name: str) -> Optional[ConversationState]:
+    def get_state_object(self, workflow_name: str) -> ConversationState | None:
         """
         Retrieve complete state object (including metadata).
 
@@ -166,7 +171,7 @@ class StateManager:
         with self._lock:
             return self._state_store.get(workflow_name)
 
-    def update_state(self, workflow_name: str, updates: Dict[str, Any]) -> bool:
+    def update_state(self, workflow_name: str, updates: dict[str, Any]) -> bool:
         """
         Update specific fields in workflow state.
 
@@ -261,7 +266,7 @@ class StateManager:
     # State Serialization/Deserialization (task-1-4-2)
     # ========================================================================
 
-    def serialize_state(self, workflow_name: str) -> Optional[str]:
+    def serialize_state(self, workflow_name: str) -> str | None:
         """
         Serialize workflow state to JSON string.
 
@@ -324,7 +329,7 @@ class StateManager:
             return True
         return False
 
-    def import_state(self, input_path: Path) -> Optional[str]:
+    def import_state(self, input_path: Path) -> str | None:
         """
         Import workflow state from JSON file.
 
@@ -500,7 +505,7 @@ class StateManager:
 
 
 # Singleton instance for convenience
-_default_manager: Optional[StateManager] = None
+_default_manager: StateManager | None = None
 
 
 def get_default_state_manager() -> StateManager:
