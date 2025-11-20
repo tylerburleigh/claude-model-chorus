@@ -30,30 +30,12 @@ from model_chorus.core.base_workflow import WorkflowResult, WorkflowStep
 
 
 # Test fixtures
+# Note: mock_provider fixture is now in conftest.py
+
 @pytest.fixture
 def cli_runner():
     """Create Typer CLI runner for testing."""
     return CliRunner()
-
-
-@pytest.fixture
-def mock_provider():
-    """Mock provider for CLI testing."""
-    provider = MagicMock()
-    provider.provider_name = "test-provider"
-    provider.validate_api_key = MagicMock(return_value=True)
-
-    # Mock async generate method
-    async def mock_generate(request):
-        return GenerationResponse(
-            content=f"Test response to: {request.prompt[:50]}",
-            model="test-model",
-            usage={"input_tokens": 10, "output_tokens": 20, "total_tokens": 30},
-            stop_reason="end_turn",
-        )
-
-    provider.generate = AsyncMock(side_effect=mock_generate)
-    return provider
 
 
 @pytest.fixture

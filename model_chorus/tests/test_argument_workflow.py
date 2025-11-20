@@ -17,31 +17,7 @@ from model_chorus.core.conversation import ConversationMemory
 from model_chorus.core.models import ArgumentMap, ArgumentPerspective
 from model_chorus.core.role_orchestration import OrchestrationResult, OrchestrationPattern
 
-
-@pytest.fixture
-def mock_provider():
-    """Mock ModelProvider for testing."""
-    provider = MagicMock()
-    provider.provider_name = "test-provider"
-    provider.validate_api_key = MagicMock(return_value=True)
-
-    # Mock async generate method
-    async def mock_generate(request: GenerationRequest) -> GenerationResponse:
-        return GenerationResponse(
-            content=f"Response to: {request.prompt[:50]}",
-            model="test-model-1",
-            usage={"input_tokens": 10, "output_tokens": 20, "total_tokens": 30},
-            stop_reason="end_turn",
-        )
-
-    provider.generate = AsyncMock(side_effect=mock_generate)
-    return provider
-
-
-@pytest.fixture
-def conversation_memory():
-    """Create ConversationMemory instance for testing."""
-    return ConversationMemory()
+# Note: mock_provider and conversation_memory fixtures are now in conftest.py
 
 
 @pytest.fixture

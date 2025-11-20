@@ -288,3 +288,50 @@ def mock_codex_provider_full():
 def mock_cursor_agent_provider_full():
     """Create fully mocked Cursor Agent provider for integration tests."""
     return _create_smart_mock_provider("cursor-agent", "composer-1", "end_turn")
+
+
+# ============================================================================
+# Generic Test Fixtures (Consolidated from Individual Test Files)
+# ============================================================================
+
+@pytest.fixture
+def mock_provider():
+    """
+    Generic mock ModelProvider for testing.
+
+    Provides a simple mock provider suitable for most unit tests.
+    For integration tests with smart context handling, use the
+    provider-specific fixtures above (mock_claude_provider_full, etc.).
+    """
+    provider = MagicMock()
+    provider.provider_name = "test-provider"
+    provider.validate_api_key = MagicMock(return_value=True)
+
+    # Mock async generate method with simple echo response
+    async def mock_generate(request):
+        return GenerationResponse(
+            content=f"Response to: {request.prompt[:50]}",
+            model="test-model-1",
+            usage={"input_tokens": 10, "output_tokens": 20, "total_tokens": 30},
+            stop_reason="end_turn",
+        )
+
+    provider.generate = AsyncMock(side_effect=mock_generate)
+
+    # Mock async check_availability method
+    async def mock_check_availability():
+        return (True, None)  # is_available=True, error=None
+
+    provider.check_availability = AsyncMock(side_effect=mock_check_availability)
+    return provider
+
+
+@pytest.fixture
+def conversation_memory():
+    """
+    Create ConversationMemory instance for testing.
+
+    Provides a fresh conversation memory instance for each test.
+    """
+    from model_chorus.core.conversation import ConversationMemory
+    return ConversationMemory()

@@ -130,11 +130,7 @@ Phased rollout starting with core gamification mechanics.
     provider.generate = AsyncMock(side_effect=mock_generate)
     return provider
 
-
-@pytest.fixture
-def conversation_memory():
-    """Create ConversationMemory instance for testing."""
-    return ConversationMemory()
+# Note: conversation_memory fixture is now in conftest.py (generic version)
 
 
 @pytest.fixture
