@@ -2,7 +2,7 @@
   "spec_id": "architectural-improvements-2025-01-20-001",
   "title": "Model-Chorus Architectural Improvements",
   "generated": "2025-01-20T20:30:00Z",
-  "last_updated": "2025-11-20T23:48:51.060083Z",
+  "last_updated": "2025-11-20T23:50:53.223900Z",
   "description": "Comprehensive architectural refactoring to eliminate code duplication, improve maintainability, enhance reliability, and establish scalable foundations for future development.",
   "hierarchy": {
     "spec-root": {
@@ -17,7 +17,7 @@
         "phase-4"
       ],
       "total_tasks": 69,
-      "completed_tasks": 18,
+      "completed_tasks": 19,
       "metadata": {
         "objectives": [
           "Reduce code duplication by 30-40% through shared primitives",
@@ -687,7 +687,7 @@
         "depends": []
       },
       "total_tasks": 17,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "purpose": "Break down monolithic main.py into reusable command primitives",
         "risk_level": "medium-high",
@@ -748,7 +748,7 @@
     "phase-2-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-2",
       "children": [
         "task-2-2",
@@ -772,13 +772,13 @@
         "depends": []
       },
       "total_tasks": 11,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {}
     },
     "task-2-2": {
       "type": "task",
       "title": "model_chorus/cli/primitives.py",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-2-files",
       "children": [
         "task-2-2-1",
@@ -796,7 +796,7 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/cli/primitives.py",
         "task_category": "implementation",
@@ -807,7 +807,7 @@
     "task-2-2-1": {
       "type": "subtask",
       "title": "Implement ProviderResolver class",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-2",
       "children": [],
       "dependencies": {
@@ -816,12 +816,18 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/cli/primitives.py",
         "task_category": "implementation",
         "estimated_hours": 2,
-        "description": "Extract provider resolution logic from main.py"
+        "description": "Extract provider resolution logic from main.py",
+        "started_at": "2025-11-20T23:50:05.680164Z",
+        "status_note": "Creating ProviderResolver class in primitives.py",
+        "completed_at": "2025-11-20T23:50:53.214552Z",
+        "needs_journaling": false,
+        "actual_hours": 0.013,
+        "journaled_at": "2025-11-20T23:50:53.221202Z"
       }
     },
     "task-2-2-2": {
@@ -2253,7 +2259,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-20T20:38:01.399125Z",
-    "progress_percentage": 26,
+    "progress_percentage": 27,
     "current_phase": "phase-1"
   },
   "journal": [
@@ -2436,6 +2442,15 @@
       "content": "All child tasks in group phase-2-investigation have been completed.",
       "metadata": {},
       "task_id": "phase-2-investigation"
+    },
+    {
+      "timestamp": "2025-11-20T23:50:53.221192Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Implement ProviderResolver class",
+      "author": "claude-code",
+      "content": "Implemented ProviderResolver class in model_chorus/src/model_chorus/cli/primitives.py.\n\nCLASS FEATURES:\n- resolve_provider(): Initializes primary provider with comprehensive error handling for ProviderDisabledError, ProviderUnavailableError, and generic exceptions\n- resolve_fallback_providers(): Loads and initializes fallback providers from config with graceful error handling\n- Verbose logging support for initialization steps\n- Helpful error messages with installation commands and configuration guidance\n\nEXTRACTED PATTERNS:\n- Provider initialization logic (~35 lines from each command)\n- Fallback provider setup (~30 lines from each command)\n- Error handling and user messaging\n\nFILES CREATED:\n- model_chorus/src/model_chorus/cli/primitives.py (165 lines)\n\nThis class eliminates ~140 lines of duplicated provider initialization code across 4 commands.",
+      "metadata": {},
+      "task_id": "task-2-2-1"
     }
   ]
 }
