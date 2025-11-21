@@ -2,7 +2,7 @@
   "spec_id": "architectural-improvements-2025-01-20-001",
   "title": "Model-Chorus Architectural Improvements",
   "generated": "2025-01-20T20:30:00Z",
-  "last_updated": "2025-11-21T15:22:27.995421Z",
+  "last_updated": "2025-11-21T15:23:38.217944Z",
   "description": "Comprehensive architectural refactoring to eliminate code duplication, improve maintainability, enhance reliability, and establish scalable foundations for future development.",
   "hierarchy": {
     "spec-root": {
@@ -17,7 +17,7 @@
         "phase-4"
       ],
       "total_tasks": 69,
-      "completed_tasks": 56,
+      "completed_tasks": 57,
       "metadata": {
         "objectives": [
           "Reduce code duplication by 30-40% through shared primitives",
@@ -1945,7 +1945,7 @@
         "depends": []
       },
       "total_tasks": 18,
-      "completed_tasks": 5,
+      "completed_tasks": 6,
       "metadata": {
         "purpose": "Replace JSON persistence with SQLite and enhance workflow registry",
         "risk_level": "medium-high",
@@ -1968,7 +1968,7 @@
         "task-4-8"
       ],
       "total_tasks": 13,
-      "completed_tasks": 5,
+      "completed_tasks": 6,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -2173,7 +2173,7 @@
     "task-4-3": {
       "type": "task",
       "title": "model_chorus/core/conversation.py - dual storage support",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-4-files",
       "children": [
         "task-4-3-1",
@@ -2188,7 +2188,7 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/core/conversation.py",
         "task_category": "refactoring",
@@ -2199,7 +2199,7 @@
     "task-4-3-1": {
       "type": "subtask",
       "title": "Add storage_backend config option and feature flag",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-4-3",
       "children": [],
       "dependencies": {
@@ -2210,11 +2210,17 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/core/conversation.py",
         "task_category": "refactoring",
-        "estimated_hours": 2
+        "estimated_hours": 2,
+        "started_at": "2025-11-21T15:23:03.289783Z",
+        "status_note": "Adding storage_backend configuration option and feature flag",
+        "completed_at": "2025-11-21T15:23:38.207818Z",
+        "needs_journaling": false,
+        "actual_hours": 0.01,
+        "journaled_at": "2025-11-21T15:23:38.214992Z"
       }
     },
     "task-4-3-2": {
@@ -2524,7 +2530,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-20T20:38:01.399125Z",
-    "progress_percentage": 81,
+    "progress_percentage": 82,
     "current_phase": "phase-4"
   },
   "journal": [
@@ -3121,6 +3127,15 @@
       "content": "Added backup and rollback capabilities to migration script. Implemented three key components:\n\n1. create_backup() method (already existed from task-4-2-1) - Creates timestamped backup directory and copies all JSON files. Returns backup path or None if disabled.\n\n2. rollback_database() method (NEW) - Deletes SQLite database file and associated WAL/SHM files on migration failure. Safe cleanup of partial migration state. Returns success status.\n\n3. restore_from_backup() method (NEW) - Restores JSON files from backup directory. Clears source directory and copies backup files back. Returns success status.\n\n4. Enhanced run() method with automatic rollback - Catches MigrationError and unexpected exceptions. On failure, automatically triggers rollback_database() and restore_from_backup() when backups enabled. Ensures database connection closed in finally block. Logs backup location on success and rollback status on failure.\n\nSafety features:\n- Automatic rollback on critical errors (MigrationError)\n- Automatic rollback on unexpected exceptions\n- Backup path preserved and reported to user\n- Connection cleanup in finally block\n- Clear logging of all rollback steps\n- Safe handling of missing WAL/SHM files\n\nMigration script now provides complete safety net with backup/restore capability. No tests run as this will be tested in verification phase.",
       "metadata": {},
       "task_id": "task-4-2-2"
+    },
+    {
+      "timestamp": "2025-11-21T15:23:38.214987Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add storage_backend config option and feature flag",
+      "author": "claude-code",
+      "content": "Added storage_backend configuration option and feature flag to config.py. Implemented two new components:\n\n1. StorageConfig class (NEW) - Pydantic model for storage backend configuration with:\n   - backend field: str with pattern validation for 'file' or 'sqlite' (defaults to 'file' for backward compatibility)\n   - sqlite_path field: Optional path to SQLite database (only used when backend='sqlite')\n   - Full Pydantic validation with field descriptions\n\n2. Updated ModelChorusConfig - Added storage field with default_factory=StorageConfig to maintain backward compatibility. Existing configs without storage section will automatically use file-based backend.\n\nConfiguration format:\n```yaml\nstorage:\n  backend: \"sqlite\"  # or \"file\"\n  sqlite_path: \"~/.model-chorus/conversations.db\"\n```\n\nFeature flag approach:\n- backend=\"file\" uses existing JSON file storage (ConversationMemory)\n- backend=\"sqlite\" uses new SQLite storage (ConversationDatabase)\n- Default is \"file\" to ensure no breaking changes\n- Pattern validation ensures only valid backends accepted\n\nReady for ConversationMemory delegation in next task. No tests run as this will be tested when integrated with conversation management.",
+      "metadata": {},
+      "task_id": "task-4-3-1"
     }
   ]
 }

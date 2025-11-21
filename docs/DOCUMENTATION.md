@@ -1,14 +1,14 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-21 10:21:40
+**Generated:** 2025-11-21 10:23:18
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 117
-- **Total Lines:** 52549
+- **Total Lines:** 52648
 - **Total Classes:** 302
 - **Total Functions:** 219
 - **Avg Complexity:** 4.37
@@ -1168,6 +1168,8 @@ Attributes:
 - `create_backup()`
 - `migrate_thread()`
 - `migrate_all()`
+- `rollback_database()`
+- `restore_from_backup()`
 - `print_summary()`
 - `run()`
 
@@ -9850,7 +9852,7 @@ Returns:
 ### `main() -> int`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py:398`
+**Defined in:** `model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py:497`
 **Complexity:** 3
 
 **Description:**

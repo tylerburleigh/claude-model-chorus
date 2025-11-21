@@ -77,6 +77,20 @@ class WorkflowConfig(BaseModel):
         return None
 
 
+class StorageConfig(BaseModel):
+    """Configuration for conversation storage backend."""
+
+    backend: str = Field(
+        "file",
+        pattern=r"^(file|sqlite)$",
+        description="Storage backend: 'file' for JSON files, 'sqlite' for database",
+    )
+    sqlite_path: str | None = Field(
+        None,
+        description="Path to SQLite database (only used when backend='sqlite')",
+    )
+
+
 class ModelChorusConfig(BaseModel):
     """Root configuration model for ModelChorus."""
 
@@ -84,6 +98,10 @@ class ModelChorusConfig(BaseModel):
     providers: dict[str, ProviderConfig] | None = None
     generation: GenerationDefaults | None = None
     workflows: dict[str, WorkflowConfig] | None = None
+    storage: StorageConfig | None = Field(
+        default_factory=StorageConfig,
+        description="Conversation storage configuration",
+    )
 
     @field_validator("default_provider")
     def validate_default_provider(cls, v):
