@@ -494,6 +494,11 @@ def argument(
         "--system",
         help="System prompt for context",
     ),
+    temperature: float | None = typer.Option(
+        None,
+        "--temperature",
+        help="Temperature for creative variation (0.0-2.0). Defaults to config or 0.7",
+    ),
     timeout: float | None = typer.Option(
         None,
         "--timeout",
@@ -603,6 +608,8 @@ def argument(
         config = {}
         if system:
             config["system_prompt"] = system
+        if temperature is not None:
+            config["temperature"] = temperature
 
         # Execute workflow
         result = asyncio.run(
@@ -706,6 +713,11 @@ def ideate(
         None,
         "--system",
         help="System prompt for context",
+    ),
+    temperature: float | None = typer.Option(
+        None,
+        "--temperature",
+        help="Temperature for creative variation (0.0-2.0). Higher values = more creative",
     ),
     timeout: float | None = typer.Option(
         None,
@@ -816,6 +828,8 @@ def ideate(
         }
         if system:
             workflow_config["system_prompt"] = system
+        if temperature is not None:
+            workflow_config["temperature"] = temperature
 
         # Execute workflow
         result = asyncio.run(

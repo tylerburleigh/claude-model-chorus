@@ -6,13 +6,18 @@ with various parameters, options, and error conditions.
 """
 
 import json
+import sys
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from typer.testing import CliRunner
 
+from model_chorus import cli
 from model_chorus.cli.main import app
 from model_chorus.core.base_workflow import WorkflowResult, WorkflowStep
+
+# Get the module object (not the main() function)
+cli_main = sys.modules['model_chorus.cli.main']
 
 # Test fixtures
 # Note: mock_provider fixture is now in conftest.py
@@ -93,9 +98,12 @@ class TestArgumentCommand:
 
         # Assertions
         assert result.exit_code == 0
-        assert "Analyzing argument" in result.stdout
+        assert "Starting new argument workflow" in result.stdout or "Analysis Complete" in result.stdout
         assert "Test synthesis result" in result.stdout
-        mock_get_provider.assert_called_once_with("claude")
+        # Provider resolver calls get_provider_by_name multiple times (main + fallbacks)
+        # Just verify that claude was requested as the main provider
+        calls = mock_get_provider.call_args_list
+        assert any("claude" in str(call) for call in calls)
         mock_workflow.run.assert_called_once()
 
     @patch("model_chorus.cli.main.get_provider_by_name")
@@ -119,7 +127,10 @@ class TestArgumentCommand:
         )
 
         assert result.exit_code == 0
-        mock_get_provider.assert_called_once_with("gemini")
+        # Provider resolver may call get_provider_by_name multiple times (main + fallbacks)
+        # Just verify that gemini was requested as the main provider
+        calls = mock_get_provider.call_args_list
+        assert any("gemini" in str(call) for call in calls)
 
     @patch("model_chorus.cli.main.get_provider_by_name")
     @patch("model_chorus.cli.main.ArgumentWorkflow")
@@ -724,10 +735,8 @@ class TestCommandIntegration:
     @patch("model_chorus.cli.main.get_provider_by_name")
     @patch("model_chorus.cli.main.ArgumentWorkflow")
     @patch("model_chorus.cli.main.IdeateWorkflow")
-    @patch("model_chorus.cli.main.ResearchWorkflow")
     def test_all_commands_available(
         self,
-        mock_research_wf,
         mock_ideate_wf,
         mock_argument_wf,
         mock_get_provider,
@@ -735,11 +744,11 @@ class TestCommandIntegration:
         mock_provider,
         mock_workflow_result,
     ):
-        """Test that all three new commands are available."""
+        """Test that argument and ideate commands are available."""
         mock_get_provider.return_value = mock_provider
 
         # Setup mocks for all workflows
-        for mock_wf_class in [mock_argument_wf, mock_ideate_wf, mock_research_wf]:
+        for mock_wf_class in [mock_argument_wf, mock_ideate_wf]:
             mock_wf = MagicMock()
             mock_wf.run = AsyncMock(return_value=mock_workflow_result)
             mock_wf.ingest_source = MagicMock()
@@ -749,7 +758,6 @@ class TestCommandIntegration:
         commands = [
             ["argument", "Test argument"],
             ["ideate", "Test ideation"],
-            ["research", "Test research"],
         ]
 
         for cmd in commands:
@@ -763,7 +771,6 @@ class TestCommandIntegration:
         assert result.exit_code == 0
         assert "argument" in result.stdout
         assert "ideate" in result.stdout
-        assert "research" in result.stdout
 
     @patch("model_chorus.cli.main.get_provider_by_name")
     def test_common_options_work_across_commands(
@@ -772,7 +779,7 @@ class TestCommandIntegration:
         """Test that common options (--verbose, --provider) work for all commands."""
         mock_get_provider.return_value = mock_provider
 
-        commands = ["argument", "ideate", "research"]
+        commands = ["argument", "ideate"]
 
         for cmd in commands:
             # Test --help

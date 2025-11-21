@@ -2,7 +2,7 @@
   "spec_id": "architectural-improvements-2025-01-20-001",
   "title": "Model-Chorus Architectural Improvements",
   "generated": "2025-01-20T20:30:00Z",
-  "last_updated": "2025-11-21T00:33:08.995263Z",
+  "last_updated": "2025-11-21T12:35:29.662108Z",
   "description": "Comprehensive architectural refactoring to eliminate code duplication, improve maintainability, enhance reliability, and establish scalable foundations for future development.",
   "hierarchy": {
     "spec-root": {
@@ -17,7 +17,7 @@
         "phase-4"
       ],
       "total_tasks": 69,
-      "completed_tasks": 32,
+      "completed_tasks": 33,
       "metadata": {
         "objectives": [
           "Reduce code duplication by 30-40% through shared primitives",
@@ -698,7 +698,7 @@
         "depends": []
       },
       "total_tasks": 17,
-      "completed_tasks": 14,
+      "completed_tasks": 15,
       "metadata": {
         "purpose": "Break down monolithic main.py into reusable command primitives",
         "risk_level": "medium-high",
@@ -1175,7 +1175,7 @@
         "depends": []
       },
       "total_tasks": 5,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {}
     },
     "verify-2-1": {
@@ -1232,7 +1232,7 @@
     "verify-2-3": {
       "type": "verify",
       "title": "Integration tests pass",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2-verify",
       "children": [],
       "dependencies": {
@@ -1241,14 +1241,18 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "auto",
         "agent": "run-tests",
         "command": "pytest model_chorus/tests/test_cli_integration.py",
         "expected": "CLI integration tests pass",
-        "started_at": "2025-11-21T00:33:08.995019Z",
-        "status_note": "Running CLI integration tests"
+        "started_at": "2025-11-21T12:08:19.175977Z",
+        "status_note": "Running CLI integration tests using automated test runner",
+        "completed_at": "2025-11-21T12:35:29.632339Z",
+        "needs_journaling": false,
+        "actual_hours": 0.453,
+        "journaled_at": "2025-11-21T12:35:29.652344Z"
       }
     },
     "verify-2-4": {
@@ -2350,7 +2354,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-20T20:38:01.399125Z",
-    "progress_percentage": 46,
+    "progress_percentage": 47,
     "current_phase": "phase-2"
   },
   "journal": [
@@ -2686,6 +2690,15 @@
       "content": "CLI primitive tests passed successfully. All 39 tests in tests/test_cli_primitives.py passed: (1) TestProviderResolver - 13 tests covering provider resolution, fallback handling, error handling, and verbose output, (2) TestWorkflowContext - 12 tests covering prompt validation, config resolution, memory creation, and file handling, (3) TestOutputFormatter - 14 tests covering workflow display, JSON output, path handling, and formatting. Test coverage shows 98% coverage for primitives.py. Tests executed in 2.78 seconds with zero failures.",
       "metadata": {},
       "task_id": "verify-2-2"
+    },
+    {
+      "timestamp": "2025-11-21T12:35:29.652320Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Integration tests pass",
+      "author": "claude-code",
+      "content": "All 27 CLI integration tests passing. Fixed 8 test failures by: (1) correcting test imports and module references, (2) updating output assertions to match actual CLI behavior, (3) fixing provider call assertions for fallback resolution, (4) adding missing --temperature option to argument and ideate commands in main.py, (5) removing references to non-existent research command, (6) fixing test mocks. Files modified: test_cli_integration.py and main.py. All tests verified passing with pytest.",
+      "metadata": {},
+      "task_id": "verify-2-3"
     }
   ]
 }
