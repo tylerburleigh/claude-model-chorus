@@ -1,17 +1,17 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-20 19:06:01
+**Generated:** 2025-11-20 19:07:56
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 109
-- **Total Lines:** 48458
-- **Total Classes:** 271
-- **Total Functions:** 210
-- **Avg Complexity:** 4.92
+- **Total Files:** 110
+- **Total Lines:** 48797
+- **Total Classes:** 272
+- **Total Functions:** 211
+- **Avg Complexity:** 4.91
 - **Max Complexity:** 55
 - **High Complexity Functions:**
   - thinkdeep (55)
@@ -599,6 +599,34 @@ Values:
     VERY_HIGH: Very strong evidence, high confidence
     ALMOST_CERTAIN: Near complete confidence, comprehensive evidence
     CERTAIN: 100% confidence, hypothesis validated beyond reasonable doubt
+
+---
+
+### `ConfigLoader`
+
+**Language:** python
+**Defined in:** `src/model_chorus/config/loader.py:22`
+
+**Description:**
+> Loads and manages ModelChorus configuration.
+
+ConfigLoader handles:
+- Finding config files in project directories (.model-chorusrc)
+- Parsing YAML and JSON config formats
+- Validating configuration with Pydantic models
+- Providing convenient access to config values with fallback logic
+
+**Methods:**
+- `__init__()`
+- `find_config_file()`
+- `load_config()`
+- `_parse_config_content()`
+- `get_config()`
+- `get_workflow_default()`
+- `get_workflow_default_provider()`
+- `get_workflow_default_providers()`
+- `get_workflow_fallback_providers()`
+- `get_provider_model()`
 
 ---
 
@@ -8600,6 +8628,20 @@ Returns:
 ### `get_config_loader() -> ConfigLoader`
 
 **Language:** python
+**Defined in:** `src/model_chorus/config/loader.py:326`
+**Complexity:** 2
+
+**Description:**
+> Get the global ConfigLoader instance.
+
+Returns:
+    Singleton ConfigLoader instance
+
+---
+
+### `get_config_loader() -> ConfigLoader`
+
+**Language:** python
 **Defined in:** `src/model_chorus/core/config.py:418`
 **Complexity:** 2
 
@@ -10495,10 +10537,21 @@ Returns:
 
 ### `src/model_chorus/config/__init__.py`
 
+- `loader.ConfigLoader`
+- `loader.get_config_loader`
 - `models.GenerationDefaults`
 - `models.ModelChorusConfig`
 - `models.ProviderConfig`
 - `models.WorkflowConfig`
+
+### `src/model_chorus/config/loader.py`
+
+- `json`
+- `models.ModelChorusConfig`
+- `models.ProviderConfig`
+- `models.WorkflowConfig`
+- `pathlib.Path`
+- `typing.Any`
 
 ### `src/model_chorus/config/models.py`
 

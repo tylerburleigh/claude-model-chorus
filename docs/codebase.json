@@ -2,18 +2,18 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-21T00:06:01.926145Z",
+    "generated_at": "2025-11-21T00:07:56.450354Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 109,
-    "total_lines": 48458,
-    "total_classes": 271,
-    "total_functions": 210,
-    "avg_complexity": 4.92,
+    "total_files": 110,
+    "total_lines": 48797,
+    "total_classes": 272,
+    "total_functions": 211,
+    "avg_complexity": 4.91,
     "max_complexity": 55,
     "high_complexity_functions": [
       "thinkdeep (55)",
@@ -24,11 +24,11 @@
     ],
     "by_language": {
       "python": {
-        "files": 109,
-        "lines": 48458,
-        "classes": 271,
-        "functions": 210,
-        "avg_complexity": 4.92
+        "files": 110,
+        "lines": 48797,
+        "classes": 272,
+        "functions": 211,
+        "avg_complexity": 4.91
       }
     }
   },
@@ -371,13 +371,37 @@
       "classes": [],
       "functions": [],
       "imports": [
+        "loader.ConfigLoader",
+        "loader.get_config_loader",
         "models.GenerationDefaults",
         "models.ModelChorusConfig",
         "models.ProviderConfig",
         "models.WorkflowConfig"
       ],
       "exports": [],
-      "lines": 15
+      "lines": 18
+    },
+    {
+      "name": "loader",
+      "file": "src/model_chorus/config/loader.py",
+      "language": "python",
+      "docstring": "Configuration loader for ModelChorus.\n\nThis module provides ConfigLoader class for loading and managing configuration\nfrom .model-chorusrc files (YAML or JSON format).",
+      "classes": [
+        "ConfigLoader"
+      ],
+      "functions": [
+        "get_config_loader"
+      ],
+      "imports": [
+        "json",
+        "pathlib.Path",
+        "typing.Any",
+        "models.ModelChorusConfig",
+        "models.ProviderConfig",
+        "models.WorkflowConfig"
+      ],
+      "exports": [],
+      "lines": 336
     },
     {
       "name": "models",
@@ -3111,6 +3135,264 @@
       "imported_by": []
     },
     {
+      "name": "ConfigLoader",
+      "file": "src/model_chorus/config/loader.py",
+      "line": 22,
+      "language": "python",
+      "docstring": "Loads and manages ModelChorus configuration.\n\nConfigLoader handles:\n- Finding config files in project directories (.model-chorusrc)\n- Parsing YAML and JSON config formats\n- Validating configuration with Pydantic models\n- Providing convenient access to config values with fallback logic",
+      "bases": [],
+      "methods": [
+        "__init__",
+        "find_config_file",
+        "load_config",
+        "_parse_config_content",
+        "get_config",
+        "get_workflow_default",
+        "get_workflow_default_provider",
+        "get_workflow_default_providers",
+        "get_workflow_fallback_providers",
+        "get_provider_model"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "validate_config",
+          "file": "src/model_chorus/cli/setup.py",
+          "line": 734,
+          "context": [
+            "validate_config"
+          ]
+        },
+        {
+          "instantiator": "get_config_loader",
+          "file": "src/model_chorus/config/loader.py",
+          "line": 335,
+          "context": [
+            "get_config_loader"
+          ]
+        },
+        {
+          "instantiator": "get_config_loader",
+          "file": "src/model_chorus/core/config.py",
+          "line": 422,
+          "context": [
+            "get_config_loader"
+          ]
+        },
+        {
+          "instantiator": "test_find_config_file_in_current_dir",
+          "file": "tests/test_config.py",
+          "line": 37,
+          "context": [
+            "TestConfigLoader",
+            "test_find_config_file_in_current_dir"
+          ]
+        },
+        {
+          "instantiator": "test_find_config_file_in_parent_dir",
+          "file": "tests/test_config.py",
+          "line": 51,
+          "context": [
+            "TestConfigLoader",
+            "test_find_config_file_in_parent_dir"
+          ]
+        },
+        {
+          "instantiator": "test_find_config_file_yaml_extension",
+          "file": "tests/test_config.py",
+          "line": 61,
+          "context": [
+            "TestConfigLoader",
+            "test_find_config_file_yaml_extension"
+          ]
+        },
+        {
+          "instantiator": "test_find_config_file_json_extension",
+          "file": "tests/test_config.py",
+          "line": 71,
+          "context": [
+            "TestConfigLoader",
+            "test_find_config_file_json_extension"
+          ]
+        },
+        {
+          "instantiator": "test_find_config_file_not_found",
+          "file": "tests/test_config.py",
+          "line": 78,
+          "context": [
+            "TestConfigLoader",
+            "test_find_config_file_not_found"
+          ]
+        },
+        {
+          "instantiator": "test_load_yaml_config_global_defaults",
+          "file": "tests/test_config.py",
+          "line": 99,
+          "context": [
+            "TestConfigLoader",
+            "test_load_yaml_config_global_defaults"
+          ]
+        },
+        {
+          "instantiator": "test_load_yaml_config_workflow_specific",
+          "file": "tests/test_config.py",
+          "line": 123,
+          "context": [
+            "TestConfigLoader",
+            "test_load_yaml_config_workflow_specific"
+          ]
+        },
+        {
+          "instantiator": "test_load_json_config",
+          "file": "tests/test_config.py",
+          "line": 147,
+          "context": [
+            "TestConfigLoader",
+            "test_load_json_config"
+          ]
+        },
+        {
+          "instantiator": "test_invalid_provider_raises_error",
+          "file": "tests/test_config.py",
+          "line": 163,
+          "context": [
+            "TestConfigLoader",
+            "test_invalid_provider_raises_error"
+          ]
+        },
+        {
+          "instantiator": "test_invalid_temperature_raises_error",
+          "file": "tests/test_config.py",
+          "line": 177,
+          "context": [
+            "TestConfigLoader",
+            "test_invalid_temperature_raises_error"
+          ]
+        },
+        {
+          "instantiator": "test_invalid_workflow_name_raises_error",
+          "file": "tests/test_config.py",
+          "line": 192,
+          "context": [
+            "TestConfigLoader",
+            "test_invalid_workflow_name_raises_error"
+          ]
+        },
+        {
+          "instantiator": "test_invalid_consensus_strategy_raises_error",
+          "file": "tests/test_config.py",
+          "line": 207,
+          "context": [
+            "TestConfigLoader",
+            "test_invalid_consensus_strategy_raises_error"
+          ]
+        },
+        {
+          "instantiator": "test_get_default_provider_workflow_specific",
+          "file": "tests/test_config.py",
+          "line": 227,
+          "context": [
+            "TestConfigLoader",
+            "test_get_default_provider_workflow_specific"
+          ]
+        },
+        {
+          "instantiator": "test_get_default_provider_fallback",
+          "file": "tests/test_config.py",
+          "line": 240,
+          "context": [
+            "TestConfigLoader",
+            "test_get_default_provider_fallback"
+          ]
+        },
+        {
+          "instantiator": "test_get_workflow_default_temperature",
+          "file": "tests/test_config.py",
+          "line": 257,
+          "context": [
+            "TestConfigLoader",
+            "test_get_workflow_default_temperature"
+          ]
+        },
+        {
+          "instantiator": "test_get_default_providers_multi",
+          "file": "tests/test_config.py",
+          "line": 279,
+          "context": [
+            "TestConfigLoader",
+            "test_get_default_providers_multi"
+          ]
+        },
+        {
+          "instantiator": "test_load_empty_config",
+          "file": "tests/test_config.py",
+          "line": 294,
+          "context": [
+            "TestConfigLoader",
+            "test_load_empty_config"
+          ]
+        },
+        {
+          "instantiator": "test_load_minimal_config",
+          "file": "tests/test_config.py",
+          "line": 306,
+          "context": [
+            "TestConfigLoader",
+            "test_load_minimal_config"
+          ]
+        },
+        {
+          "instantiator": "test_load_nonexistent_file_raises_error",
+          "file": "tests/test_config.py",
+          "line": 375,
+          "context": [
+            "TestConfigLoader",
+            "test_load_nonexistent_file_raises_error"
+          ]
+        },
+        {
+          "instantiator": "test_load_invalid_yaml_raises_error",
+          "file": "tests/test_config.py",
+          "line": 385,
+          "context": [
+            "TestConfigLoader",
+            "test_load_invalid_yaml_raises_error"
+          ]
+        },
+        {
+          "instantiator": "test_load_invalid_json_raises_error",
+          "file": "tests/test_config.py",
+          "line": 395,
+          "context": [
+            "TestConfigLoader",
+            "test_load_invalid_json_raises_error"
+          ]
+        },
+        {
+          "instantiator": "test_full_config_all_workflows",
+          "file": "tests/test_config.py",
+          "line": 483,
+          "context": [
+            "TestComplexConfigScenarios",
+            "test_full_config_all_workflows"
+          ]
+        },
+        {
+          "instantiator": "test_precedence_workflow_overrides_global",
+          "file": "tests/test_config.py",
+          "line": 510,
+          "context": [
+            "TestComplexConfigScenarios",
+            "test_precedence_workflow_overrides_global"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 26
+    },
+    {
       "name": "GenerationDefaults",
       "file": "src/model_chorus/config/models.py",
       "line": 13,
@@ -3431,6 +3713,33 @@
       "instantiated_by": [
         {
           "instantiator": "load_config",
+          "file": "src/model_chorus/config/loader.py",
+          "line": 84,
+          "context": [
+            "ConfigLoader",
+            "load_config"
+          ]
+        },
+        {
+          "instantiator": "load_config",
+          "file": "src/model_chorus/config/loader.py",
+          "line": 100,
+          "context": [
+            "ConfigLoader",
+            "load_config"
+          ]
+        },
+        {
+          "instantiator": "get_config",
+          "file": "src/model_chorus/config/loader.py",
+          "line": 157,
+          "context": [
+            "ConfigLoader",
+            "get_config"
+          ]
+        },
+        {
+          "instantiator": "load_config",
           "file": "src/model_chorus/core/config.py",
           "line": 180,
           "context": [
@@ -3467,7 +3776,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 4
+      "instantiation_count": 7
     },
     {
       "name": "WorkflowStep",
@@ -4322,6 +4631,33 @@
       "instantiated_by": [
         {
           "instantiator": "load_config",
+          "file": "src/model_chorus/config/loader.py",
+          "line": 84,
+          "context": [
+            "ConfigLoader",
+            "load_config"
+          ]
+        },
+        {
+          "instantiator": "load_config",
+          "file": "src/model_chorus/config/loader.py",
+          "line": 100,
+          "context": [
+            "ConfigLoader",
+            "load_config"
+          ]
+        },
+        {
+          "instantiator": "get_config",
+          "file": "src/model_chorus/config/loader.py",
+          "line": 157,
+          "context": [
+            "ConfigLoader",
+            "get_config"
+          ]
+        },
+        {
+          "instantiator": "load_config",
           "file": "src/model_chorus/core/config.py",
           "line": 180,
           "context": [
@@ -4358,7 +4694,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 4
+      "instantiation_count": 7
     },
     {
       "name": "ConfigLoader",
@@ -4392,6 +4728,14 @@
           "line": 734,
           "context": [
             "validate_config"
+          ]
+        },
+        {
+          "instantiator": "get_config_loader",
+          "file": "src/model_chorus/config/loader.py",
+          "line": 335,
+          "context": [
+            "get_config_loader"
           ]
         },
         {
@@ -4611,7 +4955,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 25
+      "instantiation_count": 26
     },
     {
       "name": "GenerationDefaultsV2",
@@ -23106,7 +23450,7 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 102,
           "call_type": "method_call"
         },
@@ -23631,6 +23975,36 @@
         },
         {
           "name": "get_workflow_default",
+          "file": "src/model_chorus/config/loader.py",
+          "line": 177,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get_workflow_default_provider",
+          "file": "src/model_chorus/config/loader.py",
+          "line": 208,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get_workflow_default_providers",
+          "file": "src/model_chorus/config/loader.py",
+          "line": 250,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get_workflow_fallback_providers",
+          "file": "src/model_chorus/config/loader.py",
+          "line": 279,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get_provider_model",
+          "file": "src/model_chorus/config/loader.py",
+          "line": 311,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get_workflow_default",
           "file": "src/model_chorus/core/config.py",
           "line": 268,
           "call_type": "method_call"
@@ -23740,7 +24114,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 27
+      "call_count": 32
     },
     {
       "name": "get_install_command",
@@ -28052,7 +28426,7 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 2124,
           "call_type": "method_call"
         },
@@ -28921,7 +29295,7 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 342,
           "call_type": "method_call"
         },
@@ -29227,7 +29601,7 @@
         },
         {
           "name": "read",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 596,
           "call_type": "method_call"
         },
@@ -29329,7 +29703,7 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 703,
           "call_type": "method_call"
         },
@@ -29578,7 +29952,7 @@
         },
         {
           "name": "read",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 815,
           "call_type": "method_call"
         },
@@ -29614,25 +29988,25 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 837,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 840,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 842,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 844,
           "call_type": "method_call"
         },
@@ -29741,7 +30115,7 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 908,
           "call_type": "method_call"
         },
@@ -30293,6 +30667,36 @@
         },
         {
           "name": "get_workflow_default",
+          "file": "src/model_chorus/config/loader.py",
+          "line": 177,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get_workflow_default_provider",
+          "file": "src/model_chorus/config/loader.py",
+          "line": 208,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get_workflow_default_providers",
+          "file": "src/model_chorus/config/loader.py",
+          "line": 250,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get_workflow_fallback_providers",
+          "file": "src/model_chorus/config/loader.py",
+          "line": 279,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get_provider_model",
+          "file": "src/model_chorus/config/loader.py",
+          "line": 311,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get_workflow_default",
           "file": "src/model_chorus/core/config.py",
           "line": 268,
           "call_type": "method_call"
@@ -30402,7 +30806,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 27
+      "call_count": 32
     },
     {
       "name": "get_install_command",
@@ -32372,6 +32776,54 @@
     },
     {
       "name": "get_config_loader",
+      "file": "src/model_chorus/config/loader.py",
+      "line": 326,
+      "language": "python",
+      "docstring": "Get the global ConfigLoader instance.\n\nReturns:\n    Singleton ConfigLoader instance",
+      "parameters": [],
+      "return_type": "ConfigLoader",
+      "complexity": 2,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "get_config",
+          "file": "src/model_chorus/cli/study_commands.py",
+          "line": 46,
+          "call_type": "function_call"
+        },
+        {
+          "name": "load_config",
+          "file": "src/model_chorus/core/config.py",
+          "line": 435,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get_config",
+          "file": "src/model_chorus/core/config.py",
+          "line": 445,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_get_config_loader_singleton",
+          "file": "tests/test_config.py",
+          "line": 362,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_get_config_loader_singleton",
+          "file": "tests/test_config.py",
+          "line": 363,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [],
+      "call_count": 5
+    },
+    {
+      "name": "get_config_loader",
       "file": "src/model_chorus/core/config.py",
       "line": 418,
       "language": "python",
@@ -32460,6 +32912,12 @@
           "name": "get_config",
           "file": "src/model_chorus/cli/study_commands.py",
           "line": 48,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get_config",
+          "file": "src/model_chorus/config/loader.py",
+          "line": 154,
           "call_type": "method_call"
         },
         {
@@ -32610,7 +33068,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 189,
           "call_type": "method_call"
         },
@@ -32652,7 +33110,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 606,
           "call_type": "method_call"
         },
@@ -32663,7 +33121,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 25
+      "call_count": 26
     },
     {
       "name": "get_config",
@@ -32744,6 +33202,36 @@
           "file": "src/model_chorus/cli/study_commands.py",
           "line": 488,
           "call_type": "function_call"
+        },
+        {
+          "name": "get_workflow_default",
+          "file": "src/model_chorus/config/loader.py",
+          "line": 177,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get_workflow_default_provider",
+          "file": "src/model_chorus/config/loader.py",
+          "line": 208,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get_workflow_default_providers",
+          "file": "src/model_chorus/config/loader.py",
+          "line": 250,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get_workflow_fallback_providers",
+          "file": "src/model_chorus/config/loader.py",
+          "line": 279,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get_provider_model",
+          "file": "src/model_chorus/config/loader.py",
+          "line": 311,
+          "call_type": "method_call"
         },
         {
           "name": "get_workflow_default",
@@ -32868,7 +33356,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 27
+      "call_count": 32
     },
     {
       "name": "get_claude_config_loader",
@@ -41138,7 +41626,17 @@
       "workflows.study.StudyWorkflow"
     ],
     "src/model_chorus/config/__init__.py": [
+      "loader.ConfigLoader",
+      "loader.get_config_loader",
       "models.GenerationDefaults",
+      "models.ModelChorusConfig",
+      "models.ProviderConfig",
+      "models.WorkflowConfig"
+    ],
+    "src/model_chorus/config/loader.py": [
+      "json",
+      "pathlib.Path",
+      "typing.Any",
       "models.ModelChorusConfig",
       "models.ProviderConfig",
       "models.WorkflowConfig"
