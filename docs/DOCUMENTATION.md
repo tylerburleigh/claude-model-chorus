@@ -1,14 +1,14 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-21 09:39:27
+**Generated:** 2025-11-21 09:41:42
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 112
-- **Total Lines:** 49739
+- **Total Lines:** 49826
 - **Total Classes:** 285
 - **Total Functions:** 211
 - **Avg Complexity:** 4.47
@@ -1063,6 +1063,7 @@ Attributes:
 - `add_message()`
 - `get_messages()`
 - `_estimate_tokens()`
+- `_is_important_message()`
 - `_apply_token_budget()`
 - `build_conversation_history()`
 - `get_context_summary()`

@@ -108,6 +108,7 @@ class ChatWorkflow(BaseWorkflow):
         continuation_id: str | None = None,
         files: list[str] | None = None,
         skip_provider_check: bool = False,
+        max_history_tokens: int | None = None,
         **kwargs,
     ) -> WorkflowResult:
         """
@@ -122,6 +123,7 @@ class ChatWorkflow(BaseWorkflow):
             continuation_id: Optional thread ID to continue an existing conversation
             files: Optional list of file paths to include in conversation context
             skip_provider_check: Skip provider availability check (faster startup)
+            max_history_tokens: Optional token budget for conversation history (uses smart compaction)
             **kwargs: Additional parameters passed to provider.generate()
                      (e.g., temperature, max_tokens, system_prompt)
 
@@ -235,7 +237,7 @@ class ChatWorkflow(BaseWorkflow):
 
         try:
             # Build the full prompt with conversation history and file context if available
-            full_prompt = self._build_prompt_with_history(prompt, thread_id, files)
+            full_prompt = self._build_prompt_with_history(prompt, thread_id, files, max_history_tokens)
 
             # Prepare system prompt with read-only constraints
             custom_system_prompt = kwargs.get("system_prompt")
@@ -325,7 +327,7 @@ class ChatWorkflow(BaseWorkflow):
         return result
 
     def _build_prompt_with_history(
-        self, prompt: str, thread_id: str, files: list[str] | None = None
+        self, prompt: str, thread_id: str, files: list[str] | None = None, max_history_tokens: int | None = None
     ) -> str:
         """
         Build prompt with conversation history and file context if available.
@@ -334,6 +336,7 @@ class ChatWorkflow(BaseWorkflow):
             prompt: Current user prompt
             thread_id: Thread ID to load history from
             files: Optional list of file paths to include in context
+            max_history_tokens: Optional token budget for conversation history (uses smart compaction)
 
         Returns:
             Full prompt string with conversation history and file contents prepended
@@ -363,24 +366,19 @@ class ChatWorkflow(BaseWorkflow):
                 return "\n".join(context_parts)
             return prompt
 
-        # Try to load conversation history
-        messages = self.resume_conversation(thread_id)
+        # Use build_conversation_history for token-aware history construction
+        history, message_count = self.conversation_memory.build_conversation_history(
+            thread_id=thread_id,
+            max_tokens=max_history_tokens,
+            include_files=False,  # We handle files separately above
+            smart_compaction=True  # Use smart compaction by default
+        )
 
-        # Add conversation history
-        if messages:
-            context_parts.append("\nPrevious conversation:\n")
-            for msg in messages:
-                role_label = msg.role.upper()
-                context_parts.append(f"{role_label}: {msg.content}\n")
-
-                # Include file references from history if present
-                if msg.files:
-                    context_parts.append(
-                        f"  [Referenced files: {', '.join(msg.files)}]\n"
-                    )
-
-            # Add current user prompt with USER: prefix when there's history
-            context_parts.append(f"\nUSER: {prompt}")
+        # Add conversation history if available
+        if history:
+            context_parts.append(history)
+            # Add current user prompt
+            context_parts.append(f"\n{prompt}")
         else:
             # No history - just add prompt (with file context if any)
             if context_parts:
