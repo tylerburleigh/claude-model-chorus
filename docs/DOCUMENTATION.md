@@ -1,21 +1,21 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-20 19:23:25
+**Generated:** 2025-11-20 19:25:55
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 110
-- **Total Lines:** 48678
+- **Total Lines:** 48644
 - **Total Classes:** 272
 - **Total Functions:** 211
-- **Avg Complexity:** 4.64
-- **Max Complexity:** 55
+- **Avg Complexity:** 4.57
+- **Max Complexity:** 44
 - **High Complexity Functions:**
-  - thinkdeep (55)
   - start (44)
+  - thinkdeep (41)
   - _create_smart_mock_provider (37)
   - ideate (35)
   - study_next (35)
@@ -6165,7 +6165,7 @@ Returns:
 ### `_config_init(verbose) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1953`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1919`
 **Complexity:** 4
 
 **Description:**
@@ -6179,7 +6179,7 @@ Returns:
 ### `_config_show(verbose) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1857`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1823`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -6193,7 +6193,7 @@ Returns:
 ### `_config_validate(verbose) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1920`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1886`
 **Complexity:** 4
 
 **Description:**
@@ -7276,7 +7276,7 @@ and hypotheses are validated.
 ### `config_cmd(subcommand, verbose) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1810`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1776`
 **Complexity:** 7
 
 **Decorators:** `@app.command(name='config')`
@@ -9014,7 +9014,7 @@ Returns:
 ### `list_providers(check) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:2022`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1988`
 **Complexity:** 8
 
 **Decorators:** `@app.command()`
@@ -9132,7 +9132,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:2118`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:2084`
 **Complexity:** 1
 
 **Description:**
@@ -10292,7 +10292,7 @@ Example:
 
 **Language:** python
 **Defined in:** `model_chorus/src/model_chorus/cli/main.py:1287`
-⚠️ **Complexity:** 55 (High)
+⚠️ **Complexity:** 41 (High)
 
 **Decorators:** `@app.command()`
 
@@ -10335,7 +10335,7 @@ Example:
 ### `thinkdeep_status(thread_id, show_steps, show_files, verbose) -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1664`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:1630`
 ⚠️ **Complexity:** 18 (High)
 
 **Decorators:** `@app.command(name='thinkdeep-status')`
@@ -10414,7 +10414,7 @@ Returns:
 ### `version() -> None`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/cli/main.py:2107`
+**Defined in:** `model_chorus/src/model_chorus/cli/main.py:2073`
 **Complexity:** 1
 
 **Decorators:** `@app.command()`
