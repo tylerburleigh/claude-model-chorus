@@ -2,7 +2,7 @@
   "spec_id": "architectural-improvements-2025-01-20-001",
   "title": "Model-Chorus Architectural Improvements",
   "generated": "2025-01-20T20:30:00Z",
-  "last_updated": "2025-11-21T15:08:34.974131Z",
+  "last_updated": "2025-11-21T15:16:42.108876Z",
   "description": "Comprehensive architectural refactoring to eliminate code duplication, improve maintainability, enhance reliability, and establish scalable foundations for future development.",
   "hierarchy": {
     "spec-root": {
@@ -17,7 +17,7 @@
         "phase-4"
       ],
       "total_tasks": 69,
-      "completed_tasks": 51,
+      "completed_tasks": 52,
       "metadata": {
         "objectives": [
           "Reduce code duplication by 30-40% through shared primitives",
@@ -1931,7 +1931,7 @@
     "phase-4": {
       "type": "phase",
       "title": "Data Layer & Extensibility",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "spec-root",
       "children": [
         "phase-4-files",
@@ -1945,7 +1945,7 @@
         "depends": []
       },
       "total_tasks": 18,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "purpose": "Replace JSON persistence with SQLite and enhance workflow registry",
         "risk_level": "medium-high",
@@ -1955,7 +1955,7 @@
     "phase-4-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-4",
       "children": [
         "task-4-1",
@@ -1968,7 +1968,7 @@
         "task-4-8"
       ],
       "total_tasks": 13,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1981,7 +1981,7 @@
     "task-4-1": {
       "type": "task",
       "title": "model_chorus/core/conversation_db.py",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-4-files",
       "children": [
         "task-4-1-1",
@@ -1998,7 +1998,7 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/core/conversation_db.py",
         "task_category": "implementation",
@@ -2009,7 +2009,7 @@
     "task-4-1-1": {
       "type": "subtask",
       "title": "Implement ConversationDatabase class with WAL mode",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-4-1",
       "children": [],
       "dependencies": {
@@ -2020,11 +2020,17 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/core/conversation_db.py",
         "task_category": "implementation",
-        "estimated_hours": 3
+        "estimated_hours": 3,
+        "started_at": "2025-11-21T15:14:19.569115Z",
+        "status_note": "Starting implementation of ConversationDatabase class with WAL mode",
+        "completed_at": "2025-11-21T15:16:42.100219Z",
+        "needs_journaling": false,
+        "actual_hours": 0.04,
+        "journaled_at": "2025-11-21T15:16:42.106360Z"
       }
     },
     "task-4-1-2": {
@@ -2494,8 +2500,8 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-20T20:38:01.399125Z",
-    "progress_percentage": 73,
-    "current_phase": "phase-3"
+    "progress_percentage": 75,
+    "current_phase": "phase-4"
   },
   "journal": [
     {
@@ -3046,6 +3052,15 @@
       "content": "All child tasks in phase phase-3 have been completed.",
       "metadata": {},
       "task_id": "phase-3"
+    },
+    {
+      "timestamp": "2025-11-21T15:16:42.106354Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Implement ConversationDatabase class with WAL mode",
+      "author": "claude-code",
+      "content": "Implemented ConversationDatabase class with WAL mode in model_chorus/src/model_chorus/core/conversation_db.py. The implementation includes:\n- SQLite-based storage with WAL mode enabled for concurrent access\n- Complete schema with threads, messages, and thread_metadata tables\n- Indexes on common query patterns (created_at, status, workflow_name, thread_id+timestamp)\n- Full CRUD operations matching ConversationMemory API\n- Thread lifecycle management (create, get, complete, archive)\n- Message operations (add, get with filtering)\n- TTL-based cleanup for expired and archived threads\n- Foreign key constraints with CASCADE delete for referential integrity\n- Atomic operations with transaction support\n- Thread-safe with check_same_thread=False and autocommit mode\n\nAll methods mirror the ConversationMemory API for backward compatibility. Ready for schema creation in next task.",
+      "metadata": {},
+      "task_id": "task-4-1-1"
     }
   ]
 }
