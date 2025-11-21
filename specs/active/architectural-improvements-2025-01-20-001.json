@@ -2,7 +2,7 @@
   "spec_id": "architectural-improvements-2025-01-20-001",
   "title": "Model-Chorus Architectural Improvements",
   "generated": "2025-01-20T20:30:00Z",
-  "last_updated": "2025-11-21T14:50:44.697750Z",
+  "last_updated": "2025-11-21T14:56:57.367008Z",
   "description": "Comprehensive architectural refactoring to eliminate code duplication, improve maintainability, enhance reliability, and establish scalable foundations for future development.",
   "hierarchy": {
     "spec-root": {
@@ -17,7 +17,7 @@
         "phase-4"
       ],
       "total_tasks": 69,
-      "completed_tasks": 45,
+      "completed_tasks": 46,
       "metadata": {
         "objectives": [
           "Reduce code duplication by 30-40% through shared primitives",
@@ -1351,7 +1351,7 @@
         "depends": []
       },
       "total_tasks": 16,
-      "completed_tasks": 10,
+      "completed_tasks": 11,
       "metadata": {
         "purpose": "Add provider middleware, token budgeting, and workflow runner abstraction",
         "risk_level": "medium",
@@ -1361,7 +1361,7 @@
     "phase-3-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-3",
       "children": [
         "task-3-1",
@@ -1373,8 +1373,12 @@
         "task-3-7"
       ],
       "total_tasks": 11,
-      "completed_tasks": 10,
-      "metadata": {},
+      "completed_tasks": 11,
+      "metadata": {
+        "needs_journaling": false,
+        "completed_at": "2025-11-21T14:56:57.330456Z",
+        "journaled_at": "2025-11-21T14:56:57.366972Z"
+      },
       "dependencies": {
         "blocks": [
           "phase-3-verify"
@@ -1736,7 +1740,7 @@
     "task-3-7": {
       "type": "task",
       "title": "model_chorus/tests/test_token_budgeting.py",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-3-files",
       "children": [],
       "dependencies": {
@@ -1747,12 +1751,18 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "model_chorus/tests/test_token_budgeting.py",
         "task_category": "implementation",
         "estimated_hours": 2,
-        "description": "Create tests for token budgeting and compaction"
+        "description": "Create tests for token budgeting and compaction",
+        "started_at": "2025-11-21T14:51:19.877659Z",
+        "status_note": "Starting token budgeting and compaction test implementation",
+        "completed_at": "2025-11-21T14:56:57.330274Z",
+        "needs_journaling": false,
+        "actual_hours": 0.094,
+        "journaled_at": "2025-11-21T14:56:57.345782Z"
       }
     },
     "phase-3-verify": {
@@ -2447,7 +2457,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-20T20:38:01.399125Z",
-    "progress_percentage": 65,
+    "progress_percentage": 66,
     "current_phase": "phase-3"
   },
   "journal": [
@@ -2918,6 +2928,24 @@
       "content": "Created comprehensive test suite for provider middleware (retry and circuit breaker) in model_chorus/tests/test_middleware.py. The test file includes:\n\nTest Coverage:\n- 39 tests total, all passing\n- 98% code coverage for middleware.py module\n- Tests organized into logical test classes\n\nError Classes Tests (5 tests):\n- ProviderError base exception with provider_name and original_error attributes\n- ConfigError with config_field and invalid_value tracking\n- RetryExhaustedError with attempt count and last error details\n\nRetryConfig Tests (3 tests):\n- Default configuration validation (3 retries, exponential backoff)\n- Custom configuration options\n- Permanent error pattern detection (auth failures, 4xx errors)\n\nRetryMiddleware Tests (13 tests):\n- Initialization with default and custom configs\n- Retryable vs permanent error detection\n- Exponential backoff calculation with and without jitter\n- Success on first attempt and after retries\n- Permanent errors fail immediately without retry\n- RetryExhaustedError when all attempts fail\n- Backoff delay timing verification\n\nCircuitBreakerConfig Tests (2 tests):\n- Default configuration (5 failures, 60s timeout)\n- Custom thresholds and exception filtering\n\nCircuitBreakerMiddleware Tests (13 tests):\n- State transitions: CLOSED -> OPEN -> HALF_OPEN -> CLOSED\n- Failure tracking and threshold enforcement\n- Circuit opens after failure threshold reached\n- OPEN circuit rejects requests with CircuitOpenError\n- Recovery timeout and transition to HALF_OPEN\n- Success threshold in HALF_OPEN closes circuit\n- Failure in HALF_OPEN immediately reopens\n- Excluded exceptions don't count as failures\n- State change callback invocation\n- Success resets failure count in CLOSED state\n\nMiddleware Chaining Tests (3 tests):\n- Composing retry with circuit breaker\n- Retry exhaustion counts as circuit breaker failure\n- Multiple middleware layers work together correctly\n\nAll tests use proper async/await patterns with pytest.asyncio markers. The tests verify both happy paths and error conditions, ensuring robust middleware behavior under various failure scenarios.",
       "metadata": {},
       "task_id": "task-3-6"
+    },
+    {
+      "timestamp": "2025-11-21T14:56:57.345764Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: model_chorus/tests/test_token_budgeting.py",
+      "author": "claude-code",
+      "content": "Created comprehensive test suite for token budgeting and smart compaction in model_chorus/tests/test_token_budgeting.py. The test file includes 35 tests total with 99% code coverage for conversation.py token budgeting functionality.\n\nTest Coverage Breakdown:\n- Token Estimation Tests (4 tests): Empty string, short text, medium text, and long text estimation with character-based heuristic verification (~4 chars per token)\n- Message Importance Tests (7 tests): Tests for files, multiple files, metadata, workflow_name, long messages (>500 chars), and short/medium messages without attributes\n- Simple Compaction Tests (5 tests): No compaction within budget, newest message priority, order preservation, token budget enforcement (5% tolerance), and minimum one message inclusion\n- Smart Compaction Tests (6 tests): Recent messages prioritized (70% budget), important older messages (30% budget), file preservation, chronological order, better than simple compaction, and token budget respect\n- Build History with Token Budget Tests (7 tests): Build without limit, token limit effects, max_messages application, smart vs simple comparison, truncation notes, recent message inclusion, and file reference handling\n- Edge Cases Tests (6 tests): Empty lists, single messages within/exceeding budget, all important messages, zero token budget (includes one), and file path token counting\n\nAll tests verify both simple newest-first compaction and smart compaction that preserves important older messages (files, long content, metadata) while prioritizing recent context. Tests properly use ConversationMemory.add_message API with timestamps.",
+      "metadata": {},
+      "task_id": "task-3-7"
+    },
+    {
+      "timestamp": "2025-11-21T14:56:57.366955Z",
+      "entry_type": "status_change",
+      "title": "Group Completed: File Modifications",
+      "author": "claude-code",
+      "content": "All child tasks in group phase-3-files have been completed.",
+      "metadata": {},
+      "task_id": "phase-3-files"
     }
   ]
 }

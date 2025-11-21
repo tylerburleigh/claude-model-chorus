@@ -1,17 +1,17 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-21 09:48:32
+**Generated:** 2025-11-21 09:51:34
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 112
-- **Total Lines:** 49824
-- **Total Classes:** 285
-- **Total Functions:** 211
-- **Avg Complexity:** 4.47
+- **Total Files:** 113
+- **Total Lines:** 50581
+- **Total Classes:** 293
+- **Total Functions:** 214
+- **Avg Complexity:** 4.43
 - **Max Complexity:** 44
 - **High Complexity Functions:**
   - start (44)
@@ -3550,6 +3550,46 @@ Example:
 
 ---
 
+### `TestCircuitBreakerConfig`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_middleware.py:381`
+
+**Description:**
+> Test CircuitBreakerConfig dataclass.
+
+**Methods:**
+- `test_default_config()`
+- `test_custom_config()`
+
+---
+
+### `TestCircuitBreakerMiddleware`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_middleware.py:414`
+
+**Description:**
+> Test CircuitBreakerMiddleware implementation.
+
+**Methods:**
+- `test_initialization_default_config()`
+- `test_initialization_custom_config()`
+- `test_initialization_with_callback()`
+- `test_generate_success_in_closed_state()`
+- `test_failure_count_increases_on_error()`
+- `test_circuit_opens_after_threshold()`
+- `test_circuit_open_rejects_requests()`
+- `test_circuit_transitions_to_half_open()`
+- `test_half_open_closes_after_success_threshold()`
+- `test_half_open_reopens_on_failure()`
+- `test_excluded_exceptions_not_counted()`
+- `test_state_change_callback_invoked()`
+- `test_success_resets_failure_count_in_closed()`
+- `test_is_monitored_exception()`
+
+---
+
 ### `TestCitation`
 
 **Language:** python
@@ -4050,6 +4090,20 @@ scenarios with proper thread isolation and performance.
 - `test_investigation_summary_includes_confidence()`
 - `test_confidence_cannot_decrease()`
 - `test_confidence_persistence_across_turns()`
+
+---
+
+### `TestConfigError`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_middleware.py:91`
+
+**Description:**
+> Test ConfigError exception.
+
+**Methods:**
+- `test_basic_initialization()`
+- `test_full_initialization()`
 
 ---
 
@@ -5087,6 +5141,20 @@ with long-running conversations with many messages.
 
 ---
 
+### `TestMiddlewareChaining`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_middleware.py:706`
+
+**Description:**
+> Test chaining multiple middleware together.
+
+**Methods:**
+- `test_retry_with_circuit_breaker()`
+- `test_retry_exhausted_counts_as_circuit_failure()`
+
+---
+
 ### `TestMissingEvidenceDetection`
 
 **Language:** python
@@ -5368,6 +5436,20 @@ with long-running conversations with many messages.
 
 ---
 
+### `TestProviderError`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_middleware.py:72`
+
+**Description:**
+> Test ProviderError base exception.
+
+**Methods:**
+- `test_basic_initialization()`
+- `test_full_initialization()`
+
+---
+
 ### `TestProviderResolver`
 
 **Language:** python
@@ -5512,6 +5594,59 @@ with long-running conversations with many messages.
 - `test_researcher_invoke_includes_prompt_in_findings()`
 - `test_create_researcher_factory()`
 - `test_create_researcher_factory_with_params()`
+
+---
+
+### `TestRetryConfig`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_middleware.py:137`
+
+**Description:**
+> Test RetryConfig dataclass.
+
+**Methods:**
+- `test_default_config()`
+- `test_custom_config()`
+- `test_permanent_error_patterns()`
+
+---
+
+### `TestRetryExhaustedError`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_middleware.py:113`
+
+**Description:**
+> Test RetryExhaustedError exception.
+
+**Methods:**
+- `test_initialization()`
+
+---
+
+### `TestRetryMiddleware`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_middleware.py:186`
+
+**Description:**
+> Test RetryMiddleware implementation.
+
+**Methods:**
+- `test_initialization_default_config()`
+- `test_initialization_custom_config()`
+- `test_is_retryable_error_transient()`
+- `test_is_retryable_error_permanent()`
+- `test_is_retryable_error_non_exception_type()`
+- `test_calculate_delay_exponential_backoff()`
+- `test_calculate_delay_max_cap()`
+- `test_calculate_delay_with_jitter()`
+- `test_generate_success_first_attempt()`
+- `test_generate_success_after_retries()`
+- `test_generate_permanent_error_no_retry()`
+- `test_generate_all_retries_exhausted()`
+- `test_generate_respects_backoff_delay()`
 
 ---
 
@@ -9665,6 +9800,19 @@ provider-specific fixtures above (mock_claude_provider_full, etc.).
 
 ---
 
+### `mock_provider() -> None`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_middleware.py:38`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create a mock ModelProvider for testing middleware.
+
+---
+
 ### `mock_subprocess_run() -> None`
 
 **Language:** python
@@ -9904,6 +10052,32 @@ Returns:
 
 **Description:**
 > Sample GenerationRequest for testing.
+
+---
+
+### `sample_request() -> None`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_middleware.py:47`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create a sample GenerationRequest for testing.
+
+---
+
+### `sample_response() -> None`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_middleware.py:57`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create a sample GenerationResponse for testing.
 
 ---
 
@@ -11754,6 +11928,26 @@ Returns:
 - `model_chorus.workflows.chat.ChatWorkflow`
 - `pytest`
 - `unittest.mock.AsyncMock`
+
+### `model_chorus/tests/test_middleware.py`
+
+- `asyncio`
+- `model_chorus.providers.base_provider.GenerationRequest`
+- `model_chorus.providers.base_provider.GenerationResponse`
+- `model_chorus.providers.base_provider.ModelProvider`
+- `model_chorus.providers.middleware.CircuitBreakerConfig`
+- `model_chorus.providers.middleware.CircuitBreakerMiddleware`
+- `model_chorus.providers.middleware.CircuitOpenError`
+- `model_chorus.providers.middleware.CircuitState`
+- `model_chorus.providers.middleware.ConfigError`
+- `model_chorus.providers.middleware.Middleware`
+- `model_chorus.providers.middleware.ProviderError`
+- `model_chorus.providers.middleware.RetryConfig`
+- `model_chorus.providers.middleware.RetryExhaustedError`
+- `model_chorus.providers.middleware.RetryMiddleware`
+- `pytest`
+- `unittest.mock.AsyncMock`
+- `unittest.mock.MagicMock`
 
 ### `model_chorus/tests/test_providers/test_cli_interface.py`
 

@@ -2,18 +2,18 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-21T14:48:32.439330Z",
+    "generated_at": "2025-11-21T14:51:34.834615Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 112,
-    "total_lines": 49824,
-    "total_classes": 285,
-    "total_functions": 211,
-    "avg_complexity": 4.47,
+    "total_files": 113,
+    "total_lines": 50581,
+    "total_classes": 293,
+    "total_functions": 214,
+    "avg_complexity": 4.43,
     "max_complexity": 44,
     "high_complexity_functions": [
       "start (44)",
@@ -24,11 +24,11 @@
     ],
     "by_language": {
       "python": {
-        "files": 112,
-        "lines": 49824,
-        "classes": 285,
-        "functions": 211,
-        "avg_complexity": 4.47
+        "files": 113,
+        "lines": 50581,
+        "classes": 293,
+        "functions": 214,
+        "avg_complexity": 4.43
       }
     }
   },
@@ -2350,6 +2350,48 @@
       ],
       "exports": [],
       "lines": 349
+    },
+    {
+      "name": "test_middleware",
+      "file": "model_chorus/tests/test_middleware.py",
+      "language": "python",
+      "docstring": "Tests for provider middleware (retry, circuit breaker).\n\nThis module tests the middleware components that wrap model providers\nto add resilience features like automatic retries and circuit breakers.",
+      "classes": [
+        "TestProviderError",
+        "TestConfigError",
+        "TestRetryExhaustedError",
+        "TestRetryConfig",
+        "TestRetryMiddleware",
+        "TestCircuitBreakerConfig",
+        "TestCircuitBreakerMiddleware",
+        "TestMiddlewareChaining"
+      ],
+      "functions": [
+        "mock_provider",
+        "sample_request",
+        "sample_response"
+      ],
+      "imports": [
+        "asyncio",
+        "unittest.mock.AsyncMock",
+        "unittest.mock.MagicMock",
+        "pytest",
+        "model_chorus.providers.base_provider.GenerationRequest",
+        "model_chorus.providers.base_provider.GenerationResponse",
+        "model_chorus.providers.base_provider.ModelProvider",
+        "model_chorus.providers.middleware.CircuitBreakerConfig",
+        "model_chorus.providers.middleware.CircuitBreakerMiddleware",
+        "model_chorus.providers.middleware.CircuitOpenError",
+        "model_chorus.providers.middleware.CircuitState",
+        "model_chorus.providers.middleware.ConfigError",
+        "model_chorus.providers.middleware.Middleware",
+        "model_chorus.providers.middleware.ProviderError",
+        "model_chorus.providers.middleware.RetryConfig",
+        "model_chorus.providers.middleware.RetryExhaustedError",
+        "model_chorus.providers.middleware.RetryMiddleware"
+      ],
+      "exports": [],
+      "lines": 757
     },
     {
       "name": "__init__",
@@ -11040,6 +11082,14 @@
           ]
         },
         {
+          "instantiator": "sample_request",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 49,
+          "context": [
+            "sample_request"
+          ]
+        },
+        {
           "instantiator": "test_build_command_returns_list",
           "file": "model_chorus/tests/test_providers/test_cli_interface.py",
           "line": 138,
@@ -11077,7 +11127,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 47
+      "instantiation_count": 48
     },
     {
       "name": "TokenUsage",
@@ -11530,6 +11580,14 @@
           "context": [
             "TestMemoryManagement",
             "test_concurrent_long_conversations_memory"
+          ]
+        },
+        {
+          "instantiator": "sample_response",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 59,
+          "context": [
+            "sample_response"
           ]
         },
         {
@@ -12470,7 +12528,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 144
+      "instantiation_count": 145
     },
     {
       "name": "ModelProvider",
@@ -13607,8 +13665,28 @@
       "properties": [],
       "is_exported": false,
       "is_public": true,
-      "instantiated_by": [],
-      "imported_by": []
+      "instantiated_by": [
+        {
+          "instantiator": "test_basic_initialization",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 77,
+          "context": [
+            "TestProviderError",
+            "test_basic_initialization"
+          ]
+        },
+        {
+          "instantiator": "test_full_initialization",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 85,
+          "context": [
+            "TestProviderError",
+            "test_full_initialization"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 2
     },
     {
       "name": "ConfigError",
@@ -13625,8 +13703,28 @@
       "properties": [],
       "is_exported": false,
       "is_public": true,
-      "instantiated_by": [],
-      "imported_by": []
+      "instantiated_by": [
+        {
+          "instantiator": "test_basic_initialization",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 96,
+          "context": [
+            "TestConfigError",
+            "test_basic_initialization"
+          ]
+        },
+        {
+          "instantiator": "test_full_initialization",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 103,
+          "context": [
+            "TestConfigError",
+            "test_full_initialization"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 2
     },
     {
       "name": "RetryExhaustedError",
@@ -13652,10 +13750,19 @@
             "RetryMiddleware",
             "generate"
           ]
+        },
+        {
+          "instantiator": "test_initialization",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 119,
+          "context": [
+            "TestRetryExhaustedError",
+            "test_initialization"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 1
+      "instantiation_count": 2
     },
     {
       "name": "Middleware",
@@ -13696,10 +13803,127 @@
             "RetryMiddleware",
             "__init__"
           ]
+        },
+        {
+          "instantiator": "test_default_config",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 142,
+          "context": [
+            "TestRetryConfig",
+            "test_default_config"
+          ]
+        },
+        {
+          "instantiator": "test_custom_config",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 153,
+          "context": [
+            "TestRetryConfig",
+            "test_custom_config"
+          ]
+        },
+        {
+          "instantiator": "test_permanent_error_patterns",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 168,
+          "context": [
+            "TestRetryConfig",
+            "test_permanent_error_patterns"
+          ]
+        },
+        {
+          "instantiator": "test_initialization_custom_config",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 198,
+          "context": [
+            "TestRetryMiddleware",
+            "test_initialization_custom_config"
+          ]
+        },
+        {
+          "instantiator": "test_is_retryable_error_non_exception_type",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 224,
+          "context": [
+            "TestRetryMiddleware",
+            "test_is_retryable_error_non_exception_type"
+          ]
+        },
+        {
+          "instantiator": "test_calculate_delay_exponential_backoff",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 235,
+          "context": [
+            "TestRetryMiddleware",
+            "test_calculate_delay_exponential_backoff"
+          ]
+        },
+        {
+          "instantiator": "test_calculate_delay_max_cap",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 251,
+          "context": [
+            "TestRetryMiddleware",
+            "test_calculate_delay_max_cap"
+          ]
+        },
+        {
+          "instantiator": "test_calculate_delay_with_jitter",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 264,
+          "context": [
+            "TestRetryMiddleware",
+            "test_calculate_delay_with_jitter"
+          ]
+        },
+        {
+          "instantiator": "test_generate_success_after_retries",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 300,
+          "context": [
+            "TestRetryMiddleware",
+            "test_generate_success_after_retries"
+          ]
+        },
+        {
+          "instantiator": "test_generate_all_retries_exhausted",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 333,
+          "context": [
+            "TestRetryMiddleware",
+            "test_generate_all_retries_exhausted"
+          ]
+        },
+        {
+          "instantiator": "test_generate_respects_backoff_delay",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 359,
+          "context": [
+            "TestRetryMiddleware",
+            "test_generate_respects_backoff_delay"
+          ]
+        },
+        {
+          "instantiator": "test_retry_with_circuit_breaker",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 719,
+          "context": [
+            "TestMiddlewareChaining",
+            "test_retry_with_circuit_breaker"
+          ]
+        },
+        {
+          "instantiator": "test_retry_exhausted_counts_as_circuit_failure",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 740,
+          "context": [
+            "TestMiddlewareChaining",
+            "test_retry_exhausted_counts_as_circuit_failure"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 1
+      "instantiation_count": 14
     },
     {
       "name": "RetryMiddleware",
@@ -13719,8 +13943,145 @@
       "properties": [],
       "is_exported": false,
       "is_public": true,
-      "instantiated_by": [],
-      "imported_by": []
+      "instantiated_by": [
+        {
+          "instantiator": "test_initialization_default_config",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 191,
+          "context": [
+            "TestRetryMiddleware",
+            "test_initialization_default_config"
+          ]
+        },
+        {
+          "instantiator": "test_initialization_custom_config",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 199,
+          "context": [
+            "TestRetryMiddleware",
+            "test_initialization_custom_config"
+          ]
+        },
+        {
+          "instantiator": "test_is_retryable_error_transient",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 206,
+          "context": [
+            "TestRetryMiddleware",
+            "test_is_retryable_error_transient"
+          ]
+        },
+        {
+          "instantiator": "test_is_retryable_error_permanent",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 214,
+          "context": [
+            "TestRetryMiddleware",
+            "test_is_retryable_error_permanent"
+          ]
+        },
+        {
+          "instantiator": "test_is_retryable_error_non_exception_type",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 225,
+          "context": [
+            "TestRetryMiddleware",
+            "test_is_retryable_error_non_exception_type"
+          ]
+        },
+        {
+          "instantiator": "test_calculate_delay_exponential_backoff",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 241,
+          "context": [
+            "TestRetryMiddleware",
+            "test_calculate_delay_exponential_backoff"
+          ]
+        },
+        {
+          "instantiator": "test_calculate_delay_max_cap",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 257,
+          "context": [
+            "TestRetryMiddleware",
+            "test_calculate_delay_max_cap"
+          ]
+        },
+        {
+          "instantiator": "test_calculate_delay_with_jitter",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 265,
+          "context": [
+            "TestRetryMiddleware",
+            "test_calculate_delay_with_jitter"
+          ]
+        },
+        {
+          "instantiator": "test_generate_success_first_attempt",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 279,
+          "context": [
+            "TestRetryMiddleware",
+            "test_generate_success_first_attempt"
+          ]
+        },
+        {
+          "instantiator": "test_generate_success_after_retries",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 301,
+          "context": [
+            "TestRetryMiddleware",
+            "test_generate_success_after_retries"
+          ]
+        },
+        {
+          "instantiator": "test_generate_permanent_error_no_retry",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 317,
+          "context": [
+            "TestRetryMiddleware",
+            "test_generate_permanent_error_no_retry"
+          ]
+        },
+        {
+          "instantiator": "test_generate_all_retries_exhausted",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 334,
+          "context": [
+            "TestRetryMiddleware",
+            "test_generate_all_retries_exhausted"
+          ]
+        },
+        {
+          "instantiator": "test_generate_respects_backoff_delay",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 360,
+          "context": [
+            "TestRetryMiddleware",
+            "test_generate_respects_backoff_delay"
+          ]
+        },
+        {
+          "instantiator": "test_retry_with_circuit_breaker",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 717,
+          "context": [
+            "TestMiddlewareChaining",
+            "test_retry_with_circuit_breaker"
+          ]
+        },
+        {
+          "instantiator": "test_retry_exhausted_counts_as_circuit_failure",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 738,
+          "context": [
+            "TestMiddlewareChaining",
+            "test_retry_exhausted_counts_as_circuit_failure"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 15
     },
     {
       "name": "CircuitState",
@@ -13787,10 +14148,145 @@
             "CircuitBreakerMiddleware",
             "__init__"
           ]
+        },
+        {
+          "instantiator": "test_default_config",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 386,
+          "context": [
+            "TestCircuitBreakerConfig",
+            "test_default_config"
+          ]
+        },
+        {
+          "instantiator": "test_custom_config",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 395,
+          "context": [
+            "TestCircuitBreakerConfig",
+            "test_custom_config"
+          ]
+        },
+        {
+          "instantiator": "test_initialization_custom_config",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 428,
+          "context": [
+            "TestCircuitBreakerMiddleware",
+            "test_initialization_custom_config"
+          ]
+        },
+        {
+          "instantiator": "test_failure_count_increases_on_error",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 459,
+          "context": [
+            "TestCircuitBreakerMiddleware",
+            "test_failure_count_increases_on_error"
+          ]
+        },
+        {
+          "instantiator": "test_circuit_opens_after_threshold",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 480,
+          "context": [
+            "TestCircuitBreakerMiddleware",
+            "test_circuit_opens_after_threshold"
+          ]
+        },
+        {
+          "instantiator": "test_circuit_open_rejects_requests",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 498,
+          "context": [
+            "TestCircuitBreakerMiddleware",
+            "test_circuit_open_rejects_requests"
+          ]
+        },
+        {
+          "instantiator": "test_circuit_transitions_to_half_open",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 524,
+          "context": [
+            "TestCircuitBreakerMiddleware",
+            "test_circuit_transitions_to_half_open"
+          ]
+        },
+        {
+          "instantiator": "test_half_open_closes_after_success_threshold",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 553,
+          "context": [
+            "TestCircuitBreakerMiddleware",
+            "test_half_open_closes_after_success_threshold"
+          ]
+        },
+        {
+          "instantiator": "test_half_open_reopens_on_failure",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 588,
+          "context": [
+            "TestCircuitBreakerMiddleware",
+            "test_half_open_reopens_on_failure"
+          ]
+        },
+        {
+          "instantiator": "test_excluded_exceptions_not_counted",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 617,
+          "context": [
+            "TestCircuitBreakerMiddleware",
+            "test_excluded_exceptions_not_counted"
+          ]
+        },
+        {
+          "instantiator": "test_state_change_callback_invoked",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 640,
+          "context": [
+            "TestCircuitBreakerMiddleware",
+            "test_state_change_callback_invoked"
+          ]
+        },
+        {
+          "instantiator": "test_success_resets_failure_count_in_closed",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 663,
+          "context": [
+            "TestCircuitBreakerMiddleware",
+            "test_success_resets_failure_count_in_closed"
+          ]
+        },
+        {
+          "instantiator": "test_is_monitored_exception",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 684,
+          "context": [
+            "TestCircuitBreakerMiddleware",
+            "test_is_monitored_exception"
+          ]
+        },
+        {
+          "instantiator": "test_retry_with_circuit_breaker",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 723,
+          "context": [
+            "TestMiddlewareChaining",
+            "test_retry_with_circuit_breaker"
+          ]
+        },
+        {
+          "instantiator": "test_retry_exhausted_counts_as_circuit_failure",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 744,
+          "context": [
+            "TestMiddlewareChaining",
+            "test_retry_exhausted_counts_as_circuit_failure"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 1
+      "instantiation_count": 16
     },
     {
       "name": "CircuitBreakerMiddleware",
@@ -13818,8 +14314,154 @@
       ],
       "is_exported": false,
       "is_public": true,
-      "instantiated_by": [],
-      "imported_by": []
+      "instantiated_by": [
+        {
+          "instantiator": "test_initialization_default_config",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 419,
+          "context": [
+            "TestCircuitBreakerMiddleware",
+            "test_initialization_default_config"
+          ]
+        },
+        {
+          "instantiator": "test_initialization_custom_config",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 429,
+          "context": [
+            "TestCircuitBreakerMiddleware",
+            "test_initialization_custom_config"
+          ]
+        },
+        {
+          "instantiator": "test_initialization_with_callback",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 436,
+          "context": [
+            "TestCircuitBreakerMiddleware",
+            "test_initialization_with_callback"
+          ]
+        },
+        {
+          "instantiator": "test_generate_success_in_closed_state",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 445,
+          "context": [
+            "TestCircuitBreakerMiddleware",
+            "test_generate_success_in_closed_state"
+          ]
+        },
+        {
+          "instantiator": "test_failure_count_increases_on_error",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 460,
+          "context": [
+            "TestCircuitBreakerMiddleware",
+            "test_failure_count_increases_on_error"
+          ]
+        },
+        {
+          "instantiator": "test_circuit_opens_after_threshold",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 481,
+          "context": [
+            "TestCircuitBreakerMiddleware",
+            "test_circuit_opens_after_threshold"
+          ]
+        },
+        {
+          "instantiator": "test_circuit_open_rejects_requests",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 499,
+          "context": [
+            "TestCircuitBreakerMiddleware",
+            "test_circuit_open_rejects_requests"
+          ]
+        },
+        {
+          "instantiator": "test_circuit_transitions_to_half_open",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 528,
+          "context": [
+            "TestCircuitBreakerMiddleware",
+            "test_circuit_transitions_to_half_open"
+          ]
+        },
+        {
+          "instantiator": "test_half_open_closes_after_success_threshold",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 558,
+          "context": [
+            "TestCircuitBreakerMiddleware",
+            "test_half_open_closes_after_success_threshold"
+          ]
+        },
+        {
+          "instantiator": "test_half_open_reopens_on_failure",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 592,
+          "context": [
+            "TestCircuitBreakerMiddleware",
+            "test_half_open_reopens_on_failure"
+          ]
+        },
+        {
+          "instantiator": "test_excluded_exceptions_not_counted",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 621,
+          "context": [
+            "TestCircuitBreakerMiddleware",
+            "test_excluded_exceptions_not_counted"
+          ]
+        },
+        {
+          "instantiator": "test_state_change_callback_invoked",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 641,
+          "context": [
+            "TestCircuitBreakerMiddleware",
+            "test_state_change_callback_invoked"
+          ]
+        },
+        {
+          "instantiator": "test_success_resets_failure_count_in_closed",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 664,
+          "context": [
+            "TestCircuitBreakerMiddleware",
+            "test_success_resets_failure_count_in_closed"
+          ]
+        },
+        {
+          "instantiator": "test_is_monitored_exception",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 688,
+          "context": [
+            "TestCircuitBreakerMiddleware",
+            "test_is_monitored_exception"
+          ]
+        },
+        {
+          "instantiator": "test_retry_with_circuit_breaker",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 721,
+          "context": [
+            "TestMiddlewareChaining",
+            "test_retry_with_circuit_breaker"
+          ]
+        },
+        {
+          "instantiator": "test_retry_exhausted_counts_as_circuit_failure",
+          "file": "model_chorus/tests/test_middleware.py",
+          "line": 742,
+          "context": [
+            "TestMiddlewareChaining",
+            "test_retry_exhausted_counts_as_circuit_failure"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 16
     },
     {
       "name": "CitationStyle",
@@ -18767,6 +19409,165 @@
         "test_multiple_long_conversations_memory_isolation",
         "test_memory_efficiency_with_large_messages",
         "test_concurrent_long_conversations_memory"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestProviderError",
+      "file": "model_chorus/tests/test_middleware.py",
+      "line": 72,
+      "language": "python",
+      "docstring": "Test ProviderError base exception.",
+      "bases": [],
+      "methods": [
+        "test_basic_initialization",
+        "test_full_initialization"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestConfigError",
+      "file": "model_chorus/tests/test_middleware.py",
+      "line": 91,
+      "language": "python",
+      "docstring": "Test ConfigError exception.",
+      "bases": [],
+      "methods": [
+        "test_basic_initialization",
+        "test_full_initialization"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestRetryExhaustedError",
+      "file": "model_chorus/tests/test_middleware.py",
+      "line": 113,
+      "language": "python",
+      "docstring": "Test RetryExhaustedError exception.",
+      "bases": [],
+      "methods": [
+        "test_initialization"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestRetryConfig",
+      "file": "model_chorus/tests/test_middleware.py",
+      "line": 137,
+      "language": "python",
+      "docstring": "Test RetryConfig dataclass.",
+      "bases": [],
+      "methods": [
+        "test_default_config",
+        "test_custom_config",
+        "test_permanent_error_patterns"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestRetryMiddleware",
+      "file": "model_chorus/tests/test_middleware.py",
+      "line": 186,
+      "language": "python",
+      "docstring": "Test RetryMiddleware implementation.",
+      "bases": [],
+      "methods": [
+        "test_initialization_default_config",
+        "test_initialization_custom_config",
+        "test_is_retryable_error_transient",
+        "test_is_retryable_error_permanent",
+        "test_is_retryable_error_non_exception_type",
+        "test_calculate_delay_exponential_backoff",
+        "test_calculate_delay_max_cap",
+        "test_calculate_delay_with_jitter",
+        "test_generate_success_first_attempt",
+        "test_generate_success_after_retries",
+        "test_generate_permanent_error_no_retry",
+        "test_generate_all_retries_exhausted",
+        "test_generate_respects_backoff_delay"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestCircuitBreakerConfig",
+      "file": "model_chorus/tests/test_middleware.py",
+      "line": 381,
+      "language": "python",
+      "docstring": "Test CircuitBreakerConfig dataclass.",
+      "bases": [],
+      "methods": [
+        "test_default_config",
+        "test_custom_config"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestCircuitBreakerMiddleware",
+      "file": "model_chorus/tests/test_middleware.py",
+      "line": 414,
+      "language": "python",
+      "docstring": "Test CircuitBreakerMiddleware implementation.",
+      "bases": [],
+      "methods": [
+        "test_initialization_default_config",
+        "test_initialization_custom_config",
+        "test_initialization_with_callback",
+        "test_generate_success_in_closed_state",
+        "test_failure_count_increases_on_error",
+        "test_circuit_opens_after_threshold",
+        "test_circuit_open_rejects_requests",
+        "test_circuit_transitions_to_half_open",
+        "test_half_open_closes_after_success_threshold",
+        "test_half_open_reopens_on_failure",
+        "test_excluded_exceptions_not_counted",
+        "test_state_change_callback_invoked",
+        "test_success_resets_failure_count_in_closed",
+        "test_is_monitored_exception"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestMiddlewareChaining",
+      "file": "model_chorus/tests/test_middleware.py",
+      "line": 706,
+      "language": "python",
+      "docstring": "Test chaining multiple middleware together.",
+      "bases": [],
+      "methods": [
+        "test_retry_with_circuit_breaker",
+        "test_retry_exhausted_counts_as_circuit_failure"
       ],
       "properties": [],
       "is_exported": false,
@@ -27978,7 +28779,7 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 1926,
           "call_type": "method_call"
         },
@@ -32554,7 +33355,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 189,
           "call_type": "method_call"
         },
@@ -32596,7 +33397,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 606,
           "call_type": "method_call"
         },
@@ -39683,6 +40484,60 @@
       "calls": []
     },
     {
+      "name": "mock_provider",
+      "file": "model_chorus/tests/test_middleware.py",
+      "line": 38,
+      "language": "python",
+      "docstring": "Create a mock ModelProvider for testing middleware.",
+      "parameters": [],
+      "return_type": null,
+      "complexity": 1,
+      "decorators": [
+        "pytest.fixture"
+      ],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": []
+    },
+    {
+      "name": "sample_request",
+      "file": "model_chorus/tests/test_middleware.py",
+      "line": 47,
+      "language": "python",
+      "docstring": "Create a sample GenerationRequest for testing.",
+      "parameters": [],
+      "return_type": null,
+      "complexity": 1,
+      "decorators": [
+        "pytest.fixture"
+      ],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": []
+    },
+    {
+      "name": "sample_response",
+      "file": "model_chorus/tests/test_middleware.py",
+      "line": 57,
+      "language": "python",
+      "docstring": "Create a sample GenerationResponse for testing.",
+      "parameters": [],
+      "return_type": null,
+      "complexity": 1,
+      "decorators": [
+        "pytest.fixture"
+      ],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": []
+    },
+    {
       "name": "review_json_path",
       "file": "model_chorus/tests/test_review_response.py",
       "line": 19,
@@ -41887,6 +42742,25 @@
       "model_chorus.core.conversation.ConversationMemory",
       "model_chorus.providers.base_provider.GenerationResponse",
       "model_chorus.workflows.chat.ChatWorkflow"
+    ],
+    "model_chorus/tests/test_middleware.py": [
+      "asyncio",
+      "unittest.mock.AsyncMock",
+      "unittest.mock.MagicMock",
+      "pytest",
+      "model_chorus.providers.base_provider.GenerationRequest",
+      "model_chorus.providers.base_provider.GenerationResponse",
+      "model_chorus.providers.base_provider.ModelProvider",
+      "model_chorus.providers.middleware.CircuitBreakerConfig",
+      "model_chorus.providers.middleware.CircuitBreakerMiddleware",
+      "model_chorus.providers.middleware.CircuitOpenError",
+      "model_chorus.providers.middleware.CircuitState",
+      "model_chorus.providers.middleware.ConfigError",
+      "model_chorus.providers.middleware.Middleware",
+      "model_chorus.providers.middleware.ProviderError",
+      "model_chorus.providers.middleware.RetryConfig",
+      "model_chorus.providers.middleware.RetryExhaustedError",
+      "model_chorus.providers.middleware.RetryMiddleware"
     ],
     "model_chorus/tests/test_providers/test_cli_interface.py": [
       "pytest",
