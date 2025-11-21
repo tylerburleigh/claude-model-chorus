@@ -12,6 +12,7 @@ from dataclasses import dataclass, field, replace
 from enum import Enum
 from typing import Any
 
+from ..core.base_workflow import BaseWorkflow, WorkflowResult
 from ..core.progress import (
     emit_provider_complete,
     emit_provider_start,
@@ -59,7 +60,7 @@ class ConsensusResult:
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
-class ConsensusWorkflow:
+class ConsensusWorkflow(BaseWorkflow):
     """
     Workflow for coordinating multiple AI models to reach consensus.
 
@@ -100,6 +101,8 @@ class ConsensusWorkflow:
         strategy: ConsensusStrategy = ConsensusStrategy.ALL_RESPONSES,
         default_timeout: float = 120.0,
         num_to_consult: int | None = None,
+        config: dict[str, Any] | None = None,
+        conversation_memory: Any | None = None,
     ):
         """
         Initialize the consensus workflow.
@@ -109,9 +112,18 @@ class ConsensusWorkflow:
             strategy: Strategy for reaching consensus (default: ALL_RESPONSES)
             default_timeout: Default timeout per provider in seconds (default: 120)
             num_to_consult: Number of successful responses required (default: use all providers)
+            config: Optional configuration dictionary
+            conversation_memory: Optional ConversationMemory for multi-turn conversations
         """
         if not providers:
             raise ValueError("At least one provider must be specified")
+
+        super().__init__(
+            name="Consensus",
+            description="Multi-model consultation with parallel execution and configurable synthesis strategies",
+            config=config,
+            conversation_memory=conversation_memory,
+        )
 
         self.provider_configs = [
             ProviderConfig(provider=p, timeout=default_timeout) for p in providers
@@ -321,6 +333,66 @@ class ConsensusWorkflow:
         # Emit workflow complete
         emit_workflow_complete("consensus")
 
+        return result
+
+    async def run(self, prompt: str, **kwargs) -> WorkflowResult:
+        """
+        Execute the workflow with the given prompt.
+
+        This is the BaseWorkflow interface method that wraps the execute() method
+        and converts ConsensusResult to WorkflowResult.
+
+        Args:
+            prompt: The input prompt/task for the workflow
+            **kwargs: Additional workflow-specific parameters
+                - strategy: Override the default consensus strategy (optional)
+                - model: Override model for specific provider (optional)
+                - system_prompt: System prompt to prepend (optional)
+
+        Returns:
+            WorkflowResult containing the execution results
+
+        Raises:
+            RuntimeError: If unable to obtain num_to_consult successful responses
+        """
+        # Create generation request from prompt
+        request = GenerationRequest(
+            prompt=prompt,
+            model=kwargs.get("model"),
+            system_prompt=kwargs.get("system_prompt"),
+        )
+
+        # Execute consensus workflow
+        strategy = kwargs.get("strategy")
+        consensus_result = await self.execute(request, strategy=strategy)
+
+        # Convert ConsensusResult to WorkflowResult
+        result = WorkflowResult(
+            success=True,
+            synthesis=consensus_result.consensus_response,
+            metadata={
+                "strategy": consensus_result.strategy_used.value,
+                "provider_results": {
+                    name: resp.content
+                    for name, resp in consensus_result.provider_results.items()
+                },
+                "failed_providers": consensus_result.failed_providers,
+                **consensus_result.metadata,
+            },
+        )
+
+        # Add steps for each provider response
+        for i, (provider_name, response) in enumerate(
+            consensus_result.provider_results.items(), 1
+        ):
+            result.add_step(
+                step_number=i,
+                content=response.content,
+                model=provider_name,
+                provider=provider_name,
+            )
+
+        self._result = result
         return result
 
     def _apply_strategy(

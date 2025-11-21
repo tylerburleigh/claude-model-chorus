@@ -44,6 +44,18 @@ WorkflowRegistry.register_metadata(
     examples=["model-chorus chat 'What is quantum computing?'"],
 )
 
+# Register ConsensusWorkflow (not using decorator)
+WorkflowRegistry.register_workflow("consensus", ConsensusWorkflow)
+WorkflowRegistry.register_metadata(
+    "consensus",
+    description="Multi-model consultation with parallel execution and configurable synthesis strategies",
+    version="1.0.0",
+    author="ModelChorus Team",
+    category="consultation",
+    parameters=["prompt", "strategy", "num_to_consult"],
+    examples=["model-chorus consensus 'Explain quantum computing' --num-to-consult 2"],
+)
+
 # ArgumentWorkflow is already registered via decorator, just add metadata
 WorkflowRegistry.register_metadata(
     "argument",

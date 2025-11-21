@@ -2,13 +2,13 @@
   "spec_id": "architectural-improvements-2025-01-20-001",
   "title": "Model-Chorus Architectural Improvements",
   "generated": "2025-01-20T20:30:00Z",
-  "last_updated": "2025-11-21T16:53:50.579919Z",
+  "last_updated": "2025-11-21T18:35:01.583366Z",
   "description": "Comprehensive architectural refactoring to eliminate code duplication, improve maintainability, enhance reliability, and establish scalable foundations for future development.",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
       "title": "Model-Chorus Architectural Improvements",
-      "status": "in_progress",
+      "status": "completed",
       "parent": null,
       "children": [
         "phase-1",
@@ -17,7 +17,7 @@
         "phase-4"
       ],
       "total_tasks": 69,
-      "completed_tasks": 68,
+      "completed_tasks": 69,
       "metadata": {
         "objectives": [
           "Reduce code duplication by 30-40% through shared primitives",
@@ -1931,7 +1931,7 @@
     "phase-4": {
       "type": "phase",
       "title": "Data Layer & Extensibility",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "spec-root",
       "children": [
         "phase-4-files",
@@ -1945,11 +1945,14 @@
         "depends": []
       },
       "total_tasks": 18,
-      "completed_tasks": 17,
+      "completed_tasks": 18,
       "metadata": {
         "purpose": "Replace JSON persistence with SQLite and enhance workflow registry",
         "risk_level": "medium-high",
-        "estimated_duration": "2-3 weeks"
+        "estimated_duration": "2-3 weeks",
+        "needs_journaling": false,
+        "completed_at": "2025-11-21T18:35:01.563603Z",
+        "journaled_at": "2025-11-21T18:35:01.583326Z"
       }
     },
     "phase-4-files": {
@@ -2450,7 +2453,7 @@
     "phase-4-verify": {
       "type": "group",
       "title": "Verification",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-4",
       "children": [
         "verify-4-1",
@@ -2467,8 +2470,12 @@
         "depends": []
       },
       "total_tasks": 5,
-      "completed_tasks": 4,
-      "metadata": {}
+      "completed_tasks": 5,
+      "metadata": {
+        "needs_journaling": false,
+        "completed_at": "2025-11-21T18:35:01.563600Z",
+        "journaled_at": "2025-11-21T18:35:01.579902Z"
+      }
     },
     "verify-4-1": {
       "type": "verify",
@@ -2573,7 +2580,7 @@
     "verify-4-5": {
       "type": "verify",
       "title": "Phase 4 implementation fidelity review",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-4-verify",
       "children": [],
       "dependencies": {
@@ -2582,7 +2589,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "fidelity",
         "agent": "sdd-fidelity-review",
@@ -2592,14 +2599,19 @@
           "consult": true,
           "revert_status": "in_progress",
           "continue_on_failure": false
-        }
+        },
+        "started_at": "2025-11-21T16:54:14.935570Z",
+        "completed_at": "2025-11-21T18:35:01.563425Z",
+        "needs_journaling": false,
+        "actual_hours": 1.68,
+        "journaled_at": "2025-11-21T18:35:01.572166Z"
       }
     }
   },
   "metadata": {
-    "status": "active",
+    "status": "completed",
     "activated_date": "2025-11-20T20:38:01.399125Z",
-    "progress_percentage": 98,
+    "progress_percentage": 100,
     "current_phase": "phase-4"
   },
   "journal": [
@@ -3313,6 +3325,33 @@
       "content": "Verified list-workflows command successfully displays all 5 workflows (argument, chat, ideate, study, thinkdeep) with complete metadata including descriptions, versions, authors, categories, parameters, and usage examples. Output formatting is clean and professional.",
       "metadata": {},
       "task_id": "verify-4-4"
+    },
+    {
+      "timestamp": "2025-11-21T18:35:01.572158Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Phase 4 implementation fidelity review",
+      "author": "claude-code",
+      "content": "Fidelity review identified ConsensusWorkflow registration issue. Fixed by: 1) Made ConsensusWorkflow inherit from BaseWorkflow, 2) Implemented run() abstract method, 3) Registered workflow and metadata in workflows/__init__.py, 4) Removed duplicate list_workflows() method from registry.py. All tests pass: 41 registry tests and 7 consensus workflow tests. ConsensusWorkflow now appears in model-chorus list-workflows output with full metadata.",
+      "metadata": {},
+      "task_id": "verify-4-5"
+    },
+    {
+      "timestamp": "2025-11-21T18:35:01.579890Z",
+      "entry_type": "status_change",
+      "title": "Group Completed: Verification",
+      "author": "claude-code",
+      "content": "All child tasks in group phase-4-verify have been completed.",
+      "metadata": {},
+      "task_id": "phase-4-verify"
+    },
+    {
+      "timestamp": "2025-11-21T18:35:01.583316Z",
+      "entry_type": "status_change",
+      "title": "Phase Completed: Data Layer & Extensibility",
+      "author": "claude-code",
+      "content": "All child tasks in phase phase-4 have been completed.",
+      "metadata": {},
+      "task_id": "phase-4"
     }
   ]
 }

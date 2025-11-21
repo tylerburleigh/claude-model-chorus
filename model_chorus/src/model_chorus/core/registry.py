@@ -160,23 +160,6 @@ class WorkflowRegistry:
         return cls._workflows[name]
 
     @classmethod
-    def list_workflows(cls) -> dict[str, type[BaseWorkflow]]:
-        """
-        Get all registered workflows.
-
-        Returns:
-            Dictionary mapping workflow names to their classes
-
-        Example:
-            ```python
-            workflows = WorkflowRegistry.list_workflows()
-            for name, workflow_class in workflows.items():
-                print(f"{name}: {workflow_class.__name__}")
-            ```
-        """
-        return cls._workflows.copy()
-
-    @classmethod
     def is_registered(cls, name: str) -> bool:
         """
         Check if a workflow is registered.
