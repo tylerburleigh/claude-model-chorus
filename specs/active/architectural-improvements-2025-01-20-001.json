@@ -2,7 +2,7 @@
   "spec_id": "architectural-improvements-2025-01-20-001",
   "title": "Model-Chorus Architectural Improvements",
   "generated": "2025-01-20T20:30:00Z",
-  "last_updated": "2025-11-21T13:26:30.737190Z",
+  "last_updated": "2025-11-21T13:37:30.591287Z",
   "description": "Comprehensive architectural refactoring to eliminate code duplication, improve maintainability, enhance reliability, and establish scalable foundations for future development.",
   "hierarchy": {
     "spec-root": {
@@ -17,7 +17,7 @@
         "phase-4"
       ],
       "total_tasks": 69,
-      "completed_tasks": 36,
+      "completed_tasks": 37,
       "metadata": {
         "objectives": [
           "Reduce code duplication by 30-40% through shared primitives",
@@ -1351,7 +1351,7 @@
         "depends": []
       },
       "total_tasks": 16,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "purpose": "Add provider middleware, token budgeting, and workflow runner abstraction",
         "risk_level": "medium",
@@ -1373,7 +1373,7 @@
         "task-3-7"
       ],
       "total_tasks": 11,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1402,7 +1402,7 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/providers/middleware.py",
         "task_category": "implementation",
@@ -1438,7 +1438,7 @@
     "task-3-1-2": {
       "type": "subtask",
       "title": "Implement CircuitBreakerMiddleware",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-3-1",
       "children": [],
       "dependencies": {
@@ -1447,11 +1447,17 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/providers/middleware.py",
         "task_category": "implementation",
-        "estimated_hours": 3
+        "estimated_hours": 3,
+        "started_at": "2025-11-21T13:34:42.477924Z",
+        "status_note": "Starting CircuitBreakerMiddleware implementation with three-state pattern (CLOSED, OPEN, HALF_OPEN)",
+        "completed_at": "2025-11-21T13:37:30.568132Z",
+        "needs_journaling": false,
+        "actual_hours": 0.047,
+        "journaled_at": "2025-11-21T13:37:30.585712Z"
       }
     },
     "task-3-1-3": {
@@ -2393,7 +2399,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-20T20:38:01.399125Z",
-    "progress_percentage": 52,
+    "progress_percentage": 53,
     "current_phase": "phase-3"
   },
   "journal": [
@@ -2783,6 +2789,15 @@
       "content": "Successfully implemented RetryMiddleware with exponential backoff for provider resilience. Created model_chorus/src/model_chorus/providers/middleware.py (292 lines) with:\n\n1. **Middleware abstract base class**: Foundation for composable middleware pattern\n2. **RetryConfig dataclass**: Configurable retry parameters (max_retries, base_delay, max_delay, backoff_multiplier, jitter, permanent error patterns)\n3. **RetryMiddleware class**: Implements exponential backoff with jitter, smart error classification, and comprehensive logging\n\nKey features:\n- Configurable exponential backoff: delay = base_delay * (multiplier^attempt), capped at max_delay\n- Optional jitter (\u00b125% randomness) to prevent thundering herd\n- Smart error classification: distinguishes permanent errors (auth, validation) from transient errors\n- Transparent wrapping: works with any ModelProvider\n- Async/await support\n- Detailed logging at all retry stages\n\nTesting:\n- Created and ran comprehensive tests covering:\n  * Success after transient failures (2 failures then success)\n  * Immediate success (no retries needed)\n  * Permanent errors (no retry, fail immediately)\n  * All retries exhausted (max attempts reached)\n- All 4 tests passed successfully\n\nThe middleware is production-ready and can be composed with other middleware for logging, rate limiting, circuit breakers, etc. No changes needed to existing provider code - middleware wraps providers transparently.\n\nExample usage:\n```python\nfrom model_chorus.providers.middleware import RetryMiddleware, RetryConfig\nfrom model_chorus.providers.claude_provider import ClaudeProvider\n\n# Default config (3 retries, exponential backoff)\nprovider = RetryMiddleware(ClaudeProvider())\n\n# Custom config\nconfig = RetryConfig(max_retries=5, base_delay=2.0, max_delay=120.0)\nprovider = RetryMiddleware(ClaudeProvider(), config)\n```\n\nFile created: model_chorus/src/model_chorus/providers/middleware.py (292 lines)",
       "metadata": {},
       "task_id": "task-3-1-1"
+    },
+    {
+      "timestamp": "2025-11-21T13:37:30.585694Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Implement CircuitBreakerMiddleware",
+      "author": "claude-code",
+      "content": "Successfully implemented CircuitBreakerMiddleware with three-state pattern for provider fault tolerance. Added to existing model_chorus/src/model_chorus/providers/middleware.py (~320 lines added, total now 589 lines).\n\nImplementation details:\n\n1. **CircuitState Enum**: Defines CLOSED, OPEN, HALF_OPEN states\n2. **CircuitOpenError Exception**: Custom exception raised when circuit is open with recovery time information\n3. **CircuitBreakerConfig Dataclass**: Configurable parameters:\n   - failure_threshold: int (default: 5) - failures before opening circuit\n   - success_threshold: int (default: 2) - successes in half-open to close\n   - recovery_timeout: float (default: 60.0) - seconds before trying half-open\n   - monitored_exceptions: tuple - which exceptions count as failures\n   - excluded_exceptions: tuple - exceptions that don't trigger circuit\n\n4. **CircuitBreakerMiddleware Class**: Complete state machine implementation\n   - Thread-safe state management using asyncio.Lock()\n   - State transition logic: CLOSED \u2192 OPEN (failures >= threshold) \u2192 HALF_OPEN (timeout elapsed) \u2192 CLOSED (successes >= threshold)\n   - HALF_OPEN \u2192 OPEN on any failure during testing\n   - Fast-fail when circuit is OPEN (no provider calls)\n   - Optional state change callbacks for observability\n   - Properties for state inspection (state, failure_count, success_count)\n\nKey Features:\n- Protects against cascading failures by failing fast when provider is unhealthy\n- Automatic recovery testing after timeout period\n- Composable with other middleware (e.g., wrap RetryMiddleware)\n- Detailed logging of all state transitions\n- Thread-safe for concurrent requests\n\nTesting:\nCreated and ran 7 comprehensive tests covering:\n1. Circuit starts in CLOSED state\n2. Circuit opens after failure threshold (5 failures \u2192 OPEN)\n3. OPEN circuit rejects requests immediately with CircuitOpenError\n4. Circuit transitions to HALF_OPEN after recovery timeout\n5. Circuit closes after success threshold in HALF_OPEN (2 successes \u2192 CLOSED)\n6. Circuit reopens on any failure in HALF_OPEN\n7. State change callbacks are invoked correctly\n\nAll 7 tests passed successfully with proper state transitions and counter management.\n\nExample usage:\n```python\nfrom model_chorus.providers.middleware import CircuitBreakerMiddleware, CircuitBreakerConfig\n\n# Default config (5 failures, 60s timeout)\nprovider = CircuitBreakerMiddleware(ClaudeProvider())\n\n# Custom config\nconfig = CircuitBreakerConfig(failure_threshold=3, recovery_timeout=30.0)\nprovider = CircuitBreakerMiddleware(ClaudeProvider(), config)\n\n# Compose with retry middleware (circuit breaker wraps retry)\nprovider = CircuitBreakerMiddleware(\n    RetryMiddleware(ClaudeProvider())\n)\n\ntry:\n    response = await provider.generate(request)\nexcept CircuitOpenError as e:\n    print(f\"Circuit open, retry in {e.recovery_time}s\")\n```\n\nThe middleware is production-ready and provides robust fault tolerance for provider failures.\n\nFile modified: model_chorus/src/model_chorus/providers/middleware.py (269 \u2192 589 lines, +320 lines)",
+      "metadata": {},
+      "task_id": "task-3-1-2"
     }
   ]
 }

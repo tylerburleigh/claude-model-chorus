@@ -266,3 +266,323 @@ class RetryMiddleware(Middleware):
         error_msg = f"All {self.config.max_retries + 1} attempts failed. Last error: {last_exception}"
         logger.error(error_msg)
         raise Exception(error_msg) from last_exception
+
+
+# Circuit Breaker Implementation
+
+from enum import Enum
+from time import time
+from typing import Callable
+
+
+class CircuitState(Enum):
+    """States of a circuit breaker.
+
+    - CLOSED: Normal operation, requests pass through
+    - OPEN: Too many failures, requests fail immediately
+    - HALF_OPEN: Testing recovery, limited requests allowed
+    """
+
+    CLOSED = "closed"
+    OPEN = "open"
+    HALF_OPEN = "half_open"
+
+
+class CircuitOpenError(Exception):
+    """Raised when circuit breaker is open and request is rejected."""
+
+    def __init__(self, provider_name: str, recovery_time: float):
+        """
+        Initialize circuit open error.
+
+        Args:
+            provider_name: Name of the provider with open circuit
+            recovery_time: Seconds until circuit will try half-open state
+        """
+        self.provider_name = provider_name
+        self.recovery_time = recovery_time
+        super().__init__(
+            f"Circuit breaker is OPEN for provider '{provider_name}'. "
+            f"Retry in {recovery_time:.1f} seconds."
+        )
+
+
+@dataclass
+class CircuitBreakerConfig:
+    """Configuration for circuit breaker behavior.
+
+    Attributes:
+        failure_threshold: Number of consecutive failures before opening circuit (default: 5)
+        success_threshold: Number of consecutive successes in half-open to close circuit (default: 2)
+        recovery_timeout: Seconds to wait before trying half-open state (default: 60.0)
+        monitored_exceptions: Tuple of exception types that count as failures (default: (Exception,))
+        excluded_exceptions: Tuple of exception types that don't count as failures
+            (e.g., validation errors that shouldn't trigger circuit)
+
+    Examples:
+        # Default config: 5 failures, 60s timeout
+        config = CircuitBreakerConfig()
+
+        # Aggressive protection
+        config = CircuitBreakerConfig(failure_threshold=3, recovery_timeout=30.0)
+
+        # Conservative (allow more failures)
+        config = CircuitBreakerConfig(failure_threshold=10, recovery_timeout=120.0)
+    """
+
+    failure_threshold: int = 5
+    success_threshold: int = 2
+    recovery_timeout: float = 60.0
+    monitored_exceptions: tuple[type[Exception], ...] = (Exception,)
+    excluded_exceptions: tuple[type[Exception], ...] = ()
+
+
+class CircuitBreakerMiddleware(Middleware):
+    """
+    Middleware that implements circuit breaker pattern for fault tolerance.
+
+    Protects against cascading failures by tracking provider health and
+    "opening the circuit" when failures exceed threshold. Gives failing
+    providers time to recover before allowing requests through again.
+
+    State Machine:
+        CLOSED (normal) --[failures >= threshold]--> OPEN (rejecting)
+        OPEN --[timeout elapsed]--> HALF_OPEN (testing)
+        HALF_OPEN --[success >= threshold]--> CLOSED
+        HALF_OPEN --[any failure]--> OPEN
+
+    Example:
+        # Use default config (5 failures, 60s timeout)
+        provider = CircuitBreakerMiddleware(ClaudeProvider())
+
+        # Custom config
+        config = CircuitBreakerConfig(failure_threshold=3, recovery_timeout=30.0)
+        provider = CircuitBreakerMiddleware(ClaudeProvider(), config)
+
+        # Compose with retry middleware (circuit breaker wraps retry)
+        provider = CircuitBreakerMiddleware(
+            RetryMiddleware(ClaudeProvider())
+        )
+
+        try:
+            response = await provider.generate(request)
+        except CircuitOpenError as e:
+            print(f"Circuit open, retry in {e.recovery_time}s")
+    """
+
+    def __init__(
+        self,
+        provider: ModelProvider,
+        config: CircuitBreakerConfig | None = None,
+        on_state_change: Callable[[CircuitState, CircuitState], None] | None = None,
+    ):
+        """
+        Initialize circuit breaker middleware.
+
+        Args:
+            provider: The model provider to wrap
+            config: Optional CircuitBreakerConfig for customizing behavior
+            on_state_change: Optional callback for state changes (old_state, new_state)
+        """
+        super().__init__(provider)
+        self.config = config or CircuitBreakerConfig()
+        self.on_state_change = on_state_change
+
+        # State tracking
+        self._state = CircuitState.CLOSED
+        self._failure_count = 0
+        self._success_count = 0
+        self._last_failure_time: float | None = None
+        self._lock = asyncio.Lock()  # Thread-safe state changes
+
+    @property
+    def state(self) -> CircuitState:
+        """Get current circuit state."""
+        return self._state
+
+    @property
+    def failure_count(self) -> int:
+        """Get current failure count."""
+        return self._failure_count
+
+    @property
+    def success_count(self) -> int:
+        """Get current success count."""
+        return self._success_count
+
+    async def _transition_to(self, new_state: CircuitState) -> None:
+        """
+        Transition to a new circuit state.
+
+        Args:
+            new_state: The state to transition to
+        """
+        old_state = self._state
+        if old_state != new_state:
+            self._state = new_state
+
+            # Reset counters on state change
+            if new_state == CircuitState.CLOSED:
+                self._failure_count = 0
+                self._success_count = 0
+                self._last_failure_time = None
+            elif new_state == CircuitState.HALF_OPEN:
+                self._success_count = 0
+                # Keep failure count for logging
+
+            logger.info(
+                f"Circuit breaker state: {old_state.value} -> {new_state.value} "
+                f"(provider: {self.provider.__class__.__name__})"
+            )
+
+            # Call state change callback if provided
+            if self.on_state_change:
+                self.on_state_change(old_state, new_state)
+
+    def _should_attempt_request(self) -> bool:
+        """
+        Check if request should be attempted based on circuit state.
+
+        Returns:
+            True if request should proceed, False if circuit is open
+        """
+        if self._state == CircuitState.CLOSED:
+            return True
+
+        if self._state == CircuitState.HALF_OPEN:
+            return True
+
+        # State is OPEN - check if recovery timeout has elapsed
+        if self._last_failure_time is None:
+            return True
+
+        time_since_failure = time() - self._last_failure_time
+        if time_since_failure >= self.config.recovery_timeout:
+            # Timeout elapsed, allow one request through (will transition to HALF_OPEN)
+            return True
+
+        return False
+
+    def _time_until_recovery(self) -> float:
+        """
+        Calculate seconds until circuit can try half-open state.
+
+        Returns:
+            Seconds until recovery (0 if ready now)
+        """
+        if self._last_failure_time is None:
+            return 0.0
+
+        time_since_failure = time() - self._last_failure_time
+        remaining = self.config.recovery_timeout - time_since_failure
+        return max(0.0, remaining)
+
+    def _is_monitored_exception(self, error: Exception) -> bool:
+        """
+        Check if exception should be counted as failure.
+
+        Args:
+            error: The exception to check
+
+        Returns:
+            True if exception counts as failure, False otherwise
+        """
+        # Check if excluded
+        if isinstance(error, self.config.excluded_exceptions):
+            return False
+
+        # Check if monitored
+        return isinstance(error, self.config.monitored_exceptions)
+
+    async def _record_success(self) -> None:
+        """Record a successful request."""
+        async with self._lock:
+            if self._state == CircuitState.HALF_OPEN:
+                self._success_count += 1
+                logger.debug(
+                    f"Circuit breaker success in HALF_OPEN: "
+                    f"{self._success_count}/{self.config.success_threshold}"
+                )
+
+                if self._success_count >= self.config.success_threshold:
+                    await self._transition_to(CircuitState.CLOSED)
+            elif self._state == CircuitState.CLOSED:
+                # Reset failure count on success in CLOSED state
+                if self._failure_count > 0:
+                    logger.debug("Circuit breaker: Resetting failure count after success")
+                    self._failure_count = 0
+
+    async def _record_failure(self, error: Exception) -> None:
+        """
+        Record a failed request.
+
+        Args:
+            error: The exception that caused the failure
+        """
+        if not self._is_monitored_exception(error):
+            logger.debug(f"Exception not monitored by circuit breaker: {type(error).__name__}")
+            return
+
+        async with self._lock:
+            self._failure_count += 1
+            self._last_failure_time = time()
+
+            if self._state == CircuitState.CLOSED:
+                logger.debug(
+                    f"Circuit breaker failure: "
+                    f"{self._failure_count}/{self.config.failure_threshold}"
+                )
+
+                if self._failure_count >= self.config.failure_threshold:
+                    await self._transition_to(CircuitState.OPEN)
+
+            elif self._state == CircuitState.HALF_OPEN:
+                # Any failure in HALF_OPEN immediately opens circuit
+                logger.warning("Circuit breaker: Failure during HALF_OPEN, reopening circuit")
+                await self._transition_to(CircuitState.OPEN)
+
+    async def generate(self, request: GenerationRequest) -> GenerationResponse:
+        """
+        Generate text with circuit breaker protection.
+
+        Fails fast with CircuitOpenError when circuit is open. Records
+        successes and failures to manage circuit state transitions.
+
+        Args:
+            request: GenerationRequest containing prompt and parameters
+
+        Returns:
+            GenerationResponse with generated content
+
+        Raises:
+            CircuitOpenError: If circuit is open and not ready to retry
+            Exception: If provider request fails
+        """
+        # Check if request should be attempted
+        if not self._should_attempt_request():
+            recovery_time = self._time_until_recovery()
+            raise CircuitOpenError(
+                self.provider.__class__.__name__,
+                recovery_time
+            )
+
+        # If OPEN and timeout elapsed, transition to HALF_OPEN
+        async with self._lock:
+            if self._state == CircuitState.OPEN:
+                time_since_failure = (
+                    time() - self._last_failure_time
+                    if self._last_failure_time
+                    else float("inf")
+                )
+                if time_since_failure >= self.config.recovery_timeout:
+                    await self._transition_to(CircuitState.HALF_OPEN)
+
+        # Attempt the request
+        try:
+            response = await self.provider.generate(request)
+            await self._record_success()
+            return response
+
+        except Exception as e:
+            await self._record_failure(e)
+            raise
