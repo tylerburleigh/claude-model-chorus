@@ -1,17 +1,17 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-21 09:51:34
+**Generated:** 2025-11-21 09:57:50
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 113
-- **Total Lines:** 50581
-- **Total Classes:** 293
-- **Total Functions:** 214
-- **Avg Complexity:** 4.43
+- **Total Files:** 114
+- **Total Lines:** 51139
+- **Total Classes:** 299
+- **Total Functions:** 218
+- **Avg Complexity:** 4.38
 - **Max Complexity:** 44
 - **High Complexity Functions:**
   - start (44)
@@ -3463,6 +3463,25 @@ Example:
 
 ---
 
+### `TestBuildHistoryWithTokenBudget`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_token_budgeting.py:380`
+
+**Description:**
+> Test build_conversation_history with max_tokens parameter.
+
+**Methods:**
+- `test_build_history_without_token_limit()`
+- `test_build_history_with_token_limit()`
+- `test_build_history_with_max_messages_and_tokens()`
+- `test_build_history_smart_vs_simple_compaction()`
+- `test_build_history_truncation_note()`
+- `test_build_history_includes_recent_messages()`
+- `test_build_history_includes_files_within_budget()`
+
+---
+
 ### `TestCLIProvidersImplementInterface`
 
 **Language:** python
@@ -4483,6 +4502,24 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 
 ---
 
+### `TestEdgeCases`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_token_budgeting.py:501`
+
+**Description:**
+> Test edge cases for token budgeting.
+
+**Methods:**
+- `test_empty_message_list()`
+- `test_single_message_within_budget()`
+- `test_single_message_exceeds_budget()`
+- `test_all_messages_important()`
+- `test_zero_token_budget()`
+- `test_file_content_counted_in_tokens()`
+
+---
+
 ### `TestElaboration`
 
 **Language:** python
@@ -5138,6 +5175,25 @@ with long-running conversations with many messages.
 - `test_multiple_long_conversations_memory_isolation()`
 - `test_memory_efficiency_with_large_messages()`
 - `test_concurrent_long_conversations_memory()`
+
+---
+
+### `TestMessageImportance`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_token_budgeting.py:135`
+
+**Description:**
+> Test message importance detection.
+
+**Methods:**
+- `test_message_with_files_is_important()`
+- `test_message_with_multiple_files_is_important()`
+- `test_message_with_metadata_is_important()`
+- `test_message_with_workflow_name_is_important()`
+- `test_long_message_is_important()`
+- `test_short_message_not_important()`
+- `test_medium_message_not_important()`
 
 ---
 
@@ -5828,6 +5884,41 @@ with long-running conversations with many messages.
 
 ---
 
+### `TestSimpleCompaction`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_token_budgeting.py:183`
+
+**Description:**
+> Test simple newest-first compaction strategy.
+
+**Methods:**
+- `test_no_compaction_needed()`
+- `test_compaction_keeps_newest()`
+- `test_compaction_preserves_order()`
+- `test_compaction_respects_token_budget()`
+- `test_compaction_includes_at_least_one_message()`
+
+---
+
+### `TestSmartCompaction`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_token_budgeting.py:260`
+
+**Description:**
+> Test smart compaction with importance preservation.
+
+**Methods:**
+- `test_smart_compaction_preserves_recent()`
+- `test_smart_compaction_reserves_budget_for_important()`
+- `test_smart_compaction_preserves_files()`
+- `test_smart_compaction_preserves_order()`
+- `test_smart_compaction_vs_simple()`
+- `test_smart_compaction_respects_token_budget()`
+
+---
+
 ### `TestStandardization`
 
 **Language:** python
@@ -6156,6 +6247,22 @@ with long-running conversations with many messages.
 - `test_thinkdeep_state_serialization()`
 - `test_thinkdeep_state_json_roundtrip()`
 - `test_thinkdeep_state_nested_validation()`
+
+---
+
+### `TestTokenEstimation`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_token_budgeting.py:103`
+
+**Description:**
+> Test token estimation helper.
+
+**Methods:**
+- `test_estimate_tokens_empty_string()`
+- `test_estimate_tokens_short_text()`
+- `test_estimate_tokens_medium_text()`
+- `test_estimate_tokens_long_text()`
 
 ---
 
@@ -8039,6 +8146,22 @@ Returns:
 
 ---
 
+### `create_message(role, content, files) -> ConversationMessage`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_token_budgeting.py:21`
+**Complexity:** 2
+
+**Description:**
+> Helper to create ConversationMessage with timestamp.
+
+**Parameters:**
+- `role`: str
+- `content`: str
+- `files`: list[str] | None
+
+---
+
 ### `create_planner(temperature, max_tokens) -> PlannerPersona`
 
 **Language:** python
@@ -9640,6 +9763,19 @@ Returns:
 
 ---
 
+### `memory() -> None`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_token_budgeting.py:33`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create ConversationMemory instance for testing.
+
+---
+
 ### `minimal_citation() -> None`
 
 **Language:** python
@@ -10892,6 +11028,38 @@ Example:
 
 ---
 
+### `thread_id_with_long_messages(memory) -> None`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_token_budgeting.py:84`
+**Complexity:** 2
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create a thread with many long messages for token budget testing.
+
+**Parameters:**
+- `memory`: None
+
+---
+
+### `thread_id_with_messages(memory) -> None`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_token_budgeting.py:39`
+**Complexity:** 2
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create a thread with various types of messages for testing.
+
+**Parameters:**
+- `memory`: None
+
+---
+
 ### `validate_citation(citation) -> tuple[bool, list[str]]`
 
 **Language:** python
@@ -12050,6 +12218,14 @@ Returns:
 - `model_chorus.workflows.thinkdeep.ThinkDeepWorkflow`
 - `pytest`
 - `unittest.mock.AsyncMock`
+
+### `model_chorus/tests/test_token_budgeting.py`
+
+- `datetime.UTC`
+- `datetime.datetime`
+- `model_chorus.core.conversation.ConversationMemory`
+- `model_chorus.core.models.ConversationMessage`
+- `pytest`
 
 ### `model_chorus/tests/test_workflow_integration_chaining.py`
 

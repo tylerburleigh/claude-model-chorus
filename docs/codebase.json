@@ -2,18 +2,18 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-21T14:51:34.834615Z",
+    "generated_at": "2025-11-21T14:57:50.156979Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 113,
-    "total_lines": 50581,
-    "total_classes": 293,
-    "total_functions": 214,
-    "avg_complexity": 4.43,
+    "total_files": 114,
+    "total_lines": 51139,
+    "total_classes": 299,
+    "total_functions": 218,
+    "avg_complexity": 4.38,
     "max_complexity": 44,
     "high_complexity_functions": [
       "start (44)",
@@ -24,11 +24,11 @@
     ],
     "by_language": {
       "python": {
-        "files": 113,
-        "lines": 50581,
-        "classes": 293,
-        "functions": 214,
-        "avg_complexity": 4.43
+        "files": 114,
+        "lines": 51139,
+        "classes": 299,
+        "functions": 218,
+        "avg_complexity": 4.38
       }
     }
   },
@@ -2660,6 +2660,35 @@
       ],
       "exports": [],
       "lines": 2234
+    },
+    {
+      "name": "test_token_budgeting",
+      "file": "model_chorus/tests/test_token_budgeting.py",
+      "language": "python",
+      "docstring": "Tests for token budgeting and smart compaction in conversation history.\n\nThis module tests the token-aware limiting and smart compaction features\nthat prevent context overflow in long conversations.",
+      "classes": [
+        "TestTokenEstimation",
+        "TestMessageImportance",
+        "TestSimpleCompaction",
+        "TestSmartCompaction",
+        "TestBuildHistoryWithTokenBudget",
+        "TestEdgeCases"
+      ],
+      "functions": [
+        "create_message",
+        "memory",
+        "thread_id_with_messages",
+        "thread_id_with_long_messages"
+      ],
+      "imports": [
+        "datetime.UTC",
+        "datetime.datetime",
+        "pytest",
+        "model_chorus.core.conversation.ConversationMemory",
+        "model_chorus.core.models.ConversationMessage"
+      ],
+      "exports": [],
+      "lines": 558
     },
     {
       "name": "test_workflow_integration_chaining",
@@ -6348,6 +6377,14 @@
           ]
         },
         {
+          "instantiator": "memory",
+          "file": "model_chorus/tests/test_token_budgeting.py",
+          "line": 35,
+          "context": [
+            "memory"
+          ]
+        },
+        {
           "instantiator": "conversation_memory",
           "file": "model_chorus/tests/test_workflow_integration_chaining.py",
           "line": 53,
@@ -6385,7 +6422,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 58
+      "instantiation_count": 59
     },
     {
       "name": "GapType",
@@ -6954,10 +6991,18 @@
             "ConversationMemory",
             "add_message"
           ]
+        },
+        {
+          "instantiator": "create_message",
+          "file": "model_chorus/tests/test_token_budgeting.py",
+          "line": 23,
+          "context": [
+            "create_message"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 1
+      "instantiation_count": 2
     },
     {
       "name": "ConversationThread",
@@ -20615,6 +20660,131 @@
       "imported_by": []
     },
     {
+      "name": "TestTokenEstimation",
+      "file": "model_chorus/tests/test_token_budgeting.py",
+      "line": 103,
+      "language": "python",
+      "docstring": "Test token estimation helper.",
+      "bases": [],
+      "methods": [
+        "test_estimate_tokens_empty_string",
+        "test_estimate_tokens_short_text",
+        "test_estimate_tokens_medium_text",
+        "test_estimate_tokens_long_text"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestMessageImportance",
+      "file": "model_chorus/tests/test_token_budgeting.py",
+      "line": 135,
+      "language": "python",
+      "docstring": "Test message importance detection.",
+      "bases": [],
+      "methods": [
+        "test_message_with_files_is_important",
+        "test_message_with_multiple_files_is_important",
+        "test_message_with_metadata_is_important",
+        "test_message_with_workflow_name_is_important",
+        "test_long_message_is_important",
+        "test_short_message_not_important",
+        "test_medium_message_not_important"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestSimpleCompaction",
+      "file": "model_chorus/tests/test_token_budgeting.py",
+      "line": 183,
+      "language": "python",
+      "docstring": "Test simple newest-first compaction strategy.",
+      "bases": [],
+      "methods": [
+        "test_no_compaction_needed",
+        "test_compaction_keeps_newest",
+        "test_compaction_preserves_order",
+        "test_compaction_respects_token_budget",
+        "test_compaction_includes_at_least_one_message"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestSmartCompaction",
+      "file": "model_chorus/tests/test_token_budgeting.py",
+      "line": 260,
+      "language": "python",
+      "docstring": "Test smart compaction with importance preservation.",
+      "bases": [],
+      "methods": [
+        "test_smart_compaction_preserves_recent",
+        "test_smart_compaction_reserves_budget_for_important",
+        "test_smart_compaction_preserves_files",
+        "test_smart_compaction_preserves_order",
+        "test_smart_compaction_vs_simple",
+        "test_smart_compaction_respects_token_budget"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestBuildHistoryWithTokenBudget",
+      "file": "model_chorus/tests/test_token_budgeting.py",
+      "line": 380,
+      "language": "python",
+      "docstring": "Test build_conversation_history with max_tokens parameter.",
+      "bases": [],
+      "methods": [
+        "test_build_history_without_token_limit",
+        "test_build_history_with_token_limit",
+        "test_build_history_with_max_messages_and_tokens",
+        "test_build_history_smart_vs_simple_compaction",
+        "test_build_history_truncation_note",
+        "test_build_history_includes_recent_messages",
+        "test_build_history_includes_files_within_budget"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestEdgeCases",
+      "file": "model_chorus/tests/test_token_budgeting.py",
+      "line": 501,
+      "language": "python",
+      "docstring": "Test edge cases for token budgeting.",
+      "bases": [],
+      "methods": [
+        "test_empty_message_list",
+        "test_single_message_within_budget",
+        "test_single_message_exceeds_budget",
+        "test_all_messages_important",
+        "test_zero_token_budget",
+        "test_file_content_counted_in_tokens"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
       "name": "TestConsensusThinkDeepChatChaining",
       "file": "model_chorus/tests/test_workflow_integration_chaining.py",
       "line": 22,
@@ -24647,7 +24817,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 86,
           "call_type": "method_call"
         },
@@ -28779,7 +28949,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 1926,
           "call_type": "method_call"
         },
@@ -29648,7 +29818,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 342,
           "call_type": "method_call"
         },
@@ -30056,7 +30226,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 703,
           "call_type": "method_call"
         },
@@ -30341,25 +30511,25 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 837,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 840,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 842,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 844,
           "call_type": "method_call"
         },
@@ -30468,7 +30638,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 908,
           "call_type": "method_call"
         },
@@ -33355,7 +33525,7 @@
         },
         {
           "name": "read",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 189,
           "call_type": "method_call"
         },
@@ -33397,7 +33567,7 @@
         },
         {
           "name": "read",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 606,
           "call_type": "method_call"
         },
@@ -40982,6 +41152,229 @@
       ]
     },
     {
+      "name": "create_message",
+      "file": "model_chorus/tests/test_token_budgeting.py",
+      "line": 21,
+      "language": "python",
+      "docstring": "Helper to create ConversationMessage with timestamp.",
+      "parameters": [
+        {
+          "name": "role",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "content",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "files",
+          "type": "list[str] | None",
+          "default": null
+        }
+      ],
+      "return_type": "ConversationMessage",
+      "complexity": 2,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "test_message_with_files_is_important",
+          "file": "model_chorus/tests/test_token_budgeting.py",
+          "line": 140,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_message_with_multiple_files_is_important",
+          "file": "model_chorus/tests/test_token_budgeting.py",
+          "line": 145,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_message_with_metadata_is_important",
+          "file": "model_chorus/tests/test_token_budgeting.py",
+          "line": 150,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_message_with_workflow_name_is_important",
+          "file": "model_chorus/tests/test_token_budgeting.py",
+          "line": 155,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_long_message_is_important",
+          "file": "model_chorus/tests/test_token_budgeting.py",
+          "line": 162,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_short_message_not_important",
+          "file": "model_chorus/tests/test_token_budgeting.py",
+          "line": 167,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_medium_message_not_important",
+          "file": "model_chorus/tests/test_token_budgeting.py",
+          "line": 174,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_single_message_within_budget",
+          "file": "model_chorus/tests/test_token_budgeting.py",
+          "line": 511,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_single_message_exceeds_budget",
+          "file": "model_chorus/tests/test_token_budgeting.py",
+          "line": 518,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_all_messages_important",
+          "file": "model_chorus/tests/test_token_budgeting.py",
+          "line": 527,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_all_messages_important",
+          "file": "model_chorus/tests/test_token_budgeting.py",
+          "line": 528,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_all_messages_important",
+          "file": "model_chorus/tests/test_token_budgeting.py",
+          "line": 529,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_file_content_counted_in_tokens",
+          "file": "model_chorus/tests/test_token_budgeting.py",
+          "line": 549,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "isoformat",
+          "file": "unknown",
+          "line": 26,
+          "call_type": "method_call"
+        },
+        {
+          "name": "now",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "line": 26,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 13
+    },
+    {
+      "name": "memory",
+      "file": "model_chorus/tests/test_token_budgeting.py",
+      "line": 33,
+      "language": "python",
+      "docstring": "Create ConversationMemory instance for testing.",
+      "parameters": [],
+      "return_type": null,
+      "complexity": 1,
+      "decorators": [
+        "pytest.fixture"
+      ],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": []
+    },
+    {
+      "name": "thread_id_with_messages",
+      "file": "model_chorus/tests/test_token_budgeting.py",
+      "line": 39,
+      "language": "python",
+      "docstring": "Create a thread with various types of messages for testing.",
+      "parameters": [
+        {
+          "name": "memory",
+          "type": null,
+          "default": null
+        }
+      ],
+      "return_type": null,
+      "complexity": 2,
+      "decorators": [
+        "pytest.fixture"
+      ],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "create_thread",
+          "file": "unknown",
+          "line": 41,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_message",
+          "file": "unknown",
+          "line": 78,
+          "call_type": "method_call"
+        }
+      ]
+    },
+    {
+      "name": "thread_id_with_long_messages",
+      "file": "model_chorus/tests/test_token_budgeting.py",
+      "line": 84,
+      "language": "python",
+      "docstring": "Create a thread with many long messages for token budget testing.",
+      "parameters": [
+        {
+          "name": "memory",
+          "type": null,
+          "default": null
+        }
+      ],
+      "return_type": null,
+      "complexity": 2,
+      "decorators": [
+        "pytest.fixture"
+      ],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "create_thread",
+          "file": "unknown",
+          "line": 86,
+          "call_type": "method_call"
+        },
+        {
+          "name": "range",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "line": 89,
+          "call_type": "function_call"
+        },
+        {
+          "name": "add_message",
+          "file": "unknown",
+          "line": 93,
+          "call_type": "method_call"
+        }
+      ]
+    },
+    {
       "name": "cache",
       "file": "model_chorus/tests/workflows/study/memory/test_cache.py",
       "line": 18,
@@ -42853,6 +43246,13 @@
       "model_chorus.providers.base_provider.GenerationRequest",
       "model_chorus.providers.base_provider.GenerationResponse",
       "model_chorus.workflows.thinkdeep.ThinkDeepWorkflow"
+    ],
+    "model_chorus/tests/test_token_budgeting.py": [
+      "datetime.UTC",
+      "datetime.datetime",
+      "pytest",
+      "model_chorus.core.conversation.ConversationMemory",
+      "model_chorus.core.models.ConversationMessage"
     ],
     "model_chorus/tests/test_workflow_integration_chaining.py": [
       "unittest.mock.AsyncMock",
