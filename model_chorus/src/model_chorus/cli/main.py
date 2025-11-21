@@ -537,102 +537,48 @@ def argument(
         model-chorus argument "Review this proposal" -f proposal.md -f data.csv
     """
     try:
-        # Validate prompt input
-        if prompt_arg is None and prompt_flag is None:
-            console.print(
-                "[red]Error: Prompt is required (provide as positional argument or use --prompt)[/red]"
-            )
-            raise typer.Exit(1)
-        if prompt_arg is not None and prompt_flag is not None:
-            console.print(
-                "[red]Error: Cannot specify prompt both as positional argument and --prompt flag[/red]"
-            )
-            raise typer.Exit(1)
-
-        prompt = prompt_arg or prompt_flag
-        assert prompt is not None  # Validated above
-        # Apply config defaults if values not provided
+        # Initialize context helpers
         config = get_config()
-        if provider is None:
-            provider = config.get_workflow_default_provider("argument", "claude")
-            if provider is None:
-                console.print(
-                    "[red]Error: Default provider for 'argument' workflow is disabled.[/red]"
-                )
-                console.print(
-                    "[yellow]Enable it in .claude/model_chorus_config.yaml or specify --provider[/yellow]"
-                )
-                raise typer.Exit(1)
-        if timeout is None:
-            timeout = config.get_workflow_default("argument", "timeout", 120.0)
-
-        # Create provider instance
-        if verbose:
-            console.print(f"[cyan]Initializing provider: {provider}[/cyan]")
-
-        try:
-            provider_instance = get_provider_by_name(provider, timeout=int(timeout))
-            if verbose:
-                console.print(f"[green]✓ {provider} initialized[/green]")
-        except ProviderDisabledError as e:
-            # Provider disabled in config
-            console.print(f"[red]Error: {e}[/red]")
-            console.print(
-                f"\n[yellow]To fix this, edit .claude/model_chorus_config.yaml and set '{provider}: enabled: true'[/yellow]"
-            )
-            raise typer.Exit(1)
-        except ProviderUnavailableError as e:
-            # Provider CLI not available - show helpful error message
-            console.print(f"[red]Error: {e.reason}[/red]\n")
-            if e.suggestions:
-                console.print("[yellow]To fix this:[/yellow]")
-                for suggestion in e.suggestions:
-                    console.print(f"  • {suggestion}")
-            console.print(
-                f"\n[yellow]Installation:[/yellow] {get_install_command(provider)}"
-            )
-            console.print(
-                "\n[dim]Run 'model-chorus list-providers --check' to see which providers are available[/dim]"
-            )
-            raise typer.Exit(1)
-        except Exception as e:
-            console.print(f"[red]Failed to initialize {provider}: {e}[/red]")
-            raise typer.Exit(1)
-
-        # Load fallback providers from config and filter by enabled status
-        fallback_provider_names = config.get_workflow_fallback_providers(
-            "argument", exclude_provider=provider
+        workflow_context = WorkflowContext(
+            workflow_name="argument",
+            config=config,
+            construct_prompt_with_files_fn=construct_prompt_with_files,
+        )
+        provider_resolver = ProviderResolver(
+            config=config,
+            get_provider_fn=get_provider_by_name,
+            get_install_command_fn=get_install_command,
+            verbose=verbose,
         )
 
-        fallback_providers: list[ModelProvider] = []
-        if fallback_provider_names and verbose:
-            console.print(
-                f"[cyan]Initializing fallback providers: {', '.join(fallback_provider_names)}[/cyan]"
-            )
+        # Validate and get prompt
+        prompt = workflow_context.validate_and_get_prompt(prompt_arg, prompt_flag)
 
-        for fallback_name in fallback_provider_names:
-            try:
-                fallback_instance = get_provider_by_name(
-                    fallback_name, timeout=int(timeout)
-                )
-                fallback_providers.append(fallback_instance)
-                if verbose:
-                    console.print(
-                        f"[green]✓ {fallback_name} initialized (fallback)[/green]"
-                    )
-            except ProviderDisabledError:
-                if verbose:
-                    console.print(
-                        f"[yellow]⚠ Skipping disabled fallback provider {fallback_name}[/yellow]"
-                    )
-            except Exception as e:
-                if verbose:
-                    console.print(
-                        f"[yellow]⚠ Could not initialize fallback {fallback_name}: {e}[/yellow]"
-                    )
+        # Resolve config defaults
+        resolved_config = workflow_context.resolve_config_defaults(
+            provider=provider,
+            system=system,
+            timeout=timeout,
+        )
+        provider = resolved_config["provider"]
+        system = resolved_config["system"]
+        timeout = resolved_config["timeout"]
+
+        # Initialize primary provider
+        provider_instance = provider_resolver.resolve_provider(provider, timeout)
+
+        # Initialize fallback providers
+        fallback_providers = provider_resolver.resolve_fallback_providers(
+            workflow_name="argument",
+            exclude_provider=provider,
+            timeout=timeout,
+        )
 
         # Create conversation memory
-        memory = ConversationMemory()
+        memory = workflow_context.create_memory()
+
+        # Prepare final prompt with file context
+        final_prompt = workflow_context.prepare_prompt_with_files(prompt, files)
 
         # Create workflow
         workflow = ArgumentWorkflow(
@@ -644,14 +590,13 @@ def argument(
         if verbose:
             console.print(f"[cyan]Workflow: {workflow}[/cyan]")
 
-        final_prompt = construct_prompt_with_files(prompt, files)
-
-        # Display analysis info
-        console.print(
-            "\n[bold cyan]Analyzing argument through dialectical reasoning...[/bold cyan]"
-        )
-        console.print(
-            f"[dim]Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}[/dim]\n"
+        # Display workflow start information
+        OutputFormatter.display_workflow_start(
+            workflow_name="argument",
+            prompt=prompt,
+            provider=provider,
+            continuation_id=continuation_id,
+            files=files,
         )
 
         # Build config
@@ -709,10 +654,7 @@ def argument(
                 "metadata": result.metadata,
             }
 
-            with open(output, "w") as f:
-                json.dump(output_data, f, indent=2)
-
-            console.print(f"\n[green]Results saved to: {output}[/green]")
+            OutputFormatter.write_json_output(output, output_data)
 
     except KeyboardInterrupt:
         console.print("\n[yellow]Interrupted by user[/yellow]")
