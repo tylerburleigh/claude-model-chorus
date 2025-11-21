@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-21T15:17:30.509304Z",
+    "generated_at": "2025-11-21T15:19:46.966976Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 115,
-    "total_lines": 51875,
+    "total_lines": 52095,
     "total_classes": 300,
     "total_functions": 218,
     "avg_complexity": 4.38,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 115,
-        "lines": 51875,
+        "lines": 52095,
         "classes": 300,
         "functions": 218,
         "avg_complexity": 4.38
@@ -667,7 +667,7 @@
         "models.ConversationThread"
       ],
       "exports": [],
-      "lines": 736
+      "lines": 956
     },
     {
       "name": "gap_analysis",
@@ -6469,6 +6469,10 @@
         "cleanup_expired_threads",
         "cleanup_archived_threads",
         "_delete_thread",
+        "query_by_workflow",
+        "query_recent_threads",
+        "get_thread_chain",
+        "get_thread_statistics",
         "close"
       ],
       "properties": [],
@@ -24921,7 +24925,7 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 102,
           "call_type": "method_call"
         },

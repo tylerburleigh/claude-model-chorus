@@ -1,14 +1,14 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-21 10:17:30
+**Generated:** 2025-11-21 10:19:46
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 115
-- **Total Lines:** 51875
+- **Total Lines:** 52095
 - **Total Classes:** 300
 - **Total Functions:** 218
 - **Avg Complexity:** 4.38
@@ -1068,6 +1068,10 @@ Attributes:
 - `cleanup_expired_threads()`
 - `cleanup_archived_threads()`
 - `_delete_thread()`
+- `query_by_workflow()`
+- `query_recent_threads()`
+- `get_thread_chain()`
+- `get_thread_statistics()`
 - `close()`
 
 ---
