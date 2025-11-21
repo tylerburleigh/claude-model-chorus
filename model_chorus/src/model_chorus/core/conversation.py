@@ -354,10 +354,67 @@ class ConversationMemory:
     # Context Window Management (task-1-3-3)
     # ========================================================================
 
+    def _estimate_tokens(self, text: str) -> int:
+        """
+        Estimate token count for text.
+
+        Uses a simple character-based heuristic (~4 characters per token).
+        This is approximate but efficient for budget management.
+
+        Args:
+            text: Text to estimate
+
+        Returns:
+            Estimated token count
+        """
+        return len(text) // 4
+
+    def _apply_token_budget(
+        self, messages: list[ConversationMessage], max_tokens: int
+    ) -> list[ConversationMessage]:
+        """
+        Apply token budget to message list.
+
+        Includes messages from newest to oldest until budget would be exceeded.
+        Always includes at least the most recent message.
+
+        Args:
+            messages: List of messages (should be in chronological order)
+            max_tokens: Maximum tokens allowed
+
+        Returns:
+            Filtered list of messages that fit within budget
+        """
+        if not messages:
+            return messages
+
+        # Start with most recent and work backwards
+        result = []
+        token_count = 0
+
+        for msg in reversed(messages):
+            # Estimate tokens for this message
+            msg_text = msg.content
+            if msg.files:
+                msg_text += " " + " ".join(msg.files)
+            msg_tokens = self._estimate_tokens(msg_text)
+
+            # Check if adding this message would exceed budget
+            if result and (token_count + msg_tokens > max_tokens):
+                # Budget exceeded, stop here
+                break
+
+            result.append(msg)
+            token_count += msg_tokens
+
+        # Reverse to restore chronological order
+        return list(reversed(result))
+
     def build_conversation_history(
         self,
         thread_id: str,
         max_messages: int | None = None,
+        max_tokens: int | None = None,
         include_files: bool = True,
     ) -> tuple[str, int]:
         """
@@ -365,15 +422,24 @@ class ConversationMemory:
 
         Constructs human-readable conversation history with file context,
         using newest-first prioritization for both files and messages.
-        Adapted from Zen MCP's sophisticated build strategy.
+        Supports token-aware limiting to prevent context overflow.
 
         Args:
             thread_id: Thread to build history from
-            max_messages: Optional limit on messages to include
+            max_messages: Optional limit on messages to include (applied first)
+            max_tokens: Optional token budget for history (applied after max_messages)
             include_files: Whether to embed file contents
 
         Returns:
             Tuple of (formatted_history, message_count)
+
+        Token Budgeting:
+            When max_tokens is specified, messages are included from newest to oldest
+            until the estimated token count would exceed the budget. Uses a simple
+            character-based estimation (~4 chars per token) for efficiency.
+
+            The max_messages limit is applied first (if specified), then max_tokens
+            further reduces the set if needed.
 
         Format:
             === CONVERSATION HISTORY (CONTINUATION) ===
@@ -402,13 +468,17 @@ class ConversationMemory:
             return "", 0
 
         messages = thread.messages
+        total_messages = len(messages)
 
-        # Limit messages if specified (keep most recent)
+        # Apply max_messages limit first (keep most recent)
         if max_messages and len(messages) > max_messages:
             messages = messages[-max_messages:]
-            truncated = len(thread.messages) - len(messages)
-        else:
-            truncated = 0
+
+        # Apply max_tokens limit (keep most recent that fit within budget)
+        if max_tokens:
+            messages = self._apply_token_budget(messages, max_tokens)
+
+        truncated = total_messages - len(messages)
 
         # Build header
         lines = [

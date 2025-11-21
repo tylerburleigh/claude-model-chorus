@@ -1,14 +1,14 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-21 09:34:18
+**Generated:** 2025-11-21 09:36:20
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 112
-- **Total Lines:** 49654
+- **Total Lines:** 49669
 - **Total Classes:** 285
 - **Total Functions:** 211
 - **Avg Complexity:** 4.47
@@ -195,7 +195,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `ABC`
-**Defined in:** `src/model_chorus/core/base_workflow.py:55`
+**Defined in:** `src/model_chorus/core/base_workflow.py:56`
 
 **Description:**
 > Abstract base class for all ModelChorus workflows.
@@ -215,6 +215,8 @@ Attributes:
 - `synthesize()`
 - `get_result()`
 - `validate_config()`
+- `get_execution_metrics()`
+- `register_telemetry_callback()`
 - `_execute_with_fallback()`
 - `check_provider_availability()`
 - `get_thread()`
@@ -6386,7 +6388,7 @@ Attributes:
 ### `WorkflowResult`
 
 **Language:** python
-**Defined in:** `src/model_chorus/core/base_workflow.py:36`
+**Defined in:** `src/model_chorus/core/base_workflow.py:37`
 
 **Description:**
 > Result of a workflow execution.
@@ -6437,7 +6439,7 @@ Example:
 ### `WorkflowStep`
 
 **Language:** python
-**Defined in:** `src/model_chorus/core/base_workflow.py:25`
+**Defined in:** `src/model_chorus/core/base_workflow.py:26`
 
 **Description:**
 > Represents a single step in a workflow execution.
@@ -10968,6 +10970,8 @@ Returns:
 - `typing.Any`
 - `typing.Literal`
 - `typing.TYPE_CHECKING`
+- `workflow_runner.ExecutionMetrics`
+- `workflow_runner.WorkflowRunner`
 
 ### `src/model_chorus/core/clustering.py`
 

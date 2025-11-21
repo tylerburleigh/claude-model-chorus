@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-21T14:34:18.314704Z",
+    "generated_at": "2025-11-21T14:36:20.204397Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 112,
-    "total_lines": 49654,
+    "total_lines": 49669,
     "total_classes": 285,
     "total_functions": 211,
     "avg_complexity": 4.47,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 112,
-        "lines": 49654,
+        "lines": 49669,
         "classes": 285,
         "functions": 211,
         "avg_complexity": 4.47
@@ -506,10 +506,12 @@
         "typing.Literal",
         "conversation.ConversationMemory",
         "models.ConversationMessage",
-        "models.ConversationThread"
+        "models.ConversationThread",
+        "workflow_runner.ExecutionMetrics",
+        "workflow_runner.WorkflowRunner"
       ],
       "exports": [],
-      "lines": 415
+      "lines": 430
     },
     {
       "name": "clustering",
@@ -3919,7 +3921,7 @@
     {
       "name": "WorkflowStep",
       "file": "src/model_chorus/core/base_workflow.py",
-      "line": 25,
+      "line": 26,
       "language": "python",
       "docstring": "Represents a single step in a workflow execution.",
       "bases": [],
@@ -3931,7 +3933,7 @@
         {
           "instantiator": "add_step",
           "file": "src/model_chorus/core/base_workflow.py",
-          "line": 49,
+          "line": 50,
           "context": [
             "WorkflowResult",
             "add_step"
@@ -4201,7 +4203,7 @@
     {
       "name": "WorkflowResult",
       "file": "src/model_chorus/core/base_workflow.py",
-      "line": 36,
+      "line": 37,
       "language": "python",
       "docstring": "Result of a workflow execution.",
       "bases": [],
@@ -4406,7 +4408,7 @@
     {
       "name": "BaseWorkflow",
       "file": "src/model_chorus/core/base_workflow.py",
-      "line": 55,
+      "line": 56,
       "language": "python",
       "docstring": "Abstract base class for all ModelChorus workflows.\n\nAll workflow implementations (thinkdeep, debug, consensus, etc.) must inherit\nfrom this class and implement the run() method.\n\nAttributes:\n    name: Human-readable name of the workflow\n    description: Brief description of what this workflow does\n    config: Configuration dictionary for the workflow\n    conversation_memory: Optional ConversationMemory instance for multi-turn conversations",
       "bases": [
@@ -4418,6 +4420,8 @@
         "synthesize",
         "get_result",
         "validate_config",
+        "get_execution_metrics",
+        "register_telemetry_callback",
         "_execute_with_fallback",
         "check_provider_availability",
         "get_thread",
@@ -6584,7 +6588,7 @@
         {
           "instantiator": "add_step",
           "file": "src/model_chorus/core/base_workflow.py",
-          "line": 49,
+          "line": 50,
           "context": [
             "WorkflowResult",
             "add_step"
@@ -10483,8 +10487,19 @@
       "properties": [],
       "is_exported": false,
       "is_public": true,
-      "instantiated_by": [],
-      "imported_by": []
+      "instantiated_by": [
+        {
+          "instantiator": "__init__",
+          "file": "src/model_chorus/core/base_workflow.py",
+          "line": 93,
+          "context": [
+            "BaseWorkflow",
+            "__init__"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 1
     },
     {
       "name": "ModelCapability",
@@ -28829,7 +28844,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 342,
           "call_type": "method_call"
         },
@@ -29135,7 +29150,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 596,
           "call_type": "method_call"
         },
@@ -29237,7 +29252,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 703,
           "call_type": "method_call"
         },
@@ -29486,7 +29501,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 815,
           "call_type": "method_call"
         },
@@ -29522,25 +29537,25 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 837,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 840,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 842,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 844,
           "call_type": "method_call"
         },
@@ -29649,7 +29664,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 908,
           "call_type": "method_call"
         },
@@ -41171,7 +41186,9 @@
       "typing.Literal",
       "conversation.ConversationMemory",
       "models.ConversationMessage",
-      "models.ConversationThread"
+      "models.ConversationThread",
+      "workflow_runner.ExecutionMetrics",
+      "workflow_runner.WorkflowRunner"
     ],
     "src/model_chorus/core/clustering.py": [
       "dataclasses.dataclass",
