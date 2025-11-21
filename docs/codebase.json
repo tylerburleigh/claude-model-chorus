@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-21T15:23:18.818130Z",
+    "generated_at": "2025-11-21T15:26:27.405857Z",
     "languages": [
       "python"
     ],
@@ -10,8 +10,8 @@
   },
   "statistics": {
     "total_files": 117,
-    "total_lines": 52648,
-    "total_classes": 302,
+    "total_lines": 52956,
+    "total_classes": 305,
     "total_functions": 219,
     "avg_complexity": 4.37,
     "max_complexity": 44,
@@ -25,8 +25,8 @@
     "by_language": {
       "python": {
         "files": 117,
-        "lines": 52648,
-        "classes": 302,
+        "lines": 52956,
+        "classes": 305,
         "functions": 219,
         "avg_complexity": 4.37
       }
@@ -541,6 +541,7 @@
         "GenerationDefaults",
         "ProviderConfig",
         "WorkflowConfig",
+        "StorageConfig",
         "ModelChorusConfig",
         "ConfigLoader",
         "GenerationDefaultsV2",
@@ -565,7 +566,7 @@
         "pydantic.field_validator"
       ],
       "exports": [],
-      "lines": 902
+      "lines": 920
     },
     {
       "name": "context_ingestion",
@@ -621,14 +622,17 @@
       "name": "conversation",
       "file": "model_chorus/src/model_chorus/core/conversation.py",
       "language": "python",
-      "docstring": "Conversation memory management for ModelChorus.\n\nProvides file-based persistence for multi-turn conversations with continuation support.\nBased on Zen MCP patterns but adapted for CLI-based orchestration architecture.\n\nKey Features:\n- UUID-based thread identification (continuation_id)\n- File-based persistence (survives process restarts)\n- Thread-safe operations with file locking\n- TTL-based automatic cleanup\n- Context window management for long conversations",
+      "docstring": "Conversation memory management for ModelChorus.\n\nProvides persistence for multi-turn conversations with continuation support.\nSupports both file-based (JSON) and SQLite database backends via configuration.\n\nKey Features:\n- UUID-based thread identification (continuation_id)\n- Pluggable storage backends (file or SQLite)\n- Thread-safe operations\n- TTL-based automatic cleanup\n- Context window management for long conversations\n- Configurable via .model-chorusrc\n\nBackend Selection:\n    - file: Individual JSON files (legacy, default)\n    - sqlite: SQLite database with WAL mode (recommended)",
       "classes": [
+        "ConversationBackend",
+        "FileBackend",
         "ConversationMemory"
       ],
       "functions": [],
       "imports": [
         "json",
         "logging",
+        "os",
         "uuid",
         "datetime.UTC",
         "datetime.datetime",
@@ -636,12 +640,13 @@
         "pathlib.Path",
         "typing.Any",
         "typing.Literal",
+        "typing.Protocol",
         "filelock",
         "models.ConversationMessage",
         "models.ConversationThread"
       ],
       "exports": [],
-      "lines": 853
+      "lines": 1143
     },
     {
       "name": "conversation_db",
@@ -3452,7 +3457,7 @@
         {
           "instantiator": "get_config_loader",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 422,
+          "line": 440,
           "context": [
             "get_config_loader"
           ]
@@ -4017,7 +4022,7 @@
         {
           "instantiator": "load_config",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 180,
+          "line": 198,
           "context": [
             "ConfigLoader",
             "load_config"
@@ -4026,7 +4031,7 @@
         {
           "instantiator": "load_config",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 196,
+          "line": 214,
           "context": [
             "ConfigLoader",
             "load_config"
@@ -4035,7 +4040,7 @@
         {
           "instantiator": "get_config",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 249,
+          "line": 267,
           "context": [
             "ConfigLoader",
             "get_config"
@@ -4890,9 +4895,25 @@
       "instantiation_count": 13
     },
     {
-      "name": "ModelChorusConfig",
+      "name": "StorageConfig",
       "file": "model_chorus/src/model_chorus/core/config.py",
       "line": 80,
+      "language": "python",
+      "docstring": "Configuration for conversation storage backend.",
+      "bases": [
+        "BaseModel"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "ModelChorusConfig",
+      "file": "model_chorus/src/model_chorus/core/config.py",
+      "line": 94,
       "language": "python",
       "docstring": "Root configuration model for ModelChorus.",
       "bases": [
@@ -4937,7 +4958,7 @@
         {
           "instantiator": "load_config",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 180,
+          "line": 198,
           "context": [
             "ConfigLoader",
             "load_config"
@@ -4946,7 +4967,7 @@
         {
           "instantiator": "load_config",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 196,
+          "line": 214,
           "context": [
             "ConfigLoader",
             "load_config"
@@ -4955,7 +4976,7 @@
         {
           "instantiator": "get_config",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 249,
+          "line": 267,
           "context": [
             "ConfigLoader",
             "get_config"
@@ -4977,7 +4998,7 @@
     {
       "name": "ConfigLoader",
       "file": "model_chorus/src/model_chorus/core/config.py",
-      "line": 129,
+      "line": 147,
       "language": "python",
       "docstring": "Loads and manages ModelChorus configuration.",
       "bases": [],
@@ -5019,7 +5040,7 @@
         {
           "instantiator": "get_config_loader",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 422,
+          "line": 440,
           "context": [
             "get_config_loader"
           ]
@@ -5238,7 +5259,7 @@
     {
       "name": "GenerationDefaultsV2",
       "file": "model_chorus/src/model_chorus/core/config.py",
-      "line": 454,
+      "line": 472,
       "language": "python",
       "docstring": "Default generation parameters for .claude/model_chorus_config.yaml.",
       "bases": [
@@ -5254,7 +5275,7 @@
     {
       "name": "ProviderConfigV2",
       "file": "model_chorus/src/model_chorus/core/config.py",
-      "line": 462,
+      "line": 480,
       "language": "python",
       "docstring": "Configuration for a provider in .claude/model_chorus_config.yaml.",
       "bases": [
@@ -5268,7 +5289,7 @@
         {
           "instantiator": "load_config",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 592,
+          "line": 610,
           "context": [
             "ClaudeConfigLoader",
             "load_config"
@@ -5277,7 +5298,7 @@
         {
           "instantiator": "load_config",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 593,
+          "line": 611,
           "context": [
             "ClaudeConfigLoader",
             "load_config"
@@ -5286,7 +5307,7 @@
         {
           "instantiator": "load_config",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 594,
+          "line": 612,
           "context": [
             "ClaudeConfigLoader",
             "load_config"
@@ -5295,7 +5316,7 @@
         {
           "instantiator": "load_config",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 595,
+          "line": 613,
           "context": [
             "ClaudeConfigLoader",
             "load_config"
@@ -5304,7 +5325,7 @@
         {
           "instantiator": "get_config",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 640,
+          "line": 658,
           "context": [
             "ClaudeConfigLoader",
             "get_config"
@@ -5313,7 +5334,7 @@
         {
           "instantiator": "get_config",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 641,
+          "line": 659,
           "context": [
             "ClaudeConfigLoader",
             "get_config"
@@ -5322,7 +5343,7 @@
         {
           "instantiator": "get_config",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 642,
+          "line": 660,
           "context": [
             "ClaudeConfigLoader",
             "get_config"
@@ -5331,7 +5352,7 @@
         {
           "instantiator": "get_config",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 643,
+          "line": 661,
           "context": [
             "ClaudeConfigLoader",
             "get_config"
@@ -5344,7 +5365,7 @@
     {
       "name": "WorkflowConfigV2",
       "file": "model_chorus/src/model_chorus/core/config.py",
-      "line": 470,
+      "line": 488,
       "language": "python",
       "docstring": "Workflow configuration for .claude/model_chorus_config.yaml.",
       "bases": [
@@ -5363,7 +5384,7 @@
     {
       "name": "ModelChorusConfigV2",
       "file": "model_chorus/src/model_chorus/core/config.py",
-      "line": 506,
+      "line": 524,
       "language": "python",
       "docstring": "Root configuration for .claude/model_chorus_config.yaml.",
       "bases": [
@@ -5380,7 +5401,7 @@
         {
           "instantiator": "load_config",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 590,
+          "line": 608,
           "context": [
             "ClaudeConfigLoader",
             "load_config"
@@ -5389,7 +5410,7 @@
         {
           "instantiator": "load_config",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 622,
+          "line": 640,
           "context": [
             "ClaudeConfigLoader",
             "load_config"
@@ -5398,7 +5419,7 @@
         {
           "instantiator": "get_config",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 638,
+          "line": 656,
           "context": [
             "ClaudeConfigLoader",
             "get_config"
@@ -5411,7 +5432,7 @@
     {
       "name": "ClaudeConfigLoader",
       "file": "model_chorus/src/model_chorus/core/config.py",
-      "line": 544,
+      "line": 562,
       "language": "python",
       "docstring": "Loads and manages configuration from .claude/model_chorus_config.yaml.",
       "bases": [],
@@ -5440,7 +5461,7 @@
         {
           "instantiator": "get_claude_config_loader",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 891,
+          "line": 909,
           "context": [
             "get_claude_config_loader"
           ]
@@ -5952,11 +5973,36 @@
       "instantiation_count": 6
     },
     {
-      "name": "ConversationMemory",
+      "name": "ConversationBackend",
       "file": "model_chorus/src/model_chorus/core/conversation.py",
       "line": 35,
       "language": "python",
-      "docstring": "Manages conversation threads with file-based persistence.\n\nProvides thread-safe storage and retrieval of conversation history,\nenabling multi-turn conversations across workflow executions.\n\nArchitecture:\n    - Each thread stored as JSON file: ~/.model-chorus/conversations/{thread_id}.json\n    - File locking prevents concurrent access corruption\n    - TTL-based cleanup removes expired threads\n    - Supports conversation chains via parent_thread_id\n\nAttributes:\n    conversations_dir: Directory where conversation files are stored\n    ttl_hours: Time-to-live for conversation threads in hours\n    max_messages: Maximum messages per thread before truncation",
+      "docstring": "Protocol defining the interface for conversation storage backends.",
+      "bases": [
+        "Protocol"
+      ],
+      "methods": [
+        "create_thread",
+        "get_thread",
+        "add_message",
+        "get_messages",
+        "complete_thread",
+        "archive_thread",
+        "cleanup_expired_threads",
+        "cleanup_archived_threads"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "FileBackend",
+      "file": "model_chorus/src/model_chorus/core/conversation.py",
+      "line": 94,
+      "language": "python",
+      "docstring": "File-based conversation storage implementation (legacy).\n\nProvides thread-safe storage using individual JSON files per thread.\nThis is the original implementation, now wrapped by ConversationMemory.\n\nArchitecture:\n    - Each thread stored as JSON file: ~/.model-chorus/conversations/{thread_id}.json\n    - File locking prevents concurrent access corruption\n    - TTL-based cleanup removes expired threads\n    - Supports conversation chains via parent_thread_id\n\nAttributes:\n    conversations_dir: Directory where conversation files are stored\n    ttl_hours: Time-to-live for conversation threads in hours\n    max_messages: Maximum messages per thread before truncation",
       "bases": [],
       "methods": [
         "__init__",
@@ -5976,6 +6022,45 @@
         "cleanup_archived_threads",
         "_save_thread",
         "_delete_thread"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "__init__",
+          "file": "model_chorus/src/model_chorus/core/conversation.py",
+          "line": 970,
+          "context": [
+            "ConversationMemory",
+            "__init__"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 1
+    },
+    {
+      "name": "ConversationMemory",
+      "file": "model_chorus/src/model_chorus/core/conversation.py",
+      "line": 915,
+      "language": "python",
+      "docstring": "Unified conversation memory interface with pluggable storage backends.\n\nAutomatically selects storage backend based on configuration:\n- file: JSON file-based storage (default, backward compatible)\n- sqlite: SQLite database with WAL mode (recommended for production)\n\nConfiguration via .model-chorusrc:\n    storage:\n      backend: \"sqlite\"  # or \"file\"\n      sqlite_path: \"~/.model-chorus/conversations.db\"\n\nThis class delegates all operations to the appropriate backend implementation\nwhile maintaining the same API as the original ConversationMemory.\n\nAttributes:\n    backend: The underlying storage backend (FileBackend or ConversationDatabase)",
+      "bases": [],
+      "methods": [
+        "__init__",
+        "_detect_backend",
+        "create_thread",
+        "get_thread",
+        "get_thread_chain",
+        "add_message",
+        "get_messages",
+        "build_conversation_history",
+        "get_context_summary",
+        "complete_thread",
+        "archive_thread",
+        "cleanup_expired_threads",
+        "cleanup_archived_threads"
       ],
       "properties": [],
       "is_exported": false,
@@ -6519,6 +6604,15 @@
       "is_public": true,
       "instantiated_by": [
         {
+          "instantiator": "__init__",
+          "file": "model_chorus/src/model_chorus/core/conversation.py",
+          "line": 963,
+          "context": [
+            "ConversationMemory",
+            "__init__"
+          ]
+        },
+        {
           "instantiator": "run",
           "file": "model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py",
           "line": 438,
@@ -6529,7 +6623,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 1
+      "instantiation_count": 2
     },
     {
       "name": "GapType",
@@ -7093,9 +7187,9 @@
         {
           "instantiator": "add_message",
           "file": "model_chorus/src/model_chorus/core/conversation.py",
-          "line": 284,
+          "line": 343,
           "context": [
-            "ConversationMemory",
+            "FileBackend",
             "add_message"
           ]
         },
@@ -7146,27 +7240,27 @@
         {
           "instantiator": "create_thread",
           "file": "model_chorus/src/model_chorus/core/conversation.py",
-          "line": 115,
+          "line": 174,
           "context": [
-            "ConversationMemory",
+            "FileBackend",
             "create_thread"
           ]
         },
         {
           "instantiator": "get_thread",
           "file": "model_chorus/src/model_chorus/core/conversation.py",
-          "line": 172,
+          "line": 231,
           "context": [
-            "ConversationMemory",
+            "FileBackend",
             "get_thread"
           ]
         },
         {
           "instantiator": "add_message",
           "file": "model_chorus/src/model_chorus/core/conversation.py",
-          "line": 271,
+          "line": 330,
           "context": [
-            "ConversationMemory",
+            "FileBackend",
             "add_message"
           ]
         },
@@ -25095,7 +25189,7 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 102,
           "call_type": "method_call"
         },
@@ -25657,97 +25751,97 @@
         {
           "name": "get_workflow_default",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 268,
+          "line": 286,
           "call_type": "method_call"
         },
         {
           "name": "get_default_provider",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 296,
+          "line": 314,
           "call_type": "method_call"
         },
         {
           "name": "get_default_providers",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 325,
+          "line": 343,
           "call_type": "method_call"
         },
         {
           "name": "get_fallback_providers",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 344,
+          "line": 362,
           "call_type": "method_call"
         },
         {
           "name": "get_provider_model",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 398,
+          "line": 416,
           "call_type": "method_call"
         },
         {
           "name": "get_config",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 446,
+          "line": 464,
           "call_type": "method_call"
         },
         {
           "name": "is_provider_enabled",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 658,
+          "line": 676,
           "call_type": "method_call"
         },
         {
           "name": "get_enabled_providers",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 673,
+          "line": 691,
           "call_type": "method_call"
         },
         {
           "name": "get_workflow_providers",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 692,
+          "line": 710,
           "call_type": "method_call"
         },
         {
           "name": "get_workflow_provider_priority",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 722,
+          "line": 740,
           "call_type": "method_call"
         },
         {
           "name": "get_workflow_num_to_consult",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 745,
+          "line": 763,
           "call_type": "method_call"
         },
         {
           "name": "get_workflow_default",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 789,
+          "line": 807,
           "call_type": "method_call"
         },
         {
           "name": "get_workflow_default_provider",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 819,
+          "line": 837,
           "call_type": "method_call"
         },
         {
           "name": "get_workflow_fallback_providers",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 843,
+          "line": 861,
           "call_type": "method_call"
         },
         {
           "name": "get_provider_model",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 869,
+          "line": 887,
           "call_type": "method_call"
         },
         {
           "name": "get_claude_config",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 902,
+          "line": 920,
           "call_type": "method_call"
         }
       ],
@@ -29209,7 +29303,7 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 1926,
           "call_type": "method_call"
         },
@@ -30084,7 +30178,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 342,
           "call_type": "method_call"
         },
@@ -30492,7 +30586,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 703,
           "call_type": "method_call"
         },
@@ -30777,25 +30871,25 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 837,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 840,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 842,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 844,
           "call_type": "method_call"
         },
@@ -30904,7 +30998,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 908,
           "call_type": "method_call"
         },
@@ -31493,97 +31587,97 @@
         {
           "name": "get_workflow_default",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 268,
+          "line": 286,
           "call_type": "method_call"
         },
         {
           "name": "get_default_provider",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 296,
+          "line": 314,
           "call_type": "method_call"
         },
         {
           "name": "get_default_providers",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 325,
+          "line": 343,
           "call_type": "method_call"
         },
         {
           "name": "get_fallback_providers",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 344,
+          "line": 362,
           "call_type": "method_call"
         },
         {
           "name": "get_provider_model",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 398,
+          "line": 416,
           "call_type": "method_call"
         },
         {
           "name": "get_config",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 446,
+          "line": 464,
           "call_type": "method_call"
         },
         {
           "name": "is_provider_enabled",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 658,
+          "line": 676,
           "call_type": "method_call"
         },
         {
           "name": "get_enabled_providers",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 673,
+          "line": 691,
           "call_type": "method_call"
         },
         {
           "name": "get_workflow_providers",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 692,
+          "line": 710,
           "call_type": "method_call"
         },
         {
           "name": "get_workflow_provider_priority",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 722,
+          "line": 740,
           "call_type": "method_call"
         },
         {
           "name": "get_workflow_num_to_consult",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 745,
+          "line": 763,
           "call_type": "method_call"
         },
         {
           "name": "get_workflow_default",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 789,
+          "line": 807,
           "call_type": "method_call"
         },
         {
           "name": "get_workflow_default_provider",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 819,
+          "line": 837,
           "call_type": "method_call"
         },
         {
           "name": "get_workflow_fallback_providers",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 843,
+          "line": 861,
           "call_type": "method_call"
         },
         {
           "name": "get_provider_model",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 869,
+          "line": 887,
           "call_type": "method_call"
         },
         {
           "name": "get_claude_config",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 902,
+          "line": 920,
           "call_type": "method_call"
         }
       ],
@@ -33526,13 +33620,13 @@
         {
           "name": "load_config",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 435,
+          "line": 453,
           "call_type": "function_call"
         },
         {
           "name": "get_config",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 445,
+          "line": 463,
           "call_type": "function_call"
         },
         {
@@ -33554,7 +33648,7 @@
     {
       "name": "get_config_loader",
       "file": "model_chorus/src/model_chorus/core/config.py",
-      "line": 418,
+      "line": 436,
       "language": "python",
       "docstring": "Get the global config loader instance.",
       "parameters": [],
@@ -33574,13 +33668,13 @@
         {
           "name": "load_config",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 435,
+          "line": 453,
           "call_type": "function_call"
         },
         {
           "name": "get_config",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 445,
+          "line": 463,
           "call_type": "function_call"
         },
         {
@@ -33602,7 +33696,7 @@
     {
       "name": "load_config",
       "file": "model_chorus/src/model_chorus/core/config.py",
-      "line": 426,
+      "line": 444,
       "language": "python",
       "docstring": "Load configuration (convenience function).\n\nArgs:\n    config_path: Optional explicit path to config file\n\nReturns:\n    Loaded configuration",
       "parameters": [
@@ -33652,20 +33746,26 @@
         {
           "name": "get_config",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 246,
+          "line": 264,
           "call_type": "method_call"
         },
         {
           "name": "load_config",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 436,
+          "line": 454,
           "call_type": "method_call"
         },
         {
           "name": "get_config",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 635,
+          "line": 653,
           "call_type": "method_call"
+        },
+        {
+          "name": "_detect_backend",
+          "file": "model_chorus/src/model_chorus/core/conversation.py",
+          "line": 997,
+          "call_type": "function_call"
         },
         {
           "name": "test_load_yaml_config_global_defaults",
@@ -33780,82 +33880,82 @@
         {
           "name": "find_config_file",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
-          "line": 177,
+          "line": 195,
           "call_type": "method_call"
         },
         {
           "name": "exists",
           "file": "built-in",
-          "line": 182,
+          "line": 200,
           "call_type": "method_call"
         },
         {
           "name": "open",
           "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 188,
+          "line": 206,
           "call_type": "function_call"
         },
         {
           "name": "read",
           "file": "built-in",
-          "line": 189,
+          "line": 207,
           "call_type": "method_call"
         },
         {
           "name": "_parse_config_content",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
-          "line": 192,
+          "line": 210,
           "call_type": "method_call"
         },
         {
           "name": "get_config_loader",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
-          "line": 435,
+          "line": 453,
           "call_type": "function_call"
         },
         {
           "name": "load_config",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
-          "line": 436,
+          "line": 454,
           "call_type": "method_call"
         },
         {
           "name": "find_config_file",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
-          "line": 587,
+          "line": 605,
           "call_type": "method_call"
         },
         {
           "name": "exists",
           "file": "built-in",
-          "line": 599,
+          "line": 617,
           "call_type": "method_call"
         },
         {
           "name": "open",
           "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
-          "line": 605,
+          "line": 623,
           "call_type": "function_call"
         },
         {
           "name": "read",
           "file": "built-in",
-          "line": 606,
+          "line": 624,
           "call_type": "method_call"
         },
         {
           "name": "safe_load",
           "file": "/opt/anaconda3/lib/python3.13/site-packages/yaml/__init__.py",
-          "line": 616,
+          "line": 634,
           "call_type": "method_call"
         }
       ],
-      "call_count": 26
+      "call_count": 27
     },
     {
       "name": "get_config",
       "file": "model_chorus/src/model_chorus/core/config.py",
-      "line": 439,
+      "line": 457,
       "language": "python",
       "docstring": "Get the current configuration (convenience function).\n\nReturns:\n    Current configuration",
       "parameters": [],
@@ -33965,97 +34065,97 @@
         {
           "name": "get_workflow_default",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 268,
+          "line": 286,
           "call_type": "method_call"
         },
         {
           "name": "get_default_provider",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 296,
+          "line": 314,
           "call_type": "method_call"
         },
         {
           "name": "get_default_providers",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 325,
+          "line": 343,
           "call_type": "method_call"
         },
         {
           "name": "get_fallback_providers",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 344,
+          "line": 362,
           "call_type": "method_call"
         },
         {
           "name": "get_provider_model",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 398,
+          "line": 416,
           "call_type": "method_call"
         },
         {
           "name": "get_config",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 446,
+          "line": 464,
           "call_type": "method_call"
         },
         {
           "name": "is_provider_enabled",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 658,
+          "line": 676,
           "call_type": "method_call"
         },
         {
           "name": "get_enabled_providers",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 673,
+          "line": 691,
           "call_type": "method_call"
         },
         {
           "name": "get_workflow_providers",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 692,
+          "line": 710,
           "call_type": "method_call"
         },
         {
           "name": "get_workflow_provider_priority",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 722,
+          "line": 740,
           "call_type": "method_call"
         },
         {
           "name": "get_workflow_num_to_consult",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 745,
+          "line": 763,
           "call_type": "method_call"
         },
         {
           "name": "get_workflow_default",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 789,
+          "line": 807,
           "call_type": "method_call"
         },
         {
           "name": "get_workflow_default_provider",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 819,
+          "line": 837,
           "call_type": "method_call"
         },
         {
           "name": "get_workflow_fallback_providers",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 843,
+          "line": 861,
           "call_type": "method_call"
         },
         {
           "name": "get_provider_model",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 869,
+          "line": 887,
           "call_type": "method_call"
         },
         {
           "name": "get_claude_config",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 902,
+          "line": 920,
           "call_type": "method_call"
         }
       ],
@@ -34063,25 +34163,25 @@
         {
           "name": "load_config",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
-          "line": 246,
+          "line": 264,
           "call_type": "method_call"
         },
         {
           "name": "get_config_loader",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
-          "line": 445,
+          "line": 463,
           "call_type": "function_call"
         },
         {
           "name": "get_config",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
-          "line": 446,
+          "line": 464,
           "call_type": "method_call"
         },
         {
           "name": "load_config",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
-          "line": 635,
+          "line": 653,
           "call_type": "method_call"
         }
       ],
@@ -34090,7 +34190,7 @@
     {
       "name": "get_claude_config_loader",
       "file": "model_chorus/src/model_chorus/core/config.py",
-      "line": 887,
+      "line": 905,
       "language": "python",
       "docstring": "Get the global Claude config loader instance.",
       "parameters": [],
@@ -34110,7 +34210,7 @@
         {
           "name": "get_claude_config",
           "file": "model_chorus/src/model_chorus/core/config.py",
-          "line": 901,
+          "line": 919,
           "call_type": "function_call"
         }
       ],
@@ -34120,7 +34220,7 @@
     {
       "name": "get_claude_config",
       "file": "model_chorus/src/model_chorus/core/config.py",
-      "line": 895,
+      "line": 913,
       "language": "python",
       "docstring": "Get the current Claude configuration (convenience function).\n\nReturns:\n    Current configuration from .claude/model_chorus_config.yaml",
       "parameters": [],
@@ -34135,13 +34235,13 @@
         {
           "name": "get_claude_config_loader",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
-          "line": 901,
+          "line": 919,
           "call_type": "function_call"
         },
         {
           "name": "get_config",
           "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/core/config.py",
-          "line": 902,
+          "line": 920,
           "call_type": "method_call"
         }
       ]
@@ -42901,6 +43001,7 @@
     "model_chorus/src/model_chorus/core/conversation.py": [
       "json",
       "logging",
+      "os",
       "uuid",
       "datetime.UTC",
       "datetime.datetime",
@@ -42908,6 +43009,7 @@
       "pathlib.Path",
       "typing.Any",
       "typing.Literal",
+      "typing.Protocol",
       "filelock",
       "models.ConversationMessage",
       "models.ConversationThread"

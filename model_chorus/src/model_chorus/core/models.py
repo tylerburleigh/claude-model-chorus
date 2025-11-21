@@ -203,6 +203,79 @@ class WorkflowResponse(BaseModel):
     )
 
 
+class WorkflowMetadata(BaseModel):
+    """
+    Metadata about a registered workflow for discovery and documentation.
+
+    Provides descriptive information about workflows registered in the
+    WorkflowRegistry, enabling workflow listing, documentation generation,
+    and user discovery of available workflows.
+
+    Attributes:
+        name: Unique workflow identifier (e.g., "consensus", "thinkdeep")
+        description: Human-readable description of what the workflow does
+        version: Semantic version string (e.g., "1.0.0")
+        author: Workflow author or maintainer
+        category: Optional workflow category for organization
+        parameters: Optional list of workflow-specific parameter names
+        examples: Optional list of usage examples
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "name": "consensus",
+                "description": "Multi-model consultation with configurable synthesis",
+                "version": "2.0.0",
+                "author": "ModelChorus Team",
+                "category": "consultation",
+                "parameters": ["strategy", "providers", "temperature"],
+                "examples": [
+                    "model-chorus consensus 'Analyze this code' --strategy synthesize"
+                ],
+            }
+        }
+    )
+
+    name: str = Field(
+        ...,
+        description="Unique workflow identifier",
+        min_length=1,
+    )
+
+    description: str = Field(
+        ...,
+        description="Human-readable description of workflow functionality",
+        min_length=1,
+    )
+
+    version: str = Field(
+        default="1.0.0",
+        description="Semantic version string",
+        pattern=r"^\d+\.\d+\.\d+$",
+    )
+
+    author: str = Field(
+        default="Unknown",
+        description="Workflow author or maintainer",
+    )
+
+    category: str | None = Field(
+        default=None,
+        description="Optional category for workflow organization",
+    )
+
+    parameters: list[str] = Field(
+        default_factory=list,
+        description="List of workflow-specific parameter names",
+    )
+
+    examples: list[str] = Field(
+        default_factory=list,
+        description="Usage examples for documentation",
+    )
+
+
 class ModelSelection(BaseModel):
     """
     Model for specifying model selection criteria.

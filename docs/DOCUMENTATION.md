@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-21 10:23:18
+**Generated:** 2025-11-21 10:26:27
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 117
-- **Total Lines:** 52648
-- **Total Classes:** 302
+- **Total Lines:** 52956
+- **Total Classes:** 305
 - **Total Functions:** 219
 - **Avg Complexity:** 4.37
 - **Max Complexity:** 44
@@ -569,7 +569,7 @@ Example:
 ### `ClaudeConfigLoader`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/core/config.py:544`
+**Defined in:** `model_chorus/src/model_chorus/core/config.py:562`
 
 **Description:**
 > Loads and manages configuration from .claude/model_chorus_config.yaml.
@@ -772,7 +772,7 @@ ConfigLoader handles:
 ### `ConfigLoader`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/core/config.py:129`
+**Defined in:** `model_chorus/src/model_chorus/core/config.py:147`
 
 **Description:**
 > Loads and manages ModelChorus configuration.
@@ -1033,6 +1033,27 @@ Values:
 
 ---
 
+### `ConversationBackend`
+
+**Language:** python
+**Inherits from:** `Protocol`
+**Defined in:** `model_chorus/src/model_chorus/core/conversation.py:35`
+
+**Description:**
+> Protocol defining the interface for conversation storage backends.
+
+**Methods:**
+- `create_thread()`
+- `get_thread()`
+- `add_message()`
+- `get_messages()`
+- `complete_thread()`
+- `archive_thread()`
+- `cleanup_expired_threads()`
+- `cleanup_archived_threads()`
+
+---
+
 ### `ConversationDatabase`
 
 **Language:** python
@@ -1079,43 +1100,40 @@ Attributes:
 ### `ConversationMemory`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/core/conversation.py:35`
+**Defined in:** `model_chorus/src/model_chorus/core/conversation.py:915`
 
 **Description:**
-> Manages conversation threads with file-based persistence.
+> Unified conversation memory interface with pluggable storage backends.
 
-Provides thread-safe storage and retrieval of conversation history,
-enabling multi-turn conversations across workflow executions.
+Automatically selects storage backend based on configuration:
+- file: JSON file-based storage (default, backward compatible)
+- sqlite: SQLite database with WAL mode (recommended for production)
 
-Architecture:
-    - Each thread stored as JSON file: ~/.model-chorus/conversations/{thread_id}.json
-    - File locking prevents concurrent access corruption
-    - TTL-based cleanup removes expired threads
-    - Supports conversation chains via parent_thread_id
+Configuration via .model-chorusrc:
+    storage:
+      backend: "sqlite"  # or "file"
+      sqlite_path: "~/.model-chorus/conversations.db"
+
+This class delegates all operations to the appropriate backend implementation
+while maintaining the same API as the original ConversationMemory.
 
 Attributes:
-    conversations_dir: Directory where conversation files are stored
-    ttl_hours: Time-to-live for conversation threads in hours
-    max_messages: Maximum messages per thread before truncation
+    backend: The underlying storage backend (FileBackend or ConversationDatabase)
 
 **Methods:**
 - `__init__()`
+- `_detect_backend()`
 - `create_thread()`
 - `get_thread()`
 - `get_thread_chain()`
 - `add_message()`
 - `get_messages()`
-- `_estimate_tokens()`
-- `_is_important_message()`
-- `_apply_token_budget()`
 - `build_conversation_history()`
 - `get_context_summary()`
 - `complete_thread()`
 - `archive_thread()`
 - `cleanup_expired_threads()`
 - `cleanup_archived_threads()`
-- `_save_thread()`
-- `_delete_thread()`
 
 ---
 
@@ -1414,6 +1432,49 @@ Attributes:
 
 ---
 
+### `FileBackend`
+
+**Language:** python
+**Defined in:** `model_chorus/src/model_chorus/core/conversation.py:94`
+
+**Description:**
+> File-based conversation storage implementation (legacy).
+
+Provides thread-safe storage using individual JSON files per thread.
+This is the original implementation, now wrapped by ConversationMemory.
+
+Architecture:
+    - Each thread stored as JSON file: ~/.model-chorus/conversations/{thread_id}.json
+    - File locking prevents concurrent access corruption
+    - TTL-based cleanup removes expired threads
+    - Supports conversation chains via parent_thread_id
+
+Attributes:
+    conversations_dir: Directory where conversation files are stored
+    ttl_hours: Time-to-live for conversation threads in hours
+    max_messages: Maximum messages per thread before truncation
+
+**Methods:**
+- `__init__()`
+- `create_thread()`
+- `get_thread()`
+- `get_thread_chain()`
+- `add_message()`
+- `get_messages()`
+- `_estimate_tokens()`
+- `_is_important_message()`
+- `_apply_token_budget()`
+- `build_conversation_history()`
+- `get_context_summary()`
+- `complete_thread()`
+- `archive_thread()`
+- `cleanup_expired_threads()`
+- `cleanup_archived_threads()`
+- `_save_thread()`
+- `_delete_thread()`
+
+---
+
 ### `FileTooLargeError`
 
 **Language:** python
@@ -1573,7 +1634,7 @@ runtime parameters passed to CLI commands.
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `model_chorus/src/model_chorus/core/config.py:454`
+**Defined in:** `model_chorus/src/model_chorus/core/config.py:472`
 
 **Description:**
 > Default generation parameters for .claude/model_chorus_config.yaml.
@@ -2360,7 +2421,7 @@ settings.
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `model_chorus/src/model_chorus/core/config.py:80`
+**Defined in:** `model_chorus/src/model_chorus/core/config.py:94`
 
 **Description:**
 > Root configuration model for ModelChorus.
@@ -2376,7 +2437,7 @@ settings.
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `model_chorus/src/model_chorus/core/config.py:506`
+**Defined in:** `model_chorus/src/model_chorus/core/config.py:524`
 
 **Description:**
 > Root configuration for .claude/model_chorus_config.yaml.
@@ -2760,7 +2821,7 @@ API endpoints, and provider-specific parameters.
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `model_chorus/src/model_chorus/core/config.py:462`
+**Defined in:** `model_chorus/src/model_chorus/core/config.py:480`
 
 **Description:**
 > Configuration for a provider in .claude/model_chorus_config.yaml.
@@ -3227,6 +3288,17 @@ Attributes:
 - `load_from_disk()`
 - `load_all_from_disk()`
 - `sync_to_disk()`
+
+---
+
+### `StorageConfig`
+
+**Language:** python
+**Inherits from:** `BaseModel`
+**Defined in:** `model_chorus/src/model_chorus/core/config.py:80`
+
+**Description:**
+> Configuration for conversation storage backend.
 
 ---
 
@@ -6599,7 +6671,7 @@ and workflow-specific settings.
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `model_chorus/src/model_chorus/core/config.py:470`
+**Defined in:** `model_chorus/src/model_chorus/core/config.py:488`
 
 **Description:**
 > Workflow configuration for .claude/model_chorus_config.yaml.
@@ -9234,7 +9306,7 @@ Example:
 ### `get_claude_config() -> ModelChorusConfigV2`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/core/config.py:895`
+**Defined in:** `model_chorus/src/model_chorus/core/config.py:913`
 **Complexity:** 1
 
 **Description:**
@@ -9248,7 +9320,7 @@ Returns:
 ### `get_claude_config_loader() -> ClaudeConfigLoader`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/core/config.py:887`
+**Defined in:** `model_chorus/src/model_chorus/core/config.py:905`
 **Complexity:** 2
 
 **Description:**
@@ -9311,7 +9383,7 @@ Example:
 ### `get_config() -> ModelChorusConfig`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/core/config.py:439`
+**Defined in:** `model_chorus/src/model_chorus/core/config.py:457`
 **Complexity:** 1
 
 **Description:**
@@ -9339,7 +9411,7 @@ Returns:
 ### `get_config_loader() -> ConfigLoader`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/core/config.py:418`
+**Defined in:** `model_chorus/src/model_chorus/core/config.py:436`
 **Complexity:** 2
 
 **Description:**
@@ -9730,7 +9802,7 @@ Use --check to verify which providers are actually installed and working.
 ### `load_config(config_path) -> ModelChorusConfig`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/core/config.py:426`
+**Defined in:** `model_chorus/src/model_chorus/core/config.py:444`
 **Complexity:** 1
 
 **Description:**
@@ -11468,9 +11540,11 @@ Returns:
 - `logging`
 - `models.ConversationMessage`
 - `models.ConversationThread`
+- `os`
 - `pathlib.Path`
 - `typing.Any`
 - `typing.Literal`
+- `typing.Protocol`
 - `uuid`
 
 ### `model_chorus/src/model_chorus/core/conversation_db.py`
