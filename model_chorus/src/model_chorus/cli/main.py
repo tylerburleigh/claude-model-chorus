@@ -2024,6 +2024,53 @@ def list_providers(
         )
 
 
+@app.command(name="list-workflows")
+def list_workflows_cmd():
+    """List all registered workflows with metadata.
+
+    Shows available workflows in the ModelChorus registry along with
+    their descriptions, versions, and authors.
+
+    Example:
+        model-chorus list-workflows
+    """
+    from ..core.registry import WorkflowRegistry
+
+    workflows = WorkflowRegistry.list_workflows()
+
+    if not workflows:
+        console.print("[yellow]No workflows registered[/yellow]")
+        return
+
+    console.print("\n[bold cyan]Available Workflows:[/bold cyan]\n")
+
+    for workflow_name in workflows:
+        # Get workflow info
+        info = WorkflowRegistry.get_workflow_info(workflow_name)
+
+        console.print(f"[bold green]● {workflow_name}[/bold green]")
+
+        if info:
+            console.print(f"  Description: {info.description}")
+            console.print(f"  Version: {info.version}")
+            console.print(f"  Author: {info.author}")
+
+            if info.category:
+                console.print(f"  Category: {info.category}")
+
+            if info.parameters:
+                console.print(f"  Parameters: {', '.join(info.parameters)}")
+
+            if info.examples:
+                console.print("  Examples:")
+                for example in info.examples:
+                    console.print(f"    {example}")
+        else:
+            console.print("  [dim]No metadata available[/dim]")
+
+        console.print()
+
+
 @app.command()
 def version():
     """Show version information."""

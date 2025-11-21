@@ -1,14 +1,14 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-21 10:28:02
+**Generated:** 2025-11-21 10:35:28
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 117
-- **Total Lines:** 53029
+- **Total Lines:** 53130
 - **Total Classes:** 306
 - **Total Functions:** 219
 - **Avg Complexity:** 4.37
@@ -6732,26 +6732,33 @@ Attributes:
 ### `WorkflowRegistry`
 
 **Language:** python
-**Defined in:** `model_chorus/src/model_chorus/core/registry.py:14`
+**Defined in:** `model_chorus/src/model_chorus/core/registry.py:16`
 
 **Description:**
-> Registry for workflow implementations.
+> Registry for workflow implementations with metadata support.
 
 Provides a plugin system for registering and retrieving workflow classes
-dynamically. Workflows can be registered using the @register decorator or
-programmatically via register_workflow().
+dynamically with rich metadata for discovery and documentation. Workflows
+can be registered using the @register decorator or programmatically.
 
 Example:
     ```python
-    @WorkflowRegistry.register("thinkdeep")
+    @WorkflowRegistry.register(
+        "thinkdeep",
+        description="Extended reasoning with systematic investigation",
+        version="2.0.0",
+        author="ModelChorus Team"
+    )
     class ThinkDeepWorkflow(BaseWorkflow):
         async def run(self, prompt: str, **kwargs):
             # Implementation
             pass
 
-    # Later, retrieve the workflow
-    workflow_class = WorkflowRegistry.get("thinkdeep")
-    workflow = workflow_class("My Workflow", "Description")
+    # List all workflows
+    workflows = WorkflowRegistry.list_workflows()
+
+    # Get workflow info
+    info = WorkflowRegistry.get_workflow_info("thinkdeep")
     ```
 
 **Methods:**
@@ -6762,6 +6769,9 @@ Example:
 - `is_registered()`
 - `unregister()`
 - `clear()`
+- `list_workflows()`
+- `get_workflow_info()`
+- `register_metadata()`
 
 ---
 
@@ -11614,6 +11624,7 @@ Returns:
 - `base_workflow.BaseWorkflow`
 - `collections.abc.Callable`
 - `inspect`
+- `models.WorkflowMetadata`
 
 ### `model_chorus/src/model_chorus/core/role_orchestration.py`
 

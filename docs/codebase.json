@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-21T15:28:02.555405Z",
+    "generated_at": "2025-11-21T15:35:28.390488Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 117,
-    "total_lines": 53029,
+    "total_lines": 53130,
     "total_classes": 306,
     "total_functions": 219,
     "avg_complexity": 4.37,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 117,
-        "lines": 53029,
+        "lines": 53130,
         "classes": 306,
         "functions": 219,
         "avg_complexity": 4.37
@@ -790,7 +790,7 @@
       "name": "registry",
       "file": "model_chorus/src/model_chorus/core/registry.py",
       "language": "python",
-      "docstring": "Workflow registry for ModelChorus plugin system.\n\nThis module provides a registry for dynamically registering and loading\nworkflow implementations, enabling a flexible plugin architecture.",
+      "docstring": "Workflow registry for ModelChorus plugin system.\n\nThis module provides a registry for dynamically registering and loading\nworkflow implementations, enabling a flexible plugin architecture with\nworkflow discovery and metadata management.",
       "classes": [
         "WorkflowRegistry"
       ],
@@ -798,10 +798,11 @@
       "imports": [
         "inspect",
         "collections.abc.Callable",
-        "base_workflow.BaseWorkflow"
+        "base_workflow.BaseWorkflow",
+        "models.WorkflowMetadata"
       ],
       "exports": [],
-      "lines": 221
+      "lines": 322
     },
     {
       "name": "role_orchestration",
@@ -6852,8 +6853,19 @@
       "properties": [],
       "is_exported": false,
       "is_public": true,
-      "instantiated_by": [],
-      "imported_by": []
+      "instantiated_by": [
+        {
+          "instantiator": "register_metadata",
+          "file": "model_chorus/src/model_chorus/core/registry.py",
+          "line": 313,
+          "context": [
+            "WorkflowRegistry",
+            "register_metadata"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 1
     },
     {
       "name": "ModelSelection",
@@ -9701,9 +9713,9 @@
     {
       "name": "WorkflowRegistry",
       "file": "model_chorus/src/model_chorus/core/registry.py",
-      "line": 14,
+      "line": 16,
       "language": "python",
-      "docstring": "Registry for workflow implementations.\n\nProvides a plugin system for registering and retrieving workflow classes\ndynamically. Workflows can be registered using the @register decorator or\nprogrammatically via register_workflow().\n\nExample:\n    ```python\n    @WorkflowRegistry.register(\"thinkdeep\")\n    class ThinkDeepWorkflow(BaseWorkflow):\n        async def run(self, prompt: str, **kwargs):\n            # Implementation\n            pass\n\n    # Later, retrieve the workflow\n    workflow_class = WorkflowRegistry.get(\"thinkdeep\")\n    workflow = workflow_class(\"My Workflow\", \"Description\")\n    ```",
+      "docstring": "Registry for workflow implementations with metadata support.\n\nProvides a plugin system for registering and retrieving workflow classes\ndynamically with rich metadata for discovery and documentation. Workflows\ncan be registered using the @register decorator or programmatically.\n\nExample:\n    ```python\n    @WorkflowRegistry.register(\n        \"thinkdeep\",\n        description=\"Extended reasoning with systematic investigation\",\n        version=\"2.0.0\",\n        author=\"ModelChorus Team\"\n    )\n    class ThinkDeepWorkflow(BaseWorkflow):\n        async def run(self, prompt: str, **kwargs):\n            # Implementation\n            pass\n\n    # List all workflows\n    workflows = WorkflowRegistry.list_workflows()\n\n    # Get workflow info\n    info = WorkflowRegistry.get_workflow_info(\"thinkdeep\")\n    ```",
       "bases": [],
       "methods": [
         "register",
@@ -9712,7 +9724,10 @@
         "list_workflows",
         "is_registered",
         "unregister",
-        "clear"
+        "clear",
+        "list_workflows",
+        "get_workflow_info",
+        "register_metadata"
       ],
       "properties": [],
       "is_exported": false,
@@ -25182,7 +25197,7 @@
         },
         {
           "name": "read",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 86,
           "call_type": "method_call"
         },
@@ -29320,7 +29335,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 1926,
           "call_type": "method_call"
         },
@@ -30195,7 +30210,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 342,
           "call_type": "method_call"
         },
@@ -30501,7 +30516,7 @@
         },
         {
           "name": "read",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 596,
           "call_type": "method_call"
         },
@@ -30603,7 +30618,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 703,
           "call_type": "method_call"
         },
@@ -30852,7 +30867,7 @@
         },
         {
           "name": "read",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 815,
           "call_type": "method_call"
         },
@@ -30888,25 +30903,25 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 837,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 840,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 842,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 844,
           "call_type": "method_call"
         },
@@ -31015,7 +31030,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 908,
           "call_type": "method_call"
         },
@@ -43068,7 +43083,8 @@
     "model_chorus/src/model_chorus/core/registry.py": [
       "inspect",
       "collections.abc.Callable",
-      "base_workflow.BaseWorkflow"
+      "base_workflow.BaseWorkflow",
+      "models.WorkflowMetadata"
     ],
     "model_chorus/src/model_chorus/core/role_orchestration.py": [
       "asyncio",
