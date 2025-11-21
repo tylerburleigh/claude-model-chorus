@@ -367,16 +367,25 @@ class ChatWorkflow(BaseWorkflow):
             return prompt
 
         # Use build_conversation_history for token-aware history construction
+        history_kwargs = {
+            "thread_id": thread_id,
+            "include_files": False,  # We handle files separately above
+        }
+        if max_history_tokens is not None:
+            history_kwargs["max_tokens"] = max_history_tokens
+            history_kwargs["smart_compaction"] = True
+
         history, message_count = self.conversation_memory.build_conversation_history(
-            thread_id=thread_id,
-            max_tokens=max_history_tokens,
-            include_files=False,  # We handle files separately above
-            smart_compaction=True  # Use smart compaction by default
+            **history_kwargs
         )
 
         # Add conversation history if available
-        if history:
+        has_history = bool(message_count and history and history.strip())
+        if has_history:
             context_parts.append(history)
+            dialogue_summary = self._build_dialogue_summary(thread_id, message_count)
+            if dialogue_summary:
+                context_parts.append(dialogue_summary)
             # Add current user prompt
             context_parts.append(f"\n{prompt}")
         else:
@@ -388,12 +397,31 @@ class ChatWorkflow(BaseWorkflow):
 
         full_prompt = "\n".join(context_parts)
 
+        previous_messages = message_count or 0
         logger.debug(
-            f"Built prompt with {len(messages) if messages else 0} previous messages, "
-            f"{len(files) if files else 0} files, total length: {len(full_prompt)}"
+            "Built prompt with %d previous messages, %d files, total length: %d",
+            previous_messages,
+            len(files) if files else 0,
+            len(full_prompt),
         )
 
         return full_prompt
+
+    def _build_dialogue_summary(self, thread_id: str, message_count: int) -> str | None:
+        """Render recent conversation turns in a simple USER/ASSISTANT format."""
+        if not self.conversation_memory or message_count <= 0:
+            return None
+
+        thread = self.get_thread(thread_id)
+        if not thread or not thread.messages:
+            return None
+
+        recent_messages = thread.messages[-message_count:]
+        lines = ["Previous conversation (dialogue format):"]
+        for msg in recent_messages:
+            role = msg.role.upper()
+            lines.append(f"{role}: {msg.content}")
+        return "\n".join(lines)
 
     def _get_conversation_length(self, thread_id: str) -> int:
         """

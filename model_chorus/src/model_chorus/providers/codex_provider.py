@@ -151,8 +151,8 @@ class CodexProvider(CLIProvider):
             for image_path in request.images:
                 command.extend(["--image", image_path])
 
-        # Pass prompt as a positional argument
-        command.append(request.prompt)
+        # Pass prompt via stdin to keep exec mode non-interactive
+        self.input_data = request.prompt or ""
 
         logger.debug(f"Built Codex command: {' '.join(command)}")
         return command

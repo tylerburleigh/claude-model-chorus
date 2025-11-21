@@ -130,20 +130,22 @@ class ThinkDeepWorkflow(BaseWorkflow):
 
     async def run(  # type: ignore[override,no-untyped-def]
         self,
-        step: str,
-        step_number: int,
-        total_steps: int,
-        next_step_required: bool,
-        findings: str,
+        step: str | None = None,
+        step_number: int | None = None,
+        total_steps: int | None = None,
+        next_step_required: bool | None = None,
+        findings: str | None = None,
         hypothesis: str | None = None,
-        confidence: str = "exploring",
+        confidence: str | None = None,
         continuation_id: str | None = None,
         files: list[str] | None = None,
         relevant_files: list[str] | None = None,
         thinking_mode: str = "medium",
         skip_provider_check: bool = False,
+        prompt: str | None = None,
         **kwargs,
     ) -> WorkflowResult:
+
         """
         Execute ThinkDeep investigation workflow with explicit multi-step control.
 
@@ -201,6 +203,18 @@ class ThinkDeepWorkflow(BaseWorkflow):
             ...     files=["src/services/token.py"]
             ... )
         """
+        # Backward compatibility: allow legacy prompt-only invocations
+        if step is None:
+            step = prompt or "Investigation prompt"
+        if step_number is None:
+            step_number = 1
+        if total_steps is None:
+            total_steps = max(step_number, 1)
+        if next_step_required is None:
+            next_step_required = False
+        if findings is None:
+            findings = "No findings provided."
+
         logger.info(
             f"Starting ThinkDeep investigation step {step_number}/{total_steps} - "
             f"continuation: {continuation_id is not None}, "
@@ -208,6 +222,12 @@ class ThinkDeepWorkflow(BaseWorkflow):
             f"files: {len(files) if files else 0}, "
             f"relevant_files: {len(relevant_files) if relevant_files else 0}"
         )
+
+        step = step or prompt or "Investigate issue"
+        step_number = step_number or 1
+        total_steps = total_steps or step_number
+        next_step_required = next_step_required if next_step_required is not None else False
+        findings = findings or "No findings provided."
 
         # Check provider availability
         if not skip_provider_check:
@@ -242,7 +262,6 @@ class ThinkDeepWorkflow(BaseWorkflow):
         if continuation_id:
             thread_id = continuation_id
         else:
-            # Create new thread if conversation memory available
             if self.conversation_memory:
                 thread_id = self.conversation_memory.create_thread(
                     workflow_name=self.name
@@ -250,21 +269,25 @@ class ThinkDeepWorkflow(BaseWorkflow):
             else:
                 thread_id = str(uuid.uuid4())
 
-        # Initialize result
         result = WorkflowResult(success=False)
 
         try:
-            # Load or initialize investigation state
             state = self._get_or_create_state(thread_id)
+            if not state.current_confidence:
+                state.current_confidence = ConfidenceLevel.EXPLORING.value
+            confidence_value = (
+                confidence
+                or state.current_confidence
+                or ConfidenceLevel.EXPLORING.value
+            )
 
-            # Build the full prompt with multi-step investigation context
             full_prompt = self._build_investigation_prompt(
                 step=step,
                 step_number=step_number,
                 total_steps=total_steps,
                 findings=findings,
                 hypothesis=hypothesis,
-                confidence=confidence,
+                confidence=confidence_value,
                 thread_id=thread_id,
                 state=state,
                 files=files,
@@ -272,7 +295,6 @@ class ThinkDeepWorkflow(BaseWorkflow):
                 thinking_mode=thinking_mode,
             )
 
-            # Create generation request
             request = GenerationRequest(
                 prompt=full_prompt, continuation_id=thread_id, **kwargs
             )
@@ -280,12 +302,9 @@ class ThinkDeepWorkflow(BaseWorkflow):
             logger.info(
                 f"Sending investigation request to provider: {self.provider.provider_name}"
             )
-
-            # Emit workflow start (for step 1) or progress update
             if step_number == 1:
                 emit_workflow_start("thinkdeep")
 
-            # Generate response from provider with fallback
             response, used_provider, failed = await self._execute_with_fallback(
                 request, self.provider, self.fallback_providers
             )
@@ -299,25 +318,27 @@ class ThinkDeepWorkflow(BaseWorkflow):
                 f"{len(response.content)} chars"
             )
 
-            # Add user message to conversation history (step description + findings)
+            if not response.content or not response.content.strip():
+                raise ValueError(
+                    f"Provider '{self.provider.provider_name}' returned an empty response"
+                )
+
+            combined_files = self._merge_file_lists(files, relevant_files)
+
             if self.conversation_memory:
                 user_message = (
                     f"Step {step_number}/{total_steps}: {step}\nFindings: {findings}"
                 )
                 if hypothesis:
                     user_message += f"\nHypothesis: {hypothesis}"
-                message_files = self._merge_file_lists(files, relevant_files)
                 self.add_message(
                     thread_id,
                     "user",
                     user_message,
-                    files=message_files or None,
+                    files=combined_files or None,
                     workflow_name=self.name,
                     model_provider=self.provider.provider_name,
                 )
-
-            # Add assistant response to conversation history
-            if self.conversation_memory:
                 self.add_message(
                     thread_id,
                     "assistant",
@@ -327,55 +348,47 @@ class ThinkDeepWorkflow(BaseWorkflow):
                     model_name=response.model,
                 )
 
-            # Create and add investigation step with explicit parameters
             investigation_step = InvestigationStep(
                 step_number=step_number,
                 findings=findings,
                 files_checked=files if files else [],
-                confidence=confidence,
+                confidence=confidence_value,
             )
             state.steps.append(investigation_step)
+            state.current_confidence = confidence_value
 
-            # Update current confidence
-            state.current_confidence = confidence
-
-            # Add/update hypothesis if provided
             if hypothesis:
-                # Check if this hypothesis already exists
                 existing_hyp = next(
                     (h for h in state.hypotheses if h.hypothesis == hypothesis), None
                 )
                 if existing_hyp:
-                    # Update existing hypothesis status based on confidence
-                    if confidence in ["very_high", "almost_certain", "certain"]:
+                    if confidence_value in [
+                        ConfidenceLevel.VERY_HIGH.value,
+                        ConfidenceLevel.ALMOST_CERTAIN.value,
+                        ConfidenceLevel.CERTAIN.value,
+                    ]:
                         existing_hyp.status = "validated"
                     else:
                         existing_hyp.status = "active"
                 else:
-                    # Add new hypothesis
-                    new_hyp = Hypothesis(
-                        hypothesis=hypothesis,
-                        status="active",
-                        evidence=[findings],  # Add current findings as evidence
+                    state.hypotheses.append(
+                        Hypothesis(
+                            hypothesis=hypothesis,
+                            status="active",
+                            evidence=[findings],
+                        )
                     )
-                    state.hypotheses.append(new_hyp)
 
-            # Track files examined
-            combined_files = self._merge_file_lists(files, relevant_files)
             if combined_files:
                 for file in combined_files:
                     if file not in state.relevant_files:
                         state.relevant_files.append(file)
 
-            # Perform expert validation if configured and confidence not "certain"
             expert_validation = await self._perform_expert_validation(
                 thread_id, state, response.content, **kwargs
             )
-
-            # Save updated state (after expert validation)
             self._save_state(thread_id, state)
 
-            # Build successful result
             result.success = True
             result.synthesis = response.content
             result.add_step(
@@ -383,8 +396,6 @@ class ThinkDeepWorkflow(BaseWorkflow):
                 content=response.content,
                 model=response.model,
             )
-
-            # Add expert validation to result if performed
             if expert_validation and self.expert_provider is not None:
                 result.add_step(
                     step_number=len(state.steps) + 2,
@@ -392,11 +403,12 @@ class ThinkDeepWorkflow(BaseWorkflow):
                     model=f"{self.expert_provider.provider_name} (expert validation)",
                 )
 
-            # Add metadata with continuation_id for next step
+            files_examined_count = len(files) if files else 0
+            next_step_pointer = len(state.steps) + 1
             result.metadata.update(
                 {
-                    "thread_id": thread_id,  # Keep for backward compatibility
-                    "continuation_id": thread_id,  # Primary ID for multi-step continuation
+                    "thread_id": thread_id,
+                    "continuation_id": thread_id,
                     "provider": self.provider.provider_name,
                     "model": response.model,
                     "usage": response.usage,
@@ -404,17 +416,21 @@ class ThinkDeepWorkflow(BaseWorkflow):
                     "step_number": step_number,
                     "total_steps": total_steps,
                     "next_step_required": next_step_required,
-                    "confidence": confidence,
+                    "confidence": confidence_value,
                     "hypothesis": hypothesis,
                     "findings": findings,
-                    "files_examined_this_step": len(files) if files else 0,
+                    "files_examined": files_examined_count,
+                    "files_examined_this_step": files_examined_count,
                     "total_files_examined": len(state.relevant_files),
                     "total_hypotheses": len(state.hypotheses),
+                    "hypotheses_count": len(state.hypotheses),
                     "expert_validation_performed": expert_validation is not None,
                     "relevant_files_this_step": self._merge_file_lists(
                         None, relevant_files
                     ),
                     "relevant_files": list(state.relevant_files),
+                    "is_continuation": continuation_id is not None,
+                    "investigation_step": next_step_pointer,
                 }
             )
 
@@ -422,14 +438,18 @@ class ThinkDeepWorkflow(BaseWorkflow):
                 f"ThinkDeep investigation step {step_number}/{total_steps} completed for thread: {thread_id}"
             )
 
-            # Emit workflow complete (for final step)
             if not next_step_required or step_number == total_steps:
                 emit_workflow_complete("thinkdeep")
 
         except Exception as e:
             logger.error(f"ThinkDeep investigation failed: {e}", exc_info=True)
+            error_message = str(e)
+            if "Last error:" in error_message:
+                error_message = error_message.split("Last error:", 1)[1].strip()
+            elif " failed:" in error_message:
+                error_message = error_message.split(" failed:", 1)[1].strip()
             result.success = False
-            result.error = str(e)
+            result.error = error_message
             result.metadata["thread_id"] = thread_id
 
         # Store result

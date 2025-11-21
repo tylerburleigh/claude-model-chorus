@@ -1110,6 +1110,108 @@ class ConversationMemory:
         lines.append("=== END CONVERSATION HISTORY ===")
         return "\n".join(lines), len(messages)
 
+    # ------------------------------------------------------------------
+    # Compatibility helpers for legacy tests and workflows
+    # ------------------------------------------------------------------
+    def _save_thread(self, thread: ConversationThread) -> None:
+        backend_method = getattr(self.backend, "_save_thread", None)
+        if backend_method:
+            backend_method(thread)
+        else:
+            logger.warning(
+                "Conversation backend %s does not support _save_thread; state changes may not persist",
+                type(self.backend).__name__,
+            )
+
+    def _estimate_tokens(self, text: str) -> int:
+        backend_method = getattr(self.backend, "_estimate_tokens", None)
+        if backend_method:
+            return backend_method(text)
+        return len(text) // 4
+
+    def _is_important_message(self, msg: ConversationMessage) -> bool:
+        backend_method = getattr(self.backend, "_is_important_message", None)
+        if backend_method:
+            return backend_method(msg)
+
+        if msg.files:
+            return True
+        if msg.workflow_name or msg.metadata:
+            return True
+        if len(msg.content) > 500:
+            return True
+        return False
+
+    def _apply_token_budget(
+        self,
+        messages: list[ConversationMessage],
+        max_tokens: int,
+        smart_compaction: bool = True,
+    ) -> list[ConversationMessage]:
+        backend_method = getattr(self.backend, "_apply_token_budget", None)
+        if backend_method:
+            return backend_method(messages, max_tokens, smart_compaction)
+
+        if not messages:
+            return messages
+
+        if not smart_compaction:
+            result: list[ConversationMessage] = []
+            token_count = 0
+            for msg in reversed(messages):
+                msg_text = msg.content
+                if msg.files:
+                    msg_text += " " + " ".join(msg.files)
+                msg_tokens = self._estimate_tokens(msg_text)
+
+                if result and (token_count + msg_tokens > max_tokens):
+                    break
+
+                result.append(msg)
+                token_count += msg_tokens
+
+            return list(reversed(result))
+
+        recent_messages: list[ConversationMessage] = []
+        important_messages: list[tuple[int, ConversationMessage]] = []
+        token_count = 0
+
+        for msg in reversed(messages):
+            msg_text = msg.content
+            if msg.files:
+                msg_text += " " + " ".join(msg.files)
+            msg_tokens = self._estimate_tokens(msg_text)
+
+            if recent_messages and (token_count + msg_tokens > max_tokens * 0.7):
+                break
+
+            recent_messages.append(msg)
+            token_count += msg_tokens
+
+        recent_indices = set(messages.index(msg) for msg in recent_messages)
+        remaining_budget = max_tokens - token_count
+
+        for idx, msg in enumerate(messages):
+            if idx in recent_indices:
+                continue
+            if not self._is_important_message(msg):
+                continue
+
+            msg_text = msg.content
+            if msg.files:
+                msg_text += " " + " ".join(msg.files)
+            msg_tokens = self._estimate_tokens(msg_text)
+
+            if msg_tokens <= remaining_budget:
+                important_messages.append((idx, msg))
+                remaining_budget -= msg_tokens
+
+        result = list(reversed(recent_messages))
+        for idx, msg in sorted(important_messages):
+            result.insert(idx, msg)
+
+        return result
+
     def get_context_summary(self, thread_id: str) -> dict[str, Any]:
         """Get summary statistics for thread context."""
         if hasattr(self.backend, "get_context_summary"):

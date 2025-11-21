@@ -707,7 +707,7 @@ Generate diverse, innovative ideas. Think broadly and explore multiple approache
         """
         prompt_parts = [
             "You are analyzing brainstorming results from multiple perspectives. "
-            "Extract individual, discrete ideas from the following outputs.\n\n"
+            "Extract individual ideas from the following outputs (each idea should be discrete).\n\n"
             "For each idea:\n"
             "1. State it clearly and concisely (1-2 sentences)\n"
             "2. Note which perspective(s) it came from\n"

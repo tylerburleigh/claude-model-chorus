@@ -9,7 +9,7 @@ import subprocess
 import pytest
 
 # Import provider availability from shared test helpers
-from test_helpers import GEMINI_AVAILABLE
+from .test_helpers import GEMINI_AVAILABLE
 
 from model_chorus.providers.base_provider import GenerationRequest
 from model_chorus.providers.gemini_provider import GeminiProvider

@@ -165,8 +165,8 @@ class ClaudeProvider(CLIProvider):
         # Note: Claude CLI doesn't support --temperature, --max-tokens flags
         # These would need to be set via config or are model defaults
 
-        # Pass prompt as a positional argument
-        command.append(request.prompt)
+        # Pass prompt via stdin to avoid shell-escaping issues
+        self.input_data = request.prompt or ""
 
         logger.debug(f"Built Claude command: {' '.join(command)}")
         return command

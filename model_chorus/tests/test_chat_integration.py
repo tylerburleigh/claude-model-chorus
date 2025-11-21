@@ -10,7 +10,7 @@ import os
 import pytest
 
 # Import provider availability flags from shared test helpers
-from test_helpers import ANY_PROVIDER_AVAILABLE
+from .test_helpers import ANY_PROVIDER_AVAILABLE
 
 from model_chorus.core.conversation import ConversationMemory
 from model_chorus.providers import (
@@ -359,6 +359,8 @@ class TestChatThreadManagement:
         )
 
         assert result1_cont.success and result2_cont.success
+        assert result1_cont.synthesis is not None
+        assert result2_cont.synthesis is not None
         assert "alice" in result1_cont.synthesis.lower()
         assert "bob" in result2_cont.synthesis.lower()
 
