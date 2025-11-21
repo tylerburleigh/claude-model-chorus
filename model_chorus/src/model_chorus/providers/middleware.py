@@ -23,6 +23,103 @@ from .base_provider import GenerationRequest, GenerationResponse, ModelProvider
 logger = logging.getLogger(__name__)
 
 
+# Structured Error Types
+
+
+class ProviderError(Exception):
+    """Base exception for provider-related errors.
+
+    All provider middleware errors should inherit from this base class
+    to enable consistent error handling across the middleware stack.
+
+    Attributes:
+        provider_name: Name of the provider where the error occurred
+        original_error: The underlying exception that caused this error (if any)
+    """
+
+    def __init__(
+        self,
+        message: str,
+        provider_name: str | None = None,
+        original_error: Exception | None = None,
+    ):
+        """
+        Initialize provider error.
+
+        Args:
+            message: Human-readable error description
+            provider_name: Name of the provider (if available)
+            original_error: The underlying exception (if any)
+        """
+        super().__init__(message)
+        self.provider_name = provider_name
+        self.original_error = original_error
+
+
+class ConfigError(ProviderError):
+    """Configuration-related errors.
+
+    Raised when middleware or provider configuration is invalid,
+    missing required fields, or contains conflicting settings.
+
+    Examples:
+        - Invalid retry configuration (negative values, etc.)
+        - Missing required circuit breaker thresholds
+        - Conflicting rate limit settings
+    """
+
+    def __init__(
+        self,
+        message: str,
+        config_field: str | None = None,
+        invalid_value: Any | None = None,
+    ):
+        """
+        Initialize configuration error.
+
+        Args:
+            message: Human-readable error description
+            config_field: Name of the problematic config field
+            invalid_value: The invalid value that caused the error
+        """
+        super().__init__(message)
+        self.config_field = config_field
+        self.invalid_value = invalid_value
+
+
+class RetryExhaustedError(ProviderError):
+    """Raised when all retry attempts have been exhausted.
+
+    Contains details about the retry attempts and the final error
+    that prevented success.
+
+    Attributes:
+        attempts: Number of attempts made (including initial try)
+        last_error: The exception from the final attempt
+        provider_name: Name of the provider that failed
+    """
+
+    def __init__(
+        self,
+        message: str,
+        attempts: int,
+        last_error: Exception,
+        provider_name: str | None = None,
+    ):
+        """
+        Initialize retry exhausted error.
+
+        Args:
+            message: Human-readable error description
+            attempts: Number of attempts made
+            last_error: The exception from the final attempt
+            provider_name: Name of the provider
+        """
+        super().__init__(message, provider_name=provider_name, original_error=last_error)
+        self.attempts = attempts
+        self.last_error = last_error
+
+
 class Middleware(ABC):
     """
     Abstract base class for provider middleware.
@@ -263,9 +360,14 @@ class RetryMiddleware(Middleware):
                     await asyncio.sleep(delay)
 
         # All retries exhausted
-        error_msg = f"All {self.config.max_retries + 1} attempts failed. Last error: {last_exception}"
-        logger.error(error_msg)
-        raise Exception(error_msg) from last_exception
+        error_msg = f"All {self.config.max_retries + 1} attempts failed"
+        logger.error(f"{error_msg}. Last error: {last_exception}")
+        raise RetryExhaustedError(
+            message=error_msg,
+            attempts=self.config.max_retries + 1,
+            last_error=last_exception,
+            provider_name=self.provider.__class__.__name__,
+        ) from last_exception
 
 
 # Circuit Breaker Implementation
@@ -288,8 +390,13 @@ class CircuitState(Enum):
     HALF_OPEN = "half_open"
 
 
-class CircuitOpenError(Exception):
-    """Raised when circuit breaker is open and request is rejected."""
+class CircuitOpenError(ProviderError):
+    """Raised when circuit breaker is open and request is rejected.
+
+    Attributes:
+        provider_name: Name of the provider with open circuit
+        recovery_time: Seconds until circuit will try half-open state
+    """
 
     def __init__(self, provider_name: str, recovery_time: float):
         """
@@ -299,12 +406,12 @@ class CircuitOpenError(Exception):
             provider_name: Name of the provider with open circuit
             recovery_time: Seconds until circuit will try half-open state
         """
-        self.provider_name = provider_name
-        self.recovery_time = recovery_time
-        super().__init__(
+        message = (
             f"Circuit breaker is OPEN for provider '{provider_name}'. "
             f"Retry in {recovery_time:.1f} seconds."
         )
+        super().__init__(message, provider_name=provider_name)
+        self.recovery_time = recovery_time
 
 
 @dataclass
