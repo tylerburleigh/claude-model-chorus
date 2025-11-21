@@ -722,6 +722,226 @@ class ConversationDatabase:
         self.conn.commit()
         logger.debug(f"Deleted thread {thread_id}")
 
+    def query_by_workflow(
+        self,
+        workflow_name: str,
+        limit: int | None = None,
+        status: str | None = None,
+    ) -> list[ConversationThread]:
+        """
+        Query threads by workflow name.
+
+        NEW CAPABILITY: Enables workflow-specific conversation retrieval,
+        not possible with file-based storage.
+
+        Args:
+            workflow_name: Name of workflow to filter by
+            limit: Optional limit on number of threads
+            status: Optional status filter ('active', 'completed', 'archived')
+
+        Returns:
+            List of threads matching criteria, ordered by last_updated_at descending
+
+        Example:
+            >>> threads = db.query_by_workflow("consensus", limit=10, status="active")
+            >>> for thread in threads:
+            ...     print(f"{thread.thread_id}: {len(thread.messages)} messages")
+        """
+        cursor = self.conn.cursor()
+
+        # Build query
+        query = """
+            SELECT thread_id
+            FROM threads
+            WHERE workflow_name = ?
+        """
+        params: list[Any] = [workflow_name]
+
+        if status:
+            query += " AND status = ?"
+            params.append(status)
+
+        query += " ORDER BY last_updated_at DESC"
+
+        if limit:
+            query += " LIMIT ?"
+            params.append(limit)
+
+        cursor.execute(query, params)
+
+        # Fetch full threads
+        threads = []
+        for row in cursor.fetchall():
+            thread_id = row[0]
+            thread = self.get_thread(thread_id)
+            if thread:
+                threads.append(thread)
+
+        logger.debug(
+            f"Found {len(threads)} threads for workflow '{workflow_name}'"
+        )
+        return threads
+
+    def query_recent_threads(
+        self,
+        limit: int = 10,
+        status: str | None = None,
+        workflow_name: str | None = None,
+    ) -> list[ConversationThread]:
+        """
+        Query most recent conversation threads.
+
+        NEW CAPABILITY: Efficient retrieval of recent conversations
+        across all workflows or filtered by specific criteria.
+
+        Args:
+            limit: Maximum number of threads to return (default: 10)
+            status: Optional status filter ('active', 'completed', 'archived')
+            workflow_name: Optional workflow name filter
+
+        Returns:
+            List of threads ordered by last_updated_at descending
+
+        Example:
+            >>> recent = db.query_recent_threads(limit=5, status="active")
+            >>> for thread in recent:
+            ...     print(f"{thread.workflow_name}: {thread.thread_id}")
+        """
+        cursor = self.conn.cursor()
+
+        # Build query
+        query = "SELECT thread_id FROM threads WHERE 1=1"
+        params: list[Any] = []
+
+        if status:
+            query += " AND status = ?"
+            params.append(status)
+
+        if workflow_name:
+            query += " AND workflow_name = ?"
+            params.append(workflow_name)
+
+        query += " ORDER BY last_updated_at DESC LIMIT ?"
+        params.append(limit)
+
+        cursor.execute(query, params)
+
+        # Fetch full threads
+        threads = []
+        for row in cursor.fetchall():
+            thread_id = row[0]
+            thread = self.get_thread(thread_id)
+            if thread:
+                threads.append(thread)
+
+        logger.debug(f"Found {len(threads)} recent threads")
+        return threads
+
+    def get_thread_chain(
+        self, thread_id: str, max_depth: int = 20
+    ) -> list[ConversationThread]:
+        """
+        Retrieve thread and all parent threads in chronological order.
+
+        Traverses parent_thread_id links up to max_depth to prevent
+        circular references and infinite loops.
+
+        Args:
+            thread_id: Starting thread ID
+            max_depth: Maximum parent chain depth
+
+        Returns:
+            List of threads in chronological order (oldest first)
+
+        Example:
+            >>> chain = db.get_thread_chain(thread_id)
+            >>> for thread in chain:
+            ...     print(f"Thread {thread.thread_id}: {len(thread.messages)} messages")
+        """
+        chain: list[ConversationThread] = []
+        current_id: str | None = thread_id
+        depth = 0
+
+        while current_id and depth < max_depth:
+            thread = self.get_thread(current_id)
+            if not thread:
+                break
+
+            chain.insert(0, thread)  # Add to beginning for chronological order
+            current_id = thread.parent_thread_id
+            depth += 1
+
+        if depth >= max_depth:
+            logger.warning(
+                f"Thread chain depth limit reached ({max_depth}) for {thread_id}"
+            )
+
+        return chain
+
+    def get_thread_statistics(self) -> dict[str, Any]:
+        """
+        Get database-wide statistics.
+
+        NEW CAPABILITY: Provides insights into conversation patterns
+        and database health metrics.
+
+        Returns:
+            Dict with statistics about threads and messages
+
+        Example:
+            >>> stats = db.get_thread_statistics()
+            >>> print(f"Total threads: {stats['total_threads']}")
+            >>> print(f"Active threads: {stats['active_threads']}")
+        """
+        cursor = self.conn.cursor()
+
+        # Thread counts by status
+        cursor.execute("""
+            SELECT status, COUNT(*) as count
+            FROM threads
+            GROUP BY status
+        """)
+        status_counts = {row[0]: row[1] for row in cursor.fetchall()}
+
+        # Total threads and messages
+        cursor.execute("SELECT COUNT(*) FROM threads")
+        total_threads = cursor.fetchone()[0]
+
+        cursor.execute("SELECT COUNT(*) FROM messages")
+        total_messages = cursor.fetchone()[0]
+
+        # Threads by workflow
+        cursor.execute("""
+            SELECT workflow_name, COUNT(*) as count
+            FROM threads
+            GROUP BY workflow_name
+            ORDER BY count DESC
+            LIMIT 10
+        """)
+        top_workflows = {row[0]: row[1] for row in cursor.fetchall()}
+
+        # Average messages per thread
+        cursor.execute("""
+            SELECT AVG(message_count) as avg_messages
+            FROM (
+                SELECT thread_id, COUNT(*) as message_count
+                FROM messages
+                GROUP BY thread_id
+            )
+        """)
+        avg_messages_row = cursor.fetchone()
+        avg_messages = avg_messages_row[0] if avg_messages_row[0] else 0.0
+
+        return {
+            "total_threads": total_threads,
+            "total_messages": total_messages,
+            "active_threads": status_counts.get("active", 0),
+            "completed_threads": status_counts.get("completed", 0),
+            "archived_threads": status_counts.get("archived", 0),
+            "avg_messages_per_thread": round(avg_messages, 2),
+            "top_workflows": top_workflows,
+        }
+
     def close(self) -> None:
         """
         Close database connection.
