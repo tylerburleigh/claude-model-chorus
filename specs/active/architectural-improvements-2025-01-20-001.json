@@ -2,7 +2,7 @@
   "spec_id": "architectural-improvements-2025-01-20-001",
   "title": "Model-Chorus Architectural Improvements",
   "generated": "2025-01-20T20:30:00Z",
-  "last_updated": "2025-11-21T15:56:01.189568Z",
+  "last_updated": "2025-11-21T16:04:47.312170Z",
   "description": "Comprehensive architectural refactoring to eliminate code duplication, improve maintainability, enhance reliability, and establish scalable foundations for future development.",
   "hierarchy": {
     "spec-root": {
@@ -17,7 +17,7 @@
         "phase-4"
       ],
       "total_tasks": 69,
-      "completed_tasks": 62,
+      "completed_tasks": 63,
       "metadata": {
         "objectives": [
           "Reduce code duplication by 30-40% through shared primitives",
@@ -1945,7 +1945,7 @@
         "depends": []
       },
       "total_tasks": 18,
-      "completed_tasks": 11,
+      "completed_tasks": 12,
       "metadata": {
         "purpose": "Replace JSON persistence with SQLite and enhance workflow registry",
         "risk_level": "medium-high",
@@ -1968,7 +1968,7 @@
         "task-4-8"
       ],
       "total_tasks": 13,
-      "completed_tasks": 11,
+      "completed_tasks": 12,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -2390,7 +2390,7 @@
     "task-4-7": {
       "type": "task",
       "title": "model_chorus/tests/test_conversation_db.py",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-4-files",
       "children": [],
       "dependencies": {
@@ -2401,12 +2401,18 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "model_chorus/tests/test_conversation_db.py",
         "task_category": "implementation",
         "estimated_hours": 3,
-        "description": "Create tests for SQLite conversation storage"
+        "description": "Create tests for SQLite conversation storage",
+        "started_at": "2025-11-21T15:56:41.286165Z",
+        "status_note": "Starting implementation of SQLite conversation storage tests",
+        "completed_at": "2025-11-21T16:04:47.300478Z",
+        "needs_journaling": false,
+        "actual_hours": 0.135,
+        "journaled_at": "2025-11-21T16:04:47.308924Z"
       }
     },
     "task-4-8": {
@@ -2560,7 +2566,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-20T20:38:01.399125Z",
-    "progress_percentage": 89,
+    "progress_percentage": 91,
     "current_phase": "phase-4"
   },
   "journal": [
@@ -3211,6 +3217,15 @@
       "content": "Successfully added workflow metadata registration for all workflow classes that inherit from BaseWorkflow. The metadata includes descriptions, versions, authors, categories, parameters, and usage examples for each workflow.\n\nImplementation details:\n- Updated model_chorus/src/model_chorus/workflows/__init__.py to register metadata for all workflows\n- Registered both workflow and metadata for ChatWorkflow and ThinkDeepWorkflow (not using decorators)\n- Added metadata for ArgumentWorkflow, IdeateWorkflow, and StudyWorkflow (already registered via @WorkflowRegistry.register decorators in their respective files)\n- Each workflow now has complete metadata including:\n  * Name and description\n  * Version (1.0.0 or 2.0.0)\n  * Author (ModelChorus Team)\n  * Category (consultation, reasoning, creativity, research)\n  * Parameters list\n  * Usage examples\n\nWorkflows with metadata:\n1. ChatWorkflow - Single-model peer consultation (v1.0.0)\n2. ArgumentWorkflow - Structured dialectical reasoning (v1.0.0)\n3. ThinkDeepWorkflow - Extended reasoning with investigation (v2.0.0)\n4. IdeateWorkflow - Creative brainstorming (v1.0.0)\n5. StudyWorkflow - Persona-based collaborative research (v1.0.0)\n\nNote: ConsensusWorkflow was not registered as it doesn't inherit from BaseWorkflow (uses different architecture)\n\nTesting:\n- Manually tested: model-chorus list-workflows displays all metadata correctly\n- All 27 existing CLI integration tests pass\n- No regressions introduced\n\nFiles modified:\n- model_chorus/src/model_chorus/workflows/__init__.py (added metadata registration for all workflows)",
       "metadata": {},
       "task_id": "task-4-6"
+    },
+    {
+      "timestamp": "2025-11-21T16:04:47.308912Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Comprehensive Test Suite for SQLite Conversation Database",
+      "author": "claude-code",
+      "content": "Successfully created comprehensive test suite for SQLite-based conversation database with 42 tests covering all functionality of the ConversationDatabase class.\n\nTest Coverage:\n- 42 tests total, all passing\n- 100% code coverage on test file\n- 95% code coverage on conversation_db.py implementation\n- 0.73s execution time\n\nTest Organization (9 test classes):\n1. TestDatabaseInitialization (6 tests) - Schema creation, WAL mode, foreign keys, custom config\n2. TestThreadCreation (5 tests) - UUID generation, uniqueness, initial context, parent threads, status\n3. TestThreadRetrieval (3 tests) - Thread retrieval, non-existent threads, TTL expiration\n4. TestMessageOperations (6 tests) - Message persistence, files, metadata, truncation, chronological order\n5. TestThreadLifecycle (4 tests) - Thread completion, archiving, status management\n6. TestCleanupOperations (2 tests) - TTL-based cleanup, archived thread cleanup\n7. TestQueryOperations (6 tests) - Workflow filtering, status filtering, recent threads, thread chains\n8. TestStatistics (2 tests) - Database statistics, empty database handling\n9. TestDatabaseClosing (2 tests) - Connection closing, multiple close calls\n10. TestCascadingDeletes (2 tests) - Foreign key cascades for messages and metadata\n11. TestEdgeCases (4 tests) - Implicit thread creation, minimal workflow names, large content, Unicode\n\nKey Features Tested:\n- Database initialization with WAL mode and foreign keys\n- Thread CRUD operations with UUID generation\n- Message persistence with truncation\n- TTL-based expiration and cleanup\n- Thread lifecycle (active \u2192 completed \u2192 archived)\n- Query capabilities (by workflow, status, recency)\n- Thread chain navigation (parent-child relationships)\n- Database statistics and metrics\n- Cascade deletes for referential integrity\n- Edge cases (large messages, Unicode, implicit thread creation)\n\nTesting verified:\n- All database operations work correctly\n- WAL mode enabled for concurrency\n- Foreign key constraints enforced\n- TTL expiration functioning\n- Message truncation at max_messages limit\n- Statistics accurately reflect database state\n- Cascade deletes maintain referential integrity\n\nFiles created:\n- model_chorus/tests/test_conversation_db.py (464 lines, 42 tests)",
+      "metadata": {},
+      "task_id": "task-4-7"
     }
   ]
 }
