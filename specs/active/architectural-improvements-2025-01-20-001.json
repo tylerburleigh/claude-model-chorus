@@ -2,7 +2,7 @@
   "spec_id": "architectural-improvements-2025-01-20-001",
   "title": "Model-Chorus Architectural Improvements",
   "generated": "2025-01-20T20:30:00Z",
-  "last_updated": "2025-11-21T14:58:11.714079Z",
+  "last_updated": "2025-11-21T14:59:14.129966Z",
   "description": "Comprehensive architectural refactoring to eliminate code duplication, improve maintainability, enhance reliability, and establish scalable foundations for future development.",
   "hierarchy": {
     "spec-root": {
@@ -17,7 +17,7 @@
         "phase-4"
       ],
       "total_tasks": 69,
-      "completed_tasks": 47,
+      "completed_tasks": 48,
       "metadata": {
         "objectives": [
           "Reduce code duplication by 30-40% through shared primitives",
@@ -1351,7 +1351,7 @@
         "depends": []
       },
       "total_tasks": 16,
-      "completed_tasks": 12,
+      "completed_tasks": 13,
       "metadata": {
         "purpose": "Add provider middleware, token budgeting, and workflow runner abstraction",
         "risk_level": "medium",
@@ -1785,7 +1785,7 @@
         "depends": []
       },
       "total_tasks": 5,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {}
     },
     "verify-3-1": {
@@ -1817,7 +1817,7 @@
     "verify-3-2": {
       "type": "verify",
       "title": "Token budgeting tests pass",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-3-verify",
       "children": [],
       "dependencies": {
@@ -1826,12 +1826,18 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "auto",
         "agent": "run-tests",
         "command": "pytest model_chorus/tests/test_token_budgeting.py",
-        "expected": "Token budgeting tests pass"
+        "expected": "Token budgeting tests pass",
+        "started_at": "2025-11-21T14:58:38.567517Z",
+        "status_note": "Running token budgeting tests",
+        "completed_at": "2025-11-21T14:59:14.120401Z",
+        "needs_journaling": false,
+        "actual_hours": 0.01,
+        "journaled_at": "2025-11-21T14:59:14.127262Z"
       }
     },
     "verify-3-3": {
@@ -2463,7 +2469,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-20T20:38:01.399125Z",
-    "progress_percentage": 68,
+    "progress_percentage": 69,
     "current_phase": "phase-3"
   },
   "journal": [
@@ -2961,6 +2967,15 @@
       "content": "Successfully verified middleware implementation by running pytest model_chorus/tests/test_middleware.py. All 39 tests passed in 1.45s with 98% code coverage (194 statements, only 3 not covered). Tests comprehensively cover:\n\n- Exception classes (ProviderError, ConfigError, RetryExhaustedError)\n- RetryMiddleware with exponential backoff, jitter, permanent error detection\n- CircuitBreakerMiddleware with state transitions (CLOSED\u2192OPEN\u2192HALF_OPEN\u2192CLOSED)\n- Middleware chaining (retry + circuit breaker composition)\n\nThe middleware implementation is production-ready with robust test coverage.",
       "metadata": {},
       "task_id": "verify-3-1"
+    },
+    {
+      "timestamp": "2025-11-21T14:59:14.127255Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Token budgeting tests pass",
+      "author": "claude-code",
+      "content": "Successfully verified token budgeting implementation by running pytest model_chorus/tests/test_token_budgeting.py. All 35 tests passed in 0.72s with 99% code coverage (only 2 lines not covered). Tests comprehensively cover:\n\n- Token estimation for various text lengths (empty, short, medium, long)\n- Message importance detection (files, metadata, workflow names, content length)\n- Simple compaction strategy (newest-first with budget enforcement)\n- Smart compaction strategy (preserves important messages while prioritizing recent)\n- Integration with build_conversation_history (max_messages and max_tokens)\n- Edge cases (empty lists, zero budgets, single messages, file path counting)\n\nThe token budgeting implementation is production-ready with excellent test coverage validating both simple and smart compaction approaches.",
+      "metadata": {},
+      "task_id": "verify-3-2"
     }
   ]
 }
