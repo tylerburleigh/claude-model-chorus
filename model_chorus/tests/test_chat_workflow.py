@@ -4,46 +4,13 @@ Tests for ChatWorkflow functionality.
 Tests conversation initiation, continuation, file context, and conversation tracking.
 """
 
+from unittest.mock import AsyncMock, MagicMock
+
 import pytest
-import uuid
-from unittest.mock import AsyncMock, MagicMock, patch
-from pathlib import Path
 
 from model_chorus.workflows import ChatWorkflow
-from model_chorus.providers.base_provider import GenerationRequest, GenerationResponse
-from model_chorus.core.conversation import ConversationMemory
 
-
-@pytest.fixture
-def mock_provider():
-    """Mock ModelProvider for testing."""
-    provider = MagicMock()
-    provider.provider_name = "test-provider"
-    provider.validate_api_key = MagicMock(return_value=True)
-
-    # Mock async generate method
-    async def mock_generate(request: GenerationRequest) -> GenerationResponse:
-        return GenerationResponse(
-            content=f"Response to: {request.prompt[:50]}",
-            model="test-model-1",
-            usage={"input_tokens": 10, "output_tokens": 20, "total_tokens": 30},
-            stop_reason="end_turn",
-        )
-
-    provider.generate = AsyncMock(side_effect=mock_generate)
-
-    # Mock async check_availability method
-    async def mock_check_availability():
-        return (True, None)  # is_available=True, error=None
-
-    provider.check_availability = AsyncMock(side_effect=mock_check_availability)
-    return provider
-
-
-@pytest.fixture
-def conversation_memory():
-    """Create ConversationMemory instance for testing."""
-    return ConversationMemory()
+# Note: mock_provider and conversation_memory fixtures are now in conftest.py
 
 
 @pytest.fixture
@@ -66,7 +33,10 @@ class TestChatWorkflowInitialization:
         )
 
         assert workflow.name == "Chat"
-        assert workflow.description == "Single-model peer consultation with conversation threading"
+        assert (
+            workflow.description
+            == "Single-model peer consultation with conversation threading"
+        )
         assert workflow.provider == mock_provider
         assert workflow.conversation_memory == conversation_memory
 
@@ -102,7 +72,9 @@ class TestConversationInitiation:
         assert result.success is True
         assert "thread_id" in result.metadata
         assert result.metadata["is_continuation"] is False
-        assert result.metadata["conversation_length"] == 2  # Current turn: user + assistant
+        assert (
+            result.metadata["conversation_length"] == 2
+        )  # Current turn: user + assistant
 
     @pytest.mark.asyncio
     async def test_new_conversation_has_response(self, chat_workflow):
@@ -126,7 +98,9 @@ class TestConversationInitiation:
         assert result.metadata["conversation_length"] == 0
 
     @pytest.mark.asyncio
-    async def test_provider_generate_called_with_correct_params(self, chat_workflow, mock_provider):
+    async def test_provider_generate_called_with_correct_params(
+        self, chat_workflow, mock_provider
+    ):
         """Test that provider.generate is called with correct parameters."""
         await chat_workflow.run(
             prompt="Test prompt",
@@ -229,7 +203,9 @@ class TestFileContext:
     """Test file context handling."""
 
     @pytest.mark.asyncio
-    async def test_file_context_included_in_prompt(self, chat_workflow, mock_provider, tmp_path):
+    async def test_file_context_included_in_prompt(
+        self, chat_workflow, mock_provider, tmp_path
+    ):
         """Test that file contents are included in the prompt."""
         # Create test file
         test_file = tmp_path / "test.txt"
@@ -249,7 +225,9 @@ class TestFileContext:
         assert "This is test file content." in prompt_sent
 
     @pytest.mark.asyncio
-    async def test_multiple_files_included(self, chat_workflow, mock_provider, tmp_path):
+    async def test_multiple_files_included(
+        self, chat_workflow, mock_provider, tmp_path
+    ):
         """Test that multiple files are included in context."""
         file1 = tmp_path / "file1.txt"
         file1.write_text("Content of file 1")
@@ -269,7 +247,9 @@ class TestFileContext:
         assert "Content of file 2" in prompt_sent
 
     @pytest.mark.asyncio
-    async def test_file_not_found_handled_gracefully(self, chat_workflow, mock_provider):
+    async def test_file_not_found_handled_gracefully(
+        self, chat_workflow, mock_provider
+    ):
         """Test that missing files are handled gracefully."""
         result = await chat_workflow.run(
             prompt="Review this file",
@@ -286,7 +266,9 @@ class TestFileContext:
         assert "Failed to read" in prompt_sent or "file.txt" in prompt_sent
 
     @pytest.mark.asyncio
-    async def test_file_references_stored_in_conversation(self, chat_workflow, tmp_path):
+    async def test_file_references_stored_in_conversation(
+        self, chat_workflow, tmp_path
+    ):
         """Test that file references are stored in conversation memory."""
         test_file = tmp_path / "test.txt"
         test_file.write_text("Test content")
@@ -371,7 +353,9 @@ class TestErrorHandling:
         async def mock_check_availability():
             return (True, None)  # is_available=True, error=None
 
-        error_provider.check_availability = AsyncMock(side_effect=mock_check_availability)
+        error_provider.check_availability = AsyncMock(
+            side_effect=mock_check_availability
+        )
 
         workflow = ChatWorkflow(
             provider=error_provider,

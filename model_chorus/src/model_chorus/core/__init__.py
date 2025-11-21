@@ -6,45 +6,47 @@ components that power multi-model AI workflows.
 """
 
 from .base_workflow import BaseWorkflow, WorkflowResult, WorkflowStep
-from .registry import WorkflowRegistry
-from .prompts import get_read_only_system_prompt, prepend_system_constraints
-from .models import (
-    ConfidenceLevel,
-    WorkflowRequest,
-    WorkflowResponse,
-    ModelSelection,
-    WorkflowStep as WorkflowStepModel,
-    ModelResponse,
-    ConsensusConfig,
-    ConversationMessage,
-    ConversationThread,
-    ConversationState,
-    Hypothesis,
-    InvestigationStep,
-    ThinkDeepState,
+from .contradiction import (
+    Contradiction,
+    ContradictionSeverity,
+    assess_contradiction_severity,
+    detect_contradiction,
+    detect_contradictions_batch,
+    detect_polarity_opposition,
+    generate_contradiction_explanation,
+    generate_reconciliation_suggestion,
 )
 from .conversation import ConversationMemory
 from .gap_analysis import (
     Gap,
-    GapType,
     GapSeverity,
-    detect_gaps,
-    detect_missing_evidence,
-    detect_logical_gaps,
-    detect_unsupported_claims,
+    GapType,
     assess_gap_severity,
+    detect_gaps,
+    detect_logical_gaps,
+    detect_missing_evidence,
+    detect_unsupported_claims,
     generate_gap_recommendation,
 )
-from .contradiction import (
-    Contradiction,
-    ContradictionSeverity,
-    detect_contradiction,
-    detect_contradictions_batch,
-    detect_polarity_opposition,
-    assess_contradiction_severity,
-    generate_contradiction_explanation,
-    generate_reconciliation_suggestion,
+from .models import (
+    ConfidenceLevel,
+    ConsensusConfig,
+    ConversationMessage,
+    ConversationState,
+    ConversationThread,
+    Hypothesis,
+    InvestigationStep,
+    ModelResponse,
+    ModelSelection,
+    ThinkDeepState,
+    WorkflowRequest,
+    WorkflowResponse,
 )
+from .models import (
+    WorkflowStep as WorkflowStepModel,
+)
+from .prompts import get_read_only_system_prompt, prepend_system_constraints
+from .registry import WorkflowRegistry
 
 __all__ = [
     "BaseWorkflow",

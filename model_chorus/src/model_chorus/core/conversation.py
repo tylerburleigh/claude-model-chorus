@@ -1,30 +1,88 @@
 """
 Conversation memory management for ModelChorus.
 
-Provides file-based persistence for multi-turn conversations with continuation support.
-Based on Zen MCP patterns but adapted for CLI-based orchestration architecture.
+Provides persistence for multi-turn conversations with continuation support.
+Supports both file-based (JSON) and SQLite database backends via configuration.
 
 Key Features:
 - UUID-based thread identification (continuation_id)
-- File-based persistence (survives process restarts)
-- Thread-safe operations with file locking
+- Pluggable storage backends (file or SQLite)
+- Thread-safe operations
 - TTL-based automatic cleanup
 - Context window management for long conversations
+- Configurable via .model-chorusrc
+
+Backend Selection:
+    - file: Individual JSON files (legacy, default)
+    - sqlite: SQLite database with WAL mode (recommended)
 """
 
 import json
-import uuid
 import logging
+import os
+import uuid
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from datetime import datetime, timezone, timedelta
-from typing import Optional, List, Tuple, Dict, Any
+from typing import Any, Literal, Protocol
 
 import filelock
 
-from .models import ConversationMessage, ConversationThread, ConversationState
-
+from .models import ConversationMessage, ConversationThread
 
 logger = logging.getLogger(__name__)
+
+
+class ConversationBackend(Protocol):
+    """Protocol defining the interface for conversation storage backends."""
+
+    def create_thread(
+        self,
+        workflow_name: str,
+        initial_context: dict[str, Any] | None = None,
+        parent_thread_id: str | None = None,
+    ) -> str:
+        """Create new conversation thread."""
+        ...
+
+    def get_thread(self, thread_id: str) -> ConversationThread | None:
+        """Retrieve conversation thread by ID."""
+        ...
+
+    def add_message(
+        self,
+        thread_id: str,
+        role: Literal["user", "assistant"],
+        content: str,
+        files: list[str] | None = None,
+        workflow_name: str | None = None,
+        model_provider: str | None = None,
+        model_name: str | None = None,
+        metadata: dict[str, Any] | None = None,
+    ) -> bool:
+        """Add message to conversation thread."""
+        ...
+
+    def get_messages(
+        self, thread_id: str, limit: int | None = None, role: str | None = None
+    ) -> list[ConversationMessage]:
+        """Retrieve messages from thread with optional filtering."""
+        ...
+
+    def complete_thread(self, thread_id: str) -> bool:
+        """Mark thread as completed."""
+        ...
+
+    def archive_thread(self, thread_id: str) -> bool:
+        """Mark thread as archived."""
+        ...
+
+    def cleanup_expired_threads(self) -> int:
+        """Remove threads older than TTL."""
+        ...
+
+    def cleanup_archived_threads(self) -> int:
+        """Remove archived threads regardless of TTL."""
+        ...
 
 
 # Default configuration
@@ -33,12 +91,12 @@ DEFAULT_TTL_HOURS = 3
 DEFAULT_MAX_MESSAGES_PER_THREAD = 50
 
 
-class ConversationMemory:
+class FileBackend:
     """
-    Manages conversation threads with file-based persistence.
+    File-based conversation storage implementation (legacy).
 
-    Provides thread-safe storage and retrieval of conversation history,
-    enabling multi-turn conversations across workflow executions.
+    Provides thread-safe storage using individual JSON files per thread.
+    This is the original implementation, now wrapped by ConversationMemory.
 
     Architecture:
         - Each thread stored as JSON file: ~/.model-chorus/conversations/{thread_id}.json
@@ -56,7 +114,7 @@ class ConversationMemory:
         self,
         conversations_dir: Path = DEFAULT_CONVERSATIONS_DIR,
         ttl_hours: int = DEFAULT_TTL_HOURS,
-        max_messages: int = DEFAULT_MAX_MESSAGES_PER_THREAD
+        max_messages: int = DEFAULT_MAX_MESSAGES_PER_THREAD,
     ):
         """
         Initialize conversation memory manager.
@@ -85,8 +143,8 @@ class ConversationMemory:
     def create_thread(
         self,
         workflow_name: str,
-        initial_context: Optional[Dict[str, Any]] = None,
-        parent_thread_id: Optional[str] = None
+        initial_context: dict[str, Any] | None = None,
+        parent_thread_id: str | None = None,
     ) -> str:
         """
         Create new conversation thread.
@@ -112,7 +170,7 @@ class ConversationMemory:
         thread_id = str(uuid.uuid4())
 
         # Create thread context
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(UTC).isoformat()
         thread = ConversationThread(
             thread_id=thread_id,
             parent_thread_id=parent_thread_id,
@@ -122,7 +180,7 @@ class ConversationMemory:
             messages=[],
             state={},
             initial_context=initial_context or {},
-            status="active"
+            status="active",
         )
 
         # Persist to disk
@@ -131,7 +189,7 @@ class ConversationMemory:
         logger.info(f"Created thread {thread_id} for workflow '{workflow_name}'")
         return thread_id
 
-    def get_thread(self, thread_id: str) -> Optional[ConversationThread]:
+    def get_thread(self, thread_id: str) -> ConversationThread | None:
         """
         Retrieve conversation thread by ID.
 
@@ -156,8 +214,8 @@ class ConversationMemory:
             return None
 
         # Check TTL
-        file_age = datetime.now(timezone.utc) - datetime.fromtimestamp(
-            thread_file.stat().st_mtime, timezone.utc
+        file_age = datetime.now(UTC) - datetime.fromtimestamp(
+            thread_file.stat().st_mtime, UTC
         )
         if file_age > timedelta(hours=self.ttl_hours):
             logger.info(f"Thread {thread_id} expired (age: {file_age})")
@@ -168,10 +226,12 @@ class ConversationMemory:
         lock = filelock.FileLock(f"{thread_file}.lock", timeout=5)
         try:
             with lock:
-                with open(thread_file, 'r') as f:
+                with open(thread_file) as f:
                     data = json.load(f)
                     thread = ConversationThread(**data)
-                    logger.debug(f"Retrieved thread {thread_id} with {len(thread.messages)} messages")
+                    logger.debug(
+                        f"Retrieved thread {thread_id} with {len(thread.messages)} messages"
+                    )
                     return thread
         except filelock.Timeout:
             logger.error(f"Timeout acquiring lock for thread {thread_id}")
@@ -181,10 +241,8 @@ class ConversationMemory:
             return None
 
     def get_thread_chain(
-        self,
-        thread_id: str,
-        max_depth: int = 20
-    ) -> List[ConversationThread]:
+        self, thread_id: str, max_depth: int = 20
+    ) -> list[ConversationThread]:
         """
         Retrieve thread and all parent threads in chronological order.
 
@@ -203,8 +261,8 @@ class ConversationMemory:
             >>> for thread in chain:
             ...     print(f"Thread {thread.thread_id}: {len(thread.messages)} messages")
         """
-        chain = []
-        current_id = thread_id
+        chain: list[ConversationThread] = []
+        current_id: str | None = thread_id
         depth = 0
 
         while current_id and depth < max_depth:
@@ -217,7 +275,9 @@ class ConversationMemory:
             depth += 1
 
         if depth >= max_depth:
-            logger.warning(f"Thread chain depth limit reached ({max_depth}) for {thread_id}")
+            logger.warning(
+                f"Thread chain depth limit reached ({max_depth}) for {thread_id}"
+            )
 
         return chain
 
@@ -228,13 +288,13 @@ class ConversationMemory:
     def add_message(
         self,
         thread_id: str,
-        role: str,
+        role: Literal["user", "assistant"],
         content: str,
-        files: Optional[List[str]] = None,
-        workflow_name: Optional[str] = None,
-        model_provider: Optional[str] = None,
-        model_name: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None
+        files: list[str] | None = None,
+        workflow_name: str | None = None,
+        model_provider: str | None = None,
+        model_name: str | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> bool:
         """
         Add message to conversation thread.
@@ -266,7 +326,7 @@ class ConversationMemory:
         thread = self.get_thread(thread_id)
         if not thread:
             # If thread doesn't exist, create it
-            now = datetime.now(timezone.utc).isoformat()
+            now = datetime.now(UTC).isoformat()
             thread = ConversationThread(
                 thread_id=thread_id,
                 created_at=now,
@@ -275,7 +335,7 @@ class ConversationMemory:
                 messages=[],
                 state={},
                 initial_context={},
-                status="active"
+                status="active",
             )
             logger.info(f"Created new thread {thread_id} implicitly from add_message")
 
@@ -283,12 +343,12 @@ class ConversationMemory:
         message = ConversationMessage(
             role=role,
             content=content,
-            timestamp=datetime.now(timezone.utc).isoformat(),
+            timestamp=datetime.now(UTC).isoformat(),
             files=files,
             workflow_name=workflow_name,
             model_provider=model_provider,
             model_name=model_name,
-            metadata=metadata or {}
+            metadata=metadata or {},
         )
 
         # Add to thread
@@ -297,27 +357,26 @@ class ConversationMemory:
         # Enforce max messages limit (keep most recent)
         if len(thread.messages) > self.max_messages:
             removed_count = len(thread.messages) - self.max_messages
-            thread.messages = thread.messages[-self.max_messages:]
+            thread.messages = thread.messages[-self.max_messages :]
             logger.warning(
                 f"Thread {thread_id} exceeded max messages, "
                 f"removed {removed_count} oldest messages"
             )
 
         # Update timestamp
-        thread.last_updated_at = datetime.now(timezone.utc).isoformat()
+        thread.last_updated_at = datetime.now(UTC).isoformat()
 
         # Persist
         self._save_thread(thread)
 
-        logger.debug(f"Added {role} message to thread {thread_id} ({len(thread.messages)} total)")
+        logger.debug(
+            f"Added {role} message to thread {thread_id} ({len(thread.messages)} total)"
+        )
         return True
 
     def get_messages(
-        self,
-        thread_id: str,
-        limit: Optional[int] = None,
-        role: Optional[str] = None
-    ) -> List[ConversationMessage]:
+        self, thread_id: str, limit: int | None = None, role: str | None = None
+    ) -> list[ConversationMessage]:
         """
         Retrieve messages from thread with optional filtering.
 
@@ -354,26 +413,179 @@ class ConversationMemory:
     # Context Window Management (task-1-3-3)
     # ========================================================================
 
+    def _estimate_tokens(self, text: str) -> int:
+        """
+        Estimate token count for text.
+
+        Uses a simple character-based heuristic (~4 characters per token).
+        This is approximate but efficient for budget management.
+
+        Args:
+            text: Text to estimate
+
+        Returns:
+            Estimated token count
+        """
+        return len(text) // 4
+
+    def _is_important_message(self, msg: ConversationMessage) -> bool:
+        """
+        Determine if a message is important and should be preserved during compaction.
+
+        Messages are considered important if they:
+        - Have attached files (context-rich)
+        - Are longer than average (substantive content)
+        - Contain workflow metadata
+
+        Args:
+            msg: Message to evaluate
+
+        Returns:
+            True if message is important, False otherwise
+        """
+        # Messages with files are important (context-rich)
+        if msg.files:
+            return True
+
+        # Messages with workflow metadata are important
+        if msg.workflow_name or msg.metadata:
+            return True
+
+        # Long messages (>500 chars) likely contain substantive content
+        if len(msg.content) > 500:
+            return True
+
+        return False
+
+    def _apply_token_budget(
+        self, messages: list[ConversationMessage], max_tokens: int, smart_compaction: bool = True
+    ) -> list[ConversationMessage]:
+        """
+        Apply token budget to message list with optional smart compaction.
+
+        Smart compaction preserves:
+        1. All recent messages (newest N that fit)
+        2. Important older messages (files, long content, metadata)
+        3. At least the most recent message
+
+        Args:
+            messages: List of messages (should be in chronological order)
+            max_tokens: Maximum tokens allowed
+            smart_compaction: If True, preserve important older messages (default: True)
+
+        Returns:
+            Filtered list of messages that fit within budget
+        """
+        if not messages:
+            return messages
+
+        if not smart_compaction:
+            # Simple newest-first strategy
+            result = []
+            token_count = 0
+
+            for msg in reversed(messages):
+                msg_text = msg.content
+                if msg.files:
+                    msg_text += " " + " ".join(msg.files)
+                msg_tokens = self._estimate_tokens(msg_text)
+
+                if result and (token_count + msg_tokens > max_tokens):
+                    break
+
+                result.append(msg)
+                token_count += msg_tokens
+
+            return list(reversed(result))
+
+        # Smart compaction: preserve recent + important messages
+        recent_messages = []
+        important_messages = []
+        token_count = 0
+
+        # Phase 1: Include recent messages (from newest)
+        for msg in reversed(messages):
+            msg_text = msg.content
+            if msg.files:
+                msg_text += " " + " ".join(msg.files)
+            msg_tokens = self._estimate_tokens(msg_text)
+
+            if recent_messages and (token_count + msg_tokens > max_tokens * 0.7):
+                # Reserve 30% of budget for important older messages
+                break
+
+            recent_messages.append(msg)
+            token_count += msg_tokens
+
+        recent_indices = set(messages.index(msg) for msg in recent_messages)
+
+        # Phase 2: Add important older messages if budget allows
+        remaining_budget = max_tokens - token_count
+
+        for idx, msg in enumerate(messages):
+            # Skip if already included in recent
+            if idx in recent_indices:
+                continue
+
+            # Check if important
+            if not self._is_important_message(msg):
+                continue
+
+            msg_text = msg.content
+            if msg.files:
+                msg_text += " " + " ".join(msg.files)
+            msg_tokens = self._estimate_tokens(msg_text)
+
+            if msg_tokens <= remaining_budget:
+                important_messages.append((idx, msg))
+                remaining_budget -= msg_tokens
+
+        # Combine and sort by original order
+        result = list(reversed(recent_messages))
+        for idx, msg in sorted(important_messages):
+            # Insert in correct position to maintain order
+            result.insert(idx, msg)
+
+        return result
+
     def build_conversation_history(
         self,
         thread_id: str,
-        max_messages: Optional[int] = None,
-        include_files: bool = True
-    ) -> Tuple[str, int]:
+        max_messages: int | None = None,
+        max_tokens: int | None = None,
+        include_files: bool = True,
+        smart_compaction: bool = True,
+    ) -> tuple[str, int]:
         """
         Build formatted conversation history for context injection.
 
         Constructs human-readable conversation history with file context,
         using newest-first prioritization for both files and messages.
-        Adapted from Zen MCP's sophisticated build strategy.
+        Supports token-aware limiting with smart compaction to prevent context overflow.
 
         Args:
             thread_id: Thread to build history from
-            max_messages: Optional limit on messages to include
+            max_messages: Optional limit on messages to include (applied first)
+            max_tokens: Optional token budget for history (applied after max_messages)
             include_files: Whether to embed file contents
+            smart_compaction: If True, preserve important older messages when token
+                budgeting is active (default: True)
 
         Returns:
             Tuple of (formatted_history, message_count)
+
+        Token Budgeting:
+            When max_tokens is specified, messages are selected using either:
+
+            1. Smart compaction (default): Allocates 70% of budget to recent messages,
+               reserves 30% for important older messages (files, long content, metadata).
+               Preserves conversation continuity while keeping important context.
+
+            2. Simple compaction: Includes messages from newest to oldest until budget
+               would be exceeded. More predictable but may lose important older context.
+
+            The max_messages limit is applied first (if specified), then max_tokens
+            further reduces the set if needed.
 
         Format:
             === CONVERSATION HISTORY (CONTINUATION) ===
@@ -402,13 +614,17 @@ class ConversationMemory:
             return "", 0
 
         messages = thread.messages
+        total_messages = len(messages)
 
-        # Limit messages if specified (keep most recent)
+        # Apply max_messages limit first (keep most recent)
         if max_messages and len(messages) > max_messages:
             messages = messages[-max_messages:]
-            truncated = len(thread.messages) - len(messages)
-        else:
-            truncated = 0
+
+        # Apply max_tokens limit (keep most recent that fit within budget)
+        if max_tokens:
+            messages = self._apply_token_budget(messages, max_tokens, smart_compaction)
+
+        truncated = total_messages - len(messages)
 
         # Build header
         lines = [
@@ -416,7 +632,7 @@ class ConversationMemory:
             f"Thread: {thread_id}",
             f"Workflow: {thread.workflow_name}",
             f"Messages: {len(messages)}/{len(thread.messages)}",
-            ""
+            "",
         ]
 
         if truncated > 0:
@@ -436,7 +652,9 @@ class ConversationMemory:
             if file_map:
                 lines.append("=== FILES REFERENCED ===")
                 for file_path in sorted(file_map.keys()):
-                    lines.append(f"- {file_path} (referenced in turn {file_map[file_path] + 1})")
+                    lines.append(
+                        f"- {file_path} (referenced in turn {file_map[file_path] + 1})"
+                    )
                 lines.append("=== END FILES ===")
                 lines.append("")
 
@@ -471,7 +689,7 @@ class ConversationMemory:
         history = "\n".join(lines)
         return history, len(messages)
 
-    def get_context_summary(self, thread_id: str) -> Dict[str, Any]:
+    def get_context_summary(self, thread_id: str) -> dict[str, Any]:
         """
         Get summary statistics for thread context.
 
@@ -495,7 +713,7 @@ class ConversationMemory:
                 "message_count": 0,
                 "unique_files": 0,
                 "user_messages": 0,
-                "assistant_messages": 0
+                "assistant_messages": 0,
             }
 
         # Collect statistics
@@ -523,7 +741,7 @@ class ConversationMemory:
             "unique_files": len(unique_files),
             "created_at": thread.created_at,
             "last_updated_at": thread.last_updated_at,
-            "has_parent": thread.parent_thread_id is not None
+            "has_parent": thread.parent_thread_id is not None,
         }
 
     # ========================================================================
@@ -550,7 +768,7 @@ class ConversationMemory:
             return False
 
         thread.status = "completed"
-        thread.last_updated_at = datetime.now(timezone.utc).isoformat()
+        thread.last_updated_at = datetime.now(UTC).isoformat()
         self._save_thread(thread)
 
         logger.info(f"Thread {thread_id} marked as completed")
@@ -576,7 +794,7 @@ class ConversationMemory:
             return False
 
         thread.status = "archived"
-        thread.last_updated_at = datetime.now(timezone.utc).isoformat()
+        thread.last_updated_at = datetime.now(UTC).isoformat()
         self._save_thread(thread)
 
         logger.info(f"Thread {thread_id} archived")
@@ -596,14 +814,14 @@ class ConversationMemory:
             >>> deleted = memory.cleanup_expired_threads()
             >>> print(f"Cleaned up {deleted} expired threads")
         """
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         ttl = timedelta(hours=self.ttl_hours)
         deleted = 0
 
         for thread_file in self.conversations_dir.glob("*.json"):
             try:
                 file_age = now - datetime.fromtimestamp(
-                    thread_file.stat().st_mtime, timezone.utc
+                    thread_file.stat().st_mtime, UTC
                 )
                 if file_age > ttl:
                     thread_id = thread_file.stem
@@ -665,7 +883,7 @@ class ConversationMemory:
 
         try:
             with lock:
-                with open(thread_file, 'w') as f:
+                with open(thread_file, "w") as f:
                     json.dump(thread.model_dump(), f, indent=2)
         except filelock.Timeout:
             logger.error(f"Timeout acquiring lock for thread {thread.thread_id}")
@@ -692,3 +910,336 @@ class ConversationMemory:
             logger.debug(f"Deleted thread {thread_id}")
         except Exception as e:
             logger.error(f"Error deleting thread {thread_id}: {e}")
+
+
+class ConversationMemory:
+    """
+    Unified conversation memory interface with pluggable storage backends.
+
+    Automatically selects storage backend based on configuration:
+    - file: JSON file-based storage (default, backward compatible)
+    - sqlite: SQLite database with WAL mode (recommended for production)
+
+    Configuration via .model-chorusrc:
+        storage:
+          backend: "sqlite"  # or "file"
+          sqlite_path: "~/.model-chorus/conversations.db"
+
+    This class delegates all operations to the appropriate backend implementation
+    while maintaining the same API as the original ConversationMemory.
+
+    Attributes:
+        backend: The underlying storage backend (FileBackend or ConversationDatabase)
+    """
+
+    def __init__(
+        self,
+        conversations_dir: Path = DEFAULT_CONVERSATIONS_DIR,
+        ttl_hours: int = DEFAULT_TTL_HOURS,
+        max_messages: int = DEFAULT_MAX_MESSAGES_PER_THREAD,
+        backend_type: str | None = None,
+        sqlite_path: Path | None = None,
+    ):
+        """
+        Initialize conversation memory with automatic backend selection.
+
+        Args:
+            conversations_dir: Directory for file-based storage (used if backend='file')
+            ttl_hours: Time-to-live for threads in hours
+            max_messages: Maximum messages per thread
+            backend_type: Override backend type ('file' or 'sqlite'), None=auto-detect from config
+            sqlite_path: Path to SQLite database (used if backend='sqlite')
+        """
+        # Determine backend from config or environment
+        if backend_type is None:
+            backend_type = self._detect_backend()
+
+        # Initialize appropriate backend
+        if backend_type == "sqlite":
+            logger.info("Using SQLite conversation backend")
+            from .conversation_db import ConversationDatabase
+
+            db_path = sqlite_path or (Path.home() / ".model-chorus" / "conversations.db")
+            self.backend: ConversationBackend = ConversationDatabase(
+                db_path=db_path,
+                ttl_hours=ttl_hours,
+                max_messages=max_messages,
+            )
+        else:
+            logger.info("Using file-based conversation backend")
+            self.backend = FileBackend(
+                conversations_dir=conversations_dir,
+                ttl_hours=ttl_hours,
+                max_messages=max_messages,
+            )
+
+        logger.info(
+            f"ConversationMemory initialized with {backend_type} backend"
+        )
+
+    def _detect_backend(self) -> str:
+        """
+        Detect backend from configuration or environment variable.
+
+        Returns:
+            Backend type: 'file' or 'sqlite'
+        """
+        # Check environment variable first (for testing/override)
+        env_backend = os.environ.get("MODELCHORUS_STORAGE_BACKEND")
+        if env_backend in ("file", "sqlite"):
+            logger.debug(f"Backend detected from environment: {env_backend}")
+            return env_backend
+
+        # Try to load from config file
+        try:
+            from .config import load_config
+
+            config = load_config()
+            if config and config.storage and config.storage.backend:
+                logger.debug(f"Backend detected from config: {config.storage.backend}")
+                return config.storage.backend
+        except Exception as e:
+            logger.debug(f"Could not load config for backend detection: {e}")
+
+        # Default to file backend for backward compatibility
+        logger.debug("No backend config found, defaulting to 'file'")
+        return "file"
+
+    # Delegate all methods to backend
+
+    def create_thread(
+        self,
+        workflow_name: str,
+        initial_context: dict[str, Any] | None = None,
+        parent_thread_id: str | None = None,
+    ) -> str:
+        """Create new conversation thread."""
+        return self.backend.create_thread(workflow_name, initial_context, parent_thread_id)
+
+    def get_thread(self, thread_id: str) -> ConversationThread | None:
+        """Retrieve conversation thread by ID."""
+        return self.backend.get_thread(thread_id)
+
+    def get_thread_chain(
+        self, thread_id: str, max_depth: int = 20
+    ) -> list[ConversationThread]:
+        """Retrieve thread and all parent threads in chronological order."""
+        if hasattr(self.backend, "get_thread_chain"):
+            return self.backend.get_thread_chain(thread_id, max_depth)
+
+        # Fallback implementation for FileBackend
+        chain: list[ConversationThread] = []
+        current_id: str | None = thread_id
+        depth = 0
+
+        while current_id and depth < max_depth:
+            thread = self.backend.get_thread(current_id)
+            if not thread:
+                break
+
+            chain.insert(0, thread)
+            current_id = thread.parent_thread_id
+            depth += 1
+
+        if depth >= max_depth:
+            logger.warning(
+                f"Thread chain depth limit reached ({max_depth}) for {thread_id}"
+            )
+
+        return chain
+
+    def add_message(
+        self,
+        thread_id: str,
+        role: Literal["user", "assistant"],
+        content: str,
+        files: list[str] | None = None,
+        workflow_name: str | None = None,
+        model_provider: str | None = None,
+        model_name: str | None = None,
+        metadata: dict[str, Any] | None = None,
+    ) -> bool:
+        """Add message to conversation thread."""
+        return self.backend.add_message(
+            thread_id, role, content, files, workflow_name,
+            model_provider, model_name, metadata
+        )
+
+    def get_messages(
+        self, thread_id: str, limit: int | None = None, role: str | None = None
+    ) -> list[ConversationMessage]:
+        """Retrieve messages from thread with optional filtering."""
+        return self.backend.get_messages(thread_id, limit, role)
+
+    def build_conversation_history(
+        self,
+        thread_id: str,
+        max_messages: int | None = None,
+        max_tokens: int | None = None,
+        include_files: bool = True,
+        smart_compaction: bool = True,
+    ) -> tuple[str, int]:
+        """Build formatted conversation history for context injection."""
+        # FileBackend has this method, ConversationDatabase doesn't yet
+        if hasattr(self.backend, "build_conversation_history"):
+            return self.backend.build_conversation_history(
+                thread_id, max_messages, max_tokens, include_files, smart_compaction
+            )
+
+        # Fallback: simple implementation for SQLite backend
+        thread = self.backend.get_thread(thread_id)
+        if not thread:
+            return "", 0
+
+        messages = thread.messages
+        if max_messages and len(messages) > max_messages:
+            messages = messages[-max_messages:]
+
+        lines = [
+            "=== CONVERSATION HISTORY (CONTINUATION) ===",
+            f"Thread: {thread_id}",
+            f"Workflow: {thread.workflow_name}",
+            "",
+        ]
+
+        for idx, msg in enumerate(messages, 1):
+            lines.append(f"--- Turn {idx} ({msg.role}) ---")
+            lines.append(msg.content)
+            lines.append("")
+
+        lines.append("=== END CONVERSATION HISTORY ===")
+        return "\n".join(lines), len(messages)
+
+    # ------------------------------------------------------------------
+    # Compatibility helpers for legacy tests and workflows
+    # ------------------------------------------------------------------
+    def _save_thread(self, thread: ConversationThread) -> None:
+        backend_method = getattr(self.backend, "_save_thread", None)
+        if backend_method:
+            backend_method(thread)
+        else:
+            logger.warning(
+                "Conversation backend %s does not support _save_thread; state changes may not persist",
+                type(self.backend).__name__,
+            )
+
+    def _estimate_tokens(self, text: str) -> int:
+        backend_method = getattr(self.backend, "_estimate_tokens", None)
+        if backend_method:
+            return backend_method(text)
+        return len(text) // 4
+
+    def _is_important_message(self, msg: ConversationMessage) -> bool:
+        backend_method = getattr(self.backend, "_is_important_message", None)
+        if backend_method:
+            return backend_method(msg)
+
+        if msg.files:
+            return True
+        if msg.workflow_name or msg.metadata:
+            return True
+        if len(msg.content) > 500:
+            return True
+        return False
+
+    def _apply_token_budget(
+        self,
+        messages: list[ConversationMessage],
+        max_tokens: int,
+        smart_compaction: bool = True,
+    ) -> list[ConversationMessage]:
+        backend_method = getattr(self.backend, "_apply_token_budget", None)
+        if backend_method:
+            return backend_method(messages, max_tokens, smart_compaction)
+
+        if not messages:
+            return messages
+
+        if not smart_compaction:
+            result: list[ConversationMessage] = []
+            token_count = 0
+            for msg in reversed(messages):
+                msg_text = msg.content
+                if msg.files:
+                    msg_text += " " + " ".join(msg.files)
+                msg_tokens = self._estimate_tokens(msg_text)
+
+                if result and (token_count + msg_tokens > max_tokens):
+                    break
+
+                result.append(msg)
+                token_count += msg_tokens
+
+            return list(reversed(result))
+
+        recent_messages: list[ConversationMessage] = []
+        important_messages: list[tuple[int, ConversationMessage]] = []
+        token_count = 0
+
+        for msg in reversed(messages):
+            msg_text = msg.content
+            if msg.files:
+                msg_text += " " + " ".join(msg.files)
+            msg_tokens = self._estimate_tokens(msg_text)
+
+            if recent_messages and (token_count + msg_tokens > max_tokens * 0.7):
+                break
+
+            recent_messages.append(msg)
+            token_count += msg_tokens
+
+        recent_indices = set(messages.index(msg) for msg in recent_messages)
+        remaining_budget = max_tokens - token_count
+
+        for idx, msg in enumerate(messages):
+            if idx in recent_indices:
+                continue
+            if not self._is_important_message(msg):
+                continue
+
+            msg_text = msg.content
+            if msg.files:
+                msg_text += " " + " ".join(msg.files)
+            msg_tokens = self._estimate_tokens(msg_text)
+
+            if msg_tokens <= remaining_budget:
+                important_messages.append((idx, msg))
+                remaining_budget -= msg_tokens
+
+        result = list(reversed(recent_messages))
+        for idx, msg in sorted(important_messages):
+            result.insert(idx, msg)
+
+        return result
+
+    def get_context_summary(self, thread_id: str) -> dict[str, Any]:
+        """Get summary statistics for thread context."""
+        if hasattr(self.backend, "get_context_summary"):
+            return self.backend.get_context_summary(thread_id)
+
+        # Fallback implementation
+        thread = self.backend.get_thread(thread_id)
+        if not thread:
+            return {"found": False, "message_count": 0}
+
+        return {
+            "found": True,
+            "thread_id": thread_id,
+            "message_count": len(thread.messages),
+        }
+
+    def complete_thread(self, thread_id: str) -> bool:
+        """Mark thread as completed."""
+        return self.backend.complete_thread(thread_id)
+
+    def archive_thread(self, thread_id: str) -> bool:
+        """Mark thread as archived."""
+        return self.backend.archive_thread(thread_id)
+
+    def cleanup_expired_threads(self) -> int:
+        """Remove threads older than TTL."""
+        return self.backend.cleanup_expired_threads()
+
+    def cleanup_archived_threads(self) -> int:
+        """Remove archived threads regardless of TTL."""
+        return self.backend.cleanup_archived_threads()

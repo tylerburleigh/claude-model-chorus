@@ -8,14 +8,13 @@ through threading.
 
 import logging
 import uuid
-from typing import Optional, Dict, Any, List
+from typing import Any
 
-from ..core.base_workflow import BaseWorkflow, WorkflowResult, WorkflowStep
+from ..core.base_workflow import BaseWorkflow, WorkflowResult
 from ..core.conversation import ConversationMemory
+from ..core.progress import emit_workflow_complete, emit_workflow_start
 from ..core.prompts import prepend_system_constraints
-from ..providers import ModelProvider, GenerationRequest, GenerationResponse
-from ..core.models import ConversationMessage
-from ..core.progress import emit_workflow_start, emit_workflow_complete
+from ..providers import GenerationRequest, ModelProvider
 
 logger = logging.getLogger(__name__)
 
@@ -73,9 +72,9 @@ class ChatWorkflow(BaseWorkflow):
     def __init__(
         self,
         provider: ModelProvider,
-        fallback_providers: Optional[List[ModelProvider]] = None,
-        config: Optional[Dict[str, Any]] = None,
-        conversation_memory: Optional[ConversationMemory] = None
+        fallback_providers: list[ModelProvider] | None = None,
+        config: dict[str, Any] | None = None,
+        conversation_memory: ConversationMemory | None = None,
     ):
         """
         Initialize ChatWorkflow with a single provider.
@@ -96,7 +95,7 @@ class ChatWorkflow(BaseWorkflow):
             name="Chat",
             description="Single-model peer consultation with conversation threading",
             config=config,
-            conversation_memory=conversation_memory
+            conversation_memory=conversation_memory,
         )
         self.provider = provider
         self.fallback_providers = fallback_providers or []
@@ -106,10 +105,11 @@ class ChatWorkflow(BaseWorkflow):
     async def run(
         self,
         prompt: str,
-        continuation_id: Optional[str] = None,
-        files: Optional[List[str]] = None,
+        continuation_id: str | None = None,
+        files: list[str] | None = None,
         skip_provider_check: bool = False,
-        **kwargs
+        max_history_tokens: int | None = None,
+        **kwargs,
     ) -> WorkflowResult:
         """
         Execute chat workflow with optional conversation continuation.
@@ -123,6 +123,7 @@ class ChatWorkflow(BaseWorkflow):
             continuation_id: Optional thread ID to continue an existing conversation
             files: Optional list of file paths to include in conversation context
             skip_provider_check: Skip provider availability check (faster startup)
+            max_history_tokens: Optional token budget for conversation history (uses smart compaction)
             **kwargs: Additional parameters passed to provider.generate()
                      (e.g., temperature, max_tokens, system_prompt)
 
@@ -158,7 +159,7 @@ class ChatWorkflow(BaseWorkflow):
             return WorkflowResult(
                 success=False,
                 error="Prompt cannot be empty.",
-                metadata={"error_type": "validation_error"}
+                metadata={"error_type": "validation_error"},
             )
 
         logger.info(
@@ -169,12 +170,15 @@ class ChatWorkflow(BaseWorkflow):
 
         # Check provider availability
         if not skip_provider_check:
-            has_available, available, unavailable = await self.check_provider_availability(
-                self.provider, self.fallback_providers
+            has_available, available, unavailable = (
+                await self.check_provider_availability(
+                    self.provider, self.fallback_providers
+                )
             )
 
             if not has_available:
                 from ..providers.cli_provider import ProviderUnavailableError
+
                 error_msg = "No providers available for chat:\n"
                 for name, error in unavailable:
                     error_msg += f"  - {name}: {error}\n"
@@ -183,12 +187,14 @@ class ChatWorkflow(BaseWorkflow):
                     error_msg,
                     [
                         "Check installations: model-chorus list-providers --check",
-                        "Install missing providers or update .model-chorusrc"
-                    ]
+                        "Install missing providers or update .model-chorusrc",
+                    ],
                 )
 
             if unavailable and logger.isEnabledFor(logging.WARNING):
-                logger.warning(f"Some providers unavailable: {[n for n, _ in unavailable]}")
+                logger.warning(
+                    f"Some providers unavailable: {[n for n, _ in unavailable]}"
+                )
                 logger.info(f"Will use available providers: {available}")
 
         # Generate or use thread ID
@@ -209,7 +215,9 @@ class ChatWorkflow(BaseWorkflow):
                         f"Continuation ID '{continuation_id}' not found in conversation memory. "
                         f"Creating new conversation instead."
                     )
-                    thread_id = self.conversation_memory.create_thread(workflow_name=self.name)
+                    thread_id = self.conversation_memory.create_thread(
+                        workflow_name=self.name
+                    )
                     is_valid_continuation = False
             else:
                 # No conversation memory, just use the provided ID
@@ -229,19 +237,19 @@ class ChatWorkflow(BaseWorkflow):
 
         try:
             # Build the full prompt with conversation history and file context if available
-            full_prompt = self._build_prompt_with_history(prompt, thread_id, files)
+            full_prompt = self._build_prompt_with_history(prompt, thread_id, files, max_history_tokens)
 
             # Prepare system prompt with read-only constraints
-            custom_system_prompt = kwargs.get('system_prompt')
+            custom_system_prompt = kwargs.get("system_prompt")
             final_system_prompt = prepend_system_constraints(custom_system_prompt)
 
             # Create generation request with read-only constraints prepended
-            request_kwargs = {k: v for k, v in kwargs.items() if k != 'system_prompt'}
+            request_kwargs = {k: v for k, v in kwargs.items() if k != "system_prompt"}
             request = GenerationRequest(
                 prompt=full_prompt,
                 system_prompt=final_system_prompt,
                 continuation_id=thread_id,
-                **request_kwargs
+                **request_kwargs,
             )
 
             logger.info(f"Sending request to provider: {self.provider.provider_name}")
@@ -269,7 +277,7 @@ class ChatWorkflow(BaseWorkflow):
                     prompt,
                     files=files,
                     workflow_name=self.name,
-                    model_provider=self.provider.provider_name
+                    model_provider=self.provider.provider_name,
                 )
 
             # Add assistant response to conversation history
@@ -280,28 +288,28 @@ class ChatWorkflow(BaseWorkflow):
                     response.content,
                     workflow_name=self.name,
                     model_provider=self.provider.provider_name,
-                    model_name=response.model
+                    model_name=response.model,
                 )
 
             # Build successful result
             result.success = True
             result.synthesis = response.content
             result.add_step(
-                step_number=1,
-                content=response.content,
-                model=response.model
+                step_number=1, content=response.content, model=response.model
             )
 
             # Add metadata
-            result.metadata.update({
-                'thread_id': thread_id,
-                'provider': self.provider.provider_name,
-                'model': response.model,
-                'usage': response.usage,
-                'stop_reason': response.stop_reason,
-                'is_continuation': is_valid_continuation,
-                'conversation_length': self._get_conversation_length(thread_id)
-            })
+            result.metadata.update(
+                {
+                    "thread_id": thread_id,
+                    "provider": self.provider.provider_name,
+                    "model": response.model,
+                    "usage": response.usage,
+                    "stop_reason": response.stop_reason,
+                    "is_continuation": is_valid_continuation,
+                    "conversation_length": self._get_conversation_length(thread_id),
+                }
+            )
 
             logger.info(f"Chat workflow completed successfully for thread: {thread_id}")
 
@@ -312,17 +320,14 @@ class ChatWorkflow(BaseWorkflow):
             logger.error(f"Chat workflow failed: {e}", exc_info=True)
             result.success = False
             result.error = str(e)
-            result.metadata['thread_id'] = thread_id
+            result.metadata["thread_id"] = thread_id
 
         # Store result
         self._result = result
         return result
 
     def _build_prompt_with_history(
-        self,
-        prompt: str,
-        thread_id: str,
-        files: Optional[List[str]] = None
+        self, prompt: str, thread_id: str, files: list[str] | None = None, max_history_tokens: int | None = None
     ) -> str:
         """
         Build prompt with conversation history and file context if available.
@@ -331,6 +336,7 @@ class ChatWorkflow(BaseWorkflow):
             prompt: Current user prompt
             thread_id: Thread ID to load history from
             files: Optional list of file paths to include in context
+            max_history_tokens: Optional token budget for conversation history (uses smart compaction)
 
         Returns:
             Full prompt string with conversation history and file contents prepended
@@ -342,14 +348,16 @@ class ChatWorkflow(BaseWorkflow):
             context_parts.append("File context:\n")
             for file_path in files:
                 try:
-                    with open(file_path, 'r', encoding='utf-8') as f:
+                    with open(file_path, encoding="utf-8") as f:
                         file_content = f.read()
                     context_parts.append(f"\n--- File: {file_path} ---\n")
                     context_parts.append(file_content)
                     context_parts.append(f"\n--- End of {file_path} ---\n")
                 except Exception as e:
                     logger.warning(f"Failed to read file {file_path}: {e}")
-                    context_parts.append(f"\n--- File: {file_path} (Failed to read: {e}) ---\n")
+                    context_parts.append(
+                        f"\n--- File: {file_path} (Failed to read: {e}) ---\n"
+                    )
 
         # If no conversation memory, return prompt with file context only
         if not self.conversation_memory:
@@ -358,22 +366,28 @@ class ChatWorkflow(BaseWorkflow):
                 return "\n".join(context_parts)
             return prompt
 
-        # Try to load conversation history
-        messages = self.resume_conversation(thread_id)
+        # Use build_conversation_history for token-aware history construction
+        history_kwargs = {
+            "thread_id": thread_id,
+            "include_files": False,  # We handle files separately above
+        }
+        if max_history_tokens is not None:
+            history_kwargs["max_tokens"] = max_history_tokens
+            history_kwargs["smart_compaction"] = True
 
-        # Add conversation history
-        if messages:
-            context_parts.append("\nPrevious conversation:\n")
-            for msg in messages:
-                role_label = msg.role.upper()
-                context_parts.append(f"{role_label}: {msg.content}\n")
+        history, message_count = self.conversation_memory.build_conversation_history(
+            **history_kwargs
+        )
 
-                # Include file references from history if present
-                if msg.files:
-                    context_parts.append(f"  [Referenced files: {', '.join(msg.files)}]\n")
-
-            # Add current user prompt with USER: prefix when there's history
-            context_parts.append(f"\nUSER: {prompt}")
+        # Add conversation history if available
+        has_history = bool(message_count and history and history.strip())
+        if has_history:
+            context_parts.append(history)
+            dialogue_summary = self._build_dialogue_summary(thread_id, message_count)
+            if dialogue_summary:
+                context_parts.append(dialogue_summary)
+            # Add current user prompt
+            context_parts.append(f"\n{prompt}")
         else:
             # No history - just add prompt (with file context if any)
             if context_parts:
@@ -383,12 +397,31 @@ class ChatWorkflow(BaseWorkflow):
 
         full_prompt = "\n".join(context_parts)
 
+        previous_messages = message_count or 0
         logger.debug(
-            f"Built prompt with {len(messages) if messages else 0} previous messages, "
-            f"{len(files) if files else 0} files, total length: {len(full_prompt)}"
+            "Built prompt with %d previous messages, %d files, total length: %d",
+            previous_messages,
+            len(files) if files else 0,
+            len(full_prompt),
         )
 
         return full_prompt
+
+    def _build_dialogue_summary(self, thread_id: str, message_count: int) -> str | None:
+        """Render recent conversation turns in a simple USER/ASSISTANT format."""
+        if not self.conversation_memory or message_count <= 0:
+            return None
+
+        thread = self.get_thread(thread_id)
+        if not thread or not thread.messages:
+            return None
+
+        recent_messages = thread.messages[-message_count:]
+        lines = ["Previous conversation (dialogue format):"]
+        for msg in recent_messages:
+            role = msg.role.upper()
+            lines.append(f"{role}: {msg.content}")
+        return "\n".join(lines)
 
     def _get_conversation_length(self, thread_id: str) -> int:
         """
@@ -436,7 +469,7 @@ class ChatWorkflow(BaseWorkflow):
         logger.warning("clear_conversation not yet implemented in ConversationMemory")
         return False
 
-    def get_message_count(self, thread_id: Optional[str] = None) -> int:
+    def get_message_count(self, thread_id: str | None = None) -> int:
         """
         Get total message count across all threads or for a specific thread.
 
@@ -472,7 +505,9 @@ class ChatWorkflow(BaseWorkflow):
             return False
 
         if not self.provider.validate_api_key():
-            logger.warning(f"Provider {self.provider.provider_name} API key validation failed")
+            logger.warning(
+                f"Provider {self.provider.provider_name} API key validation failed"
+            )
             return False
 
         return True

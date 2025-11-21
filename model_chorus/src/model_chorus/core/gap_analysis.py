@@ -20,8 +20,9 @@ Public API:
 """
 
 from enum import Enum
-from typing import Any, Dict, Optional, List
-from pydantic import BaseModel, Field, ConfigDict, field_validator
+from typing import Any
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class GapType(str, Enum):
@@ -156,7 +157,7 @@ class Gap(BaseModel):
         le=1.0,
     )
 
-    metadata: Dict[str, Any] = Field(
+    metadata: dict[str, Any] = Field(
         default_factory=dict,
         description="Additional metadata (detection_method, context, scores, etc.)",
     )
@@ -192,6 +193,7 @@ def _import_citation_map():
     """Import CitationMap model."""
     try:
         from model_chorus.core.models import CitationMap
+
         return CitationMap
     except ImportError as e:
         raise ImportError(f"Cannot import CitationMap model: {e}")
@@ -303,9 +305,7 @@ def generate_gap_recommendation(
                 "or data supporting this claim."
             )
         else:
-            return (
-                "Consider adding additional citations to strengthen the claim's evidence base."
-            )
+            return "Consider adding additional citations to strengthen the claim's evidence base."
 
     elif gap_type == GapType.LOGICAL:
         return (
@@ -332,9 +332,9 @@ def generate_gap_recommendation(
 def detect_missing_evidence(
     claim_id: str,
     claim_text: str,
-    citations: Optional[List[Any]] = None,
+    citations: list[Any] | None = None,
     expected_citation_count: int = 1,
-) -> Optional[Gap]:
+) -> Gap | None:
     """
     Detect if a claim lacks adequate evidential support.
 
@@ -382,7 +382,15 @@ def detect_missing_evidence(
             )
 
             # Calculate confidence based on citation deficit
-            confidence = min(0.9, 0.6 + (0.3 * (expected_citation_count - citation_count) / expected_citation_count))
+            confidence = min(
+                0.9,
+                0.6
+                + (
+                    0.3
+                    * (expected_citation_count - citation_count)
+                    / expected_citation_count
+                ),
+            )
 
             gap = Gap(
                 gap_id=f"gap-evidence-{claim_id}",
@@ -408,8 +416,8 @@ def detect_missing_evidence(
 def detect_logical_gaps(
     claim_id: str,
     claim_text: str,
-    supporting_claims: Optional[List[str]] = None,
-) -> Optional[Gap]:
+    supporting_claims: list[str] | None = None,
+) -> Gap | None:
     """
     Detect logical gaps or missing reasoning steps.
 
@@ -437,12 +445,20 @@ def detect_logical_gaps(
 
     # Check for conclusion indicators without support
     conclusion_indicators = [
-        "therefore", "thus", "hence", "consequently", "as a result",
-        "it follows that", "we conclude that", "in conclusion"
+        "therefore",
+        "thus",
+        "hence",
+        "consequently",
+        "as a result",
+        "it follows that",
+        "we conclude that",
+        "in conclusion",
     ]
 
     text_lower = claim_text.lower()
-    has_conclusion_indicator = any(indicator in text_lower for indicator in conclusion_indicators)
+    has_conclusion_indicator = any(
+        indicator in text_lower for indicator in conclusion_indicators
+    )
 
     # If claim appears to be a conclusion but lacks support, flag it
     if has_conclusion_indicator and not has_support:
@@ -482,9 +498,9 @@ def detect_logical_gaps(
 
 
 def detect_unsupported_claims(
-    claims: List[tuple[str, str, Optional[List[Any]]]],
+    claims: list[tuple[str, str, list[Any] | None]],
     min_citations_per_claim: int = 1,
-) -> List[Gap]:
+) -> list[Gap]:
     """
     Detect unsupported claims in a collection.
 
@@ -522,9 +538,9 @@ def detect_unsupported_claims(
 
 
 def detect_gaps(
-    claims: List[Dict[str, Any]],
+    claims: list[dict[str, Any]],
     min_citations_per_claim: int = 1,
-) -> List[Gap]:
+) -> list[Gap]:
     """
     Main entry point for comprehensive gap detection.
 

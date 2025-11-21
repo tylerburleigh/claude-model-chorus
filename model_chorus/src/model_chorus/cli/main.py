@@ -6,34 +6,50 @@ Typer-based command-line application for running multi-model workflows.
 
 import asyncio
 import json
-import sys
+from collections.abc import Sequence
 from pathlib import Path
-from typing import List, Optional, Sequence, Tuple, Union
+from typing import cast
 
 import typer
 from rich.console import Console
 from rich.table import Table
-from rich import print as rprint
 
+from model_chorus import __version__
+
+from ..config import get_config_loader
+from ..core.config import get_claude_config_loader
+from ..core.context_ingestion import (
+    BinaryFileError,
+    ContextIngestionService,
+    FileTooLargeError,
+)
+from ..core.conversation import ConversationMemory
 from ..providers import (
     ClaudeProvider,
     CodexProvider,
-    GeminiProvider,
     CursorAgentProvider,
+    GeminiProvider,
     GenerationRequest,
 )
+from ..providers.base_provider import ModelProvider
 from ..providers.cli_provider import ProviderUnavailableError
-from ..workflows import ArgumentWorkflow, ChatWorkflow, ConsensusWorkflow, ConsensusStrategy, IdeateWorkflow, ThinkDeepWorkflow
-from ..core.conversation import ConversationMemory
-from ..core.config import get_claude_config_loader
-from ..core.progress import set_progress_enabled
-from model_chorus import __version__
+from ..workflows import (
+    ArgumentWorkflow,
+    ChatWorkflow,
+    ConsensusStrategy,
+    ConsensusWorkflow,
+    IdeateWorkflow,
+    ThinkDeepWorkflow,
+)
+from .primitives import OutputFormatter, ProviderResolver, WorkflowContext
 from .study_commands import study_app
 
 
 class ProviderDisabledError(Exception):
     """Raised when attempting to use a disabled provider."""
+
     pass
+
 
 app = typer.Typer(
     name="model-chorus",
@@ -55,7 +71,7 @@ def _find_project_root(start_path: Path) -> Path:
 PROJECT_ROOT = _find_project_root(Path(__file__).resolve())
 
 # Ordered list so that more specific mappings run before broader fallbacks.
-LEGACY_PATH_MAPPINGS: List[Tuple[Path, Path]] = [
+LEGACY_PATH_MAPPINGS: list[tuple[Path, Path]] = [
     (Path("src/claude_skills/sdd_toolkit"), Path("model_chorus/src/model_chorus")),
     (Path("src/claude_skills"), Path("model_chorus/src/model_chorus")),
 ]
@@ -70,8 +86,8 @@ def _format_path_for_display(path: Path) -> str:
 
 
 def resolve_context_files(
-    files: Optional[Union[str, Sequence[str]]]
-) -> Tuple[List[str], List[str], List[str]]:
+    files: str | Sequence[str] | None,
+) -> tuple[list[str], list[str], list[str]]:
     """Normalize and resolve context file paths with legacy mapping support.
 
     Args:
@@ -91,9 +107,9 @@ def resolve_context_files(
     else:
         entries = [str(item).strip() for item in files if str(item).strip()]
 
-    resolved_paths: List[str] = []
-    remapped_notices: List[str] = []
-    missing_files: List[str] = []
+    resolved_paths: list[str] = []
+    remapped_notices: list[str] = []
+    missing_files: list[str] = []
     cwd = Path.cwd()
 
     for original in entries:
@@ -102,12 +118,14 @@ def resolve_context_files(
         raw_path = Path(normalized_str).expanduser()
 
         candidate_paths = []
-        remapped_target: Optional[Path] = None
+        remapped_target: Path | None = None
 
         if raw_path.is_absolute():
             candidate_paths.append(raw_path.resolve(strict=False))
         else:
-            candidate_paths.append((PROJECT_ROOT / normalized_path).resolve(strict=False))
+            candidate_paths.append(
+                (PROJECT_ROOT / normalized_path).resolve(strict=False)
+            )
             candidate_paths.append((cwd / normalized_path).resolve(strict=False))
 
         for legacy_prefix, new_prefix in LEGACY_PATH_MAPPINGS:
@@ -120,7 +138,7 @@ def resolve_context_files(
             candidate_paths.insert(0, remapped_target)
             break
 
-        unique_candidates: List[Path] = []
+        unique_candidates: list[Path] = []
         seen = set()
         for candidate in candidate_paths:
             key = candidate.as_posix()
@@ -128,20 +146,27 @@ def resolve_context_files(
                 seen.add(key)
                 unique_candidates.append(candidate)
 
-        existing_path = next((path for path in unique_candidates if path.exists()), None)
+        existing_path = next(
+            (path for path in unique_candidates if path.exists()), None
+        )
 
         if existing_path:
             display_path = _format_path_for_display(existing_path)
             resolved_paths.append(display_path)
-            if remapped_target and existing_path == remapped_target and original != display_path:
+            if (
+                remapped_target
+                and existing_path == remapped_target
+                and original != display_path
+            ):
                 remapped_notices.append(f"{original} -> {display_path}")
         else:
             missing_files.append(original)
 
     return resolved_paths, remapped_notices, missing_files
 
+
 # Register study command group
-app.add_typer(study_app, name='study')
+app.add_typer(study_app, name="study")
 
 # Initialize config loader
 _config_loader = None
@@ -178,7 +203,9 @@ def get_install_command(provider: str) -> str:
     return commands.get(provider.lower(), "See provider documentation")
 
 
-def get_provider_by_name(name: str, timeout: int = 120):
+def get_provider_by_name(
+    name: str, timeout: int = 120
+) -> ClaudeProvider | CodexProvider | GeminiProvider | CursorAgentProvider:
     """Get provider instance by name.
 
     Args:
@@ -192,7 +219,13 @@ def get_provider_by_name(name: str, timeout: int = 120):
         ProviderDisabledError: If provider is disabled in config
         typer.Exit: If provider is unknown
     """
-    providers = {
+    providers: dict[
+        str,
+        type[ClaudeProvider]
+        | type[CodexProvider]
+        | type[GeminiProvider]
+        | type[CursorAgentProvider],
+    ] = {
         "claude": ClaudeProvider,
         "codex": CodexProvider,
         "gemini": GeminiProvider,
@@ -218,37 +251,43 @@ def get_provider_by_name(name: str, timeout: int = 120):
 
 @app.command()
 def chat(
-    prompt_arg: Optional[str] = typer.Argument(None, help="Message to send to the AI model"),
-    prompt_flag: Optional[str] = typer.Option(None, "--prompt", help="Message to send to the AI model (alternative to positional)"),
-    provider: Optional[str] = typer.Option(
+    prompt_arg: str | None = typer.Argument(
+        None, help="Message to send to the AI model"
+    ),
+    prompt_flag: str | None = typer.Option(
+        None,
+        "--prompt",
+        help="Message to send to the AI model (alternative to positional)",
+    ),
+    provider: str | None = typer.Option(
         None,
         "--provider",
         help="Provider to use (claude, gemini, codex, cursor-agent). Defaults to config or 'claude'",
     ),
-    continuation_id: Optional[str] = typer.Option(
+    continuation_id: str | None = typer.Option(
         None,
         "--continue",
         "-c",
         "--session-id",
         help="Thread ID to continue an existing conversation",
     ),
-    files: Optional[List[str]] = typer.Option(
+    files: list[str] | None = typer.Option(
         None,
         "--file",
         "-f",
         help="File paths to include in conversation context (can specify multiple times)",
     ),
-    system: Optional[str] = typer.Option(
+    system: str | None = typer.Option(
         None,
         "--system",
         help="System prompt for context",
     ),
-    timeout: Optional[float] = typer.Option(
+    timeout: float | None = typer.Option(
         None,
         "--timeout",
         help="Timeout per provider in seconds. Defaults to config or 120.0",
     ),
-    output: Optional[Path] = typer.Option(
+    output: Path | None = typer.Option(
         None,
         "--output",
         "-o",
@@ -283,77 +322,48 @@ def chat(
         model-chorus chat "Review this code" -f src/main.py -f tests/test_main.py
     """
     try:
-        # Validate prompt input
-        if prompt_arg is None and prompt_flag is None:
-            console.print("[red]Error: Prompt is required (provide as positional argument or use --prompt)[/red]")
-            raise typer.Exit(1)
-        if prompt_arg is not None and prompt_flag is not None:
-            console.print("[red]Error: Cannot specify prompt both as positional argument and --prompt flag[/red]")
-            raise typer.Exit(1)
-
-        prompt = prompt_arg or prompt_flag
-        # Apply config defaults if values not provided
+        # Initialize context helpers
         config = get_config()
-        if provider is None:
-            provider = config.get_workflow_default_provider('chat', 'claude')
-            if provider is None:
-                console.print("[red]Error: Default provider for 'chat' workflow is disabled.[/red]")
-                console.print("[yellow]Enable it in .claude/model_chorus_config.yaml or specify --provider[/yellow]")
-                raise typer.Exit(1)
-        if system is None:
-            system = config.get_workflow_default('chat', 'system_prompt', None)
-        if timeout is None:
-            timeout = config.get_workflow_default('chat', 'timeout', 120.0)
+        workflow_context = WorkflowContext(
+            workflow_name="chat",
+            config=config,
+            construct_prompt_with_files_fn=construct_prompt_with_files,
+        )
+        provider_resolver = ProviderResolver(
+            config=config,
+            get_provider_fn=get_provider_by_name,
+            get_install_command_fn=get_install_command,
+            verbose=verbose,
+        )
 
-        # Create provider instance
-        if verbose:
-            console.print(f"[cyan]Initializing provider: {provider}[/cyan]")
+        # Validate and get prompt
+        prompt = workflow_context.validate_and_get_prompt(prompt_arg, prompt_flag)
 
-        try:
-            provider_instance = get_provider_by_name(provider, timeout=int(timeout))
-            if verbose:
-                console.print(f"[green]✓ {provider} initialized[/green]")
-        except ProviderDisabledError as e:
-            # Provider disabled in config
-            console.print(f"[red]Error: {e}[/red]")
-            console.print(f"\n[yellow]To fix this, edit .claude/model_chorus_config.yaml and set '{provider}: enabled: true'[/yellow]")
-            raise typer.Exit(1)
-        except ProviderUnavailableError as e:
-            # Provider CLI not available - show helpful error message
-            console.print(f"[red]Error: {e.reason}[/red]\n")
-            if e.suggestions:
-                console.print("[yellow]To fix this:[/yellow]")
-                for suggestion in e.suggestions:
-                    console.print(f"  • {suggestion}")
-            console.print(f"\n[yellow]Installation:[/yellow] {get_install_command(provider)}")
-            console.print(f"\n[dim]Run 'model-chorus list-providers --check' to see which providers are available[/dim]")
-            raise typer.Exit(1)
-        except Exception as e:
-            console.print(f"[red]Failed to initialize {provider}: {e}[/red]")
-            raise typer.Exit(1)
+        # Resolve config defaults
+        resolved_config = workflow_context.resolve_config_defaults(
+            provider=provider,
+            system=system,
+            timeout=timeout,
+        )
+        provider = resolved_config["provider"]
+        system = resolved_config["system"]
+        timeout = resolved_config["timeout"]
 
-        # Load fallback providers from config and filter by enabled status
-        fallback_provider_names = config.get_workflow_fallback_providers('chat', exclude_provider=provider)
+        # Initialize primary provider
+        provider_instance = provider_resolver.resolve_provider(provider, timeout)
 
-        fallback_providers = []
-        if fallback_provider_names and verbose:
-            console.print(f"[cyan]Initializing fallback providers: {', '.join(fallback_provider_names)}[/cyan]")
+        # Initialize fallback providers
+        fallback_providers = provider_resolver.resolve_fallback_providers(
+            workflow_name="chat",
+            exclude_provider=provider,
+            timeout=timeout,
+        )
 
-        for fallback_name in fallback_provider_names:
-            try:
-                fallback_instance = get_provider_by_name(fallback_name, timeout=int(timeout))
-                fallback_providers.append(fallback_instance)
-                if verbose:
-                    console.print(f"[green]✓ {fallback_name} initialized (fallback)[/green]")
-            except ProviderDisabledError:
-                if verbose:
-                    console.print(f"[yellow]⚠ Skipping disabled fallback provider {fallback_name}[/yellow]")
-            except Exception as e:
-                if verbose:
-                    console.print(f"[yellow]⚠ Could not initialize fallback {fallback_name}: {e}[/yellow]")
+        # Create conversation memory
+        memory = workflow_context.create_memory()
 
-        # Create conversation memory (in-memory for now)
-        memory = ConversationMemory()
+        # Prepare final prompt with file context
+        final_prompt = workflow_context.prepare_prompt_with_files(prompt, files)
 
         # Create workflow
         workflow = ChatWorkflow(
@@ -365,17 +375,14 @@ def chat(
         if verbose:
             console.print(f"[cyan]Workflow: {workflow}[/cyan]")
 
-        final_prompt = construct_prompt_with_files(prompt, files)
-
-        # Display conversation info
-        console.print(f"\n[bold cyan]{'Continuing' if continuation_id else 'Starting new'} chat conversation...[/bold cyan]")
-        console.print(f"Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
-        console.print(f"Provider: {provider}")
-        if continuation_id:
-            console.print(f"Thread ID: {continuation_id}")
-        if files:
-            console.print(f"Files: {', '.join(files)}")
-        console.print()
+        # Display workflow start information
+        OutputFormatter.display_workflow_start(
+            workflow_name="chat",
+            prompt=prompt,
+            provider=provider,
+            continuation_id=continuation_id,
+            files=files,
+        )
 
         # Run async workflow
         result = asyncio.run(
@@ -390,18 +397,20 @@ def chat(
 
         # Display results
         if result.success:
-            console.print(f"[bold green]✓ Chat completed[/bold green]\n")
+            console.print("[bold green]✓ Chat completed[/bold green]\n")
 
             # Show thread info
-            thread_id = result.metadata.get('thread_id')
-            is_continuation = result.metadata.get('is_continuation', False)
-            conv_length = result.metadata.get('conversation_length', 0)
+            thread_id = result.metadata.get("thread_id")
+            is_continuation = result.metadata.get("is_continuation", False)
+            conv_length = result.metadata.get("conversation_length", 0)
 
             console.print(f"[cyan]Thread ID:[/cyan] {thread_id}")
             if not is_continuation:
                 console.print("[cyan]Status:[/cyan] New conversation started")
             else:
-                console.print(f"[cyan]Status:[/cyan] Continued ({conv_length} messages in thread)")
+                console.print(
+                    f"[cyan]Status:[/cyan] Continued ({conv_length} messages in thread)"
+                )
             console.print()
 
             # Show response
@@ -409,9 +418,11 @@ def chat(
             console.print(result.synthesis)
 
             # Show usage info if available
-            usage = result.metadata.get('usage', {})
+            usage = result.metadata.get("usage", {})
             if usage and verbose:
-                console.print(f"\n[dim]Tokens: {usage.get('total_tokens', 'N/A')}[/dim]")
+                console.print(
+                    f"\n[dim]Tokens: {usage.get('total_tokens', 'N/A')}[/dim]"
+                )
 
             # Save to file if requested
             if output:
@@ -421,17 +432,18 @@ def chat(
                     "thread_id": thread_id,
                     "is_continuation": is_continuation,
                     "response": result.synthesis,
-                    "model": result.metadata.get('model'),
+                    "model": result.metadata.get("model"),
                     "usage": usage,
                     "conversation_length": conv_length,
                 }
                 if files:
                     output_data["files"] = files
 
-                output.write_text(json.dumps(output_data, indent=2))
-                console.print(f"\n[green]✓ Result saved to {output}[/green]")
+                OutputFormatter.write_json_output(output, output_data)
 
-            console.print(f"\n[dim]To continue this conversation, use: --continue {thread_id}[/dim]")
+            console.print(
+                f"\n[dim]To continue this conversation, use: --continue {thread_id}[/dim]"
+            )
 
         else:
             console.print(f"[red]✗ Chat failed: {result.error}[/red]")
@@ -444,43 +456,55 @@ def chat(
         console.print(f"\n[red]Error: {e}[/red]")
         if verbose:
             import traceback
+
             console.print(f"\n[red]{traceback.format_exc()}[/red]")
         raise typer.Exit(1)
 
 
 @app.command()
 def argument(
-    prompt_arg: Optional[str] = typer.Argument(None, help="Argument, claim, or question to analyze"),
-    prompt_flag: Optional[str] = typer.Option(None, "--prompt", help="Argument, claim, or question to analyze (alternative to positional)"),
-    provider: Optional[str] = typer.Option(
+    prompt_arg: str | None = typer.Argument(
+        None, help="Argument, claim, or question to analyze"
+    ),
+    prompt_flag: str | None = typer.Option(
+        None,
+        "--prompt",
+        help="Argument, claim, or question to analyze (alternative to positional)",
+    ),
+    provider: str | None = typer.Option(
         None,
         "--provider",
         help="Provider to use (claude, gemini, codex, cursor-agent). Defaults to config or 'claude'",
     ),
-    continuation_id: Optional[str] = typer.Option(
+    continuation_id: str | None = typer.Option(
         None,
         "--continue",
         "-c",
         "--session-id",
         help="Thread ID to continue an existing conversation",
     ),
-    files: Optional[List[str]] = typer.Option(
+    files: list[str] | None = typer.Option(
         None,
         "--file",
         "-f",
         help="File paths to include in conversation context (can specify multiple times)",
     ),
-    system: Optional[str] = typer.Option(
+    system: str | None = typer.Option(
         None,
         "--system",
         help="System prompt for context",
     ),
-    timeout: Optional[float] = typer.Option(
+    temperature: float | None = typer.Option(
+        None,
+        "--temperature",
+        help="Temperature for creative variation (0.0-2.0). Defaults to config or 0.7",
+    ),
+    timeout: float | None = typer.Option(
         None,
         "--timeout",
         help="Timeout per provider in seconds. Defaults to config or 120.0",
     ),
-    output: Optional[Path] = typer.Option(
+    output: Path | None = typer.Option(
         None,
         "--output",
         "-o",
@@ -518,75 +542,48 @@ def argument(
         model-chorus argument "Review this proposal" -f proposal.md -f data.csv
     """
     try:
-        # Validate prompt input
-        if prompt_arg is None and prompt_flag is None:
-            console.print("[red]Error: Prompt is required (provide as positional argument or use --prompt)[/red]")
-            raise typer.Exit(1)
-        if prompt_arg is not None and prompt_flag is not None:
-            console.print("[red]Error: Cannot specify prompt both as positional argument and --prompt flag[/red]")
-            raise typer.Exit(1)
-
-        prompt = prompt_arg or prompt_flag
-        # Apply config defaults if values not provided
+        # Initialize context helpers
         config = get_config()
-        if provider is None:
-            provider = config.get_workflow_default_provider('argument', 'claude')
-            if provider is None:
-                console.print("[red]Error: Default provider for 'argument' workflow is disabled.[/red]")
-                console.print("[yellow]Enable it in .claude/model_chorus_config.yaml or specify --provider[/yellow]")
-                raise typer.Exit(1)
-        if timeout is None:
-            timeout = config.get_workflow_default('argument', 'timeout', 120.0)
+        workflow_context = WorkflowContext(
+            workflow_name="argument",
+            config=config,
+            construct_prompt_with_files_fn=construct_prompt_with_files,
+        )
+        provider_resolver = ProviderResolver(
+            config=config,
+            get_provider_fn=get_provider_by_name,
+            get_install_command_fn=get_install_command,
+            verbose=verbose,
+        )
 
-        # Create provider instance
-        if verbose:
-            console.print(f"[cyan]Initializing provider: {provider}[/cyan]")
+        # Validate and get prompt
+        prompt = workflow_context.validate_and_get_prompt(prompt_arg, prompt_flag)
 
-        try:
-            provider_instance = get_provider_by_name(provider, timeout=int(timeout))
-            if verbose:
-                console.print(f"[green]✓ {provider} initialized[/green]")
-        except ProviderDisabledError as e:
-            # Provider disabled in config
-            console.print(f"[red]Error: {e}[/red]")
-            console.print(f"\n[yellow]To fix this, edit .claude/model_chorus_config.yaml and set '{provider}: enabled: true'[/yellow]")
-            raise typer.Exit(1)
-        except ProviderUnavailableError as e:
-            # Provider CLI not available - show helpful error message
-            console.print(f"[red]Error: {e.reason}[/red]\n")
-            if e.suggestions:
-                console.print("[yellow]To fix this:[/yellow]")
-                for suggestion in e.suggestions:
-                    console.print(f"  • {suggestion}")
-            console.print(f"\n[yellow]Installation:[/yellow] {get_install_command(provider)}")
-            console.print(f"\n[dim]Run 'model-chorus list-providers --check' to see which providers are available[/dim]")
-            raise typer.Exit(1)
-        except Exception as e:
-            console.print(f"[red]Failed to initialize {provider}: {e}[/red]")
-            raise typer.Exit(1)
+        # Resolve config defaults
+        resolved_config = workflow_context.resolve_config_defaults(
+            provider=provider,
+            system=system,
+            timeout=timeout,
+        )
+        provider = resolved_config["provider"]
+        system = resolved_config["system"]
+        timeout = resolved_config["timeout"]
 
-        # Load fallback providers from config and filter by enabled status
-        fallback_provider_names = config.get_workflow_fallback_providers('argument', exclude_provider=provider)
+        # Initialize primary provider
+        provider_instance = provider_resolver.resolve_provider(provider, timeout)
 
-        fallback_providers = []
-        if fallback_provider_names and verbose:
-            console.print(f"[cyan]Initializing fallback providers: {', '.join(fallback_provider_names)}[/cyan]")
-
-        for fallback_name in fallback_provider_names:
-            try:
-                fallback_instance = get_provider_by_name(fallback_name, timeout=int(timeout))
-                fallback_providers.append(fallback_instance)
-                if verbose:
-                    console.print(f"[green]✓ {fallback_name} initialized (fallback)[/green]")
-            except ProviderDisabledError:
-                if verbose:
-                    console.print(f"[yellow]⚠ Skipping disabled fallback provider {fallback_name}[/yellow]")
-            except Exception as e:
-                if verbose:
-                    console.print(f"[yellow]⚠ Could not initialize fallback {fallback_name}: {e}[/yellow]")
+        # Initialize fallback providers
+        fallback_providers = provider_resolver.resolve_fallback_providers(
+            workflow_name="argument",
+            exclude_provider=provider,
+            timeout=timeout,
+        )
 
         # Create conversation memory
-        memory = ConversationMemory()
+        memory = workflow_context.create_memory()
+
+        # Prepare final prompt with file context
+        final_prompt = workflow_context.prepare_prompt_with_files(prompt, files)
 
         # Create workflow
         workflow = ArgumentWorkflow(
@@ -598,16 +595,21 @@ def argument(
         if verbose:
             console.print(f"[cyan]Workflow: {workflow}[/cyan]")
 
-        final_prompt = construct_prompt_with_files(prompt, files)
-
-        # Display analysis info
-        console.print(f"\n[bold cyan]Analyzing argument through dialectical reasoning...[/bold cyan]")
-        console.print(f"[dim]Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}[/dim]\n")
+        # Display workflow start information
+        OutputFormatter.display_workflow_start(
+            workflow_name="argument",
+            prompt=prompt,
+            provider=provider,
+            continuation_id=continuation_id,
+            files=files,
+        )
 
         # Build config
         config = {}
         if system:
-            config['system_prompt'] = system
+            config["system_prompt"] = system
+        if temperature is not None:
+            config["temperature"] = temperature
 
         # Execute workflow
         result = asyncio.run(
@@ -616,51 +618,50 @@ def argument(
                 continuation_id=continuation_id,
                 files=files,
                 skip_provider_check=skip_provider_check,
-                **config
+                **config,
             )
         )
 
         # Display results
         console.print("\n[bold green]Analysis Complete[/bold green]")
-        console.print(f"\n[bold]Dialectical Analysis:[/bold]")
+        console.print("\n[bold]Dialectical Analysis:[/bold]")
 
         # Show each role's perspective
         if result.steps:
             for i, step in enumerate(result.steps, 1):
-                role_name = step.name if hasattr(step, 'name') else f"Step {i}"
+                role_name = step.name if hasattr(step, "name") else f"Step {i}"
                 console.print(f"\n[bold cyan]{role_name}:[/bold cyan]")
                 console.print(step.content)
 
         # Show synthesis
         if result.synthesis:
-            console.print(f"\n[bold magenta]Final Synthesis:[/bold magenta]")
+            console.print("\n[bold magenta]Final Synthesis:[/bold magenta]")
             console.print(result.synthesis)
 
         # Show metadata
         if verbose and result.metadata:
-            console.print(f"\n[dim]Thread ID: {result.metadata.get('thread_id', 'N/A')}[/dim]")
+            console.print(
+                f"\n[dim]Thread ID: {result.metadata.get('thread_id', 'N/A')}[/dim]"
+            )
             console.print(f"[dim]Model: {result.metadata.get('model', 'N/A')}[/dim]")
 
         # Save output if requested
         if output:
             output_data = {
-                'success': result.success,
-                'synthesis': result.synthesis,
-                'steps': [
+                "success": result.success,
+                "synthesis": result.synthesis,
+                "steps": [
                     {
-                        'name': step.name if hasattr(step, 'name') else f'Step {i}',
-                        'content': step.content,
-                        'metadata': step.metadata if hasattr(step, 'metadata') else {}
+                        "name": step.name if hasattr(step, "name") else f"Step {i}",
+                        "content": step.content,
+                        "metadata": step.metadata if hasattr(step, "metadata") else {},
                     }
                     for i, step in enumerate(result.steps, 1)
                 ],
-                'metadata': result.metadata,
+                "metadata": result.metadata,
             }
 
-            with open(output, 'w') as f:
-                json.dump(output_data, f, indent=2)
-
-            console.print(f"\n[green]Results saved to: {output}[/green]")
+            OutputFormatter.write_json_output(output, output_data)
 
     except KeyboardInterrupt:
         console.print("\n[yellow]Interrupted by user[/yellow]")
@@ -669,27 +670,34 @@ def argument(
         console.print(f"\n[red]Error: {e}[/red]")
         if verbose:
             import traceback
+
             console.print(f"\n[red]{traceback.format_exc()}[/red]")
         raise typer.Exit(1)
 
 
 @app.command()
 def ideate(
-    prompt_arg: Optional[str] = typer.Argument(None, help="Topic or problem to brainstorm ideas for"),
-    prompt_flag: Optional[str] = typer.Option(None, "--prompt", help="Topic or problem to brainstorm ideas for (alternative to positional)"),
-    provider: Optional[str] = typer.Option(
+    prompt_arg: str | None = typer.Argument(
+        None, help="Topic or problem to brainstorm ideas for"
+    ),
+    prompt_flag: str | None = typer.Option(
+        None,
+        "--prompt",
+        help="Topic or problem to brainstorm ideas for (alternative to positional)",
+    ),
+    provider: str | None = typer.Option(
         None,
         "--provider",
         help="Provider to use (claude, gemini, codex, cursor-agent). Defaults to config or 'claude'",
     ),
-    continuation_id: Optional[str] = typer.Option(
+    continuation_id: str | None = typer.Option(
         None,
         "--continue",
         "-c",
         "--session-id",
         help="Thread ID to continue an existing ideation session",
     ),
-    files: Optional[List[str]] = typer.Option(
+    files: list[str] | None = typer.Option(
         None,
         "--file",
         "-f",
@@ -701,17 +709,22 @@ def ideate(
         "-n",
         help="Number of ideas to generate",
     ),
-    system: Optional[str] = typer.Option(
+    system: str | None = typer.Option(
         None,
         "--system",
         help="System prompt for context",
     ),
-    timeout: Optional[float] = typer.Option(
+    temperature: float | None = typer.Option(
+        None,
+        "--temperature",
+        help="Temperature for creative variation (0.0-2.0). Higher values = more creative",
+    ),
+    timeout: float | None = typer.Option(
         None,
         "--timeout",
         help="Timeout per provider in seconds. Defaults to config or 120.0",
     ),
-    output: Optional[Path] = typer.Option(
+    output: Path | None = typer.Option(
         None,
         "--output",
         "-o",
@@ -749,75 +762,48 @@ def ideate(
         model-chorus ideate "Refine the third idea" --continue thread-id-123
     """
     try:
-        # Validate prompt input
-        if prompt_arg is None and prompt_flag is None:
-            console.print("[red]Error: Prompt is required (provide as positional argument or use --prompt)[/red]")
-            raise typer.Exit(1)
-        if prompt_arg is not None and prompt_flag is not None:
-            console.print("[red]Error: Cannot specify prompt both as positional argument and --prompt flag[/red]")
-            raise typer.Exit(1)
-
-        prompt = prompt_arg or prompt_flag
-        # Apply config defaults if values not provided
+        # Initialize context helpers
         config = get_config()
-        if provider is None:
-            provider = config.get_workflow_default_provider('ideate', 'claude')
-            if provider is None:
-                console.print("[red]Error: Default provider for 'ideate' workflow is disabled.[/red]")
-                console.print("[yellow]Enable it in .claude/model_chorus_config.yaml or specify --provider[/yellow]")
-                raise typer.Exit(1)
-        if timeout is None:
-            timeout = config.get_workflow_default('ideate', 'timeout', 120.0)
+        workflow_context = WorkflowContext(
+            workflow_name="ideate",
+            config=config,
+            construct_prompt_with_files_fn=construct_prompt_with_files,
+        )
+        provider_resolver = ProviderResolver(
+            config=config,
+            get_provider_fn=get_provider_by_name,
+            get_install_command_fn=get_install_command,
+            verbose=verbose,
+        )
 
-        # Create provider instance
-        if verbose:
-            console.print(f"[cyan]Initializing provider: {provider}[/cyan]")
+        # Validate and get prompt
+        prompt = workflow_context.validate_and_get_prompt(prompt_arg, prompt_flag)
 
-        try:
-            provider_instance = get_provider_by_name(provider, timeout=int(timeout))
-            if verbose:
-                console.print(f"[green]✓ {provider} initialized[/green]")
-        except ProviderDisabledError as e:
-            # Provider disabled in config
-            console.print(f"[red]Error: {e}[/red]")
-            console.print(f"\n[yellow]To fix this, edit .claude/model_chorus_config.yaml and set '{provider}: enabled: true'[/yellow]")
-            raise typer.Exit(1)
-        except ProviderUnavailableError as e:
-            # Provider CLI not available - show helpful error message
-            console.print(f"[red]Error: {e.reason}[/red]\n")
-            if e.suggestions:
-                console.print("[yellow]To fix this:[/yellow]")
-                for suggestion in e.suggestions:
-                    console.print(f"  • {suggestion}")
-            console.print(f"\n[yellow]Installation:[/yellow] {get_install_command(provider)}")
-            console.print(f"\n[dim]Run 'model-chorus list-providers --check' to see which providers are available[/dim]")
-            raise typer.Exit(1)
-        except Exception as e:
-            console.print(f"[red]Failed to initialize {provider}: {e}[/red]")
-            raise typer.Exit(1)
+        # Resolve config defaults
+        resolved_config = workflow_context.resolve_config_defaults(
+            provider=provider,
+            system=system,
+            timeout=timeout,
+        )
+        provider = resolved_config["provider"]
+        system = resolved_config["system"]
+        timeout = resolved_config["timeout"]
 
-        # Load fallback providers from config and filter by enabled status
-        fallback_provider_names = config.get_workflow_fallback_providers('ideate', exclude_provider=provider)
+        # Initialize primary provider
+        provider_instance = provider_resolver.resolve_provider(provider, timeout)
 
-        fallback_providers = []
-        if fallback_provider_names and verbose:
-            console.print(f"[cyan]Initializing fallback providers: {', '.join(fallback_provider_names)}[/cyan]")
-
-        for fallback_name in fallback_provider_names:
-            try:
-                fallback_instance = get_provider_by_name(fallback_name, timeout=int(timeout))
-                fallback_providers.append(fallback_instance)
-                if verbose:
-                    console.print(f"[green]✓ {fallback_name} initialized (fallback)[/green]")
-            except ProviderDisabledError:
-                if verbose:
-                    console.print(f"[yellow]⚠ Skipping disabled fallback provider {fallback_name}[/yellow]")
-            except Exception as e:
-                if verbose:
-                    console.print(f"[yellow]⚠ Could not initialize fallback {fallback_name}: {e}[/yellow]")
+        # Initialize fallback providers
+        fallback_providers = provider_resolver.resolve_fallback_providers(
+            workflow_name="ideate",
+            exclude_provider=provider,
+            timeout=timeout,
+        )
 
         # Create conversation memory
-        memory = ConversationMemory()
+        memory = workflow_context.create_memory()
+
+        # Prepare final prompt with file context
+        final_prompt = workflow_context.prepare_prompt_with_files(prompt, files)
 
         # Create workflow
         workflow = IdeateWorkflow(
@@ -829,19 +815,21 @@ def ideate(
         if verbose:
             console.print(f"[cyan]Workflow: {workflow}[/cyan]")
 
-        final_prompt = construct_prompt_with_files(prompt, files)
-
         # Display ideation info
-        console.print(f"\n[bold cyan]Generating creative ideas...[/bold cyan]")
-        console.print(f"[dim]Topic: {prompt[:100]}{'...' if len(prompt) > 100 else ''}[/dim]")
+        console.print("\n[bold cyan]Generating creative ideas...[/bold cyan]")
+        console.print(
+            f"[dim]Topic: {prompt[:100]}{'...' if len(prompt) > 100 else ''}[/dim]"
+        )
         console.print(f"[dim]Ideas requested: {num_ideas}[/dim]\n")
 
         # Build config
-        config = {
-            'num_ideas': num_ideas,
+        workflow_config = {
+            "num_ideas": num_ideas,
         }
         if system:
-            config['system_prompt'] = system
+            workflow_config["system_prompt"] = system
+        if temperature is not None:
+            workflow_config["temperature"] = temperature
 
         # Execute workflow
         result = asyncio.run(
@@ -850,7 +838,7 @@ def ideate(
                 continuation_id=continuation_id,
                 files=files,
                 skip_provider_check=skip_provider_check,
-                **config
+                **workflow_config,
             )
         )
 
@@ -860,39 +848,40 @@ def ideate(
         # Show ideas from steps
         if result.steps:
             for i, step in enumerate(result.steps, 1):
-                console.print(f"\n[bold cyan]{step.name if hasattr(step, 'name') else f'Idea {i}'}:[/bold cyan]")
+                console.print(
+                    f"\n[bold cyan]{step.name if hasattr(step, 'name') else f'Idea {i}'}:[/bold cyan]"
+                )
                 console.print(step.content)
 
         # Show synthesis
         if result.synthesis:
-            console.print(f"\n[bold magenta]Summary & Recommendations:[/bold magenta]")
+            console.print("\n[bold magenta]Summary & Recommendations:[/bold magenta]")
             console.print(result.synthesis)
 
         # Show metadata
         if verbose and result.metadata:
-            console.print(f"\n[dim]Thread ID: {result.metadata.get('thread_id', 'N/A')}[/dim]")
+            console.print(
+                f"\n[dim]Thread ID: {result.metadata.get('thread_id', 'N/A')}[/dim]"
+            )
             console.print(f"[dim]Model: {result.metadata.get('model', 'N/A')}[/dim]")
 
         # Save output if requested
         if output:
             output_data = {
-                'success': result.success,
-                'synthesis': result.synthesis,
-                'ideas': [
+                "success": result.success,
+                "synthesis": result.synthesis,
+                "ideas": [
                     {
-                        'name': step.name if hasattr(step, 'name') else f'Idea {i}',
-                        'content': step.content,
-                        'metadata': step.metadata if hasattr(step, 'metadata') else {}
+                        "name": step.name if hasattr(step, "name") else f"Idea {i}",
+                        "content": step.content,
+                        "metadata": step.metadata if hasattr(step, "metadata") else {},
                     }
                     for i, step in enumerate(result.steps, 1)
                 ],
-                'metadata': result.metadata,
+                "metadata": result.metadata,
             }
 
-            with open(output, 'w') as f:
-                json.dump(output_data, f, indent=2)
-
-            console.print(f"\n[green]Results saved to: {output}[/green]")
+            OutputFormatter.write_json_output(output, output_data)
 
     except KeyboardInterrupt:
         console.print("\n[yellow]Interrupted by user[/yellow]")
@@ -901,58 +890,106 @@ def ideate(
         console.print(f"\n[red]Error: {e}[/red]")
         if verbose:
             import traceback
+
             console.print(f"\n[red]{traceback.format_exc()}[/red]")
         raise typer.Exit(1)
 
-def construct_prompt_with_files(prompt: str, files: Optional[List[str]]) -> str:
-    """Construct a prompt by prepending the content of files."""
+
+def construct_prompt_with_files(prompt: str, files: list[str] | None) -> str:
+    """Construct a prompt by prepending the content of files using ContextIngestionService.
+
+    NOTE: This function is retained as a convenience wrapper for backward compatibility.
+    It uses ContextIngestionService internally per architectural requirements while
+    maintaining a simple API for CLI command handlers. Direct use of ContextIngestionService
+    is preferred for new code requiring more control over file reading behavior.
+    """
     if not files:
         return prompt
 
+    # Create context ingestion service with default limits
+    service = ContextIngestionService()
+
     file_content = "The user has provided the following file(s) for context:\n\n"
+
     for file_path in files:
-        if not Path(file_path).exists():
+        try:
+            # Check if file can be read before attempting
+            can_read, reason = service.can_read_file(file_path)
+
+            if not can_read:
+                console.print(f"[red]Error: Cannot read {file_path}: {reason}[/red]")
+                raise typer.Exit(1)
+
+            # Get file info to warn about large files
+            info = service.get_file_info(file_path)
+            if info["exceeds_warn"]:
+                console.print(
+                    f"[yellow]Warning: {file_path} ({info['size_kb']:.1f} KB) is large and may consume significant context[/yellow]"
+                )
+
+            # Read the file using the service
+            content = service.read_file(file_path)
+            file_content += f"--- {file_path} ---\n{content}\n\n"
+
+        except FileNotFoundError:
             console.print(f"[red]Error: File not found: {file_path}[/red]")
             raise typer.Exit(1)
-        with open(file_path, "r") as f:
-            file_content += f"--- {file_path} ---\n{f.read()}\n\n"
-    
+        except FileTooLargeError as e:
+            console.print(f"[red]Error: {e}[/red]")
+            console.print(
+                f"[yellow]Hint: File exceeds {service.max_file_size_kb} KB limit. Consider using a smaller file or splitting the content.[/yellow]"
+            )
+            raise typer.Exit(1)
+        except BinaryFileError as e:
+            console.print(f"[red]Error: {e}[/red]")
+            console.print(
+                "[yellow]Hint: Only text files are supported for context injection.[/yellow]"
+            )
+            raise typer.Exit(1)
+        except PermissionError as e:
+            console.print(f"[red]Error: {e}[/red]")
+            raise typer.Exit(1)
+
     return f"{prompt}\n\n{file_content}"
 
 
 @app.command()
 def consensus(
-    prompt_arg: Optional[str] = typer.Argument(None, help="Prompt to send to all models"),
-    prompt_flag: Optional[str] = typer.Option(None, "--prompt", help="Prompt to send to all models (alternative to positional)"),
-    num_to_consult: Optional[int] = typer.Option(
+    prompt_arg: str | None = typer.Argument(None, help="Prompt to send to all models"),
+    prompt_flag: str | None = typer.Option(
+        None,
+        "--prompt",
+        help="Prompt to send to all models (alternative to positional)",
+    ),
+    num_to_consult: int | None = typer.Option(
         None,
         "--num-to-consult",
         "-m",
         help="Number of successful responses required (models to consult). Defaults to config or 2",
     ),
-    strategy: Optional[str] = typer.Option(
+    strategy: str | None = typer.Option(
         None,
         "--strategy",
         "-s",
         help="Consensus strategy: all_responses, first_valid, majority, weighted, synthesize. Defaults to config or 'all_responses'",
     ),
-    files: Optional[List[str]] = typer.Option(
+    files: list[str] | None = typer.Option(
         None,
         "--file",
         "-f",
         help="File paths to include in conversation context (can specify multiple times)",
     ),
-    system: Optional[str] = typer.Option(
+    system: str | None = typer.Option(
         None,
         "--system",
         help="System prompt for context",
     ),
-    timeout: Optional[float] = typer.Option(
+    timeout: float | None = typer.Option(
         None,
         "--timeout",
         help="Timeout per provider in seconds. Defaults to config or 120.0",
     ),
-    output: Optional[Path] = typer.Option(
+    output: Path | None = typer.Option(
         None,
         "--output",
         "-o",
@@ -985,31 +1022,35 @@ def consensus(
         model-chorus consensus --prompt "Explain quantum computing" --num-to-consult 2
     """
     try:
-        # Validate prompt input
-        if prompt_arg is None and prompt_flag is None:
-            console.print("[red]Error: Prompt is required (provide as positional argument or use --prompt)[/red]")
-            raise typer.Exit(1)
-        if prompt_arg is not None and prompt_flag is not None:
-            console.print("[red]Error: Cannot specify prompt both as positional argument and --prompt flag[/red]")
-            raise typer.Exit(1)
-
-        prompt = prompt_arg or prompt_flag
-        # Apply config defaults if values not provided
+        # Initialize context helpers
         config = get_config()
+        workflow_context = WorkflowContext(
+            workflow_name="consensus",
+            config=config,
+            construct_prompt_with_files_fn=construct_prompt_with_files,
+        )
 
-        # Get priority list from config
-        provider_priority = config.get_workflow_provider_priority('consensus')
+        # Validate and get prompt
+        prompt = workflow_context.validate_and_get_prompt(prompt_arg, prompt_flag)
 
-        # Get num_to_consult from CLI or config
-        if num_to_consult is None:
-            num_to_consult = config.get_workflow_num_to_consult('consensus', fallback=2)
+        # Resolve config defaults
+        resolved_config = workflow_context.resolve_config_defaults(
+            system=system,
+            timeout=timeout,
+        )
+        system = resolved_config["system"]
+        timeout = resolved_config["timeout"]
 
+        # Get consensus-specific config
         if strategy is None:
-            strategy = config.get_workflow_default('consensus', 'strategy', 'all_responses')
-        if timeout is None:
-            timeout = config.get_workflow_default('consensus', 'timeout', 120.0)
-        if system is None:
-            system = config.get_workflow_default('consensus', 'system_prompt', None)
+            strategy = config.get_workflow_default(
+                "consensus", "strategy", "all_responses"
+            )
+        if num_to_consult is None:
+            num_to_consult = config.get_workflow_num_to_consult("consensus", fallback=2)
+
+        # Get provider priority list
+        provider_priority = config.get_workflow_provider_priority("consensus")
 
         # Validate strategy
         try:
@@ -1021,12 +1062,17 @@ def consensus(
             )
             raise typer.Exit(1)
 
-        final_prompt = construct_prompt_with_files(prompt, files)
+        # Prepare final prompt with file context
+        final_prompt = workflow_context.prepare_prompt_with_files(prompt, files)
 
         # Validate we have enough providers
         if not provider_priority:
-            console.print("[red]Error: No providers configured for consensus workflow[/red]")
-            console.print("[yellow]Please configure provider_priority in .claude/model_chorus_config.yaml[/yellow]")
+            console.print(
+                "[red]Error: No providers configured for consensus workflow[/red]"
+            )
+            console.print(
+                "[yellow]Please configure provider_priority in .claude/model_chorus_config.yaml[/yellow]"
+            )
             raise typer.Exit(1)
 
         if len(provider_priority) < num_to_consult:
@@ -1034,13 +1080,19 @@ def consensus(
                 f"[red]Error: Not enough providers available. Need {num_to_consult} but only "
                 f"{len(provider_priority)} enabled: {', '.join(provider_priority)}[/red]"
             )
-            console.print("[yellow]Please enable more providers or reduce num_to_consult[/yellow]")
+            console.print(
+                "[yellow]Please enable more providers or reduce num_to_consult[/yellow]"
+            )
             raise typer.Exit(1)
 
         # Create provider instances for ALL providers in priority list (for fallback)
         if verbose:
-            console.print(f"[cyan]Provider priority order: {', '.join(provider_priority)}[/cyan]")
-            console.print(f"[cyan]Will consult {num_to_consult} providers (with automatic fallback)[/cyan]\n")
+            console.print(
+                f"[cyan]Provider priority order: {', '.join(provider_priority)}[/cyan]"
+            )
+            console.print(
+                f"[cyan]Will consult {num_to_consult} providers (with automatic fallback)[/cyan]\n"
+            )
 
         provider_instances = []
         for provider_name in provider_priority:
@@ -1049,16 +1101,18 @@ def consensus(
                 provider_instances.append(provider)
                 if verbose:
                     console.print(f"[green]✓ {provider_name} initialized[/green]")
-            except ProviderDisabledError as e:
+            except ProviderDisabledError:
                 # This shouldn't happen since we filtered above, but handle it anyway
-                console.print(f"[yellow]Skipping disabled provider {provider_name}[/yellow]")
+                console.print(
+                    f"[yellow]Skipping disabled provider {provider_name}[/yellow]"
+                )
             except Exception as e:
                 console.print(f"[red]Failed to initialize {provider_name}: {e}[/red]")
                 raise typer.Exit(1)
 
         # Create workflow with dynamic fallback support
         workflow = ConsensusWorkflow(
-            providers=provider_instances,
+            providers=cast(list[ModelProvider], provider_instances),
             strategy=strategy_enum,
             default_timeout=timeout,
             num_to_consult=num_to_consult,
@@ -1069,7 +1123,9 @@ def consensus(
             provider_key = provider_config.provider.provider_name.lower()
             override_model = config.get_provider_model(provider_key)
             if override_model:
-                metadata = dict(provider_config.metadata) if provider_config.metadata else {}
+                metadata = (
+                    dict(provider_config.metadata) if provider_config.metadata else {}
+                )
                 if "model" not in metadata:
                     metadata["model"] = override_model
                     provider_config.metadata = metadata
@@ -1087,17 +1143,21 @@ def consensus(
             system_prompt=system,
         )
 
-        # Execute workflow
-        console.print(f"\n[bold cyan]Executing consensus workflow...[/bold cyan]")
-        console.print(f"Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
-        console.print(f"Providers: {len(provider_priority)} available (need {num_to_consult} successful)")
-        console.print(f"Strategy: {strategy_enum.value}\n")
+        # Display workflow start information
+        OutputFormatter.display_workflow_start(
+            workflow_name="consensus",
+            prompt=prompt,
+            files=files,
+            num_to_consult=num_to_consult,
+            strategy=strategy_enum.value,
+            providers_available=len(provider_priority),
+        )
 
         # Run async workflow
         result = asyncio.run(workflow.execute(request, strategy=strategy_enum))
 
         # Display results
-        console.print(f"[bold green]✓ Workflow completed[/bold green]\n")
+        console.print("[bold green]✓ Workflow completed[/bold green]\n")
 
         # Show summary table
         table = Table(title="Consensus Results")
@@ -1140,7 +1200,7 @@ def consensus(
             output_data = {
                 "prompt": prompt,
                 "strategy": strategy_enum.value,
-                "providers": providers,
+                "providers": provider_priority,
                 "consensus_response": result.consensus_response,
                 "responses": {
                     name: {
@@ -1155,8 +1215,7 @@ def consensus(
                 "metadata": result.metadata,
             }
 
-            output.write_text(json.dumps(output_data, indent=2))
-            console.print(f"\n[green]✓ Results saved to {output}[/green]")
+            OutputFormatter.write_json_output(output, output_data)
 
         # Exit with appropriate code
         if result.failed_providers:
@@ -1174,6 +1233,7 @@ def consensus(
         console.print(f"\n[red]Error: {e}[/red]")
         if verbose:
             import traceback
+
             console.print(f"\n[red]{traceback.format_exc()}[/red]")
         raise typer.Exit(1)
 
@@ -1181,25 +1241,34 @@ def consensus(
 @app.command()
 def thinkdeep(
     step: str = typer.Option(..., "--step", help="Investigation step description"),
-    step_number: int = typer.Option(..., "--step-number", help="Current step index (starts at 1)"),
-    total_steps: int = typer.Option(..., "--total-steps", help="Estimated total investigation steps"),
+    step_number: int = typer.Option(
+        ..., "--step-number", help="Current step index (starts at 1)"
+    ),
+    total_steps: int = typer.Option(
+        ..., "--total-steps", help="Estimated total investigation steps"
+    ),
     next_step_required: bool = typer.Option(
         False,
         "--next-step-required",
         help="Continue investigation with another step (omit for final step)",
     ),
-    findings: str = typer.Option(..., "--findings", help="What was discovered in this step"),
-    provider: Optional[str] = typer.Option(
+    findings: str = typer.Option(
+        ..., "--findings", help="What was discovered in this step"
+    ),
+    provider: str | None = typer.Option(
         None,
         "--provider",
         help="Provider to use (claude, gemini, codex, cursor-agent). Defaults to config or 'claude'",
     ),
-    continuation_id: Optional[str] = typer.Option(
+    continuation_id: str | None = typer.Option(
         None,
-        "--continuation-id", "--continue", "-c", "--session-id",
+        "--continuation-id",
+        "--continue",
+        "-c",
+        "--session-id",
         help="Resume previous investigation thread",
     ),
-    hypothesis: Optional[str] = typer.Option(
+    hypothesis: str | None = typer.Option(
         None,
         "--hypothesis",
         help="Current working theory about the problem",
@@ -1209,17 +1278,17 @@ def thinkdeep(
         "--confidence",
         help="Confidence level (exploring, low, medium, high, very_high, almost_certain, certain)",
     ),
-    files_checked: Optional[str] = typer.Option(
+    files_checked: str | None = typer.Option(
         None,
         "--files-checked",
         help="Comma-separated list of files examined",
     ),
-    relevant_files: Optional[str] = typer.Option(
+    relevant_files: str | None = typer.Option(
         None,
         "--relevant-files",
         help="Comma-separated list of files relevant to findings",
     ),
-    thinking_mode: Optional[str] = typer.Option(
+    thinking_mode: str | None = typer.Option(
         None,
         "--thinking-mode",
         help="Reasoning depth (minimal, low, medium, high, max). Defaults to config or 'medium'",
@@ -1229,7 +1298,7 @@ def thinkdeep(
         "--use-assistant-model/--no-use-assistant-model",
         help="Enable expert validation (default: enabled)",
     ),
-    output: Optional[Path] = typer.Option(
+    output: Path | None = typer.Option(
         None,
         "--output",
         "-o",
@@ -1264,76 +1333,73 @@ def thinkdeep(
         model-chorus thinkdeep --continuation-id "thread-123" --step "Verify fix resolves issue" --step-number 3 --total-steps 3 --findings "Latency reduced to baseline" --confidence high --hypothesis "Confirmed: N+1 queries were root cause"
     """
     try:
-        # Apply config defaults if values not provided
+        # Initialize context helpers
         config = get_config()
-        if provider is None:
-            provider = config.get_workflow_default_provider('thinkdeep', 'claude')
-            if provider is None:
-                console.print("[red]Error: Default provider for 'thinkdeep' workflow is disabled.[/red]")
-                console.print("[yellow]Enable it in .claude/model_chorus_config.yaml or specify --provider[/yellow]")
-                raise typer.Exit(1)
-        if thinking_mode is None:
-            thinking_mode = config.get_workflow_default('thinkdeep', 'thinking_mode', 'medium')
+        workflow_context = WorkflowContext(
+            workflow_name="thinkdeep",
+            config=config,
+            construct_prompt_with_files_fn=construct_prompt_with_files,
+        )
+        provider_resolver = ProviderResolver(
+            config=config,
+            get_provider_fn=get_provider_by_name,
+            get_install_command_fn=get_install_command,
+            verbose=verbose,
+        )
 
-        # Read timeout from config
-        timeout = config.get_workflow_default('thinkdeep', 'timeout', 120.0)
+        # Get thinkdeep-specific defaults
+        if thinking_mode is None:
+            thinking_mode = config.get_workflow_default(
+                "thinkdeep", "thinking_mode", "medium"
+            )
+
+        # Resolve config defaults
+        resolved_config = workflow_context.resolve_config_defaults(
+            provider=provider,
+            timeout=config.get_workflow_default("thinkdeep", "timeout", 120.0),
+        )
+        provider = resolved_config["provider"]
+        timeout = resolved_config["timeout"]
 
         # Validate confidence level
-        valid_confidence_levels = ['exploring', 'low', 'medium', 'high', 'very_high', 'almost_certain', 'certain']
+        valid_confidence_levels = [
+            "exploring",
+            "low",
+            "medium",
+            "high",
+            "very_high",
+            "almost_certain",
+            "certain",
+        ]
         if confidence not in valid_confidence_levels:
-            console.print(f"[red]Error: Invalid confidence level '{confidence}'. Must be one of: {', '.join(valid_confidence_levels)}[/red]")
+            console.print(
+                f"[red]Error: Invalid confidence level '{confidence}'. Must be one of: {', '.join(valid_confidence_levels)}[/red]"
+            )
             raise typer.Exit(1)
 
         # Validate thinking mode
-        valid_thinking_modes = ['minimal', 'low', 'medium', 'high', 'max']
+        valid_thinking_modes = ["minimal", "low", "medium", "high", "max"]
         if thinking_mode not in valid_thinking_modes:
-            console.print(f"[red]Error: Invalid thinking mode '{thinking_mode}'. Must be one of: {', '.join(valid_thinking_modes)}[/red]")
+            console.print(
+                f"[red]Error: Invalid thinking mode '{thinking_mode}'. Must be one of: {', '.join(valid_thinking_modes)}[/red]"
+            )
             raise typer.Exit(1)
 
-        # Create primary provider instance
-        if verbose:
-            console.print(f"[cyan]Initializing provider: {provider}[/cyan]")
+        # Initialize primary provider
+        provider_instance = provider_resolver.resolve_provider(provider, timeout)
 
-        try:
-            provider_instance = get_provider_by_name(provider, timeout=int(timeout))
-            if verbose:
-                console.print(f"[green]✓ {provider} initialized[/green]")
-        except ProviderDisabledError as e:
-            # Provider disabled in config
-            console.print(f"[red]Error: {e}[/red]")
-            console.print(f"\n[yellow]To fix this, edit .claude/model_chorus_config.yaml and set '{provider}: enabled: true'[/yellow]")
-            raise typer.Exit(1)
-        except Exception as e:
-            console.print(f"[red]Failed to initialize {provider}: {e}[/red]")
-            raise typer.Exit(1)
-
-        # Load fallback providers from config and filter by enabled status
-        fallback_provider_names = config.get_workflow_fallback_providers('thinkdeep', exclude_provider=provider)
-
-        fallback_providers = []
-        if fallback_provider_names and verbose:
-            console.print(f"[cyan]Initializing fallback providers: {', '.join(fallback_provider_names)}[/cyan]")
-
-        for fallback_name in fallback_provider_names:
-            try:
-                fallback_instance = get_provider_by_name(fallback_name, timeout=int(timeout))
-                fallback_providers.append(fallback_instance)
-                if verbose:
-                    console.print(f"[green]✓ {fallback_name} initialized (fallback)[/green]")
-            except ProviderDisabledError:
-                if verbose:
-                    console.print(f"[yellow]⚠ Skipping disabled fallback provider {fallback_name}[/yellow]")
-            except Exception as e:
-                if verbose:
-                    console.print(f"[yellow]⚠ Could not initialize fallback {fallback_name}: {e}[/yellow]")
+        # Initialize fallback providers
+        fallback_providers = provider_resolver.resolve_fallback_providers(
+            workflow_name="thinkdeep",
+            exclude_provider=provider,
+            timeout=timeout,
+        )
 
         # Create conversation memory
-        memory = ConversationMemory()
+        memory = workflow_context.create_memory()
 
         # Create workflow config
-        config = {
-            'enable_expert_validation': use_assistant_model
-        }
+        workflow_config = {"enable_expert_validation": use_assistant_model}
 
         # Create workflow
         workflow = ThinkDeepWorkflow(
@@ -1341,7 +1407,7 @@ def thinkdeep(
             fallback_providers=fallback_providers,
             expert_provider=None,  # Expert will be handled by workflow if enabled
             conversation_memory=memory,
-            config=config,
+            config=workflow_config,
         )
 
         if verbose:
@@ -1350,28 +1416,38 @@ def thinkdeep(
         # Parse files_checked if provided
         files_list = None
         if files_checked:
-            resolved_files, remapped_files, missing_files = resolve_context_files(files_checked)
+            resolved_files, remapped_files, missing_files = resolve_context_files(
+                files_checked
+            )
             if remapped_files:
                 for notice in remapped_files:
                     console.print(f"[cyan]Remapped legacy file path: {notice}[/cyan]")
             if missing_files:
-                console.print(f"[yellow]Warning: Skipping missing context file(s): {', '.join(missing_files)}[/yellow]")
+                console.print(
+                    f"[yellow]Warning: Skipping missing context file(s): {', '.join(missing_files)}[/yellow]"
+                )
             files_list = resolved_files or None
 
         # Parse relevant files if provided
         relevant_files_list = None
         if relevant_files:
-            resolved_relevant, remapped_relevant, missing_relevant = resolve_context_files(relevant_files)
+            resolved_relevant, remapped_relevant, missing_relevant = (
+                resolve_context_files(relevant_files)
+            )
             if remapped_relevant:
                 for notice in remapped_relevant:
                     console.print(f"[cyan]Remapped relevant file path: {notice}[/cyan]")
             if missing_relevant:
-                console.print(f"[red]Error: Relevant file(s) not found: {', '.join(missing_relevant)}[/red]")
+                console.print(
+                    f"[red]Error: Relevant file(s) not found: {', '.join(missing_relevant)}[/red]"
+                )
                 raise typer.Exit(1)
             relevant_files_list = resolved_relevant or None
 
         # Display investigation info
-        console.print(f"\n[bold cyan]{'Continuing' if continuation_id else 'Starting'} ThinkDeep Investigation[/bold cyan]")
+        console.print(
+            f"\n[bold cyan]{'Continuing' if continuation_id else 'Starting'} ThinkDeep Investigation[/bold cyan]"
+        )
         console.print(f"Step {step_number}/{total_steps}: {step}")
         console.print(f"Provider: {provider}")
         console.print(f"Confidence: {confidence}")
@@ -1405,11 +1481,13 @@ def thinkdeep(
 
         # Display results
         if result.success:
-            console.print(f"[bold green]✓ Investigation step {step_number}/{total_steps} completed[/bold green]\n")
+            console.print(
+                f"[bold green]✓ Investigation step {step_number}/{total_steps} completed[/bold green]\n"
+            )
 
             # Show step info
-            thread_id = result.metadata.get('thread_id')
-            returned_continuation_id = result.metadata.get('continuation_id', thread_id)
+            thread_id = result.metadata.get("thread_id")
+            returned_continuation_id = result.metadata.get("continuation_id", thread_id)
 
             console.print(f"[cyan]Continuation ID:[/cyan] {returned_continuation_id}")
             console.print(f"[cyan]Step:[/cyan] {step_number}/{total_steps}")
@@ -1419,12 +1497,18 @@ def thinkdeep(
             console.print(f"[cyan]Findings:[/cyan] {findings}")
             if files_list:
                 console.print(f"[cyan]Files Examined:[/cyan] {len(files_list)}")
-            relevant_files_this_step = result.metadata.get('relevant_files_this_step') or []
+            relevant_files_this_step = (
+                result.metadata.get("relevant_files_this_step") or []
+            )
             if relevant_files_this_step:
-                console.print(f"[cyan]Relevant Files (this step):[/cyan] {', '.join(relevant_files_this_step)}")
-            cumulative_relevant_files = result.metadata.get('relevant_files') or []
+                console.print(
+                    f"[cyan]Relevant Files (this step):[/cyan] {', '.join(relevant_files_this_step)}"
+                )
+            cumulative_relevant_files = result.metadata.get("relevant_files") or []
             if cumulative_relevant_files:
-                console.print(f"[cyan]Relevant Files (cumulative):[/cyan] {', '.join(cumulative_relevant_files)}")
+                console.print(
+                    f"[cyan]Relevant Files (cumulative):[/cyan] {', '.join(cumulative_relevant_files)}"
+                )
             console.print()
 
             # Show response
@@ -1437,9 +1521,11 @@ def thinkdeep(
                 console.print(result.steps[-1].content)
 
             # Show usage info if available
-            usage = result.metadata.get('usage', {})
+            usage = result.metadata.get("usage", {})
             if usage and verbose:
-                console.print(f"\n[dim]Tokens: {usage.get('total_tokens', 'N/A')}[/dim]")
+                console.print(
+                    f"\n[dim]Tokens: {usage.get('total_tokens', 'N/A')}[/dim]"
+                )
 
             # Save to file if requested
             if output:
@@ -1460,21 +1546,24 @@ def thinkdeep(
                     output_data["files"] = files_list
                 if relevant_files_this_step:
                     output_data["relevant_files_this_step"] = relevant_files_this_step
-                cumulative_relevant_files = result.metadata.get('relevant_files') or []
+                cumulative_relevant_files = result.metadata.get("relevant_files") or []
                 if cumulative_relevant_files:
                     output_data["relevant_files"] = cumulative_relevant_files
                 if use_assistant_model and len(result.steps) > 1:
                     output_data["expert_validation"] = result.steps[-1].content
 
-                output.write_text(json.dumps(output_data, indent=2))
-                console.print(f"\n[green]✓ Result saved to {output}[/green]")
+                OutputFormatter.write_json_output(output, output_data)
 
             # Show next step guidance
             if next_step_required:
-                console.print(f"\n[dim]To continue this investigation:[/dim]")
-                console.print(f"[dim]  model-chorus thinkdeep --continuation-id {returned_continuation_id} --step \"Next investigation step\" --step-number {step_number + 1} --total-steps {total_steps} ...[/dim]")
+                console.print("\n[dim]To continue this investigation:[/dim]")
+                console.print(
+                    f'[dim]  model-chorus thinkdeep --continuation-id {returned_continuation_id} --step "Next investigation step" --step-number {step_number + 1} --total-steps {total_steps} ...[/dim]'
+                )
             else:
-                console.print(f"\n[green]✓ Investigation complete ({total_steps} steps)[/green]")
+                console.print(
+                    f"\n[green]✓ Investigation complete ({total_steps} steps)[/green]"
+                )
 
         else:
             console.print(f"[red]✗ Investigation failed: {result.error}[/red]")
@@ -1487,13 +1576,16 @@ def thinkdeep(
         console.print(f"\n[red]Error: {e}[/red]")
         if verbose:
             import traceback
+
             console.print(f"\n[red]{traceback.format_exc()}[/red]")
         raise typer.Exit(1)
 
 
 @app.command(name="thinkdeep-status")
 def thinkdeep_status(
-    thread_id: str = typer.Argument(..., help="Thread ID of the investigation to inspect"),
+    thread_id: str = typer.Argument(
+        ..., help="Thread ID of the investigation to inspect"
+    ),
     show_steps: bool = typer.Option(
         False,
         "--steps",
@@ -1543,15 +1635,19 @@ def thinkdeep_status(
         state = workflow.get_investigation_state(thread_id)
 
         if not state:
-            console.print(f"[red]Error: Investigation thread not found: {thread_id}[/red]")
-            console.print("[yellow]Make sure you're using the correct thread ID from a previous investigation.[/yellow]")
+            console.print(
+                f"[red]Error: Investigation thread not found: {thread_id}[/red]"
+            )
+            console.print(
+                "[yellow]Make sure you're using the correct thread ID from a previous investigation.[/yellow]"
+            )
             raise typer.Exit(1)
 
         # Get investigation summary
         summary = workflow.get_investigation_summary(thread_id)
 
         # Display header
-        console.print(f"\n[bold cyan]Investigation Status[/bold cyan]")
+        console.print("\n[bold cyan]Investigation Status[/bold cyan]")
         console.print(f"[cyan]Thread ID:[/cyan] {thread_id}\n")
 
         # Display summary metrics
@@ -1561,21 +1657,31 @@ def thinkdeep_status(
         console.print(f"[cyan]Files Examined:[/cyan] {len(state.relevant_files)}")
 
         if summary:
-            console.print(f"[cyan]Active Hypotheses:[/cyan] {summary['active_hypotheses']}")
-            console.print(f"[cyan]Validated Hypotheses:[/cyan] {summary['validated_hypotheses']}")
-            console.print(f"[cyan]Disproven Hypotheses:[/cyan] {summary['disproven_hypotheses']}")
-            console.print(f"[cyan]Complete:[/cyan] {'Yes' if summary['is_complete'] else 'No'}")
+            console.print(
+                f"[cyan]Active Hypotheses:[/cyan] {summary['active_hypotheses']}"
+            )
+            console.print(
+                f"[cyan]Validated Hypotheses:[/cyan] {summary['validated_hypotheses']}"
+            )
+            console.print(
+                f"[cyan]Disproven Hypotheses:[/cyan] {summary['disproven_hypotheses']}"
+            )
+            console.print(
+                f"[cyan]Complete:[/cyan] {'Yes' if summary['is_complete'] else 'No'}"
+            )
 
         # Display hypotheses
         if state.hypotheses:
             console.print("\n[bold]Hypotheses:[/bold]")
             for i, hyp in enumerate(state.hypotheses, 1):
                 status_color = {
-                    'active': 'yellow',
-                    'validated': 'green',
-                    'disproven': 'red'
-                }.get(hyp.status, 'white')
-                console.print(f"  {i}. [{status_color}]{hyp.status.upper()}[/{status_color}] {hyp.hypothesis}")
+                    "active": "yellow",
+                    "validated": "green",
+                    "disproven": "red",
+                }.get(hyp.status, "white")
+                console.print(
+                    f"  {i}. [{status_color}]{hyp.status.upper()}[/{status_color}] {hyp.hypothesis}"
+                )
                 if hyp.evidence and verbose:
                     console.print(f"     [dim]Evidence ({len(hyp.evidence)}):[/dim]")
                     for evidence in hyp.evidence:
@@ -1594,7 +1700,11 @@ def thinkdeep_status(
                     console.print(f"  Findings: {step.findings}")
                 else:
                     # Truncate findings if not verbose
-                    findings_preview = step.findings[:150] + "..." if len(step.findings) > 150 else step.findings
+                    findings_preview = (
+                        step.findings[:150] + "..."
+                        if len(step.findings) > 150
+                        else step.findings
+                    )
                     console.print(f"  Findings: {findings_preview}")
 
         # Display examined files if requested
@@ -1612,6 +1722,7 @@ def thinkdeep_status(
         console.print(f"\n[red]Error: {e}[/red]")
         if verbose:
             import traceback
+
             console.print(f"\n[red]{traceback.format_exc()}[/red]")
         raise typer.Exit(1)
 
@@ -1619,8 +1730,7 @@ def thinkdeep_status(
 @app.command(name="config")
 def config_cmd(
     subcommand: str = typer.Argument(
-        ...,
-        help="Config subcommand: show, validate, or init"
+        ..., help="Config subcommand: show, validate, or init"
     ),
     verbose: bool = typer.Option(
         False,
@@ -1660,6 +1770,7 @@ def config_cmd(
         console.print(f"\n[red]Error: {e}[/red]")
         if verbose:
             import traceback
+
             console.print(f"\n[red]{traceback.format_exc()}[/red]")
         raise typer.Exit(1)
 
@@ -1693,7 +1804,9 @@ def _config_show(verbose: bool):
         if config_obj.generation.timeout is not None:
             console.print(f"    timeout: {config_obj.generation.timeout}")
         if config_obj.generation.system_prompt is not None:
-            console.print(f"    system_prompt: {config_obj.generation.system_prompt[:50]}...")
+            console.print(
+                f"    system_prompt: {config_obj.generation.system_prompt[:50]}..."
+            )
 
     # Show workflow-specific config
     if config_obj.workflows:
@@ -1710,16 +1823,16 @@ def _config_show(verbose: bool):
     # Show effective defaults for each workflow if verbose
     if verbose:
         console.print("\n[bold]Effective Defaults by Workflow:[/bold]")
-        workflows = ['chat', 'consensus', 'thinkdeep', 'argument', 'ideate', 'research']
+        workflows = ["chat", "consensus", "thinkdeep", "argument", "ideate", "research"]
         for workflow in workflows:
             console.print(f"\n  [cyan]{workflow}:[/cyan]")
-            if workflow == 'consensus':
-                providers = loader.get_default_providers(workflow, ['claude', 'gemini'])
+            if workflow == "consensus":
+                providers = loader.get_default_providers(workflow, ["claude", "gemini"])
                 console.print(f"    providers: {', '.join(providers)}")
             else:
-                provider = loader.get_workflow_default_provider(workflow, 'claude')
+                provider = loader.get_workflow_default_provider(workflow, "claude")
                 console.print(f"    provider: {provider if provider else '[disabled]'}")
-            temp = loader.get_workflow_default(workflow, 'temperature', 0.7)
+            temp = loader.get_workflow_default(workflow, "temperature", 0.7)
             console.print(f"    temperature: {temp}")
 
     console.print()
@@ -1733,8 +1846,12 @@ def _config_validate(verbose: bool):
     config_path = loader.find_config_file()
 
     if not config_path:
-        console.print("[yellow]⚠ No .model-chorusrc file found in current directory or parent directories[/yellow]")
-        console.print("\nSearched for: .model-chorusrc, .model-chorusrc.yaml, .model-chorusrc.yml, .model-chorusrc.json")
+        console.print(
+            "[yellow]⚠ No .model-chorusrc file found in current directory or parent directories[/yellow]"
+        )
+        console.print(
+            "\nSearched for: .model-chorusrc, .model-chorusrc.yaml, .model-chorusrc.yml, .model-chorusrc.json"
+        )
         console.print("\nTo create a sample config file, run: model-chorus config init")
         raise typer.Exit(1)
 
@@ -1749,7 +1866,7 @@ def _config_validate(verbose: bool):
             console.print("Configuration details:")
             _config_show(verbose=False)
     except Exception as e:
-        console.print(f"[red]✗ Configuration is invalid:[/red]\n")
+        console.print("[red]✗ Configuration is invalid:[/red]\n")
         console.print(f"  {str(e)}\n")
         raise typer.Exit(1)
 
@@ -1805,15 +1922,17 @@ workflows:
 """
 
     try:
-        with open(config_path, 'w') as f:
+        with open(config_path, "w") as f:
             f.write(example_config)
 
         console.print(f"[green]✓ Created config file:[/green] {config_path}\n")
-        console.print("You can now edit this file to customize your ModelChorus configuration.")
+        console.print(
+            "You can now edit this file to customize your ModelChorus configuration."
+        )
         console.print("\nTo validate your config, run: model-chorus config validate")
 
         if verbose:
-            console.print(f"\n[dim]Config file contents:[/dim]")
+            console.print("\n[dim]Config file contents:[/dim]")
             console.print(example_config)
     except Exception as e:
         console.print(f"[red]✗ Failed to create config file:[/red] {e}")
@@ -1825,7 +1944,7 @@ def list_providers(
     check: bool = typer.Option(
         False,
         "--check",
-        help="Check if provider CLIs are actually installed and working"
+        help="Check if provider CLIs are actually installed and working",
     )
 ):
     """List all available providers and their models.
@@ -1852,7 +1971,9 @@ def list_providers(
 
         # Run all availability checks concurrently
         async def check_all():
-            tasks = [check_provider_async(name, prov) for name, prov in providers.items()]
+            tasks = [
+                check_provider_async(name, prov) for name, prov in providers.items()
+            ]
             return await asyncio.gather(*tasks)
 
         results = asyncio.run(check_all())
@@ -1862,7 +1983,7 @@ def list_providers(
             if is_available:
                 status = "[green]✓ Installed and working[/green]"
             else:
-                status = f"[red]✗ Not available[/red]"
+                status = "[red]✗ Not available[/red]"
 
             console.print(f"[cyan]● {name}[/cyan]")
             console.print(f"  Status: {status}")
@@ -1871,7 +1992,9 @@ def list_providers(
 
             if not is_available:
                 console.print(f"  [yellow]Issue:[/yellow] {error}")
-                console.print(f"  [yellow]Install:[/yellow] {get_install_command(name)}")
+                console.print(
+                    f"  [yellow]Install:[/yellow] {get_install_command(name)}"
+                )
             else:
                 models = provider.get_available_models()
                 console.print(f"  Models ({len(models)}):")
@@ -1896,9 +2019,56 @@ def list_providers(
 
             console.print()
 
-        console.print("[dim]Use --check to verify which providers are actually installed[/dim]\n")
+        console.print(
+            "[dim]Use --check to verify which providers are actually installed[/dim]\n"
+        )
 
 
+@app.command(name="list-workflows")
+def list_workflows_cmd():
+    """List all registered workflows with metadata.
+
+    Shows available workflows in the ModelChorus registry along with
+    their descriptions, versions, and authors.
+
+    Example:
+        model-chorus list-workflows
+    """
+    from ..core.registry import WorkflowRegistry
+
+    workflows = WorkflowRegistry.list_workflows()
+
+    if not workflows:
+        console.print("[yellow]No workflows registered[/yellow]")
+        return
+
+    console.print("\n[bold cyan]Available Workflows:[/bold cyan]\n")
+
+    for workflow_name in workflows:
+        # Get workflow info
+        info = WorkflowRegistry.get_workflow_info(workflow_name)
+
+        console.print(f"[bold green]● {workflow_name}[/bold green]")
+
+        if info:
+            console.print(f"  Description: {info.description}")
+            console.print(f"  Version: {info.version}")
+            console.print(f"  Author: {info.author}")
+
+            if info.category:
+                console.print(f"  Category: {info.category}")
+
+            if info.parameters:
+                console.print(f"  Parameters: {', '.join(info.parameters)}")
+
+            if info.examples:
+                console.print("  Examples:")
+                for example in info.examples:
+                    console.print(f"    {example}")
+        else:
+            console.print("  [dim]No metadata available[/dim]")
+
+        console.print()
 
 
 @app.command()

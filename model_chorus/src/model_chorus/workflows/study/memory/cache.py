@@ -14,8 +14,6 @@ Architecture:
 import logging
 import threading
 from collections import OrderedDict
-from typing import Dict, List, Optional
-from datetime import datetime, timezone
 
 from .models import MemoryEntry, MemoryMetadata, MemoryQuery
 
@@ -78,7 +76,7 @@ class ShortTermCache:
 
         logger.info(f"ShortTermCache initialized with max_size={max_size}")
 
-    def get(self, entry_id: str) -> Optional[MemoryEntry]:
+    def get(self, entry_id: str) -> MemoryEntry | None:
         """
         Retrieve a memory entry from cache.
 
@@ -164,7 +162,7 @@ class ShortTermCache:
                 logger.debug(f"Delete failed, entry not found: {entry_id}")
                 return False
 
-    def query(self, query: MemoryQuery) -> List[MemoryEntry]:
+    def query(self, query: MemoryQuery) -> list[MemoryEntry]:
         """
         Query cache for entries matching filter criteria.
 
@@ -301,7 +299,7 @@ class ShortTermCache:
                 cache_hit_rate=hit_rate,
             )
 
-    def get_stats(self) -> Dict[str, int]:
+    def get_stats(self) -> dict[str, int]:
         """
         Get detailed cache statistics.
 

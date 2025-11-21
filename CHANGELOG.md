@@ -5,6 +5,190 @@ All notable changes to ModelChorus will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2025-11-21
+
+### Added
+
+#### Data Layer & Persistence
+- **SQLite Conversation Database** - New production-ready conversation storage backend
+  - `ConversationDatabase` class with WAL mode for concurrent access (956 lines)
+  - Schema with threads, messages, and metadata tables with proper indexing
+  - Query methods: `query_recent_investigations()`, `query_by_workflow()`
+  - Opt-in via `storage_backend` config option
+  - Backward compatibility maintained through `ConversationBackend` protocol
+- **Migration Tool** - JSON to SQLite migration with backup/rollback
+  - `migrate_json_to_sqlite.py` (552 lines)
+  - Validates JSON conversations before migration
+  - Creates timestamped backups with rollback support
+  - Usage: `python -m model_chorus.migrations.migrate_json_to_sqlite`
+
+#### Workflow Registry & Discovery
+- **WorkflowMetadata System** - Rich metadata for all workflows
+  - `WorkflowMetadata` model (name, description, version, author, category, parameters, examples)
+  - Registry methods: `list_workflows()`, `get_workflow_info()`
+  - Metadata registration for all 6 workflows (chat, consensus, argument, thinkdeep, ideate, study)
+- **CLI `list-workflows` Command** - Discover available workflows
+  - Shows all workflows with rich formatting
+  - Displays description, version, author, category, parameters, and examples
+  - Usage: `model-chorus list-workflows`
+- **ConsensusWorkflow Registration** - Fixed architecture consistency
+  - Now properly inherits from `BaseWorkflow`
+  - Implements required `run()` abstract method
+  - Fully integrated with workflow registry and discovery system
+
+#### Provider Resilience & Middleware
+- **Provider Middleware System** - Chain-of-responsibility pattern for provider requests
+  - `RetryMiddleware` with exponential backoff (max 3 attempts: 1s, 2s, 4s delays)
+  - `CircuitBreakerMiddleware` for automatic failure prevention (opens after 5 failures in 1 minute)
+  - Structured error types: `ProviderError`, `ConfigError`, `CircuitBreakerError`
+  - Request/response logging middleware
+  - Extensible middleware chain (695 lines in `providers/middleware.py`)
+- **WorkflowRunner** - Execution orchestration with telemetry
+  - Wraps `_execute_with_fallback` with telemetry hooks
+  - Execution metrics collection (duration, tokens, provider attempts)
+  - Callback registration for monitoring
+  - 353 lines in `core/workflow_runner.py`
+
+#### CLI Architecture
+- **CLI Primitives** - Reusable components for command implementation
+  - `ProviderResolver` - Unified provider selection and instantiation
+  - `WorkflowContext` - Shared workflow configuration and state
+  - `OutputFormatter` - Consistent output formatting across commands
+  - 400 lines in `cli/primitives.py`
+- **Centralized Configuration** - New config module with validation
+  - `config/loader.py` - Configuration loading with fallbacks (336 lines)
+  - `config/models.py` - Pydantic models for all config sections (307 lines)
+  - Type-safe configuration with comprehensive validation
+  - Better error messages for misconfigurations
+
+#### Context & Token Management
+- **Context Ingestion Service** - Handle large file inputs
+  - File size limits with configurable thresholds
+  - Chunking strategy for files exceeding limits
+  - Consistent error handling and validation
+  - 339 lines in `core/context_ingestion.py`
+- **Token Budgeting** - Smart conversation history management
+  - `build_conversation_history()` with `max_tokens` parameter
+  - Smart compaction strategy preserving recent + important messages
+  - Prevents context window overflow
+  - Integration across all workflows
+
+#### CI/CD & Quality
+- **GitHub Actions Workflows**
+  - `.github/workflows/tests.yml` - Automated test suite
+  - `.github/workflows/code-quality.yml` - Linting and formatting checks
+  - Runs on push and pull requests
+- **Test Consolidation** - Moved `tests/` to `model_chorus/tests/`
+  - Merged conftest.py files and deduplicated fixtures
+  - Updated imports to use package-relative paths
+  - Better test organization and discovery
+
+### Changed
+- **All CLI Commands Refactored** - Using shared primitives
+  - chat, consensus, argument, thinkdeep, ideate commands
+  - Reduced code duplication by ~40%
+  - Consistent error handling and validation
+  - Better maintainability
+- **BaseWorkflow Enhanced** - Better fallback and telemetry support
+  - Improved `_execute_with_fallback()` using WorkflowRunner
+  - Telemetry callback registration
+  - Better error propagation
+- **ConversationMemory Updated** - Dual storage backend support
+  - Delegates to appropriate backend (JSON or SQLite)
+  - Automatic backend detection based on config
+  - Seamless migration path
+- **Code Formatting** - Applied black formatter to entire codebase
+  - Consistent code style (line-length=100, target py311)
+  - Added ruff and mypy configurations
+
+### Fixed
+- **Registry Duplicate Method** - Removed duplicate `list_workflows()` definition
+- **ConsensusWorkflow Architecture** - Fixed inheritance and registration issues
+- **Test Suite Cleanup** - Fixed broken tests after consolidation
+
+### Testing
+- **New Test Suites** (4,854 total lines of tests added):
+  - `test_conversation_db.py` - 75 test cases (817 lines)
+  - `test_workflow_registry.py` - 57 test cases (608 lines)
+  - `test_cli_primitives.py` - 39 test cases (812 lines)
+  - `test_middleware.py` - Comprehensive middleware tests (757 lines)
+  - `test_token_budgeting.py` - Token management tests (558 lines)
+  - `test_context_ingestion.py` - Context handling tests (492 lines)
+- All verification tasks passed across 4 implementation phases
+
+### Technical Details
+- **70 commits** across 4 development phases
+- **131 files changed**: +82,468 lines added, -17,103 lines removed
+- **Net change**: +65,365 lines
+- Comprehensive architectural improvements for production readiness
+
+### Migration Guide
+For users upgrading from 0.5.x:
+
+1. **SQLite Backend (Optional)**:
+   - Add to config: `storage_backend = "sqlite"` (defaults to "json")
+   - Run migration: `python -m model_chorus.migrations.migrate_json_to_sqlite`
+   - Backup created automatically at `~/.model_chorus/conversations.backup.{timestamp}.json`
+
+2. **No Breaking Changes** - All existing functionality remains backward compatible
+   - JSON backend still default and fully supported
+   - All CLI commands work identically
+   - No API changes for existing code
+
+3. **New Features Available**:
+   - Try `model-chorus list-workflows` to see workflow discovery
+   - ConsensusWorkflow now works with BaseWorkflow-based code
+   - Middleware automatically enabled (retry + circuit breaker)
+
+## [0.5.3] - 2025-11-14
+
+### Added
+- **TokenUsage Dataclass** - Explicit type-safe token tracking
+  - Fields: `input_tokens`, `output_tokens`, `cached_input_tokens`, `total_tokens`, `metadata`
+  - Backward compatibility via dict-like interface
+  - Better IDE autocomplete and type checking
+- **Thread ID Standardization** - Unified conversation continuation across CLI providers
+  - Codex: Native `thread_id` from JSONL events
+  - Cursor Agent: Maps `session_id` to `thread_id`
+  - Claude: Maps `session_id` to `thread_id`
+- **pytest Provider Markers** - Selective test execution by provider
+  - Markers: `requires_claude`, `requires_gemini`, `requires_codex`, `requires_cursor_agent`
+  - Usage: `pytest -m requires_gemini` or `pytest -m "not requires_gemini"`
+- **Gemini Failure Analysis** - Documentation of prompt filtering investigation (`GEMINI_FAILURE_ANALYSIS.md`)
+
+### Changed
+- **GenerationResponse Enhanced** - Added standardized fields: `usage`, `thread_id`, `provider`, `stderr`, `raw_response`, `metadata`
+- **Claude Provider** - Updated to use TokenUsage dataclass and thread_id mapping
+- **Codex Provider** - Parse JSONL events with TokenUsage and thread_id extraction
+- **Cursor Agent Provider** - JSON parsing with TokenUsage and session_id mapping
+
+### Fixed
+- **Gemini CLI Prompt Filter** - Added "Human:" prefix workaround to bypass content filter
+  - Fixes 60% of failing patterns (16/16 integration tests now passing, was 14/16)
+  - No user-facing changes required
+  - Tested 27 prompt patterns to verify solution
+
+## [0.5.2] - 2025-11-13
+
+### Added
+- **File Support for Consensus** - Extended consensus command to accept `--file` argument
+- **Centralized File Handling** - Created `construct_prompt_with_files()` helper for consistent file content prepending
+- **Testing Playbook** - Comprehensive testing documentation covering all workflows (3500+ lines)
+- **Provider Response Validation** - New test for provider response handling (`test_review_response.py`)
+
+### Changed
+- **Standardized CLI Interface** - All commands now use consistent `--prompt` flag
+  - Commands affected: chat, argument, ideate, consensus
+  - Migration: `model-chorus chat "prompt"` → `model-chorus chat --prompt "prompt"`
+- **Multi-line Prompt Handling** - Fixed systemic issue where multi-line prompts caused provider CLIs to hang
+- **Improved stdin Handling** - Modified CLIProvider base class for correct prompt data passing
+- **Claude Provider stdin** - Updated to use `-` argument for stdin reading
+
+### Fixed
+- **Conversation Threading Bug** - Threads now created automatically on first turn
+  - Fixed "thread not found" errors in multi-turn workflows
+  - Updated `ConversationMemory.add_message()` to create threads implicitly
+
 ## [0.5.1] - 2025-11-10
 
 ### Added

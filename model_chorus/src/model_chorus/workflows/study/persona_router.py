@@ -6,13 +6,17 @@ to consult next based on current investigation state using the context analysis 
 """
 
 import logging
-from typing import Optional, List, Dict, Any, Tuple
 from dataclasses import dataclass, field
 from datetime import datetime
+from typing import Any
 
 from ...core.models import StudyState
+from .context_analysis import (
+    ContextAnalysisInput,
+    ContextAnalysisResult,
+    analyze_context,
+)
 from .persona_base import Persona, PersonaRegistry
-from .context_analysis import ContextAnalysisInput, ContextAnalysisResult, analyze_context
 
 logger = logging.getLogger(__name__)
 
@@ -36,13 +40,13 @@ class RoutingDecision:
         timestamp: When this routing decision was made (ISO format)
     """
 
-    persona: Optional[Persona]
+    persona: Persona | None
     persona_name: str
     reasoning: str
     confidence: str
-    guidance: List[str]
+    guidance: list[str]
     context_summary: str
-    metadata: Dict[str, Any]
+    metadata: dict[str, Any]
     timestamp: str = field(default_factory=lambda: datetime.utcnow().isoformat())
 
 
@@ -72,7 +76,7 @@ class RoutingHistoryEntry:
     confidence: str
     findings_count: int
     questions_count: int
-    prior_persona: Optional[str]
+    prior_persona: str | None
     selected_persona: str
     reasoning: str
     context_summary: str
@@ -99,7 +103,7 @@ class PersonaRouter:
         "discovery": "Researcher",
         "validation": "Critic",
         "planning": "Planner",
-        "complete": None  # No persona needed when complete
+        "complete": None,  # No persona needed when complete
     }
 
     def __init__(self, registry: PersonaRegistry):
@@ -110,14 +114,12 @@ class PersonaRouter:
             registry: PersonaRegistry containing available personas
         """
         self.registry = registry
-        self.routing_history: List[RoutingHistoryEntry] = []
+        self.routing_history: list[RoutingHistoryEntry] = []
         logger.info("PersonaRouter initialized")
 
     def _get_fallback_persona(
-        self,
-        current_phase: str,
-        confidence: str
-    ) -> Tuple[Optional[str], str, List[str]]:
+        self, current_phase: str, confidence: str
+    ) -> tuple[str | None, str, list[str]]:
         """
         Get fallback persona when context analysis skill fails.
 
@@ -153,21 +155,23 @@ class PersonaRouter:
             guidance = [
                 "Systematically gather information",
                 "Identify key patterns and relationships",
-                "Build comprehensive understanding"
+                "Build comprehensive understanding",
             ]
-            reasoning += "Researcher is appropriate for exploration and information gathering."
+            reasoning += (
+                "Researcher is appropriate for exploration and information gathering."
+            )
         elif persona_name == "Critic":
             guidance = [
                 "Challenge assumptions and findings",
                 "Look for edge cases or contradictions",
-                "Ensure robustness of conclusions"
+                "Ensure robustness of conclusions",
             ]
             reasoning += "Critic is appropriate for validation and testing."
         elif persona_name == "Planner":
             guidance = [
                 "Synthesize findings into coherent plan",
                 "Define clear action items",
-                "Prioritize next steps"
+                "Prioritize next steps",
             ]
             reasoning += "Planner is appropriate for synthesis and planning."
         elif persona_name is None:
@@ -184,9 +188,7 @@ class PersonaRouter:
         return (persona_name, reasoning, guidance)
 
     def route_next_persona(
-        self,
-        state: StudyState,
-        unresolved_questions: Optional[List[str]] = None
+        self, state: StudyState, unresolved_questions: list[str] | None = None
     ) -> RoutingDecision:
         """
         Determine next persona to consult based on investigation state.
@@ -232,7 +234,7 @@ class PersonaRouter:
         )
 
         # Invoke context analysis skill with fallback handling
-        analysis_result: Optional[ContextAnalysisResult] = None
+        analysis_result: ContextAnalysisResult | None = None
         used_fallback = False
 
         try:
@@ -241,7 +243,7 @@ class PersonaRouter:
                 confidence=confidence,
                 findings=findings,
                 unresolved_questions=questions,
-                prior_persona=prior_persona
+                prior_persona=prior_persona,
             )
 
             analysis_result = analyze_context(context_input)
@@ -285,8 +287,8 @@ class PersonaRouter:
                     "phase": current_phase,
                     "findings_count": len(findings),
                     "has_questions": len(questions) > 0,
-                    "prior_persona": prior_persona
-                }
+                    "prior_persona": prior_persona,
+                },
             )
 
             logger.info(
@@ -306,7 +308,7 @@ class PersonaRouter:
                 confidence=analysis_result.confidence,
                 guidance=analysis_result.guidance,
                 context_summary=analysis_result.context_summary,
-                metadata=analysis_result.metadata
+                metadata=analysis_result.metadata,
             )
 
         # Retrieve persona instance
@@ -330,7 +332,7 @@ class PersonaRouter:
             confidence=analysis_result.confidence,
             guidance=analysis_result.guidance,
             context_summary=analysis_result.context_summary,
-            metadata=analysis_result.metadata
+            metadata=analysis_result.metadata,
         )
 
         # Record routing decision in history
@@ -344,7 +346,7 @@ class PersonaRouter:
             prior_persona=prior_persona,
             selected_persona=persona_name,
             reasoning=analysis_result.reasoning,
-            context_summary=analysis_result.context_summary
+            context_summary=analysis_result.context_summary,
         )
         self.routing_history.append(history_entry)
 
@@ -354,7 +356,7 @@ class PersonaRouter:
 
         return decision
 
-    def get_available_personas(self) -> List[str]:
+    def get_available_personas(self) -> list[str]:
         """
         Get list of all available persona names in the registry.
 
@@ -364,10 +366,8 @@ class PersonaRouter:
         return [persona.name for persona in self.registry.list_all()]
 
     def get_routing_history(
-        self,
-        investigation_id: Optional[str] = None,
-        limit: Optional[int] = None
-    ) -> List[RoutingHistoryEntry]:
+        self, investigation_id: str | None = None, limit: int | None = None
+    ) -> list[RoutingHistoryEntry]:
         """
         Get routing history, optionally filtered by investigation.
 
@@ -383,8 +383,7 @@ class PersonaRouter:
         # Filter by investigation if specified
         if investigation_id:
             history = [
-                entry for entry in history
-                if entry.investigation_id == investigation_id
+                entry for entry in history if entry.investigation_id == investigation_id
             ]
 
         # Reverse to get most recent first
@@ -396,7 +395,7 @@ class PersonaRouter:
 
         return history
 
-    def clear_routing_history(self, investigation_id: Optional[str] = None) -> int:
+    def clear_routing_history(self, investigation_id: str | None = None) -> int:
         """
         Clear routing history, optionally for a specific investigation.
 
@@ -409,7 +408,8 @@ class PersonaRouter:
         if investigation_id:
             initial_count = len(self.routing_history)
             self.routing_history = [
-                entry for entry in self.routing_history
+                entry
+                for entry in self.routing_history
                 if entry.investigation_id != investigation_id
             ]
             cleared = initial_count - len(self.routing_history)

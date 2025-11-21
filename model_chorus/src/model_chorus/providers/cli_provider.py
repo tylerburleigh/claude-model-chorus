@@ -11,21 +11,29 @@ import logging
 import os
 from abc import abstractmethod
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from .base_provider import (
-    ModelProvider,
     GenerationRequest,
     GenerationResponse,
+    ModelProvider,
 )
 
 logger = logging.getLogger(__name__)
 
 
+class ProviderDisabledError(Exception):
+    """Raised when attempting to use a disabled provider."""
+
+    pass
+
+
 class ProviderUnavailableError(Exception):
     """Provider CLI is not available or cannot be used."""
 
-    def __init__(self, provider_name: str, reason: str, suggestions: Optional[List[str]] = None):
+    def __init__(
+        self, provider_name: str, reason: str, suggestions: list[str] | None = None
+    ):
         """
         Initialize provider unavailability error.
 
@@ -65,8 +73,8 @@ class CLIProvider(ModelProvider):
         self,
         provider_name: str,
         cli_command: str,
-        api_key: Optional[str] = None,
-        config: Optional[Dict[str, Any]] = None,
+        api_key: str | None = None,
+        config: dict[str, Any] | None = None,
         timeout: int = 120,
         retry_limit: int = 3,
     ):
@@ -85,10 +93,10 @@ class CLIProvider(ModelProvider):
         self.cli_command = cli_command
         self.timeout = timeout
         self.retry_limit = retry_limit
-        self.input_data: Optional[str] = None
-        self.env_overrides: Dict[str, str] = {}
+        self.input_data: str | None = None
+        self.env_overrides: dict[str, str] = {}
 
-    def set_env_overrides(self, env: Optional[Dict[str, str]]) -> None:
+    def set_env_overrides(self, env: dict[str, str] | None) -> None:
         """
         Configure environment variable overrides for CLI executions.
 
@@ -97,7 +105,7 @@ class CLIProvider(ModelProvider):
         """
         self.env_overrides = env or {}
 
-    async def check_availability(self) -> tuple[bool, Optional[str]]:
+    async def check_availability(self) -> tuple[bool, str | None]:
         """
         Check if this provider's CLI is available and working.
 
@@ -118,14 +126,17 @@ class CLIProvider(ModelProvider):
             try:
                 await asyncio.wait_for(process.communicate(), timeout=5.0)
                 return (True, None)
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 # Kill the process if it times out
                 try:
                     process.kill()
                     await process.wait()
                 except:
                     pass
-                return (False, f"CLI command '{self.cli_command}' timed out during availability check")
+                return (
+                    False,
+                    f"CLI command '{self.cli_command}' timed out during availability check",
+                )
 
         except FileNotFoundError:
             return (False, f"CLI command '{self.cli_command}' not found in PATH")
@@ -134,7 +145,7 @@ class CLIProvider(ModelProvider):
         except Exception as e:
             return (False, f"Error checking availability: {str(e)}")
 
-    def _load_conversation_context(self, continuation_id: str) -> Optional[Dict[str, Any]]:
+    def _load_conversation_context(self, continuation_id: str) -> dict[str, Any] | None:
         """
         Load conversation context from continuation_id.
 
@@ -156,7 +167,7 @@ class CLIProvider(ModelProvider):
                 logger.warning(f"Conversation thread not found: {continuation_id}")
                 return None
 
-            with open(thread_file, "r") as f:
+            with open(thread_file) as f:
                 thread_data = json.load(f)
 
             logger.debug(f"Loaded conversation context for {continuation_id}")
@@ -167,7 +178,7 @@ class CLIProvider(ModelProvider):
             return None
 
     @abstractmethod
-    def build_command(self, request: GenerationRequest) -> List[str]:
+    def build_command(self, request: GenerationRequest) -> list[str]:
         """
         Build the CLI command for a generation request.
 
@@ -190,7 +201,9 @@ class CLIProvider(ModelProvider):
         raise NotImplementedError("Subclasses must implement build_command()")
 
     @abstractmethod
-    def parse_response(self, stdout: str, stderr: str, returncode: int) -> GenerationResponse:
+    def parse_response(
+        self, stdout: str, stderr: str, returncode: int
+    ) -> GenerationResponse:
         """
         Parse CLI output into a GenerationResponse.
 
@@ -210,7 +223,7 @@ class CLIProvider(ModelProvider):
         """
         raise NotImplementedError("Subclasses must implement parse_response()")
 
-    async def execute_command(self, command: List[str]) -> tuple[str, str, int]:
+    async def execute_command(self, command: list[str]) -> tuple[str, str, int]:
         """
         Execute a CLI command asynchronously with timeout and error handling.
 
@@ -229,7 +242,7 @@ class CLIProvider(ModelProvider):
 
         try:
             stdin_pipe = asyncio.subprocess.PIPE if self.input_data else None
-            input_bytes = self.input_data.encode('utf-8') if self.input_data else None
+            input_bytes = self.input_data.encode("utf-8") if self.input_data else None
 
             process = await asyncio.create_subprocess_exec(
                 *command,
@@ -269,7 +282,7 @@ class CLIProvider(ModelProvider):
                     f"Install the {self.provider_name} CLI tool",
                     f"Ensure '{self.cli_command}' is in your system PATH",
                     "Or use a different provider with --provider flag",
-                ]
+                ],
             )
         except PermissionError:
             # No permission to execute CLI command
@@ -281,16 +294,16 @@ class CLIProvider(ModelProvider):
                 suggestions=[
                     f"Check file permissions for '{self.cli_command}'",
                     "Or use a different provider with --provider flag",
-                ]
+                ],
             )
-        except asyncio.TimeoutError:
+        except TimeoutError:
             logger.error(f"Command timed out after {self.timeout} seconds")
             raise
         except Exception as e:
             logger.error(f"Error executing command: {e}")
             raise
 
-    def _build_subprocess_env(self) -> Dict[str, str]:
+    def _build_subprocess_env(self) -> dict[str, str]:
         """Build the environment for CLI subprocess execution."""
         env = os.environ.copy()
         if self.env_overrides:
@@ -379,18 +392,18 @@ class CLIProvider(ModelProvider):
                     logger.error(f"Permanent error encountered, not retrying: {e}")
                     raise
 
-                logger.warning(
-                    f"Attempt {attempt + 1}/{self.retry_limit} failed: {e}"
-                )
+                logger.warning(f"Attempt {attempt + 1}/{self.retry_limit} failed: {e}")
 
                 if attempt < self.retry_limit - 1:
                     # Exponential backoff: wait 2^attempt seconds
-                    wait_time = 2 ** attempt
+                    wait_time = 2**attempt
                     logger.info(f"Retrying in {wait_time} seconds...")
                     await asyncio.sleep(wait_time)
 
         # All retries exhausted
-        error_msg = f"All {self.retry_limit} attempts failed. Last error: {last_exception}"
+        error_msg = (
+            f"All {self.retry_limit} attempts failed. Last error: {last_exception}"
+        )
         logger.error(error_msg)
         raise Exception(error_msg)
 

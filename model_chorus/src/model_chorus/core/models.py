@@ -9,8 +9,9 @@ conversations with continuation support, adapted from Zen MCP patterns.
 """
 
 from enum import Enum
-from typing import Any, Dict, List, Optional, Literal
-from pydantic import BaseModel, Field, ConfigDict
+from typing import Any, Literal
+
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ConfidenceLevel(str, Enum):
@@ -96,40 +97,40 @@ class WorkflowRequest(BaseModel):
         min_length=1,
     )
 
-    models: List[str] = Field(
+    models: list[str] = Field(
         default_factory=list,
         description="List of model identifiers to use in the workflow",
     )
 
-    config: Dict[str, Any] = Field(
+    config: dict[str, Any] = Field(
         default_factory=dict,
         description="Workflow-specific configuration parameters",
     )
 
-    system_prompt: Optional[str] = Field(
+    system_prompt: str | None = Field(
         default=None,
         description="Optional system prompt to provide context to models",
     )
 
-    temperature: Optional[float] = Field(
+    temperature: float | None = Field(
         default=None,
         ge=0.0,
         le=1.0,
         description="Temperature for model generation (0.0-1.0)",
     )
 
-    max_tokens: Optional[int] = Field(
+    max_tokens: int | None = Field(
         default=None,
         gt=0,
         description="Maximum tokens for model generation",
     )
 
-    images: Optional[List[str]] = Field(
+    images: list[str] | None = Field(
         default=None,
         description="Optional list of image paths or URLs for vision models",
     )
 
-    metadata: Dict[str, Any] = Field(
+    metadata: dict[str, Any] = Field(
         default_factory=dict,
         description="Additional metadata for workflow execution",
     )
@@ -186,19 +187,92 @@ class WorkflowResponse(BaseModel):
         description="Number of steps executed in the workflow",
     )
 
-    models_used: List[str] = Field(
+    models_used: list[str] = Field(
         default_factory=list,
         description="List of models that were actually used",
     )
 
-    error: Optional[str] = Field(
+    error: str | None = Field(
         default=None,
         description="Error message if the workflow failed",
     )
 
-    metadata: Dict[str, Any] = Field(
+    metadata: dict[str, Any] = Field(
         default_factory=dict,
         description="Additional execution metadata (duration, tokens, etc.)",
+    )
+
+
+class WorkflowMetadata(BaseModel):
+    """
+    Metadata about a registered workflow for discovery and documentation.
+
+    Provides descriptive information about workflows registered in the
+    WorkflowRegistry, enabling workflow listing, documentation generation,
+    and user discovery of available workflows.
+
+    Attributes:
+        name: Unique workflow identifier (e.g., "consensus", "thinkdeep")
+        description: Human-readable description of what the workflow does
+        version: Semantic version string (e.g., "1.0.0")
+        author: Workflow author or maintainer
+        category: Optional workflow category for organization
+        parameters: Optional list of workflow-specific parameter names
+        examples: Optional list of usage examples
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "name": "consensus",
+                "description": "Multi-model consultation with configurable synthesis",
+                "version": "2.0.0",
+                "author": "ModelChorus Team",
+                "category": "consultation",
+                "parameters": ["strategy", "providers", "temperature"],
+                "examples": [
+                    "model-chorus consensus 'Analyze this code' --strategy synthesize"
+                ],
+            }
+        }
+    )
+
+    name: str = Field(
+        ...,
+        description="Unique workflow identifier",
+        min_length=1,
+    )
+
+    description: str = Field(
+        ...,
+        description="Human-readable description of workflow functionality",
+        min_length=1,
+    )
+
+    version: str = Field(
+        default="1.0.0",
+        description="Semantic version string",
+        pattern=r"^\d+\.\d+\.\d+$",
+    )
+
+    author: str = Field(
+        default="Unknown",
+        description="Workflow author or maintainer",
+    )
+
+    category: str | None = Field(
+        default=None,
+        description="Optional category for workflow organization",
+    )
+
+    parameters: list[str] = Field(
+        default_factory=list,
+        description="List of workflow-specific parameter names",
+    )
+
+    examples: list[str] = Field(
+        default_factory=list,
+        description="Usage examples for documentation",
     )
 
 
@@ -231,12 +305,12 @@ class ModelSelection(BaseModel):
         min_length=1,
     )
 
-    role: Optional[str] = Field(
+    role: str | None = Field(
         default=None,
         description="Optional role for this model in the workflow",
     )
 
-    config: Dict[str, Any] = Field(
+    config: dict[str, Any] = Field(
         default_factory=dict,
         description="Model-specific configuration parameters",
     )
@@ -298,7 +372,7 @@ class WorkflowStep(BaseModel):
         description="The response from this step",
     )
 
-    metadata: Dict[str, Any] = Field(
+    metadata: dict[str, Any] = Field(
         default_factory=dict,
         description="Additional metadata for this step",
     )
@@ -341,12 +415,12 @@ class ModelResponse(BaseModel):
         min_length=1,
     )
 
-    role: Optional[str] = Field(
+    role: str | None = Field(
         default=None,
         description="Optional role this model played in the workflow",
     )
 
-    metadata: Dict[str, Any] = Field(
+    metadata: dict[str, Any] = Field(
         default_factory=dict,
         description="Additional metadata (tokens, latency, cost, etc.)",
     )
@@ -387,7 +461,7 @@ class ConsensusConfig(BaseModel):
         pattern="^(debate|vote|synthesis)$",
     )
 
-    stances: Optional[List[str]] = Field(
+    stances: list[str] | None = Field(
         default=None,
         description="Optional stances to assign to models",
     )
@@ -406,7 +480,7 @@ class ConsensusConfig(BaseModel):
         description="Minimum agreement threshold for consensus (0.0-1.0)",
     )
 
-    synthesis_model: Optional[str] = Field(
+    synthesis_model: str | None = Field(
         default=None,
         description="Optional model to use for final synthesis",
     )
@@ -471,27 +545,27 @@ class ConversationMessage(BaseModel):
         description="ISO format timestamp of message creation",
     )
 
-    files: Optional[List[str]] = Field(
+    files: list[str] | None = Field(
         default=None,
         description="Files referenced in this message",
     )
 
-    workflow_name: Optional[str] = Field(
+    workflow_name: str | None = Field(
         default=None,
         description="Workflow that generated this message (if assistant)",
     )
 
-    model_provider: Optional[str] = Field(
+    model_provider: str | None = Field(
         default=None,
         description="Provider type: cli, api, or mcp",
     )
 
-    model_name: Optional[str] = Field(
+    model_name: str | None = Field(
         default=None,
         description="Specific model used (e.g., claude-3-opus, gpt-5, gemini-2.5-pro)",
     )
 
-    metadata: Dict[str, Any] = Field(
+    metadata: dict[str, Any] = Field(
         default_factory=dict,
         description="Additional message metadata (tokens, latency, cost, etc.)",
     )
@@ -544,7 +618,10 @@ class ConversationThread(BaseModel):
                     },
                 ],
                 "state": {"models_consulted": ["claude", "gpt-5", "gemini"]},
-                "initial_context": {"prompt": "Analyze this code", "models": ["claude", "gpt-5"]},
+                "initial_context": {
+                    "prompt": "Analyze this code",
+                    "models": ["claude", "gpt-5"],
+                },
                 "status": "active",
             }
         }
@@ -555,7 +632,7 @@ class ConversationThread(BaseModel):
         description="UUID identifying this conversation thread",
     )
 
-    parent_thread_id: Optional[str] = Field(
+    parent_thread_id: str | None = Field(
         default=None,
         description="Parent thread ID for conversation chains",
     )
@@ -576,17 +653,17 @@ class ConversationThread(BaseModel):
         min_length=1,
     )
 
-    messages: List[ConversationMessage] = Field(
+    messages: list[ConversationMessage] = Field(
         default_factory=list,
         description="All messages in chronological order",
     )
 
-    state: Dict[str, Any] = Field(
+    state: dict[str, Any] = Field(
         default_factory=dict,
         description="Workflow-specific state data (persisted across turns)",
     )
 
-    initial_context: Dict[str, Any] = Field(
+    initial_context: dict[str, Any] = Field(
         default_factory=dict,
         description="Original request parameters",
     )
@@ -596,12 +673,12 @@ class ConversationThread(BaseModel):
         description="Thread lifecycle status",
     )
 
-    branch_point: Optional[str] = Field(
+    branch_point: str | None = Field(
         default=None,
         description="Message ID where branch occurred (if branched)",
     )
 
-    sibling_threads: List[str] = Field(
+    sibling_threads: list[str] = Field(
         default_factory=list,
         description="Other thread IDs branched from same point",
     )
@@ -628,9 +705,9 @@ class Hypothesis(BaseModel):
                 "evidence": [
                     "Found async def in auth.py line 45",
                     "Tests use asyncio.run() in test_auth.py",
-                    "No callback patterns found in service layer"
+                    "No callback patterns found in service layer",
                 ],
-                "status": "validated"
+                "status": "validated",
             }
         }
     )
@@ -641,7 +718,7 @@ class Hypothesis(BaseModel):
         min_length=1,
     )
 
-    evidence: List[str] = Field(
+    evidence: list[str] = Field(
         default_factory=list,
         description="List of evidence items supporting or refuting this hypothesis",
     )
@@ -675,9 +752,9 @@ class InvestigationStep(BaseModel):
                 "files_checked": [
                     "src/services/auth.py",
                     "src/api/users.py",
-                    "tests/test_auth.py"
+                    "tests/test_auth.py",
                 ],
-                "confidence": "high"
+                "confidence": "high",
             }
         }
     )
@@ -694,7 +771,7 @@ class InvestigationStep(BaseModel):
         min_length=1,
     )
 
-    files_checked: List[str] = Field(
+    files_checked: list[str] = Field(
         default_factory=list,
         description="List of files examined during this step",
     )
@@ -728,44 +805,44 @@ class ThinkDeepState(BaseModel):
                     {
                         "hypothesis": "API uses async/await pattern",
                         "evidence": ["Found async def in auth.py", "Tests use asyncio"],
-                        "status": "validated"
+                        "status": "validated",
                     },
                     {
                         "hypothesis": "Error handling uses custom exceptions",
                         "evidence": ["Found CustomError class", "Used in auth service"],
-                        "status": "active"
-                    }
+                        "status": "active",
+                    },
                 ],
                 "steps": [
                     {
                         "step_number": 1,
                         "findings": "Examined auth service implementation",
                         "files_checked": ["src/auth.py"],
-                        "confidence": "medium"
+                        "confidence": "medium",
                     },
                     {
                         "step_number": 2,
                         "findings": "Validated hypothesis with tests",
                         "files_checked": ["tests/test_auth.py"],
-                        "confidence": "high"
-                    }
+                        "confidence": "high",
+                    },
                 ],
                 "current_confidence": "high",
                 "relevant_files": [
                     "src/services/auth.py",
                     "src/api/users.py",
-                    "tests/test_auth.py"
-                ]
+                    "tests/test_auth.py",
+                ],
             }
         }
     )
 
-    hypotheses: List[Hypothesis] = Field(
+    hypotheses: list[Hypothesis] = Field(
         default_factory=list,
         description="List of all hypotheses tracked during investigation",
     )
 
-    steps: List[InvestigationStep] = Field(
+    steps: list[InvestigationStep] = Field(
         default_factory=list,
         description="List of all investigation steps completed",
     )
@@ -775,7 +852,7 @@ class ThinkDeepState(BaseModel):
         description="Current overall confidence level (ConfidenceLevel value)",
     )
 
-    relevant_files: List[str] = Field(
+    relevant_files: list[str] = Field(
         default_factory=list,
         description="All files identified as relevant to the investigation",
     )
@@ -813,17 +890,17 @@ class StudyState(BaseModel):
                         "persona": "Researcher",
                         "finding": "Authentication uses JWT tokens",
                         "evidence": ["Found JWT library in dependencies"],
-                        "confidence": "high"
+                        "confidence": "high",
                     },
                     {
                         "persona": "Critic",
                         "finding": "Token expiration not consistently checked",
                         "evidence": ["Missing validation in 3 endpoints"],
-                        "confidence": "medium"
-                    }
+                        "confidence": "medium",
+                    },
                 ],
                 "personas_active": ["Researcher", "Critic"],
-                "relevant_files": ["src/auth.py", "src/middleware/jwt.py"]
+                "relevant_files": ["src/auth.py", "src/middleware/jwt.py"],
             }
         }
     )
@@ -853,17 +930,17 @@ class StudyState(BaseModel):
         description="Number of investigation iterations completed",
     )
 
-    findings: List[Dict[str, Any]] = Field(
+    findings: list[dict[str, Any]] = Field(
         default_factory=list,
         description="List of all findings from persona investigations",
     )
 
-    personas_active: List[str] = Field(
+    personas_active: list[str] = Field(
         default_factory=list,
         description="List of personas currently participating in investigation",
     )
 
-    relevant_files: List[str] = Field(
+    relevant_files: list[str] = Field(
         default_factory=list,
         description="Files examined during investigation",
     )
@@ -908,7 +985,7 @@ class ConversationState(BaseModel):
         min_length=1,
     )
 
-    data: Dict[str, Any] = Field(
+    data: dict[str, Any] = Field(
         default_factory=dict,
         description="Arbitrary workflow-specific state data",
     )
@@ -966,7 +1043,7 @@ class Citation(BaseModel):
         min_length=1,
     )
 
-    location: Optional[str] = Field(
+    location: str | None = Field(
         default=None,
         description="Specific location within source (page, line, section, timestamp)",
     )
@@ -978,12 +1055,12 @@ class Citation(BaseModel):
         description="Confidence level in citation accuracy (0.0-1.0)",
     )
 
-    snippet: Optional[str] = Field(
+    snippet: str | None = Field(
         default=None,
         description="Optional text snippet from the source",
     )
 
-    metadata: Dict[str, Any] = Field(
+    metadata: dict[str, Any] = Field(
         default_factory=dict,
         description="Additional citation metadata (author, date, context, etc.)",
     )
@@ -1046,7 +1123,7 @@ class CitationMap(BaseModel):
         min_length=1,
     )
 
-    citations: List[Citation] = Field(
+    citations: list[Citation] = Field(
         default_factory=list,
         description="List of Citation objects supporting this claim",
     )
@@ -1058,7 +1135,7 @@ class CitationMap(BaseModel):
         description="Overall strength of citation support (0.0-1.0)",
     )
 
-    metadata: Dict[str, Any] = Field(
+    metadata: dict[str, Any] = Field(
         default_factory=dict,
         description="Additional mapping metadata (argument_type, verification_status, etc.)",
     )
@@ -1117,7 +1194,7 @@ class Claim(BaseModel):
         min_length=1,
     )
 
-    location: Optional[str] = Field(
+    location: str | None = Field(
         default=None,
         description="Optional location within source (line number, section, paragraph, etc.)",
     )
@@ -1145,9 +1222,11 @@ class Claim(BaseModel):
             '[analyst] (0.90): Test claim'
         """
         location_str = f"@{self.location}" if self.location else ""
-        return f"[{self.source_id}{location_str}] ({self.confidence:.2f}): {self.content}"
+        return (
+            f"[{self.source_id}{location_str}] ({self.confidence:.2f}): {self.content}"
+        )
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """
         Convert claim to dictionary for serialization.
 
@@ -1167,7 +1246,7 @@ class Claim(BaseModel):
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "Claim":
+    def from_dict(cls, data: dict[str, Any]) -> "Claim":
         """
         Create a Claim from a dictionary.
 
@@ -1250,7 +1329,7 @@ class Evidence(BaseModel):
         min_length=1,
     )
 
-    location: Optional[str] = Field(
+    location: str | None = Field(
         default=None,
         description="Optional location within source (line number, section, page, etc.)",
     )
@@ -1267,12 +1346,12 @@ class Evidence(BaseModel):
         le=1.0,
     )
 
-    timestamp: Optional[str] = Field(
+    timestamp: str | None = Field(
         default=None,
         description="Optional ISO timestamp when evidence was collected",
     )
 
-    metadata: Dict[str, Any] = Field(
+    metadata: dict[str, Any] = Field(
         default_factory=dict,
         description="Additional evidence metadata (tags, categories, analysis, etc.)",
     )
@@ -1300,7 +1379,7 @@ class Evidence(BaseModel):
         location_str = f"@{self.location}" if self.location else ""
         return f"[{self.source_id}{location_str}] ({self.evidence_type}, {self.strength:.2f}): {self.content}"
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """
         Convert evidence to dictionary for serialization.
 
@@ -1336,7 +1415,7 @@ class Evidence(BaseModel):
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "Evidence":
+    def from_dict(cls, data: dict[str, Any]) -> "Evidence":
         """
         Create an Evidence from a dictionary.
 
@@ -1393,41 +1472,31 @@ class ArgumentPerspective(BaseModel):
                 "content": "Universal basic income would reduce poverty...",
                 "key_points": ["Ensures basic needs", "Reduces wealth gap"],
                 "model": "claude-sonnet-4",
-                "metadata": {}
+                "metadata": {},
             }
         }
     )
 
     role: Literal["creator", "skeptic", "moderator"] = Field(
-        ...,
-        description="The role name (creator, skeptic, moderator)"
+        ..., description="The role name (creator, skeptic, moderator)"
     )
 
     stance: Literal["for", "against", "neutral"] = Field(
-        ...,
-        description="The perspective's stance (for, against, neutral)"
+        ..., description="The perspective's stance (for, against, neutral)"
     )
 
     content: str = Field(
-        ...,
-        description="Full response content from this perspective",
-        min_length=1
+        ..., description="Full response content from this perspective", min_length=1
     )
 
-    key_points: List[str] = Field(
-        default_factory=list,
-        description="List of key points or arguments"
+    key_points: list[str] = Field(
+        default_factory=list, description="List of key points or arguments"
     )
 
-    model: str = Field(
-        ...,
-        description="Model used for this perspective",
-        min_length=1
-    )
+    model: str = Field(..., description="Model used for this perspective", min_length=1)
 
-    metadata: Dict[str, Any] = Field(
-        default_factory=dict,
-        description="Additional perspective metadata"
+    metadata: dict[str, Any] = Field(
+        default_factory=dict, description="Additional perspective metadata"
     )
 
 
@@ -1469,39 +1538,35 @@ class ArgumentMap(BaseModel):
                         "content": "Universal basic income would reduce poverty...",
                         "key_points": ["Ensures basic needs", "Reduces wealth gap"],
                         "model": "claude-sonnet-4",
-                        "metadata": {}
+                        "metadata": {},
                     }
                 ],
                 "synthesis": "After examining both perspectives...",
-                "metadata": {"thread_id": "abc123"}
+                "metadata": {"thread_id": "abc123"},
             }
         }
     )
 
     topic: str = Field(
-        ...,
-        description="The argument topic or claim being analyzed",
-        min_length=1
+        ..., description="The argument topic or claim being analyzed", min_length=1
     )
 
-    perspectives: List[ArgumentPerspective] = Field(
+    perspectives: list[ArgumentPerspective] = Field(
         ...,
         description="List of perspectives (Creator, Skeptic, Moderator)",
-        min_length=1
+        min_length=1,
     )
 
     synthesis: str = Field(
-        ...,
-        description="Final balanced synthesis from Moderator",
-        min_length=1
+        ..., description="Final balanced synthesis from Moderator", min_length=1
     )
 
-    metadata: Dict[str, Any] = Field(
+    metadata: dict[str, Any] = Field(
         default_factory=dict,
-        description="Additional workflow metadata (thread_id, model, timestamps, etc.)"
+        description="Additional workflow metadata (thread_id, model, timestamps, etc.)",
     )
 
-    def get_perspective(self, role: str) -> Optional[ArgumentPerspective]:
+    def get_perspective(self, role: str) -> ArgumentPerspective | None:
         """
         Get a specific perspective by role name.
 
@@ -1520,7 +1585,7 @@ class ArgumentMap(BaseModel):
                 return perspective
         return None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """
         Convert ArgumentMap to dictionary for serialization.
 
@@ -1540,11 +1605,11 @@ class ArgumentMap(BaseModel):
             "topic": self.topic,
             "perspectives": [p.model_dump() for p in self.perspectives],
             "synthesis": self.synthesis,
-            "metadata": self.metadata
+            "metadata": self.metadata,
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "ArgumentMap":
+    def from_dict(cls, data: dict[str, Any]) -> "ArgumentMap":
         """
         Create an ArgumentMap from a dictionary.
 
@@ -1572,7 +1637,7 @@ class ArgumentMap(BaseModel):
             topic=data["topic"],
             perspectives=perspectives,
             synthesis=data["synthesis"],
-            metadata=data.get("metadata", {})
+            metadata=data.get("metadata", {}),
         )
 
 
@@ -1614,7 +1679,7 @@ class Idea(BaseModel):
                 "description": "Implement semantic search using AI embeddings for better discovery",
                 "perspective": "technical",
                 "source_model": "gpt-4",
-                "metadata": {"tokens": 150, "temperature": 0.9}
+                "metadata": {"tokens": 150, "temperature": 0.9},
             }
         }
     )
@@ -1622,35 +1687,31 @@ class Idea(BaseModel):
     id: str = Field(
         ...,
         description="Unique identifier for the idea (e.g., 'idea-1')",
-        pattern=r"^idea-\d+$"
+        pattern=r"^idea-\d+$",
     )
 
     label: str = Field(
         ...,
         description="Brief descriptive label (1-5 words)",
         min_length=1,
-        max_length=100
+        max_length=100,
     )
 
     description: str = Field(
-        ...,
-        description="Full description of the idea (1-3 sentences)",
-        min_length=1
+        ..., description="Full description of the idea (1-3 sentences)", min_length=1
     )
 
     perspective: str = Field(
         ...,
-        description="Perspective this idea originated from (practical, innovative, user-focused, etc.)"
+        description="Perspective this idea originated from (practical, innovative, user-focused, etc.)",
     )
 
-    source_model: Optional[str] = Field(
-        default=None,
-        description="Model that generated this idea"
+    source_model: str | None = Field(
+        default=None, description="Model that generated this idea"
     )
 
-    metadata: Dict[str, Any] = Field(
-        default_factory=dict,
-        description="Additional metadata about the idea"
+    metadata: dict[str, Any] = Field(
+        default_factory=dict, description="Additional metadata about the idea"
     )
 
 
@@ -1695,7 +1756,7 @@ class IdeaCluster(BaseModel):
                 "scores": {"feasibility": 4.0, "impact": 4.5, "novelty": 4.0},
                 "overall_score": 4.17,
                 "recommendation": "High Priority",
-                "metadata": {"num_ideas": 3}
+                "metadata": {"num_ideas": 3},
             }
         }
     )
@@ -1703,51 +1764,47 @@ class IdeaCluster(BaseModel):
     id: str = Field(
         ...,
         description="Unique identifier for the cluster (e.g., 'cluster-1')",
-        pattern=r"^cluster-\d+$"
+        pattern=r"^cluster-\d+$",
     )
 
     theme: str = Field(
         ...,
         description="Theme name describing this cluster",
         min_length=1,
-        max_length=200
+        max_length=200,
     )
 
     description: str = Field(
-        default="",
-        description="Detailed description of the cluster theme"
+        default="", description="Detailed description of the cluster theme"
     )
 
-    idea_ids: List[str] = Field(
-        default_factory=list,
-        description="List of idea IDs in this cluster"
+    idea_ids: list[str] = Field(
+        default_factory=list, description="List of idea IDs in this cluster"
     )
 
-    ideas: Optional[List[Idea]] = Field(
-        default=None,
-        description="Optional full Idea objects in this cluster"
+    ideas: list[Idea] | None = Field(
+        default=None, description="Optional full Idea objects in this cluster"
     )
 
-    scores: Dict[str, float] = Field(
+    scores: dict[str, float] = Field(
         default_factory=dict,
-        description="Evaluation scores (e.g., feasibility: 4.5, impact: 4.0)"
+        description="Evaluation scores (e.g., feasibility: 4.5, impact: 4.0)",
     )
 
     overall_score: float = Field(
         default=0.0,
         ge=0.0,
         le=5.0,
-        description="Average score across all criteria (0.0-5.0)"
+        description="Average score across all criteria (0.0-5.0)",
     )
 
     recommendation: str = Field(
         default="Medium Priority",
-        description="Priority recommendation (High/Medium/Low Priority)"
+        description="Priority recommendation (High/Medium/Low Priority)",
     )
 
-    metadata: Dict[str, Any] = Field(
-        default_factory=dict,
-        description="Additional metadata about the cluster"
+    metadata: dict[str, Any] = Field(
+        default_factory=dict, description="Additional metadata about the cluster"
     )
 
     def add_idea(self, idea: Idea) -> None:
@@ -1827,66 +1884,56 @@ class IdeationState(BaseModel):
                 "scoring_criteria": ["feasibility", "impact", "novelty"],
                 "workflow_metadata": {"models_used": ["claude", "gpt-4"]},
                 "created_at": "2024-01-15T10:30:00Z",
-                "updated_at": "2024-01-15T11:45:00Z"
+                "updated_at": "2024-01-15T11:45:00Z",
             }
         }
     )
 
     session_id: str = Field(
-        ...,
-        description="Unique identifier for this ideation session",
-        min_length=1
+        ..., description="Unique identifier for this ideation session", min_length=1
     )
 
     topic: str = Field(
-        ...,
-        description="The topic or problem being ideated on",
-        min_length=1
+        ..., description="The topic or problem being ideated on", min_length=1
     )
 
-    perspectives: List[str] = Field(
+    perspectives: list[str] = Field(
         default_factory=list,
-        description="Perspectives used in brainstorming (practical, innovative, etc.)"
+        description="Perspectives used in brainstorming (practical, innovative, etc.)",
     )
 
-    ideas: List[Idea] = Field(
-        default_factory=list,
-        description="All extracted ideas from brainstorming"
+    ideas: list[Idea] = Field(
+        default_factory=list, description="All extracted ideas from brainstorming"
     )
 
-    clusters: List[IdeaCluster] = Field(
-        default_factory=list,
-        description="Thematic clusters of related ideas"
+    clusters: list[IdeaCluster] = Field(
+        default_factory=list, description="Thematic clusters of related ideas"
     )
 
-    selected_cluster_ids: List[str] = Field(
-        default_factory=list,
-        description="IDs of clusters selected for elaboration"
+    selected_cluster_ids: list[str] = Field(
+        default_factory=list, description="IDs of clusters selected for elaboration"
     )
 
-    elaborations: Dict[str, str] = Field(
+    elaborations: dict[str, str] = Field(
         default_factory=dict,
-        description="Detailed outlines for selected clusters (cluster_id -> outline)"
+        description="Detailed outlines for selected clusters (cluster_id -> outline)",
     )
 
-    scoring_criteria: List[str] = Field(
+    scoring_criteria: list[str] = Field(
         default_factory=list,
-        description="Criteria used for evaluation (feasibility, impact, etc.)"
+        description="Criteria used for evaluation (feasibility, impact, etc.)",
     )
 
-    workflow_metadata: Dict[str, Any] = Field(
-        default_factory=dict,
-        description="Metadata about workflow execution"
+    workflow_metadata: dict[str, Any] = Field(
+        default_factory=dict, description="Metadata about workflow execution"
     )
 
-    created_at: Optional[str] = Field(
-        default=None,
-        description="ISO timestamp when ideation session started"
+    created_at: str | None = Field(
+        default=None, description="ISO timestamp when ideation session started"
     )
 
-    updated_at: Optional[str] = Field(
-        default=None,
-        description="ISO timestamp of last update"
+    updated_at: str | None = Field(
+        default=None, description="ISO timestamp of last update"
     )
 
     def add_idea(self, idea: Idea) -> None:
@@ -1915,7 +1962,7 @@ class IdeationState(BaseModel):
         if cluster not in self.clusters:
             self.clusters.append(cluster)
 
-    def get_cluster_by_id(self, cluster_id: str) -> Optional[IdeaCluster]:
+    def get_cluster_by_id(self, cluster_id: str) -> IdeaCluster | None:
         """
         Get a cluster by its ID.
 
@@ -1933,7 +1980,7 @@ class IdeationState(BaseModel):
                 return cluster
         return None
 
-    def get_selected_clusters(self) -> List[IdeaCluster]:
+    def get_selected_clusters(self) -> list[IdeaCluster]:
         """
         Get all selected clusters.
 
@@ -1945,7 +1992,8 @@ class IdeationState(BaseModel):
             >>> print(f"Selected {len(selected)} clusters")
         """
         return [
-            cluster for cluster in self.clusters
+            cluster
+            for cluster in self.clusters
             if cluster.id in self.selected_cluster_ids
         ]
 
@@ -1973,7 +2021,7 @@ class IdeationState(BaseModel):
         """
         return len(self.clusters)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """
         Convert IdeationState to dictionary for serialization.
 
@@ -1994,11 +2042,11 @@ class IdeationState(BaseModel):
             "scoring_criteria": self.scoring_criteria,
             "workflow_metadata": self.workflow_metadata,
             "created_at": self.created_at,
-            "updated_at": self.updated_at
+            "updated_at": self.updated_at,
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "IdeationState":
+    def from_dict(cls, data: dict[str, Any]) -> "IdeationState":
         """
         Create an IdeationState from a dictionary.
 
@@ -2012,10 +2060,7 @@ class IdeationState(BaseModel):
             >>> state = IdeationState.from_dict(state_data)
         """
         # Convert idea dicts to Idea objects
-        ideas = [
-            Idea(**i) if isinstance(i, dict) else i
-            for i in data.get("ideas", [])
-        ]
+        ideas = [Idea(**i) if isinstance(i, dict) else i for i in data.get("ideas", [])]
 
         # Convert cluster dicts to IdeaCluster objects
         clusters = [
@@ -2034,7 +2079,7 @@ class IdeationState(BaseModel):
             scoring_criteria=data.get("scoring_criteria", []),
             workflow_metadata=data.get("workflow_metadata", {}),
             created_at=data.get("created_at"),
-            updated_at=data.get("updated_at")
+            updated_at=data.get("updated_at"),
         )
 
 
@@ -2088,65 +2133,50 @@ class Source(BaseModel):
                 "validation_score": 8,
                 "validation_notes": ["URL provided", "Credible type: article"],
                 "ingested_at": "2025-11-06T12:00:00Z",
-                "metadata": {}
+                "metadata": {},
             }
         }
     )
 
     source_id: str = Field(
-        ...,
-        description="Unique identifier for this source",
-        min_length=1
+        ..., description="Unique identifier for this source", min_length=1
     )
 
     title: str = Field(
-        ...,
-        description="Title or description of the source",
-        min_length=1
+        ..., description="Title or description of the source", min_length=1
     )
 
-    url: Optional[str] = Field(
-        default=None,
-        description="Optional URL or reference to the source"
+    url: str | None = Field(
+        default=None, description="Optional URL or reference to the source"
     )
 
     source_type: str = Field(
         default="unknown",
-        description="Type of source (article, paper, book, website, etc.)"
+        description="Type of source (article, paper, book, website, etc.)",
     )
 
     credibility: Literal["high", "medium", "low", "unassessed"] = Field(
-        default="unassessed",
-        description="Credibility assessment"
+        default="unassessed", description="Credibility assessment"
     )
 
-    tags: List[str] = Field(
-        default_factory=list,
-        description="Optional list of tags for categorization"
+    tags: list[str] = Field(
+        default_factory=list, description="Optional list of tags for categorization"
     )
 
     validated: bool = Field(
-        default=False,
-        description="Whether source has been validated"
+        default=False, description="Whether source has been validated"
     )
 
     validation_score: int = Field(
-        default=0,
-        ge=0,
-        description="Numeric validation score if validated"
+        default=0, ge=0, description="Numeric validation score if validated"
     )
 
-    validation_notes: List[str] = Field(
-        default_factory=list,
-        description="List of validation findings"
+    validation_notes: list[str] = Field(
+        default_factory=list, description="List of validation findings"
     )
 
-    ingested_at: str = Field(
-        ...,
-        description="ISO timestamp when source was added"
-    )
+    ingested_at: str = Field(..., description="ISO timestamp when source was added")
 
-    metadata: Dict[str, Any] = Field(
-        default_factory=dict,
-        description="Additional source metadata"
+    metadata: dict[str, Any] = Field(
+        default_factory=dict, description="Additional source metadata"
     )

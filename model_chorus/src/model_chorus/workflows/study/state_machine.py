@@ -6,10 +6,8 @@ ensuring systematic progression through DISCOVERY → VALIDATION → PLANNING �
 """
 
 import logging
-from typing import Optional, List, Dict, Any
-from enum import Enum
 
-from ...core.models import InvestigationPhase, StudyState, ConfidenceLevel
+from ...core.models import ConfidenceLevel, InvestigationPhase, StudyState
 
 logger = logging.getLogger(__name__)
 
@@ -33,17 +31,17 @@ class InvestigationStateMachine:
     """
 
     # Define valid phase transitions
-    VALID_TRANSITIONS: Dict[InvestigationPhase, List[InvestigationPhase]] = {
+    VALID_TRANSITIONS: dict[InvestigationPhase, list[InvestigationPhase]] = {
         InvestigationPhase.DISCOVERY: [InvestigationPhase.VALIDATION],
         InvestigationPhase.VALIDATION: [
             InvestigationPhase.PLANNING,
-            InvestigationPhase.DISCOVERY  # Allow returning to discovery if needed
+            InvestigationPhase.DISCOVERY,  # Allow returning to discovery if needed
         ],
         InvestigationPhase.PLANNING: [
             InvestigationPhase.COMPLETE,
-            InvestigationPhase.DISCOVERY  # Allow returning if gaps found
+            InvestigationPhase.DISCOVERY,  # Allow returning if gaps found
         ],
-        InvestigationPhase.COMPLETE: []  # Terminal state
+        InvestigationPhase.COMPLETE: [],  # Terminal state
     }
 
     def __init__(self, state: StudyState):
@@ -55,7 +53,9 @@ class InvestigationStateMachine:
         """
         self.state = state
         self.current_phase = InvestigationPhase(state.current_phase)
-        logger.info(f"InvestigationStateMachine initialized in phase: {self.current_phase.value}")
+        logger.info(
+            f"InvestigationStateMachine initialized in phase: {self.current_phase.value}"
+        )
 
     def can_transition(self, target_phase: InvestigationPhase) -> bool:
         """
@@ -77,7 +77,9 @@ class InvestigationStateMachine:
 
         return is_valid
 
-    def transition(self, target_phase: InvestigationPhase, reason: Optional[str] = None) -> bool:
+    def transition(
+        self, target_phase: InvestigationPhase, reason: str | None = None
+    ) -> bool:
         """
         Transition to target phase if valid.
 
@@ -109,7 +111,7 @@ class InvestigationStateMachine:
 
         return True
 
-    def get_next_phase(self) -> Optional[InvestigationPhase]:
+    def get_next_phase(self) -> InvestigationPhase | None:
         """
         Get the primary next phase in the investigation flow.
 
@@ -128,7 +130,7 @@ class InvestigationStateMachine:
         # Return first option as the "primary" next phase
         return valid_targets[0]
 
-    def get_valid_transitions(self) -> List[InvestigationPhase]:
+    def get_valid_transitions(self) -> list[InvestigationPhase]:
         """
         Get all valid transitions from current phase.
 
@@ -146,7 +148,7 @@ class InvestigationStateMachine:
         """
         return self.current_phase == InvestigationPhase.COMPLETE
 
-    def advance_to_next(self, reason: Optional[str] = None) -> bool:
+    def advance_to_next(self, reason: str | None = None) -> bool:
         """
         Convenience method to advance to the primary next phase.
 
@@ -167,7 +169,7 @@ class InvestigationStateMachine:
 
         return self.transition(next_phase, reason)
 
-    def reset_to_discovery(self, reason: Optional[str] = None) -> bool:
+    def reset_to_discovery(self, reason: str | None = None) -> bool:
         """
         Reset investigation to DISCOVERY phase.
 
@@ -190,7 +192,10 @@ class InvestigationStateMachine:
         if self.current_phase == InvestigationPhase.COMPLETE:
             raise ValueError("Cannot reset from COMPLETE phase")
 
-        return self.transition(InvestigationPhase.DISCOVERY, reason or "Resetting for additional exploration")
+        return self.transition(
+            InvestigationPhase.DISCOVERY,
+            reason or "Resetting for additional exploration",
+        )
 
     def update_confidence(self, new_confidence: ConfidenceLevel) -> None:
         """
@@ -202,7 +207,9 @@ class InvestigationStateMachine:
         old_confidence = ConfidenceLevel(self.state.confidence)
         self.state.confidence = new_confidence.value
 
-        logger.info(f"Confidence updated: {old_confidence.value} → {new_confidence.value}")
+        logger.info(
+            f"Confidence updated: {old_confidence.value} → {new_confidence.value}"
+        )
 
     def should_escalate_phase(self) -> bool:
         """
@@ -263,7 +270,9 @@ class InvestigationStateMachine:
 
         return should_escalate
 
-    def get_confidence_threshold(self, phase: Optional[InvestigationPhase] = None) -> Optional[ConfidenceLevel]:
+    def get_confidence_threshold(
+        self, phase: InvestigationPhase | None = None
+    ) -> ConfidenceLevel | None:
         """
         Get the confidence threshold required for escalation from a given phase.
 

@@ -6,7 +6,13 @@ using the ModelChorus framework.
 """
 
 import asyncio
-from model_chorus.core import BaseWorkflow, WorkflowResult, WorkflowRegistry, WorkflowRequest
+
+from model_chorus.core import (
+    BaseWorkflow,
+    WorkflowRegistry,
+    WorkflowRequest,
+    WorkflowResult,
+)
 
 
 # Define a custom workflow
@@ -35,16 +41,12 @@ class ExampleWorkflow(BaseWorkflow):
 
         # Add a workflow step
         result.add_step(
-            step_number=1,
-            content=f"Processing prompt: {prompt}",
-            model="example-model"
+            step_number=1, content=f"Processing prompt: {prompt}", model="example-model"
         )
 
         # Add another step
         result.add_step(
-            step_number=2,
-            content="Analysis complete",
-            model="example-model"
+            step_number=2, content="Analysis complete", model="example-model"
         )
 
         # Generate synthesis
@@ -60,7 +62,7 @@ async def main():
     request = WorkflowRequest(
         prompt="What are the benefits of multi-model AI workflows?",
         models=["example-model"],
-        config={"example_param": "value"}
+        config={"example_param": "value"},
     )
 
     print("ModelChorus - Basic Workflow Example")
@@ -74,8 +76,7 @@ async def main():
 
     # Create a workflow instance
     workflow = workflow_class(
-        name="Example Workflow",
-        description="A simple demonstration workflow"
+        name="Example Workflow", description="A simple demonstration workflow"
     )
 
     print(f"\nExecuting workflow: {workflow.name}")
@@ -96,7 +97,7 @@ async def main():
         print(f"  Model: {step.model}")
         print(f"  Content: {step.content}")
 
-    print(f"\nSynthesis:")
+    print("\nSynthesis:")
     print(result.synthesis)
 
 

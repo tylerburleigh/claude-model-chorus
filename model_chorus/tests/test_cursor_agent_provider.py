@@ -3,11 +3,12 @@ Tests for CursorAgentProvider CLI integration.
 """
 
 import json
-import pytest
-from unittest.mock import AsyncMock, patch
+from unittest.mock import patch
 
-from model_chorus.providers.cursor_agent_provider import CursorAgentProvider
+import pytest
+
 from model_chorus.providers.base_provider import GenerationRequest
+from model_chorus.providers.cursor_agent_provider import CursorAgentProvider
 
 
 class TestCursorAgentProvider:
@@ -32,7 +33,9 @@ class TestCursorAgentProvider:
         assert "json" in command
         # Prompt should be passed as positional argument (combined with system prompt if present)
         # sample_generation_request has both system_prompt and prompt
-        assert sample_generation_request.prompt in command[-1]  # Check it's in the combined prompt
+        assert (
+            sample_generation_request.prompt in command[-1]
+        )  # Check it's in the combined prompt
 
     def test_build_command_with_model(self):
         """Test building command with specific model."""

@@ -3,19 +3,11 @@ Pytest configuration and fixtures for ModelChorus tests.
 """
 
 import os
-import sys
-import shutil
-import subprocess
-import pytest
-import yaml
-from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock
-from model_chorus.providers.base_provider import GenerationResponse
 
-# Add tests directory to path to allow importing test_helpers
-_TESTS_DIR = Path(__file__).parent
-if str(_TESTS_DIR) not in sys.path:
-    sys.path.insert(0, str(_TESTS_DIR))
+import pytest
+
+from model_chorus.providers.base_provider import GenerationResponse
 
 # Control whether integration tests use real CLIs or mocks
 USE_MOCK_PROVIDERS = os.getenv("USE_MOCK_PROVIDERS", "false").lower() == "true"
@@ -26,7 +18,8 @@ USE_MOCK_PROVIDERS = os.getenv("USE_MOCK_PROVIDERS", "false").lower() == "true"
 # ============================================================================
 
 # Import provider availability detection from shared test helpers
-import test_helpers
+from . import test_helpers
+
 CLAUDE_AVAILABLE = test_helpers.CLAUDE_AVAILABLE
 GEMINI_AVAILABLE = test_helpers.GEMINI_AVAILABLE
 CODEX_AVAILABLE = test_helpers.CODEX_AVAILABLE
@@ -38,27 +31,28 @@ ANY_PROVIDER_AVAILABLE = test_helpers.ANY_PROVIDER_AVAILABLE
 # Pytest Configuration Hooks
 # ============================================================================
 
+
 def pytest_configure(config):
     """Register custom markers for provider-specific tests."""
     config.addinivalue_line(
         "markers",
-        "requires_claude: test requires Claude provider (config enabled + CLI available)"
+        "requires_claude: test requires Claude provider (config enabled + CLI available)",
     )
     config.addinivalue_line(
         "markers",
-        "requires_gemini: test requires Gemini provider (config enabled + CLI available)"
+        "requires_gemini: test requires Gemini provider (config enabled + CLI available)",
     )
     config.addinivalue_line(
         "markers",
-        "requires_codex: test requires Codex provider (config enabled + CLI available)"
+        "requires_codex: test requires Codex provider (config enabled + CLI available)",
     )
     config.addinivalue_line(
         "markers",
-        "requires_cursor_agent: test requires Cursor Agent provider (config enabled + CLI available)"
+        "requires_cursor_agent: test requires Cursor Agent provider (config enabled + CLI available)",
     )
     config.addinivalue_line(
         "markers",
-        "requires_any_provider: test requires at least one provider to be available"
+        "requires_any_provider: test requires at least one provider to be available",
     )
 
 
@@ -66,12 +60,39 @@ def pytest_configure(config):
 # Standard Fixtures
 # ============================================================================
 
-@pytest.fixture(params=[
-    pytest.param("claude", marks=pytest.mark.skipif(not CLAUDE_AVAILABLE, reason="Claude not available (config disabled or CLI not found)")),
-    pytest.param("gemini", marks=pytest.mark.skipif(not GEMINI_AVAILABLE, reason="Gemini not available (config disabled or CLI not found)")),
-    pytest.param("codex", marks=pytest.mark.skipif(not CODEX_AVAILABLE, reason="Codex not available (config disabled or CLI not found)")),
-    pytest.param("cursor-agent", marks=pytest.mark.skipif(not CURSOR_AGENT_AVAILABLE, reason="Cursor Agent not available (config disabled or CLI not found)")),
-])
+
+@pytest.fixture(
+    params=[
+        pytest.param(
+            "claude",
+            marks=pytest.mark.skipif(
+                not CLAUDE_AVAILABLE,
+                reason="Claude not available (config disabled or CLI not found)",
+            ),
+        ),
+        pytest.param(
+            "gemini",
+            marks=pytest.mark.skipif(
+                not GEMINI_AVAILABLE,
+                reason="Gemini not available (config disabled or CLI not found)",
+            ),
+        ),
+        pytest.param(
+            "codex",
+            marks=pytest.mark.skipif(
+                not CODEX_AVAILABLE,
+                reason="Codex not available (config disabled or CLI not found)",
+            ),
+        ),
+        pytest.param(
+            "cursor-agent",
+            marks=pytest.mark.skipif(
+                not CURSOR_AGENT_AVAILABLE,
+                reason="Cursor Agent not available (config disabled or CLI not found)",
+            ),
+        ),
+    ]
+)
 def provider_name(request):
     """
     Parameterized fixture for provider names with auto-skipping.
@@ -130,11 +151,7 @@ def mock_cursor_agent_response():
         "request_id": "req-789",
         "duration_ms": 1234,
         "duration_api_ms": 1200,
-        "usage": {
-            "input_tokens": 12,
-            "output_tokens": 48,
-            "cached_input_tokens": 0
-        },
+        "usage": {"input_tokens": 12, "output_tokens": 48, "cached_input_tokens": 0},
     }
 
 
@@ -228,12 +245,16 @@ def _create_smart_mock_provider(provider_name: str, model_name: str, stop_reason
         elif "now you say" in prompt:
             # Extract number from prompt
             import re
-            match = re.search(r'\d+', prompt)
+
+            match = re.search(r"\d+", prompt)
             if match:
                 response_content = match.group()
             else:
                 response_content = "Acknowledged"
-        elif "what number did we start" in prompt or "number did we start counting" in prompt:
+        elif (
+            "what number did we start" in prompt
+            or "number did we start counting" in prompt
+        ):
             response_content = "We started counting with 1."
         # Handle guessing game
         elif "thinking of a number" in prompt or "guess what it is" in prompt:
@@ -249,7 +270,9 @@ def _create_smart_mock_provider(provider_name: str, model_name: str, stop_reason
             response_content = "Continuing conversation."
         # Default response
         else:
-            response_content = f"{provider_name.title()} response: {request.prompt[:50]}..."
+            response_content = (
+                f"{provider_name.title()} response: {request.prompt[:50]}..."
+            )
 
         return GenerationResponse(
             content=response_content,
@@ -288,3 +311,52 @@ def mock_codex_provider_full():
 def mock_cursor_agent_provider_full():
     """Create fully mocked Cursor Agent provider for integration tests."""
     return _create_smart_mock_provider("cursor-agent", "composer-1", "end_turn")
+
+
+# ============================================================================
+# Generic Test Fixtures (Consolidated from Individual Test Files)
+# ============================================================================
+
+
+@pytest.fixture
+def mock_provider():
+    """
+    Generic mock ModelProvider for testing.
+
+    Provides a simple mock provider suitable for most unit tests.
+    For integration tests with smart context handling, use the
+    provider-specific fixtures above (mock_claude_provider_full, etc.).
+    """
+    provider = MagicMock()
+    provider.provider_name = "test-provider"
+    provider.validate_api_key = MagicMock(return_value=True)
+
+    # Mock async generate method with simple echo response
+    async def mock_generate(request):
+        return GenerationResponse(
+            content=f"Response to: {request.prompt[:50]}",
+            model="test-model-1",
+            usage={"input_tokens": 10, "output_tokens": 20, "total_tokens": 30},
+            stop_reason="end_turn",
+        )
+
+    provider.generate = AsyncMock(side_effect=mock_generate)
+
+    # Mock async check_availability method
+    async def mock_check_availability():
+        return (True, None)  # is_available=True, error=None
+
+    provider.check_availability = AsyncMock(side_effect=mock_check_availability)
+    return provider
+
+
+@pytest.fixture
+def conversation_memory():
+    """
+    Create ConversationMemory instance for testing.
+
+    Provides a fresh conversation memory instance for each test.
+    """
+    from model_chorus.core.conversation import ConversationMemory
+
+    return ConversationMemory()

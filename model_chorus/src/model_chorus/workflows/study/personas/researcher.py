@@ -5,7 +5,8 @@ The Researcher persona focuses on systematic investigation, deep analysis,
 and comprehensive exploration of topics.
 """
 
-from typing import Dict, Any, List
+from typing import Any
+
 from ..persona_base import Persona, PersonaResponse
 
 
@@ -54,10 +55,10 @@ Provide your findings in a clear, structured format with supporting reasoning.""
             name="Researcher",
             prompt_template=prompt_template,
             temperature=temperature,
-            max_tokens=max_tokens
+            max_tokens=max_tokens,
         )
 
-    def invoke(self, context: Dict[str, Any]) -> PersonaResponse:
+    def invoke(self, context: dict[str, Any]) -> PersonaResponse:
         """
         Invoke the Researcher persona with investigation context.
 
@@ -105,13 +106,15 @@ Provide your findings in a clear, structured format with supporting reasoning.""
             metadata={
                 "persona": self.name,
                 "phase": phase,
-                "approach": "systematic_analysis"
-            }
+                "approach": "systematic_analysis",
+            },
         )
 
 
 # Factory function for creating Researcher persona instances
-def create_researcher(temperature: float = 0.7, max_tokens: int = 4096) -> ResearcherPersona:
+def create_researcher(
+    temperature: float = 0.7, max_tokens: int = 4096
+) -> ResearcherPersona:
     """
     Factory function to create a Researcher persona instance.
 

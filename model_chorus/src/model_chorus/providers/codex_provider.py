@@ -6,16 +6,16 @@ This module provides integration with OpenAI's Codex models via the `codex` CLI 
 
 import json
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
-from .cli_provider import CLIProvider
 from .base_provider import (
     GenerationRequest,
     GenerationResponse,
-    ModelConfig,
     ModelCapability,
+    ModelConfig,
     TokenUsage,
 )
+from .cli_provider import CLIProvider
 
 logger = logging.getLogger(__name__)
 
@@ -46,12 +46,16 @@ class CodexProvider(CLIProvider):
     """
 
     # Model capability mappings
-    FUNCTION_CALLING_MODELS = {"gpt-5-codex", "gpt-5-codex-mini", "gpt-5"}  # Models with function calling
+    FUNCTION_CALLING_MODELS = {
+        "gpt-5-codex",
+        "gpt-5-codex-mini",
+        "gpt-5",
+    }  # Models with function calling
 
     def __init__(
         self,
-        api_key: Optional[str] = None,
-        config: Optional[Dict[str, Any]] = None,
+        api_key: str | None = None,
+        config: dict[str, Any] | None = None,
         timeout: int = 120,
         retry_limit: int = 3,
     ):
@@ -112,7 +116,7 @@ class CodexProvider(CLIProvider):
         ]
         self.set_model_list(models)
 
-    def build_command(self, request: GenerationRequest) -> List[str]:
+    def build_command(self, request: GenerationRequest) -> list[str]:
         """
         Build the CLI command for a Codex generation request.
 
@@ -147,13 +151,15 @@ class CodexProvider(CLIProvider):
             for image_path in request.images:
                 command.extend(["--image", image_path])
 
-        # Pass prompt as a positional argument
-        command.append(request.prompt)
+        # Pass prompt via stdin to keep exec mode non-interactive
+        self.input_data = request.prompt or ""
 
         logger.debug(f"Built Codex command: {' '.join(command)}")
         return command
 
-    def parse_response(self, stdout: str, stderr: str, returncode: int) -> GenerationResponse:
+    def parse_response(
+        self, stdout: str, stderr: str, returncode: int
+    ) -> GenerationResponse:
         """
         Parse CLI output into a GenerationResponse.
 
@@ -200,7 +206,7 @@ class CodexProvider(CLIProvider):
             events = []
 
             # Process each line as a JSON event
-            for line in stdout.strip().split('\n'):
+            for line in stdout.strip().split("\n"):
                 if not line:
                     continue
 
@@ -228,6 +234,15 @@ class CodexProvider(CLIProvider):
                         metadata={},
                     )
 
+            # Provide default usage if not parsed
+            if token_usage is None:
+                token_usage = TokenUsage(
+                    input_tokens=0,
+                    output_tokens=0,
+                    total_tokens=0,
+                    metadata={},
+                )
+
             response = GenerationResponse(
                 content=content,
                 model="gpt-5-codex",  # Default model from help output
@@ -246,7 +261,9 @@ class CodexProvider(CLIProvider):
             return response
 
         except (json.JSONDecodeError, KeyError) as e:
-            error_msg = f"Failed to parse Codex CLI JSONL output: {e}\nOutput: {stdout[:200]}"
+            error_msg = (
+                f"Failed to parse Codex CLI JSONL output: {e}\nOutput: {stdout[:200]}"
+            )
             logger.error(error_msg)
             raise ValueError(error_msg)
 

@@ -5,14 +5,14 @@ Config files can be in YAML or JSON format and support workflow-specific default
 """
 
 import json
-import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
 
 try:
     import yaml
+
     YAML_AVAILABLE = True
 except ImportError:
     YAML_AVAILABLE = False
@@ -21,104 +21,144 @@ except ImportError:
 class GenerationDefaults(BaseModel):
     """Default generation parameters."""
 
-    timeout: Optional[float] = Field(None, gt=0)
-    temperature: Optional[float] = Field(None, ge=0.0, le=2.0)
-    max_tokens: Optional[int] = Field(None, gt=0)
-    system_prompt: Optional[str] = None
+    timeout: float | None = Field(None, gt=0)
+    temperature: float | None = Field(None, ge=0.0, le=2.0)
+    max_tokens: int | None = Field(None, gt=0)
+    system_prompt: str | None = None
 
 
 class ProviderConfig(BaseModel):
     """Configuration for a specific provider."""
 
-    model: Optional[str] = None
+    model: str | None = None
 
 
 class WorkflowConfig(BaseModel):
     """Configuration for a specific workflow."""
 
-    provider: Optional[str] = None
-    providers: Optional[List[str]] = None
-    fallback_providers: Optional[List[str]] = None
-    timeout: Optional[float] = Field(None, gt=0)
-    temperature: Optional[float] = Field(None, ge=0.0, le=2.0)
-    max_tokens: Optional[int] = Field(None, gt=0)
-    system_prompt: Optional[str] = None
+    provider: str | None = None
+    providers: list[str] | None = None
+    fallback_providers: list[str] | None = None
+    timeout: float | None = Field(None, gt=0)
+    temperature: float | None = Field(None, ge=0.0, le=2.0)
+    max_tokens: int | None = Field(None, gt=0)
+    system_prompt: str | None = None
 
     # Consensus-specific
-    strategy: Optional[str] = Field(None, pattern=r"^(all_responses|synthesize|vote)$")
+    strategy: str | None = Field(None, pattern=r"^(all_responses|synthesize|vote)$")
 
     # ThinkDeep-specific
-    thinking_mode: Optional[str] = Field(None, pattern=r"^(low|medium|high)$")
+    thinking_mode: str | None = Field(None, pattern=r"^(low|medium|high)$")
 
     # Research-specific
-    citation_style: Optional[str] = Field(None, pattern=r"^(informal|academic|apa|mla)$")
-    depth: Optional[str] = Field(None, pattern=r"^(quick|thorough|comprehensive)$")
+    citation_style: str | None = Field(None, pattern=r"^(informal|academic|apa|mla)$")
+    depth: str | None = Field(None, pattern=r"^(quick|thorough|comprehensive)$")
 
-    @field_validator('provider')
+    @field_validator("provider")
     def validate_provider(cls, v):
         """Validate provider name."""
-        if v and v.lower() not in ['claude', 'gemini', 'codex', 'cursor-agent']:
-            raise ValueError(f"Invalid provider: {v}. Must be one of: claude, gemini, codex, cursor-agent")
+        if v and v.lower() not in ["claude", "gemini", "codex", "cursor-agent"]:
+            raise ValueError(
+                f"Invalid provider: {v}. Must be one of: claude, gemini, codex, cursor-agent"
+            )
         return v.lower() if v else None
 
-    @field_validator('providers')
+    @field_validator("providers")
     def validate_providers(cls, v):
         """Validate provider list."""
         if v:
-            valid_providers = ['claude', 'gemini', 'codex', 'cursor-agent']
+            valid_providers = ["claude", "gemini", "codex", "cursor-agent"]
             for provider in v:
                 if provider.lower() not in valid_providers:
-                    raise ValueError(f"Invalid provider: {provider}. Must be one of: {', '.join(valid_providers)}")
+                    raise ValueError(
+                        f"Invalid provider: {provider}. Must be one of: {', '.join(valid_providers)}"
+                    )
             return [p.lower() for p in v]
         return None
+
+
+class StorageConfig(BaseModel):
+    """Configuration for conversation storage backend."""
+
+    backend: str = Field(
+        "file",
+        pattern=r"^(file|sqlite)$",
+        description="Storage backend: 'file' for JSON files, 'sqlite' for database",
+    )
+    sqlite_path: str | None = Field(
+        None,
+        description="Path to SQLite database (only used when backend='sqlite')",
+    )
 
 
 class ModelChorusConfig(BaseModel):
     """Root configuration model for ModelChorus."""
 
-    default_provider: Optional[str] = None
-    providers: Optional[Dict[str, ProviderConfig]] = None
-    generation: Optional[GenerationDefaults] = None
-    workflows: Optional[Dict[str, WorkflowConfig]] = None
+    default_provider: str | None = None
+    providers: dict[str, ProviderConfig] | None = None
+    generation: GenerationDefaults | None = None
+    workflows: dict[str, WorkflowConfig] | None = None
+    storage: StorageConfig | None = Field(
+        default_factory=StorageConfig,
+        description="Conversation storage configuration",
+    )
 
-    @field_validator('default_provider')
+    @field_validator("default_provider")
     def validate_default_provider(cls, v):
         """Validate default provider."""
-        if v and v.lower() not in ['claude', 'gemini', 'codex', 'cursor-agent']:
-            raise ValueError(f"Invalid default_provider: {v}. Must be one of: claude, gemini, codex, cursor-agent")
+        if v and v.lower() not in ["claude", "gemini", "codex", "cursor-agent"]:
+            raise ValueError(
+                f"Invalid default_provider: {v}. Must be one of: claude, gemini, codex, cursor-agent"
+            )
         return v.lower() if v else None
 
-    @field_validator('providers')
+    @field_validator("providers")
     def validate_provider_names(cls, v):
         """Validate provider names in providers config."""
         if v:
-            valid_providers = ['claude', 'gemini', 'codex', 'cursor-agent']
+            valid_providers = ["claude", "gemini", "codex", "cursor-agent"]
             for provider_name in v.keys():
                 if provider_name.lower() not in valid_providers:
-                    raise ValueError(f"Invalid provider: {provider_name}. Must be one of: {', '.join(valid_providers)}")
+                    raise ValueError(
+                        f"Invalid provider: {provider_name}. Must be one of: {', '.join(valid_providers)}"
+                    )
         return v
 
-    @field_validator('workflows')
+    @field_validator("workflows")
     def validate_workflow_names(cls, v):
         """Validate workflow names."""
         if v:
-            valid_workflows = ['chat', 'consensus', 'thinkdeep', 'argument', 'ideate', 'research']
+            valid_workflows = [
+                "chat",
+                "consensus",
+                "thinkdeep",
+                "argument",
+                "ideate",
+                "research",
+            ]
             for workflow_name in v.keys():
                 if workflow_name.lower() not in valid_workflows:
-                    raise ValueError(f"Invalid workflow: {workflow_name}. Must be one of: {', '.join(valid_workflows)}")
+                    raise ValueError(
+                        f"Invalid workflow: {workflow_name}. Must be one of: {', '.join(valid_workflows)}"
+                    )
         return v
 
 
 class ConfigLoader:
     """Loads and manages ModelChorus configuration."""
 
-    CONFIG_FILENAMES = ['.model-chorusrc', '.model-chorusrc.yaml', '.model-chorusrc.yml', '.model-chorusrc.json']
+    CONFIG_FILENAMES = [
+        ".model-chorusrc",
+        ".model-chorusrc.yaml",
+        ".model-chorusrc.yml",
+        ".model-chorusrc.json",
+    ]
 
     def __init__(self):
-        self._config: Optional[ModelChorusConfig] = None
-        self._config_path: Optional[Path] = None
+        self._config: ModelChorusConfig | None = None
+        self._config_path: Path | None = None
 
-    def find_config_file(self, start_path: Optional[Path] = None) -> Optional[Path]:
+    def find_config_file(self, start_path: Path | None = None) -> Path | None:
         """Find .model-chorusrc file by searching up from start_path.
 
         Args:
@@ -138,7 +178,7 @@ class ConfigLoader:
 
         return None
 
-    def load_config(self, config_path: Optional[Path] = None) -> ModelChorusConfig:
+    def load_config(self, config_path: Path | None = None) -> ModelChorusConfig:
         """Load configuration from file.
 
         Args:
@@ -163,7 +203,7 @@ class ConfigLoader:
         self._config_path = config_path
 
         # Load and parse config file
-        with open(config_path, 'r') as f:
+        with open(config_path) as f:
             content = f.read()
 
         # Try to parse as YAML first, then JSON
@@ -176,7 +216,7 @@ class ConfigLoader:
         except Exception as e:
             raise ValueError(f"Invalid config file {config_path}: {e}")
 
-    def _parse_config_content(self, content: str, config_path: Path) -> Dict[str, Any]:
+    def _parse_config_content(self, content: str, config_path: Path) -> dict[str, Any]:
         """Parse config file content as YAML or JSON.
 
         Args:
@@ -195,7 +235,7 @@ class ConfigLoader:
                 return yaml.safe_load(content) or {}
             except yaml.YAMLError as e:
                 # If it looks like JSON, try JSON parser
-                if content.strip().startswith('{'):
+                if content.strip().startswith("{"):
                     pass  # Fall through to JSON parser
                 else:
                     raise ValueError(f"Invalid YAML in {config_path}: {e}")
@@ -209,7 +249,9 @@ class ConfigLoader:
                     f"Invalid JSON in {config_path}: {e}\n"
                     "Install PyYAML for YAML support: pip install pyyaml"
                 )
-            raise ValueError(f"Invalid config file {config_path}: Could not parse as YAML or JSON")
+            raise ValueError(
+                f"Invalid config file {config_path}: Could not parse as YAML or JSON"
+            )
 
     def get_config(self) -> ModelChorusConfig:
         """Get the loaded configuration.
@@ -223,9 +265,12 @@ class ConfigLoader:
             except Exception:
                 # If loading fails, return empty config
                 self._config = ModelChorusConfig()
+        assert self._config is not None
         return self._config
 
-    def get_workflow_default(self, workflow: str, key: str, fallback: Any = None) -> Any:
+    def get_workflow_default(
+        self, workflow: str, key: str, fallback: Any = None
+    ) -> Any:
         """Get a default value for a specific workflow.
 
         Precedence: workflow-specific > global generation defaults > fallback
@@ -280,7 +325,9 @@ class ConfigLoader:
 
         return fallback
 
-    def get_default_providers(self, workflow: str, fallback: List[str] = None) -> List[str]:
+    def get_default_providers(
+        self, workflow: str, fallback: list[str] | None = None
+    ) -> list[str]:
         """Get default providers list for multi-provider workflows.
 
         Args:
@@ -303,7 +350,7 @@ class ConfigLoader:
 
         return fallback
 
-    def get_fallback_providers(self, workflow: str) -> Optional[List[str]]:
+    def get_fallback_providers(self, workflow: str) -> list[str] | None:
         """Get fallback providers for a workflow.
 
         Args:
@@ -322,7 +369,9 @@ class ConfigLoader:
 
         return None
 
-    def get_fallback_providers_excluding(self, workflow: str, exclude_provider: str) -> Optional[List[str]]:
+    def get_fallback_providers_excluding(
+        self, workflow: str, exclude_provider: str
+    ) -> list[str] | None:
         """Get fallback providers for a workflow, excluding a specific provider.
 
         This is useful when the primary provider is specified via CLI and should not
@@ -352,7 +401,9 @@ class ConfigLoader:
         # Return None if list is now empty, otherwise return filtered list
         return filtered if filtered else None
 
-    def get_provider_model(self, provider: str, fallback: Optional[str] = None) -> Optional[str]:
+    def get_provider_model(
+        self, provider: str, fallback: str | None = None
+    ) -> str | None:
         """Get the configured model for a specific provider.
 
         Args:
@@ -373,13 +424,13 @@ class ConfigLoader:
         return fallback
 
     @property
-    def config_path(self) -> Optional[Path]:
+    def config_path(self) -> Path | None:
         """Get the path to the loaded config file."""
         return self._config_path
 
 
 # Global config loader instance
-_config_loader: Optional[ConfigLoader] = None
+_config_loader: ConfigLoader | None = None
 
 
 def get_config_loader() -> ConfigLoader:
@@ -390,7 +441,7 @@ def get_config_loader() -> ConfigLoader:
     return _config_loader
 
 
-def load_config(config_path: Optional[Path] = None) -> ModelChorusConfig:
+def load_config(config_path: Path | None = None) -> ModelChorusConfig:
     """Load configuration (convenience function).
 
     Args:
@@ -421,45 +472,51 @@ def get_config() -> ModelChorusConfig:
 class GenerationDefaultsV2(BaseModel):
     """Default generation parameters for .claude/model_chorus_config.yaml."""
 
-    timeout: Optional[float] = Field(None, gt=0)
-    temperature: Optional[float] = Field(None, ge=0.0, le=2.0)
-    max_tokens: Optional[int] = Field(None, gt=0)
+    timeout: float | None = Field(None, gt=0)
+    temperature: float | None = Field(None, ge=0.0, le=2.0)
+    max_tokens: int | None = Field(None, gt=0)
 
 
 class ProviderConfigV2(BaseModel):
     """Configuration for a provider in .claude/model_chorus_config.yaml."""
 
     enabled: bool = True
-    default_model: Optional[str] = None
-    timeout: Optional[float] = Field(None, gt=0)
+    default_model: str | None = None
+    timeout: float | None = Field(None, gt=0)
 
 
 class WorkflowConfigV2(BaseModel):
     """Workflow configuration for .claude/model_chorus_config.yaml."""
 
-    default_provider: Optional[str] = None
-    fallback_providers: Optional[List[str]] = None
-    timeout: Optional[float] = Field(None, gt=0)
+    default_provider: str | None = None
+    fallback_providers: list[str] | None = None
+    timeout: float | None = Field(None, gt=0)
 
     # Priority-based provider selection for consensus workflow
-    provider_priority: Optional[List[str]] = None  # Ordered list of providers to try
-    num_to_consult: Optional[int] = Field(None, gt=0)  # Number of successful responses needed
+    provider_priority: list[str] | None = None  # Ordered list of providers to try
+    num_to_consult: int | None = Field(
+        None, gt=0
+    )  # Number of successful responses needed
 
-    @field_validator('default_provider')
+    @field_validator("default_provider")
     def validate_provider(cls, v):
         """Validate provider name."""
-        if v and v.lower() not in ['claude', 'gemini', 'codex', 'cursor-agent']:
-            raise ValueError(f"Invalid provider: {v}. Must be one of: claude, gemini, codex, cursor-agent")
+        if v and v.lower() not in ["claude", "gemini", "codex", "cursor-agent"]:
+            raise ValueError(
+                f"Invalid provider: {v}. Must be one of: claude, gemini, codex, cursor-agent"
+            )
         return v.lower() if v else None
 
-    @field_validator('provider_priority', 'fallback_providers')
+    @field_validator("provider_priority", "fallback_providers")
     def validate_providers(cls, v):
         """Validate provider list."""
         if v:
-            valid_providers = ['claude', 'gemini', 'codex', 'cursor-agent']
+            valid_providers = ["claude", "gemini", "codex", "cursor-agent"]
             for provider in v:
                 if provider.lower() not in valid_providers:
-                    raise ValueError(f"Invalid provider: {provider}. Must be one of: {', '.join(valid_providers)}")
+                    raise ValueError(
+                        f"Invalid provider: {provider}. Must be one of: {', '.join(valid_providers)}"
+                    )
             return [p.lower() for p in v]
         return None
 
@@ -467,41 +524,52 @@ class WorkflowConfigV2(BaseModel):
 class ModelChorusConfigV2(BaseModel):
     """Root configuration for .claude/model_chorus_config.yaml."""
 
-    providers: Dict[str, ProviderConfigV2] = Field(default_factory=dict)
-    generation: Optional[GenerationDefaultsV2] = None
-    workflows: Optional[Dict[str, WorkflowConfigV2]] = None
+    providers: dict[str, ProviderConfigV2] = Field(default_factory=dict)
+    generation: GenerationDefaultsV2 | None = None
+    workflows: dict[str, WorkflowConfigV2] | None = None
 
-    @field_validator('providers')
+    @field_validator("providers")
     def validate_provider_names(cls, v):
         """Validate provider names."""
-        valid_providers = ['claude', 'gemini', 'codex', 'cursor-agent']
+        valid_providers = ["claude", "gemini", "codex", "cursor-agent"]
         for provider_name in v.keys():
             if provider_name.lower() not in valid_providers:
-                raise ValueError(f"Invalid provider: {provider_name}. Must be one of: {', '.join(valid_providers)}")
+                raise ValueError(
+                    f"Invalid provider: {provider_name}. Must be one of: {', '.join(valid_providers)}"
+                )
         return v
 
-    @field_validator('workflows')
+    @field_validator("workflows")
     def validate_workflow_names(cls, v):
         """Validate workflow names."""
         if v:
-            valid_workflows = ['chat', 'consensus', 'thinkdeep', 'argument', 'ideate', 'study']
+            valid_workflows = [
+                "chat",
+                "consensus",
+                "thinkdeep",
+                "argument",
+                "ideate",
+                "study",
+            ]
             for workflow_name in v.keys():
                 if workflow_name.lower() not in valid_workflows:
-                    raise ValueError(f"Invalid workflow: {workflow_name}. Must be one of: {', '.join(valid_workflows)}")
+                    raise ValueError(
+                        f"Invalid workflow: {workflow_name}. Must be one of: {', '.join(valid_workflows)}"
+                    )
         return v
 
 
 class ClaudeConfigLoader:
     """Loads and manages configuration from .claude/model_chorus_config.yaml."""
 
-    CONFIG_FILENAME = 'model_chorus_config.yaml'
-    CONFIG_DIR = '.claude'
+    CONFIG_FILENAME = "model_chorus_config.yaml"
+    CONFIG_DIR = ".claude"
 
     def __init__(self):
-        self._config: Optional[ModelChorusConfigV2] = None
-        self._config_path: Optional[Path] = None
+        self._config: ModelChorusConfigV2 | None = None
+        self._config_path: Path | None = None
 
-    def find_config_file(self, start_path: Optional[Path] = None) -> Optional[Path]:
+    def find_config_file(self, start_path: Path | None = None) -> Path | None:
         """Find .claude/model_chorus_config.yaml by searching up from start_path.
 
         Args:
@@ -520,7 +588,7 @@ class ClaudeConfigLoader:
 
         return None
 
-    def load_config(self, config_path: Optional[Path] = None) -> ModelChorusConfigV2:
+    def load_config(self, config_path: Path | None = None) -> ModelChorusConfigV2:
         """Load configuration from .claude/model_chorus_config.yaml.
 
         Args:
@@ -539,10 +607,10 @@ class ClaudeConfigLoader:
                 # No config file found, return default config with all providers disabled
                 self._config = ModelChorusConfigV2(
                     providers={
-                        'claude': ProviderConfigV2(enabled=False),
-                        'gemini': ProviderConfigV2(enabled=False),
-                        'codex': ProviderConfigV2(enabled=False),
-                        'cursor-agent': ProviderConfigV2(enabled=False),
+                        "claude": ProviderConfigV2(enabled=False, timeout=None),
+                        "gemini": ProviderConfigV2(enabled=False, timeout=None),
+                        "codex": ProviderConfigV2(enabled=False, timeout=None),
+                        "cursor-agent": ProviderConfigV2(enabled=False, timeout=None),
                     }
                 )
                 return self._config
@@ -552,7 +620,7 @@ class ClaudeConfigLoader:
         self._config_path = config_path
 
         # Load and parse config file
-        with open(config_path, 'r') as f:
+        with open(config_path) as f:
             content = f.read()
 
         # Parse as YAML
@@ -587,12 +655,13 @@ class ClaudeConfigLoader:
                 # If loading fails, return default config with all providers disabled
                 self._config = ModelChorusConfigV2(
                     providers={
-                        'claude': ProviderConfigV2(enabled=False),
-                        'gemini': ProviderConfigV2(enabled=False),
-                        'codex': ProviderConfigV2(enabled=False),
-                        'cursor-agent': ProviderConfigV2(enabled=False),
+                        "claude": ProviderConfigV2(enabled=False, timeout=None),
+                        "gemini": ProviderConfigV2(enabled=False, timeout=None),
+                        "codex": ProviderConfigV2(enabled=False, timeout=None),
+                        "cursor-agent": ProviderConfigV2(enabled=False, timeout=None),
                     }
                 )
+        assert self._config is not None
         return self._config
 
     def is_provider_enabled(self, provider: str) -> bool:
@@ -613,7 +682,7 @@ class ClaudeConfigLoader:
         # If provider not in config, assume disabled
         return False
 
-    def get_enabled_providers(self) -> List[str]:
+    def get_enabled_providers(self) -> list[str]:
         """Get list of all enabled providers.
 
         Returns:
@@ -626,7 +695,9 @@ class ClaudeConfigLoader:
             if provider_config.enabled
         ]
 
-    def get_workflow_providers(self, workflow: str, fallback: Optional[List[str]] = None) -> List[str]:
+    def get_workflow_providers(
+        self, workflow: str, fallback: list[str] | None = None
+    ) -> list[str]:
         """Get providers for a workflow, filtered by enabled status.
 
         Args:
@@ -651,7 +722,9 @@ class ClaudeConfigLoader:
         # Filter by enabled status
         return [p for p in providers if self.is_provider_enabled(p)]
 
-    def get_workflow_provider_priority(self, workflow: str, fallback: Optional[List[str]] = None) -> List[str]:
+    def get_workflow_provider_priority(
+        self, workflow: str, fallback: list[str] | None = None
+    ) -> list[str]:
         """Get priority-ordered provider list for a workflow.
 
         Args:
@@ -697,7 +770,9 @@ class ClaudeConfigLoader:
 
         return fallback
 
-    def get_default_providers(self, workflow: str, fallback: Optional[List[str]] = None) -> List[str]:
+    def get_default_providers(
+        self, workflow: str, fallback: list[str] | None = None
+    ) -> list[str]:
         """Get default providers list for multi-provider workflows.
 
         This is an alias for get_workflow_providers for compatibility with ConfigLoader.
@@ -714,7 +789,9 @@ class ClaudeConfigLoader:
 
         return self.get_workflow_providers(workflow, fallback)
 
-    def get_workflow_default(self, workflow: str, key: str, fallback: Any = None) -> Any:
+    def get_workflow_default(
+        self, workflow: str, key: str, fallback: Any = None
+    ) -> Any:
         """Get a default value for a specific workflow.
 
         Precedence: workflow-specific > global generation defaults > fallback
@@ -745,7 +822,9 @@ class ClaudeConfigLoader:
         # Return fallback
         return fallback
 
-    def get_workflow_default_provider(self, workflow: str, fallback: str = "claude") -> Optional[str]:
+    def get_workflow_default_provider(
+        self, workflow: str, fallback: str = "claude"
+    ) -> str | None:
         """Get default provider for a workflow, if enabled.
 
         Args:
@@ -767,7 +846,9 @@ class ClaudeConfigLoader:
         # Return provider only if enabled
         return provider if self.is_provider_enabled(provider) else None
 
-    def get_workflow_fallback_providers(self, workflow: str, exclude_provider: Optional[str] = None) -> List[str]:
+    def get_workflow_fallback_providers(
+        self, workflow: str, exclude_provider: str | None = None
+    ) -> list[str]:
         """Get fallback providers for a workflow, filtered by enabled status.
 
         Args:
@@ -788,11 +869,13 @@ class ClaudeConfigLoader:
 
         # Filter by enabled status and exclude specified provider
         if exclude_provider:
-            fallback_providers = [p for p in fallback_providers if p != exclude_provider]
+            fallback_providers = [
+                p for p in fallback_providers if p != exclude_provider
+            ]
 
         return [p for p in fallback_providers if self.is_provider_enabled(p)]
 
-    def get_provider_model(self, provider: str) -> Optional[str]:
+    def get_provider_model(self, provider: str) -> str | None:
         """Get the configured default model for a provider.
 
         Args:
@@ -810,13 +893,13 @@ class ClaudeConfigLoader:
         return None
 
     @property
-    def config_path(self) -> Optional[Path]:
+    def config_path(self) -> Path | None:
         """Get the path to the loaded config file."""
         return self._config_path
 
 
 # Global Claude config loader instance
-_claude_config_loader: Optional[ClaudeConfigLoader] = None
+_claude_config_loader: ClaudeConfigLoader | None = None
 
 
 def get_claude_config_loader() -> ClaudeConfigLoader:

@@ -13,12 +13,13 @@ Skill Input Parameters:
     prior_persona: Previously consulted persona name (optional)
 """
 
-from dataclasses import dataclass, field, asdict
-from typing import Optional, List, Dict, Any
 import json
+from dataclasses import asdict, dataclass, field
+from typing import Any
+
 from pydantic import BaseModel, Field, field_validator
 
-from ...core.models import InvestigationPhase, ConfidenceLevel
+from ...core.models import ConfidenceLevel, InvestigationPhase
 
 
 class ContextAnalysisInput(BaseModel):
@@ -43,13 +44,13 @@ class ContextAnalysisInput(BaseModel):
                 "confidence": "medium",
                 "findings": [
                     "Authentication uses JWT tokens",
-                    "Token expiration check missing in some endpoints"
+                    "Token expiration check missing in some endpoints",
                 ],
                 "unresolved_questions": [
                     "Which endpoints lack token validation?",
-                    "Is there a centralized auth middleware?"
+                    "Is there a centralized auth middleware?",
                 ],
-                "prior_persona": "Researcher"
+                "prior_persona": "Researcher",
             }
         }
     }
@@ -64,17 +65,17 @@ class ContextAnalysisInput(BaseModel):
         description="Current confidence level (ConfidenceLevel enum value or 0-100)",
     )
 
-    findings: List[str] = Field(
+    findings: list[str] = Field(
         default_factory=list,
         description="List of findings/insights discovered so far",
     )
 
-    unresolved_questions: List[str] = Field(
+    unresolved_questions: list[str] = Field(
         default_factory=list,
         description="List of questions that still need investigation",
     )
 
-    prior_persona: Optional[str] = Field(
+    prior_persona: str | None = Field(
         default=None,
         description="Name of the previously consulted persona (if any)",
     )
@@ -156,10 +157,10 @@ class ContextAnalysisResult:
     reasoning: str
     context_summary: str
     confidence: str
-    guidance: List[str] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    guidance: list[str] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """
         Convert the result to a dictionary.
 
@@ -168,7 +169,7 @@ class ContextAnalysisResult:
         """
         return asdict(self)
 
-    def to_json(self, indent: Optional[int] = 2) -> str:
+    def to_json(self, indent: int | None = 2) -> str:
         """
         Convert the result to a JSON string.
 
@@ -194,11 +195,8 @@ class ContextAnalysisResult:
 
 
 def _select_persona_by_phase_and_state(
-    phase: str,
-    findings_count: int,
-    has_questions: bool,
-    prior_persona: Optional[str]
-) -> tuple[str, str, List[str]]:
+    phase: str, findings_count: int, has_questions: bool, prior_persona: str | None
+) -> tuple[str, str, list[str]]:
     """
     Select persona based on investigation phase and current state.
 
@@ -229,8 +227,8 @@ def _select_persona_by_phase_and_state(
                 [
                     "Challenge the initial findings",
                     "Look for edge cases or contradictions",
-                    "Identify gaps in the current understanding"
-                ]
+                    "Identify gaps in the current understanding",
+                ],
             )
         else:
             # Default to Researcher for systematic exploration
@@ -241,8 +239,8 @@ def _select_persona_by_phase_and_state(
                 [
                     "Gather initial information systematically",
                     "Identify key patterns and relationships",
-                    "Build comprehensive understanding"
-                ]
+                    "Build comprehensive understanding",
+                ],
             )
 
     elif phase == InvestigationPhase.VALIDATION.value:
@@ -256,8 +254,8 @@ def _select_persona_by_phase_and_state(
                 [
                     "Address gaps identified by critical analysis",
                     "Gather supporting evidence for key findings",
-                    "Validate assumptions with deeper investigation"
-                ]
+                    "Validate assumptions with deeper investigation",
+                ],
             )
         else:
             # Default to Critic for validation
@@ -268,8 +266,8 @@ def _select_persona_by_phase_and_state(
                 [
                     "Stress-test existing findings",
                     "Look for counterexamples or exceptions",
-                    "Ensure conclusions are well-supported"
-                ]
+                    "Ensure conclusions are well-supported",
+                ],
             )
 
     elif phase == InvestigationPhase.PLANNING.value:
@@ -284,8 +282,8 @@ def _select_persona_by_phase_and_state(
                     [
                         "Address remaining open questions",
                         "Gather any missing information",
-                        "Complete the investigation picture"
-                    ]
+                        "Complete the investigation picture",
+                    ],
                 )
             else:
                 return (
@@ -295,8 +293,8 @@ def _select_persona_by_phase_and_state(
                     [
                         "Validate the proposed plan",
                         "Identify potential risks or issues",
-                        "Ensure nothing has been overlooked"
-                    ]
+                        "Ensure nothing has been overlooked",
+                    ],
                 )
         else:
             # Default to Planner for synthesis
@@ -307,8 +305,8 @@ def _select_persona_by_phase_and_state(
                 [
                     "Synthesize all findings into coherent plan",
                     "Define clear action items",
-                    "Prioritize next steps by impact"
-                ]
+                    "Prioritize next steps by impact",
+                ],
             )
 
     else:  # COMPLETE phase
@@ -316,7 +314,7 @@ def _select_persona_by_phase_and_state(
         return (
             "None",
             "Investigation is complete. No further persona consultation needed.",
-            ["Review final results and close investigation"]
+            ["Review final results and close investigation"],
         )
 
 
@@ -378,6 +376,6 @@ def analyze_context(context_input: ContextAnalysisInput) -> ContextAnalysisResul
             "findings_count": findings_count,
             "has_questions": has_questions,
             "prior_persona": prior_persona,
-            "selection_strategy": "phase_based_with_rotation"
-        }
+            "selection_strategy": "phase_based_with_rotation",
+        },
     )

@@ -6,16 +6,16 @@ This module provides integration with Cursor's AI agent via the `cursor-agent` C
 
 import json
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
-from .cli_provider import CLIProvider
 from .base_provider import (
     GenerationRequest,
     GenerationResponse,
-    ModelConfig,
     ModelCapability,
+    ModelConfig,
     TokenUsage,
 )
+from .cli_provider import CLIProvider
 
 logger = logging.getLogger(__name__)
 
@@ -53,8 +53,8 @@ class CursorAgentProvider(CLIProvider):
 
     def __init__(
         self,
-        api_key: Optional[str] = None,
-        config: Optional[Dict[str, Any]] = None,
+        api_key: str | None = None,
+        config: dict[str, Any] | None = None,
         timeout: int = 120,
         retry_limit: int = 3,
     ):
@@ -105,7 +105,7 @@ class CursorAgentProvider(CLIProvider):
         ]
         self.set_model_list(models)
 
-    def build_command(self, request: GenerationRequest) -> List[str]:
+    def build_command(self, request: GenerationRequest) -> list[str]:
         """
         Build the CLI command for a Cursor Agent generation request.
 
@@ -146,7 +146,9 @@ class CursorAgentProvider(CLIProvider):
         logger.debug(f"Built Cursor Agent command: {' '.join(command)}")
         return command
 
-    def parse_response(self, stdout: str, stderr: str, returncode: int) -> GenerationResponse:
+    def parse_response(
+        self, stdout: str, stderr: str, returncode: int
+    ) -> GenerationResponse:
         """
         Parse CLI output into a GenerationResponse.
 
@@ -215,7 +217,8 @@ class CursorAgentProvider(CLIProvider):
                 input_tokens=usage_dict.get("input_tokens", 0),
                 output_tokens=usage_dict.get("output_tokens", 0),
                 cached_input_tokens=usage_dict.get("cached_input_tokens", 0),
-                total_tokens=usage_dict.get("input_tokens", 0) + usage_dict.get("output_tokens", 0),
+                total_tokens=usage_dict.get("input_tokens", 0)
+                + usage_dict.get("output_tokens", 0),
                 metadata={},
             )
 

@@ -8,8 +8,8 @@ Also includes validation and confidence scoring utilities for citation quality
 assessment and verification.
 """
 
-from typing import Optional, List, Dict, Any, Tuple
 from enum import Enum
+from typing import Any
 
 
 class CitationStyle(str, Enum):
@@ -75,7 +75,9 @@ def _format_apa(citation: "Citation") -> str:  # type: ignore
         parts.append(f"{author}")
 
     # Year
-    year = citation.metadata.get("year") or citation.metadata.get("publication_date", "")
+    year = citation.metadata.get("year") or citation.metadata.get(
+        "publication_date", ""
+    )
     if year:
         # Extract year if full date provided
         year_str = str(year)[:4] if len(str(year)) > 4 else str(year)
@@ -123,7 +125,9 @@ def _format_mla(citation: "Citation") -> str:  # type: ignore
     parts.append(f"{citation.source},")
 
     # Year
-    year = citation.metadata.get("year") or citation.metadata.get("publication_date", "")
+    year = citation.metadata.get("year") or citation.metadata.get(
+        "publication_date", ""
+    )
     if year:
         year_str = str(year)[:4] if len(str(year)) > 4 else str(year)
         parts.append(f"{year_str}.")
@@ -163,7 +167,9 @@ def _format_chicago(citation: "Citation") -> str:  # type: ignore
     source_part = citation.source
 
     # Year (in parentheses after source)
-    year = citation.metadata.get("year") or citation.metadata.get("publication_date", "")
+    year = citation.metadata.get("year") or citation.metadata.get(
+        "publication_date", ""
+    )
     if year:
         year_str = str(year)[:4] if len(str(year)) > 4 else str(year)
         source_part += f" ({year_str})"
@@ -224,7 +230,7 @@ def format_citation_map(
 # ============================================================================
 
 
-def validate_citation(citation: "Citation") -> Tuple[bool, List[str]]:  # type: ignore
+def validate_citation(citation: "Citation") -> tuple[bool, list[str]]:  # type: ignore
     """
     Validate a Citation object for completeness and quality.
 
@@ -276,7 +282,7 @@ def validate_citation(citation: "Citation") -> Tuple[bool, List[str]]:  # type: 
     return is_valid, issues
 
 
-def calculate_citation_confidence(citation: "Citation") -> Dict[str, Any]:  # type: ignore
+def calculate_citation_confidence(citation: "Citation") -> dict[str, Any]:  # type: ignore
     """
     Calculate a detailed confidence score for a citation's reliability.
 
@@ -344,10 +350,10 @@ def calculate_citation_confidence(citation: "Citation") -> Dict[str, Any]:  # ty
 
     # Calculate overall confidence (weighted average)
     overall_confidence = (
-        base_confidence * 0.4 +      # 40% from original confidence
-        metadata_score * 0.3 +        # 30% from metadata completeness
-        source_quality * 0.2 +        # 20% from source quality
-        location_score * 0.1          # 10% from location specificity
+        base_confidence * 0.4  # 40% from original confidence
+        + metadata_score * 0.3  # 30% from metadata completeness
+        + source_quality * 0.2  # 20% from source quality
+        + location_score * 0.1  # 10% from location specificity
     )
 
     return {
@@ -358,13 +364,17 @@ def calculate_citation_confidence(citation: "Citation") -> Dict[str, Any]:  # ty
         "location_score": round(location_score, 3),
         "factors": {
             "metadata_completeness": metadata_factors,
-            "source_type": "academic" if source_quality >= 0.9 else "web" if "http" in source_lower else "file",
+            "source_type": (
+                "academic"
+                if source_quality >= 0.9
+                else "web" if "http" in source_lower else "file"
+            ),
             "has_specific_location": location_score > 0.5,
         },
     }
 
 
-def calculate_citation_map_confidence(citation_map: "CitationMap") -> Dict[str, Any]:  # type: ignore
+def calculate_citation_map_confidence(citation_map: "CitationMap") -> dict[str, Any]:  # type: ignore
     """
     Calculate aggregate confidence scores for a CitationMap.
 
@@ -401,8 +411,7 @@ def calculate_citation_map_confidence(citation_map: "CitationMap") -> Dict[str, 
 
     # Calculate confidence for each citation
     individual_scores = [
-        calculate_citation_confidence(citation)
-        for citation in citation_map.citations
+        calculate_citation_confidence(citation) for citation in citation_map.citations
     ]
 
     overall_confidences = [score["overall_confidence"] for score in individual_scores]
@@ -419,9 +428,9 @@ def calculate_citation_map_confidence(citation_map: "CitationMap") -> Dict[str, 
     citation_count_factor = min(len(citation_map.citations) / 5.0, 1.0)
 
     overall_confidence = (
-        average_confidence * 0.5 +
-        citation_map.strength * 0.3 +
-        citation_count_factor * 0.2
+        average_confidence * 0.5
+        + citation_map.strength * 0.3
+        + citation_count_factor * 0.2
     )
 
     return {

@@ -5,22 +5,22 @@ Tests embedding computation, similarity scoring, claim comparison,
 and integration with Citation/CitationMap models.
 """
 
-import pytest
 import numpy as np
+import pytest
 
 from model_chorus.core.models import Citation, CitationMap
 from model_chorus.workflows.argument.semantic import (
+    add_similarity_to_citation,
+    cluster_claims_hierarchical,
+    cluster_claims_kmeans,
+    compute_claim_similarity,
+    compute_claim_similarity_batch,
+    compute_cluster_statistics,
     compute_embedding,
     cosine_similarity,
-    compute_claim_similarity,
-    find_similar_claims,
-    compute_claim_similarity_batch,
-    add_similarity_to_citation,
     find_duplicate_claims,
-    cluster_claims_kmeans,
-    cluster_claims_hierarchical,
+    find_similar_claims,
     get_cluster_representative,
-    compute_cluster_statistics,
 )
 
 
@@ -205,7 +205,10 @@ class TestFindSimilarClaims:
 
         # Should find at least the very similar claims
         assert len(results) >= 1
-        assert all(isinstance(cm, CitationMap) and isinstance(score, float) for cm, score in results)
+        assert all(
+            isinstance(cm, CitationMap) and isinstance(score, float)
+            for cm, score in results
+        )
 
     def test_find_similar_claims_threshold(self, sample_citation_maps):
         """Test threshold filtering."""
@@ -586,8 +589,12 @@ class TestKMeansClustering:
 
     def test_cluster_claims_kmeans_reproducibility(self, diverse_citation_maps):
         """Test that clustering is reproducible with same random_state."""
-        clusters1 = cluster_claims_kmeans(diverse_citation_maps, n_clusters=3, random_state=42)
-        clusters2 = cluster_claims_kmeans(diverse_citation_maps, n_clusters=3, random_state=42)
+        clusters1 = cluster_claims_kmeans(
+            diverse_citation_maps, n_clusters=3, random_state=42
+        )
+        clusters2 = cluster_claims_kmeans(
+            diverse_citation_maps, n_clusters=3, random_state=42
+        )
 
         # Should produce same clusters
         for c1, c2 in zip(clusters1, clusters2):
@@ -645,9 +652,7 @@ class TestHierarchicalClustering:
         """Test different linkage methods."""
         for linkage in ["ward", "complete", "average", "single"]:
             clusters = cluster_claims_hierarchical(
-                sample_maps,
-                n_clusters=2,
-                linkage_method=linkage
+                sample_maps, n_clusters=2, linkage_method=linkage
             )
 
             assert len(clusters) == 2
@@ -722,14 +727,36 @@ class TestClusterStatistics:
         clusters = [
             # Cluster 1: 3 similar claims
             [
-                CitationMap(claim_id="1", claim_text="AI models", citations=[], strength=0.9),
-                CitationMap(claim_id="2", claim_text="ML algorithms", citations=[], strength=0.85),
-                CitationMap(claim_id="3", claim_text="Deep learning", citations=[], strength=0.88),
+                CitationMap(
+                    claim_id="1", claim_text="AI models", citations=[], strength=0.9
+                ),
+                CitationMap(
+                    claim_id="2",
+                    claim_text="ML algorithms",
+                    citations=[],
+                    strength=0.85,
+                ),
+                CitationMap(
+                    claim_id="3",
+                    claim_text="Deep learning",
+                    citations=[],
+                    strength=0.88,
+                ),
             ],
             # Cluster 2: 2 similar claims
             [
-                CitationMap(claim_id="4", claim_text="Weather forecast", citations=[], strength=0.8),
-                CitationMap(claim_id="5", claim_text="Climate prediction", citations=[], strength=0.82),
+                CitationMap(
+                    claim_id="4",
+                    claim_text="Weather forecast",
+                    citations=[],
+                    strength=0.8,
+                ),
+                CitationMap(
+                    claim_id="5",
+                    claim_text="Climate prediction",
+                    citations=[],
+                    strength=0.82,
+                ),
             ],
         ]
 
@@ -755,8 +782,16 @@ class TestClusterStatistics:
     def test_compute_cluster_statistics_single_item_clusters(self):
         """Test statistics when clusters have single items."""
         clusters = [
-            [CitationMap(claim_id="1", claim_text="Test 1", citations=[], strength=0.9)],
-            [CitationMap(claim_id="2", claim_text="Test 2", citations=[], strength=0.8)],
+            [
+                CitationMap(
+                    claim_id="1", claim_text="Test 1", citations=[], strength=0.9
+                )
+            ],
+            [
+                CitationMap(
+                    claim_id="2", claim_text="Test 2", citations=[], strength=0.8
+                )
+            ],
         ]
 
         stats = compute_cluster_statistics(clusters)
@@ -771,7 +806,12 @@ class TestClusteringIntegration:
     def test_kmeans_to_statistics_pipeline(self):
         """Test complete pipeline: cluster -> compute statistics."""
         maps = [
-            CitationMap(claim_id=str(i), claim_text=f"Claim about topic {i % 3}", citations=[], strength=0.9)
+            CitationMap(
+                claim_id=str(i),
+                claim_text=f"Claim about topic {i % 3}",
+                citations=[],
+                strength=0.9,
+            )
             for i in range(9)
         ]
 
@@ -788,10 +828,27 @@ class TestClusteringIntegration:
     def test_hierarchical_to_statistics_pipeline(self):
         """Test complete pipeline with hierarchical clustering."""
         maps = [
-            CitationMap(claim_id="ml-1", claim_text="Machine learning", citations=[], strength=0.9),
-            CitationMap(claim_id="ml-2", claim_text="AI algorithms", citations=[], strength=0.85),
-            CitationMap(claim_id="db-1", claim_text="Database optimization", citations=[], strength=0.8),
-            CitationMap(claim_id="db-2", claim_text="Query performance", citations=[], strength=0.82),
+            CitationMap(
+                claim_id="ml-1",
+                claim_text="Machine learning",
+                citations=[],
+                strength=0.9,
+            ),
+            CitationMap(
+                claim_id="ml-2", claim_text="AI algorithms", citations=[], strength=0.85
+            ),
+            CitationMap(
+                claim_id="db-1",
+                claim_text="Database optimization",
+                citations=[],
+                strength=0.8,
+            ),
+            CitationMap(
+                claim_id="db-2",
+                claim_text="Query performance",
+                citations=[],
+                strength=0.82,
+            ),
         ]
 
         # Cluster

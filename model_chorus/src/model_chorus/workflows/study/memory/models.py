@@ -9,10 +9,11 @@ The models support a two-tier memory architecture:
 - Long-term persistence: Serialized MemoryEntry stored in SQLite
 """
 
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from datetime import UTC, datetime
 from enum import Enum
-from pydantic import BaseModel, Field, ConfigDict
+from typing import Any
+
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class MemoryType(str, Enum):
@@ -98,7 +99,7 @@ class MemoryEntry(BaseModel):
     )
 
     timestamp: str = Field(
-        default_factory=lambda: datetime.now(timezone.utc).isoformat(),
+        default_factory=lambda: datetime.now(UTC).isoformat(),
         description="ISO format timestamp of when entry was created",
     )
 
@@ -129,7 +130,7 @@ class MemoryEntry(BaseModel):
         description="Confidence level after this investigation step",
     )
 
-    memory_references: List[str] = Field(
+    memory_references: list[str] = Field(
         default_factory=list,
         description="List of memory entry IDs referenced or related to this one",
     )
@@ -139,7 +140,7 @@ class MemoryEntry(BaseModel):
         description="Type of memory entry for categorization",
     )
 
-    metadata: Dict[str, Any] = Field(
+    metadata: dict[str, Any] = Field(
         default_factory=dict,
         description="Additional metadata (sources, tags, importance, etc.)",
     )
@@ -202,7 +203,7 @@ class MemoryMetadata(BaseModel):
         description="Number of distinct investigations tracked",
     )
 
-    last_cleanup: Optional[str] = Field(
+    last_cleanup: str | None = Field(
         default=None,
         description="ISO timestamp of last cleanup/pruning operation",
     )
@@ -264,32 +265,32 @@ class MemoryQuery(BaseModel):
         }
     )
 
-    investigation_id: Optional[str] = Field(
+    investigation_id: str | None = Field(
         default=None,
         description="Filter by specific investigation ID",
     )
 
-    persona: Optional[str] = Field(
+    persona: str | None = Field(
         default=None,
         description="Filter by persona identifier",
     )
 
-    confidence_level: Optional[str] = Field(
+    confidence_level: str | None = Field(
         default=None,
         description="Filter by minimum confidence level",
     )
 
-    time_range_start: Optional[str] = Field(
+    time_range_start: str | None = Field(
         default=None,
         description="Filter by start time (ISO format timestamp)",
     )
 
-    time_range_end: Optional[str] = Field(
+    time_range_end: str | None = Field(
         default=None,
         description="Filter by end time (ISO format timestamp)",
     )
 
-    memory_type: Optional[MemoryType] = Field(
+    memory_type: MemoryType | None = Field(
         default=None,
         description="Filter by memory entry type",
     )

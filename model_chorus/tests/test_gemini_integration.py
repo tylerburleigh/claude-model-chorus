@@ -4,17 +4,22 @@ Integration tests for GeminiProvider.
 These tests verify that the Gemini CLI integration works correctly with real CLI calls.
 """
 
-import pytest
 import subprocess
-from model_chorus.providers.gemini_provider import GeminiProvider
-from model_chorus.providers.base_provider import GenerationRequest
+
+import pytest
 
 # Import provider availability from shared test helpers
-from test_helpers import GEMINI_AVAILABLE
+from .test_helpers import GEMINI_AVAILABLE
+
+from model_chorus.providers.base_provider import GenerationRequest
+from model_chorus.providers.gemini_provider import GeminiProvider
 
 
 @pytest.mark.requires_gemini
-@pytest.mark.skipif(not GEMINI_AVAILABLE, reason="Gemini not available (config disabled or CLI not found)")
+@pytest.mark.skipif(
+    not GEMINI_AVAILABLE,
+    reason="Gemini not available (config disabled or CLI not found)",
+)
 class TestGeminiIntegration:
     """Integration tests for Gemini provider."""
 
@@ -66,25 +71,36 @@ class TestGeminiIntegration:
         assert "chat" not in command, "Gemini CLI doesn't use 'chat' subcommand"
 
         # Should not include --temperature (not supported)
-        assert "--temperature" not in command, "Gemini CLI doesn't support --temperature"
+        assert (
+            "--temperature" not in command
+        ), "Gemini CLI doesn't support --temperature"
 
         # Should not include --json (uses --output-format instead)
-        assert "--json" not in command, "Gemini CLI uses --output-format json, not --json"
+        assert (
+            "--json" not in command
+        ), "Gemini CLI uses --output-format json, not --json"
 
         # Should include --output-format json
-        assert "--output-format" in command and "json" in command, "Should use --output-format json for JSON output"
+        assert (
+            "--output-format" in command and "json" in command
+        ), "Should use --output-format json for JSON output"
 
         # Prompt is passed as positional argument (after all flags)
         # The -p flag only works with shell=True, not with subprocess.exec
         # Gemini prepends "Human: " to prompts, so check for that
-        assert command[-1].endswith(simple_request.prompt) or simple_request.prompt in command[-1], \
-            f"Prompt should be in command as positional argument. Got: {command[-1]}"
-        assert "-p" not in command, "Should not use -p flag (use positional arg instead)"
+        assert (
+            command[-1].endswith(simple_request.prompt)
+            or simple_request.prompt in command[-1]
+        ), f"Prompt should be in command as positional argument. Got: {command[-1]}"
+        assert (
+            "-p" not in command
+        ), "Should not use -p flag (use positional arg instead)"
 
         # Verify input_data is NOT set (we use positional args, not stdin)
         command_result = provider.build_command(simple_request)  # Reset state
-        assert not hasattr(provider, 'input_data') or provider.input_data is None, \
-            "Provider should not use input_data (positional args used instead)"
+        assert (
+            not hasattr(provider, "input_data") or provider.input_data is None
+        ), "Provider should not use input_data (positional args used instead)"
 
     def test_build_command_with_model(self, provider):
         """Test command building with model metadata."""
@@ -109,7 +125,11 @@ class TestGeminiIntegration:
                 timeout=5,
                 check=True,
             )
-        except (FileNotFoundError, subprocess.TimeoutExpired, subprocess.CalledProcessError):
+        except (
+            FileNotFoundError,
+            subprocess.TimeoutExpired,
+            subprocess.CalledProcessError,
+        ):
             pytest.skip("Gemini CLI not available or not working")
 
         # Make actual request
@@ -117,7 +137,11 @@ class TestGeminiIntegration:
             response = await provider.generate(simple_request)
         except Exception as e:
             # Skip if Gemini API is unavailable (e.g., error code 144, API key issues)
-            if "144" in str(e) or "API" in str(e).upper() or "authentication" in str(e).lower():
+            if (
+                "144" in str(e)
+                or "API" in str(e).upper()
+                or "authentication" in str(e).lower()
+            ):
                 pytest.skip(f"Gemini API unavailable or authentication failed: {e}")
             raise  # Re-raise if it's a different error
 

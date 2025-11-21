@@ -18,10 +18,11 @@ Public API:
 
 import asyncio
 import logging
-from enum import Enum
-from typing import Any, Dict, Optional, List
 from dataclasses import dataclass, field
-from pydantic import BaseModel, Field, ConfigDict, field_validator
+from enum import Enum
+from typing import Any
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 logger = logging.getLogger(__name__)
 
@@ -159,42 +160,42 @@ class ModelRole(BaseModel):
         min_length=1,
     )
 
-    stance: Optional[str] = Field(
+    stance: str | None = Field(
         default=None,
         description="Optional stance for debate-style workflows ('for', 'against', 'neutral')",
     )
 
-    stance_prompt: Optional[str] = Field(
+    stance_prompt: str | None = Field(
         default=None,
         description="Optional additional prompt text to reinforce the stance",
     )
 
-    system_prompt: Optional[str] = Field(
+    system_prompt: str | None = Field(
         default=None,
         description="Optional system-level prompt for this role",
     )
 
-    temperature: Optional[float] = Field(
+    temperature: float | None = Field(
         default=None,
         description="Optional temperature override for this role (0.0 to 1.0)",
         ge=0.0,
         le=1.0,
     )
 
-    max_tokens: Optional[int] = Field(
+    max_tokens: int | None = Field(
         default=None,
         description="Optional max tokens override for this role",
         gt=0,
     )
 
-    metadata: Dict[str, Any] = Field(
+    metadata: dict[str, Any] = Field(
         default_factory=dict,
         description="Additional metadata for this role (tags, priority, constraints, etc.)",
     )
 
     @field_validator("stance")
     @classmethod
-    def validate_stance(cls, v: Optional[str]) -> Optional[str]:
+    def validate_stance(cls, v: str | None) -> str | None:
         """
         Validate stance is one of the allowed values.
 
@@ -217,15 +218,13 @@ class ModelRole(BaseModel):
         stance_lower = v.lower()
 
         if stance_lower not in allowed_stances:
-            raise ValueError(
-                f"Stance must be one of {allowed_stances}, got '{v}'"
-            )
+            raise ValueError(f"Stance must be one of {allowed_stances}, got '{v}'")
 
         return stance_lower
 
     @field_validator("temperature")
     @classmethod
-    def validate_temperature(cls, v: Optional[float]) -> Optional[float]:
+    def validate_temperature(cls, v: float | None) -> float | None:
         """
         Validate temperature is in valid range.
 
@@ -327,14 +326,14 @@ class OrchestrationResult:
         ... )
     """
 
-    role_responses: List[tuple[str, Any]] = field(default_factory=list)
-    all_responses: List[Any] = field(default_factory=list)
-    failed_roles: List[str] = field(default_factory=list)
+    role_responses: list[tuple[str, Any]] = field(default_factory=list)
+    all_responses: list[Any] = field(default_factory=list)
+    failed_roles: list[str] = field(default_factory=list)
     pattern_used: OrchestrationPattern = OrchestrationPattern.SEQUENTIAL
-    execution_order: List[str] = field(default_factory=list)
-    synthesized_output: Optional[Any] = None
-    synthesis_strategy: Optional[SynthesisStrategy] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    execution_order: list[str] = field(default_factory=list)
+    synthesized_output: Any | None = None
+    synthesis_strategy: SynthesisStrategy | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 class RoleOrchestrator:
@@ -391,8 +390,8 @@ class RoleOrchestrator:
 
     def __init__(
         self,
-        roles: List[ModelRole],
-        provider_map: Dict[str, Any],
+        roles: list[ModelRole],
+        provider_map: dict[str, Any],
         pattern: OrchestrationPattern = OrchestrationPattern.SEQUENTIAL,
         default_timeout: float = 120.0,
     ):
@@ -413,7 +412,10 @@ class RoleOrchestrator:
         if not roles:
             raise ValueError("At least one role is required")
 
-        if pattern not in (OrchestrationPattern.SEQUENTIAL, OrchestrationPattern.PARALLEL):
+        if pattern not in (
+            OrchestrationPattern.SEQUENTIAL,
+            OrchestrationPattern.PARALLEL,
+        ):
             raise ValueError(
                 f"Only SEQUENTIAL and PARALLEL patterns are supported, got {pattern}. "
                 f"HYBRID pattern is not yet implemented."
@@ -472,7 +474,7 @@ class RoleOrchestrator:
     async def execute(
         self,
         base_prompt: str,
-        context: Optional[str] = None,
+        context: str | None = None,
     ) -> OrchestrationResult:
         """
         Execute the orchestrated workflow with all roles.
@@ -512,7 +514,7 @@ class RoleOrchestrator:
     async def _execute_sequential(
         self,
         base_prompt: str,
-        context: Optional[str] = None,
+        context: str | None = None,
     ) -> OrchestrationResult:
         """
         Execute all roles sequentially in order.
@@ -530,9 +532,7 @@ class RoleOrchestrator:
         # Import here to avoid circular dependency
         from ..providers import GenerationRequest
 
-        logger.info(
-            f"Starting sequential execution of {len(self.roles)} roles"
-        )
+        logger.info(f"Starting sequential execution of {len(self.roles)} roles")
 
         role_responses = []
         all_responses = []
@@ -579,10 +579,7 @@ class RoleOrchestrator:
                 )
 
             except Exception as e:
-                logger.error(
-                    f"Role '{role.role}' failed: {e}",
-                    exc_info=True
-                )
+                logger.error(f"Role '{role.role}' failed: {e}", exc_info=True)
                 failed_roles.append(role.role)
                 # Continue with remaining roles even if one fails
 
@@ -609,7 +606,7 @@ class RoleOrchestrator:
     async def _execute_parallel(
         self,
         base_prompt: str,
-        context: Optional[str] = None,
+        context: str | None = None,
     ) -> OrchestrationResult:
         """
         Execute all roles in parallel (concurrently).
@@ -628,9 +625,7 @@ class RoleOrchestrator:
         # Import here to avoid circular dependency
         from ..providers import GenerationRequest
 
-        logger.info(
-            f"Starting parallel execution of {len(self.roles)} roles"
-        )
+        logger.info(f"Starting parallel execution of {len(self.roles)} roles")
 
         # Build context-enhanced prompt if context provided
         full_base_prompt = base_prompt
@@ -638,7 +633,9 @@ class RoleOrchestrator:
             full_base_prompt = f"{context}\n\n{base_prompt}"
 
         # Create tasks for all roles
-        async def execute_role(role: ModelRole, index: int) -> tuple[int, Optional[str], Optional[Any], Optional[str]]:
+        async def execute_role(
+            role: ModelRole, index: int
+        ) -> tuple[int, str, Any | None, str | None]:
             """
             Execute a single role and return (index, role_name, response, error).
 
@@ -650,7 +647,9 @@ class RoleOrchestrator:
                 Tuple of (index, role_name, response or None, error_message or None)
             """
             try:
-                logger.info(f"Executing role {index + 1}/{len(self.roles)}: {role.role} (model: {role.model})")
+                logger.info(
+                    f"Executing role {index + 1}/{len(self.roles)}: {role.role} (model: {role.model})"
+                )
 
                 # Resolve provider for this role
                 provider = self._resolve_provider(role.model)
@@ -669,7 +668,9 @@ class RoleOrchestrator:
                 # Execute via provider
                 response = await provider.generate(request)
 
-                logger.info(f"Role '{role.role}' completed successfully ({len(response.content)} chars)")
+                logger.info(
+                    f"Role '{role.role}' completed successfully ({len(response.content)} chars)"
+                )
 
                 return (index, role.role, response, None)
 
@@ -726,8 +727,8 @@ class RoleOrchestrator:
         self,
         result: OrchestrationResult,
         strategy: SynthesisStrategy = SynthesisStrategy.CONCATENATE,
-        synthesis_provider: Optional[Any] = None,
-        synthesis_prompt: Optional[str] = None,
+        synthesis_provider: Any | None = None,
+        synthesis_prompt: str | None = None,
     ) -> OrchestrationResult:
         """
         Synthesize multiple role outputs into a unified result.
@@ -768,7 +769,9 @@ class RoleOrchestrator:
             result.synthesis_strategy = strategy
             result.metadata["synthesis_method"] = "concatenate"
 
-            logger.info(f"Concatenated {len(result.role_responses)} responses ({len(synthesized)} chars)")
+            logger.info(
+                f"Concatenated {len(result.role_responses)} responses ({len(synthesized)} chars)"
+            )
 
             return result
 
@@ -829,7 +832,9 @@ class RoleOrchestrator:
                 result.metadata["synthesis_model"] = synthesis_response.model
                 result.metadata["synthesis_usage"] = synthesis_response.usage
 
-                logger.info(f"AI synthesis completed ({len(synthesis_response.content)} chars)")
+                logger.info(
+                    f"AI synthesis completed ({len(synthesis_response.content)} chars)"
+                )
 
                 return result
 

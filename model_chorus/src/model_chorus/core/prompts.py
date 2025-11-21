@@ -5,8 +5,6 @@ for all ModelChorus workflows, particularly those that invoke external
 CLI tools in read-only mode.
 """
 
-from typing import Optional
-
 
 def get_read_only_system_prompt() -> str:
     """
@@ -48,7 +46,7 @@ You CANNOT perform file write or modification operations.
 Focus on understanding, explaining, and suggesting improvements."""
 
 
-def prepend_system_constraints(custom_prompt: Optional[str] = None) -> str:
+def prepend_system_constraints(custom_prompt: str | None = None) -> str:
     """
     Prepend read-only environment constraints to a custom system prompt.
 

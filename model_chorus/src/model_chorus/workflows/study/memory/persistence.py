@@ -13,12 +13,12 @@ Architecture:
 - Full-text search support (future enhancement)
 """
 
+import json
 import logging
 import sqlite3
-import json
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import List, Optional, Dict, Any
-from datetime import datetime, timezone
+from typing import Any
 
 from .models import MemoryEntry, MemoryMetadata, MemoryQuery, MemoryType
 
@@ -81,7 +81,7 @@ class LongTermStorage:
             db_path: Path to SQLite database file (created if doesn't exist)
         """
         self.db_path = Path(db_path)
-        self.connection: Optional[sqlite3.Connection] = None
+        self.connection: sqlite3.Connection | None = None
         logger.info(f"LongTermStorage initialized with db_path={db_path}")
 
     def initialize(self) -> None:
@@ -98,7 +98,8 @@ class LongTermStorage:
             cursor = conn.cursor()
 
             # Create investigations table
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE IF NOT EXISTS investigations (
                     investigation_id TEXT PRIMARY KEY,
                     created_at TEXT NOT NULL,
@@ -107,10 +108,12 @@ class LongTermStorage:
                     entry_count INTEGER DEFAULT 0,
                     metadata_json TEXT
                 )
-            """)
+            """
+            )
 
             # Create memory_entries table
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE IF NOT EXISTS memory_entries (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     entry_id TEXT UNIQUE NOT NULL,
@@ -126,24 +129,32 @@ class LongTermStorage:
                     metadata_json TEXT,
                     FOREIGN KEY (investigation_id) REFERENCES investigations(investigation_id)
                 )
-            """)
+            """
+            )
 
             # Create indexes for common queries
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_memory_entries_investigation
                 ON memory_entries(investigation_id)
-            """)
-            cursor.execute("""
+            """
+            )
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_memory_entries_persona
                 ON memory_entries(persona)
-            """)
-            cursor.execute("""
+            """
+            )
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_memory_entries_timestamp
                 ON memory_entries(timestamp)
-            """)
+            """
+            )
 
             # Create memory_references table
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE IF NOT EXISTS memory_references (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     source_entry_id TEXT NOT NULL,
@@ -152,12 +163,15 @@ class LongTermStorage:
                     FOREIGN KEY (source_entry_id) REFERENCES memory_entries(entry_id),
                     FOREIGN KEY (target_entry_id) REFERENCES memory_entries(entry_id)
                 )
-            """)
+            """
+            )
 
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_memory_references_source
                 ON memory_references(source_entry_id)
-            """)
+            """
+            )
 
             conn.commit()
             logger.info("Database schema initialized successfully")
@@ -197,7 +211,7 @@ class LongTermStorage:
                 """,
                     (
                         entry.investigation_id,
-                        datetime.now(timezone.utc).isoformat(),
+                        datetime.now(UTC).isoformat(),
                         json.dumps({}),
                     ),
                 )
@@ -234,7 +248,7 @@ class LongTermStorage:
                         source_entry_id, target_entry_id, created_at
                     ) VALUES (?, ?, ?)
                 """,
-                    (entry_id, ref_id, datetime.now(timezone.utc).isoformat()),
+                    (entry_id, ref_id, datetime.now(UTC).isoformat()),
                 )
 
             # Update investigation entry count
@@ -257,7 +271,7 @@ class LongTermStorage:
             logger.error(f"Failed to save entry {entry_id}: {e}")
             raise
 
-    def get(self, entry_id: str) -> Optional[MemoryEntry]:
+    def get(self, entry_id: str) -> MemoryEntry | None:
         """
         Retrieve a memory entry from persistent storage.
 
@@ -319,7 +333,7 @@ class LongTermStorage:
             logger.error(f"Failed to retrieve entry {entry_id}: {e}")
             raise
 
-    def query(self, query: MemoryQuery) -> List[MemoryEntry]:
+    def query(self, query: MemoryQuery) -> list[MemoryEntry]:
         """
         Query persistent storage for entries matching filter criteria.
 
@@ -341,7 +355,7 @@ class LongTermStorage:
 
             # Build WHERE clauses
             where_clauses = []
-            params = []
+            params: list[Any] = []
 
             if query.investigation_id:
                 where_clauses.append("investigation_id = ?")

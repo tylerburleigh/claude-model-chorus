@@ -13,11 +13,9 @@ Architecture:
 
 import logging
 import uuid
-from typing import List, Optional
-from datetime import datetime, timezone
 
-from .models import MemoryEntry, MemoryMetadata, MemoryQuery
 from .cache import ShortTermCache
+from .models import MemoryEntry, MemoryMetadata, MemoryQuery
 from .persistence import LongTermStorage
 
 logger = logging.getLogger(__name__)
@@ -115,8 +113,8 @@ class MemoryController:
         evidence: str = "",
         confidence_before: str = "exploring",
         confidence_after: str = "exploring",
-        session_id: Optional[str] = None,
-        memory_references: Optional[List[str]] = None,
+        session_id: str | None = None,
+        memory_references: list[str] | None = None,
         **metadata,
     ) -> str:
         """
@@ -173,7 +171,7 @@ class MemoryController:
 
         return entry_id
 
-    def get(self, entry_id: str) -> Optional[MemoryEntry]:
+    def get(self, entry_id: str) -> MemoryEntry | None:
         """
         Retrieve a memory entry by ID.
 
@@ -206,7 +204,7 @@ class MemoryController:
 
         return entry
 
-    def query(self, query: MemoryQuery) -> List[MemoryEntry]:
+    def query(self, query: MemoryQuery) -> list[MemoryEntry]:
         """
         Query memory entries with filtering and pagination.
 
@@ -247,8 +245,7 @@ class MemoryController:
 
         # Merge results, removing duplicates (by investigation_id + timestamp)
         seen = {
-            (entry.investigation_id, entry.timestamp): entry
-            for entry in cache_results
+            (entry.investigation_id, entry.timestamp): entry for entry in cache_results
         }
 
         for entry in storage_results:

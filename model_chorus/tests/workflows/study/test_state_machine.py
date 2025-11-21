@@ -6,11 +6,8 @@ valid phase transitions and confidence escalation logic.
 """
 
 import pytest
-from model_chorus.core.models import (
-    InvestigationPhase,
-    StudyState,
-    ConfidenceLevel
-)
+
+from model_chorus.core.models import ConfidenceLevel, InvestigationPhase, StudyState
 from model_chorus.workflows.study.state_machine import InvestigationStateMachine
 
 
@@ -84,7 +81,9 @@ class TestInvestigationStateMachineTransitions:
         assert state_machine.can_transition(InvestigationPhase.DISCOVERY)
 
         # Perform transition
-        result = state_machine.transition(InvestigationPhase.DISCOVERY, reason="Need more evidence")
+        result = state_machine.transition(
+            InvestigationPhase.DISCOVERY, reason="Need more evidence"
+        )
         assert result is True
         assert state_machine.current_phase == InvestigationPhase.DISCOVERY
 
@@ -98,7 +97,9 @@ class TestInvestigationStateMachineTransitions:
         assert state_machine.can_transition(InvestigationPhase.DISCOVERY)
 
         # Perform transition
-        result = state_machine.transition(InvestigationPhase.DISCOVERY, reason="Found gaps")
+        result = state_machine.transition(
+            InvestigationPhase.DISCOVERY, reason="Found gaps"
+        )
         assert result is True
         assert state_machine.current_phase == InvestigationPhase.DISCOVERY
 
@@ -256,8 +257,7 @@ class TestInvestigationStateMachineTransitions:
         """Test that transition reason is logged."""
         # Transition with reason (just verify it doesn't error)
         result = state_machine.transition(
-            InvestigationPhase.VALIDATION,
-            reason="Sufficient evidence gathered"
+            InvestigationPhase.VALIDATION, reason="Sufficient evidence gathered"
         )
         assert result is True
         assert state_machine.current_phase == InvestigationPhase.VALIDATION
@@ -348,7 +348,9 @@ class TestConfidenceLevelProgression:
 
     def test_confidence_threshold_validation(self, state_machine):
         """Test getting confidence threshold for VALIDATION phase."""
-        threshold = state_machine.get_confidence_threshold(InvestigationPhase.VALIDATION)
+        threshold = state_machine.get_confidence_threshold(
+            InvestigationPhase.VALIDATION
+        )
         assert threshold == ConfidenceLevel.HIGH
 
     def test_confidence_threshold_planning(self, state_machine):

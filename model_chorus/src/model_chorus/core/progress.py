@@ -6,7 +6,7 @@ feedback during multi-step workflow execution.
 """
 
 import sys
-from typing import Optional
+
 from rich.console import Console
 
 # Create a console that outputs to stderr for progress updates
@@ -32,11 +32,7 @@ def is_progress_enabled() -> bool:
     return _progress_enabled
 
 
-def emit_progress(
-    message: str,
-    prefix: Optional[str] = None,
-    style: str = "cyan"
-) -> None:
+def emit_progress(message: str, prefix: str | None = None, style: str = "cyan") -> None:
     """
     Emit a progress update to stderr.
 
@@ -94,7 +90,7 @@ def emit_provider_start(provider: str) -> None:
     emit_progress("Executing...", prefix=provider, style="yellow")
 
 
-def emit_provider_complete(provider: str, duration: Optional[float] = None) -> None:
+def emit_provider_complete(provider: str, duration: float | None = None) -> None:
     """
     Emit progress for provider execution completion.
 
@@ -114,7 +110,7 @@ def emit_provider_complete(provider: str, duration: Optional[float] = None) -> N
     emit_progress(message, prefix=provider, style="green")
 
 
-def emit_workflow_start(workflow: str, estimated_duration: Optional[str] = None) -> None:
+def emit_workflow_start(workflow: str, estimated_duration: str | None = None) -> None:
     """
     Emit workflow start with optional time estimate.
 

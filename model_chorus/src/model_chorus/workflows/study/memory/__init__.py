@@ -75,10 +75,10 @@ Future Extensions:
 """
 
 # Component imports (all implemented):
-from .models import MemoryEntry, MemoryMetadata, MemoryType, MemoryQuery
 from .cache import ShortTermCache
-from .persistence import LongTermStorage
 from .controller import MemoryController
+from .models import MemoryEntry, MemoryMetadata, MemoryQuery, MemoryType
+from .persistence import LongTermStorage
 
 __all__ = [
     # Data models (task 4-2 complete):

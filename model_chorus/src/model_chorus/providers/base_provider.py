@@ -7,9 +7,9 @@ must inherit from, providing a consistent interface for different AI providers
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional
 from dataclasses import dataclass, field
 from enum import Enum
+from typing import Any
 
 
 class ModelCapability(Enum):
@@ -28,9 +28,9 @@ class ModelConfig:
 
     model_id: str
     temperature: float = 0.7
-    max_tokens: Optional[int] = None
-    capabilities: List[ModelCapability] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    max_tokens: int | None = None
+    capabilities: list[ModelCapability] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -38,13 +38,13 @@ class GenerationRequest:
     """Request for text generation."""
 
     prompt: str
-    system_prompt: Optional[str] = None
-    temperature: Optional[float] = None
-    max_tokens: Optional[int] = None
+    system_prompt: str | None = None
+    temperature: float | None = None
+    max_tokens: int | None = None
     stream: bool = False
-    images: Optional[List[str]] = None
-    continuation_id: Optional[str] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    images: list[str] | None = None
+    continuation_id: str | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -73,7 +73,7 @@ class TokenUsage:
     output_tokens: int = 0
     cached_input_tokens: int = 0
     total_tokens: int = 0
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def __getitem__(self, key: str) -> Any:
         """Support dict-like read access: usage['input_tokens'].
@@ -118,23 +118,33 @@ class TokenUsage:
         """
         return getattr(self, key, default)
 
-    def keys(self) -> List[str]:
+    def keys(self) -> list[str]:
         """Return field names like dict.keys().
 
         Returns:
             List of field names in the TokenUsage dataclass.
         """
-        return ['input_tokens', 'output_tokens', 'cached_input_tokens',
-                'total_tokens', 'metadata']
+        return [
+            "input_tokens",
+            "output_tokens",
+            "cached_input_tokens",
+            "total_tokens",
+            "metadata",
+        ]
 
-    def values(self) -> List[Any]:
+    def values(self) -> list[Any]:
         """Return field values like dict.values().
 
         Returns:
             List of current field values.
         """
-        return [self.input_tokens, self.output_tokens,
-                self.cached_input_tokens, self.total_tokens, self.metadata]
+        return [
+            self.input_tokens,
+            self.output_tokens,
+            self.cached_input_tokens,
+            self.total_tokens,
+            self.metadata,
+        ]
 
     def items(self) -> zip:
         """Return (key, value) pairs like dict.items().
@@ -219,13 +229,13 @@ class GenerationResponse:
     content: str
     model: str
     usage: TokenUsage = field(default_factory=TokenUsage)
-    stop_reason: Optional[str] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
-    thread_id: Optional[str] = None
-    provider: Optional[str] = None
-    stderr: Optional[str] = None
-    duration_ms: Optional[int] = None
-    raw_response: Optional[Dict[str, Any]] = None
+    stop_reason: str | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
+    thread_id: str | None = None
+    provider: str | None = None
+    stderr: str | None = None
+    duration_ms: int | None = None
+    raw_response: dict[str, Any] | None = None
 
 
 class ModelProvider(ABC):
@@ -244,8 +254,8 @@ class ModelProvider(ABC):
     def __init__(
         self,
         provider_name: str,
-        api_key: Optional[str] = None,
-        config: Optional[Dict[str, Any]] = None
+        api_key: str | None = None,
+        config: dict[str, Any] | None = None,
     ):
         """
         Initialize the model provider.
@@ -258,7 +268,7 @@ class ModelProvider(ABC):
         self.provider_name = provider_name
         self.api_key = api_key
         self.config = config or {}
-        self._available_models: List[ModelConfig] = []
+        self._available_models: list[ModelConfig] = []
 
     @abstractmethod
     async def generate(self, request: GenerationRequest) -> GenerationResponse:
@@ -295,7 +305,7 @@ class ModelProvider(ABC):
         """
         raise NotImplementedError("Subclasses must implement supports_vision()")
 
-    def get_available_models(self) -> List[ModelConfig]:
+    def get_available_models(self) -> list[ModelConfig]:
         """
         Get list of available models for this provider.
 
@@ -331,7 +341,7 @@ class ModelProvider(ABC):
         """
         return self.api_key is not None and len(self.api_key) > 0
 
-    def set_model_list(self, models: List[ModelConfig]) -> None:
+    def set_model_list(self, models: list[ModelConfig]) -> None:
         """
         Set the list of available models for this provider.
 

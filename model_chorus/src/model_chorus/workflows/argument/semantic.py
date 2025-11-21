@@ -7,17 +7,16 @@ across citation maps.
 """
 
 import hashlib
-from typing import List, Dict, Tuple, Optional, Any
 from functools import lru_cache
+from typing import Any
 
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
 from model_chorus.core.models import Citation, CitationMap
 
-
 # Global model instance (lazy-loaded)
-_model: Optional[SentenceTransformer] = None
+_model: SentenceTransformer | None = None
 _DEFAULT_MODEL = "all-MiniLM-L6-v2"  # Fast, lightweight model (384 dimensions)
 
 
@@ -38,8 +37,7 @@ def _get_model(model_name: str = _DEFAULT_MODEL) -> SentenceTransformer:
     if _model is None:
         # Initialize with tokenizer kwargs to suppress FutureWarning
         _model = SentenceTransformer(
-            model_name,
-            tokenizer_kwargs={"clean_up_tokenization_spaces": True}
+            model_name, tokenizer_kwargs={"clean_up_tokenization_spaces": True}
         )
     return _model
 
@@ -178,11 +176,11 @@ def compute_claim_similarity(
 
 def find_similar_claims(
     query_claim: str,
-    citation_maps: List[CitationMap],
+    citation_maps: list[CitationMap],
     threshold: float = 0.7,
-    top_k: Optional[int] = None,
+    top_k: int | None = None,
     model_name: str = _DEFAULT_MODEL,
-) -> List[Tuple[CitationMap, float]]:
+) -> list[tuple[CitationMap, float]]:
     """
     Find citation maps with claims similar to the query claim.
 
@@ -218,7 +216,7 @@ def find_similar_claims(
     query_embedding = compute_embedding(query_claim, model_name=model_name)
 
     # Compute similarities for all citation maps
-    similarities: List[Tuple[CitationMap, float]] = []
+    similarities: list[tuple[CitationMap, float]] = []
     for cm in citation_maps:
         claim_embedding = compute_embedding(cm.claim_text, model_name=model_name)
         score = cosine_similarity(query_embedding, claim_embedding)
@@ -237,7 +235,7 @@ def find_similar_claims(
 
 
 def compute_claim_similarity_batch(
-    claims: List[str],
+    claims: list[str],
     model_name: str = _DEFAULT_MODEL,
 ) -> np.ndarray:
     """
@@ -331,10 +329,10 @@ def add_similarity_to_citation(
 
 
 def find_duplicate_claims(
-    citation_maps: List[CitationMap],
+    citation_maps: list[CitationMap],
     threshold: float = 0.9,
     model_name: str = _DEFAULT_MODEL,
-) -> List[List[CitationMap]]:
+) -> list[list[CitationMap]]:
     """
     Detect groups of duplicate or near-duplicate claims.
 
@@ -370,7 +368,7 @@ def find_duplicate_claims(
     # Find duplicate groups using connected components
     n = len(citation_maps)
     visited = [False] * n
-    duplicate_groups: List[List[CitationMap]] = []
+    duplicate_groups: list[list[CitationMap]] = []
 
     for i in range(n):
         if visited[i]:
@@ -399,12 +397,12 @@ def find_duplicate_claims(
 
 
 def cluster_claims_kmeans(
-    citation_maps: List[CitationMap],
+    citation_maps: list[CitationMap],
     n_clusters: int = 3,
     model_name: str = _DEFAULT_MODEL,
     random_state: int = 42,
     max_iterations: int = 50,
-) -> List[List[CitationMap]]:
+) -> list[list[CitationMap]]:
     """
     Cluster claims using K-means algorithm on semantic embeddings.
 
@@ -445,7 +443,9 @@ def cluster_claims_kmeans(
 
     # Compute embeddings for all claims
     claims = [cm.claim_text for cm in citation_maps]
-    embeddings = np.array([compute_embedding(claim, model_name=model_name) for claim in claims])
+    embeddings = np.array(
+        [compute_embedding(claim, model_name=model_name) for claim in claims]
+    )
 
     rng = np.random.default_rng(random_state)
 
@@ -464,7 +464,9 @@ def cluster_claims_kmeans(
             r = rng.random()
             next_idx = np.searchsorted(cumulative, r)
             centroids[i] = embeddings[next_idx]
-            distances = np.minimum(distances, np.linalg.norm(embeddings - centroids[i], axis=1) ** 2)
+            distances = np.minimum(
+                distances, np.linalg.norm(embeddings - centroids[i], axis=1) ** 2
+            )
 
     labels = np.zeros(len(embeddings), dtype=int)
 
@@ -494,7 +496,7 @@ def cluster_claims_kmeans(
         centroids = new_centroids
 
     # Group citation maps by cluster
-    clusters: List[List[CitationMap]] = [[] for _ in range(n_clusters)]
+    clusters: list[list[CitationMap]] = [[] for _ in range(n_clusters)]
     for idx, label in enumerate(labels):
         clusters[label].append(citation_maps[idx])
 
@@ -502,11 +504,11 @@ def cluster_claims_kmeans(
 
 
 def cluster_claims_hierarchical(
-    citation_maps: List[CitationMap],
+    citation_maps: list[CitationMap],
     n_clusters: int = 3,
     model_name: str = _DEFAULT_MODEL,
     linkage_method: str = "ward",
-) -> List[List[CitationMap]]:
+) -> list[list[CitationMap]]:
     """
     Cluster claims using hierarchical clustering on semantic embeddings.
 
@@ -548,17 +550,19 @@ def cluster_claims_hierarchical(
 
     # Compute embeddings for all claims
     claims = [cm.claim_text for cm in citation_maps]
-    embeddings = np.array([compute_embedding(claim, model_name=model_name) for claim in claims])
+    embeddings = np.array(
+        [compute_embedding(claim, model_name=model_name) for claim in claims]
+    )
 
     # Run hierarchical clustering
     hierarchical = AgglomerativeClustering(
         n_clusters=n_clusters,
-        linkage=linkage_method,
+        linkage=linkage_method,  # type: ignore[arg-type]
     )
     labels = hierarchical.fit_predict(embeddings)
 
     # Group citation maps by cluster
-    clusters: List[List[CitationMap]] = [[] for _ in range(n_clusters)]
+    clusters: list[list[CitationMap]] = [[] for _ in range(n_clusters)]
     for idx, label in enumerate(labels):
         clusters[label].append(citation_maps[idx])
 
@@ -566,7 +570,7 @@ def cluster_claims_hierarchical(
 
 
 def get_cluster_representative(
-    cluster: List[CitationMap],
+    cluster: list[CitationMap],
     model_name: str = _DEFAULT_MODEL,
 ) -> CitationMap:
     """
@@ -595,7 +599,9 @@ def get_cluster_representative(
 
     # Compute embeddings for all claims in cluster
     claims = [cm.claim_text for cm in cluster]
-    embeddings = np.array([compute_embedding(claim, model_name=model_name) for claim in claims])
+    embeddings = np.array(
+        [compute_embedding(claim, model_name=model_name) for claim in claims]
+    )
 
     # Compute centroid
     centroid = np.mean(embeddings, axis=0)
@@ -609,7 +615,7 @@ def get_cluster_representative(
 
 
 def generate_cluster_name(
-    cluster: List[CitationMap],
+    cluster: list[CitationMap],
     model_name: str = _DEFAULT_MODEL,
     max_words: int = 5,
 ) -> str:
@@ -658,7 +664,7 @@ def generate_cluster_name(
 
 
 def summarize_cluster(
-    cluster: List[CitationMap],
+    cluster: list[CitationMap],
     model_name: str = _DEFAULT_MODEL,
     max_length: int = 150,
 ) -> str:
@@ -690,7 +696,7 @@ def summarize_cluster(
         # For single-item clusters, return the claim itself
         claim_text = cluster[0].claim_text
         if len(claim_text) > max_length:
-            return claim_text[:max_length - 3] + "..."
+            return claim_text[: max_length - 3] + "..."
         return claim_text
 
     # Get representative claim as central theme
@@ -707,15 +713,15 @@ def summarize_cluster(
 
     # Truncate if too long
     if len(summary) > max_length:
-        summary = summary[:max_length - 3] + "..."
+        summary = summary[: max_length - 3] + "..."
 
     return summary
 
 
 def compute_cluster_statistics(
-    clusters: List[List[CitationMap]],
+    clusters: list[list[CitationMap]],
     model_name: str = _DEFAULT_MODEL,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Compute statistics and quality metrics for clusters.
 
@@ -753,7 +759,7 @@ def compute_cluster_statistics(
     cluster_sizes = [len(cluster) for cluster in clusters]
 
     # Representative claims
-    representatives = []
+    representatives: list[str | None] = []
     for cluster in clusters:
         if len(cluster) > 0:
             rep = get_cluster_representative(cluster, model_name=model_name)
@@ -765,7 +771,9 @@ def compute_cluster_statistics(
     intra_cluster_sims = []
     for cluster in clusters:
         if len(cluster) <= 1:
-            intra_cluster_sims.append(1.0)  # Perfect similarity for single-item clusters
+            intra_cluster_sims.append(
+                1.0
+            )  # Perfect similarity for single-item clusters
             continue
 
         # Compute pairwise similarities within cluster
@@ -786,12 +794,14 @@ def compute_cluster_statistics(
         "max_cluster_size": max(cluster_sizes) if cluster_sizes else 0,
         "representatives": representatives,
         "intra_cluster_similarities": intra_cluster_sims,
-        "avg_intra_cluster_similarity": float(np.mean(intra_cluster_sims)) if intra_cluster_sims else 0.0,
+        "avg_intra_cluster_similarity": (
+            float(np.mean(intra_cluster_sims)) if intra_cluster_sims else 0.0
+        ),
     }
 
 
 def score_cluster_coherence(
-    cluster: List[CitationMap],
+    cluster: list[CitationMap],
     model_name: str = _DEFAULT_MODEL,
 ) -> float:
     """
@@ -838,7 +848,7 @@ def score_cluster_coherence(
 
 
 def score_cluster_separation(
-    clusters: List[List[CitationMap]],
+    clusters: list[list[CitationMap]],
     model_name: str = _DEFAULT_MODEL,
 ) -> float:
     """
@@ -877,7 +887,9 @@ def score_cluster_separation(
     centroids = []
     for cluster in non_empty_clusters:
         claims = [cm.claim_text for cm in cluster]
-        embeddings = np.array([compute_embedding(claim, model_name=model_name) for claim in claims])
+        embeddings = np.array(
+            [compute_embedding(claim, model_name=model_name) for claim in claims]
+        )
 
         # Compute centroid
         centroid = np.mean(embeddings, axis=0)
@@ -908,9 +920,9 @@ def score_cluster_separation(
 
 
 def score_clustering_quality(
-    clusters: List[List[CitationMap]],
+    clusters: list[list[CitationMap]],
     model_name: str = _DEFAULT_MODEL,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Compute comprehensive quality metrics for clustering results.
 
@@ -1001,14 +1013,18 @@ def score_clustering_quality(
                     labels.append(cluster_idx)
 
             # Compute embeddings
-            embeddings = np.array([
-                compute_embedding(claim, model_name=model_name)
-                for claim in all_claims
-            ])
+            embeddings = np.array(
+                [
+                    compute_embedding(claim, model_name=model_name)
+                    for claim in all_claims
+                ]
+            )
 
             # Compute silhouette score
             if len(set(labels)) > 1:  # Need at least 2 clusters
-                silhouette = float(sklearn_silhouette(embeddings, labels, metric='cosine'))
+                silhouette = float(
+                    sklearn_silhouette(embeddings, labels, metric="cosine")
+                )
                 # Convert from [-1, 1] to [0, 1] range
                 silhouette = (silhouette + 1.0) / 2.0
         except ImportError:

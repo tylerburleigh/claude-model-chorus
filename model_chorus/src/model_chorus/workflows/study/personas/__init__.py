@@ -6,9 +6,9 @@ including Researcher, Critic, Planner, and other specialized investigation perso
 """
 
 from ..persona_base import PersonaRegistry
-from .researcher import ResearcherPersona, create_researcher
 from .critic import CriticPersona, create_critic
 from .planner import PlannerPersona, create_planner
+from .researcher import ResearcherPersona, create_researcher
 
 __all__ = [
     "ResearcherPersona",
