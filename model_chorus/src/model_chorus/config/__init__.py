@@ -1,5 +1,6 @@
 """Configuration module for ModelChorus."""
 
+from .loader import ConfigLoader, get_config_loader
 from .models import (
     GenerationDefaults,
     ModelChorusConfig,
@@ -8,8 +9,10 @@ from .models import (
 )
 
 __all__ = [
+    "ConfigLoader",
     "GenerationDefaults",
     "ModelChorusConfig",
     "ProviderConfig",
     "WorkflowConfig",
+    "get_config_loader",
 ]

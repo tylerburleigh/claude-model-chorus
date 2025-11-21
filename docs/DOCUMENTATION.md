@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-20 19:03:57
+**Generated:** 2025-11-20 19:06:01
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 107
-- **Total Lines:** 48136
-- **Total Classes:** 262
+- **Total Files:** 109
+- **Total Lines:** 48458
+- **Total Classes:** 271
 - **Total Functions:** 210
 - **Avg Complexity:** 4.92
 - **Max Complexity:** 55
@@ -180,6 +180,17 @@ Example:
 
 ---
 
+### `ArgumentWorkflowConfig`
+
+**Language:** python
+**Inherits from:** `BaseModel`
+**Defined in:** `src/model_chorus/config/models.py:115`
+
+**Description:**
+> Configuration specific to argument workflow.
+
+---
+
 ### `BaseWorkflow`
 
 **Language:** python
@@ -329,6 +340,17 @@ Example:
 - `get_message_count()`
 - `validate_config()`
 - `__repr__()`
+
+---
+
+### `ChatWorkflowConfig`
+
+**Language:** python
+**Inherits from:** `BaseModel`
+**Defined in:** `src/model_chorus/config/models.py:126`
+
+**Description:**
+> Configuration specific to chat workflow.
 
 ---
 
@@ -697,6 +719,17 @@ Example:
 - `get_providers()`
 - `set_strategy()`
 - `__repr__()`
+
+---
+
+### `ConsensusWorkflowConfig`
+
+**Language:** python
+**Inherits from:** `BaseModel`
+**Defined in:** `src/model_chorus/config/models.py:65`
+
+**Description:**
+> Configuration specific to consensus workflow.
 
 ---
 
@@ -1231,6 +1264,20 @@ Example:
 
 **Language:** python
 **Inherits from:** `BaseModel`
+**Defined in:** `src/model_chorus/config/models.py:13`
+
+**Description:**
+> Default generation parameters that apply globally.
+
+These defaults can be overridden by workflow-specific settings or
+runtime parameters passed to CLI commands.
+
+---
+
+### `GenerationDefaults`
+
+**Language:** python
+**Inherits from:** `BaseModel`
 **Defined in:** `src/model_chorus/core/config.py:21`
 
 **Description:**
@@ -1525,6 +1572,17 @@ Example:
 - `_synthesize_elaborations()`
 - `validate_config()`
 - `get_provider()`
+
+---
+
+### `IdeateWorkflowConfig`
+
+**Language:** python
+**Inherits from:** `BaseModel`
+**Defined in:** `src/model_chorus/config/models.py:98`
+
+**Description:**
+> Configuration specific to ideate workflow.
 
 ---
 
@@ -1959,6 +2017,28 @@ Values:
 
 **Language:** python
 **Inherits from:** `BaseModel`
+**Defined in:** `src/model_chorus/config/models.py:218`
+
+**Description:**
+> Root configuration model for ModelChorus.
+
+This is the top-level configuration object that encompasses all settings
+including global defaults, provider configurations, and workflow-specific
+settings.
+
+**Methods:**
+- `validate_default_provider()`
+- `validate_provider_names()`
+- `get_provider_config()`
+- `get_workflow_config()`
+- `is_provider_enabled()`
+
+---
+
+### `ModelChorusConfig`
+
+**Language:** python
+**Inherits from:** `BaseModel`
 **Defined in:** `src/model_chorus/core/config.py:80`
 
 **Description:**
@@ -2317,6 +2397,20 @@ focusing on turning knowledge into actionable strategies.
 **Methods:**
 - `__init__()`
 - `invoke()`
+
+---
+
+### `ProviderConfig`
+
+**Language:** python
+**Inherits from:** `BaseModel`
+**Defined in:** `src/model_chorus/config/models.py:40`
+
+**Description:**
+> Configuration for a specific AI provider.
+
+Allows customization of provider-specific settings like model selection,
+API endpoints, and provider-specific parameters.
 
 ---
 
@@ -5752,6 +5846,17 @@ Example:
 
 ---
 
+### `ThinkDeepWorkflowConfig`
+
+**Language:** python
+**Inherits from:** `BaseModel`
+**Defined in:** `src/model_chorus/config/models.py:81`
+
+**Description:**
+> Configuration specific to thinkdeep workflow.
+
+---
+
 ### `TokenUsage`
 
 **Language:** python
@@ -5784,6 +5889,24 @@ Attributes:
 - `keys()`
 - `values()`
 - `items()`
+
+---
+
+### `WorkflowConfig`
+
+**Language:** python
+**Inherits from:** `BaseModel`
+**Defined in:** `src/model_chorus/config/models.py:137`
+
+**Description:**
+> Configuration for a specific workflow.
+
+Provides workflow-specific overrides for providers, generation parameters,
+and workflow-specific settings.
+
+**Methods:**
+- `validate_provider()`
+- `validate_providers()`
 
 ---
 
@@ -10369,6 +10492,20 @@ Returns:
 - `typer`
 - `typing.Any`
 - `workflows.study.StudyWorkflow`
+
+### `src/model_chorus/config/__init__.py`
+
+- `models.GenerationDefaults`
+- `models.ModelChorusConfig`
+- `models.ProviderConfig`
+- `models.WorkflowConfig`
+
+### `src/model_chorus/config/models.py`
+
+- `pydantic.BaseModel`
+- `pydantic.Field`
+- `pydantic.field_validator`
+- `typing.Literal`
 
 ### `src/model_chorus/core/__init__.py`
 

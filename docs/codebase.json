@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-21T00:03:57.780657Z",
+    "generated_at": "2025-11-21T00:06:01.926145Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 107,
-    "total_lines": 48136,
-    "total_classes": 262,
+    "total_files": 109,
+    "total_lines": 48458,
+    "total_classes": 271,
     "total_functions": 210,
     "avg_complexity": 4.92,
     "max_complexity": 55,
@@ -24,9 +24,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 107,
-        "lines": 48136,
-        "classes": 262,
+        "files": 109,
+        "lines": 48458,
+        "classes": 271,
         "functions": 210,
         "avg_complexity": 4.92
       }
@@ -362,6 +362,48 @@
       ],
       "exports": [],
       "lines": 900
+    },
+    {
+      "name": "__init__",
+      "file": "src/model_chorus/config/__init__.py",
+      "language": "python",
+      "docstring": "Configuration module for ModelChorus.",
+      "classes": [],
+      "functions": [],
+      "imports": [
+        "models.GenerationDefaults",
+        "models.ModelChorusConfig",
+        "models.ProviderConfig",
+        "models.WorkflowConfig"
+      ],
+      "exports": [],
+      "lines": 15
+    },
+    {
+      "name": "models",
+      "file": "src/model_chorus/config/models.py",
+      "language": "python",
+      "docstring": "Pydantic models for ModelChorus configuration.\n\nThis module provides comprehensive typed configuration models with validation\nfor all configuration sections including providers, workflows, and generation defaults.",
+      "classes": [
+        "GenerationDefaults",
+        "ProviderConfig",
+        "ConsensusWorkflowConfig",
+        "ThinkDeepWorkflowConfig",
+        "IdeateWorkflowConfig",
+        "ArgumentWorkflowConfig",
+        "ChatWorkflowConfig",
+        "WorkflowConfig",
+        "ModelChorusConfig"
+      ],
+      "functions": [],
+      "imports": [
+        "typing.Literal",
+        "pydantic.BaseModel",
+        "pydantic.Field",
+        "pydantic.field_validator"
+      ],
+      "exports": [],
+      "lines": 307
     },
     {
       "name": "__init__",
@@ -3069,6 +3111,365 @@
       "imported_by": []
     },
     {
+      "name": "GenerationDefaults",
+      "file": "src/model_chorus/config/models.py",
+      "line": 13,
+      "language": "python",
+      "docstring": "Default generation parameters that apply globally.\n\nThese defaults can be overridden by workflow-specific settings or\nruntime parameters passed to CLI commands.",
+      "bases": [
+        "BaseModel"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "test_generation_defaults_validation",
+          "file": "tests/test_config.py",
+          "line": 319,
+          "context": [
+            "TestConfigLoader",
+            "test_generation_defaults_validation"
+          ]
+        },
+        {
+          "instantiator": "test_model_chorus_config_complete",
+          "file": "tests/test_config.py",
+          "line": 344,
+          "context": [
+            "TestConfigLoader",
+            "test_model_chorus_config_complete"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 2
+    },
+    {
+      "name": "ProviderConfig",
+      "file": "src/model_chorus/config/models.py",
+      "line": 40,
+      "language": "python",
+      "docstring": "Configuration for a specific AI provider.\n\nAllows customization of provider-specific settings like model selection,\nAPI endpoints, and provider-specific parameters.",
+      "bases": [
+        "BaseModel"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "get_provider_config",
+          "file": "src/model_chorus/config/models.py",
+          "line": 280,
+          "context": [
+            "ModelChorusConfig",
+            "get_provider_config"
+          ]
+        },
+        {
+          "instantiator": "__init__",
+          "file": "src/model_chorus/workflows/consensus.py",
+          "line": 117,
+          "context": [
+            "ConsensusWorkflow",
+            "__init__"
+          ]
+        },
+        {
+          "instantiator": "add_provider",
+          "file": "src/model_chorus/workflows/consensus.py",
+          "line": 139,
+          "context": [
+            "ConsensusWorkflow",
+            "add_provider"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 3
+    },
+    {
+      "name": "ConsensusWorkflowConfig",
+      "file": "src/model_chorus/config/models.py",
+      "line": 65,
+      "language": "python",
+      "docstring": "Configuration specific to consensus workflow.",
+      "bases": [
+        "BaseModel"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "ThinkDeepWorkflowConfig",
+      "file": "src/model_chorus/config/models.py",
+      "line": 81,
+      "language": "python",
+      "docstring": "Configuration specific to thinkdeep workflow.",
+      "bases": [
+        "BaseModel"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "IdeateWorkflowConfig",
+      "file": "src/model_chorus/config/models.py",
+      "line": 98,
+      "language": "python",
+      "docstring": "Configuration specific to ideate workflow.",
+      "bases": [
+        "BaseModel"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "ArgumentWorkflowConfig",
+      "file": "src/model_chorus/config/models.py",
+      "line": 115,
+      "language": "python",
+      "docstring": "Configuration specific to argument workflow.",
+      "bases": [
+        "BaseModel"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "ChatWorkflowConfig",
+      "file": "src/model_chorus/config/models.py",
+      "line": 126,
+      "language": "python",
+      "docstring": "Configuration specific to chat workflow.",
+      "bases": [
+        "BaseModel"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "WorkflowConfig",
+      "file": "src/model_chorus/config/models.py",
+      "line": 137,
+      "language": "python",
+      "docstring": "Configuration for a specific workflow.\n\nProvides workflow-specific overrides for providers, generation parameters,\nand workflow-specific settings.",
+      "bases": [
+        "BaseModel"
+      ],
+      "methods": [
+        "validate_provider",
+        "validate_providers"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "get_workflow_config",
+          "file": "src/model_chorus/config/models.py",
+          "line": 294,
+          "context": [
+            "ModelChorusConfig",
+            "get_workflow_config"
+          ]
+        },
+        {
+          "instantiator": "test_workflow_config_validation",
+          "file": "tests/test_config.py",
+          "line": 327,
+          "context": [
+            "TestConfigLoader",
+            "test_workflow_config_validation"
+          ]
+        },
+        {
+          "instantiator": "test_workflow_config_provider_normalization",
+          "file": "tests/test_config.py",
+          "line": 337,
+          "context": [
+            "TestConfigLoader",
+            "test_workflow_config_provider_normalization"
+          ]
+        },
+        {
+          "instantiator": "test_model_chorus_config_complete",
+          "file": "tests/test_config.py",
+          "line": 346,
+          "context": [
+            "TestConfigLoader",
+            "test_model_chorus_config_complete"
+          ]
+        },
+        {
+          "instantiator": "test_model_chorus_config_complete",
+          "file": "tests/test_config.py",
+          "line": 347,
+          "context": [
+            "TestConfigLoader",
+            "test_model_chorus_config_complete"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_thinking_mode_validation",
+          "file": "tests/test_config.py",
+          "line": 407,
+          "context": [
+            "TestWorkflowConfigValidation",
+            "test_thinkdeep_thinking_mode_validation"
+          ]
+        },
+        {
+          "instantiator": "test_thinkdeep_thinking_mode_validation",
+          "file": "tests/test_config.py",
+          "line": 412,
+          "context": [
+            "TestWorkflowConfigValidation",
+            "test_thinkdeep_thinking_mode_validation"
+          ]
+        },
+        {
+          "instantiator": "test_research_citation_style_validation",
+          "file": "tests/test_config.py",
+          "line": 418,
+          "context": [
+            "TestWorkflowConfigValidation",
+            "test_research_citation_style_validation"
+          ]
+        },
+        {
+          "instantiator": "test_research_citation_style_validation",
+          "file": "tests/test_config.py",
+          "line": 423,
+          "context": [
+            "TestWorkflowConfigValidation",
+            "test_research_citation_style_validation"
+          ]
+        },
+        {
+          "instantiator": "test_research_depth_validation",
+          "file": "tests/test_config.py",
+          "line": 429,
+          "context": [
+            "TestWorkflowConfigValidation",
+            "test_research_depth_validation"
+          ]
+        },
+        {
+          "instantiator": "test_research_depth_validation",
+          "file": "tests/test_config.py",
+          "line": 434,
+          "context": [
+            "TestWorkflowConfigValidation",
+            "test_research_depth_validation"
+          ]
+        },
+        {
+          "instantiator": "test_consensus_strategy_validation",
+          "file": "tests/test_config.py",
+          "line": 440,
+          "context": [
+            "TestWorkflowConfigValidation",
+            "test_consensus_strategy_validation"
+          ]
+        },
+        {
+          "instantiator": "test_consensus_strategy_validation",
+          "file": "tests/test_config.py",
+          "line": 445,
+          "context": [
+            "TestWorkflowConfigValidation",
+            "test_consensus_strategy_validation"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 13
+    },
+    {
+      "name": "ModelChorusConfig",
+      "file": "src/model_chorus/config/models.py",
+      "line": 218,
+      "language": "python",
+      "docstring": "Root configuration model for ModelChorus.\n\nThis is the top-level configuration object that encompasses all settings\nincluding global defaults, provider configurations, and workflow-specific\nsettings.",
+      "bases": [
+        "BaseModel"
+      ],
+      "methods": [
+        "validate_default_provider",
+        "validate_provider_names",
+        "get_provider_config",
+        "get_workflow_config",
+        "is_provider_enabled"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "load_config",
+          "file": "src/model_chorus/core/config.py",
+          "line": 180,
+          "context": [
+            "ConfigLoader",
+            "load_config"
+          ]
+        },
+        {
+          "instantiator": "load_config",
+          "file": "src/model_chorus/core/config.py",
+          "line": 196,
+          "context": [
+            "ConfigLoader",
+            "load_config"
+          ]
+        },
+        {
+          "instantiator": "get_config",
+          "file": "src/model_chorus/core/config.py",
+          "line": 249,
+          "context": [
+            "ConfigLoader",
+            "get_config"
+          ]
+        },
+        {
+          "instantiator": "test_model_chorus_config_complete",
+          "file": "tests/test_config.py",
+          "line": 342,
+          "context": [
+            "TestConfigLoader",
+            "test_model_chorus_config_complete"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 4
+    },
+    {
       "name": "WorkflowStep",
       "file": "src/model_chorus/core/base_workflow.py",
       "line": 25,
@@ -3733,6 +4134,15 @@
       "is_public": true,
       "instantiated_by": [
         {
+          "instantiator": "get_provider_config",
+          "file": "src/model_chorus/config/models.py",
+          "line": 280,
+          "context": [
+            "ModelChorusConfig",
+            "get_provider_config"
+          ]
+        },
+        {
           "instantiator": "__init__",
           "file": "src/model_chorus/workflows/consensus.py",
           "line": 117,
@@ -3752,7 +4162,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 2
+      "instantiation_count": 3
     },
     {
       "name": "WorkflowConfig",
@@ -3771,6 +4181,15 @@
       "is_exported": false,
       "is_public": true,
       "instantiated_by": [
+        {
+          "instantiator": "get_workflow_config",
+          "file": "src/model_chorus/config/models.py",
+          "line": 294,
+          "context": [
+            "ModelChorusConfig",
+            "get_workflow_config"
+          ]
+        },
         {
           "instantiator": "test_workflow_config_validation",
           "file": "tests/test_config.py",
@@ -3881,7 +4300,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 12
+      "instantiation_count": 13
     },
     {
       "name": "ModelChorusConfig",
@@ -13042,6 +13461,15 @@
       "is_public": true,
       "instantiated_by": [
         {
+          "instantiator": "get_provider_config",
+          "file": "src/model_chorus/config/models.py",
+          "line": 280,
+          "context": [
+            "ModelChorusConfig",
+            "get_provider_config"
+          ]
+        },
+        {
           "instantiator": "__init__",
           "file": "src/model_chorus/workflows/consensus.py",
           "line": 117,
@@ -13061,7 +13489,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 2
+      "instantiation_count": 3
     },
     {
       "name": "ConsensusResult",
@@ -22678,7 +23106,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 102,
           "call_type": "method_call"
         },
@@ -27624,7 +28052,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 2124,
           "call_type": "method_call"
         },
@@ -28493,7 +28921,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 342,
           "call_type": "method_call"
         },
@@ -28901,7 +29329,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 703,
           "call_type": "method_call"
         },
@@ -29186,25 +29614,25 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 837,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 840,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 842,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 844,
           "call_type": "method_call"
         },
@@ -29313,7 +29741,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 908,
           "call_type": "method_call"
         },
@@ -40708,6 +41136,18 @@
       "providers.base_provider.ModelProvider",
       "providers.cli_provider.ProviderUnavailableError",
       "workflows.study.StudyWorkflow"
+    ],
+    "src/model_chorus/config/__init__.py": [
+      "models.GenerationDefaults",
+      "models.ModelChorusConfig",
+      "models.ProviderConfig",
+      "models.WorkflowConfig"
+    ],
+    "src/model_chorus/config/models.py": [
+      "typing.Literal",
+      "pydantic.BaseModel",
+      "pydantic.Field",
+      "pydantic.field_validator"
     ],
     "src/model_chorus/core/__init__.py": [
       "base_workflow.BaseWorkflow",
