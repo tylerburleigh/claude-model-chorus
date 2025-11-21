@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-21 09:29:50
+**Generated:** 2025-11-21 09:31:53
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 111
-- **Total Lines:** 49301
-- **Total Classes:** 282
+- **Total Files:** 112
+- **Total Lines:** 49535
+- **Total Classes:** 284
 - **Total Functions:** 211
 - **Avg Complexity:** 4.47
 - **Max Complexity:** 44
@@ -1292,6 +1292,28 @@ needed to create a working workflow.
 
 **Methods:**
 - `run()`
+
+---
+
+### `ExecutionMetrics`
+
+**Language:** python
+**Defined in:** `src/model_chorus/core/workflow_runner.py:21`
+
+**Description:**
+> Metrics collected during workflow execution.
+
+Attributes:
+    started_at: Timestamp when execution started
+    completed_at: Timestamp when execution completed (None if still running)
+    duration_ms: Execution duration in milliseconds (None if still running)
+    provider_attempts: List of (provider_name, success, error) tuples for each attempt
+    total_attempts: Total number of provider attempts made
+    successful_provider: Name of the provider that succeeded (None if all failed)
+
+**Methods:**
+- `mark_complete()`
+- `add_attempt()`
 
 ---
 
@@ -6357,6 +6379,42 @@ Attributes:
 
 ---
 
+### `WorkflowRunner`
+
+**Language:** python
+**Defined in:** `src/model_chorus/core/workflow_runner.py:64`
+
+**Description:**
+> Orchestrates workflow execution with provider fallback and telemetry.
+
+The WorkflowRunner extracts provider fallback logic from BaseWorkflow
+and adds structured error handling, execution metrics, and extension hooks
+for telemetry/observability.
+
+Key Features:
+- Automatic provider fallback with configurable retry logic
+- Execution metrics collection (timing, attempts, success/failure)
+- Extension hooks for telemetry integration
+- Structured error handling with detailed context
+
+Example:
+    >>> runner = WorkflowRunner()
+    >>> response, metrics = await runner.execute(
+    ...     request,
+    ...     primary_provider,
+    ...     fallback_providers=[backup1, backup2]
+    ... )
+    >>> print(f"Used {metrics.successful_provider} after {metrics.total_attempts} attempts")
+    >>> print(f"Duration: {metrics.duration_ms}ms")
+
+**Methods:**
+- `__init__()`
+- `execute()`
+- `_on_execution_complete()`
+- `_on_execution_failed()`
+
+---
+
 ### `WorkflowStep`
 
 **Language:** python
@@ -10990,6 +11048,15 @@ Returns:
 - `pathlib.Path`
 - `threading`
 - `typing.Any`
+
+### `src/model_chorus/core/workflow_runner.py`
+
+- `dataclasses.dataclass`
+- `dataclasses.field`
+- `datetime.datetime`
+- `logging`
+- `typing.Any`
+- `typing.TYPE_CHECKING`
 
 ### `src/model_chorus/providers/__init__.py`
 

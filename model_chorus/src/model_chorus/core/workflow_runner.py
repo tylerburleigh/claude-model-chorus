@@ -7,14 +7,24 @@ enhances the fallback logic previously embedded in BaseWorkflow.
 """
 
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
+from enum import Enum
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from ..providers import GenerationRequest, GenerationResponse, ModelProvider
 
 logger = logging.getLogger(__name__)
+
+
+class ExecutionStatus(Enum):
+    """Status of workflow execution."""
+
+    SUCCESS = "success"
+    FAILURE = "failure"
+    PARTIAL = "partial"  # Some providers failed but one succeeded
 
 
 @dataclass
@@ -28,6 +38,10 @@ class ExecutionMetrics:
         provider_attempts: List of (provider_name, success, error) tuples for each attempt
         total_attempts: Total number of provider attempts made
         successful_provider: Name of the provider that succeeded (None if all failed)
+        status: Overall execution status (SUCCESS, FAILURE, or PARTIAL)
+        input_tokens: Total input tokens used (if available from response)
+        output_tokens: Total output tokens generated (if available from response)
+        custom_metrics: Dictionary for custom metrics added by telemetry handlers
     """
 
     started_at: datetime = field(default_factory=datetime.now)
@@ -36,6 +50,10 @@ class ExecutionMetrics:
     provider_attempts: list[tuple[str, bool, str | None]] = field(default_factory=list)
     total_attempts: int = 0
     successful_provider: str | None = None
+    status: ExecutionStatus | None = None
+    input_tokens: int = 0
+    output_tokens: int = 0
+    custom_metrics: dict[str, Any] = field(default_factory=dict)
 
     def mark_complete(self) -> None:
         """Mark execution as complete and calculate duration."""
@@ -59,6 +77,27 @@ class ExecutionMetrics:
         self.total_attempts += 1
         if success:
             self.successful_provider = provider_name
+
+    def set_token_usage(self, input_tokens: int, output_tokens: int) -> None:
+        """
+        Set token usage metrics.
+
+        Args:
+            input_tokens: Number of input tokens used
+            output_tokens: Number of output tokens generated
+        """
+        self.input_tokens = input_tokens
+        self.output_tokens = output_tokens
+
+    def add_custom_metric(self, key: str, value: Any) -> None:
+        """
+        Add a custom metric.
+
+        Args:
+            key: Metric name
+            value: Metric value
+        """
+        self.custom_metrics[key] = value
 
 
 class WorkflowRunner:
@@ -94,6 +133,50 @@ class WorkflowRunner:
             telemetry_enabled: Whether to enable telemetry hooks (default: False)
         """
         self.telemetry_enabled = telemetry_enabled
+        self._telemetry_callbacks: list[
+            Callable[[ExecutionMetrics, Any], None]
+        ] = []
+
+    def register_telemetry_callback(
+        self, callback: Callable[[ExecutionMetrics, Any], None]
+    ) -> None:
+        """
+        Register a telemetry callback to be invoked on execution events.
+
+        Callbacks receive (metrics, context) where context is either:
+        - GenerationResponse for successful executions
+        - Exception for failed executions
+
+        Args:
+            callback: Callable that takes (ExecutionMetrics, context)
+
+        Example:
+            >>> def my_telemetry(metrics, context):
+            ...     print(f"Duration: {metrics.duration_ms}ms")
+            ...     if isinstance(context, GenerationResponse):
+            ...         print(f"Success with {context.provider}")
+            >>> runner = WorkflowRunner(telemetry_enabled=True)
+            >>> runner.register_telemetry_callback(my_telemetry)
+        """
+        self._telemetry_callbacks.append(callback)
+
+    def unregister_telemetry_callback(
+        self, callback: Callable[[ExecutionMetrics, Any], None]
+    ) -> bool:
+        """
+        Unregister a previously registered telemetry callback.
+
+        Args:
+            callback: The callback to remove
+
+        Returns:
+            True if callback was found and removed, False otherwise
+        """
+        try:
+            self._telemetry_callbacks.remove(callback)
+            return True
+        except ValueError:
+            return False
 
     async def execute(
         self,
@@ -148,6 +231,20 @@ class WorkflowRunner:
 
                 # Record successful attempt
                 metrics.add_attempt(provider.provider_name, success=True)
+
+                # Set execution status based on whether fallback was used
+                if i > 0:
+                    metrics.status = ExecutionStatus.PARTIAL
+                else:
+                    metrics.status = ExecutionStatus.SUCCESS
+
+                # Extract token usage from response if available
+                if hasattr(response, "usage") and response.usage:
+                    metrics.set_token_usage(
+                        input_tokens=getattr(response.usage, "input_tokens", 0),
+                        output_tokens=getattr(response.usage, "output_tokens", 0),
+                    )
+
                 metrics.mark_complete()
 
                 # Log fallback usage
@@ -178,6 +275,7 @@ class WorkflowRunner:
                 last_exception = e
 
         # All providers failed
+        metrics.status = ExecutionStatus.FAILURE
         metrics.mark_complete()
 
         # Call telemetry hooks for failure
@@ -203,8 +301,8 @@ class WorkflowRunner:
         """
         Hook called when execution completes successfully.
 
-        Subclasses or telemetry integrations can override this to collect
-        additional metrics, send to monitoring systems, etc.
+        Invokes all registered telemetry callbacks with the metrics and response.
+        Subclasses can override this to add custom telemetry behavior.
 
         Args:
             metrics: Execution metrics collected
@@ -212,8 +310,19 @@ class WorkflowRunner:
         """
         logger.debug(
             f"Execution complete: {metrics.successful_provider} "
-            f"in {metrics.duration_ms}ms after {metrics.total_attempts} attempts"
+            f"in {metrics.duration_ms}ms after {metrics.total_attempts} attempts "
+            f"(tokens: {metrics.input_tokens} in / {metrics.output_tokens} out)"
         )
+
+        # Invoke all registered telemetry callbacks
+        for callback in self._telemetry_callbacks:
+            try:
+                callback(metrics, response)
+            except Exception as e:
+                logger.error(
+                    f"Telemetry callback {callback.__name__} failed: {e}",
+                    exc_info=True,
+                )
 
     def _on_execution_failed(
         self, metrics: ExecutionMetrics, exception: Exception | None
@@ -221,8 +330,8 @@ class WorkflowRunner:
         """
         Hook called when all providers fail.
 
-        Subclasses or telemetry integrations can override this to log
-        failures, send alerts, update dashboards, etc.
+        Invokes all registered telemetry callbacks with the metrics and exception.
+        Subclasses can override this to add custom error handling or alerting.
 
         Args:
             metrics: Execution metrics collected
@@ -232,3 +341,13 @@ class WorkflowRunner:
             f"Execution failed: all {metrics.total_attempts} attempts failed "
             f"in {metrics.duration_ms}ms"
         )
+
+        # Invoke all registered telemetry callbacks
+        for callback in self._telemetry_callbacks:
+            try:
+                callback(metrics, exception)
+            except Exception as e:
+                logger.error(
+                    f"Telemetry callback {callback.__name__} failed: {e}",
+                    exc_info=True,
+                )

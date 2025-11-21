@@ -2,7 +2,7 @@
   "spec_id": "architectural-improvements-2025-01-20-001",
   "title": "Model-Chorus Architectural Improvements",
   "generated": "2025-01-20T20:30:00Z",
-  "last_updated": "2025-11-21T14:31:06.969172Z",
+  "last_updated": "2025-11-21T14:33:33.764087Z",
   "description": "Comprehensive architectural refactoring to eliminate code duplication, improve maintainability, enhance reliability, and establish scalable foundations for future development.",
   "hierarchy": {
     "spec-root": {
@@ -17,7 +17,7 @@
         "phase-4"
       ],
       "total_tasks": 69,
-      "completed_tasks": 39,
+      "completed_tasks": 40,
       "metadata": {
         "objectives": [
           "Reduce code duplication by 30-40% through shared primitives",
@@ -1351,7 +1351,7 @@
         "depends": []
       },
       "total_tasks": 16,
-      "completed_tasks": 4,
+      "completed_tasks": 5,
       "metadata": {
         "purpose": "Add provider middleware, token budgeting, and workflow runner abstraction",
         "risk_level": "medium",
@@ -1373,7 +1373,7 @@
         "task-3-7"
       ],
       "total_tasks": 11,
-      "completed_tasks": 4,
+      "completed_tasks": 5,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1488,7 +1488,7 @@
     "task-3-2": {
       "type": "task",
       "title": "model_chorus/core/workflow_runner.py",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-3-files",
       "children": [
         "task-3-2-1",
@@ -1502,7 +1502,7 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/core/workflow_runner.py",
         "task_category": "implementation",
@@ -1540,7 +1540,7 @@
     "task-3-2-2": {
       "type": "subtask",
       "title": "Add basic telemetry/metrics collection hooks",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-3-2",
       "children": [],
       "dependencies": {
@@ -1551,11 +1551,17 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/core/workflow_runner.py",
         "task_category": "implementation",
-        "estimated_hours": 2
+        "estimated_hours": 2,
+        "started_at": "2025-11-21T14:31:38.327581Z",
+        "status_note": "Adding telemetry and metrics collection hooks to WorkflowRunner",
+        "completed_at": "2025-11-21T14:33:33.756383Z",
+        "needs_journaling": false,
+        "actual_hours": 0.032,
+        "journaled_at": "2025-11-21T14:33:33.761859Z"
       }
     },
     "task-3-3": {
@@ -2411,7 +2417,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-20T20:38:01.399125Z",
-    "progress_percentage": 56,
+    "progress_percentage": 57,
     "current_phase": "phase-3"
   },
   "journal": [
@@ -2828,6 +2834,15 @@
       "content": "Successfully implemented WorkflowRunner class that wraps the _execute_with_fallback functionality from BaseWorkflow:\n\n**Core Implementation:**\n- Created new file model_chorus/src/model_chorus/core/workflow_runner.py (~260 lines)\n- Implemented WorkflowRunner class with execute() method that orchestrates provider fallback\n- Extracted and enhanced fallback logic from BaseWorkflow._execute_with_fallback (lines 161-232)\n\n**Key Features:**\n- ExecutionMetrics dataclass for collecting detailed metrics (started_at, completed_at, duration_ms, provider_attempts, total_attempts, successful_provider)\n- Automatic provider fallback with structured error handling\n- Telemetry hooks (_on_execution_complete, _on_execution_failed) for future observability integration\n- Detailed error messages showing all provider attempts and failure reasons\n- Type-safe implementation using TYPE_CHECKING for forward references\n\n**Verification:**\n- Python syntax validation passed\n- Module imports successfully\n- ExecutionMetrics functionality tested (attempt tracking, duration calculation, success recording)\n- All assertions passed in unit testing\n\n**Design Benefits:**\n- Separates execution orchestration from workflow logic\n- Enables better testing and metrics collection\n- Provides foundation for task-3-2-2 (telemetry/metrics hooks)\n- Maintains backward compatibility (BaseWorkflow can continue using _execute_with_fallback)\n\nFiles created:\n- model_chorus/src/model_chorus/core/workflow_runner.py (260 lines)",
       "metadata": {},
       "task_id": "task-3-2-1"
+    },
+    {
+      "timestamp": "2025-11-21T14:33:33.761854Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add basic telemetry/metrics collection hooks",
+      "author": "claude-code",
+      "content": "Successfully enhanced WorkflowRunner with comprehensive telemetry and metrics collection:\n\n**Enhanced ExecutionMetrics:**\n- Added ExecutionStatus enum (SUCCESS, FAILURE, PARTIAL) for execution outcomes\n- Added input_tokens and output_tokens fields for token usage tracking\n- Added custom_metrics dictionary for extensible metric collection\n- Added set_token_usage() method for recording token consumption\n- Added add_custom_metric() method for custom telemetry data\n\n**Telemetry Callback System:**\n- Implemented callback registry (_telemetry_callbacks list)\n- Added register_telemetry_callback() for registering external telemetry handlers\n- Added unregister_telemetry_callback() for cleanup\n- Callbacks receive (ExecutionMetrics, context) where context is GenerationResponse or Exception\n- Error handling around callback invocation to prevent telemetry failures from breaking execution\n\n**Enhanced Execution Hooks:**\n- Updated _on_execution_complete() to invoke all registered callbacks\n- Updated _on_execution_failed() to invoke callbacks on failures\n- Added token usage extraction from GenerationResponse\n- Added execution status tracking (SUCCESS for primary, PARTIAL for fallback, FAILURE for all failed)\n- Enhanced debug logging with token counts\n\n**Verification:**\n- All syntax checks passed\n- ExecutionStatus enum works correctly\n- Token usage tracking tested and verified\n- Custom metrics addition tested\n- Callback registration/unregistration tested\n- All assertions passed\n\n**Design Benefits:**\n- Extensible telemetry system without modifying core execution logic\n- Safe callback invocation with error isolation\n- Rich metrics for observability and monitoring\n- Foundation for future integrations (Prometheus, OpenTelemetry, etc.)\n\nFiles modified:\n- model_chorus/src/model_chorus/core/workflow_runner.py (added ~100 lines of telemetry infrastructure)",
+      "metadata": {},
+      "task_id": "task-3-2-2"
     }
   ]
 }

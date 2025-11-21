@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-21T14:29:50.005608Z",
+    "generated_at": "2025-11-21T14:31:53.017026Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 111,
-    "total_lines": 49301,
-    "total_classes": 282,
+    "total_files": 112,
+    "total_lines": 49535,
+    "total_classes": 284,
     "total_functions": 211,
     "avg_complexity": 4.47,
     "max_complexity": 44,
@@ -24,9 +24,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 111,
-        "lines": 49301,
-        "classes": 282,
+        "files": 112,
+        "lines": 49535,
+        "classes": 284,
         "functions": 211,
         "avg_complexity": 4.47
       }
@@ -819,6 +819,27 @@
       ],
       "exports": [],
       "lines": 526
+    },
+    {
+      "name": "workflow_runner",
+      "file": "src/model_chorus/core/workflow_runner.py",
+      "language": "python",
+      "docstring": "Workflow execution runner for ModelChorus.\n\nThis module provides the WorkflowRunner class that orchestrates workflow execution\nwith provider fallback, error handling, and telemetry hooks. It extracts and\nenhances the fallback logic previously embedded in BaseWorkflow.",
+      "classes": [
+        "ExecutionMetrics",
+        "WorkflowRunner"
+      ],
+      "functions": [],
+      "imports": [
+        "logging",
+        "dataclasses.dataclass",
+        "dataclasses.field",
+        "datetime.datetime",
+        "typing.TYPE_CHECKING",
+        "typing.Any"
+      ],
+      "exports": [],
+      "lines": 234
     },
     {
       "name": "__init__",
@@ -10394,6 +10415,53 @@
       ],
       "imported_by": [],
       "instantiation_count": 33
+    },
+    {
+      "name": "ExecutionMetrics",
+      "file": "src/model_chorus/core/workflow_runner.py",
+      "line": 21,
+      "language": "python",
+      "docstring": "Metrics collected during workflow execution.\n\nAttributes:\n    started_at: Timestamp when execution started\n    completed_at: Timestamp when execution completed (None if still running)\n    duration_ms: Execution duration in milliseconds (None if still running)\n    provider_attempts: List of (provider_name, success, error) tuples for each attempt\n    total_attempts: Total number of provider attempts made\n    successful_provider: Name of the provider that succeeded (None if all failed)",
+      "bases": [],
+      "methods": [
+        "mark_complete",
+        "add_attempt"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "execute",
+          "file": "src/model_chorus/core/workflow_runner.py",
+          "line": 134,
+          "context": [
+            "WorkflowRunner",
+            "execute"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 1
+    },
+    {
+      "name": "WorkflowRunner",
+      "file": "src/model_chorus/core/workflow_runner.py",
+      "line": 64,
+      "language": "python",
+      "docstring": "Orchestrates workflow execution with provider fallback and telemetry.\n\nThe WorkflowRunner extracts provider fallback logic from BaseWorkflow\nand adds structured error handling, execution metrics, and extension hooks\nfor telemetry/observability.\n\nKey Features:\n- Automatic provider fallback with configurable retry logic\n- Execution metrics collection (timing, attempts, success/failure)\n- Extension hooks for telemetry integration\n- Structured error handling with detailed context\n\nExample:\n    >>> runner = WorkflowRunner()\n    >>> response, metrics = await runner.execute(\n    ...     request,\n    ...     primary_provider,\n    ...     fallback_providers=[backup1, backup2]\n    ... )\n    >>> print(f\"Used {metrics.successful_provider} after {metrics.total_attempts} attempts\")\n    >>> print(f\"Duration: {metrics.duration_ms}ms\")",
+      "bases": [],
+      "methods": [
+        "__init__",
+        "execute",
+        "_on_execution_complete",
+        "_on_execution_failed"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
     },
     {
       "name": "ModelCapability",
@@ -23737,7 +23805,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 86,
           "call_type": "method_call"
         },
@@ -28738,7 +28806,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 342,
           "call_type": "method_call"
         },
@@ -29044,7 +29112,7 @@
         },
         {
           "name": "read",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 596,
           "call_type": "method_call"
         },
@@ -29146,7 +29214,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 703,
           "call_type": "method_call"
         },
@@ -29395,7 +29463,7 @@
         },
         {
           "name": "read",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 815,
           "call_type": "method_call"
         },
@@ -29431,25 +29499,25 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 837,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 840,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 842,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 844,
           "call_type": "method_call"
         },
@@ -29558,7 +29626,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 908,
           "call_type": "method_call"
         },
@@ -41169,6 +41237,14 @@
       "pathlib.Path",
       "typing.Any",
       "models.ConversationState"
+    ],
+    "src/model_chorus/core/workflow_runner.py": [
+      "logging",
+      "dataclasses.dataclass",
+      "dataclasses.field",
+      "datetime.datetime",
+      "typing.TYPE_CHECKING",
+      "typing.Any"
     ],
     "src/model_chorus/providers/__init__.py": [
       "base_provider.GenerationRequest",
