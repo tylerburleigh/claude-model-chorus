@@ -2,7 +2,7 @@
   "spec_id": "architectural-improvements-2025-01-20-001",
   "title": "Model-Chorus Architectural Improvements",
   "generated": "2025-01-20T20:30:00Z",
-  "last_updated": "2025-11-21T15:20:53.283787Z",
+  "last_updated": "2025-11-21T15:22:27.995421Z",
   "description": "Comprehensive architectural refactoring to eliminate code duplication, improve maintainability, enhance reliability, and establish scalable foundations for future development.",
   "hierarchy": {
     "spec-root": {
@@ -17,7 +17,7 @@
         "phase-4"
       ],
       "total_tasks": 69,
-      "completed_tasks": 55,
+      "completed_tasks": 56,
       "metadata": {
         "objectives": [
           "Reduce code duplication by 30-40% through shared primitives",
@@ -1945,7 +1945,7 @@
         "depends": []
       },
       "total_tasks": 18,
-      "completed_tasks": 4,
+      "completed_tasks": 5,
       "metadata": {
         "purpose": "Replace JSON persistence with SQLite and enhance workflow registry",
         "risk_level": "medium-high",
@@ -1968,7 +1968,7 @@
         "task-4-8"
       ],
       "total_tasks": 13,
-      "completed_tasks": 4,
+      "completed_tasks": 5,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -2092,7 +2092,7 @@
     "task-4-2": {
       "type": "task",
       "title": "model_chorus/migrations/migrate_json_to_sqlite.py",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-4-files",
       "children": [
         "task-4-2-1",
@@ -2108,7 +2108,7 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py",
         "task_category": "implementation",
@@ -2146,7 +2146,7 @@
     "task-4-2-2": {
       "type": "subtask",
       "title": "Add backup and rollback capabilities",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-4-2",
       "children": [],
       "dependencies": {
@@ -2157,11 +2157,17 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py",
         "task_category": "implementation",
-        "estimated_hours": 2
+        "estimated_hours": 2,
+        "started_at": "2025-11-21T15:21:25.440067Z",
+        "status_note": "Adding rollback capability to complement existing backup functionality",
+        "completed_at": "2025-11-21T15:22:27.986568Z",
+        "needs_journaling": false,
+        "actual_hours": 0.017,
+        "journaled_at": "2025-11-21T15:22:27.992854Z"
       }
     },
     "task-4-3": {
@@ -2518,7 +2524,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-20T20:38:01.399125Z",
-    "progress_percentage": 79,
+    "progress_percentage": 81,
     "current_phase": "phase-4"
   },
   "journal": [
@@ -3106,6 +3112,15 @@
       "content": "Implemented JSON file reading and validation in migrate_json_to_sqlite.py. Created comprehensive migration script with the following components:\n\n1. ConversationMigrator class - Main migration orchestrator with statistics tracking\n2. validate_json_file() - Validates JSON structure and parses into ConversationThread model. Checks required fields (thread_id, created_at, last_updated_at, workflow_name, messages, state, initial_context, status). Handles malformed JSON gracefully with error logging.\n3. scan_json_files() - Scans source directory for *.json files and returns paths\n4. validate_all_files() - Batch validation of all JSON files before migration. Builds dict of valid threads and tracks validation statistics.\n5. migrate_thread() - Migrates single thread to database, checking for duplicates and preserving original timestamps\n6. migrate_all() - Batch migration with progress tracking\n7. print_summary() - Formatted statistics display\n\nFeatures implemented:\n- Comprehensive validation before migration\n- Error handling for malformed JSON files  \n- Statistics tracking (total, validated, skipped, migrated, errors)\n- Graceful handling of invalid files\n- Duplicate detection (skips existing threads)\n- Preserves all original data and timestamps\n- CLI interface with argparse (--source, --dest, --backup, --verbose flags)\n\nReady for backup/rollback capabilities in next task.",
       "metadata": {},
       "task_id": "task-4-2-1"
+    },
+    {
+      "timestamp": "2025-11-21T15:22:27.992849Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add backup and rollback capabilities",
+      "author": "claude-code",
+      "content": "Added backup and rollback capabilities to migration script. Implemented three key components:\n\n1. create_backup() method (already existed from task-4-2-1) - Creates timestamped backup directory and copies all JSON files. Returns backup path or None if disabled.\n\n2. rollback_database() method (NEW) - Deletes SQLite database file and associated WAL/SHM files on migration failure. Safe cleanup of partial migration state. Returns success status.\n\n3. restore_from_backup() method (NEW) - Restores JSON files from backup directory. Clears source directory and copies backup files back. Returns success status.\n\n4. Enhanced run() method with automatic rollback - Catches MigrationError and unexpected exceptions. On failure, automatically triggers rollback_database() and restore_from_backup() when backups enabled. Ensures database connection closed in finally block. Logs backup location on success and rollback status on failure.\n\nSafety features:\n- Automatic rollback on critical errors (MigrationError)\n- Automatic rollback on unexpected exceptions\n- Backup path preserved and reported to user\n- Connection cleanup in finally block\n- Clear logging of all rollback steps\n- Safe handling of missing WAL/SHM files\n\nMigration script now provides complete safety net with backup/restore capability. No tests run as this will be tested in verification phase.",
+      "metadata": {},
+      "task_id": "task-4-2-2"
     }
   ]
 }

@@ -1,17 +1,17 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-21 10:19:46
+**Generated:** 2025-11-21 10:21:40
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 115
-- **Total Lines:** 52095
-- **Total Classes:** 300
-- **Total Functions:** 218
-- **Avg Complexity:** 4.38
+- **Total Files:** 117
+- **Total Lines:** 52549
+- **Total Classes:** 302
+- **Total Functions:** 219
+- **Avg Complexity:** 4.37
 - **Max Complexity:** 44
 - **High Complexity Functions:**
   - start (44)
@@ -1143,6 +1143,36 @@ Attributes:
 
 ---
 
+### `ConversationMigrator`
+
+**Language:** python
+**Defined in:** `model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py:47`
+
+**Description:**
+> Migrates file-based conversation storage to SQLite database.
+
+Handles validation, backup, and rollback for safe migration from
+individual JSON files to consolidated SQLite database.
+
+Attributes:
+    source_dir: Directory containing JSON conversation files
+    db_path: Path to target SQLite database
+    backup_enabled: Whether to create backups before migration
+    backup_dir: Directory for backup files
+
+**Methods:**
+- `__init__()`
+- `validate_json_file()`
+- `scan_json_files()`
+- `validate_all_files()`
+- `create_backup()`
+- `migrate_thread()`
+- `migrate_all()`
+- `print_summary()`
+- `run()`
+
+---
+
 ### `ConversationState`
 
 **Language:** python
@@ -2240,6 +2270,17 @@ Example:
 **Methods:**
 - `__init__()`
 - `generate()`
+
+---
+
+### `MigrationError`
+
+**Language:** python
+**Inherits from:** `Exception`
+**Defined in:** `model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py:41`
+
+**Description:**
+> Raised when migration encounters an error.
 
 ---
 
@@ -9806,6 +9847,17 @@ Returns:
 
 ---
 
+### `main() -> int`
+
+**Language:** python
+**Defined in:** `model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py:398`
+**Complexity:** 3
+
+**Description:**
+> Main entry point for migration script.
+
+---
+
 ### `memory() -> None`
 
 **Language:** python
@@ -11496,6 +11548,20 @@ Returns:
 - `logging`
 - `typing.Any`
 - `typing.TYPE_CHECKING`
+
+### `model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py`
+
+- `argparse`
+- `datetime.datetime`
+- `json`
+- `logging`
+- `model_chorus.core.conversation_db.ConversationDatabase`
+- `model_chorus.core.models.ConversationMessage`
+- `model_chorus.core.models.ConversationThread`
+- `pathlib.Path`
+- `shutil`
+- `sys`
+- `typing.Any`
 
 ### `model_chorus/src/model_chorus/providers/__init__.py`
 

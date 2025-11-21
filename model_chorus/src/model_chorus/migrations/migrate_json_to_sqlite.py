@@ -323,6 +323,69 @@ class ConversationMigrator:
             f"{self.stats['errors']} errors"
         )
 
+    def rollback_database(self) -> bool:
+        """
+        Rollback database by deleting it.
+
+        Returns:
+            True if rollback successful, False otherwise
+        """
+        try:
+            if self.db_path.exists():
+                logger.info(f"Rolling back: deleting database {self.db_path}")
+                self.db_path.unlink()
+
+                # Also remove WAL and SHM files if they exist
+                wal_path = Path(str(self.db_path) + "-wal")
+                shm_path = Path(str(self.db_path) + "-shm")
+
+                if wal_path.exists():
+                    wal_path.unlink()
+                if shm_path.exists():
+                    shm_path.unlink()
+
+                logger.info("Database rollback complete")
+                return True
+            else:
+                logger.warning("Database does not exist, nothing to rollback")
+                return False
+
+        except Exception as e:
+            logger.error(f"Error during rollback: {e}")
+            return False
+
+    def restore_from_backup(self, backup_path: Path) -> bool:
+        """
+        Restore JSON files from backup.
+
+        Args:
+            backup_path: Path to backup directory
+
+        Returns:
+            True if restore successful, False otherwise
+        """
+        try:
+            if not backup_path or not backup_path.exists():
+                logger.error(f"Backup path does not exist: {backup_path}")
+                return False
+
+            logger.info(f"Restoring from backup: {backup_path}")
+
+            # Clear source directory
+            for json_file in self.source_dir.glob("*.json"):
+                json_file.unlink()
+
+            # Copy backup files to source
+            for backup_file in backup_path.glob("*.json"):
+                shutil.copy2(backup_file, self.source_dir / backup_file.name)
+
+            logger.info(f"Restored {len(list(backup_path.glob('*.json')))} files")
+            return True
+
+        except Exception as e:
+            logger.error(f"Error during restore: {e}")
+            return False
+
     def print_summary(self) -> None:
         """Print migration summary statistics."""
         print("\n" + "=" * 60)
@@ -345,11 +408,14 @@ class ConversationMigrator:
 
     def run(self) -> int:
         """
-        Execute full migration process.
+        Execute full migration process with rollback on failure.
 
         Returns:
             Exit code (0 for success, 1 for failure)
         """
+        backup_path: Path | None = None
+        db: ConversationDatabase | None = None
+
         try:
             logger.info("Starting conversation migration...")
             logger.info(f"Source: {self.source_dir}")
@@ -382,17 +448,50 @@ class ConversationMigrator:
 
             if self.stats["errors"] == 0:
                 logger.info("Migration completed successfully")
+                if backup_path:
+                    logger.info(f"Backup available at: {backup_path}")
                 return 0
             else:
                 logger.warning(f"Migration completed with {self.stats['errors']} errors")
+                if backup_path:
+                    logger.info(f"Backup available at: {backup_path}")
                 return 1
 
         except MigrationError as e:
             logger.error(f"Migration failed: {e}")
+
+            # Attempt rollback on critical failure
+            if backup_path and self.backup_enabled:
+                logger.warning("Attempting rollback...")
+                self.rollback_database()
+                if self.restore_from_backup(backup_path):
+                    logger.info("Rollback successful, JSON files restored from backup")
+                else:
+                    logger.error("Rollback failed, backup is available at: {backup_path}")
+
             return 1
+
         except Exception as e:
             logger.error(f"Unexpected error during migration: {e}", exc_info=True)
+
+            # Attempt rollback on unexpected error
+            if backup_path and self.backup_enabled:
+                logger.warning("Attempting rollback due to unexpected error...")
+                self.rollback_database()
+                if self.restore_from_backup(backup_path):
+                    logger.info("Rollback successful, JSON files restored from backup")
+                else:
+                    logger.error(f"Rollback failed, backup is available at: {backup_path}")
+
             return 1
+
+        finally:
+            # Ensure database connection is closed
+            if db and hasattr(db, 'conn') and db.conn:
+                try:
+                    db.close()
+                except Exception:
+                    pass
 
 
 def main() -> int:

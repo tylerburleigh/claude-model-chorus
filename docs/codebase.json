@@ -2,18 +2,18 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-21T15:19:46.966976Z",
+    "generated_at": "2025-11-21T15:21:40.827892Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 115,
-    "total_lines": 52095,
-    "total_classes": 300,
-    "total_functions": 218,
-    "avg_complexity": 4.38,
+    "total_files": 117,
+    "total_lines": 52549,
+    "total_classes": 302,
+    "total_functions": 219,
+    "avg_complexity": 4.37,
     "max_complexity": 44,
     "high_complexity_functions": [
       "start (44)",
@@ -24,11 +24,11 @@
     ],
     "by_language": {
       "python": {
-        "files": 115,
-        "lines": 52095,
-        "classes": 300,
-        "functions": 218,
-        "avg_complexity": 4.38
+        "files": 117,
+        "lines": 52549,
+        "classes": 302,
+        "functions": 219,
+        "avg_complexity": 4.37
       }
     }
   },
@@ -871,6 +871,45 @@
       ],
       "exports": [],
       "lines": 353
+    },
+    {
+      "name": "__init__",
+      "file": "model_chorus/src/model_chorus/migrations/__init__.py",
+      "language": "python",
+      "docstring": "Migration utilities for ModelChorus.",
+      "classes": [],
+      "functions": [],
+      "imports": [],
+      "exports": [],
+      "lines": 1
+    },
+    {
+      "name": "migrate_json_to_sqlite",
+      "file": "model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py",
+      "language": "python",
+      "docstring": "Migration script to convert file-based conversation storage to SQLite.\n\nMigrates conversation threads from individual JSON files to consolidated\nSQLite database with WAL mode. Provides validation, backup, and rollback\ncapabilities to ensure safe migration.\n\nUsage:\n    python -m model_chorus.migrations.migrate_json_to_sqlite \\\n        --source ~/.model-chorus/conversations \\\n        --dest ~/.model-chorus/conversations.db \\\n        --backup\n\nFeatures:\n- Validates JSON files before migration\n- Creates automatic backups\n- Provides rollback on errors\n- Reports progress and statistics\n- Handles malformed files gracefully",
+      "classes": [
+        "MigrationError",
+        "ConversationMigrator"
+      ],
+      "functions": [
+        "main"
+      ],
+      "imports": [
+        "argparse",
+        "json",
+        "logging",
+        "shutil",
+        "sys",
+        "datetime.datetime",
+        "pathlib.Path",
+        "typing.Any",
+        "model_chorus.core.conversation_db.ConversationDatabase",
+        "model_chorus.core.models.ConversationMessage",
+        "model_chorus.core.models.ConversationThread"
+      ],
+      "exports": [],
+      "lines": 453
     },
     {
       "name": "__init__",
@@ -6478,8 +6517,19 @@
       "properties": [],
       "is_exported": false,
       "is_public": true,
-      "instantiated_by": [],
-      "imported_by": []
+      "instantiated_by": [
+        {
+          "instantiator": "run",
+          "file": "model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py",
+          "line": 372,
+          "context": [
+            "ConversationMigrator",
+            "run"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 1
     },
     {
       "name": "GapType",
@@ -7128,10 +7178,19 @@
             "ConversationDatabase",
             "get_thread"
           ]
+        },
+        {
+          "instantiator": "validate_json_file",
+          "file": "model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py",
+          "line": 126,
+          "context": [
+            "ConversationMigrator",
+            "validate_json_file"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 4
+      "instantiation_count": 5
     },
     {
       "name": "Hypothesis",
@@ -10669,6 +10728,85 @@
           "context": [
             "BaseWorkflow",
             "__init__"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 1
+    },
+    {
+      "name": "MigrationError",
+      "file": "model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py",
+      "line": 41,
+      "language": "python",
+      "docstring": "Raised when migration encounters an error.",
+      "bases": [
+        "Exception"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "scan_json_files",
+          "file": "model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py",
+          "line": 152,
+          "context": [
+            "ConversationMigrator",
+            "scan_json_files"
+          ]
+        },
+        {
+          "instantiator": "validate_all_files",
+          "file": "model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py",
+          "line": 191,
+          "context": [
+            "ConversationMigrator",
+            "validate_all_files"
+          ]
+        },
+        {
+          "instantiator": "create_backup",
+          "file": "model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py",
+          "line": 224,
+          "context": [
+            "ConversationMigrator",
+            "create_backup"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 3
+    },
+    {
+      "name": "ConversationMigrator",
+      "file": "model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py",
+      "line": 47,
+      "language": "python",
+      "docstring": "Migrates file-based conversation storage to SQLite database.\n\nHandles validation, backup, and rollback for safe migration from\nindividual JSON files to consolidated SQLite database.\n\nAttributes:\n    source_dir: Directory containing JSON conversation files\n    db_path: Path to target SQLite database\n    backup_enabled: Whether to create backups before migration\n    backup_dir: Directory for backup files",
+      "bases": [],
+      "methods": [
+        "__init__",
+        "validate_json_file",
+        "scan_json_files",
+        "validate_all_files",
+        "create_backup",
+        "migrate_thread",
+        "migrate_all",
+        "print_summary",
+        "run"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "main",
+          "file": "model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py",
+          "line": 443,
+          "context": [
+            "main"
           ]
         }
       ],
@@ -22641,6 +22779,12 @@
         },
         {
           "name": "<module>",
+          "file": "model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py",
+          "line": 453,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
           "file": "model_chorus/tests/workflows/study/memory/test_cache.py",
           "line": 226,
           "call_type": "method_call"
@@ -22684,7 +22828,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 10
+      "call_count": 11
     },
     {
       "name": "main",
@@ -22746,6 +22890,12 @@
           "name": "<module>",
           "file": "model_chorus/src/model_chorus/cli/setup.py",
           "line": 1103,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py",
+          "line": 453,
           "call_type": "function_call"
         },
         {
@@ -22889,7 +23039,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 10
+      "call_count": 11
     },
     {
       "name": "basic_chat_example",
@@ -23367,6 +23517,12 @@
         },
         {
           "name": "<module>",
+          "file": "model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py",
+          "line": 453,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
           "file": "model_chorus/tests/workflows/study/memory/test_cache.py",
           "line": 226,
           "call_type": "method_call"
@@ -23422,7 +23578,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 10
+      "call_count": 11
     },
     {
       "name": "main",
@@ -23484,6 +23640,12 @@
           "name": "<module>",
           "file": "model_chorus/src/model_chorus/cli/setup.py",
           "line": 1103,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py",
+          "line": 453,
           "call_type": "function_call"
         },
         {
@@ -23699,7 +23861,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 10
+      "call_count": 11
     },
     {
       "name": "basic_investigation_example",
@@ -24640,6 +24802,12 @@
         },
         {
           "name": "<module>",
+          "file": "model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py",
+          "line": 453,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
           "file": "model_chorus/tests/workflows/study/memory/test_cache.py",
           "line": 226,
           "call_type": "method_call"
@@ -24773,7 +24941,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 10
+      "call_count": 11
     },
     {
       "name": "fix_simple_call",
@@ -24901,7 +25069,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 86,
           "call_type": "method_call"
         },
@@ -24925,7 +25093,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 102,
           "call_type": "method_call"
         },
@@ -25008,6 +25176,12 @@
         },
         {
           "name": "<module>",
+          "file": "model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py",
+          "line": 453,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
           "file": "model_chorus/tests/workflows/study/memory/test_cache.py",
           "line": 226,
           "call_type": "method_call"
@@ -25045,7 +25219,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 10
+      "call_count": 11
     },
     {
       "name": "_find_project_root",
@@ -29033,7 +29207,7 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 1926,
           "call_type": "method_call"
         },
@@ -29418,6 +29592,12 @@
         },
         {
           "name": "<module>",
+          "file": "model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py",
+          "line": 453,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
           "file": "model_chorus/tests/workflows/study/memory/test_cache.py",
           "line": 226,
           "call_type": "method_call"
@@ -29437,7 +29617,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 10
+      "call_count": 11
     },
     {
       "name": "check_package_installed",
@@ -30208,7 +30388,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 596,
           "call_type": "method_call"
         },
@@ -30559,7 +30739,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 815,
           "call_type": "method_call"
         },
@@ -30801,6 +30981,12 @@
           "name": "<module>",
           "file": "model_chorus/src/model_chorus/cli/setup.py",
           "line": 1103,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py",
+          "line": 453,
           "call_type": "function_call"
         },
         {
@@ -31190,7 +31376,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 10
+      "call_count": 11
     },
     {
       "name": "get_config",
@@ -33609,7 +33795,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 189,
           "call_type": "method_call"
         },
@@ -33651,7 +33837,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 606,
           "call_type": "method_call"
         },
@@ -35633,6 +35819,163 @@
       ],
       "calls": [],
       "call_count": 2
+    },
+    {
+      "name": "main",
+      "file": "model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py",
+      "line": 398,
+      "language": "python",
+      "docstring": "Main entry point for migration script.",
+      "parameters": [],
+      "return_type": "int",
+      "complexity": 3,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "<module>",
+          "file": "examples/workflow_examples.py",
+          "line": 576,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "model_chorus/examples/basic_workflow.py",
+          "line": 106,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "model_chorus/examples/chat_example.py",
+          "line": 210,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "model_chorus/examples/provider_integration.py",
+          "line": 161,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "model_chorus/examples/thinkdeep_example.py",
+          "line": 496,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "model_chorus/fix_thinkdeep_calls.py",
+          "line": 133,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "model_chorus/src/model_chorus/cli/main.py",
+          "line": 2045,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "model_chorus/src/model_chorus/cli/setup.py",
+          "line": 1103,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py",
+          "line": 453,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "model_chorus/tests/workflows/study/memory/test_cache.py",
+          "line": 226,
+          "call_type": "method_call"
+        },
+        {
+          "name": "<module>",
+          "file": "model_chorus/tests/workflows/study/memory/test_persistence.py",
+          "line": 210,
+          "call_type": "method_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "ArgumentParser",
+          "file": "/opt/anaconda3/lib/python3.13/argparse.py",
+          "line": 400,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "/opt/anaconda3/lib/python3.13/argparse.py",
+          "line": 403,
+          "call_type": "method_call"
+        },
+        {
+          "name": "home",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "line": 406,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "/opt/anaconda3/lib/python3.13/argparse.py",
+          "line": 409,
+          "call_type": "method_call"
+        },
+        {
+          "name": "home",
+          "file": "/Users/tylerburleigh/anaconda3/lib/python3.11/site-packages/jedi/third_party/typeshed/stdlib/3/builtins.pyi",
+          "line": 412,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "/opt/anaconda3/lib/python3.13/argparse.py",
+          "line": 415,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "/opt/anaconda3/lib/python3.13/argparse.py",
+          "line": 421,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "/opt/anaconda3/lib/python3.13/argparse.py",
+          "line": 426,
+          "call_type": "method_call"
+        },
+        {
+          "name": "parse_args",
+          "file": "/opt/anaconda3/lib/python3.13/argparse.py",
+          "line": 433,
+          "call_type": "method_call"
+        },
+        {
+          "name": "setLevel",
+          "file": "/opt/anaconda3/lib/python3.13/logging/__init__.py",
+          "line": 437,
+          "call_type": "method_call"
+        },
+        {
+          "name": "getLogger",
+          "file": "/opt/anaconda3/lib/python3.13/logging/__init__.py",
+          "line": 437,
+          "call_type": "method_call"
+        },
+        {
+          "name": "run",
+          "file": "/Users/tylerburleigh/Documents/claude-model-chorus/model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py",
+          "line": 449,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 11
     },
     {
       "name": "format_citation",
@@ -42636,6 +42979,19 @@
       "enum.Enum",
       "typing.TYPE_CHECKING",
       "typing.Any"
+    ],
+    "model_chorus/src/model_chorus/migrations/migrate_json_to_sqlite.py": [
+      "argparse",
+      "json",
+      "logging",
+      "shutil",
+      "sys",
+      "datetime.datetime",
+      "pathlib.Path",
+      "typing.Any",
+      "model_chorus.core.conversation_db.ConversationDatabase",
+      "model_chorus.core.models.ConversationMessage",
+      "model_chorus.core.models.ConversationThread"
     ],
     "model_chorus/src/model_chorus/providers/__init__.py": [
       "base_provider.GenerationRequest",
