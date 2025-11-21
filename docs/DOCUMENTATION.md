@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-21 11:09:23
+**Generated:** 2025-11-21 11:16:45
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 118
-- **Total Lines:** 54069
-- **Total Classes:** 317
+- **Total Files:** 119
+- **Total Lines:** 54677
+- **Total Classes:** 324
 - **Total Functions:** 220
 - **Avg Complexity:** 4.39
 - **Max Complexity:** 44
@@ -23,6 +23,20 @@
 
 
 ## 🏛️ Classes
+
+### `AnotherMockWorkflow`
+
+**Language:** python
+**Inherits from:** `BaseWorkflow`
+**Defined in:** `model_chorus/tests/test_workflow_registry.py:32`
+
+**Description:**
+> Another mock workflow for multiple registration tests.
+
+**Methods:**
+- `run()`
+
+---
 
 ### `ArgumentMap`
 
@@ -1979,6 +1993,19 @@ Example:
 
 ---
 
+### `InvalidWorkflow`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_workflow_registry.py:40`
+
+**Description:**
+> Invalid workflow that doesn't inherit from BaseWorkflow.
+
+**Methods:**
+- `run()`
+
+---
+
 ### `InvestigationPhase`
 
 **Language:** python
@@ -2381,6 +2408,20 @@ Example:
 **Methods:**
 - `__init__()`
 - `generate()`
+
+---
+
+### `MockWorkflow`
+
+**Language:** python
+**Inherits from:** `BaseWorkflow`
+**Defined in:** `model_chorus/tests/test_workflow_registry.py:22`
+
+**Description:**
+> Minimal mock workflow implementation.
+
+**Methods:**
+- `run()`
 
 ---
 
@@ -6651,6 +6692,103 @@ with long-running conversations with many messages.
 - `test_create_memory()`
 - `test_prepare_prompt_with_files_no_files()`
 - `test_prepare_prompt_with_files_with_files()`
+
+---
+
+### `TestWorkflowMetadata`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_workflow_registry.py:275`
+
+**Description:**
+> Test suite for workflow metadata functionality.
+
+**Methods:**
+- `setup_method()`
+- `teardown_method()`
+- `test_register_metadata_basic()`
+- `test_register_metadata_full()`
+- `test_register_metadata_without_workflow()`
+- `test_register_metadata_updates_existing()`
+- `test_get_workflow_info_exists()`
+- `test_get_workflow_info_not_exists()`
+- `test_get_workflow_info_after_registration()`
+
+---
+
+### `TestWorkflowRegistryBasics`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_workflow_registry.py:48`
+
+**Description:**
+> Test suite for basic WorkflowRegistry functionality.
+
+**Methods:**
+- `setup_method()`
+- `teardown_method()`
+- `test_register_decorator_basic()`
+- `test_register_decorator_returns_class()`
+- `test_register_decorator_duplicate_name_raises_error()`
+- `test_register_decorator_non_baseflow_raises_error()`
+- `test_register_decorator_non_class_raises_error()`
+- `test_register_workflow_programmatic()`
+- `test_register_workflow_duplicate_raises_error()`
+- `test_register_workflow_non_baseflow_raises_error()`
+- `test_register_workflow_non_class_raises_error()`
+- `test_get_workflow_exists()`
+- `test_get_workflow_not_exists_raises_error()`
+- `test_get_workflow_error_lists_available()`
+- `test_get_workflow_error_when_empty_registry()`
+- `test_list_workflows_empty()`
+- `test_list_workflows_single()`
+- `test_list_workflows_multiple_sorted()`
+- `test_is_registered_true()`
+- `test_is_registered_false()`
+- `test_unregister_workflow()`
+- `test_unregister_nonexistent_raises_error()`
+- `test_unregister_removes_metadata()`
+- `test_clear_removes_all_workflows()`
+- `test_clear_removes_all_metadata()`
+
+---
+
+### `TestWorkflowRegistryEdgeCases`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_workflow_registry.py:551`
+
+**Description:**
+> Test suite for edge cases and error conditions.
+
+**Methods:**
+- `setup_method()`
+- `teardown_method()`
+- `test_empty_workflow_name()`
+- `test_special_characters_in_name()`
+- `test_clear_on_empty_registry()`
+- `test_unregister_after_clear()`
+- `test_metadata_version_format()`
+
+---
+
+### `TestWorkflowRegistryIntegration`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_workflow_registry.py:379`
+
+**Description:**
+> Test suite for integrated workflow and metadata scenarios.
+
+**Methods:**
+- `setup_method()`
+- `teardown_method()`
+- `test_workflow_with_metadata()`
+- `test_multiple_workflows_with_metadata()`
+- `test_workflow_instantiation_after_registry()`
+- `test_decorator_pattern_with_metadata()`
+- `test_list_workflows_discovery()`
+- `test_registry_isolation()`
 
 ---
 
@@ -12683,6 +12821,15 @@ Returns:
 - `model_chorus.workflows.thinkdeep.ThinkDeepWorkflow`
 - `pytest`
 - `unittest.mock.AsyncMock`
+
+### `model_chorus/tests/test_workflow_registry.py`
+
+- `inspect`
+- `model_chorus.core.base_workflow.BaseWorkflow`
+- `model_chorus.core.base_workflow.WorkflowResult`
+- `model_chorus.core.models.WorkflowMetadata`
+- `model_chorus.core.registry.WorkflowRegistry`
+- `pytest`
 
 ### `model_chorus/tests/workflows/study/memory/test_cache.py`
 

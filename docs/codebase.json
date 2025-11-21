@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-21T16:09:23.880112Z",
+    "generated_at": "2025-11-21T16:16:45.073395Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 118,
-    "total_lines": 54069,
-    "total_classes": 317,
+    "total_files": 119,
+    "total_lines": 54677,
+    "total_classes": 324,
     "total_functions": 220,
     "avg_complexity": 4.39,
     "max_complexity": 44,
@@ -24,9 +24,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 118,
-        "lines": 54069,
-        "classes": 317,
+        "files": 119,
+        "lines": 54677,
+        "classes": 324,
         "functions": 220,
         "avg_complexity": 4.39
       }
@@ -2825,6 +2825,32 @@
       "lines": 365
     },
     {
+      "name": "test_workflow_registry",
+      "file": "model_chorus/tests/test_workflow_registry.py",
+      "language": "python",
+      "docstring": "Unit tests for WorkflowRegistry module.\n\nTests verify workflow registration, retrieval, and metadata management including:\n- Workflow registration via decorator and programmatic methods\n- Workflow retrieval and listing\n- Metadata registration and querying\n- Error handling for invalid registrations\n- Registry state management (clear, unregister)",
+      "classes": [
+        "MockWorkflow",
+        "AnotherMockWorkflow",
+        "InvalidWorkflow",
+        "TestWorkflowRegistryBasics",
+        "TestWorkflowMetadata",
+        "TestWorkflowRegistryIntegration",
+        "TestWorkflowRegistryEdgeCases"
+      ],
+      "functions": [],
+      "imports": [
+        "inspect",
+        "pytest",
+        "model_chorus.core.base_workflow.BaseWorkflow",
+        "model_chorus.core.base_workflow.WorkflowResult",
+        "model_chorus.core.models.WorkflowMetadata",
+        "model_chorus.core.registry.WorkflowRegistry"
+      ],
+      "exports": [],
+      "lines": 608
+    },
+    {
       "name": "__init__",
       "file": "model_chorus/tests/workflows/study/memory/__init__.py",
       "language": "python",
@@ -4582,10 +4608,83 @@
             "TestErrorHandling",
             "test_extraction_with_no_brainstorming_steps"
           ]
+        },
+        {
+          "instantiator": "run",
+          "file": "model_chorus/tests/test_workflow_registry.py",
+          "line": 27,
+          "context": [
+            "MockWorkflow",
+            "run"
+          ]
+        },
+        {
+          "instantiator": "run",
+          "file": "model_chorus/tests/test_workflow_registry.py",
+          "line": 37,
+          "context": [
+            "AnotherMockWorkflow",
+            "run"
+          ]
+        },
+        {
+          "instantiator": "run",
+          "file": "model_chorus/tests/test_workflow_registry.py",
+          "line": 69,
+          "context": [
+            "TestWorkflowRegistryBasics",
+            "test_register_decorator_basic",
+            "DecoratorWorkflow",
+            "run"
+          ]
+        },
+        {
+          "instantiator": "run",
+          "file": "model_chorus/tests/test_workflow_registry.py",
+          "line": 80,
+          "context": [
+            "TestWorkflowRegistryBasics",
+            "test_register_decorator_returns_class",
+            "DecoratorWorkflow",
+            "run"
+          ]
+        },
+        {
+          "instantiator": "run",
+          "file": "model_chorus/tests/test_workflow_registry.py",
+          "line": 93,
+          "context": [
+            "TestWorkflowRegistryBasics",
+            "test_register_decorator_duplicate_name_raises_error",
+            "FirstWorkflow",
+            "run"
+          ]
+        },
+        {
+          "instantiator": "run",
+          "file": "model_chorus/tests/test_workflow_registry.py",
+          "line": 100,
+          "context": [
+            "TestWorkflowRegistryBasics",
+            "test_register_decorator_duplicate_name_raises_error",
+            "SecondWorkflow",
+            "run"
+          ]
+        },
+        {
+          "instantiator": "run",
+          "file": "model_chorus/tests/test_workflow_registry.py",
+          "line": 476,
+          "context": [
+            "TestWorkflowRegistryIntegration",
+            "test_decorator_pattern_with_metadata",
+            "AdvancedWorkflow",
+            "run"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 21
+      "instantiation_count": 28
     },
     {
       "name": "BaseWorkflow",
@@ -21780,6 +21879,167 @@
       "imported_by": []
     },
     {
+      "name": "MockWorkflow",
+      "file": "model_chorus/tests/test_workflow_registry.py",
+      "line": 22,
+      "language": "python",
+      "docstring": "Minimal mock workflow implementation.",
+      "bases": [
+        "BaseWorkflow"
+      ],
+      "methods": [
+        "run"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "AnotherMockWorkflow",
+      "file": "model_chorus/tests/test_workflow_registry.py",
+      "line": 32,
+      "language": "python",
+      "docstring": "Another mock workflow for multiple registration tests.",
+      "bases": [
+        "BaseWorkflow"
+      ],
+      "methods": [
+        "run"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "InvalidWorkflow",
+      "file": "model_chorus/tests/test_workflow_registry.py",
+      "line": 40,
+      "language": "python",
+      "docstring": "Invalid workflow that doesn't inherit from BaseWorkflow.",
+      "bases": [],
+      "methods": [
+        "run"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestWorkflowRegistryBasics",
+      "file": "model_chorus/tests/test_workflow_registry.py",
+      "line": 48,
+      "language": "python",
+      "docstring": "Test suite for basic WorkflowRegistry functionality.",
+      "bases": [],
+      "methods": [
+        "setup_method",
+        "teardown_method",
+        "test_register_decorator_basic",
+        "test_register_decorator_returns_class",
+        "test_register_decorator_duplicate_name_raises_error",
+        "test_register_decorator_non_baseflow_raises_error",
+        "test_register_decorator_non_class_raises_error",
+        "test_register_workflow_programmatic",
+        "test_register_workflow_duplicate_raises_error",
+        "test_register_workflow_non_baseflow_raises_error",
+        "test_register_workflow_non_class_raises_error",
+        "test_get_workflow_exists",
+        "test_get_workflow_not_exists_raises_error",
+        "test_get_workflow_error_lists_available",
+        "test_get_workflow_error_when_empty_registry",
+        "test_list_workflows_empty",
+        "test_list_workflows_single",
+        "test_list_workflows_multiple_sorted",
+        "test_is_registered_true",
+        "test_is_registered_false",
+        "test_unregister_workflow",
+        "test_unregister_nonexistent_raises_error",
+        "test_unregister_removes_metadata",
+        "test_clear_removes_all_workflows",
+        "test_clear_removes_all_metadata"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestWorkflowMetadata",
+      "file": "model_chorus/tests/test_workflow_registry.py",
+      "line": 275,
+      "language": "python",
+      "docstring": "Test suite for workflow metadata functionality.",
+      "bases": [],
+      "methods": [
+        "setup_method",
+        "teardown_method",
+        "test_register_metadata_basic",
+        "test_register_metadata_full",
+        "test_register_metadata_without_workflow",
+        "test_register_metadata_updates_existing",
+        "test_get_workflow_info_exists",
+        "test_get_workflow_info_not_exists",
+        "test_get_workflow_info_after_registration"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestWorkflowRegistryIntegration",
+      "file": "model_chorus/tests/test_workflow_registry.py",
+      "line": 379,
+      "language": "python",
+      "docstring": "Test suite for integrated workflow and metadata scenarios.",
+      "bases": [],
+      "methods": [
+        "setup_method",
+        "teardown_method",
+        "test_workflow_with_metadata",
+        "test_multiple_workflows_with_metadata",
+        "test_workflow_instantiation_after_registry",
+        "test_decorator_pattern_with_metadata",
+        "test_list_workflows_discovery",
+        "test_registry_isolation"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestWorkflowRegistryEdgeCases",
+      "file": "model_chorus/tests/test_workflow_registry.py",
+      "line": 551,
+      "language": "python",
+      "docstring": "Test suite for edge cases and error conditions.",
+      "bases": [],
+      "methods": [
+        "setup_method",
+        "teardown_method",
+        "test_empty_workflow_name",
+        "test_special_characters_in_name",
+        "test_clear_on_empty_registry",
+        "test_unregister_after_clear",
+        "test_metadata_version_format"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
       "name": "TestPersonaResponse",
       "file": "model_chorus/tests/workflows/study/test_personas.py",
       "line": 31,
@@ -30949,7 +31209,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 342,
           "call_type": "method_call"
         },
@@ -31357,7 +31617,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 703,
           "call_type": "method_call"
         },
@@ -31642,25 +31902,25 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 837,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 840,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 842,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 844,
           "call_type": "method_call"
         },
@@ -31769,7 +32029,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 908,
           "call_type": "method_call"
         },
@@ -44610,6 +44870,14 @@
       "model_chorus.workflows.consensus.ConsensusStrategy",
       "model_chorus.workflows.consensus.ConsensusWorkflow",
       "model_chorus.workflows.thinkdeep.ThinkDeepWorkflow"
+    ],
+    "model_chorus/tests/test_workflow_registry.py": [
+      "inspect",
+      "pytest",
+      "model_chorus.core.base_workflow.BaseWorkflow",
+      "model_chorus.core.base_workflow.WorkflowResult",
+      "model_chorus.core.models.WorkflowMetadata",
+      "model_chorus.core.registry.WorkflowRegistry"
     ],
     "model_chorus/tests/workflows/study/memory/test_cache.py": [
       "pytest",
