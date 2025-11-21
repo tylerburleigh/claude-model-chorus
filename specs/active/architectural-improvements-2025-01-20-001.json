@@ -2,7 +2,7 @@
   "spec_id": "architectural-improvements-2025-01-20-001",
   "title": "Model-Chorus Architectural Improvements",
   "generated": "2025-01-20T20:30:00Z",
-  "last_updated": "2025-11-21T16:44:12.611594Z",
+  "last_updated": "2025-11-21T16:48:44.203697Z",
   "description": "Comprehensive architectural refactoring to eliminate code duplication, improve maintainability, enhance reliability, and establish scalable foundations for future development.",
   "hierarchy": {
     "spec-root": {
@@ -17,7 +17,7 @@
         "phase-4"
       ],
       "total_tasks": 69,
-      "completed_tasks": 66,
+      "completed_tasks": 67,
       "metadata": {
         "objectives": [
           "Reduce code duplication by 30-40% through shared primitives",
@@ -1945,7 +1945,7 @@
         "depends": []
       },
       "total_tasks": 18,
-      "completed_tasks": 15,
+      "completed_tasks": 16,
       "metadata": {
         "purpose": "Replace JSON persistence with SQLite and enhance workflow registry",
         "risk_level": "medium-high",
@@ -2467,7 +2467,7 @@
         "depends": []
       },
       "total_tasks": 5,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {}
     },
     "verify-4-1": {
@@ -2524,7 +2524,7 @@
     "verify-4-3": {
       "type": "verify",
       "title": "Query capabilities work correctly",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-4-verify",
       "children": [],
       "dependencies": {
@@ -2533,11 +2533,17 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "manual",
         "expected": "Test query_recent_investigations and query_by_workflow methods",
-        "command": ""
+        "command": "",
+        "started_at": "2025-11-21T16:44:42.946914Z",
+        "status_note": "Starting query capabilities verification",
+        "completed_at": "2025-11-21T16:48:44.192129Z",
+        "needs_journaling": false,
+        "actual_hours": 0.067,
+        "journaled_at": "2025-11-21T16:48:44.200506Z"
       }
     },
     "verify-4-4": {
@@ -2588,7 +2594,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-20T20:38:01.399125Z",
-    "progress_percentage": 95,
+    "progress_percentage": 97,
     "current_phase": "phase-4"
   },
   "journal": [
@@ -3284,6 +3290,15 @@
       "content": "SQLite conversation storage tests completed successfully with 100% pass rate.\n\nTest Execution Results:\n- Test file: model_chorus/tests/test_conversation_db.py\n- Total tests: 42\n- Passed: 42 (100%)\n- Failed: 0\n- Code coverage: 95% of conversation_db.py\n\nTest Categories Verified (all passing):\n1. Database Initialization (6 tests) - WAL mode, foreign keys, schema\n2. Thread Creation (5 tests) - UUID generation, parent relationships\n3. Thread Retrieval (3 tests) - Queries, expiration handling\n4. Message Operations (6 tests) - Addition, truncation, ordering\n5. Thread Lifecycle (4 tests) - Completion, archival\n6. Cleanup Operations (2 tests) - Expired and archived thread cleanup\n7. Query Operations (6 tests) - Workflow filtering, status queries, chains\n8. Statistics & Edge Cases (10 tests) - Stats, cascading deletes, unicode, large messages\n\nConclusion: SQLite conversation storage implementation fully verified and production-ready.",
       "metadata": {},
       "task_id": "verify-4-2"
+    },
+    {
+      "timestamp": "2025-11-21T16:48:44.200493Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Query capabilities work correctly",
+      "author": "claude-code",
+      "content": "Query capabilities verified successfully with comprehensive testing.\n\n**Methods Verified:**\n1. query_recent_threads() - Retrieves recent threads with TTL filtering\n2. query_by_workflow() - Retrieves threads filtered by workflow type\n\n**Tests Performed:**\n\nTEST 1: query_recent_threads()\n- \u2713 Correct count returned (6 threads)\n- \u2713 Chronological ordering (most recent first)\n- \u2713 Limit parameter works correctly\n- \u2713 TTL filtering works (24h window)\n\nTEST 2: query_by_workflow()\n- \u2713 thinkdeep: 2 threads found, all correct workflow\n- \u2713 consensus: 2 threads found, all correct workflow\n- \u2713 chat: 1 thread found, correct workflow\n- \u2713 argument: 1 thread found, correct workflow\n\nTEST 3: query_by_workflow() with limit\n- \u2713 Limit parameter works (requested 1, got 1)\n\nTEST 4: Non-existent workflow\n- \u2713 Returns empty list correctly\n\nTEST 5: Result completeness\n- \u2713 All required fields present (thread_id, workflow_name, status, created_at, last_updated_at, messages)\n- \u2713 Messages included in results\n\nTEST 6: TTL filtering\n- \u2713 Only threads within TTL window returned\n\n**Conclusion:** Both query methods work correctly with proper filtering, ordering, and limit support. All test cases passed.",
+      "metadata": {},
+      "task_id": "verify-4-3"
     }
   ]
 }
