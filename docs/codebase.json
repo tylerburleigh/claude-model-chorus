@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-21T14:36:20.204397Z",
+    "generated_at": "2025-11-21T14:39:27.509429Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 112,
-    "total_lines": 49669,
+    "total_lines": 49739,
     "total_classes": 285,
     "total_functions": 211,
     "avg_complexity": 4.47,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 112,
-        "lines": 49669,
+        "lines": 49739,
         "classes": 285,
         "functions": 211,
         "avg_complexity": 4.47
@@ -641,7 +641,7 @@
         "models.ConversationThread"
       ],
       "exports": [],
-      "lines": 696
+      "lines": 766
     },
     {
       "name": "gap_analysis",
@@ -5829,6 +5829,8 @@
         "get_thread_chain",
         "add_message",
         "get_messages",
+        "_estimate_tokens",
+        "_apply_token_budget",
         "build_conversation_history",
         "get_context_summary",
         "complete_thread",
@@ -23867,7 +23869,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 102,
           "call_type": "method_call"
         },
@@ -27975,7 +27977,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 1926,
           "call_type": "method_call"
         },
@@ -29150,7 +29152,7 @@
         },
         {
           "name": "read",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 596,
           "call_type": "method_call"
         },
@@ -29501,7 +29503,7 @@
         },
         {
           "name": "read",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 815,
           "call_type": "method_call"
         },
@@ -32551,7 +32553,7 @@
         },
         {
           "name": "read",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 189,
           "call_type": "method_call"
         },
@@ -32593,7 +32595,7 @@
         },
         {
           "name": "read",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 606,
           "call_type": "method_call"
         },

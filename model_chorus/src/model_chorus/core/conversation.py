@@ -369,18 +369,50 @@ class ConversationMemory:
         """
         return len(text) // 4
 
+    def _is_important_message(self, msg: ConversationMessage) -> bool:
+        """
+        Determine if a message is important and should be preserved during compaction.
+
+        Messages are considered important if they:
+        - Have attached files (context-rich)
+        - Are longer than average (substantive content)
+        - Contain workflow metadata
+
+        Args:
+            msg: Message to evaluate
+
+        Returns:
+            True if message is important, False otherwise
+        """
+        # Messages with files are important (context-rich)
+        if msg.files:
+            return True
+
+        # Messages with workflow metadata are important
+        if msg.workflow_name or msg.metadata:
+            return True
+
+        # Long messages (>500 chars) likely contain substantive content
+        if len(msg.content) > 500:
+            return True
+
+        return False
+
     def _apply_token_budget(
-        self, messages: list[ConversationMessage], max_tokens: int
+        self, messages: list[ConversationMessage], max_tokens: int, smart_compaction: bool = True
     ) -> list[ConversationMessage]:
         """
-        Apply token budget to message list.
+        Apply token budget to message list with optional smart compaction.
 
-        Includes messages from newest to oldest until budget would be exceeded.
-        Always includes at least the most recent message.
+        Smart compaction preserves:
+        1. All recent messages (newest N that fit)
+        2. Important older messages (files, long content, metadata)
+        3. At least the most recent message
 
         Args:
             messages: List of messages (should be in chronological order)
             max_tokens: Maximum tokens allowed
+            smart_compaction: If True, preserve important older messages (default: True)
 
         Returns:
             Filtered list of messages that fit within budget
@@ -388,27 +420,74 @@ class ConversationMemory:
         if not messages:
             return messages
 
-        # Start with most recent and work backwards
-        result = []
+        if not smart_compaction:
+            # Simple newest-first strategy
+            result = []
+            token_count = 0
+
+            for msg in reversed(messages):
+                msg_text = msg.content
+                if msg.files:
+                    msg_text += " " + " ".join(msg.files)
+                msg_tokens = self._estimate_tokens(msg_text)
+
+                if result and (token_count + msg_tokens > max_tokens):
+                    break
+
+                result.append(msg)
+                token_count += msg_tokens
+
+            return list(reversed(result))
+
+        # Smart compaction: preserve recent + important messages
+        recent_messages = []
+        important_messages = []
         token_count = 0
 
+        # Phase 1: Include recent messages (from newest)
         for msg in reversed(messages):
-            # Estimate tokens for this message
             msg_text = msg.content
             if msg.files:
                 msg_text += " " + " ".join(msg.files)
             msg_tokens = self._estimate_tokens(msg_text)
 
-            # Check if adding this message would exceed budget
-            if result and (token_count + msg_tokens > max_tokens):
-                # Budget exceeded, stop here
+            if recent_messages and (token_count + msg_tokens > max_tokens * 0.7):
+                # Reserve 30% of budget for important older messages
                 break
 
-            result.append(msg)
+            recent_messages.append(msg)
             token_count += msg_tokens
 
-        # Reverse to restore chronological order
-        return list(reversed(result))
+        recent_indices = set(messages.index(msg) for msg in recent_messages)
+
+        # Phase 2: Add important older messages if budget allows
+        remaining_budget = max_tokens - token_count
+
+        for idx, msg in enumerate(messages):
+            # Skip if already included in recent
+            if idx in recent_indices:
+                continue
+
+            # Check if important
+            if not self._is_important_message(msg):
+                continue
+
+            msg_text = msg.content
+            if msg.files:
+                msg_text += " " + " ".join(msg.files)
+            msg_tokens = self._estimate_tokens(msg_text)
+
+            if msg_tokens <= remaining_budget:
+                important_messages.append((idx, msg))
+                remaining_budget -= msg_tokens
+
+        # Combine and sort by original order
+        result = list(reversed(recent_messages))
+        for idx, msg in sorted(important_messages):
+            # Insert in correct position to maintain order
+            result.insert(idx, msg)
+
+        return result
 
     def build_conversation_history(
         self,
@@ -416,27 +495,35 @@ class ConversationMemory:
         max_messages: int | None = None,
         max_tokens: int | None = None,
         include_files: bool = True,
+        smart_compaction: bool = True,
     ) -> tuple[str, int]:
         """
         Build formatted conversation history for context injection.
 
         Constructs human-readable conversation history with file context,
         using newest-first prioritization for both files and messages.
-        Supports token-aware limiting to prevent context overflow.
+        Supports token-aware limiting with smart compaction to prevent context overflow.
 
         Args:
             thread_id: Thread to build history from
             max_messages: Optional limit on messages to include (applied first)
             max_tokens: Optional token budget for history (applied after max_messages)
             include_files: Whether to embed file contents
+            smart_compaction: If True, preserve important older messages when token
+                budgeting is active (default: True)
 
         Returns:
             Tuple of (formatted_history, message_count)
 
         Token Budgeting:
-            When max_tokens is specified, messages are included from newest to oldest
-            until the estimated token count would exceed the budget. Uses a simple
-            character-based estimation (~4 chars per token) for efficiency.
+            When max_tokens is specified, messages are selected using either:
+
+            1. Smart compaction (default): Allocates 70% of budget to recent messages,
+               reserves 30% for important older messages (files, long content, metadata).
+               Preserves conversation continuity while keeping important context.
+
+            2. Simple compaction: Includes messages from newest to oldest until budget
+               would be exceeded. More predictable but may lose important older context.
 
             The max_messages limit is applied first (if specified), then max_tokens
             further reduces the set if needed.
@@ -476,7 +563,7 @@ class ConversationMemory:
 
         # Apply max_tokens limit (keep most recent that fit within budget)
         if max_tokens:
-            messages = self._apply_token_budget(messages, max_tokens)
+            messages = self._apply_token_budget(messages, max_tokens, smart_compaction)
 
         truncated = total_messages - len(messages)
 

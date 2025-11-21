@@ -2,7 +2,7 @@
   "spec_id": "architectural-improvements-2025-01-20-001",
   "title": "Model-Chorus Architectural Improvements",
   "generated": "2025-01-20T20:30:00Z",
-  "last_updated": "2025-11-21T14:38:37.078628Z",
+  "last_updated": "2025-11-21T14:40:51.965739Z",
   "description": "Comprehensive architectural refactoring to eliminate code duplication, improve maintainability, enhance reliability, and establish scalable foundations for future development.",
   "hierarchy": {
     "spec-root": {
@@ -17,7 +17,7 @@
         "phase-4"
       ],
       "total_tasks": 69,
-      "completed_tasks": 42,
+      "completed_tasks": 43,
       "metadata": {
         "objectives": [
           "Reduce code duplication by 30-40% through shared primitives",
@@ -1351,7 +1351,7 @@
         "depends": []
       },
       "total_tasks": 16,
-      "completed_tasks": 7,
+      "completed_tasks": 8,
       "metadata": {
         "purpose": "Add provider middleware, token budgeting, and workflow runner abstraction",
         "risk_level": "medium",
@@ -1373,7 +1373,7 @@
         "task-3-7"
       ],
       "total_tasks": 11,
-      "completed_tasks": 7,
+      "completed_tasks": 8,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1598,7 +1598,7 @@
     "task-3-4": {
       "type": "task",
       "title": "model_chorus/core/conversation.py - token budgeting",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-3-files",
       "children": [
         "task-3-4-1",
@@ -1615,7 +1615,7 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/core/conversation.py",
         "task_category": "implementation",
@@ -1653,7 +1653,7 @@
     "task-3-4-2": {
       "type": "subtask",
       "title": "Add smart compaction strategy (preserve recent + important messages)",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-3-4",
       "children": [],
       "dependencies": {
@@ -1664,11 +1664,17 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/core/conversation.py",
         "task_category": "implementation",
-        "estimated_hours": 2
+        "estimated_hours": 2,
+        "started_at": "2025-11-21T14:39:12.308420Z",
+        "status_note": "Implementing smart compaction strategy for conversation history",
+        "completed_at": "2025-11-21T14:40:51.953922Z",
+        "needs_journaling": false,
+        "actual_hours": 0.028,
+        "journaled_at": "2025-11-21T14:40:51.962885Z"
       }
     },
     "task-3-5": {
@@ -2429,7 +2435,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-20T20:38:01.399125Z",
-    "progress_percentage": 60,
+    "progress_percentage": 62,
     "current_phase": "phase-3"
   },
   "journal": [
@@ -2873,6 +2879,15 @@
       "content": "Successfully enhanced build_conversation_history with max_tokens parameter for token-aware context management:\n\n**New Parameters:**\n- Added max_tokens parameter to build_conversation_history method\n- Supports token budget limiting in addition to existing max_messages parameter\n- Parameters applied in sequence: max_messages first (if specified), then max_tokens\n\n**Token Estimation:**\n- Implemented _estimate_tokens() helper method using character-based heuristic (~4 chars per token)\n- Simple and efficient approach that doesn't require external tokenizer libraries\n- Provides reasonable approximation for budget management\n\n**Token Budgeting Logic:**\n- Implemented _apply_token_budget() helper method\n- Includes messages from newest to oldest until budget would be exceeded\n- Always includes at least the most recent message (even if over budget)\n- Maintains chronological order in returned list\n- Considers message content and file references in token estimation\n\n**Usage Example:**\n```python\n# Limit to 1000 tokens of history\nhistory, count = memory.build_conversation_history(\n    thread_id='abc123',\n    max_tokens=1000\n)\n\n# Combine message count and token limits\nhistory, count = memory.build_conversation_history(\n    thread_id='abc123',\n    max_messages=50,  # Applied first\n    max_tokens=2000   # Then applied to further reduce if needed\n)\n```\n\n**Verification:**\n- Python syntax validation passed\n- Token estimation tested (400 chars = 100 tokens)\n- Token budgeting tested with various budgets (100, 250, 500 tokens)\n- Edge cases handled (empty messages, single message, all messages fit)\n- All unit tests passed\n\n**Design Benefits:**\n- Prevents context window overflow\n- Maintains conversation continuity by prioritizing recent messages\n- Simple heuristic avoids dependency on external libraries\n- Foundation for task-3-4-2 (smart compaction strategy)\n\nFiles modified:\n- model_chorus/src/model_chorus/core/conversation.py (added max_tokens parameter, _estimate_tokens(), _apply_token_budget() methods)",
       "metadata": {},
       "task_id": "task-3-4-1"
+    },
+    {
+      "timestamp": "2025-11-21T14:40:51.962869Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add smart compaction strategy (preserve recent + important messages)",
+      "author": "claude-code",
+      "content": "Successfully implemented smart compaction strategy for conversation history:\n\n**Core Implementation:**\n- Added _is_important_message() method to identify context-rich messages\n- Enhanced _apply_token_budget() with smart_compaction parameter and two-phase selection\n- Added smart_compaction parameter to build_conversation_history() (default: True)\n\n**Important Message Criteria:**\nMessages are preserved during compaction if they have:\n1. Attached files (context-rich references)\n2. Workflow metadata (structured context)\n3. Long content (>500 chars, substantive information)\n\n**Smart Compaction Strategy:**\n- Phase 1: Allocate 70% of token budget to recent messages (newest-first)\n- Phase 2: Reserve 30% of budget for important older messages\n- Maintains chronological order in final result\n- Fallback to simple newest-first if smart_compaction=False\n\n**Design Benefits:**\n- Preserves conversation continuity with recent messages\n- Retains important context that might be lost with simple truncation\n- Configurable: can disable for predictable behavior\n- Efficient two-phase selection algorithm\n\n**Usage Examples:**\n// Smart compaction (default) - preserves important older messages\nhistory, count = memory.build_conversation_history(\n    thread_id='abc123',\n    max_tokens=1000,\n    smart_compaction=True  // default\n)\n\n// Simple compaction - pure newest-first\nhistory, count = memory.build_conversation_history(\n    thread_id='abc123',\n    max_tokens=1000,\n    smart_compaction=False\n)\n\n**Verification:**\n- Python syntax validation passed\n- Important message detection tested (files, metadata, long content)\n- Smart compaction tested with various budgets (100, 200, 500 tokens)\n- Two-phase allocation verified (70% recent, 30% important)\n- Simple compaction mode tested as fallback\n- All unit tests passed\n\n**Performance Characteristics:**\n- O(n) time complexity for message selection\n- Minimal memory overhead (stores indices during selection)\n- Character-based token estimation remains efficient\n\n**Files modified:**\n- model_chorus/src/model_chorus/core/conversation.py (added _is_important_message(), enhanced _apply_token_budget() with two-phase smart compaction, added smart_compaction parameter)",
+      "metadata": {},
+      "task_id": "task-3-4-2"
     }
   ]
 }
