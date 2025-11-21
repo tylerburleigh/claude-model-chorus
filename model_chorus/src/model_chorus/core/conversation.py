@@ -1,23 +1,29 @@
 """
 Conversation memory management for ModelChorus.
 
-Provides file-based persistence for multi-turn conversations with continuation support.
-Based on Zen MCP patterns but adapted for CLI-based orchestration architecture.
+Provides persistence for multi-turn conversations with continuation support.
+Supports both file-based (JSON) and SQLite database backends via configuration.
 
 Key Features:
 - UUID-based thread identification (continuation_id)
-- File-based persistence (survives process restarts)
-- Thread-safe operations with file locking
+- Pluggable storage backends (file or SQLite)
+- Thread-safe operations
 - TTL-based automatic cleanup
 - Context window management for long conversations
+- Configurable via .model-chorusrc
+
+Backend Selection:
+    - file: Individual JSON files (legacy, default)
+    - sqlite: SQLite database with WAL mode (recommended)
 """
 
 import json
 import logging
+import os
 import uuid
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, Protocol
 
 import filelock
 
@@ -26,18 +32,71 @@ from .models import ConversationMessage, ConversationThread
 logger = logging.getLogger(__name__)
 
 
+class ConversationBackend(Protocol):
+    """Protocol defining the interface for conversation storage backends."""
+
+    def create_thread(
+        self,
+        workflow_name: str,
+        initial_context: dict[str, Any] | None = None,
+        parent_thread_id: str | None = None,
+    ) -> str:
+        """Create new conversation thread."""
+        ...
+
+    def get_thread(self, thread_id: str) -> ConversationThread | None:
+        """Retrieve conversation thread by ID."""
+        ...
+
+    def add_message(
+        self,
+        thread_id: str,
+        role: Literal["user", "assistant"],
+        content: str,
+        files: list[str] | None = None,
+        workflow_name: str | None = None,
+        model_provider: str | None = None,
+        model_name: str | None = None,
+        metadata: dict[str, Any] | None = None,
+    ) -> bool:
+        """Add message to conversation thread."""
+        ...
+
+    def get_messages(
+        self, thread_id: str, limit: int | None = None, role: str | None = None
+    ) -> list[ConversationMessage]:
+        """Retrieve messages from thread with optional filtering."""
+        ...
+
+    def complete_thread(self, thread_id: str) -> bool:
+        """Mark thread as completed."""
+        ...
+
+    def archive_thread(self, thread_id: str) -> bool:
+        """Mark thread as archived."""
+        ...
+
+    def cleanup_expired_threads(self) -> int:
+        """Remove threads older than TTL."""
+        ...
+
+    def cleanup_archived_threads(self) -> int:
+        """Remove archived threads regardless of TTL."""
+        ...
+
+
 # Default configuration
 DEFAULT_CONVERSATIONS_DIR = Path.home() / ".model-chorus" / "conversations"
 DEFAULT_TTL_HOURS = 3
 DEFAULT_MAX_MESSAGES_PER_THREAD = 50
 
 
-class ConversationMemory:
+class FileBackend:
     """
-    Manages conversation threads with file-based persistence.
+    File-based conversation storage implementation (legacy).
 
-    Provides thread-safe storage and retrieval of conversation history,
-    enabling multi-turn conversations across workflow executions.
+    Provides thread-safe storage using individual JSON files per thread.
+    This is the original implementation, now wrapped by ConversationMemory.
 
     Architecture:
         - Each thread stored as JSON file: ~/.model-chorus/conversations/{thread_id}.json
@@ -851,3 +910,234 @@ class ConversationMemory:
             logger.debug(f"Deleted thread {thread_id}")
         except Exception as e:
             logger.error(f"Error deleting thread {thread_id}: {e}")
+
+
+class ConversationMemory:
+    """
+    Unified conversation memory interface with pluggable storage backends.
+
+    Automatically selects storage backend based on configuration:
+    - file: JSON file-based storage (default, backward compatible)
+    - sqlite: SQLite database with WAL mode (recommended for production)
+
+    Configuration via .model-chorusrc:
+        storage:
+          backend: "sqlite"  # or "file"
+          sqlite_path: "~/.model-chorus/conversations.db"
+
+    This class delegates all operations to the appropriate backend implementation
+    while maintaining the same API as the original ConversationMemory.
+
+    Attributes:
+        backend: The underlying storage backend (FileBackend or ConversationDatabase)
+    """
+
+    def __init__(
+        self,
+        conversations_dir: Path = DEFAULT_CONVERSATIONS_DIR,
+        ttl_hours: int = DEFAULT_TTL_HOURS,
+        max_messages: int = DEFAULT_MAX_MESSAGES_PER_THREAD,
+        backend_type: str | None = None,
+        sqlite_path: Path | None = None,
+    ):
+        """
+        Initialize conversation memory with automatic backend selection.
+
+        Args:
+            conversations_dir: Directory for file-based storage (used if backend='file')
+            ttl_hours: Time-to-live for threads in hours
+            max_messages: Maximum messages per thread
+            backend_type: Override backend type ('file' or 'sqlite'), None=auto-detect from config
+            sqlite_path: Path to SQLite database (used if backend='sqlite')
+        """
+        # Determine backend from config or environment
+        if backend_type is None:
+            backend_type = self._detect_backend()
+
+        # Initialize appropriate backend
+        if backend_type == "sqlite":
+            logger.info("Using SQLite conversation backend")
+            from .conversation_db import ConversationDatabase
+
+            db_path = sqlite_path or (Path.home() / ".model-chorus" / "conversations.db")
+            self.backend: ConversationBackend = ConversationDatabase(
+                db_path=db_path,
+                ttl_hours=ttl_hours,
+                max_messages=max_messages,
+            )
+        else:
+            logger.info("Using file-based conversation backend")
+            self.backend = FileBackend(
+                conversations_dir=conversations_dir,
+                ttl_hours=ttl_hours,
+                max_messages=max_messages,
+            )
+
+        logger.info(
+            f"ConversationMemory initialized with {backend_type} backend"
+        )
+
+    def _detect_backend(self) -> str:
+        """
+        Detect backend from configuration or environment variable.
+
+        Returns:
+            Backend type: 'file' or 'sqlite'
+        """
+        # Check environment variable first (for testing/override)
+        env_backend = os.environ.get("MODELCHORUS_STORAGE_BACKEND")
+        if env_backend in ("file", "sqlite"):
+            logger.debug(f"Backend detected from environment: {env_backend}")
+            return env_backend
+
+        # Try to load from config file
+        try:
+            from .config import load_config
+
+            config = load_config()
+            if config and config.storage and config.storage.backend:
+                logger.debug(f"Backend detected from config: {config.storage.backend}")
+                return config.storage.backend
+        except Exception as e:
+            logger.debug(f"Could not load config for backend detection: {e}")
+
+        # Default to file backend for backward compatibility
+        logger.debug("No backend config found, defaulting to 'file'")
+        return "file"
+
+    # Delegate all methods to backend
+
+    def create_thread(
+        self,
+        workflow_name: str,
+        initial_context: dict[str, Any] | None = None,
+        parent_thread_id: str | None = None,
+    ) -> str:
+        """Create new conversation thread."""
+        return self.backend.create_thread(workflow_name, initial_context, parent_thread_id)
+
+    def get_thread(self, thread_id: str) -> ConversationThread | None:
+        """Retrieve conversation thread by ID."""
+        return self.backend.get_thread(thread_id)
+
+    def get_thread_chain(
+        self, thread_id: str, max_depth: int = 20
+    ) -> list[ConversationThread]:
+        """Retrieve thread and all parent threads in chronological order."""
+        if hasattr(self.backend, "get_thread_chain"):
+            return self.backend.get_thread_chain(thread_id, max_depth)
+
+        # Fallback implementation for FileBackend
+        chain: list[ConversationThread] = []
+        current_id: str | None = thread_id
+        depth = 0
+
+        while current_id and depth < max_depth:
+            thread = self.backend.get_thread(current_id)
+            if not thread:
+                break
+
+            chain.insert(0, thread)
+            current_id = thread.parent_thread_id
+            depth += 1
+
+        if depth >= max_depth:
+            logger.warning(
+                f"Thread chain depth limit reached ({max_depth}) for {thread_id}"
+            )
+
+        return chain
+
+    def add_message(
+        self,
+        thread_id: str,
+        role: Literal["user", "assistant"],
+        content: str,
+        files: list[str] | None = None,
+        workflow_name: str | None = None,
+        model_provider: str | None = None,
+        model_name: str | None = None,
+        metadata: dict[str, Any] | None = None,
+    ) -> bool:
+        """Add message to conversation thread."""
+        return self.backend.add_message(
+            thread_id, role, content, files, workflow_name,
+            model_provider, model_name, metadata
+        )
+
+    def get_messages(
+        self, thread_id: str, limit: int | None = None, role: str | None = None
+    ) -> list[ConversationMessage]:
+        """Retrieve messages from thread with optional filtering."""
+        return self.backend.get_messages(thread_id, limit, role)
+
+    def build_conversation_history(
+        self,
+        thread_id: str,
+        max_messages: int | None = None,
+        max_tokens: int | None = None,
+        include_files: bool = True,
+        smart_compaction: bool = True,
+    ) -> tuple[str, int]:
+        """Build formatted conversation history for context injection."""
+        # FileBackend has this method, ConversationDatabase doesn't yet
+        if hasattr(self.backend, "build_conversation_history"):
+            return self.backend.build_conversation_history(
+                thread_id, max_messages, max_tokens, include_files, smart_compaction
+            )
+
+        # Fallback: simple implementation for SQLite backend
+        thread = self.backend.get_thread(thread_id)
+        if not thread:
+            return "", 0
+
+        messages = thread.messages
+        if max_messages and len(messages) > max_messages:
+            messages = messages[-max_messages:]
+
+        lines = [
+            "=== CONVERSATION HISTORY (CONTINUATION) ===",
+            f"Thread: {thread_id}",
+            f"Workflow: {thread.workflow_name}",
+            "",
+        ]
+
+        for idx, msg in enumerate(messages, 1):
+            lines.append(f"--- Turn {idx} ({msg.role}) ---")
+            lines.append(msg.content)
+            lines.append("")
+
+        lines.append("=== END CONVERSATION HISTORY ===")
+        return "\n".join(lines), len(messages)
+
+    def get_context_summary(self, thread_id: str) -> dict[str, Any]:
+        """Get summary statistics for thread context."""
+        if hasattr(self.backend, "get_context_summary"):
+            return self.backend.get_context_summary(thread_id)
+
+        # Fallback implementation
+        thread = self.backend.get_thread(thread_id)
+        if not thread:
+            return {"found": False, "message_count": 0}
+
+        return {
+            "found": True,
+            "thread_id": thread_id,
+            "message_count": len(thread.messages),
+        }
+
+    def complete_thread(self, thread_id: str) -> bool:
+        """Mark thread as completed."""
+        return self.backend.complete_thread(thread_id)
+
+    def archive_thread(self, thread_id: str) -> bool:
+        """Mark thread as archived."""
+        return self.backend.archive_thread(thread_id)
+
+    def cleanup_expired_threads(self) -> int:
+        """Remove threads older than TTL."""
+        return self.backend.cleanup_expired_threads()
+
+    def cleanup_archived_threads(self) -> int:
+        """Remove archived threads regardless of TTL."""
+        return self.backend.cleanup_archived_threads()
