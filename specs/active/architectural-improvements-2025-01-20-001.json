@@ -2,7 +2,7 @@
   "spec_id": "architectural-improvements-2025-01-20-001",
   "title": "Model-Chorus Architectural Improvements",
   "generated": "2025-01-20T20:30:00Z",
-  "last_updated": "2025-11-21T15:38:29.846496Z",
+  "last_updated": "2025-11-21T15:56:01.189568Z",
   "description": "Comprehensive architectural refactoring to eliminate code duplication, improve maintainability, enhance reliability, and establish scalable foundations for future development.",
   "hierarchy": {
     "spec-root": {
@@ -17,7 +17,7 @@
         "phase-4"
       ],
       "total_tasks": 69,
-      "completed_tasks": 61,
+      "completed_tasks": 62,
       "metadata": {
         "objectives": [
           "Reduce code duplication by 30-40% through shared primitives",
@@ -1945,7 +1945,7 @@
         "depends": []
       },
       "total_tasks": 18,
-      "completed_tasks": 10,
+      "completed_tasks": 11,
       "metadata": {
         "purpose": "Replace JSON persistence with SQLite and enhance workflow registry",
         "risk_level": "medium-high",
@@ -1968,7 +1968,7 @@
         "task-4-8"
       ],
       "total_tasks": 13,
-      "completed_tasks": 10,
+      "completed_tasks": 11,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -2362,7 +2362,7 @@
     "task-4-6": {
       "type": "task",
       "title": "Update all workflow classes with metadata",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-4-files",
       "children": [],
       "dependencies": {
@@ -2373,12 +2373,18 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "task_category": "refactoring",
         "estimated_hours": 2,
         "description": "Add metadata to ChatWorkflow, ConsensusWorkflow, ArgumentWorkflow, ThinkDeepWorkflow, IdeateWorkflow",
-        "file_path": "task-4-6.md"
+        "file_path": "task-4-6.md",
+        "started_at": "2025-11-21T15:38:59.825871Z",
+        "status_note": "Starting to add metadata to all workflow classes",
+        "completed_at": "2025-11-21T15:56:01.166459Z",
+        "needs_journaling": false,
+        "actual_hours": 0.284,
+        "journaled_at": "2025-11-21T15:56:01.181697Z"
       }
     },
     "task-4-7": {
@@ -2554,7 +2560,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-20T20:38:01.399125Z",
-    "progress_percentage": 88,
+    "progress_percentage": 89,
     "current_phase": "phase-4"
   },
   "journal": [
@@ -3196,6 +3202,15 @@
       "content": "Successfully implemented the list-workflows CLI command that exposes WorkflowRegistry.list_workflows() and get_workflow_info() methods. The command follows the established CLI pattern and displays workflow names, descriptions, versions, and authors (when metadata is available). Implementation includes @app.command(name=\"list-workflows\") decorator with list_workflows_cmd() function at line 2027, following the same rich console output style as other commands, handling cases where metadata is not available. Command appears in help menu and is fully functional. Manually tested with successful workflow listing. All 27 existing CLI integration tests still pass with no regressions introduced. Files modified: model_chorus/src/model_chorus/cli/main.py (added list_workflows_cmd function).",
       "metadata": {},
       "task_id": "task-4-5"
+    },
+    {
+      "timestamp": "2025-11-21T15:56:01.181681Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Update all workflow classes with metadata",
+      "author": "claude-code",
+      "content": "Successfully added workflow metadata registration for all workflow classes that inherit from BaseWorkflow. The metadata includes descriptions, versions, authors, categories, parameters, and usage examples for each workflow.\n\nImplementation details:\n- Updated model_chorus/src/model_chorus/workflows/__init__.py to register metadata for all workflows\n- Registered both workflow and metadata for ChatWorkflow and ThinkDeepWorkflow (not using decorators)\n- Added metadata for ArgumentWorkflow, IdeateWorkflow, and StudyWorkflow (already registered via @WorkflowRegistry.register decorators in their respective files)\n- Each workflow now has complete metadata including:\n  * Name and description\n  * Version (1.0.0 or 2.0.0)\n  * Author (ModelChorus Team)\n  * Category (consultation, reasoning, creativity, research)\n  * Parameters list\n  * Usage examples\n\nWorkflows with metadata:\n1. ChatWorkflow - Single-model peer consultation (v1.0.0)\n2. ArgumentWorkflow - Structured dialectical reasoning (v1.0.0)\n3. ThinkDeepWorkflow - Extended reasoning with investigation (v2.0.0)\n4. IdeateWorkflow - Creative brainstorming (v1.0.0)\n5. StudyWorkflow - Persona-based collaborative research (v1.0.0)\n\nNote: ConsensusWorkflow was not registered as it doesn't inherit from BaseWorkflow (uses different architecture)\n\nTesting:\n- Manually tested: model-chorus list-workflows displays all metadata correctly\n- All 27 existing CLI integration tests pass\n- No regressions introduced\n\nFiles modified:\n- model_chorus/src/model_chorus/workflows/__init__.py (added metadata registration for all workflows)",
+      "metadata": {},
+      "task_id": "task-4-6"
     }
   ]
 }
