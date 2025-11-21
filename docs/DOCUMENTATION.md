@@ -1,24 +1,24 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-20 19:07:56
+**Generated:** 2025-11-20 19:12:27
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 110
-- **Total Lines:** 48797
+- **Total Lines:** 48737
 - **Total Classes:** 272
 - **Total Functions:** 211
-- **Avg Complexity:** 4.91
+- **Avg Complexity:** 4.78
 - **Max Complexity:** 55
 - **High Complexity Functions:**
   - thinkdeep (55)
   - start (44)
-  - chat (37)
   - _create_smart_mock_provider (37)
   - argument (35)
+  - ideate (35)
 
 
 
@@ -2478,7 +2478,7 @@ API endpoints, and provider-specific parameters.
 
 **Language:** python
 **Inherits from:** `Exception`
-**Defined in:** `src/model_chorus/cli/main.py:46`
+**Defined in:** `src/model_chorus/cli/main.py:48`
 
 **Description:**
 > Raised when attempting to use a disabled provider.
@@ -6165,7 +6165,7 @@ Returns:
 ### `_config_init(verbose) -> None`
 
 **Language:** python
-**Defined in:** `src/model_chorus/cli/main.py:2072`
+**Defined in:** `src/model_chorus/cli/main.py:2012`
 **Complexity:** 4
 
 **Description:**
@@ -6179,7 +6179,7 @@ Returns:
 ### `_config_show(verbose) -> None`
 
 **Language:** python
-**Defined in:** `src/model_chorus/cli/main.py:1976`
+**Defined in:** `src/model_chorus/cli/main.py:1916`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -6193,7 +6193,7 @@ Returns:
 ### `_config_validate(verbose) -> None`
 
 **Language:** python
-**Defined in:** `src/model_chorus/cli/main.py:2039`
+**Defined in:** `src/model_chorus/cli/main.py:1979`
 **Complexity:** 4
 
 **Description:**
@@ -6228,7 +6228,7 @@ This mock provider can:
 ### `_find_project_root(start_path) -> Path`
 
 **Language:** python
-**Defined in:** `src/model_chorus/cli/main.py:60`
+**Defined in:** `src/model_chorus/cli/main.py:62`
 **Complexity:** 4
 
 **Description:**
@@ -6308,7 +6308,7 @@ Returns:
 ### `_format_path_for_display(path) -> str`
 
 **Language:** python
-**Defined in:** `src/model_chorus/cli/main.py:78`
+**Defined in:** `src/model_chorus/cli/main.py:80`
 **Complexity:** 2
 
 **Description:**
@@ -6558,7 +6558,7 @@ Returns:
 ### `argument(prompt_arg, prompt_flag, provider, continuation_id, files, system, timeout, output, verbose, skip_provider_check) -> None`
 
 **Language:** python
-**Defined in:** `src/model_chorus/cli/main.py:525`
+**Defined in:** `src/model_chorus/cli/main.py:465`
 ⚠️ **Complexity:** 35 (High)
 
 **Decorators:** `@app.command()`
@@ -6808,8 +6808,8 @@ Example:
 ### `chat(prompt_arg, prompt_flag, provider, continuation_id, files, system, timeout, output, verbose, skip_provider_check) -> None`
 
 **Language:** python
-**Defined in:** `src/model_chorus/cli/main.py:251`
-⚠️ **Complexity:** 37 (High)
+**Defined in:** `src/model_chorus/cli/main.py:253`
+⚠️ **Complexity:** 11 (High)
 
 **Decorators:** `@app.command()`
 
@@ -7276,7 +7276,7 @@ and hypotheses are validated.
 ### `config_cmd(subcommand, verbose) -> None`
 
 **Language:** python
-**Defined in:** `src/model_chorus/cli/main.py:1929`
+**Defined in:** `src/model_chorus/cli/main.py:1869`
 **Complexity:** 7
 
 **Decorators:** `@app.command(name='config')`
@@ -7303,7 +7303,7 @@ Examples:
 ### `consensus(prompt_arg, prompt_flag, num_to_consult, strategy, files, system, timeout, output, verbose, skip_provider_check) -> None`
 
 **Language:** python
-**Defined in:** `src/model_chorus/cli/main.py:1120`
+**Defined in:** `src/model_chorus/cli/main.py:1060`
 ⚠️ **Complexity:** 33 (High)
 
 **Decorators:** `@app.command()`
@@ -7339,7 +7339,7 @@ Example:
 ### `construct_prompt_with_files(prompt, files) -> str`
 
 **Language:** python
-**Defined in:** `src/model_chorus/cli/main.py:1061`
+**Defined in:** `src/model_chorus/cli/main.py:1001`
 **Complexity:** 9
 
 **Description:**
@@ -8592,7 +8592,7 @@ Example:
 ### `get_config() -> None`
 
 **Language:** python
-**Defined in:** `src/model_chorus/cli/main.py:173`
+**Defined in:** `src/model_chorus/cli/main.py:175`
 **Complexity:** 3
 
 **Description:**
@@ -8686,7 +8686,7 @@ Example:
 ### `get_install_command(provider) -> str`
 
 **Language:** python
-**Defined in:** `src/model_chorus/cli/main.py:186`
+**Defined in:** `src/model_chorus/cli/main.py:188`
 **Complexity:** 1
 
 **Description:**
@@ -8726,7 +8726,7 @@ Returns:
 ### `get_provider_by_name(name, timeout) -> ClaudeProvider | CodexProvider | GeminiProvider | CursorAgentProvider`
 
 **Language:** python
-**Defined in:** `src/model_chorus/cli/main.py:204`
+**Defined in:** `src/model_chorus/cli/main.py:206`
 **Complexity:** 3
 
 **Description:**
@@ -8828,7 +8828,7 @@ during an investigation.
 ### `ideate(prompt_arg, prompt_flag, provider, continuation_id, files, num_ideas, system, timeout, output, verbose, skip_provider_check) -> None`
 
 **Language:** python
-**Defined in:** `src/model_chorus/cli/main.py:790`
+**Defined in:** `src/model_chorus/cli/main.py:730`
 ⚠️ **Complexity:** 35 (High)
 
 **Decorators:** `@app.command()`
@@ -9014,7 +9014,7 @@ Returns:
 ### `list_providers(check) -> None`
 
 **Language:** python
-**Defined in:** `src/model_chorus/cli/main.py:2141`
+**Defined in:** `src/model_chorus/cli/main.py:2081`
 **Complexity:** 8
 
 **Decorators:** `@app.command()`
@@ -9132,7 +9132,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `src/model_chorus/cli/main.py:2237`
+**Defined in:** `src/model_chorus/cli/main.py:2177`
 **Complexity:** 1
 
 **Description:**
@@ -9466,7 +9466,7 @@ will be automatically skipped.
 ### `resolve_context_files(files) -> tuple[list[str], list[str], list[str]]`
 
 **Language:** python
-**Defined in:** `src/model_chorus/cli/main.py:86`
+**Defined in:** `src/model_chorus/cli/main.py:88`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -10291,7 +10291,7 @@ Example:
 ### `thinkdeep(step, step_number, total_steps, next_step_required, findings, provider, continuation_id, hypothesis, confidence, files_checked, relevant_files, thinking_mode, use_assistant_model, output, verbose, skip_provider_check) -> None`
 
 **Language:** python
-**Defined in:** `src/model_chorus/cli/main.py:1406`
+**Defined in:** `src/model_chorus/cli/main.py:1346`
 ⚠️ **Complexity:** 55 (High)
 
 **Decorators:** `@app.command()`
@@ -10335,7 +10335,7 @@ Example:
 ### `thinkdeep_status(thread_id, show_steps, show_files, verbose) -> None`
 
 **Language:** python
-**Defined in:** `src/model_chorus/cli/main.py:1783`
+**Defined in:** `src/model_chorus/cli/main.py:1723`
 ⚠️ **Complexity:** 18 (High)
 
 **Decorators:** `@app.command(name='thinkdeep-status')`
@@ -10414,7 +10414,7 @@ Returns:
 ### `version() -> None`
 
 **Language:** python
-**Defined in:** `src/model_chorus/cli/main.py:2226`
+**Defined in:** `src/model_chorus/cli/main.py:2166`
 **Complexity:** 1
 
 **Decorators:** `@app.command()`
@@ -10476,6 +10476,7 @@ Returns:
 
 - `asyncio`
 - `collections.abc.Sequence`
+- `config.get_config_loader`
 - `core.config.get_claude_config_loader`
 - `core.context_ingestion.BinaryFileError`
 - `core.context_ingestion.ContextIngestionService`
@@ -10484,6 +10485,9 @@ Returns:
 - `json`
 - `model_chorus.__version__`
 - `pathlib.Path`
+- `primitives.OutputFormatter`
+- `primitives.ProviderResolver`
+- `primitives.WorkflowContext`
 - `providers.ClaudeProvider`
 - `providers.CodexProvider`
 - `providers.CursorAgentProvider`

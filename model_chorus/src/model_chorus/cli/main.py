@@ -1125,38 +1125,35 @@ def consensus(
         model-chorus consensus --prompt "Explain quantum computing" --num-to-consult 2
     """
     try:
-        # Validate prompt input
-        if prompt_arg is None and prompt_flag is None:
-            console.print(
-                "[red]Error: Prompt is required (provide as positional argument or use --prompt)[/red]"
-            )
-            raise typer.Exit(1)
-        if prompt_arg is not None and prompt_flag is not None:
-            console.print(
-                "[red]Error: Cannot specify prompt both as positional argument and --prompt flag[/red]"
-            )
-            raise typer.Exit(1)
-
-        prompt = prompt_arg or prompt_flag
-        assert prompt is not None  # Validated above
-        # Apply config defaults if values not provided
+        # Initialize context helpers
         config = get_config()
+        workflow_context = WorkflowContext(
+            workflow_name="consensus",
+            config=config,
+            construct_prompt_with_files_fn=construct_prompt_with_files,
+        )
 
-        # Get priority list from config
-        provider_priority = config.get_workflow_provider_priority("consensus")
+        # Validate and get prompt
+        prompt = workflow_context.validate_and_get_prompt(prompt_arg, prompt_flag)
 
-        # Get num_to_consult from CLI or config
-        if num_to_consult is None:
-            num_to_consult = config.get_workflow_num_to_consult("consensus", fallback=2)
+        # Resolve config defaults
+        resolved_config = workflow_context.resolve_config_defaults(
+            system=system,
+            timeout=timeout,
+        )
+        system = resolved_config["system"]
+        timeout = resolved_config["timeout"]
 
+        # Get consensus-specific config
         if strategy is None:
             strategy = config.get_workflow_default(
                 "consensus", "strategy", "all_responses"
             )
-        if timeout is None:
-            timeout = config.get_workflow_default("consensus", "timeout", 120.0)
-        if system is None:
-            system = config.get_workflow_default("consensus", "system_prompt", None)
+        if num_to_consult is None:
+            num_to_consult = config.get_workflow_num_to_consult("consensus", fallback=2)
+
+        # Get provider priority list
+        provider_priority = config.get_workflow_provider_priority("consensus")
 
         # Validate strategy
         try:
@@ -1168,7 +1165,8 @@ def consensus(
             )
             raise typer.Exit(1)
 
-        final_prompt = construct_prompt_with_files(prompt, files)
+        # Prepare final prompt with file context
+        final_prompt = workflow_context.prepare_prompt_with_files(prompt, files)
 
         # Validate we have enough providers
         if not provider_priority:
@@ -1248,13 +1246,15 @@ def consensus(
             system_prompt=system,
         )
 
-        # Execute workflow
-        console.print("\n[bold cyan]Executing consensus workflow...[/bold cyan]")
-        console.print(f"Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
-        console.print(
-            f"Providers: {len(provider_priority)} available (need {num_to_consult} successful)"
+        # Display workflow start information
+        OutputFormatter.display_workflow_start(
+            workflow_name="consensus",
+            prompt=prompt,
+            files=files,
+            num_to_consult=num_to_consult,
+            strategy=strategy_enum.value,
+            providers_available=len(provider_priority),
         )
-        console.print(f"Strategy: {strategy_enum.value}\n")
 
         # Run async workflow
         result = asyncio.run(workflow.execute(request, strategy=strategy_enum))
@@ -1318,8 +1318,7 @@ def consensus(
                 "metadata": result.metadata,
             }
 
-            output.write_text(json.dumps(output_data, indent=2))
-            console.print(f"\n[green]✓ Results saved to {output}[/green]")
+            OutputFormatter.write_json_output(output, output_data)
 
         # Exit with appropriate code
         if result.failed_providers:
