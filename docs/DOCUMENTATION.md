@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-21 09:57:50
+**Generated:** 2025-11-21 10:17:30
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 114
-- **Total Lines:** 51139
-- **Total Classes:** 299
+- **Total Files:** 115
+- **Total Lines:** 51875
+- **Total Classes:** 300
 - **Total Functions:** 218
 - **Avg Complexity:** 4.38
 - **Max Complexity:** 44
@@ -1030,6 +1030,45 @@ Values:
           Requires careful analysis and resolution.
     CRITICAL: Direct, irreconcilable contradiction that invalidates
              one or both claims. Immediate attention required.
+
+---
+
+### `ConversationDatabase`
+
+**Language:** python
+**Defined in:** `model_chorus/src/model_chorus/core/conversation_db.py:42`
+
+**Description:**
+> SQLite-based conversation storage with WAL mode for concurrency.
+
+Provides persistent storage for conversation threads using SQLite instead
+of individual JSON files. Supports concurrent access through WAL mode
+and offers better query performance for conversation history.
+
+Architecture:
+    - Database file: ~/.model-chorus/conversations.db
+    - WAL mode enabled for concurrent reads during writes
+    - Foreign key constraints for referential integrity
+    - Indexes on common query patterns (thread_id, timestamps)
+
+Attributes:
+    db_path: Path to SQLite database file
+    ttl_hours: Time-to-live for conversation threads in hours
+    max_messages: Maximum messages per thread before truncation
+
+**Methods:**
+- `__init__()`
+- `_create_schema()`
+- `create_thread()`
+- `get_thread()`
+- `add_message()`
+- `get_messages()`
+- `complete_thread()`
+- `archive_thread()`
+- `cleanup_expired_threads()`
+- `cleanup_archived_threads()`
+- `_delete_thread()`
+- `close()`
 
 ---
 
@@ -11372,6 +11411,21 @@ Returns:
 - `models.ConversationMessage`
 - `models.ConversationThread`
 - `pathlib.Path`
+- `typing.Any`
+- `typing.Literal`
+- `uuid`
+
+### `model_chorus/src/model_chorus/core/conversation_db.py`
+
+- `datetime.UTC`
+- `datetime.datetime`
+- `datetime.timedelta`
+- `json`
+- `logging`
+- `models.ConversationMessage`
+- `models.ConversationThread`
+- `pathlib.Path`
+- `sqlite3`
 - `typing.Any`
 - `typing.Literal`
 - `uuid`

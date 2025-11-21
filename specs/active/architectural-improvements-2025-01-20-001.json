@@ -2,7 +2,7 @@
   "spec_id": "architectural-improvements-2025-01-20-001",
   "title": "Model-Chorus Architectural Improvements",
   "generated": "2025-01-20T20:30:00Z",
-  "last_updated": "2025-11-21T15:16:42.108876Z",
+  "last_updated": "2025-11-21T15:17:40.329679Z",
   "description": "Comprehensive architectural refactoring to eliminate code duplication, improve maintainability, enhance reliability, and establish scalable foundations for future development.",
   "hierarchy": {
     "spec-root": {
@@ -17,7 +17,7 @@
         "phase-4"
       ],
       "total_tasks": 69,
-      "completed_tasks": 52,
+      "completed_tasks": 53,
       "metadata": {
         "objectives": [
           "Reduce code duplication by 30-40% through shared primitives",
@@ -1945,7 +1945,7 @@
         "depends": []
       },
       "total_tasks": 18,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "purpose": "Replace JSON persistence with SQLite and enhance workflow registry",
         "risk_level": "medium-high",
@@ -1968,7 +1968,7 @@
         "task-4-8"
       ],
       "total_tasks": 13,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1998,7 +1998,7 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/core/conversation_db.py",
         "task_category": "implementation",
@@ -2036,7 +2036,7 @@
     "task-4-1-2": {
       "type": "subtask",
       "title": "Create schema with threads, messages, and metadata tables",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-4-1",
       "children": [],
       "dependencies": {
@@ -2049,11 +2049,17 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/core/conversation_db.py",
         "task_category": "implementation",
-        "estimated_hours": 2
+        "estimated_hours": 2,
+        "started_at": "2025-11-21T15:17:15.845285Z",
+        "status_note": "Verifying schema implementation already created in task-4-1-1",
+        "completed_at": "2025-11-21T15:17:40.319453Z",
+        "needs_journaling": false,
+        "actual_hours": 0.007,
+        "journaled_at": "2025-11-21T15:17:40.326247Z"
       }
     },
     "task-4-1-3": {
@@ -2500,7 +2506,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-20T20:38:01.399125Z",
-    "progress_percentage": 75,
+    "progress_percentage": 76,
     "current_phase": "phase-4"
   },
   "journal": [
@@ -3061,6 +3067,15 @@
       "content": "Implemented ConversationDatabase class with WAL mode in model_chorus/src/model_chorus/core/conversation_db.py. The implementation includes:\n- SQLite-based storage with WAL mode enabled for concurrent access\n- Complete schema with threads, messages, and thread_metadata tables\n- Indexes on common query patterns (created_at, status, workflow_name, thread_id+timestamp)\n- Full CRUD operations matching ConversationMemory API\n- Thread lifecycle management (create, get, complete, archive)\n- Message operations (add, get with filtering)\n- TTL-based cleanup for expired and archived threads\n- Foreign key constraints with CASCADE delete for referential integrity\n- Atomic operations with transaction support\n- Thread-safe with check_same_thread=False and autocommit mode\n\nAll methods mirror the ConversationMemory API for backward compatibility. Ready for schema creation in next task.",
       "metadata": {},
       "task_id": "task-4-1-1"
+    },
+    {
+      "timestamp": "2025-11-21T15:17:40.326236Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Create schema with threads, messages, and metadata tables",
+      "author": "claude-code",
+      "content": "Schema implementation verified complete in _create_schema() method (lines 102-186). All three tables created:\n1. threads table - Core thread metadata with thread_id as primary key, includes parent_thread_id for conversation chains, workflow_name, status, initial_context, state, and branch_point fields\n2. messages table - Individual messages with foreign key to threads, includes role, content, timestamp, files (JSON), workflow_name, model_provider, model_name, and metadata (JSON). Uses ON DELETE CASCADE for automatic cleanup.\n3. thread_metadata table - Flexible key-value storage with composite primary key (thread_id, key), includes ON DELETE CASCADE\n\nAll required indexes created:\n- idx_threads_created_at: Optimizes TTL cleanup queries\n- idx_threads_status: Optimizes status filtering (active/completed/archived)\n- idx_threads_workflow: Optimizes workflow-based queries\n- idx_messages_thread_timestamp: Optimizes chronological message retrieval\n\nSchema uses foreign key constraints for referential integrity and CASCADE delete for automatic cleanup. No tests needed as this was implemented as part of task-4-1-1.",
+      "metadata": {},
+      "task_id": "task-4-1-2"
     }
   ]
 }

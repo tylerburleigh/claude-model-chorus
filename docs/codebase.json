@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-21T14:57:50.156979Z",
+    "generated_at": "2025-11-21T15:17:30.509304Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 114,
-    "total_lines": 51139,
-    "total_classes": 299,
+    "total_files": 115,
+    "total_lines": 51875,
+    "total_classes": 300,
     "total_functions": 218,
     "avg_complexity": 4.38,
     "max_complexity": 44,
@@ -24,9 +24,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 114,
-        "lines": 51139,
-        "classes": 299,
+        "files": 115,
+        "lines": 51875,
+        "classes": 300,
         "functions": 218,
         "avg_complexity": 4.38
       }
@@ -642,6 +642,32 @@
       ],
       "exports": [],
       "lines": 853
+    },
+    {
+      "name": "conversation_db",
+      "file": "model_chorus/src/model_chorus/core/conversation_db.py",
+      "language": "python",
+      "docstring": "SQLite-based conversation database with Write-Ahead Logging (WAL).\n\nProvides persistent storage for conversation threads and messages using SQLite\ninstead of individual JSON files. Enables better performance, concurrency,\nand query capabilities compared to file-based storage.\n\nKey Features:\n- WAL mode for improved concurrency and performance\n- Atomic operations with transaction support\n- Efficient queries for thread history and metadata\n- Migration support from file-based storage\n- Thread-safe operations\n\nArchitecture:\n    Database: ~/.model-chorus/conversations.db (SQLite with WAL)\n    Tables:\n        - threads: Thread metadata and status\n        - messages: Individual messages with foreign key to threads\n        - thread_metadata: Flexible key-value metadata storage",
+      "classes": [
+        "ConversationDatabase"
+      ],
+      "functions": [],
+      "imports": [
+        "json",
+        "logging",
+        "sqlite3",
+        "uuid",
+        "datetime.UTC",
+        "datetime.datetime",
+        "datetime.timedelta",
+        "pathlib.Path",
+        "typing.Any",
+        "typing.Literal",
+        "models.ConversationMessage",
+        "models.ConversationThread"
+      ],
+      "exports": [],
+      "lines": 736
     },
     {
       "name": "gap_analysis",
@@ -6425,6 +6451,33 @@
       "instantiation_count": 59
     },
     {
+      "name": "ConversationDatabase",
+      "file": "model_chorus/src/model_chorus/core/conversation_db.py",
+      "line": 42,
+      "language": "python",
+      "docstring": "SQLite-based conversation storage with WAL mode for concurrency.\n\nProvides persistent storage for conversation threads using SQLite instead\nof individual JSON files. Supports concurrent access through WAL mode\nand offers better query performance for conversation history.\n\nArchitecture:\n    - Database file: ~/.model-chorus/conversations.db\n    - WAL mode enabled for concurrent reads during writes\n    - Foreign key constraints for referential integrity\n    - Indexes on common query patterns (thread_id, timestamps)\n\nAttributes:\n    db_path: Path to SQLite database file\n    ttl_hours: Time-to-live for conversation threads in hours\n    max_messages: Maximum messages per thread before truncation",
+      "bases": [],
+      "methods": [
+        "__init__",
+        "_create_schema",
+        "create_thread",
+        "get_thread",
+        "add_message",
+        "get_messages",
+        "complete_thread",
+        "archive_thread",
+        "cleanup_expired_threads",
+        "cleanup_archived_threads",
+        "_delete_thread",
+        "close"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
       "name": "GapType",
       "file": "model_chorus/src/model_chorus/core/gap_analysis.py",
       "line": 28,
@@ -6993,6 +7046,24 @@
           ]
         },
         {
+          "instantiator": "get_thread",
+          "file": "model_chorus/src/model_chorus/core/conversation_db.py",
+          "line": 338,
+          "context": [
+            "ConversationDatabase",
+            "get_thread"
+          ]
+        },
+        {
+          "instantiator": "get_messages",
+          "file": "model_chorus/src/model_chorus/core/conversation_db.py",
+          "line": 558,
+          "context": [
+            "ConversationDatabase",
+            "get_messages"
+          ]
+        },
+        {
           "instantiator": "create_message",
           "file": "model_chorus/tests/test_token_budgeting.py",
           "line": 23,
@@ -7002,7 +7073,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 2
+      "instantiation_count": 4
     },
     {
       "name": "ConversationThread",
@@ -7044,10 +7115,19 @@
             "ConversationMemory",
             "add_message"
           ]
+        },
+        {
+          "instantiator": "get_thread",
+          "file": "model_chorus/src/model_chorus/core/conversation_db.py",
+          "line": 351,
+          "context": [
+            "ConversationDatabase",
+            "get_thread"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 3
+      "instantiation_count": 4
     },
     {
       "name": "Hypothesis",
@@ -24817,7 +24897,7 @@
         },
         {
           "name": "read",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 86,
           "call_type": "method_call"
         },
@@ -29818,7 +29898,7 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 342,
           "call_type": "method_call"
         },
@@ -30124,7 +30204,7 @@
         },
         {
           "name": "read",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 596,
           "call_type": "method_call"
         },
@@ -30226,7 +30306,7 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 703,
           "call_type": "method_call"
         },
@@ -30475,7 +30555,7 @@
         },
         {
           "name": "read",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 815,
           "call_type": "method_call"
         },
@@ -30511,25 +30591,25 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 837,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 840,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 842,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 844,
           "call_type": "method_call"
         },
@@ -30638,7 +30718,7 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 908,
           "call_type": "method_call"
         },
@@ -42480,6 +42560,20 @@
       "typing.Any",
       "typing.Literal",
       "filelock",
+      "models.ConversationMessage",
+      "models.ConversationThread"
+    ],
+    "model_chorus/src/model_chorus/core/conversation_db.py": [
+      "json",
+      "logging",
+      "sqlite3",
+      "uuid",
+      "datetime.UTC",
+      "datetime.datetime",
+      "datetime.timedelta",
+      "pathlib.Path",
+      "typing.Any",
+      "typing.Literal",
       "models.ConversationMessage",
       "models.ConversationThread"
     ],
