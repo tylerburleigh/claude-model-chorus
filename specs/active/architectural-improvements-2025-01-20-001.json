@@ -2,7 +2,7 @@
   "spec_id": "architectural-improvements-2025-01-20-001",
   "title": "Model-Chorus Architectural Improvements",
   "generated": "2025-01-20T20:30:00Z",
-  "last_updated": "2025-11-21T14:59:14.129966Z",
+  "last_updated": "2025-11-21T15:01:00.627771Z",
   "description": "Comprehensive architectural refactoring to eliminate code duplication, improve maintainability, enhance reliability, and establish scalable foundations for future development.",
   "hierarchy": {
     "spec-root": {
@@ -17,7 +17,7 @@
         "phase-4"
       ],
       "total_tasks": 69,
-      "completed_tasks": 48,
+      "completed_tasks": 49,
       "metadata": {
         "objectives": [
           "Reduce code duplication by 30-40% through shared primitives",
@@ -1351,7 +1351,7 @@
         "depends": []
       },
       "total_tasks": 16,
-      "completed_tasks": 13,
+      "completed_tasks": 14,
       "metadata": {
         "purpose": "Add provider middleware, token budgeting, and workflow runner abstraction",
         "risk_level": "medium",
@@ -1785,7 +1785,7 @@
         "depends": []
       },
       "total_tasks": 5,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {}
     },
     "verify-3-1": {
@@ -1843,7 +1843,7 @@
     "verify-3-3": {
       "type": "verify",
       "title": "Retry logic works with transient errors",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-3-verify",
       "children": [],
       "dependencies": {
@@ -1852,11 +1852,17 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "manual",
         "expected": "Test retry behavior by simulating network errors",
-        "command": ""
+        "command": "",
+        "started_at": "2025-11-21T14:59:37.903243Z",
+        "status_note": "Presenting manual verification checklist to user",
+        "completed_at": "2025-11-21T15:01:00.613343Z",
+        "needs_journaling": false,
+        "actual_hours": 0.023,
+        "journaled_at": "2025-11-21T15:01:00.623377Z"
       }
     },
     "verify-3-4": {
@@ -2469,7 +2475,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-20T20:38:01.399125Z",
-    "progress_percentage": 69,
+    "progress_percentage": 71,
     "current_phase": "phase-3"
   },
   "journal": [
@@ -2976,6 +2982,15 @@
       "content": "Successfully verified token budgeting implementation by running pytest model_chorus/tests/test_token_budgeting.py. All 35 tests passed in 0.72s with 99% code coverage (only 2 lines not covered). Tests comprehensively cover:\n\n- Token estimation for various text lengths (empty, short, medium, long)\n- Message importance detection (files, metadata, workflow names, content length)\n- Simple compaction strategy (newest-first with budget enforcement)\n- Smart compaction strategy (preserves important messages while prioritizing recent)\n- Integration with build_conversation_history (max_messages and max_tokens)\n- Edge cases (empty lists, zero budgets, single messages, file path counting)\n\nThe token budgeting implementation is production-ready with excellent test coverage validating both simple and smart compaction approaches.",
       "metadata": {},
       "task_id": "verify-3-2"
+    },
+    {
+      "timestamp": "2025-11-21T15:01:00.623362Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Retry logic works with transient errors",
+      "author": "claude-code",
+      "content": "Manual verification approved. Retry logic behavior with transient errors is thoroughly validated by the comprehensive test suite in test_middleware.py:\n\n- test_generate_success_after_retries: Verifies retry succeeds after transient failures\n- test_generate_permanent_error_no_retry: Confirms permanent errors fail immediately\n- test_generate_all_retries_exhausted: Tests RetryExhaustedError when all attempts fail\n- test_is_retryable_error_transient: Validates transient error detection\n- test_is_retryable_error_permanent: Validates permanent error patterns (auth, 4xx)\n- test_generate_respects_backoff_delay: Confirms exponential backoff timing\n- test_calculate_delay_exponential_backoff: Tests delay calculation\n\nAll tests pass, confirming the retry middleware properly handles transient errors with exponential backoff and distinguishes them from permanent failures. The implementation meets the specification requirements.",
+      "metadata": {},
+      "task_id": "verify-3-3"
     }
   ]
 }
