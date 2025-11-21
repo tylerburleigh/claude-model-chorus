@@ -2,7 +2,7 @@
   "spec_id": "architectural-improvements-2025-01-20-001",
   "title": "Model-Chorus Architectural Improvements",
   "generated": "2025-01-20T20:30:00Z",
-  "last_updated": "2025-11-21T14:44:02.728837Z",
+  "last_updated": "2025-11-21T14:50:44.697750Z",
   "description": "Comprehensive architectural refactoring to eliminate code duplication, improve maintainability, enhance reliability, and establish scalable foundations for future development.",
   "hierarchy": {
     "spec-root": {
@@ -17,7 +17,7 @@
         "phase-4"
       ],
       "total_tasks": 69,
-      "completed_tasks": 44,
+      "completed_tasks": 45,
       "metadata": {
         "objectives": [
           "Reduce code duplication by 30-40% through shared primitives",
@@ -1351,7 +1351,7 @@
         "depends": []
       },
       "total_tasks": 16,
-      "completed_tasks": 9,
+      "completed_tasks": 10,
       "metadata": {
         "purpose": "Add provider middleware, token budgeting, and workflow runner abstraction",
         "risk_level": "medium",
@@ -1373,7 +1373,7 @@
         "task-3-7"
       ],
       "total_tasks": 11,
-      "completed_tasks": 9,
+      "completed_tasks": 10,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1708,7 +1708,7 @@
     "task-3-6": {
       "type": "task",
       "title": "model_chorus/tests/test_middleware.py",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-3-files",
       "children": [],
       "dependencies": {
@@ -1719,12 +1719,18 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "model_chorus/tests/test_middleware.py",
         "task_category": "implementation",
         "estimated_hours": 3,
-        "description": "Create tests for middleware (retry, circuit breaker)"
+        "description": "Create tests for middleware (retry, circuit breaker)",
+        "started_at": "2025-11-21T14:48:18.479156Z",
+        "status_note": "Starting middleware test implementation",
+        "completed_at": "2025-11-21T14:50:44.686800Z",
+        "needs_journaling": false,
+        "actual_hours": 0.041,
+        "journaled_at": "2025-11-21T14:50:44.695073Z"
       }
     },
     "task-3-7": {
@@ -2441,7 +2447,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-20T20:38:01.399125Z",
-    "progress_percentage": 63,
+    "progress_percentage": 65,
     "current_phase": "phase-3"
   },
   "journal": [
@@ -2903,6 +2909,15 @@
       "content": "Successfully updated ChatWorkflow to use token budgeting for conversation history:\n\n**ChatWorkflow Updates:**\n- Added max_history_tokens parameter to run() method\n- Updated _build_prompt_with_history() to accept max_history_tokens parameter\n- Replaced manual conversation history building with call to build_conversation_history()\n- Integrated smart compaction strategy (enabled by default)\n- Updated docstrings to document the new parameter\n\n**Implementation Details:**\n- Replaced manual message iteration with ConversationMemory.build_conversation_history()\n- Passes max_history_tokens to enable token-aware history limiting\n- Uses smart_compaction=True to preserve important older messages\n- Maintains backward compatibility (max_history_tokens is optional, defaults to None = unlimited)\n- File context handling remains separate and manual (for fine-grained control)\n\n**Usage Example:**\n```python\n# Without token limit (existing behavior)\nresult = await workflow.run(\"Hello\", continuation_id=thread_id)\n\n# With token budget to prevent context overflow\nresult = await workflow.run(\n    \"Hello\",\n    continuation_id=thread_id,\n    max_history_tokens=2000  # Limit history to 2000 tokens\n)\n```\n\n**Benefits:**\n- Prevents context window overflow in long conversations\n- Smart compaction preserves important older messages (files, metadata, long content)\n- Maintains conversation continuity with recent messages\n- Configurable per-request basis\n- Foundation for other workflows to adopt the same pattern\n\n**Verification:**\n- Python syntax validation passed\n- ChatWorkflow.run() signature updated with max_history_tokens\n- _build_prompt_with_history() properly passes parameter to build_conversation_history()\n- All method signatures maintain backward compatibility\n\n**Note on Other Workflows:**\nThe pattern demonstrated in ChatWorkflow can be applied to ArgumentWorkflow and ThinkDeepWorkflow following the same approach:\n1. Add max_history_tokens parameter to run() method\n2. Pass it through to conversation history building\n3. Use build_conversation_history() with smart compaction\n\n**Files modified:**\n- model_chorus/src/model_chorus/workflows/chat.py (integrated token budgeting into ChatWorkflow)",
       "metadata": {},
       "task_id": "task-3-5"
+    },
+    {
+      "timestamp": "2025-11-21T14:50:44.695063Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: model_chorus/tests/test_middleware.py",
+      "author": "claude-code",
+      "content": "Created comprehensive test suite for provider middleware (retry and circuit breaker) in model_chorus/tests/test_middleware.py. The test file includes:\n\nTest Coverage:\n- 39 tests total, all passing\n- 98% code coverage for middleware.py module\n- Tests organized into logical test classes\n\nError Classes Tests (5 tests):\n- ProviderError base exception with provider_name and original_error attributes\n- ConfigError with config_field and invalid_value tracking\n- RetryExhaustedError with attempt count and last error details\n\nRetryConfig Tests (3 tests):\n- Default configuration validation (3 retries, exponential backoff)\n- Custom configuration options\n- Permanent error pattern detection (auth failures, 4xx errors)\n\nRetryMiddleware Tests (13 tests):\n- Initialization with default and custom configs\n- Retryable vs permanent error detection\n- Exponential backoff calculation with and without jitter\n- Success on first attempt and after retries\n- Permanent errors fail immediately without retry\n- RetryExhaustedError when all attempts fail\n- Backoff delay timing verification\n\nCircuitBreakerConfig Tests (2 tests):\n- Default configuration (5 failures, 60s timeout)\n- Custom thresholds and exception filtering\n\nCircuitBreakerMiddleware Tests (13 tests):\n- State transitions: CLOSED -> OPEN -> HALF_OPEN -> CLOSED\n- Failure tracking and threshold enforcement\n- Circuit opens after failure threshold reached\n- OPEN circuit rejects requests with CircuitOpenError\n- Recovery timeout and transition to HALF_OPEN\n- Success threshold in HALF_OPEN closes circuit\n- Failure in HALF_OPEN immediately reopens\n- Excluded exceptions don't count as failures\n- State change callback invocation\n- Success resets failure count in CLOSED state\n\nMiddleware Chaining Tests (3 tests):\n- Composing retry with circuit breaker\n- Retry exhaustion counts as circuit breaker failure\n- Multiple middleware layers work together correctly\n\nAll tests use proper async/await patterns with pytest.asyncio markers. The tests verify both happy paths and error conditions, ensuring robust middleware behavior under various failure scenarios.",
+      "metadata": {},
+      "task_id": "task-3-6"
     }
   ]
 }
