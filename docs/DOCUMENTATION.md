@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-21 10:26:27
+**Generated:** 2025-11-21 10:28:02
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 117
-- **Total Lines:** 52956
-- **Total Classes:** 305
+- **Total Lines:** 53029
+- **Total Classes:** 306
 - **Total Functions:** 219
 - **Avg Complexity:** 4.37
 - **Max Complexity:** 44
@@ -28,7 +28,7 @@
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `model_chorus/src/model_chorus/core/models.py:1430`
+**Defined in:** `model_chorus/src/model_chorus/core/models.py:1503`
 
 **Description:**
 > Structured output from ARGUMENT workflow containing all perspectives.
@@ -66,7 +66,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `model_chorus/src/model_chorus/core/models.py:1369`
+**Defined in:** `model_chorus/src/model_chorus/core/models.py:1442`
 
 **Description:**
 > Represents a single perspective in an argument analysis.
@@ -475,7 +475,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `model_chorus/src/model_chorus/core/models.py:936`
+**Defined in:** `model_chorus/src/model_chorus/core/models.py:1009`
 
 **Description:**
 > Citation model for tracking sources in ARGUMENT workflow.
@@ -496,7 +496,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `model_chorus/src/model_chorus/core/models.py:996`
+**Defined in:** `model_chorus/src/model_chorus/core/models.py:1069`
 
 **Description:**
 > Maps claims to their supporting citations for evidence tracking.
@@ -529,7 +529,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `model_chorus/src/model_chorus/core/models.py:1071`
+**Defined in:** `model_chorus/src/model_chorus/core/models.py:1144`
 
 **Description:**
 > Represents a factual or arguable statement extracted from model output.
@@ -799,7 +799,7 @@ ConfigLoader handles:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `model_chorus/src/model_chorus/core/models.py:356`
+**Defined in:** `model_chorus/src/model_chorus/core/models.py:429`
 
 **Description:**
 > Configuration for consensus-building workflows.
@@ -1141,7 +1141,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `model_chorus/src/model_chorus/core/models.py:429`
+**Defined in:** `model_chorus/src/model_chorus/core/models.py:502`
 
 **Description:**
 > Single message in a conversation thread.
@@ -1197,7 +1197,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `model_chorus/src/model_chorus/core/models.py:876`
+**Defined in:** `model_chorus/src/model_chorus/core/models.py:949`
 
 **Description:**
 > Generic state container for workflow-specific conversation data.
@@ -1219,7 +1219,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `model_chorus/src/model_chorus/core/models.py:501`
+**Defined in:** `model_chorus/src/model_chorus/core/models.py:574`
 
 **Description:**
 > Complete conversation context for a thread.
@@ -1315,7 +1315,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `model_chorus/src/model_chorus/core/models.py:1195`
+**Defined in:** `model_chorus/src/model_chorus/core/models.py:1268`
 
 **Description:**
 > Represents supporting or refuting evidence for claims and hypotheses.
@@ -1731,7 +1731,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `model_chorus/src/model_chorus/core/models.py:614`
+**Defined in:** `model_chorus/src/model_chorus/core/models.py:687`
 
 **Description:**
 > Model for tracking hypotheses in investigation workflows.
@@ -1751,7 +1751,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `model_chorus/src/model_chorus/core/models.py:1576`
+**Defined in:** `model_chorus/src/model_chorus/core/models.py:1649`
 
 **Description:**
 > Represents a single idea extracted from brainstorming.
@@ -1782,7 +1782,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `model_chorus/src/model_chorus/core/models.py:1645`
+**Defined in:** `model_chorus/src/model_chorus/core/models.py:1718`
 
 **Description:**
 > Represents a themed cluster of related ideas.
@@ -1935,7 +1935,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `model_chorus/src/model_chorus/core/models.py:1769`
+**Defined in:** `model_chorus/src/model_chorus/core/models.py:1842`
 
 **Description:**
 > Represents the complete state of an ideation workflow session.
@@ -2063,7 +2063,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `model_chorus/src/model_chorus/core/models.py:659`
+**Defined in:** `model_chorus/src/model_chorus/core/models.py:732`
 
 **Description:**
 > Model for a single investigation step in Thinkdeep workflow.
@@ -2491,7 +2491,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `model_chorus/src/model_chorus/core/models.py:308`
+**Defined in:** `model_chorus/src/model_chorus/core/models.py:381`
 
 **Description:**
 > Model for a response from a single model.
@@ -2559,7 +2559,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `model_chorus/src/model_chorus/core/models.py:206`
+**Defined in:** `model_chorus/src/model_chorus/core/models.py:279`
 
 **Description:**
 > Model for specifying model selection criteria.
@@ -3213,7 +3213,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `model_chorus/src/model_chorus/core/models.py:2018`
+**Defined in:** `model_chorus/src/model_chorus/core/models.py:2091`
 
 **Description:**
 > Represents a research source with metadata and validation.
@@ -3330,7 +3330,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `model_chorus/src/model_chorus/core/models.py:788`
+**Defined in:** `model_chorus/src/model_chorus/core/models.py:861`
 
 **Description:**
 > State model for Study workflow multi-persona investigations.
@@ -6484,7 +6484,7 @@ with long-running conversations with many messages.
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `model_chorus/src/model_chorus/core/models.py:713`
+**Defined in:** `model_chorus/src/model_chorus/core/models.py:786`
 
 **Description:**
 > State model for Thinkdeep workflow multi-turn conversations.
@@ -6705,6 +6705,30 @@ Extracts common patterns of:
 
 ---
 
+### `WorkflowMetadata`
+
+**Language:** python
+**Inherits from:** `BaseModel`
+**Defined in:** `model_chorus/src/model_chorus/core/models.py:206`
+
+**Description:**
+> Metadata about a registered workflow for discovery and documentation.
+
+Provides descriptive information about workflows registered in the
+WorkflowRegistry, enabling workflow listing, documentation generation,
+and user discovery of available workflows.
+
+Attributes:
+    name: Unique workflow identifier (e.g., "consensus", "thinkdeep")
+    description: Human-readable description of what the workflow does
+    version: Semantic version string (e.g., "1.0.0")
+    author: Workflow author or maintainer
+    category: Optional workflow category for organization
+    parameters: Optional list of workflow-specific parameter names
+    examples: Optional list of usage examples
+
+---
+
 ### `WorkflowRegistry`
 
 **Language:** python
@@ -6853,7 +6877,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `BaseModel`
-**Defined in:** `model_chorus/src/model_chorus/core/models.py:246`
+**Defined in:** `model_chorus/src/model_chorus/core/models.py:319`
 
 **Description:**
 > Model for a single workflow execution step.

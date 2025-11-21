@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-21T15:26:27.405857Z",
+    "generated_at": "2025-11-21T15:28:02.555405Z",
     "languages": [
       "python"
     ],
@@ -10,8 +10,8 @@
   },
   "statistics": {
     "total_files": 117,
-    "total_lines": 52956,
-    "total_classes": 305,
+    "total_lines": 53029,
+    "total_classes": 306,
     "total_functions": 219,
     "avg_complexity": 4.37,
     "max_complexity": 44,
@@ -25,8 +25,8 @@
     "by_language": {
       "python": {
         "files": 117,
-        "lines": 52956,
-        "classes": 305,
+        "lines": 53029,
+        "classes": 306,
         "functions": 219,
         "avg_complexity": 4.37
       }
@@ -714,6 +714,7 @@
         "InvestigationPhase",
         "WorkflowRequest",
         "WorkflowResponse",
+        "WorkflowMetadata",
         "ModelSelection",
         "WorkflowStep",
         "ModelResponse",
@@ -746,7 +747,7 @@
         "pydantic.Field"
       ],
       "exports": [],
-      "lines": 2109
+      "lines": 2182
     },
     {
       "name": "progress",
@@ -6839,9 +6840,25 @@
       "imported_by": []
     },
     {
-      "name": "ModelSelection",
+      "name": "WorkflowMetadata",
       "file": "model_chorus/src/model_chorus/core/models.py",
       "line": 206,
+      "language": "python",
+      "docstring": "Metadata about a registered workflow for discovery and documentation.\n\nProvides descriptive information about workflows registered in the\nWorkflowRegistry, enabling workflow listing, documentation generation,\nand user discovery of available workflows.\n\nAttributes:\n    name: Unique workflow identifier (e.g., \"consensus\", \"thinkdeep\")\n    description: Human-readable description of what the workflow does\n    version: Semantic version string (e.g., \"1.0.0\")\n    author: Workflow author or maintainer\n    category: Optional workflow category for organization\n    parameters: Optional list of workflow-specific parameter names\n    examples: Optional list of usage examples",
+      "bases": [
+        "BaseModel"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "ModelSelection",
+      "file": "model_chorus/src/model_chorus/core/models.py",
+      "line": 279,
       "language": "python",
       "docstring": "Model for specifying model selection criteria.\n\nUsed to configure which models should be used for specific\nworkflow steps or roles.\n\nAttributes:\n    model_id: The model identifier (e.g., \"gpt-4\", \"claude-3-opus\")\n    role: Optional role for this model (e.g., \"analyzer\", \"synthesizer\")\n    config: Optional model-specific configuration",
       "bases": [
@@ -6857,7 +6874,7 @@
     {
       "name": "WorkflowStep",
       "file": "model_chorus/src/model_chorus/core/models.py",
-      "line": 246,
+      "line": 319,
       "language": "python",
       "docstring": "Model for a single workflow execution step.\n\nRepresents one step in a multi-step workflow, capturing what\nwas done, which model was used, and the results.\n\nAttributes:\n    step_number: Sequential step number (1-indexed)\n    description: Human-readable description of this step\n    model: Model that executed this step\n    prompt: The prompt used for this step\n    response: The response from this step\n    metadata: Additional step metadata",
       "bases": [
@@ -7141,7 +7158,7 @@
     {
       "name": "ModelResponse",
       "file": "model_chorus/src/model_chorus/core/models.py",
-      "line": 308,
+      "line": 381,
       "language": "python",
       "docstring": "Model for a response from a single model.\n\nRepresents the output from querying a specific model, used in\nmulti-model workflows to track individual model contributions.\n\nAttributes:\n    model: Identifier of the model that generated this response\n    content: The response content/text\n    role: Optional role this model played (e.g., \"for\", \"against\", \"neutral\")\n    metadata: Additional response metadata (tokens, latency, etc.)",
       "bases": [
@@ -7157,7 +7174,7 @@
     {
       "name": "ConsensusConfig",
       "file": "model_chorus/src/model_chorus/core/models.py",
-      "line": 356,
+      "line": 429,
       "language": "python",
       "docstring": "Configuration for consensus-building workflows.\n\nSpecifies how multiple models should be consulted and how their\nresponses should be synthesized into a consensus.\n\nAttributes:\n    mode: Consensus mode (\"debate\", \"vote\", \"synthesis\")\n    stances: Optional list of stances to assign to models (e.g., [\"for\", \"against\", \"neutral\"])\n    temperature: Temperature for model responses\n    min_agreement: Minimum agreement threshold (0.0-1.0) for consensus\n    synthesis_model: Optional model to use for final synthesis\n    max_rounds: Maximum number of consensus rounds",
       "bases": [
@@ -7173,7 +7190,7 @@
     {
       "name": "ConversationMessage",
       "file": "model_chorus/src/model_chorus/core/models.py",
-      "line": 429,
+      "line": 502,
       "language": "python",
       "docstring": "Single message in a conversation thread.\n\nBased on Zen MCP's ConversationTurn but adapted for CLI-based architecture.\nTracks who said what, when, and with what context (files, models, workflow).\n\nAttributes:\n    role: Message role - 'user' or 'assistant'\n    content: The actual message text/content\n    timestamp: ISO format timestamp of when message was created\n    files: Optional list of file paths referenced in this message\n    workflow_name: Optional workflow that generated this message (for assistant messages)\n    model_provider: Optional provider type used (cli, api, mcp)\n    model_name: Optional specific model identifier (e.g., claude-3-opus, gpt-5)\n    metadata: Additional message metadata (tokens, latency, cost, etc.)",
       "bases": [
@@ -7226,7 +7243,7 @@
     {
       "name": "ConversationThread",
       "file": "model_chorus/src/model_chorus/core/models.py",
-      "line": 501,
+      "line": 574,
       "language": "python",
       "docstring": "Complete conversation context for a thread.\n\nAdapted from Zen MCP's ThreadContext with enhancements for CLI orchestration:\n- Provider-agnostic design supporting multiple CLI providers\n- Explicit lifecycle management (status field)\n- Support for conversation branching (future enhancement)\n- Workflow-specific state persistence\n\nAttributes:\n    thread_id: UUID identifying this conversation thread\n    parent_thread_id: Optional parent thread ID for conversation chains\n    created_at: ISO timestamp of thread creation\n    last_updated_at: ISO timestamp of last update\n    workflow_name: Workflow that created this thread\n    messages: All messages in chronological order\n    state: Workflow-specific state data (persisted across turns)\n    initial_context: Original request parameters\n    status: Thread lifecycle status (active, completed, archived)\n    branch_point: Optional message ID where branch occurred\n    sibling_threads: Other thread IDs branched from same point",
       "bases": [
@@ -7289,7 +7306,7 @@
     {
       "name": "Hypothesis",
       "file": "model_chorus/src/model_chorus/core/models.py",
-      "line": 614,
+      "line": 687,
       "language": "python",
       "docstring": "Model for tracking hypotheses in investigation workflows.\n\nUsed in Thinkdeep workflow to track hypothesis evolution during\nsystematic investigation, including the hypothesis text, supporting\nevidence, and current validation status.\n\nAttributes:\n    hypothesis: The hypothesis text/statement being investigated\n    evidence: List of evidence items supporting or refuting this hypothesis\n    status: Current validation status (active, disproven, validated)",
       "bases": [
@@ -7559,7 +7576,7 @@
     {
       "name": "InvestigationStep",
       "file": "model_chorus/src/model_chorus/core/models.py",
-      "line": 659,
+      "line": 732,
       "language": "python",
       "docstring": "Model for a single investigation step in Thinkdeep workflow.\n\nCaptures the details of one step in a systematic investigation,\nincluding what was found, which files were examined, and the\ncurrent confidence level in the hypothesis.\n\nAttributes:\n    step_number: Sequential step number (1-indexed)\n    findings: Key findings and insights discovered in this step\n    files_checked: List of files examined during this step\n    confidence: Current confidence level after this step",
       "bases": [
@@ -7829,7 +7846,7 @@
     {
       "name": "ThinkDeepState",
       "file": "model_chorus/src/model_chorus/core/models.py",
-      "line": 713,
+      "line": 786,
       "language": "python",
       "docstring": "State model for Thinkdeep workflow multi-turn conversations.\n\nMaintains the complete investigation state across conversation turns,\ntracking hypothesis evolution, investigation steps, confidence progression,\nand files examined.\n\nAttributes:\n    hypotheses: List of all hypotheses tracked during investigation\n    steps: List of all investigation steps completed\n    current_confidence: Current overall confidence level\n    relevant_files: All files identified as relevant to the investigation",
       "bases": [
@@ -8000,7 +8017,7 @@
     {
       "name": "StudyState",
       "file": "model_chorus/src/model_chorus/core/models.py",
-      "line": 788,
+      "line": 861,
       "language": "python",
       "docstring": "State model for Study workflow multi-persona investigations.\n\nMaintains the complete investigation state across conversation turns,\ntracking investigation phase, persona findings, confidence levels,\nand collaborative exploration progress.\n\nAttributes:\n    investigation_id: Unique identifier for this investigation session\n    session_id: Session/thread identifier for conversation continuity\n    current_phase: Current phase of investigation (InvestigationPhase)\n    confidence: Overall confidence level in findings (ConfidenceLevel)\n    iteration_count: Number of investigation iterations completed\n    findings: List of all findings from persona investigations\n    personas_active: List of personas currently participating\n    relevant_files: Files examined during investigation",
       "bases": [
@@ -8135,7 +8152,7 @@
     {
       "name": "ConversationState",
       "file": "model_chorus/src/model_chorus/core/models.py",
-      "line": 876,
+      "line": 949,
       "language": "python",
       "docstring": "Generic state container for workflow-specific conversation data.\n\nProvides type-safe structure for storing arbitrary workflow state\nwhile maintaining serializability for file-based persistence.\nIncludes versioning to support schema evolution.\n\nAttributes:\n    workflow_name: Workflow this state belongs to\n    data: Arbitrary workflow-specific state data\n    schema_version: State schema version for compatibility\n    created_at: ISO timestamp of state creation\n    updated_at: ISO timestamp of last state update",
       "bases": [
@@ -8162,7 +8179,7 @@
     {
       "name": "Citation",
       "file": "model_chorus/src/model_chorus/core/models.py",
-      "line": 936,
+      "line": 1009,
       "language": "python",
       "docstring": "Citation model for tracking sources in ARGUMENT workflow.\n\nTracks the source of information, its location, and confidence level\nfor evidence-based argumentation and research workflows.\n\nAttributes:\n    source: The source identifier (URL, file path, document ID, etc.)\n    location: Specific location within source (page, line, section, timestamp)\n    confidence: Confidence level in the citation accuracy (0.0-1.0)\n    snippet: Optional text snippet from the source\n    metadata: Additional citation metadata (author, date, context, etc.)",
       "bases": [
@@ -8797,7 +8814,7 @@
     {
       "name": "CitationMap",
       "file": "model_chorus/src/model_chorus/core/models.py",
-      "line": 996,
+      "line": 1069,
       "language": "python",
       "docstring": "Maps claims to their supporting citations for evidence tracking.\n\nUsed in ARGUMENT workflow to maintain bidirectional mapping between\nclaims/arguments and their source citations, enabling verification\nand citation analysis.\n\nAttributes:\n    claim_id: Unique identifier for the claim being supported\n    claim_text: The actual claim or argument text\n    citations: List of Citation objects supporting this claim\n    strength: Overall strength of citation support (0.0-1.0)\n    metadata: Additional mapping metadata (argument_type, verification_status, etc.)",
       "bases": [
@@ -9461,7 +9478,7 @@
     {
       "name": "Claim",
       "file": "model_chorus/src/model_chorus/core/models.py",
-      "line": 1071,
+      "line": 1144,
       "language": "python",
       "docstring": "Represents a factual or arguable statement extracted from model output.\n\nClaims are fundamental units in argument analysis and research workflows.\nEach claim captures a specific assertion along with metadata about its source,\nlocation, and confidence level.\n\nUsed in workflows like:\n- ARGUMENT: Extracting claims from debate responses for contradiction detection\n- RESEARCH: Identifying factual claims across multiple sources\n- IDEATE: Capturing key assertions from diverse perspectives\n\nAttributes:\n    content: The actual claim text (the statement being made)\n    source_id: Identifier for the source (role name, document ID, model ID, etc.)\n    location: Optional location within source (line number, section, paragraph, etc.)\n    confidence: Confidence score for this claim (0.0 = low, 1.0 = high)\n\nExample:\n    >>> claim = Claim(\n    ...     content=\"TypeScript reduces runtime errors by 15%\",\n    ...     source_id=\"proponent\",\n    ...     location=\"paragraph 2\",\n    ...     confidence=0.8\n    ... )\n    >>> print(claim)\n    [proponent@paragraph 2] (0.80): TypeScript reduces runtime errors by 15%",
       "bases": [
@@ -9481,7 +9498,7 @@
     {
       "name": "Evidence",
       "file": "model_chorus/src/model_chorus/core/models.py",
-      "line": 1195,
+      "line": 1268,
       "language": "python",
       "docstring": "Represents supporting or refuting evidence for claims and hypotheses.\n\nEvidence is a fundamental building block in investigation, research, and\nargument workflows. Each piece of evidence captures specific information\nfrom a source along with its type, strength, and relevance.\n\nUsed in workflows like:\n- THINKDEEP: Tracking evidence that supports or refutes hypotheses\n- ARGUMENT: Recording factual evidence for debate claims\n- RESEARCH: Documenting findings from multiple sources\n\nAttributes:\n    content: The actual evidence text (the observation or fact)\n    source_id: Identifier for the source (file path, model ID, document ID, etc.)\n    location: Optional location within source (line number, section, page, etc.)\n    evidence_type: Type of evidence (supporting, refuting, neutral, contextual)\n    strength: Strength/weight of this evidence (0.0 = weak, 1.0 = strong)\n    timestamp: Optional ISO timestamp when evidence was collected\n    metadata: Additional evidence metadata (tags, categories, analysis, etc.)\n\nExample:\n    >>> evidence = Evidence(\n    ...     content=\"Found async def pattern in auth.py line 45\",\n    ...     source_id=\"src/services/auth.py\",\n    ...     location=\"line 45\",\n    ...     evidence_type=\"supporting\",\n    ...     strength=0.9\n    ... )\n    >>> print(evidence)\n    [src/services/auth.py@line 45] (supporting, 0.90): Found async def pattern in auth.py line 45",
       "bases": [
@@ -9501,7 +9518,7 @@
     {
       "name": "ArgumentPerspective",
       "file": "model_chorus/src/model_chorus/core/models.py",
-      "line": 1369,
+      "line": 1442,
       "language": "python",
       "docstring": "Represents a single perspective in an argument analysis.\n\nEach perspective captures one role's analysis (Creator, Skeptic, or Moderator)\nwith their stance, reasoning, and key points.\n\nAttributes:\n    role: The role name (creator, skeptic, moderator)\n    stance: The perspective's stance (for, against, neutral)\n    content: Full response content from this perspective\n    key_points: List of key points or arguments\n    model: Model used for this perspective\n    metadata: Additional perspective metadata\n\nExample:\n    >>> perspective = ArgumentPerspective(\n    ...     role=\"creator\",\n    ...     stance=\"for\",\n    ...     content=\"Universal basic income would reduce poverty...\",\n    ...     key_points=[\"Ensures basic needs\", \"Reduces wealth gap\"],\n    ...     model=\"claude-sonnet-4\"\n    ... )",
       "bases": [
@@ -9515,7 +9532,7 @@
         {
           "instantiator": "from_dict",
           "file": "model_chorus/src/model_chorus/core/models.py",
-          "line": 1560,
+          "line": 1633,
           "context": [
             "ArgumentMap",
             "from_dict"
@@ -9555,7 +9572,7 @@
     {
       "name": "ArgumentMap",
       "file": "model_chorus/src/model_chorus/core/models.py",
-      "line": 1430,
+      "line": 1503,
       "language": "python",
       "docstring": "Structured output from ARGUMENT workflow containing all perspectives.\n\nArgumentMap provides a comprehensive view of the dialectical analysis,\nincluding the thesis (Creator), rebuttal (Skeptic), and synthesis (Moderator).\nThis structured format enables programmatic access to different perspectives\nand supports downstream analysis, visualization, and decision-making.\n\nAttributes:\n    topic: The argument topic or claim being analyzed\n    perspectives: List of perspectives (Creator, Skeptic, Moderator)\n    synthesis: Final balanced synthesis from Moderator\n    metadata: Additional workflow metadata (thread_id, model, timestamps, etc.)\n\nExample:\n    >>> arg_map = ArgumentMap(\n    ...     topic=\"Universal basic income would reduce poverty\",\n    ...     perspectives=[creator_perspective, skeptic_perspective, moderator_perspective],\n    ...     synthesis=\"After examining both perspectives...\",\n    ...     metadata={\"thread_id\": \"abc123\", \"model\": \"claude-sonnet-4\"}\n    ... )\n    >>> print(arg_map.perspectives[0].role)  # 'creator'\n    >>> print(arg_map.perspectives[1].role)  # 'skeptic'\n    >>> print(arg_map.perspectives[2].role)  # 'moderator'",
       "bases": [
@@ -9586,7 +9603,7 @@
     {
       "name": "Idea",
       "file": "model_chorus/src/model_chorus/core/models.py",
-      "line": 1576,
+      "line": 1649,
       "language": "python",
       "docstring": "Represents a single idea extracted from brainstorming.\n\nUsed in the IDEATE workflow to track individual creative ideas\nthat are extracted from multiple perspective-based brainstorming sessions.\n\nAttributes:\n    id: Unique identifier for the idea (e.g., \"idea-1\")\n    label: Brief descriptive label for the idea (1-2 words)\n    description: Full description of the idea (1-2 sentences)\n    perspective: The perspective this idea originated from (practical, innovative, etc.)\n    source_model: Model that generated this idea\n    metadata: Additional metadata about the idea\n\nExample:\n    >>> idea = Idea(\n    ...     id=\"idea-1\",\n    ...     label=\"Gamification System\",\n    ...     description=\"Add game mechanics like points and badges to improve engagement\",\n    ...     perspective=\"innovative\",\n    ...     source_model=\"claude\"\n    ... )",
       "bases": [
@@ -9600,7 +9617,7 @@
         {
           "instantiator": "from_dict",
           "file": "model_chorus/src/model_chorus/core/models.py",
-          "line": 1990,
+          "line": 2063,
           "context": [
             "IdeationState",
             "from_dict"
@@ -9613,7 +9630,7 @@
     {
       "name": "IdeaCluster",
       "file": "model_chorus/src/model_chorus/core/models.py",
-      "line": 1645,
+      "line": 1718,
       "language": "python",
       "docstring": "Represents a themed cluster of related ideas.\n\nUsed in the IDEATE workflow to group similar ideas into coherent\nthemes after convergent analysis. Each cluster represents a distinct\napproach or solution category.\n\nAttributes:\n    id: Unique identifier for the cluster (e.g., \"cluster-1\")\n    theme: Theme name that describes this cluster\n    description: Detailed description of the cluster theme\n    idea_ids: List of idea IDs belonging to this cluster\n    ideas: Optional list of full Idea objects in this cluster\n    scores: Evaluation scores for this cluster (feasibility, impact, etc.)\n    overall_score: Average score across all criteria (0.0-5.0)\n    recommendation: Priority recommendation (High/Medium/Low Priority)\n    metadata: Additional metadata about the cluster\n\nExample:\n    >>> cluster = IdeaCluster(\n    ...     id=\"cluster-1\",\n    ...     theme=\"User Experience Improvements\",\n    ...     description=\"Ideas focused on enhancing user interface and usability\",\n    ...     idea_ids=[\"idea-1\", \"idea-3\", \"idea-5\"],\n    ...     scores={\"feasibility\": 4.5, \"impact\": 4.0, \"novelty\": 3.5},\n    ...     overall_score=4.0,\n    ...     recommendation=\"High Priority\"\n    ... )",
       "bases": [
@@ -9630,7 +9647,7 @@
         {
           "instantiator": "from_dict",
           "file": "model_chorus/src/model_chorus/core/models.py",
-          "line": 1994,
+          "line": 2067,
           "context": [
             "IdeationState",
             "from_dict"
@@ -9643,7 +9660,7 @@
     {
       "name": "IdeationState",
       "file": "model_chorus/src/model_chorus/core/models.py",
-      "line": 1769,
+      "line": 1842,
       "language": "python",
       "docstring": "Represents the complete state of an ideation workflow session.\n\nTracks the full lifecycle of an IDEATE workflow execution, from initial\nbrainstorming through convergent analysis, selection, and elaboration.\n\nAttributes:\n    session_id: Unique identifier for this ideation session\n    topic: The topic or problem being ideated on\n    perspectives: List of perspectives used in brainstorming\n    ideas: All extracted ideas from brainstorming\n    clusters: Thematic clusters of related ideas\n    selected_cluster_ids: IDs of clusters selected for elaboration\n    elaborations: Detailed outlines for selected clusters\n    scoring_criteria: Criteria used for evaluation (feasibility, impact, etc.)\n    workflow_metadata: Metadata about workflow execution\n    created_at: Timestamp when ideation session started\n    updated_at: Timestamp of last update\n\nExample:\n    >>> state = IdeationState(\n    ...     session_id=\"ideation-2024-01-15-001\",\n    ...     topic=\"How can we improve our API documentation?\",\n    ...     perspectives=[\"practical\", \"innovative\", \"user-focused\"],\n    ...     ideas=[idea1, idea2, idea3],\n    ...     clusters=[cluster1, cluster2],\n    ...     selected_cluster_ids=[\"cluster-1\"],\n    ...     scoring_criteria=[\"feasibility\", \"impact\", \"user_value\"]\n    ... )",
       "bases": [
@@ -9668,7 +9685,7 @@
     {
       "name": "Source",
       "file": "model_chorus/src/model_chorus/core/models.py",
-      "line": 2018,
+      "line": 2091,
       "language": "python",
       "docstring": "Represents a research source with metadata and validation.\n\nUsed in the RESEARCH workflow to track sources that provide evidence\nfor research findings. Each source includes credibility assessment,\ntype classification, and validation status.\n\nAttributes:\n    source_id: Unique identifier for this source\n    title: Title or description of the source\n    url: Optional URL or reference to the source\n    source_type: Type of source (article, paper, book, website, etc.)\n    credibility: Credibility assessment (high, medium, low, unassessed)\n    tags: Optional list of tags for categorization\n    validated: Whether source has been validated\n    validation_score: Numeric validation score if validated\n    validation_notes: List of validation findings\n    ingested_at: ISO timestamp when source was added\n    metadata: Additional source metadata\n\nExample:\n    >>> source = Source(\n    ...     source_id=\"src-001\",\n    ...     title=\"Machine Learning Best Practices\",\n    ...     url=\"https://example.com/ml-practices\",\n    ...     source_type=\"article\",\n    ...     credibility=\"high\",\n    ...     tags=[\"machine-learning\", \"best-practices\"]\n    ... )",
       "bases": [
@@ -25165,7 +25182,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 86,
           "call_type": "method_call"
         },
@@ -30178,7 +30195,7 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 342,
           "call_type": "method_call"
         },
@@ -30484,7 +30501,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 596,
           "call_type": "method_call"
         },
@@ -30586,7 +30603,7 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 703,
           "call_type": "method_call"
         },
@@ -30835,7 +30852,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 815,
           "call_type": "method_call"
         },
@@ -30871,25 +30888,25 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 837,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 840,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 842,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 844,
           "call_type": "method_call"
         },
@@ -30998,7 +31015,7 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 908,
           "call_type": "method_call"
         },

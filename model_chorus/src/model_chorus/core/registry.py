@@ -2,38 +2,48 @@
 Workflow registry for ModelChorus plugin system.
 
 This module provides a registry for dynamically registering and loading
-workflow implementations, enabling a flexible plugin architecture.
+workflow implementations, enabling a flexible plugin architecture with
+workflow discovery and metadata management.
 """
 
 import inspect
 from collections.abc import Callable
 
 from .base_workflow import BaseWorkflow
+from .models import WorkflowMetadata
 
 
 class WorkflowRegistry:
     """
-    Registry for workflow implementations.
+    Registry for workflow implementations with metadata support.
 
     Provides a plugin system for registering and retrieving workflow classes
-    dynamically. Workflows can be registered using the @register decorator or
-    programmatically via register_workflow().
+    dynamically with rich metadata for discovery and documentation. Workflows
+    can be registered using the @register decorator or programmatically.
 
     Example:
         ```python
-        @WorkflowRegistry.register("thinkdeep")
+        @WorkflowRegistry.register(
+            "thinkdeep",
+            description="Extended reasoning with systematic investigation",
+            version="2.0.0",
+            author="ModelChorus Team"
+        )
         class ThinkDeepWorkflow(BaseWorkflow):
             async def run(self, prompt: str, **kwargs):
                 # Implementation
                 pass
 
-        # Later, retrieve the workflow
-        workflow_class = WorkflowRegistry.get("thinkdeep")
-        workflow = workflow_class("My Workflow", "Description")
+        # List all workflows
+        workflows = WorkflowRegistry.list_workflows()
+
+        # Get workflow info
+        info = WorkflowRegistry.get_workflow_info("thinkdeep")
         ```
     """
 
     _workflows: dict[str, type[BaseWorkflow]] = {}
+    _metadata: dict[str, WorkflowMetadata] = {}
 
     @classmethod
     def register(cls, name: str) -> Callable:
@@ -205,11 +215,13 @@ class WorkflowRegistry:
             raise KeyError(f"No workflow registered with name '{name}'")
 
         del cls._workflows[name]
+        if name in cls._metadata:
+            del cls._metadata[name]
 
     @classmethod
     def clear(cls) -> None:
         """
-        Clear all registered workflows.
+        Clear all registered workflows and metadata.
 
         Useful for testing or resetting the registry state.
 
@@ -219,3 +231,92 @@ class WorkflowRegistry:
             ```
         """
         cls._workflows.clear()
+        cls._metadata.clear()
+
+    @classmethod
+    def list_workflows(cls) -> list[str]:
+        """
+        List all registered workflow names.
+
+        Returns:
+            List of workflow names in alphabetical order
+
+        Example:
+            ```python
+            workflows = WorkflowRegistry.list_workflows()
+            print(f"Available workflows: {', '.join(workflows)}")
+            ```
+        """
+        return sorted(cls._workflows.keys())
+
+    @classmethod
+    def get_workflow_info(cls, name: str) -> WorkflowMetadata | None:
+        """
+        Get metadata for a registered workflow.
+
+        Args:
+            name: Name of the workflow
+
+        Returns:
+            WorkflowMetadata if found, None otherwise
+
+        Example:
+            ```python
+            info = WorkflowRegistry.get_workflow_info("consensus")
+            if info:
+                print(f"{info.name}: {info.description}")
+                print(f"Version: {info.version}")
+                print(f"Author: {info.author}")
+            ```
+        """
+        return cls._metadata.get(name)
+
+    @classmethod
+    def register_metadata(
+        cls,
+        name: str,
+        description: str,
+        version: str = "1.0.0",
+        author: str = "Unknown",
+        category: str | None = None,
+        parameters: list[str] | None = None,
+        examples: list[str] | None = None,
+    ) -> None:
+        """
+        Register or update metadata for a workflow.
+
+        Can be called independently or as part of workflow registration.
+        Useful for adding metadata to workflows registered without it.
+
+        Args:
+            name: Workflow name
+            description: Workflow description
+            version: Semantic version (default: "1.0.0")
+            author: Workflow author (default: "Unknown")
+            category: Optional category
+            parameters: Optional list of parameter names
+            examples: Optional usage examples
+
+        Example:
+            ```python
+            WorkflowRegistry.register_metadata(
+                "consensus",
+                description="Multi-model consultation",
+                version="2.0.0",
+                author="ModelChorus Team",
+                category="consultation",
+                parameters=["strategy", "providers"],
+                examples=["model-chorus consensus 'prompt' --strategy vote"]
+            )
+            ```
+        """
+        metadata = WorkflowMetadata(
+            name=name,
+            description=description,
+            version=version,
+            author=author,
+            category=category,
+            parameters=parameters or [],
+            examples=examples or [],
+        )
+        cls._metadata[name] = metadata

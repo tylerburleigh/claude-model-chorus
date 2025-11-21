@@ -2,7 +2,7 @@
   "spec_id": "architectural-improvements-2025-01-20-001",
   "title": "Model-Chorus Architectural Improvements",
   "generated": "2025-01-20T20:30:00Z",
-  "last_updated": "2025-11-21T15:27:08.679507Z",
+  "last_updated": "2025-11-21T15:28:48.482940Z",
   "description": "Comprehensive architectural refactoring to eliminate code duplication, improve maintainability, enhance reliability, and establish scalable foundations for future development.",
   "hierarchy": {
     "spec-root": {
@@ -17,7 +17,7 @@
         "phase-4"
       ],
       "total_tasks": 69,
-      "completed_tasks": 59,
+      "completed_tasks": 60,
       "metadata": {
         "objectives": [
           "Reduce code duplication by 30-40% through shared primitives",
@@ -1945,7 +1945,7 @@
         "depends": []
       },
       "total_tasks": 18,
-      "completed_tasks": 8,
+      "completed_tasks": 9,
       "metadata": {
         "purpose": "Replace JSON persistence with SQLite and enhance workflow registry",
         "risk_level": "medium-high",
@@ -1968,7 +1968,7 @@
         "task-4-8"
       ],
       "total_tasks": 13,
-      "completed_tasks": 8,
+      "completed_tasks": 9,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -2253,7 +2253,7 @@
     "task-4-4": {
       "type": "task",
       "title": "model_chorus/core/registry.py",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-4-files",
       "children": [
         "task-4-4-1",
@@ -2269,7 +2269,7 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/core/registry.py",
         "task_category": "implementation",
@@ -2307,7 +2307,7 @@
     "task-4-4-2": {
       "type": "subtask",
       "title": "Add list_workflows() and get_workflow_info() methods",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-4-4",
       "children": [],
       "dependencies": {
@@ -2318,11 +2318,17 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/core/registry.py",
         "task_category": "implementation",
-        "estimated_hours": 2
+        "estimated_hours": 2,
+        "started_at": "2025-11-21T15:27:44.016420Z",
+        "status_note": "Adding workflow listing and info retrieval methods to registry",
+        "completed_at": "2025-11-21T15:28:48.470598Z",
+        "needs_journaling": false,
+        "actual_hours": 0.018,
+        "journaled_at": "2025-11-21T15:28:48.480208Z"
       }
     },
     "task-4-5": {
@@ -2542,7 +2548,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-20T20:38:01.399125Z",
-    "progress_percentage": 85,
+    "progress_percentage": 86,
     "current_phase": "phase-4"
   },
   "journal": [
@@ -3166,6 +3172,15 @@
       "content": "Added WorkflowMetadata model to models.py (lines 206-276). Implemented comprehensive Pydantic model for workflow discovery with:\n\nFields:\n- name: str (required) - Unique workflow identifier with min_length=1 validation\n- description: str (required) - Human-readable workflow description with min_length=1\n- version: str - Semantic version with pattern validation (^\\d+\\.\\d+\\.\\d+$), defaults to \"1.0.0\"\n- author: str - Workflow author/maintainer, defaults to \"Unknown\"\n- category: Optional[str] - Optional category for workflow organization\n- parameters: list[str] - List of workflow-specific parameter names (default empty list)\n- examples: list[str] - Usage examples for documentation (default empty list)\n\nFeatures:\n- Full Pydantic validation with Field descriptors\n- Pattern validation for version string (semantic versioning)\n- ConfigDict with example for schema generation\n- Comprehensive docstring with attribute descriptions\n- Ready for integration with WorkflowRegistry\n\nModel supports workflow discovery, documentation generation, and user-facing workflow listing. Placed after WorkflowResponse in models.py for logical grouping with other workflow-related models. Ready for registry integration in next task.",
       "metadata": {},
       "task_id": "task-4-4-1"
+    },
+    {
+      "timestamp": "2025-11-21T15:28:48.480199Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add list_workflows() and get_workflow_info() methods",
+      "author": "claude-code",
+      "content": "Added workflow listing and metadata retrieval methods to WorkflowRegistry. Implemented three new methods and updated existing methods:\n\nNEW METHODS:\n1. list_workflows() - Returns sorted list of all registered workflow names. Enables workflow discovery and CLI completion.\n\n2. get_workflow_info(name) - Returns WorkflowMetadata for a workflow or None if not found. Enables programmatic access to workflow documentation, version info, parameters, and examples.\n\n3. register_metadata(name, description, version, author, category, parameters, examples) - Registers or updates metadata for a workflow independently of workflow class registration. Useful for adding metadata to workflows registered without it.\n\nUPDATED METHODS:\n- unregister() - Now also removes metadata when unregistering workflows\n- clear() - Now clears both _workflows and _metadata dictionaries\n- Added _metadata class variable to store WorkflowMetadata instances\n\nFeatures:\n- Alphabetical sorting in list_workflows() for consistent ordering\n- Optional metadata - workflows can be registered without metadata\n- Independent metadata registration via register_metadata()\n- Full integration with WorkflowMetadata model\n- Comprehensive docstrings with examples\n\nReady for workflow metadata registration in existing workflows. No tests run as this will be tested in verification phase.",
+      "metadata": {},
+      "task_id": "task-4-4-2"
     }
   ]
 }
