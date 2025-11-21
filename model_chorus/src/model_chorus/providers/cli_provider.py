@@ -22,6 +22,12 @@ from .base_provider import (
 logger = logging.getLogger(__name__)
 
 
+class ProviderDisabledError(Exception):
+    """Raised when attempting to use a disabled provider."""
+
+    pass
+
+
 class ProviderUnavailableError(Exception):
     """Provider CLI is not available or cannot be used."""
 
