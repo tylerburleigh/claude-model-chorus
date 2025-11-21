@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-21 10:56:54
+**Generated:** 2025-11-21 11:09:23
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 117
-- **Total Lines:** 53252
-- **Total Classes:** 306
+- **Total Files:** 118
+- **Total Lines:** 54069
+- **Total Classes:** 317
 - **Total Functions:** 220
 - **Avg Complexity:** 4.39
 - **Max Complexity:** 44
@@ -3681,6 +3681,20 @@ Example:
 
 ---
 
+### `TestCascadingDeletes`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_conversation_db.py:703`
+
+**Description:**
+> Test suite for foreign key cascade behavior.
+
+**Methods:**
+- `test_delete_thread_cascades_to_messages()`
+- `test_delete_thread_cascades_to_metadata()`
+
+---
+
 ### `TestChatErrorHandling`
 
 **Language:** python
@@ -3992,6 +4006,20 @@ Example:
 - `test_supports_thinking()`
 - `test_read_only_mode_allowed_tools()`
 - `test_read_only_mode_disallowed_tools()`
+
+---
+
+### `TestCleanupOperations`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_conversation_db.py:438`
+
+**Description:**
+> Test suite for cleanup and maintenance operations.
+
+**Methods:**
+- `test_cleanup_expired_threads()`
+- `test_cleanup_archived_threads()`
 
 ---
 
@@ -4627,6 +4655,38 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 
 ---
 
+### `TestDatabaseClosing`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_conversation_db.py:672`
+
+**Description:**
+> Test suite for database connection management.
+
+**Methods:**
+- `test_close_connection()`
+- `test_multiple_close_calls()`
+
+---
+
+### `TestDatabaseInitialization`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_conversation_db.py:30`
+
+**Description:**
+> Test suite for database initialization and schema creation.
+
+**Methods:**
+- `test_create_database_file()`
+- `test_create_parent_directory()`
+- `test_schema_creation()`
+- `test_wal_mode_enabled()`
+- `test_foreign_keys_enabled()`
+- `test_custom_ttl_and_max_messages()`
+
+---
+
 ### `TestDuplicateDetection`
 
 **Language:** python
@@ -4641,6 +4701,22 @@ This pattern demonstrates using multiple orchestration strategies in sequence:
 - `test_find_duplicate_claims_no_duplicates()`
 - `test_find_duplicate_claims_empty_list()`
 - `test_find_duplicate_claims_single_item()`
+
+---
+
+### `TestEdgeCases`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_conversation_db.py:754`
+
+**Description:**
+> Test suite for edge cases and error handling.
+
+**Methods:**
+- `test_add_message_to_nonexistent_thread_creates_thread()`
+- `test_minimal_workflow_name()`
+- `test_large_message_content()`
+- `test_unicode_content()`
 
 ---
 
@@ -5355,6 +5431,24 @@ with long-running conversations with many messages.
 
 ---
 
+### `TestMessageOperations`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_conversation_db.py:255`
+
+**Description:**
+> Test suite for message persistence operations.
+
+**Methods:**
+- `test_add_message_basic()`
+- `test_add_multiple_messages()`
+- `test_add_message_with_files()`
+- `test_add_message_with_metadata()`
+- `test_message_truncation_when_max_reached()`
+- `test_get_messages_returns_chronological_order()`
+
+---
+
 ### `TestMiddlewareChaining`
 
 **Language:** python
@@ -5686,6 +5780,24 @@ with long-running conversations with many messages.
 - `test_resolve_fallback_providers_skips_disabled()`
 - `test_resolve_fallback_providers_handles_errors()`
 - `test_resolve_fallback_providers_verbose_output()`
+
+---
+
+### `TestQueryOperations`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_conversation_db.py:498`
+
+**Description:**
+> Test suite for query and search operations.
+
+**Methods:**
+- `test_query_by_workflow()`
+- `test_query_by_workflow_with_status_filter()`
+- `test_query_recent_threads()`
+- `test_query_recent_threads_respects_ttl()`
+- `test_get_thread_chain()`
+- `test_get_thread_chain_single_thread()`
 
 ---
 
@@ -6171,6 +6283,20 @@ with long-running conversations with many messages.
 
 ---
 
+### `TestStatistics`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_conversation_db.py:624`
+
+**Description:**
+> Test suite for database statistics operations.
+
+**Methods:**
+- `test_get_thread_statistics()`
+- `test_get_statistics_empty_database()`
+
+---
+
 ### `TestStudyWorkflowConversationHandling`
 
 **Language:** python
@@ -6405,6 +6531,54 @@ with long-running conversations with many messages.
 - `test_thinkdeep_state_serialization()`
 - `test_thinkdeep_state_json_roundtrip()`
 - `test_thinkdeep_state_nested_validation()`
+
+---
+
+### `TestThreadCreation`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_conversation_db.py:120`
+
+**Description:**
+> Test suite for thread creation functionality.
+
+**Methods:**
+- `test_create_thread_generates_valid_uuid()`
+- `test_create_thread_unique_ids()`
+- `test_create_thread_with_initial_context()`
+- `test_create_thread_with_parent()`
+- `test_create_thread_status_is_active()`
+
+---
+
+### `TestThreadLifecycle`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_conversation_db.py:386`
+
+**Description:**
+> Test suite for thread lifecycle management.
+
+**Methods:**
+- `test_complete_thread()`
+- `test_complete_nonexistent_thread_returns_false()`
+- `test_archive_thread()`
+- `test_archive_nonexistent_thread_returns_false()`
+
+---
+
+### `TestThreadRetrieval`
+
+**Language:** python
+**Defined in:** `model_chorus/tests/test_conversation_db.py:195`
+
+**Description:**
+> Test suite for thread retrieval functionality.
+
+**Methods:**
+- `test_get_nonexistent_thread_returns_none()`
+- `test_get_thread_returns_correct_data()`
+- `test_get_expired_thread_returns_none()`
 
 ---
 
@@ -12273,6 +12447,22 @@ Returns:
 
 - `json`
 - `model_chorus.core.conversation.ConversationMemory`
+- `uuid`
+
+### `model_chorus/tests/test_conversation_db.py`
+
+- `datetime.UTC`
+- `datetime.datetime`
+- `datetime.timedelta`
+- `json`
+- `model_chorus.core.conversation_db.ConversationDatabase`
+- `model_chorus.core.conversation_db.DEFAULT_MAX_MESSAGES_PER_THREAD`
+- `model_chorus.core.conversation_db.DEFAULT_TTL_HOURS`
+- `model_chorus.core.models.ConversationMessage`
+- `model_chorus.core.models.ConversationThread`
+- `pathlib.Path`
+- `pytest`
+- `sqlite3`
 - `uuid`
 
 ### `model_chorus/tests/test_cursor_agent_provider.py`

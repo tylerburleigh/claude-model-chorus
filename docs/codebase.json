@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-21T15:56:54.382082Z",
+    "generated_at": "2025-11-21T16:09:23.880112Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 117,
-    "total_lines": 53252,
-    "total_classes": 306,
+    "total_files": 118,
+    "total_lines": 54069,
+    "total_classes": 317,
     "total_functions": 220,
     "avg_complexity": 4.39,
     "max_complexity": 44,
@@ -24,9 +24,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 117,
-        "lines": 53252,
-        "classes": 306,
+        "files": 118,
+        "lines": 54069,
+        "classes": 317,
         "functions": 220,
         "avg_complexity": 4.39
       }
@@ -2227,6 +2227,43 @@
       ],
       "exports": [],
       "lines": 235
+    },
+    {
+      "name": "test_conversation_db",
+      "file": "model_chorus/tests/test_conversation_db.py",
+      "language": "python",
+      "docstring": "Unit tests for SQLite-based conversation database.\n\nTests verify ConversationDatabase functionality including:\n- Database initialization and schema creation\n- Thread creation and retrieval\n- Message persistence\n- TTL-based expiration\n- Thread lifecycle management (active, completed, archived)\n- Query capabilities\n- Statistics and cleanup operations",
+      "classes": [
+        "TestDatabaseInitialization",
+        "TestThreadCreation",
+        "TestThreadRetrieval",
+        "TestMessageOperations",
+        "TestThreadLifecycle",
+        "TestCleanupOperations",
+        "TestQueryOperations",
+        "TestStatistics",
+        "TestDatabaseClosing",
+        "TestCascadingDeletes",
+        "TestEdgeCases"
+      ],
+      "functions": [],
+      "imports": [
+        "json",
+        "sqlite3",
+        "uuid",
+        "datetime.UTC",
+        "datetime.datetime",
+        "datetime.timedelta",
+        "pathlib.Path",
+        "pytest",
+        "model_chorus.core.conversation_db.DEFAULT_MAX_MESSAGES_PER_THREAD",
+        "model_chorus.core.conversation_db.DEFAULT_TTL_HOURS",
+        "model_chorus.core.conversation_db.ConversationDatabase",
+        "model_chorus.core.models.ConversationMessage",
+        "model_chorus.core.models.ConversationThread"
+      ],
+      "exports": [],
+      "lines": 817
     },
     {
       "name": "test_cursor_agent_provider",
@@ -6624,10 +6661,388 @@
             "ConversationMigrator",
             "run"
           ]
+        },
+        {
+          "instantiator": "test_create_database_file",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 36,
+          "context": [
+            "TestDatabaseInitialization",
+            "test_create_database_file"
+          ]
+        },
+        {
+          "instantiator": "test_create_parent_directory",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 45,
+          "context": [
+            "TestDatabaseInitialization",
+            "test_create_parent_directory"
+          ]
+        },
+        {
+          "instantiator": "test_schema_creation",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 54,
+          "context": [
+            "TestDatabaseInitialization",
+            "test_schema_creation"
+          ]
+        },
+        {
+          "instantiator": "test_wal_mode_enabled",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 84,
+          "context": [
+            "TestDatabaseInitialization",
+            "test_wal_mode_enabled"
+          ]
+        },
+        {
+          "instantiator": "test_foreign_keys_enabled",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 96,
+          "context": [
+            "TestDatabaseInitialization",
+            "test_foreign_keys_enabled"
+          ]
+        },
+        {
+          "instantiator": "test_custom_ttl_and_max_messages",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 111,
+          "context": [
+            "TestDatabaseInitialization",
+            "test_custom_ttl_and_max_messages"
+          ]
+        },
+        {
+          "instantiator": "test_create_thread_generates_valid_uuid",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 126,
+          "context": [
+            "TestThreadCreation",
+            "test_create_thread_generates_valid_uuid"
+          ]
+        },
+        {
+          "instantiator": "test_create_thread_unique_ids",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 141,
+          "context": [
+            "TestThreadCreation",
+            "test_create_thread_unique_ids"
+          ]
+        },
+        {
+          "instantiator": "test_create_thread_with_initial_context",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 155,
+          "context": [
+            "TestThreadCreation",
+            "test_create_thread_with_initial_context"
+          ]
+        },
+        {
+          "instantiator": "test_create_thread_with_parent",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 170,
+          "context": [
+            "TestThreadCreation",
+            "test_create_thread_with_parent"
+          ]
+        },
+        {
+          "instantiator": "test_create_thread_status_is_active",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 185,
+          "context": [
+            "TestThreadCreation",
+            "test_create_thread_status_is_active"
+          ]
+        },
+        {
+          "instantiator": "test_get_nonexistent_thread_returns_none",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 201,
+          "context": [
+            "TestThreadRetrieval",
+            "test_get_nonexistent_thread_returns_none"
+          ]
+        },
+        {
+          "instantiator": "test_get_thread_returns_correct_data",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 210,
+          "context": [
+            "TestThreadRetrieval",
+            "test_get_thread_returns_correct_data"
+          ]
+        },
+        {
+          "instantiator": "test_get_expired_thread_returns_none",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 231,
+          "context": [
+            "TestThreadRetrieval",
+            "test_get_expired_thread_returns_none"
+          ]
+        },
+        {
+          "instantiator": "test_add_message_basic",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 261,
+          "context": [
+            "TestMessageOperations",
+            "test_add_message_basic"
+          ]
+        },
+        {
+          "instantiator": "test_add_multiple_messages",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 282,
+          "context": [
+            "TestMessageOperations",
+            "test_add_multiple_messages"
+          ]
+        },
+        {
+          "instantiator": "test_add_message_with_files",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 303,
+          "context": [
+            "TestMessageOperations",
+            "test_add_message_with_files"
+          ]
+        },
+        {
+          "instantiator": "test_add_message_with_metadata",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 324,
+          "context": [
+            "TestMessageOperations",
+            "test_add_message_with_metadata"
+          ]
+        },
+        {
+          "instantiator": "test_message_truncation_when_max_reached",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 346,
+          "context": [
+            "TestMessageOperations",
+            "test_message_truncation_when_max_reached"
+          ]
+        },
+        {
+          "instantiator": "test_get_messages_returns_chronological_order",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 368,
+          "context": [
+            "TestMessageOperations",
+            "test_get_messages_returns_chronological_order"
+          ]
+        },
+        {
+          "instantiator": "test_complete_thread",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 392,
+          "context": [
+            "TestThreadLifecycle",
+            "test_complete_thread"
+          ]
+        },
+        {
+          "instantiator": "test_complete_nonexistent_thread_returns_false",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 407,
+          "context": [
+            "TestThreadLifecycle",
+            "test_complete_nonexistent_thread_returns_false"
+          ]
+        },
+        {
+          "instantiator": "test_archive_thread",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 416,
+          "context": [
+            "TestThreadLifecycle",
+            "test_archive_thread"
+          ]
+        },
+        {
+          "instantiator": "test_archive_nonexistent_thread_returns_false",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 431,
+          "context": [
+            "TestThreadLifecycle",
+            "test_archive_nonexistent_thread_returns_false"
+          ]
+        },
+        {
+          "instantiator": "test_cleanup_expired_threads",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 444,
+          "context": [
+            "TestCleanupOperations",
+            "test_cleanup_expired_threads"
+          ]
+        },
+        {
+          "instantiator": "test_cleanup_archived_threads",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 475,
+          "context": [
+            "TestCleanupOperations",
+            "test_cleanup_archived_threads"
+          ]
+        },
+        {
+          "instantiator": "test_query_by_workflow",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 504,
+          "context": [
+            "TestQueryOperations",
+            "test_query_by_workflow"
+          ]
+        },
+        {
+          "instantiator": "test_query_by_workflow_with_status_filter",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 532,
+          "context": [
+            "TestQueryOperations",
+            "test_query_by_workflow_with_status_filter"
+          ]
+        },
+        {
+          "instantiator": "test_query_recent_threads",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 556,
+          "context": [
+            "TestQueryOperations",
+            "test_query_recent_threads"
+          ]
+        },
+        {
+          "instantiator": "test_query_recent_threads_respects_ttl",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 570,
+          "context": [
+            "TestQueryOperations",
+            "test_query_recent_threads_respects_ttl"
+          ]
+        },
+        {
+          "instantiator": "test_get_thread_chain",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 594,
+          "context": [
+            "TestQueryOperations",
+            "test_get_thread_chain"
+          ]
+        },
+        {
+          "instantiator": "test_get_thread_chain_single_thread",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 614,
+          "context": [
+            "TestQueryOperations",
+            "test_get_thread_chain_single_thread"
+          ]
+        },
+        {
+          "instantiator": "test_get_thread_statistics",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 630,
+          "context": [
+            "TestStatistics",
+            "test_get_thread_statistics"
+          ]
+        },
+        {
+          "instantiator": "test_get_statistics_empty_database",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 659,
+          "context": [
+            "TestStatistics",
+            "test_get_statistics_empty_database"
+          ]
+        },
+        {
+          "instantiator": "test_close_connection",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 678,
+          "context": [
+            "TestDatabaseClosing",
+            "test_close_connection"
+          ]
+        },
+        {
+          "instantiator": "test_multiple_close_calls",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 694,
+          "context": [
+            "TestDatabaseClosing",
+            "test_multiple_close_calls"
+          ]
+        },
+        {
+          "instantiator": "test_delete_thread_cascades_to_messages",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 709,
+          "context": [
+            "TestCascadingDeletes",
+            "test_delete_thread_cascades_to_messages"
+          ]
+        },
+        {
+          "instantiator": "test_delete_thread_cascades_to_metadata",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 730,
+          "context": [
+            "TestCascadingDeletes",
+            "test_delete_thread_cascades_to_metadata"
+          ]
+        },
+        {
+          "instantiator": "test_add_message_to_nonexistent_thread_creates_thread",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 760,
+          "context": [
+            "TestEdgeCases",
+            "test_add_message_to_nonexistent_thread_creates_thread"
+          ]
+        },
+        {
+          "instantiator": "test_minimal_workflow_name",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 778,
+          "context": [
+            "TestEdgeCases",
+            "test_minimal_workflow_name"
+          ]
+        },
+        {
+          "instantiator": "test_large_message_content",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 790,
+          "context": [
+            "TestEdgeCases",
+            "test_large_message_content"
+          ]
+        },
+        {
+          "instantiator": "test_unicode_content",
+          "file": "model_chorus/tests/test_conversation_db.py",
+          "line": 807,
+          "context": [
+            "TestEdgeCases",
+            "test_unicode_content"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 2
+      "instantiation_count": 44
     },
     {
       "name": "GapType",
@@ -19245,6 +19660,213 @@
       "imported_by": []
     },
     {
+      "name": "TestDatabaseInitialization",
+      "file": "model_chorus/tests/test_conversation_db.py",
+      "line": 30,
+      "language": "python",
+      "docstring": "Test suite for database initialization and schema creation.",
+      "bases": [],
+      "methods": [
+        "test_create_database_file",
+        "test_create_parent_directory",
+        "test_schema_creation",
+        "test_wal_mode_enabled",
+        "test_foreign_keys_enabled",
+        "test_custom_ttl_and_max_messages"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestThreadCreation",
+      "file": "model_chorus/tests/test_conversation_db.py",
+      "line": 120,
+      "language": "python",
+      "docstring": "Test suite for thread creation functionality.",
+      "bases": [],
+      "methods": [
+        "test_create_thread_generates_valid_uuid",
+        "test_create_thread_unique_ids",
+        "test_create_thread_with_initial_context",
+        "test_create_thread_with_parent",
+        "test_create_thread_status_is_active"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestThreadRetrieval",
+      "file": "model_chorus/tests/test_conversation_db.py",
+      "line": 195,
+      "language": "python",
+      "docstring": "Test suite for thread retrieval functionality.",
+      "bases": [],
+      "methods": [
+        "test_get_nonexistent_thread_returns_none",
+        "test_get_thread_returns_correct_data",
+        "test_get_expired_thread_returns_none"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestMessageOperations",
+      "file": "model_chorus/tests/test_conversation_db.py",
+      "line": 255,
+      "language": "python",
+      "docstring": "Test suite for message persistence operations.",
+      "bases": [],
+      "methods": [
+        "test_add_message_basic",
+        "test_add_multiple_messages",
+        "test_add_message_with_files",
+        "test_add_message_with_metadata",
+        "test_message_truncation_when_max_reached",
+        "test_get_messages_returns_chronological_order"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestThreadLifecycle",
+      "file": "model_chorus/tests/test_conversation_db.py",
+      "line": 386,
+      "language": "python",
+      "docstring": "Test suite for thread lifecycle management.",
+      "bases": [],
+      "methods": [
+        "test_complete_thread",
+        "test_complete_nonexistent_thread_returns_false",
+        "test_archive_thread",
+        "test_archive_nonexistent_thread_returns_false"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestCleanupOperations",
+      "file": "model_chorus/tests/test_conversation_db.py",
+      "line": 438,
+      "language": "python",
+      "docstring": "Test suite for cleanup and maintenance operations.",
+      "bases": [],
+      "methods": [
+        "test_cleanup_expired_threads",
+        "test_cleanup_archived_threads"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestQueryOperations",
+      "file": "model_chorus/tests/test_conversation_db.py",
+      "line": 498,
+      "language": "python",
+      "docstring": "Test suite for query and search operations.",
+      "bases": [],
+      "methods": [
+        "test_query_by_workflow",
+        "test_query_by_workflow_with_status_filter",
+        "test_query_recent_threads",
+        "test_query_recent_threads_respects_ttl",
+        "test_get_thread_chain",
+        "test_get_thread_chain_single_thread"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestStatistics",
+      "file": "model_chorus/tests/test_conversation_db.py",
+      "line": 624,
+      "language": "python",
+      "docstring": "Test suite for database statistics operations.",
+      "bases": [],
+      "methods": [
+        "test_get_thread_statistics",
+        "test_get_statistics_empty_database"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestDatabaseClosing",
+      "file": "model_chorus/tests/test_conversation_db.py",
+      "line": 672,
+      "language": "python",
+      "docstring": "Test suite for database connection management.",
+      "bases": [],
+      "methods": [
+        "test_close_connection",
+        "test_multiple_close_calls"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestCascadingDeletes",
+      "file": "model_chorus/tests/test_conversation_db.py",
+      "line": 703,
+      "language": "python",
+      "docstring": "Test suite for foreign key cascade behavior.",
+      "bases": [],
+      "methods": [
+        "test_delete_thread_cascades_to_messages",
+        "test_delete_thread_cascades_to_metadata"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestEdgeCases",
+      "file": "model_chorus/tests/test_conversation_db.py",
+      "line": 754,
+      "language": "python",
+      "docstring": "Test suite for edge cases and error handling.",
+      "bases": [],
+      "methods": [
+        "test_add_message_to_nonexistent_thread_creates_thread",
+        "test_minimal_workflow_name",
+        "test_large_message_content",
+        "test_unicode_content"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
       "name": "TestCursorAgentProvider",
       "file": "model_chorus/tests/test_cursor_agent_provider.py",
       "line": 14,
@@ -25199,7 +25821,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 86,
           "call_type": "method_call"
         },
@@ -29337,7 +29959,7 @@
         },
         {
           "name": "write",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 1926,
           "call_type": "method_call"
         },
@@ -30633,7 +31255,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 596,
           "call_type": "method_call"
         },
@@ -30984,7 +31606,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 815,
           "call_type": "method_call"
         },
@@ -34046,7 +34668,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 207,
           "call_type": "method_call"
         },
@@ -34088,7 +34710,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 624,
           "call_type": "method_call"
         },
@@ -43775,6 +44397,21 @@
       "json",
       "uuid",
       "model_chorus.core.conversation.ConversationMemory"
+    ],
+    "model_chorus/tests/test_conversation_db.py": [
+      "json",
+      "sqlite3",
+      "uuid",
+      "datetime.UTC",
+      "datetime.datetime",
+      "datetime.timedelta",
+      "pathlib.Path",
+      "pytest",
+      "model_chorus.core.conversation_db.DEFAULT_MAX_MESSAGES_PER_THREAD",
+      "model_chorus.core.conversation_db.DEFAULT_TTL_HOURS",
+      "model_chorus.core.conversation_db.ConversationDatabase",
+      "model_chorus.core.models.ConversationMessage",
+      "model_chorus.core.models.ConversationThread"
     ],
     "model_chorus/tests/test_cursor_agent_provider.py": [
       "json",
