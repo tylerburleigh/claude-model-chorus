@@ -1378,25 +1378,33 @@ def thinkdeep(
         model-chorus thinkdeep --continuation-id "thread-123" --step "Verify fix resolves issue" --step-number 3 --total-steps 3 --findings "Latency reduced to baseline" --confidence high --hypothesis "Confirmed: N+1 queries were root cause"
     """
     try:
-        # Apply config defaults if values not provided
+        # Initialize context helpers
         config = get_config()
-        if provider is None:
-            provider = config.get_workflow_default_provider("thinkdeep", "claude")
-            if provider is None:
-                console.print(
-                    "[red]Error: Default provider for 'thinkdeep' workflow is disabled.[/red]"
-                )
-                console.print(
-                    "[yellow]Enable it in .claude/model_chorus_config.yaml or specify --provider[/yellow]"
-                )
-                raise typer.Exit(1)
+        workflow_context = WorkflowContext(
+            workflow_name="thinkdeep",
+            config=config,
+            construct_prompt_with_files_fn=construct_prompt_with_files,
+        )
+        provider_resolver = ProviderResolver(
+            config=config,
+            get_provider_fn=get_provider_by_name,
+            get_install_command_fn=get_install_command,
+            verbose=verbose,
+        )
+
+        # Get thinkdeep-specific defaults
         if thinking_mode is None:
             thinking_mode = config.get_workflow_default(
                 "thinkdeep", "thinking_mode", "medium"
             )
 
-        # Read timeout from config
-        timeout = config.get_workflow_default("thinkdeep", "timeout", 120.0)
+        # Resolve config defaults
+        resolved_config = workflow_context.resolve_config_defaults(
+            provider=provider,
+            timeout=config.get_workflow_default("thinkdeep", "timeout", 120.0),
+        )
+        provider = resolved_config["provider"]
+        timeout = resolved_config["timeout"]
 
         # Validate confidence level
         valid_confidence_levels = [
@@ -1422,62 +1430,21 @@ def thinkdeep(
             )
             raise typer.Exit(1)
 
-        # Create primary provider instance
-        if verbose:
-            console.print(f"[cyan]Initializing provider: {provider}[/cyan]")
+        # Initialize primary provider
+        provider_instance = provider_resolver.resolve_provider(provider, timeout)
 
-        try:
-            provider_instance = get_provider_by_name(provider, timeout=int(timeout))
-            if verbose:
-                console.print(f"[green]✓ {provider} initialized[/green]")
-        except ProviderDisabledError as e:
-            # Provider disabled in config
-            console.print(f"[red]Error: {e}[/red]")
-            console.print(
-                f"\n[yellow]To fix this, edit .claude/model_chorus_config.yaml and set '{provider}: enabled: true'[/yellow]"
-            )
-            raise typer.Exit(1)
-        except Exception as e:
-            console.print(f"[red]Failed to initialize {provider}: {e}[/red]")
-            raise typer.Exit(1)
-
-        # Load fallback providers from config and filter by enabled status
-        fallback_provider_names = config.get_workflow_fallback_providers(
-            "thinkdeep", exclude_provider=provider
+        # Initialize fallback providers
+        fallback_providers = provider_resolver.resolve_fallback_providers(
+            workflow_name="thinkdeep",
+            exclude_provider=provider,
+            timeout=timeout,
         )
 
-        fallback_providers: list[ModelProvider] = []
-        if fallback_provider_names and verbose:
-            console.print(
-                f"[cyan]Initializing fallback providers: {', '.join(fallback_provider_names)}[/cyan]"
-            )
-
-        for fallback_name in fallback_provider_names:
-            try:
-                fallback_instance = get_provider_by_name(
-                    fallback_name, timeout=int(timeout)
-                )
-                fallback_providers.append(fallback_instance)
-                if verbose:
-                    console.print(
-                        f"[green]✓ {fallback_name} initialized (fallback)[/green]"
-                    )
-            except ProviderDisabledError:
-                if verbose:
-                    console.print(
-                        f"[yellow]⚠ Skipping disabled fallback provider {fallback_name}[/yellow]"
-                    )
-            except Exception as e:
-                if verbose:
-                    console.print(
-                        f"[yellow]⚠ Could not initialize fallback {fallback_name}: {e}[/yellow]"
-                    )
-
         # Create conversation memory
-        memory = ConversationMemory()
+        memory = workflow_context.create_memory()
 
         # Create workflow config
-        config = {"enable_expert_validation": use_assistant_model}
+        workflow_config = {"enable_expert_validation": use_assistant_model}
 
         # Create workflow
         workflow = ThinkDeepWorkflow(
@@ -1485,7 +1452,7 @@ def thinkdeep(
             fallback_providers=fallback_providers,
             expert_provider=None,  # Expert will be handled by workflow if enabled
             conversation_memory=memory,
-            config=config,
+            config=workflow_config,
         )
 
         if verbose:
@@ -1630,8 +1597,7 @@ def thinkdeep(
                 if use_assistant_model and len(result.steps) > 1:
                     output_data["expert_validation"] = result.steps[-1].content
 
-                output.write_text(json.dumps(output_data, indent=2))
-                console.print(f"\n[green]✓ Result saved to {output}[/green]")
+                OutputFormatter.write_json_output(output, output_data)
 
             # Show next step guidance
             if next_step_required:
