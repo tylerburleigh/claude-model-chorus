@@ -2,7 +2,7 @@
   "spec_id": "architectural-improvements-2025-01-20-001",
   "title": "Model-Chorus Architectural Improvements",
   "generated": "2025-01-20T20:30:00Z",
-  "last_updated": "2025-11-21T14:33:33.764087Z",
+  "last_updated": "2025-11-21T14:35:35.247370Z",
   "description": "Comprehensive architectural refactoring to eliminate code duplication, improve maintainability, enhance reliability, and establish scalable foundations for future development.",
   "hierarchy": {
     "spec-root": {
@@ -17,7 +17,7 @@
         "phase-4"
       ],
       "total_tasks": 69,
-      "completed_tasks": 40,
+      "completed_tasks": 41,
       "metadata": {
         "objectives": [
           "Reduce code duplication by 30-40% through shared primitives",
@@ -1351,7 +1351,7 @@
         "depends": []
       },
       "total_tasks": 16,
-      "completed_tasks": 5,
+      "completed_tasks": 6,
       "metadata": {
         "purpose": "Add provider middleware, token budgeting, and workflow runner abstraction",
         "risk_level": "medium",
@@ -1373,7 +1373,7 @@
         "task-3-7"
       ],
       "total_tasks": 11,
-      "completed_tasks": 5,
+      "completed_tasks": 6,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1567,7 +1567,7 @@
     "task-3-3": {
       "type": "task",
       "title": "model_chorus/workflows/base.py",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-3-files",
       "children": [],
       "dependencies": {
@@ -1581,12 +1581,18 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "model_chorus/src/model_chorus/core/base_workflow.py",
         "task_category": "refactoring",
         "estimated_hours": 3,
-        "description": "Integrate middleware and runner into BaseWorkflow"
+        "description": "Integrate middleware and runner into BaseWorkflow",
+        "started_at": "2025-11-21T14:34:08.705837Z",
+        "status_note": "Integrating middleware and runner into BaseWorkflow",
+        "completed_at": "2025-11-21T14:35:35.238600Z",
+        "needs_journaling": false,
+        "actual_hours": 0.024,
+        "journaled_at": "2025-11-21T14:35:35.244566Z"
       }
     },
     "task-3-4": {
@@ -2417,7 +2423,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-20T20:38:01.399125Z",
-    "progress_percentage": 57,
+    "progress_percentage": 59,
     "current_phase": "phase-3"
   },
   "journal": [
@@ -2843,6 +2849,15 @@
       "content": "Successfully enhanced WorkflowRunner with comprehensive telemetry and metrics collection:\n\n**Enhanced ExecutionMetrics:**\n- Added ExecutionStatus enum (SUCCESS, FAILURE, PARTIAL) for execution outcomes\n- Added input_tokens and output_tokens fields for token usage tracking\n- Added custom_metrics dictionary for extensible metric collection\n- Added set_token_usage() method for recording token consumption\n- Added add_custom_metric() method for custom telemetry data\n\n**Telemetry Callback System:**\n- Implemented callback registry (_telemetry_callbacks list)\n- Added register_telemetry_callback() for registering external telemetry handlers\n- Added unregister_telemetry_callback() for cleanup\n- Callbacks receive (ExecutionMetrics, context) where context is GenerationResponse or Exception\n- Error handling around callback invocation to prevent telemetry failures from breaking execution\n\n**Enhanced Execution Hooks:**\n- Updated _on_execution_complete() to invoke all registered callbacks\n- Updated _on_execution_failed() to invoke callbacks on failures\n- Added token usage extraction from GenerationResponse\n- Added execution status tracking (SUCCESS for primary, PARTIAL for fallback, FAILURE for all failed)\n- Enhanced debug logging with token counts\n\n**Verification:**\n- All syntax checks passed\n- ExecutionStatus enum works correctly\n- Token usage tracking tested and verified\n- Custom metrics addition tested\n- Callback registration/unregistration tested\n- All assertions passed\n\n**Design Benefits:**\n- Extensible telemetry system without modifying core execution logic\n- Safe callback invocation with error isolation\n- Rich metrics for observability and monitoring\n- Foundation for future integrations (Prometheus, OpenTelemetry, etc.)\n\nFiles modified:\n- model_chorus/src/model_chorus/core/workflow_runner.py (added ~100 lines of telemetry infrastructure)",
       "metadata": {},
       "task_id": "task-3-2-2"
+    },
+    {
+      "timestamp": "2025-11-21T14:35:35.244556Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: model_chorus/workflows/base.py",
+      "author": "claude-code",
+      "content": "Successfully integrated WorkflowRunner and middleware infrastructure into BaseWorkflow:\n\n**Core Integration:**\n- Added WorkflowRunner import and ExecutionMetrics to base_workflow.py\n- Added _workflow_runner instance to BaseWorkflow.__init__() with telemetry flag\n- Added _last_execution_metrics field to store metrics from executions\n- Added enable_telemetry parameter to __init__() for controlling telemetry (default: False)\n\n**Refactored _execute_with_fallback:**\n- Completely refactored to delegate execution to WorkflowRunner\n- Maintains full backward compatibility with existing return signature (response, provider_name, failed_providers)\n- Now benefits from WorkflowRunner's telemetry, metrics collection, and error handling\n- Simplified from ~70 lines of fallback logic to ~15 lines of delegation\n- Stores ExecutionMetrics in _last_execution_metrics for access\n\n**New Public API Methods:**\n- get_execution_metrics(): Retrieve metrics from last provider execution\n- register_telemetry_callback(): Register callbacks for execution monitoring\n- Both methods provide clean access to WorkflowRunner capabilities\n\n**Backward Compatibility:**\n- All existing BaseWorkflow subclasses continue to work without changes\n- Return signature of _execute_with_fallback unchanged\n- Telemetry disabled by default (opt-in via enable_telemetry=True)\n- No breaking changes to public or protected APIs\n\n**Benefits:**\n- Centralized execution orchestration via WorkflowRunner\n- Automatic telemetry and metrics collection when enabled\n- Cleaner separation of concerns (execution vs. workflow logic)\n- Foundation for future middleware integration (retry, circuit breakers, etc.)\n- Rich execution metrics available to all workflows\n\n**Verification:**\n- Python syntax validation passed\n- Module imports successfully\n- All refactored methods maintain backward-compatible signatures\n\nFiles modified:\n- model_chorus/src/model_chorus/core/base_workflow.py (integrated WorkflowRunner, refactored _execute_with_fallback, added metrics access methods)",
+      "metadata": {},
+      "task_id": "task-3-3"
     }
   ]
 }

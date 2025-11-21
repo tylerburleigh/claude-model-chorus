@@ -1,15 +1,15 @@
 # claude-model-chorus Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-21 09:31:53
+**Generated:** 2025-11-21 09:34:18
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 112
-- **Total Lines:** 49535
-- **Total Classes:** 284
+- **Total Lines:** 49654
+- **Total Classes:** 285
 - **Total Functions:** 211
 - **Avg Complexity:** 4.47
 - **Max Complexity:** 44
@@ -1298,7 +1298,7 @@ needed to create a working workflow.
 ### `ExecutionMetrics`
 
 **Language:** python
-**Defined in:** `src/model_chorus/core/workflow_runner.py:21`
+**Defined in:** `src/model_chorus/core/workflow_runner.py:31`
 
 **Description:**
 > Metrics collected during workflow execution.
@@ -1310,10 +1310,27 @@ Attributes:
     provider_attempts: List of (provider_name, success, error) tuples for each attempt
     total_attempts: Total number of provider attempts made
     successful_provider: Name of the provider that succeeded (None if all failed)
+    status: Overall execution status (SUCCESS, FAILURE, or PARTIAL)
+    input_tokens: Total input tokens used (if available from response)
+    output_tokens: Total output tokens generated (if available from response)
+    custom_metrics: Dictionary for custom metrics added by telemetry handlers
 
 **Methods:**
 - `mark_complete()`
 - `add_attempt()`
+- `set_token_usage()`
+- `add_custom_metric()`
+
+---
+
+### `ExecutionStatus`
+
+**Language:** python
+**Inherits from:** `Enum`
+**Defined in:** `src/model_chorus/core/workflow_runner.py:22`
+
+**Description:**
+> Status of workflow execution.
 
 ---
 
@@ -6382,7 +6399,7 @@ Attributes:
 ### `WorkflowRunner`
 
 **Language:** python
-**Defined in:** `src/model_chorus/core/workflow_runner.py:64`
+**Defined in:** `src/model_chorus/core/workflow_runner.py:103`
 
 **Description:**
 > Orchestrates workflow execution with provider fallback and telemetry.
@@ -6409,6 +6426,8 @@ Example:
 
 **Methods:**
 - `__init__()`
+- `register_telemetry_callback()`
+- `unregister_telemetry_callback()`
 - `execute()`
 - `_on_execution_complete()`
 - `_on_execution_failed()`
@@ -11051,9 +11070,11 @@ Returns:
 
 ### `src/model_chorus/core/workflow_runner.py`
 
+- `collections.abc.Callable`
 - `dataclasses.dataclass`
 - `dataclasses.field`
 - `datetime.datetime`
+- `enum.Enum`
 - `logging`
 - `typing.Any`
 - `typing.TYPE_CHECKING`

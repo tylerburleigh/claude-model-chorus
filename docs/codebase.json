@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "claude-model-chorus",
     "version": "1.0.0",
-    "generated_at": "2025-11-21T14:31:53.017026Z",
+    "generated_at": "2025-11-21T14:34:18.314704Z",
     "languages": [
       "python"
     ],
@@ -10,8 +10,8 @@
   },
   "statistics": {
     "total_files": 112,
-    "total_lines": 49535,
-    "total_classes": 284,
+    "total_lines": 49654,
+    "total_classes": 285,
     "total_functions": 211,
     "avg_complexity": 4.47,
     "max_complexity": 44,
@@ -25,8 +25,8 @@
     "by_language": {
       "python": {
         "files": 112,
-        "lines": 49535,
-        "classes": 284,
+        "lines": 49654,
+        "classes": 285,
         "functions": 211,
         "avg_complexity": 4.47
       }
@@ -826,20 +826,23 @@
       "language": "python",
       "docstring": "Workflow execution runner for ModelChorus.\n\nThis module provides the WorkflowRunner class that orchestrates workflow execution\nwith provider fallback, error handling, and telemetry hooks. It extracts and\nenhances the fallback logic previously embedded in BaseWorkflow.",
       "classes": [
+        "ExecutionStatus",
         "ExecutionMetrics",
         "WorkflowRunner"
       ],
       "functions": [],
       "imports": [
         "logging",
+        "collections.abc.Callable",
         "dataclasses.dataclass",
         "dataclasses.field",
         "datetime.datetime",
+        "enum.Enum",
         "typing.TYPE_CHECKING",
         "typing.Any"
       ],
       "exports": [],
-      "lines": 234
+      "lines": 353
     },
     {
       "name": "__init__",
@@ -10417,15 +10420,33 @@
       "instantiation_count": 33
     },
     {
+      "name": "ExecutionStatus",
+      "file": "src/model_chorus/core/workflow_runner.py",
+      "line": 22,
+      "language": "python",
+      "docstring": "Status of workflow execution.",
+      "bases": [
+        "Enum"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
       "name": "ExecutionMetrics",
       "file": "src/model_chorus/core/workflow_runner.py",
-      "line": 21,
+      "line": 31,
       "language": "python",
-      "docstring": "Metrics collected during workflow execution.\n\nAttributes:\n    started_at: Timestamp when execution started\n    completed_at: Timestamp when execution completed (None if still running)\n    duration_ms: Execution duration in milliseconds (None if still running)\n    provider_attempts: List of (provider_name, success, error) tuples for each attempt\n    total_attempts: Total number of provider attempts made\n    successful_provider: Name of the provider that succeeded (None if all failed)",
+      "docstring": "Metrics collected during workflow execution.\n\nAttributes:\n    started_at: Timestamp when execution started\n    completed_at: Timestamp when execution completed (None if still running)\n    duration_ms: Execution duration in milliseconds (None if still running)\n    provider_attempts: List of (provider_name, success, error) tuples for each attempt\n    total_attempts: Total number of provider attempts made\n    successful_provider: Name of the provider that succeeded (None if all failed)\n    status: Overall execution status (SUCCESS, FAILURE, or PARTIAL)\n    input_tokens: Total input tokens used (if available from response)\n    output_tokens: Total output tokens generated (if available from response)\n    custom_metrics: Dictionary for custom metrics added by telemetry handlers",
       "bases": [],
       "methods": [
         "mark_complete",
-        "add_attempt"
+        "add_attempt",
+        "set_token_usage",
+        "add_custom_metric"
       ],
       "properties": [],
       "is_exported": false,
@@ -10434,7 +10455,7 @@
         {
           "instantiator": "execute",
           "file": "src/model_chorus/core/workflow_runner.py",
-          "line": 134,
+          "line": 217,
           "context": [
             "WorkflowRunner",
             "execute"
@@ -10447,12 +10468,14 @@
     {
       "name": "WorkflowRunner",
       "file": "src/model_chorus/core/workflow_runner.py",
-      "line": 64,
+      "line": 103,
       "language": "python",
       "docstring": "Orchestrates workflow execution with provider fallback and telemetry.\n\nThe WorkflowRunner extracts provider fallback logic from BaseWorkflow\nand adds structured error handling, execution metrics, and extension hooks\nfor telemetry/observability.\n\nKey Features:\n- Automatic provider fallback with configurable retry logic\n- Execution metrics collection (timing, attempts, success/failure)\n- Extension hooks for telemetry integration\n- Structured error handling with detailed context\n\nExample:\n    >>> runner = WorkflowRunner()\n    >>> response, metrics = await runner.execute(\n    ...     request,\n    ...     primary_provider,\n    ...     fallback_providers=[backup1, backup2]\n    ... )\n    >>> print(f\"Used {metrics.successful_provider} after {metrics.total_attempts} attempts\")\n    >>> print(f\"Duration: {metrics.duration_ms}ms\")",
       "bases": [],
       "methods": [
         "__init__",
+        "register_telemetry_callback",
+        "unregister_telemetry_callback",
         "execute",
         "_on_execution_complete",
         "_on_execution_failed"
@@ -23805,7 +23828,7 @@
         },
         {
           "name": "read",
-          "file": "/opt/anaconda3/lib/python3.13/typing.py",
+          "file": "built-in",
           "line": 86,
           "call_type": "method_call"
         },
@@ -28806,7 +28829,7 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 342,
           "call_type": "method_call"
         },
@@ -29214,7 +29237,7 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 703,
           "call_type": "method_call"
         },
@@ -29499,25 +29522,25 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 837,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 840,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 842,
           "call_type": "method_call"
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 844,
           "call_type": "method_call"
         },
@@ -29626,7 +29649,7 @@
         },
         {
           "name": "write",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 908,
           "call_type": "method_call"
         },
@@ -32513,7 +32536,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 189,
           "call_type": "method_call"
         },
@@ -32555,7 +32578,7 @@
         },
         {
           "name": "read",
-          "file": "built-in",
+          "file": "/opt/anaconda3/lib/python3.13/typing.py",
           "line": 606,
           "call_type": "method_call"
         },
@@ -41240,9 +41263,11 @@
     ],
     "src/model_chorus/core/workflow_runner.py": [
       "logging",
+      "collections.abc.Callable",
       "dataclasses.dataclass",
       "dataclasses.field",
       "datetime.datetime",
+      "enum.Enum",
       "typing.TYPE_CHECKING",
       "typing.Any"
     ],
